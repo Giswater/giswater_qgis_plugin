@@ -86,7 +86,7 @@ COMMIT;
 -- ----------------------------
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_pattern" VALUES ('DAILY', null);
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_pattern" VALUES ('HORLY', null);
+INSERT INTO "SCHEMA_NAME"."inp_typevalue_pattern" VALUES ('HOURLY', null);
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_pattern" VALUES ('MONTHLY', null);
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_pattern" VALUES ('WEEKEND', null);
 COMMIT;
@@ -335,6 +335,14 @@ INSERT INTO "SCHEMA_NAME"."inp_value_raingage" VALUES ('VOLUME');
 COMMIT;
 
 -- ----------------------------
+-- Records of inp_value_status
+-- ----------------------------
+BEGIN;
+INSERT INTO "SCHEMA_NAME"."inp_value_status" VALUES ('ON');
+INSERT INTO "SCHEMA_NAME"."inp_value_status" VALUES ('OFF');
+COMMIT;
+
+-- ----------------------------
 -- Records of inp_value_timserid
 -- ----------------------------
 BEGIN;
@@ -385,7 +393,7 @@ COMMIT;
 -- Records of inp_options
 -- ----------------------------
 BEGIN;
-INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'D-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:01', '01/01/2001', '03:00', '01/01/2001', '00:00', '01/01', '12/31', '10', '00:15:00', '0:05:00', '1:00:00', '0:00:10', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
+INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'D-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:01', '01/01/2001', '03:00', '01/01/2001', '00:00', '01/01', '12/31', '10', '00:01:00', '0:05:00', '1:00:00', '0:00:10', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
 COMMIT;
 
 -- ----------------------------

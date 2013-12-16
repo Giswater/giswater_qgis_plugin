@@ -8,16 +8,24 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 
-
 -- ----------------------------
--- Records of inp_typevalue_curve
+-- Records of inp_type_arc
 -- ----------------------------
 BEGIN;
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_curve" VALUES ('EFFICIENCY');
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_curve" VALUES ('HEADLOSS');
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_curve" VALUES ('PUMP');
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_curve" VALUES ('VOLUME');
+INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('PIPE', 'inp_pipe', null);
+INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('PUMP', 'inp_pump', null);
+INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('VALVE', 'inp_valve', null);
 COMMIT;
+
+-- ----------------------------
+-- Records of inp_type_node
+-- ----------------------------
+BEGIN;
+INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('JUNCTION', 'inp_junction', null);
+INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('RESERVOIR', 'inp_reservoir', null);
+INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('TANK', 'inp_tank', null);
+COMMIT;
+
 
 -- ----------------------------
 -- Records of inp_typevalue_energy
@@ -76,6 +84,16 @@ COMMIT;
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_value_ampm" VALUES ('AM');
 INSERT INTO "SCHEMA_NAME"."inp_value_ampm" VALUES ('PM');
+COMMIT;
+
+-- ----------------------------
+-- Records of inp_value_curve
+-- ----------------------------
+BEGIN;
+INSERT INTO "SCHEMA_NAME"."inp_value_curve" VALUES ('EFFICIENCY');
+INSERT INTO "SCHEMA_NAME"."inp_value_curve" VALUES ('HEADLOSS');
+INSERT INTO "SCHEMA_NAME"."inp_value_curve" VALUES ('PUMP');
+INSERT INTO "SCHEMA_NAME"."inp_value_curve" VALUES ('VOLUME');
 COMMIT;
 
 -- ----------------------------

@@ -11,8 +11,6 @@ This program is free software: you can redistribute it and/or modify it under th
 
 -- Function: SCHEMA_NAME.update_v_inp_edit_junction()
 
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_junction();
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_junction()
   RETURNS trigger AS
 $BODY$
@@ -38,8 +36,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_junction()
-  OWNER TO tecnics;
 
 CREATE TRIGGER "update_v_inp_edit_juction" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_junction"
 FOR EACH ROW
@@ -47,10 +43,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_junction"();
 
   
   
-  
-  -- Function: SCHEMA_NAME.update_v_inp_edit_pipe()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_pipe();
+-- Function: SCHEMA_NAME.update_v_inp_edit_pipe()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_pipe()
   RETURNS trigger AS
@@ -76,8 +69,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_pipe()
-  OWNER TO tecnics;
 
 CREATE TRIGGER "update_v_inp_edit_pipe" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_pipe"
 FOR EACH ROW
@@ -86,9 +77,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_pipe"();
 
   
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_pump()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_pump();
+-- Function: SCHEMA_NAME.update_v_inp_edit_pump()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_pump()
   RETURNS trigger AS
@@ -115,8 +104,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_pump()
-  OWNER TO tecnics;
 
 CREATE TRIGGER "update_v_inp_edit_pump" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_pump"
 FOR EACH ROW
@@ -125,9 +112,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_pump"();
   
   
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_reservoir()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_reservoir();
+-- Function: SCHEMA_NAME.update_v_inp_edit_reservoir()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_reservoir()
   RETURNS trigger AS
@@ -153,8 +138,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_reservoir()
-  OWNER TO tecnics;
 
 CREATE TRIGGER "update_v_inp_edit_reservoir" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_reservoir"
 FOR EACH ROW
@@ -163,9 +146,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_reservoir"();
 
   
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_tank()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_tank();
+-- Function: SCHEMA_NAME.update_v_inp_edit_tank()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_tank()
   RETURNS trigger AS
@@ -191,8 +172,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_tank()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_tank" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_tank"
 FOR EACH ROW
@@ -201,9 +181,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_tank"();
 
 
 
-  -- Function: SCHEMA_NAME.update_v_inp_edit_valve()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_valve();
+-- Function: SCHEMA_NAME.update_v_inp_edit_valve()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_valve()
   RETURNS trigger AS
@@ -229,8 +207,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_valve()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_valve" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_valve"
 FOR EACH ROW

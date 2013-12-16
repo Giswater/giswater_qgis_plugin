@@ -538,7 +538,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_aquifer
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_aquifer" (
-"aquif_id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_aquifer_id_seq'::regclass) NOT NULL,
+"aquif_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".inp_aquifer_id_seq'::regclass) NOT NULL,
 "por" numeric(12,4),
 "wp" numeric(12,4),
 "fc" numeric(12,4),
@@ -630,7 +630,6 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_curve" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_id_seq'::regclass) NOT NULL,
 "curve_id" varchar(16) COLLATE "default",
-"curve_type" varchar(16) COLLATE "default",
 "x_value" numeric(18,6),
 "y_value" numeric(18,6)
 )
@@ -756,7 +755,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_groundwater" (
 "subc_id" varchar(16) COLLATE "default" NOT NULL,
-"aquif_id" int4 NOT NULL,
+"aquif_id" varchar(16) NOT NULL,
 "node_id" varchar(16) COLLATE "default",
 "surfel" numeric(10,4),
 "a1" numeric(10,4),
@@ -1245,7 +1244,6 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_timeseries" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_timeseries_rel_id_seq'::regclass) NOT NULL,
 "timser_id" varchar(16) COLLATE "default",
-"times_type" varchar(18) COLLATE "default",
 "date" varchar(12) COLLATE "default",
 "hour" varchar(10) COLLATE "default",
 "time" varchar(10) COLLATE "default",
@@ -1261,7 +1259,8 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_timser_id" (
 "id" varchar(16) COLLATE "default" NOT NULL,
-"times_type" varchar(20) COLLATE "default"
+"timser_type" varchar(20) COLLATE "default",
+"times_type" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
 
@@ -1627,6 +1626,16 @@ WITH (OIDS=FALSE)
 ;
 
 -- ----------------------------
+-- Table structure for inp_value_status
+-- ----------------------------
+CREATE TABLE "SCHEMA_NAME"."inp_value_status" (
+"id" varchar(6) COLLATE "default" NOT NULL
+)
+WITH (OIDS=FALSE)
+
+;
+
+-- ----------------------------
 -- Table structure for inp_value_timserid
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_value_timserid" (
@@ -1922,7 +1931,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."rpt_high_flowinest_ind" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_high_flowinest_ind_id_seq'::regclass) NOT NULL,
-"result_id" varchar(254) COLLATE "default",
+"result_id" varchar(16) COLLATE "default",
 "text" varchar(255) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -1934,7 +1943,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."rpt_instability_index" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_instability_index_id_seq'::regclass) NOT NULL,
-"result_id" varchar(254) COLLATE "default",
+"result_id" varchar(16) COLLATE "default",
 "text" varchar(255) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -2326,11 +2335,14 @@ WITH (OIDS=FALSE)
 
 ;
 
+
 -- ----------------------------
 -- View structure for v_inp_arc_x_node
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_arc_x_node" AS 
-SELECT node1.arc_id, node1.node_1, node2.node_2, node1.top_elev1, node2.top_elev2, node1.elev1, node2.elev2 FROM (SELECT arc.arc_id, node.top_elev AS top_elev1, ((node.top_elev - node.ymax))::numeric(12,4) AS elev1, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.top_elev AS top_elev2, ((node.top_elev - node.ymax))::numeric(12,4) AS elev2, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+SELECT node1.arc_id, node1.node_1, node2.node_2 FROM (SELECT arc.arc_id, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+
+
 
 -- ----------------------------
 -- View structure for v_inp_buildup
@@ -2372,7 +2384,7 @@ SELECT subcatchment.subc_id, inp_coverage_land_x_subc.landus_id, inp_coverage_la
 -- View structure for v_inp_curve
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_curve" AS 
-SELECT inp_curve.curve_id, inp_curve.curve_type, inp_curve.x_value, inp_curve.y_value FROM SCHEMA_NAME.inp_curve ORDER BY inp_curve.id;
+SELECT inp_curve.id, inp_curve.curve_id, inp_curve_id.curve_type, inp_curve.x_value, inp_curve.y_value FROM SCHEMA_NAME.inp_curve JOIN SCHEMA_NAME.inp_curve_id ON ((inp_curve_id. ID) :: TEXT = (inp_curve.curve_id) :: TEXT)ORDER BY inp_curve.id;
 
 -- ----------------------------
 -- View structure for v_inp_divider_cu
@@ -2432,7 +2444,7 @@ SELECT node.node_id, node.top_elev, node.ymax, inp_junction.y0, inp_junction.ysu
 -- View structure for v_inp_edit_orifice
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_orifice" AS 
-SELECT arc.arc_id, arc.z1, arc.z2, inp_orifice.ori_type, inp_orifice."offset", inp_orifice.cd, inp_orifice.orate, inp_orifice.flap, inp_orifice.shape, inp_orifice.geom1, inp_orifice.geom2, inp_orifice.geom3, inp_orifice.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text)));
+SELECT arc.arc_id, arc.z1, arc.z2, inp_orifice.ori_type, inp_orifice."offset" AS _offset, inp_orifice.cd, inp_orifice.orate, inp_orifice.flap, inp_orifice.shape, inp_orifice.geom1, inp_orifice.geom2, inp_orifice.geom3, inp_orifice.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_edit_outfall
@@ -2444,7 +2456,7 @@ SELECT node.node_id, node.top_elev, node.ymax, inp_outfall.outfall_type, inp_out
 -- View structure for v_inp_edit_outlet
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_outlet" AS 
-SELECT arc.arc_id, arc.z1, arc.z2, inp_outlet.outlet_type, inp_outlet."offset", inp_outlet.curve_id, inp_outlet.cd1, inp_outlet.cd2, inp_outlet.flap, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text)));
+SELECT arc.arc_id, arc.z1, arc.z2, inp_outlet.outlet_type, inp_outlet."offset" AS _offset, inp_outlet.curve_id, inp_outlet.cd1, inp_outlet.cd2, inp_outlet.flap, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_edit_pump
@@ -2462,7 +2474,7 @@ SELECT node.node_id, node.top_elev, node.ymax, (node.top_elev - node.ymax) AS el
 -- View structure for v_inp_edit_weir
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_weir" AS 
-SELECT arc.arc_id, arc.z1, arc.z2, inp_weir.weir_type, inp_weir."offset", inp_weir.cd, inp_weir.ec, inp_weir.cd2, inp_weir.flap, inp_weir.geom1, inp_weir.geom2, inp_weir.geom3, inp_weir.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_weir ON (((arc.arc_id)::text = (inp_weir.arc_id)::text)));
+SELECT arc.arc_id, arc.z1, arc.z2, inp_weir.weir_type, inp_weir."offset" AS _offset, inp_weir.cd, inp_weir.ec, inp_weir.cd2, inp_weir.flap, inp_weir.geom1, inp_weir.geom2, inp_weir.geom3, inp_weir.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_weir ON (((arc.arc_id)::text = (inp_weir.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_evap_co
@@ -2756,19 +2768,19 @@ SELECT 'WINDSPEED'::text AS type_tews, inp_windspeed.wind_type AS type_temo, inp
 -- View structure for v_inp_timser_abs
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_timser_abs" AS 
-SELECT inp_timeseries.timser_id, inp_timeseries.date, inp_timeseries.hour, inp_timeseries.value FROM SCHEMA_NAME.inp_timeseries WHERE ((inp_timeseries.times_type)::text = 'ABSOLUTE'::text) ORDER BY inp_timeseries.id;
+SELECT inp_timeseries.timser_id, inp_timeseries.date, inp_timeseries.hour, inp_timeseries.value FROM (SCHEMA_NAME.inp_timeseries JOIN SCHEMA_NAME.inp_timser_id ON (((inp_timeseries.timser_id)::text = (inp_timser_id.id)::text))) WHERE ((inp_timser_id.times_type)::text = 'ABSOLUTE'::text) ORDER BY inp_timeseries.id;
 
 -- ----------------------------
 -- View structure for v_inp_timser_fl
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_timser_fl" AS 
-SELECT inp_timeseries.timser_id, 'FILE'::text AS type_times, inp_timeseries.fname FROM SCHEMA_NAME.inp_timeseries WHERE ((inp_timeseries.times_type)::text = 'FILE'::text);
+SELECT inp_timeseries.timser_id, 'FILE'::text AS type_times, inp_timeseries.fname FROM (SCHEMA_NAME.inp_timeseries JOIN SCHEMA_NAME.inp_timser_id ON (((inp_timeseries.timser_id)::text = (inp_timser_id.id)::text))) WHERE ((inp_timser_id.times_type)::text = 'FILE'::text);
 
 -- ----------------------------
 -- View structure for v_inp_timser_rel
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_timser_rel" AS 
-SELECT inp_timeseries.timser_id, inp_timeseries."time", inp_timeseries.value FROM SCHEMA_NAME.inp_timeseries WHERE ((inp_timeseries.times_type)::text = 'RELATIVE'::text) ORDER BY inp_timeseries.id;
+SELECT inp_timeseries.timser_id, inp_timeseries."time", inp_timeseries.value FROM (SCHEMA_NAME.inp_timeseries JOIN SCHEMA_NAME.inp_timser_id ON (((inp_timeseries.timser_id)::text = (inp_timser_id.id)::text))) WHERE ((inp_timser_id.times_type)::text = 'RELATIVE'::text) ORDER BY inp_timeseries.id;
 
 -- ----------------------------
 -- View structure for v_inp_transects
@@ -2781,6 +2793,13 @@ SELECT inp_transects.id, inp_transects.text FROM SCHEMA_NAME.inp_transects ORDER
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_treatment" AS 
 SELECT node.node_id, inp_treatment_node_x_pol.poll_id, inp_treatment_node_x_pol.function, sector_selection.sector_id FROM ((SCHEMA_NAME.node JOIN SCHEMA_NAME.inp_treatment_node_x_pol ON (((inp_treatment_node_x_pol.node_id)::text = (node.node_id)::text))) JOIN SCHEMA_NAME.sector_selection ON (((node.sector_id)::text = (sector_selection.sector_id)::text)));
+
+-- ----------------------------
+-- View structure for v_inp_vertice
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_inp_vertice" AS 
+SELECT nextval('"SCHEMA_NAME".inp_vertice_id_seq' :: regclass) AS "id",arc.arc_id, st_x (point) :: NUMERIC (16, 3) AS xcoord,st_y (point) ::NUMERIC (16, 3) AS ycoord FROM((SELECT geom (st_dumppoints(arc.the_geom)) AS point,(st_startpoint(arc.the_geom)) AS startpoint,
+(st_endpoint(arc.the_geom)) AS endpoint, sector_id, arc_id  FROM SCHEMA_NAME.arc) arc JOIN SCHEMA_NAME.sector_selection ON (		((arc.sector_id) :: TEXT = (sector_selection.sector_id) :: TEXT))) WHERE ((point < startpoint OR point > startpoint)AND (point < endpoint OR point > endpoint))ORDER BY id;
 
 -- ----------------------------
 -- View structure for v_inp_washoff
@@ -2808,10 +2827,35 @@ CREATE VIEW "SCHEMA_NAME"."v_rpt_condsurcharge_sum" AS
 SELECT rpt_condsurcharge_sum.id, rpt_condsurcharge_sum.result_id, rpt_condsurcharge_sum.arc_id, rpt_condsurcharge_sum.both_ends, rpt_condsurcharge_sum.upstream, rpt_condsurcharge_sum.dnstream, rpt_condsurcharge_sum.hour_nflow, rpt_condsurcharge_sum.hour_limit, arc.sector_id, arc.the_geom FROM ((SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_condsurcharge_sum ON ((((result_selection.result_id)::text = (rpt_condsurcharge_sum.result_id)::text) AND ((result_selection.result_id)::text = (rpt_condsurcharge_sum.result_id)::text)))) JOIN SCHEMA_NAME.arc ON (((arc.arc_id)::text = (rpt_condsurcharge_sum.arc_id)::text)));
 
 -- ----------------------------
+-- View structure for v_rpt_continuity_errors
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_rpt_continuity_errors" AS 
+SELECT rpt_continuity_errors.id, rpt_continuity_errors.result_id, rpt_continuity_errors.text FROM (SCHEMA_NAME.rpt_continuity_errors JOIN SCHEMA_NAME.result_selection ON (((rpt_continuity_errors.result_id)::text = (result_selection.result_id)::text)));
+
+-- ----------------------------
+-- View structure for v_rpt_critical_elements
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_rpt_critical_elements" AS 
+SELECT rpt_critical_elements.id, rpt_critical_elements.result_id, rpt_critical_elements.text FROM (SCHEMA_NAME.rpt_critical_elements JOIN SCHEMA_NAME.result_selection ON (((rpt_critical_elements.result_id)::text = (result_selection.result_id)::text)));
+
+
+-- ----------------------------
 -- View structure for v_rpt_flowclass_sum
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_rpt_flowclass_sum" AS 
 SELECT rpt_flowclass_sum.id, rpt_flowclass_sum.result_id, rpt_flowclass_sum.arc_id, rpt_flowclass_sum.length, rpt_flowclass_sum.dry, rpt_flowclass_sum.up_dry, rpt_flowclass_sum.down_dry, rpt_flowclass_sum.sub_crit, rpt_flowclass_sum.sub_crit_1, rpt_flowclass_sum.up_crit, arc.sector_id, arc.the_geom FROM ((SCHEMA_NAME.arc JOIN SCHEMA_NAME.rpt_flowclass_sum ON (((rpt_flowclass_sum.arc_id)::text = (arc.arc_id)::text))) JOIN SCHEMA_NAME.result_selection ON (((rpt_flowclass_sum.result_id)::text = (result_selection.result_id)::text)));
+
+-- ----------------------------
+-- View structure for v_rpt_flowrouting_cont
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_rpt_flowrouting_cont" AS 
+SELECT rpt_flowrouting_cont.id, rpt_flowrouting_cont.result_id, rpt_flowrouting_cont.dryw_inf, rpt_flowrouting_cont.wetw_inf, rpt_flowrouting_cont.ground_inf, rpt_flowrouting_cont.rdii_inf, rpt_flowrouting_cont.ext_inf, rpt_flowrouting_cont.ext_out, rpt_flowrouting_cont.int_out, rpt_flowrouting_cont.stor_loss, rpt_flowrouting_cont.initst_vol, rpt_flowrouting_cont.finst_vol, rpt_flowrouting_cont.cont_error FROM (SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_flowrouting_cont ON (((result_selection.result_id)::text = (rpt_flowrouting_cont.result_id)::text)));
+
+-- ----------------------------
+-- View structure for v_rpt_groundwater_cont
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_rpt_groundwater_cont" AS 
+SELECT rpt_groundwater_cont.id, rpt_groundwater_cont.result_id, rpt_groundwater_cont.init_stor, rpt_groundwater_cont.infilt, rpt_groundwater_cont.upzone_et, rpt_groundwater_cont.lowzone_et, rpt_groundwater_cont.deep_perc, rpt_groundwater_cont.groundw_fl, rpt_groundwater_cont.final_stor, rpt_groundwater_cont.cont_error FROM (SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_groundwater_cont ON (((result_selection.result_id)::text = (rpt_groundwater_cont.result_id)::text)));
 
 -- ----------------------------
 -- View structure for v_rpt_high_cont_errors
@@ -2932,6 +2976,7 @@ SELECT rpt_subcatchwashoff_sum.id, rpt_subcatchwashoff_sum.result_id, rpt_subcat
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_rpt_timestep_critelem" AS 
 SELECT rpt_timestep_critelem.id, rpt_timestep_critelem.result_id, rpt_timestep_critelem.text FROM (SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_timestep_critelem ON (((result_selection.result_id)::text = (rpt_timestep_critelem.result_id)::text)));
+
 
 -- ----------------------------
 -- Alter Sequences Owned By 
@@ -3096,6 +3141,11 @@ ALTER TABLE "SCHEMA_NAME"."inp_pattern" ADD PRIMARY KEY ("patter_id");
 -- Primary Key structure for table inp_pollutant
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_pollutant" ADD PRIMARY KEY ("poll_id");
+
+-- ----------------------------
+-- Primary Key structure for table inp_landuses
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_project" ADD PRIMARY KEY ("inp_project_id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_pump
@@ -3531,9 +3581,34 @@ ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA
 ALTER TABLE "SCHEMA_NAME"."inp_conduit" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_curve"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD FOREIGN KEY ("curve_id") REFERENCES "SCHEMA_NAME"."inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_divider"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_divider" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_dwf"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_dwf" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_dwf_pol_x_node"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_dwf_pol_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_inflows"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_inflows" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_inflows_pol_x_node"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_junction"
@@ -3544,6 +3619,25 @@ ALTER TABLE "SCHEMA_NAME"."inp_junction" ADD FOREIGN KEY ("node_id") REFERENCES 
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_orifice"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_orifice" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_options"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("infiltration") REFERENCES "SCHEMA_NAME"."inp_value_options_in" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("allow_ponding") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("normal_flow_limited") REFERENCES "SCHEMA_NAME"."inp_value_options_nfl" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("inertial_damping") REFERENCES "SCHEMA_NAME"."inp_value_options_id" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("skip_steady_state") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_quality") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_routing") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_groundwater") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_snowmelt") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_rainfall") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("force_main_equation") REFERENCES "SCHEMA_NAME"."inp_value_options_fme" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("link_offsets") REFERENCES "SCHEMA_NAME"."inp_value_options_lo" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("flow_routing") REFERENCES "SCHEMA_NAME"."inp_value_options_fr" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("flow_units") REFERENCES "SCHEMA_NAME"."inp_value_options_fu" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_outfall"
@@ -3561,6 +3655,11 @@ ALTER TABLE "SCHEMA_NAME"."inp_outlet" ADD FOREIGN KEY ("arc_id") REFERENCES "SC
 ALTER TABLE "SCHEMA_NAME"."inp_pump" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_rdii"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_rdii" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_report"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_report" ADD FOREIGN KEY ("controls") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -3572,6 +3671,16 @@ ALTER TABLE "SCHEMA_NAME"."inp_report" ADD FOREIGN KEY ("flowstats") REFERENCES 
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_storage"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_storage" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_timeseries"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_timeseries" ADD FOREIGN KEY ("timser_id") REFERENCES "SCHEMA_NAME"."inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_treatment_node_x_pol"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_treatment_node_x_pol" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_weir"

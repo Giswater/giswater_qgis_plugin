@@ -7,9 +7,9 @@ and TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL.
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
--- Function: SCHEMA_NAME.update_v_inp_edit_conduit()
 
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_conduit();
+
+-- Function: SCHEMA_NAME.update_v_inp_edit_conduit()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_conduit()
   RETURNS trigger AS
@@ -33,8 +33,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_conduit()
-  OWNER TO tecnics;
+
   
 CREATE TRIGGER "update_v_inp_edit_conduit" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_conduit"
 FOR EACH ROW
@@ -44,8 +43,6 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_conduit"();
 
   
 -- Function: SCHEMA_NAME.update_v_inp_edit_divider()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_divider();
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_divider()
   RETURNS trigger AS
@@ -69,8 +66,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_divider()
-  OWNER TO tecnics;
 
 CREATE TRIGGER "update_v_inp_edit_divider" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_divider"
 FOR EACH ROW
@@ -79,9 +74,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_divider"();
 
 
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_junction()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_junction();
+-- Function: SCHEMA_NAME.update_v_inp_edit_junction()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_junction()
   RETURNS trigger AS
@@ -105,8 +98,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_junction()
-  OWNER TO tecnics;
 
 
 CREATE TRIGGER "update_v_inp_edit_junction" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_junction"
@@ -116,9 +107,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_junction"();
 
 
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_orifice()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_orifice();
+-- Function: SCHEMA_NAME.update_v_inp_edit_orifice()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_orifice()
   RETURNS trigger AS
@@ -129,7 +118,7 @@ BEGIN
 		INSERT INTO  SCHEMA_NAME.inp_orifice VALUES(NEW.arc_id,NEW.ori_type,NEW.offset,NEW.cd,NEW.orate,NEW.flap,NEW.shape,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,categ_type=NEW.categ_type,systm_type=NEW.systm_type,sector_id=NEW.sector_id,label=NEW.label,t=NEW.t,link=NEW.link,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,categ_type=NEW.categ_type,systm_type=NEW.systm_type,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
 	   UPDATE SCHEMA_NAME.inp_orifice SET arc_id=NEW.arc_id,ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 WHERE arc_id=OLD.arc_id;
        RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
@@ -142,18 +131,16 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_orifice()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_orifice" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_orifice"
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_orifice"();
 
 
-  
-  -- Function: SCHEMA_NAME.update_v_inp_edit_outfall()
 
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_outfall();
+  
+-- Function: SCHEMA_NAME.update_v_inp_edit_outfall()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_outfall()
   RETURNS trigger AS
@@ -164,7 +151,7 @@ BEGIN
 		INSERT INTO  SCHEMA_NAME.inp_outfall VALUES(NEW.node_id,NEW.outfall_type,NEW.stage,NEW.curve_id,NEW.timser_id,NEW.gate);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,elev=NEW.elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 	   UPDATE SCHEMA_NAME.inp_outfall SET node_id=NEW.node_id,outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate WHERE node_id=OLD.node_id;
        RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
@@ -177,8 +164,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_outfall()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_outfall" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_outfall"
 FOR EACH ROW
@@ -186,11 +172,8 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_outfall"();
 
 
 
-
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_outlet()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_outlet();
+-- Function: SCHEMA_NAME.update_v_inp_edit_outlet()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_outlet()
   RETURNS trigger AS
@@ -214,8 +197,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_outlet()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_outlet" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_outlet"
 FOR EACH ROW
@@ -223,11 +205,8 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_outlet"();
 
 
 
-
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_pump()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_pump();
+-- Function: SCHEMA_NAME.update_v_inp_edit_pump()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_pump()
   RETURNS trigger AS
@@ -251,8 +230,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_pump()
-  OWNER TO tecnics;
 
 
 CREATE TRIGGER "update_v_inp_edit_pump" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_pump"
@@ -260,11 +237,8 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_pump"();
   
 
-
   
-  -- Function: SCHEMA_NAME.update_v_inp_edit_storage()
-
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_storage();
+--Function: SCHEMA_NAME.update_v_inp_edit_storage()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_storage()
   RETURNS trigger AS
@@ -288,18 +262,16 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_storage()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_storage" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_storage"
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_storage"();
 
 
-  
-  -- Function: SCHEMA_NAME.update_v_inp_edit_weir()
 
--- DROP FUNCTION SCHEMA_NAME.update_v_inp_edit_weir();
+
+-- Function: SCHEMA_NAME.update_v_inp_edit_weir()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_weir()
   RETURNS trigger AS
@@ -323,8 +295,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.update_v_inp_edit_weir()
-  OWNER TO tecnics;
+
 
 CREATE TRIGGER "update_v_inp_edit_weir" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_weir"
 FOR EACH ROW

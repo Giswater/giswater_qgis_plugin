@@ -8,7 +8,6 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 
-
 -- ----------------------------
 -- Sequence structure for inp_backdrop_id_seq
 -- ----------------------------
@@ -551,10 +550,24 @@ WITH (OIDS=FALSE)
 ;
 
 -- ----------------------------
--- Table structure for inp_typevalue_curve
+-- Table structure for inp_type_arc
 -- ----------------------------
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_curve" (
-"id" varchar(18) COLLATE "default" NOT NULL
+CREATE TABLE "SCHEMA_NAME"."inp_type_arc" (
+"id" varchar(18) COLLATE "default" NOT NULL,
+"table" varchar(30) COLLATE "default",
+"descript" varchar(100) COLLATE "default"
+)
+WITH (OIDS=FALSE)
+
+;
+
+-- ----------------------------
+-- Table structure for inp_type_node
+-- ----------------------------
+CREATE TABLE "SCHEMA_NAME"."inp_type_node" (
+"id" varchar(18) COLLATE "default" NOT NULL,
+"table" varchar(30) COLLATE "default",
+"descript" varchar(100) COLLATE "default"
 )
 WITH (OIDS=FALSE)
 
@@ -616,6 +629,16 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_value_ampm
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_value_ampm" (
+"id" varchar(18) COLLATE "default" NOT NULL
+)
+WITH (OIDS=FALSE)
+
+;
+
+-- ----------------------------
+-- Table structure for inp_value_curve
+-- ----------------------------
+CREATE TABLE "SCHEMA_NAME"."inp_value_curve" (
 "id" varchar(18) COLLATE "default" NOT NULL
 )
 WITH (OIDS=FALSE)
@@ -931,7 +954,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."sector" (
 "sector_id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default",
-"the_geom" geometry (POLYGON, SRID_VALUE)
+"the_geom" geometry (MULTIPOLYGON, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -950,8 +973,15 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 -- View structure for v_inp_arc_x_node
 -- ----------------------------
+--CREATE VIEW "SCHEMA_NAME"."v_inp_arc_x_node" AS 
+--SELECT node1.arc_id, node1.node_1, node2.node_2, node1.top_elev1, node2.top_elev2 FROM (SELECT arc.arc_id, node.elevation AS top_elev1, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.elevation AS top_elev2, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+
+-- ----------------------------
+-- View structure for v_inp_arc_x_node
+-- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_arc_x_node" AS 
-SELECT node1.arc_id, node1.node_1, node2.node_2, node1.top_elev1, node2.top_elev2 FROM (SELECT arc.arc_id, node.elevation AS top_elev1, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.elevation AS top_elev2, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+SELECT node1.arc_id, node1.node_1, node2.node_2 FROM (SELECT arc.arc_id, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+
 
 -- ----------------------------
 -- View structure for v_inp_curve
@@ -1048,7 +1078,7 @@ SELECT inp_pump.arc_id, v_inp_arc_x_node.node_1, v_inp_arc_x_node.node_2, (('POW
 -- ----------------------------
 
 CREATE VIEW "SCHEMA_NAME"."v_inp_report" AS 
-SELECT inp_report.pagesize,inp_report.file,inp_report.status,inp_report.summary,inp_report.energy,inp_report.nodes,inp_report.links,inp_report.elevation,inp_report.demand,inp_report.head,inp_report.pressure,inp_report.quality,inp_report."length",inp_report.diameter,inp_report.flow,inp_report.velocity,inp_report.headloss,inp_report.setting,inp_report.reaction,inp_report.f_factor AS "f-factor" FROM SCHEMA_NAME.inp_report;
+SELECT inp_report.pagesize,inp_report.status,inp_report.summary,inp_report.energy,inp_report.nodes,inp_report.links,inp_report.elevation,inp_report.demand,inp_report.head,inp_report.pressure,inp_report.quality,inp_report."length",inp_report.diameter,inp_report.flow,inp_report.velocity,inp_report.headloss,inp_report.setting,inp_report.reaction,inp_report.f_factor AS "f-factor" FROM SCHEMA_NAME.inp_report;
 
 -- ----------------------------
 -- View structure for v_inp_reservoir
@@ -1084,7 +1114,7 @@ SELECT inp_tank.node_id, node.elevation, inp_tank.initlevel, inp_tank.minlevel, 
 -- View structure for v_inp_times
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_times" AS 
-SELECT inp_times.duration, inp_times.hydraulic_timestep AS "hydraulic timestep", inp_times.quality_timestep AS "quality timestep", inp_times.rule_timestep AS "rule timestep", inp_times.pattern_timestep AS "pattern timestep", inp_times.pattern_start AS "pattern start", inp_times.report_timestep AS "report timestep", inp_times.report_start AS "report_start", inp_times.start_clocktime AS "start clocktime", inp_times.statistic FROM SCHEMA_NAME.inp_times;
+SELECT inp_times.duration, inp_times.hydraulic_timestep AS "hydraulic timestep", inp_times.quality_timestep AS "quality timestep", inp_times.rule_timestep AS "rule timestep", inp_times.pattern_timestep AS "pattern timestep", inp_times.pattern_start AS "pattern start", inp_times.report_timestep AS "report timestep", inp_times.report_start AS "report start", inp_times.start_clocktime AS "start clocktime", inp_times.statistic FROM SCHEMA_NAME.inp_times;
 
 -- ----------------------------
 -- View structure for v_inp_valve_cu
@@ -1114,13 +1144,14 @@ SELECT inp_valve.arc_id, v_inp_arc_x_node.node_1, v_inp_arc_x_node.node_2, arc.d
 -- View structure for v_inp_vertice
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_vertice" AS 
-SELECT arc.arc_id, (st_x((st_dumppoints(arc.the_geom)).geom))::numeric(16,3) AS xcoord, (st_y((st_dumppoints(arc.the_geom)).geom))::numeric(16,3) AS ycoord, sector_selection.sector_id FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.sector_selection ON (((arc.sector_id)::text = (sector_selection.sector_id)::text))) WHERE (st_npoints(arc.the_geom) > 2) ORDER BY arc.arc_id;
+SELECT nextval('"SCHEMA_NAME".inp_vertice_id_seq' :: regclass) AS "id",arc.arc_id, st_x (point) :: NUMERIC (16, 3) AS xcoord,st_y (point) ::NUMERIC (16, 3) AS ycoord FROM((SELECT geom (st_dumppoints(arc.the_geom)) AS point,(st_startpoint(arc.the_geom)) AS startpoint,
+(st_endpoint(arc.the_geom)) AS endpoint, sector_id, arc_id  FROM SCHEMA_NAME.arc) arc JOIN SCHEMA_NAME.sector_selection ON (		((arc.sector_id) :: TEXT = (sector_selection.sector_id) :: TEXT))) WHERE ((point < startpoint OR point > startpoint)AND (point < endpoint OR point > endpoint))ORDER BY id;
 
 -- ----------------------------
 -- View structure for v_rpt_arc
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_rpt_arc" AS 
-SELECT rpt_arc.id, result_selection.result_id, arc.arc_id, max(rpt_arc.flow) AS max_flow, min(rpt_arc.flow) AS min_flow, max(rpt_arc.vel) AS max_vel, min(rpt_arc.vel) AS min_vel, max(rpt_arc.headloss) AS max_headloss, min(rpt_arc.headloss) AS min_headloss, max(rpt_arc.setting) AS max_setting, min(rpt_arc.setting) AS min_setting, max(rpt_arc.reaction) AS max_reaction, min(rpt_arc.reaction) AS min_reaction, max(rpt_arc.ffactor) AS max_ffactor, min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom FROM ((SCHEMA_NAME.arc JOIN SCHEMA_NAME.rpt_arc ON (((rpt_arc.arc_id)::text = (arc.arc_id)::text))) JOIN SCHEMA_NAME.result_selection ON (((rpt_arc.result_id)::text = (result_selection.result_id)::text))) GROUP BY rpt_arc.id, arc.the_geom, arc.arc_id, result_selection.result_id ORDER BY arc.arc_id;
+SELECT arc.arc_id, result_selection.result_id, max(rpt_arc.flow) AS max_flow, min(rpt_arc.flow) AS min_flow, max(rpt_arc.vel) AS max_vel, min(rpt_arc.vel) AS min_vel, max(rpt_arc.headloss) AS max_headloss, min(rpt_arc.headloss) AS min_headloss, max(rpt_arc.setting) AS max_setting, min(rpt_arc.setting) AS min_setting, max(rpt_arc.reaction) AS max_reaction, min(rpt_arc.reaction) AS min_reaction, max(rpt_arc.ffactor) AS max_ffactor, min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom FROM ((SCHEMA_NAME.arc JOIN SCHEMA_NAME.rpt_arc ON (((rpt_arc.arc_id)::text = (arc.arc_id)::text))) JOIN SCHEMA_NAME.result_selection ON (((rpt_arc.result_id)::text = (result_selection.result_id)::text))) GROUP BY arc.arc_id, result_selection.result_id, arc.the_geom ORDER BY arc.arc_id;
 
 -- ----------------------------
 -- View structure for v_rpt_energy_usage
@@ -1138,7 +1169,7 @@ SELECT rpt_hydraulic_status.id, rpt_hydraulic_status.result_id, rpt_hydraulic_st
 -- View structure for v_rpt_node
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_rpt_node" AS 
-SELECT rpt_node.id, result_selection.result_id, node.node_id, max(rpt_node.elevation) AS elevation, max(rpt_node.demand) AS max_demand, min(rpt_node.demand) AS min_demand, max(rpt_node.head) AS max_head, min(rpt_node.head) AS min_head, max(rpt_node.press) AS max_pressure, min(rpt_node.press) AS min_pressure, node.the_geom FROM ((SCHEMA_NAME.node JOIN SCHEMA_NAME.rpt_node ON (((rpt_node.node_id)::text = (node.node_id)::text))) JOIN SCHEMA_NAME.result_selection ON (((rpt_node.result_id)::text = (result_selection.result_id)::text))) GROUP BY rpt_node.id, node.the_geom, node.node_id, result_selection.result_id ORDER BY node.node_id;
+SELECT node.node_id, result_selection.result_id, max(rpt_node.elevation) AS elevation, max(rpt_node.demand) AS max_demand, min(rpt_node.demand) AS min_demand, max(rpt_node.head) AS max_head, min(rpt_node.head) AS min_head, max(rpt_node.press) AS max_pressure, min(rpt_node.press) AS min_pressure, node.the_geom FROM ((SCHEMA_NAME.node JOIN SCHEMA_NAME.rpt_node ON (((rpt_node.node_id)::text = (node.node_id)::text))) JOIN SCHEMA_NAME.result_selection ON (((rpt_node.result_id)::text = (result_selection.result_id)::text))) GROUP BY node.node_id, result_selection.result_id, node.the_geom ORDER BY node.node_id;
 
 -- ----------------------------
 -- Alter Sequences Owned By 
@@ -1210,6 +1241,11 @@ ALTER TABLE "SCHEMA_NAME"."inp_pattern" ADD PRIMARY KEY ("pattern_id");
 ALTER TABLE "SCHEMA_NAME"."inp_pipe" ADD PRIMARY KEY ("arc_id");
 
 -- ----------------------------
+-- Primary Key structure for table inp_landuses
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_project" ADD PRIMARY KEY ("inp_project_id");
+
+-- ----------------------------
 -- Primary Key structure for table inp_pump
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_pump" ADD PRIMARY KEY ("arc_id");
@@ -1255,9 +1291,14 @@ ALTER TABLE "SCHEMA_NAME"."inp_tank" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "SCHEMA_NAME"."inp_times" ADD PRIMARY KEY ("duration");
 
 -- ----------------------------
--- Primary Key structure for table inp_typevalue_curve
+-- Primary Key structure for table inp_type_arc
 -- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_curve" ADD PRIMARY KEY ("id");
+ALTER TABLE "epanet"."inp_type_arc" ADD PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table inp_type_node
+-- ----------------------------
+ALTER TABLE "epanet"."inp_type_node" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_typevalue_energy
@@ -1288,6 +1329,11 @@ ALTER TABLE "SCHEMA_NAME"."inp_typevalue_valve" ADD PRIMARY KEY ("id");
 -- Primary Key structure for table inp_value_ampm
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_value_ampm" ADD PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table inp_value_curve
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_value_curve" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_value_mixing
@@ -1406,6 +1452,10 @@ ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA
 
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."inp_curve"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD FOREIGN KEY ("curve_id") REFERENCES "SCHEMA_NAME"."inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_demand"
@@ -1492,15 +1542,14 @@ ALTER TABLE "SCHEMA_NAME"."inp_times" ADD FOREIGN KEY ("statistic") REFERENCES "
 ALTER TABLE "SCHEMA_NAME"."inp_valve" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
--- Foreign Key structure for table "SCHEMA_NAME"."rpt_arc"
--- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."rpt_arc" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_result_cat" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."node"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- ----------------------------
+-- Foreign Key structure for table "SCHEMA_NAME"."rpt_arc"
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."rpt_arc" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_result_cat" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."rpt_energy_usage"
