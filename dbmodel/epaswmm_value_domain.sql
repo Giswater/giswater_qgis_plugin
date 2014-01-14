@@ -393,7 +393,7 @@ COMMIT;
 -- Records of inp_options
 -- ----------------------------
 BEGIN;
-INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'D-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:01', '01/01/2001', '03:00', '01/01/2001', '00:00', '01/01', '12/31', '10', '00:01:00', '0:05:00', '1:00:00', '0:00:10', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
+INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '24:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:10', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
 COMMIT;
 
 -- ----------------------------

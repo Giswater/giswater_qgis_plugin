@@ -266,10 +266,6 @@ COMMIT;
 -- Records of inp_times
 -- ----------------------------
 BEGIN;
-INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:05', '0:05', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
+INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 COMMIT;
 
-
--- ----------------------------
--- Alter Sequences Owned By 
--- ----------------------------

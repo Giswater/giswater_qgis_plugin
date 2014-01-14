@@ -3145,7 +3145,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_pollutant" ADD PRIMARY KEY ("poll_id");
 -- ----------------------------
 -- Primary Key structure for table inp_landuses
 -- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."inp_project" ADD PRIMARY KEY ("inp_project_id");
+ALTER TABLE "SCHEMA_NAME"."inp_project_id" ADD PRIMARY KEY ("title");
 
 -- ----------------------------
 -- Primary Key structure for table inp_pump

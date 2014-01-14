@@ -970,11 +970,6 @@ WITH (OIDS=FALSE)
 
 ;
 
--- ----------------------------
--- View structure for v_inp_arc_x_node
--- ----------------------------
---CREATE VIEW "SCHEMA_NAME"."v_inp_arc_x_node" AS 
---SELECT node1.arc_id, node1.node_1, node2.node_2, node1.top_elev1, node2.top_elev2 FROM (SELECT arc.arc_id, node.elevation AS top_elev1, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.elevation AS top_elev2, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
 
 -- ----------------------------
 -- View structure for v_inp_arc_x_node
@@ -1243,7 +1238,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_pipe" ADD PRIMARY KEY ("arc_id");
 -- ----------------------------
 -- Primary Key structure for table inp_landuses
 -- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."inp_project" ADD PRIMARY KEY ("inp_project_id");
+ALTER TABLE "SCHEMA_NAME"."inp_project_id" ADD PRIMARY KEY ("title");
 
 -- ----------------------------
 -- Primary Key structure for table inp_pump
@@ -1293,12 +1288,12 @@ ALTER TABLE "SCHEMA_NAME"."inp_times" ADD PRIMARY KEY ("duration");
 -- ----------------------------
 -- Primary Key structure for table inp_type_arc
 -- ----------------------------
-ALTER TABLE "epanet"."inp_type_arc" ADD PRIMARY KEY ("id");
+ALTER TABLE "SCHEMA_NAME"."inp_type_arc" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_type_node
 -- ----------------------------
-ALTER TABLE "epanet"."inp_type_node" ADD PRIMARY KEY ("id");
+ALTER TABLE "SCHEMA_NAME"."inp_type_node" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_typevalue_energy
