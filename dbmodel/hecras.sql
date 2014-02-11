@@ -1575,7 +1575,7 @@ CREATE TABLE "IneffAreas" (
     "Shape_Leng" double precision,
     "Shape_Area" double precision,
     "HydroID" integer,
-    "geom" "public"."geometry"(Polygon)
+    "geom" "public"."geometry"(Polygon, SRID_VALUE)
 );
 
 
@@ -1657,7 +1657,7 @@ CREATE TABLE "LandUse" (
     "OBJECTID" integer,
     "LUCode_1" character varying(32),
     "N_Value_1" double precision,
-    "geom" "public"."geometry"(Polygon)
+    "geom" "public"."geometry"(Polygon, SRID_VALUE)
 );
 
 
@@ -1707,7 +1707,7 @@ CREATE TABLE "NodesTable" (
     "X" double precision,
     "Y" double precision,
     "Z" double precision,
-    "geom" "public"."geometry"(Point),
+    "geom" "public"."geometry"(Point, SRID_VALUE),
     "numarcs" integer
 );
 
@@ -1734,7 +1734,7 @@ CREATE TABLE "banks" (
     "gid" integer NOT NULL,
     "shape_leng" numeric,
     "hydroid" integer DEFAULT "nextval"('"hydroid_seq"'::"regclass") NOT NULL,
-    "geom" "public"."geometry"(MultiLineString)
+    "geom" "public"."geometry"(MultiLineString, SRID_VALUE)
 );
 
 
@@ -1781,7 +1781,7 @@ CREATE TABLE "flowpaths" (
     "gid" integer NOT NULL,
     "shape_leng" numeric,
     "linetype" character varying(7),
-    "geom" "public"."geometry"(MultiLineString)
+    "geom" "public"."geometry"(MultiLineString, SRID_VALUE)
 );
 
 
@@ -1828,49 +1828,6 @@ CREATE TABLE "log" (
     "time" timestamp with time zone
 );
 
-
---
--- TOC entry 237 (class 1259 OID 152040)
--- Name: mdt; Type: TABLE; Schema: SCHEMA_NAME; Owner: -; Tablespace: 
---
-
-CREATE TABLE "mdt" (
-    "rid" integer NOT NULL,
-    "rast" "public"."raster",
-    "filename" "text",
-    CONSTRAINT "enforce_height_rast" CHECK (("public"."st_height"("rast") = 100)),
-    CONSTRAINT "enforce_max_extent_rast" CHECK ("public"."st_coveredby"("public"."st_convexhull"("rast"), '01030000000100000005000000000000003A3A1D410000006073A55141000000003A3A1D4100000060FDA75141000000006A641D4100000060FDA75141000000006A641D410000006073A55141000000003A3A1D410000006073A55141'::"public"."geometry")),
-    CONSTRAINT "enforce_num_bands_rast" CHECK (("public"."st_numbands"("rast") = 1)),
-    CONSTRAINT "enforce_out_db_rast" CHECK (("public"."_raster_constraint_out_db"("rast") = '{f}'::boolean[])),
-    CONSTRAINT "enforce_pixel_types_rast" CHECK (("public"."_raster_constraint_pixel_types"("rast") = '{32BF}'::"text"[])),
-    CONSTRAINT "enforce_same_alignment_rast" CHECK ("public"."st_samealignment"("rast", '0100000000000000000000F03F000000000000F0BF000000003A3A1D4100000060FDA75141000000000000000000000000000000000000000001000100'::"public"."raster")),
-    CONSTRAINT "enforce_scalex_rast" CHECK ((("public"."st_scalex"("rast"))::numeric(16,10) = (1)::numeric(16,10))),
-    CONSTRAINT "enforce_scaley_rast" CHECK ((("public"."st_scaley"("rast"))::numeric(16,10) = ((-1))::numeric(16,10))),
-    CONSTRAINT "enforce_srid_rast" CHECK (("public"."st_srid"("rast") = 0)),
-    CONSTRAINT "enforce_width_rast" CHECK (("public"."st_width"("rast") = 100))
-);
-
-
---
--- TOC entry 238 (class 1259 OID 152056)
--- Name: mdt_rid_seq; Type: SEQUENCE; Schema: SCHEMA_NAME; Owner: -
---
-
-CREATE SEQUENCE "mdt_rid_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- TOC entry 3681 (class 0 OID 0)
--- Dependencies: 238
--- Name: mdt_rid_seq; Type: SEQUENCE OWNED BY; Schema: SCHEMA_NAME; Owner: -
---
-
-ALTER SEQUENCE "mdt_rid_seq" OWNED BY "mdt"."rid";
 
 
 --
@@ -1922,7 +1879,7 @@ CREATE TABLE "river" (
     "arclength" double precision,
     "fromsta" double precision,
     "tosta" double precision,
-    "geom" "public"."geometry"(MultiLineString)
+    "geom" "public"."geometry"(MultiLineString, SRID_VALUE)
 );
 
 
@@ -1943,7 +1900,7 @@ CREATE TABLE "river3d" (
     "arclength" double precision,
     "fromsta" double precision,
     "tosta" double precision,
-    "geom" "public"."geometry"(MultiLineStringZ)
+    "geom" "public"."geometry"(MultiLineStringZ, SRID_VALUE)
 );
 
 
@@ -2036,7 +1993,7 @@ CREATE TABLE "xscutlines" (
     "chlength" double precision,
     "rlength" double precision,
     "nodename" character varying(32),
-    "geom" "public"."geometry"(MultiLineString)
+    "geom" "public"."geometry"(MultiLineString, SRID_VALUE)
 );
 
 
@@ -2068,7 +2025,7 @@ CREATE TABLE "xscutlines3d" (
     "chlength" double precision,
     "rlength" double precision,
     "nodename" character varying(32),
-    "geom" "public"."geometry"(MultiLineStringZ)
+    "geom" "public"."geometry"(MultiLineStringZ, SRID_VALUE)
 );
 
 
@@ -2146,14 +2103,6 @@ ALTER TABLE ONLY "banks" ALTER COLUMN "gid" SET DEFAULT "nextval"('"banks_gid_se
 --
 
 ALTER TABLE ONLY "flowpaths" ALTER COLUMN "gid" SET DEFAULT "nextval"('"flowpaths_gid_seq"'::"regclass");
-
-
---
--- TOC entry 3607 (class 2604 OID 152122)
--- Name: rid; Type: DEFAULT; Schema: SCHEMA_NAME; Owner: -
---
-
-ALTER TABLE ONLY "mdt" ALTER COLUMN "rid" SET DEFAULT "nextval"('"mdt_rid_seq"'::"regclass");
 
 
 --
@@ -2278,15 +2227,6 @@ ALTER TABLE ONLY "linetype"
 
 
 --
--- TOC entry 3648 (class 2606 OID 152147)
--- Name: mdt_pkey; Type: CONSTRAINT; Schema: SCHEMA_NAME; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY "mdt"
-    ADD CONSTRAINT "mdt_pkey" PRIMARY KEY ("rid");
-
-
---
 -- TOC entry 3651 (class 2606 OID 152149)
 -- Name: outfile_pkey; Type: CONSTRAINT; Schema: SCHEMA_NAME; Owner: -; Tablespace: 
 --
@@ -2346,13 +2286,6 @@ CREATE INDEX "banks_geom_gist" ON "banks" USING "gist" ("geom");
 
 CREATE INDEX "flowpaths_geom_gist" ON "flowpaths" USING "gist" ("geom");
 
-
---
--- TOC entry 3649 (class 1259 OID 152160)
--- Name: mdt_rast_gist; Type: INDEX; Schema: SCHEMA_NAME; Owner: -; Tablespace: 
---
-
-CREATE INDEX "mdt_rast_gist" ON "mdt" USING "gist" ("public"."st_convexhull"("rast"));
 
 
 --
@@ -2459,6 +2392,8 @@ CREATE TRIGGER "gr_update_xscutlines_view_trigger" INSTEAD OF INSERT OR DELETE O
 ALTER TABLE ONLY "flowpaths"
     ADD CONSTRAINT "linetype_constraint" FOREIGN KEY ("linetype") REFERENCES "linetype"("name");
 
+	
+SET search_path = public, pg_catalog;
 
 -- Completed on 2013-12-17 23:15:03
 

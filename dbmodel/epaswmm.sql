@@ -513,8 +513,6 @@ CREATE TABLE "SCHEMA_NAME"."cat_arc" (
 "geom3" numeric(12,4) DEFAULT '0',
 "geom4" numeric(12,4) DEFAULT '0',
 "geom_r" varchar(20) COLLATE "default",
-"ts" numeric(12,4),
-"thr" numeric(12,4),
 "short_des" varchar(16) COLLATE "default",
 "descript" varchar(100) COLLATE "default"
 )
