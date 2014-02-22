@@ -1,12 +1,177 @@
 /*
 This file is part of Giswater
-
-﻿Copyright (C) 2013 by GRUPO DE INVESTIGACION EN TRANSPORTE DE SEDIMENTOS (GITS) de la UNIVERSITAT POLITECNICA DE CATALUNYA (UPC)
-and TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL.
-
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
 */
 
+-----------------------------
+-- TOPOLOGY ARC-NODE
+-----------------------------
+
+CREATE FUNCTION "SCHEMA_NAME".update_t_inp_arc_insert() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	nodeRecord1 Record; 
+	nodeRecord2 Record; 
+	z1 double precision;
+	z2 double precision;
+ BEGIN 
+
+	 SELECT * INTO nodeRecord1 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_startpoint(NEW.the_geom), 0.5)
+		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+
+	 SELECT * INTO nodeRecord2 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_endpoint(NEW.the_geom), 0.5)
+		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+
+
+--	Control de lineas de longitud 0
+	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+
+		z1 = (nodeRecord1.top_elev - nodeRecord1.ymax + NEW.z1);
+		z2 = (nodeRecord2.top_elev - nodeRecord2.ymax + NEW.z2);
+
+		IF (z1 > z2) THEN
+
+			NEW.node_1 := nodeRecord1.node_id; 
+			NEW.node_2 := nodeRecord2.node_id;
+
+		ELSE 
+
+			NEW.the_geom := ST_reverse(NEW.the_geom);
+			NEW.node_1 := nodeRecord2.node_id; 
+			NEW.node_2 := nodeRecord1.node_id;
+
+		END IF;
+
+		RETURN NEW;
+
+	ELSE
+		RETURN NULL;
+	END IF;
+
+END; 
+$$;
+
+CREATE TRIGGER update_t_inp_insert_arc BEFORE INSERT OR UPDATE ON "SCHEMA_NAME"."arc"
+FOR EACH ROW 
+EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_arc_insert"();
+
+
+CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$DECLARE 
+	querystring Varchar; 
+	arcrec Record; 
+	nodeRecord1 Record; 
+	nodeRecord2 Record; 
+	z1 double precision;
+	z2 double precision;
+
+BEGIN 
+
+--	Select arcs with start-end on the updated node
+	querystring := 'SELECT * FROM "SCHEMA_NAME"."arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
+
+	FOR arcrec IN EXECUTE querystring
+	LOOP
+
+
+--		Initial and final node of the arc
+		SELECT * INTO nodeRecord1 FROM "SCHEMA_NAME"."node" node WHERE node.node_id = arcrec.node_1;
+		SELECT * INTO nodeRecord2 FROM "SCHEMA_NAME"."node" node WHERE node.node_id = arcrec.node_2;
+
+
+--		Control de lineas de longitud 0
+		IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+
+
+--			Update arc node coordinates, node_id and direction
+			IF (nodeRecord1.node_id = NEW.node_id) THEN
+
+
+--				Coordinates
+				EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+
+
+--				Search the upstream node
+				z1 = (NEW.top_elev - NEW.ymax + arcrec.z1);
+				z2 = (nodeRecord2.top_elev - nodeRecord2.ymax + arcrec.z2);
+
+				IF (z2 > z1) THEN
+
+					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET z1 = ' || arcrec.z2 || ', z2 = ' || arcrec.z1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+				END IF;
+				
+			ELSE
+
+
+--				Coordinates
+				EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+
+
+--				Search the upstream node
+				z1 = (nodeRecord1.top_elev - nodeRecord1.ymax + arcrec.z1);
+				z2 = (NEW.top_elev - NEW.ymax + arcrec.z2);
+
+				IF (z2 > z1) THEN
+
+					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET node_1 = ' || quote_literal(NEW.node_id) || ', node_2 = ' || quote_literal(nodeRecord1.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET z1 = ' || arcrec.z2 || ', z2 = ' || arcrec.z1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+				END IF;
+
+			END IF;
+
+		END IF;
+
+	END LOOP; 
+
+	RETURN NEW;
+
+
+END; $_$;
+
+
+CREATE TRIGGER update_t_inp_update_node AFTER UPDATE ON "SCHEMA_NAME"."node"
+FOR EACH ROW 
+EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_update"();
+
+
+CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_delete() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$ --Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario
+--in "PostGIS 2 Analisis Espacial Avanzado" 
+ 
+DECLARE 
+	querystring Varchar; 
+	arcrec Record; 
+	nodosactualizados Integer; 
+
+BEGIN 
+	nodosactualizados := 0; 
+ 
+	querystring := 'SELECT arc.arc_id AS arc_id FROM "SCHEMA_NAME".arc WHERE arc.node_1 = ' || quote_literal(OLD.node_id) || ' OR arc.node_2 = ' || quote_literal(OLD.node_id); 
+
+	FOR arcrec IN EXECUTE querystring
+	LOOP
+		EXECUTE 'DELETE FROM "SCHEMA_NAME".arc WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+
+	END LOOP; 
+
+	RETURN OLD; 
+END; 
+$$;
+
+CREATE TRIGGER update_t_inp_delete_node BEFORE DELETE ON "SCHEMA_NAME"."node"
+FOR EACH ROW 
+EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_delete"();
+
+------------------------------------
+--  EDITING VIEWS
+------------------------------------
 
 
 -- Function: SCHEMA_NAME.update_v_inp_edit_conduit()
@@ -16,7 +181,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_conduit()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.z1,NEW.z2,NEW.arccat_id,NEW.matcat_id,'CONDUIT'::TEXT,NEW.sector_id,NEW.the_geom);
+    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'', '', NEW.z1,NEW.z2,NEW.arccat_id,NEW.matcat_id,'CONDUIT'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_conduit VALUES(NEW.arc_id,NEW.barrels,NEW.culvert,NEW.kentry,NEW.kexit,NEW.kavg,NEW.flap,NEW.q0,NEW.qmax);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
@@ -114,7 +279,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_orifice()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.z1,NEW.z2,DEFAULT,DEFAULT,'ORIFICE'::TEXT,NEW.sector_id,NEW.the_geom);
+    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'ORIFICE'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_orifice VALUES(NEW.arc_id,NEW.ori_type,NEW.offset,NEW.cd,NEW.orate,NEW.flap,NEW.shape,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
@@ -180,7 +345,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_outlet()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.z1,NEW.z2,DEFAULT,DEFAULT,'OUTLET'::TEXT,NEW.sector_id,NEW.the_geom);
+    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'OUTLET'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_outlet VALUES(NEW.arc_id,NEW.outlet_type,NEW."offset",NEW.curve_id,NEW.cd1,NEW.cd2,NEW.flap);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
@@ -213,7 +378,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_pump()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.z1,NEW.z2,DEFAULT,DEFAULT,'PUMP'::TEXT,NEW.sector_id,NEW.the_geom);
+    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'PUMP'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_pump VALUES(NEW.arc_id,NEW.curve_id,NEW.status,NEW.startup,NEW.shutoff);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
@@ -278,7 +443,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_weir()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.z1,NEW.z2,DEFAULT,DEFAULT,'WEIR'::TEXT,NEW.sector_id,NEW.the_geom);
+    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'WEIR'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_weir VALUES(NEW.arc_id,NEW.weir_type,NEW."offset",NEW.cd,NEW.ec,NEW.cd2,NEW.flap,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN

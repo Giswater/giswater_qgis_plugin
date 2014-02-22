@@ -1,9 +1,5 @@
 /*
 This file is part of Giswater
-
-﻿Copyright (C) 2013 by GRUPO DE INVESTIGACION EN TRANSPORTE DE SEDIMENTOS (GITS) de la UNIVERSITAT POLITECNICA DE CATALUNYA (UPC)
-and TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL.
-
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
@@ -147,6 +143,8 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_result_cat_id_seq"
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."arc" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"node_1" varchar(16) COLLATE "default",
+"node_2" varchar(16) COLLATE "default",
 "diameter" numeric(12,4),
 "matcat_id" varchar(16) COLLATE "default",
 "enet_type" varchar(18) COLLATE "default",
@@ -970,12 +968,12 @@ WITH (OIDS=FALSE)
 
 ;
 
-
 -- ----------------------------
 -- View structure for v_inp_arc_x_node
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_arc_x_node" AS 
-SELECT node1.arc_id, node1.node_1, node2.node_2 FROM (SELECT arc.arc_id, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+SELECT arc_id, node_1, node_2 FROM SCHEMA_NAME.arc;
+
 
 
 -- ----------------------------
@@ -1190,7 +1188,10 @@ ALTER TABLE "SCHEMA_NAME"."inp_backdrop" ADD PRIMARY KEY ("id");
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_controls" ADD PRIMARY KEY ("id");
 
+-- Primary Key structure for table inp_curve
 -- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD PRIMARY KEY ("id");	
+
 -- Primary Key structure for table inp_curve_id
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_curve_id" ADD PRIMARY KEY ("id");
@@ -1444,8 +1445,10 @@ ALTER TABLE "SCHEMA_NAME"."sector_selection" ADD PRIMARY KEY ("sector_id");
 -- Foreign Key structure for table "SCHEMA_NAME"."arc"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_curve"

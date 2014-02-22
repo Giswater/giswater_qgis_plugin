@@ -1,9 +1,5 @@
 /*
 This file is part of Giswater
-
-﻿Copyright (C) 2013 by GRUPO DE INVESTIGACION EN TRANSPORTE DE SEDIMENTOS (GITS) de la UNIVERSITAT POLITECNICA DE CATALUNYA (UPC)
-and TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL.
-
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
@@ -335,6 +331,16 @@ INSERT INTO "SCHEMA_NAME"."inp_value_raingage" VALUES ('VOLUME');
 COMMIT;
 
 -- ----------------------------
+-- Records of inp_value_routeto
+-- ----------------------------
+BEGIN;
+INSERT INTO "SCHEMA_NAME"."inp_value_routeto" VALUES ('OUTLET');
+INSERT INTO "SCHEMA_NAME"."inp_value_routeto" VALUES ('IMPERVIOUS');
+INSERT INTO "SCHEMA_NAME"."inp_value_routeto" VALUES ('PERVIOUS');
+COMMIT;
+
+
+-- ----------------------------
 -- Records of inp_value_status
 -- ----------------------------
 BEGIN;
@@ -393,7 +399,7 @@ COMMIT;
 -- Records of inp_options
 -- ----------------------------
 BEGIN;
-INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '24:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:10', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
+INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '05:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:03', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
 COMMIT;
 
 -- ----------------------------

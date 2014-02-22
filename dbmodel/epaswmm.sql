@@ -1,9 +1,5 @@
 /*
 This file is part of Giswater
-
-﻿Copyright (C) 2013 by GRUPO DE INVESTIGACION EN TRANSPORTE DE SEDIMENTOS (GITS) de la UNIVERSITAT POLITECNICA DE CATALUNYA (UPC)
-and TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL.
-
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
 
@@ -488,8 +484,10 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_timestep_critelem_id_seq"
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."arc" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
-"z1" numeric(12,4),
-"z2" numeric(12,4),
+"node_1" varchar(16) COLLATE "default",
+"node_2" varchar(16) COLLATE "default",
+"z1" numeric(12,4) DEFAULT 0.00,
+"z2" numeric(12,4) DEFAULT 0.00,
 "arccat_id" varchar(16) COLLATE "default",
 "matcat_id" varchar(16) COLLATE "default",
 "swmm_type" varchar(18) COLLATE "default",
@@ -788,7 +786,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_inflows" (
 "timser_id" varchar(16) COLLATE "default",
 "sfactor" numeric(12,4),
 "base" numeric(12,4),
-"patter_id" varchar(16) COLLATE "default"
+"pattern_id" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
 
@@ -805,7 +803,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" (
 "mfactor" numeric(12,4),
 "sfactor" numeric(12,4),
 "base" numeric(12,4),
-"patter_id" varchar(16) COLLATE "default"
+"pattern_id" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
 
@@ -1024,8 +1022,8 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_pattern
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_pattern" (
-"patter_id" varchar(16) COLLATE "default" NOT NULL,
-"patter_type" varchar(16) COLLATE "default",
+"pattern_id" varchar(16) COLLATE "default" NOT NULL,
+"pattern_type" varchar(16) COLLATE "default",
 "factor_1" numeric(12,4),
 "factor_2" numeric(12,4),
 "factor_3" numeric(12,4),
@@ -1174,7 +1172,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_snowpack" (
 "fwf_1" numeric(12,4),
 "sd0_1" numeric(12,4),
 "fw0_1" numeric(12,4),
-"smn0_1" numeric(12,4),
+"snn0_1" numeric(12,4),
 "cmin_2" numeric(12,4),
 "cmax_2" numeric(12,4),
 "tbase_2" numeric(12,4),
@@ -1189,7 +1187,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_snowpack" (
 "sd0_3" numeric(12,4),
 "fw0_3" numeric(12,4),
 "sd100_2" numeric(12,4),
-"dplow" numeric(12,4),
+"sdplow" numeric(12,4),
 "fout" numeric(12,4),
 "fimp" numeric(12,4),
 "fperv" numeric(12,4),
@@ -1624,6 +1622,16 @@ WITH (OIDS=FALSE)
 ;
 
 -- ----------------------------
+-- Table structure for inp_value_routeto
+-- ----------------------------
+CREATE TABLE "SCHEMA_NAME"."inp_value_routeto" (
+"id" varchar(18) COLLATE "default" NOT NULL
+)
+WITH (OIDS=FALSE)
+
+;
+
+-- ----------------------------
 -- Table structure for inp_value_status
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_value_status" (
@@ -1749,8 +1757,8 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."node" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
-"top_elev" numeric(12,4),
-"ymax" numeric(12,4),
+"top_elev" numeric(12,4) DEFAULT 0.00,
+"ymax" numeric(12,4) DEFAULT 0.00,
 "swmm_type" varchar(18) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
 "the_geom" geometry (POINT, SRID_VALUE)
@@ -2338,7 +2346,7 @@ WITH (OIDS=FALSE)
 -- View structure for v_inp_arc_x_node
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_arc_x_node" AS 
-SELECT node1.arc_id, node1.node_1, node2.node_2 FROM (SELECT arc.arc_id, node.node_id AS node_1 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_startpoint(arc.the_geom))) node1, (SELECT arc.arc_id, node.node_id AS node_2 FROM SCHEMA_NAME.arc, SCHEMA_NAME.node WHERE (node.the_geom = st_endpoint(arc.the_geom))) node2 WHERE ((node1.arc_id)::text = (node2.arc_id)::text);
+SELECT arc_id, node_1, node_2 FROM SCHEMA_NAME.arc;
 
 
 
@@ -2466,7 +2474,7 @@ SELECT arc.arc_id, arc.z1, arc.z2, inp_pump.curve_id, inp_pump.status, inp_pump.
 -- View structure for v_inp_edit_storage
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_storage" AS 
-SELECT node.node_id, node.top_elev, node.ymax, (node.top_elev - node.ymax) AS elev, inp_storage.storage_type, inp_storage.curve_id, inp_storage.a1, inp_storage.a2, inp_storage.a0, inp_storage.fevap, inp_storage.sh, inp_storage.hc, inp_storage.imd, inp_storage.y0, inp_storage.ysur, inp_storage.apond, node.sector_id, node.the_geom FROM (SCHEMA_NAME.node JOIN SCHEMA_NAME.inp_storage ON (((node.node_id)::text = (inp_storage.node_id)::text)));
+SELECT node.node_id, node.top_elev, node.ymax, inp_storage.storage_type, inp_storage.curve_id, inp_storage.a1, inp_storage.a2, inp_storage.a0, inp_storage.fevap, inp_storage.sh, inp_storage.hc, inp_storage.imd, inp_storage.y0, inp_storage.ysur, inp_storage.apond, node.sector_id, node.the_geom FROM (SCHEMA_NAME.node JOIN SCHEMA_NAME.inp_storage ON (((node.node_id)::text = (inp_storage.node_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_edit_weir
@@ -2550,13 +2558,13 @@ SELECT subcatchment.subc_id, subcatchment.maxrate, subcatchment.minrate, subcatc
 -- View structure for v_inp_inflows_flow
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_inflows_flow" AS 
-SELECT inp_inflows.node_id, 'FLOW'::text AS type_flow1, inp_inflows.timser_id, 'FLOW'::text AS type_flow2, '1'::text AS type_n1, inp_inflows.sfactor, inp_inflows.base, inp_inflows.patter_id, sector_selection.sector_id FROM ((SCHEMA_NAME.sector_selection JOIN SCHEMA_NAME.node ON (((node.sector_id)::text = (sector_selection.sector_id)::text))) JOIN SCHEMA_NAME.inp_inflows ON (((inp_inflows.node_id)::text = (node.node_id)::text)));
+SELECT inp_inflows.node_id, 'FLOW'::text AS type_flow1, inp_inflows.timser_id, 'FLOW'::text AS type_flow2, '1'::text AS type_n1, inp_inflows.sfactor, inp_inflows.base, inp_inflows.pattern_id, sector_selection.sector_id FROM ((SCHEMA_NAME.sector_selection JOIN SCHEMA_NAME.node ON (((node.sector_id)::text = (sector_selection.sector_id)::text))) JOIN SCHEMA_NAME.inp_inflows ON (((inp_inflows.node_id)::text = (node.node_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_inflows_load
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_inflows_load" AS 
-SELECT inp_inflows_pol_x_node.poll_id, node.node_id, inp_inflows_pol_x_node.timser_id, inp_inflows_pol_x_node.form_type, inp_inflows_pol_x_node.mfactor, inp_inflows_pol_x_node.sfactor, inp_inflows_pol_x_node.base, inp_inflows_pol_x_node.patter_id, sector_selection.sector_id FROM ((SCHEMA_NAME.sector_selection JOIN SCHEMA_NAME.node ON (((node.sector_id)::text = (sector_selection.sector_id)::text))) JOIN SCHEMA_NAME.inp_inflows_pol_x_node ON (((inp_inflows_pol_x_node.node_id)::text = (node.node_id)::text)));
+SELECT inp_inflows_pol_x_node.poll_id, node.node_id, inp_inflows_pol_x_node.timser_id, inp_inflows_pol_x_node.form_type, inp_inflows_pol_x_node.mfactor, inp_inflows_pol_x_node.sfactor, inp_inflows_pol_x_node.base, inp_inflows_pol_x_node.pattern_id, sector_selection.sector_id FROM ((SCHEMA_NAME.sector_selection JOIN SCHEMA_NAME.node ON (((node.sector_id)::text = (sector_selection.sector_id)::text))) JOIN SCHEMA_NAME.inp_inflows_pol_x_node ON (((inp_inflows_pol_x_node.node_id)::text = (node.node_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_junction
@@ -2664,25 +2672,25 @@ SELECT arc.arc_id, v_inp_arc_x_node.node_1, v_inp_arc_x_node.node_2, inp_outlet.
 -- View structure for v_inp_pattern_dl
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_pattern_dl" AS 
-SELECT inp_pattern.patter_id, inp_pattern.patter_type AS type_padl, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.patter_type)::text = 'DAILY'::text);
+SELECT inp_pattern.pattern_id, inp_pattern.pattern_type AS type_padl, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.pattern_type)::text = 'DAILY'::text);
 
 -- ----------------------------
 -- View structure for v_inp_pattern_ho
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_pattern_ho" AS 
-SELECT inp_pattern.patter_id, inp_pattern.patter_type AS type_paho, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7, inp_pattern.factor_8, inp_pattern.factor_9, inp_pattern.factor_10, inp_pattern.factor_11, inp_pattern.factor_12, inp_pattern.factor_13, inp_pattern.factor_14, inp_pattern.factor_15, inp_pattern.factor_16, inp_pattern.factor_17, inp_pattern.factor_18, inp_pattern.factor_19, inp_pattern.factor_20, inp_pattern.factor_21, inp_pattern.factor_22, inp_pattern.factor_23, inp_pattern.factor_24 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.patter_type)::text = 'HOURLY'::text);
+SELECT inp_pattern.pattern_id, inp_pattern.pattern_type AS type_paho, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7, inp_pattern.factor_8, inp_pattern.factor_9, inp_pattern.factor_10, inp_pattern.factor_11, inp_pattern.factor_12, inp_pattern.factor_13, inp_pattern.factor_14, inp_pattern.factor_15, inp_pattern.factor_16, inp_pattern.factor_17, inp_pattern.factor_18, inp_pattern.factor_19, inp_pattern.factor_20, inp_pattern.factor_21, inp_pattern.factor_22, inp_pattern.factor_23, inp_pattern.factor_24 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.pattern_type)::text = 'HOURLY'::text);
 
 -- ----------------------------
 -- View structure for v_inp_pattern_mo
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_pattern_mo" AS 
-SELECT inp_pattern.patter_id, inp_pattern.patter_type AS type_pamo, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7, inp_pattern.factor_8, inp_pattern.factor_9, inp_pattern.factor_10, inp_pattern.factor_11, inp_pattern.factor_12 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.patter_type)::text = 'MONTHLY'::text);
+SELECT inp_pattern.pattern_id, inp_pattern.pattern_type AS type_pamo, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7, inp_pattern.factor_8, inp_pattern.factor_9, inp_pattern.factor_10, inp_pattern.factor_11, inp_pattern.factor_12 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.pattern_type)::text = 'MONTHLY'::text);
 
 -- ----------------------------
 -- View structure for v_inp_pattern_we
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_pattern_we" AS 
-SELECT inp_pattern.patter_id, inp_pattern.patter_type AS type_pawe, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7, inp_pattern.factor_8, inp_pattern.factor_9, inp_pattern.factor_10, inp_pattern.factor_11, inp_pattern.factor_12, inp_pattern.factor_13, inp_pattern.factor_14, inp_pattern.factor_15, inp_pattern.factor_16, inp_pattern.factor_17, inp_pattern.factor_18, inp_pattern.factor_19, inp_pattern.factor_20, inp_pattern.factor_21, inp_pattern.factor_22, inp_pattern.factor_23, inp_pattern.factor_24 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.patter_type)::text = 'WEEKEND'::text);
+SELECT inp_pattern.pattern_id, inp_pattern.pattern_type AS type_pawe, inp_pattern.factor_1, inp_pattern.factor_2, inp_pattern.factor_3, inp_pattern.factor_4, inp_pattern.factor_5, inp_pattern.factor_6, inp_pattern.factor_7, inp_pattern.factor_8, inp_pattern.factor_9, inp_pattern.factor_10, inp_pattern.factor_11, inp_pattern.factor_12, inp_pattern.factor_13, inp_pattern.factor_14, inp_pattern.factor_15, inp_pattern.factor_16, inp_pattern.factor_17, inp_pattern.factor_18, inp_pattern.factor_19, inp_pattern.factor_20, inp_pattern.factor_21, inp_pattern.factor_22, inp_pattern.factor_23, inp_pattern.factor_24 FROM SCHEMA_NAME.inp_pattern WHERE ((inp_pattern.pattern_type)::text = 'WEEKEND'::text);
 
 -- ----------------------------
 -- View structure for v_inp_pump
@@ -2712,7 +2720,7 @@ SELECT raingage.rg_id, raingage.form_type, raingage.intvl, raingage.scf, raingag
 -- View structure for v_inp_snowpack
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_snowpack" AS 
-SELECT inp_snowpack.snow_id, 'PLOWABLE'::text AS type_snpk1, inp_snowpack.cmin_1, inp_snowpack.cmax_1, inp_snowpack.tbase_1, inp_snowpack.fwf_1, inp_snowpack.sd0_1, inp_snowpack.fw0_1, inp_snowpack.smn0_1, 'IMPERVIOUS'::text AS type_snpk2, inp_snowpack.cmin_2, inp_snowpack.cmax_2, inp_snowpack.tbase_2, inp_snowpack.fwf_2, inp_snowpack.sd0_2, inp_snowpack.fw0_2, inp_snowpack.sd100_1, 'PERVIOUS'::text AS type_snpk3, inp_snowpack.cmin_3, inp_snowpack.cmax_3, inp_snowpack.tbase_3, inp_snowpack.fwf_3, inp_snowpack.sd0_3, inp_snowpack.fw0_3, inp_snowpack.sd100_2, 'REMOVAL'::text AS type_snpk4, inp_snowpack.dplow, inp_snowpack.fout, inp_snowpack.fimp, inp_snowpack.fperv, inp_snowpack.fimelt, inp_snowpack.fsub, inp_snowpack.subc_id FROM SCHEMA_NAME.inp_snowpack;
+SELECT inp_snowpack.snow_id, 'PLOWABLE'::text AS type_snpk1, inp_snowpack.cmin_1, inp_snowpack.cmax_1, inp_snowpack.tbase_1, inp_snowpack.fwf_1, inp_snowpack.sd0_1, inp_snowpack.fw0_1, inp_snowpack.snn0_1, 'IMPERVIOUS'::text AS type_snpk2, inp_snowpack.cmin_2, inp_snowpack.cmax_2, inp_snowpack.tbase_2, inp_snowpack.fwf_2, inp_snowpack.sd0_2, inp_snowpack.fw0_2, inp_snowpack.sd100_1, 'PERVIOUS'::text AS type_snpk3, inp_snowpack.cmin_3, inp_snowpack.cmax_3, inp_snowpack.tbase_3, inp_snowpack.fwf_3, inp_snowpack.sd0_3, inp_snowpack.fw0_3, inp_snowpack.sd100_2, 'REMOVAL'::text AS type_snpk4, inp_snowpack.sdplow, inp_snowpack.fout, inp_snowpack.fimp, inp_snowpack.fperv, inp_snowpack.fimelt, inp_snowpack.fsub, inp_snowpack.subc_id FROM SCHEMA_NAME.inp_snowpack;
 
 -- ----------------------------
 -- View structure for v_inp_storage_fc
@@ -3133,7 +3141,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_outlet" ADD PRIMARY KEY ("arc_id");
 -- ----------------------------
 -- Primary Key structure for table inp_pattern
 -- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."inp_pattern" ADD PRIMARY KEY ("patter_id");
+ALTER TABLE "SCHEMA_NAME"."inp_pattern" ADD PRIMARY KEY ("pattern_id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_pollutant
@@ -3571,7 +3579,8 @@ ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD PRIMARY KEY ("subc_id");
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."inp_conduit"

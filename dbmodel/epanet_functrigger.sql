@@ -1,11 +1,140 @@
 /*
 This file is part of Giswater
-
-﻿Copyright (C) 2013 by GRUPO DE INVESTIGACION EN TRANSPORTE DE SEDIMENTOS (GITS) de la UNIVERSITAT POLITECNICA DE CATALUNYA (UPC)
-and TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL.
-
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 */
+
+
+-----------------------------
+-- TOPOLOGY ARC-NODE
+-----------------------------
+
+CREATE FUNCTION "SCHEMA_NAME".update_t_inp_arc_insert() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	nodeRecord1 Record; 
+	nodeRecord2 Record; 
+
+ BEGIN 
+
+	 SELECT * INTO nodeRecord1 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_startpoint(NEW.the_geom), 0.5)
+		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+
+	 SELECT * INTO nodeRecord2 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_endpoint(NEW.the_geom), 0.5)
+		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+
+
+--	Control de lineas de longitud 0
+	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+
+			NEW.node_1 := nodeRecord1.node_id; 
+			NEW.node_2 := nodeRecord2.node_id;
+
+		RETURN NEW;
+
+	ELSE
+		RETURN NULL;
+	END IF;
+
+END; 
+$$;
+
+CREATE TRIGGER update_t_inp_insert_arc BEFORE INSERT OR UPDATE ON "SCHEMA_NAME"."arc"
+FOR EACH ROW 
+EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_arc_insert"();
+
+
+
+CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$DECLARE 
+	querystring Varchar; 
+	arcrec Record; 
+	nodeRecord1 Record; 
+	nodeRecord2 Record; 
+
+BEGIN 
+
+--	Select arcs with start-end on the updated node
+	querystring := 'SELECT * FROM "SCHEMA_NAME"."arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
+
+	FOR arcrec IN EXECUTE querystring
+	LOOP
+
+
+--		Initial and final node of the arc
+		SELECT * INTO nodeRecord1 FROM "SCHEMA_NAME"."node" node WHERE node.node_id = arcrec.node_1;
+		SELECT * INTO nodeRecord2 FROM "SCHEMA_NAME"."node" node WHERE node.node_id = arcrec.node_2;
+
+
+--		Control de lineas de longitud 0
+		IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
+
+
+--			Update arc node coordinates, node_id and direction
+			IF (nodeRecord1.node_id = NEW.node_id) THEN
+
+
+--				Coordinates
+				EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+
+			ELSE
+
+--				Coordinates
+				EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
+
+			END IF;
+
+		END IF;
+
+	END LOOP; 
+
+	RETURN NEW;
+
+
+END; $_$;
+
+
+CREATE TRIGGER update_t_inp_update_node AFTER UPDATE ON "SCHEMA_NAME"."node"
+FOR EACH ROW 
+EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_update"();
+
+
+
+
+CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_delete() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$ --Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario
+--in "PostGIS 2 Analisis Espacial Avanzado" 
+ 
+DECLARE 
+	querystring Varchar; 
+	arcrec Record; 
+	nodosactualizados Integer; 
+
+BEGIN 
+	nodosactualizados := 0; 
+ 
+	querystring := 'SELECT arc.arc_id AS arc_id FROM "SCHEMA_NAME".arc WHERE arc.node_1 = ' || quote_literal(OLD.node_id) || ' OR arc.node_2 = ' || quote_literal(OLD.node_id); 
+
+	FOR arcrec IN EXECUTE querystring
+	LOOP
+		EXECUTE 'DELETE FROM "SCHEMA_NAME".arc WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+
+	END LOOP; 
+
+	RETURN OLD; 
+END; 
+$$;
+
+CREATE TRIGGER update_t_inp_delete_node BEFORE DELETE ON "SCHEMA_NAME"."node"
+FOR EACH ROW 
+EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_delete"();
+
+
+------------------------------------
+--  EDITING VIEWS
+------------------------------------
 
 
 
@@ -50,7 +179,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_pipe()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.diameter,NEW.matcat_id,'PIPE'::TEXT,NEW.sector_id,NEW.the_geom);
+INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.diameter,NEW.matcat_id,'PIPE'::TEXT,NEW.sector_id,NEW.the_geom);
 INSERT INTO  SCHEMA_NAME.inp_pipe VALUES(NEW.arc_id,NEW.minorloss,NEW.status);
 		RETURN NEW;
     
@@ -85,7 +214,7 @@ $BODY$
 BEGIN
 
     IF TG_OP = 'INSERT' THEN
-INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.diameter,NEW.matcat_id,'PUMP'::TEXT,NEW.sector_id,NEW.the_geom);
+INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.diameter,NEW.matcat_id,'PUMP'::TEXT,NEW.sector_id,NEW.the_geom);
 INSERT INTO  SCHEMA_NAME.inp_pump VALUES(NEW.arc_id,NEW.power,NEW.curve_id,NEW.speed,NEW.pattern);
 		RETURN NEW;
 
@@ -188,7 +317,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_valve()
 $BODY$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,NEW.diameter,NEW.matcat_id,'VALVE'::TEXT, NEW.sector_id,NEW.the_geom);
+INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.diameter,NEW.matcat_id,'VALVE'::TEXT, NEW.sector_id,NEW.the_geom);
 INSERT INTO  SCHEMA_NAME.inp_valve VALUES(NEW.arc_id,NEW.valv_type,NEW.pressure,NEW.flow,NEW.coef_loss,NEW.curve_id,NEW.minorloss,NEW.status);
 		RETURN NEW;
 
