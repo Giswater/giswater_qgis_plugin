@@ -1,10 +1,8 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 9.2.4
--- Dumped by pg_dump version 9.2.4
--- Started on 2013-12-17 23:15:02
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
