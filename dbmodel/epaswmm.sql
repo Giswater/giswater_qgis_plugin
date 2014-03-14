@@ -508,9 +508,9 @@ CREATE TABLE "SCHEMA_NAME"."cat_arc" (
 "tsect_id" varchar(16) COLLATE "default",
 "curve_id" varchar(16) COLLATE "default",
 "geom1" numeric(12,4),
-"geom2" numeric(12,4) DEFAULT '0',
-"geom3" numeric(12,4) DEFAULT '0',
-"geom4" numeric(12,4) DEFAULT '0',
+"geom2" numeric(12,4) DEFAULT 0.00,
+"geom3" numeric(12,4) DEFAULT 0.00,
+"geom4" numeric(12,4) DEFAULT 0.00,
 "geom_r" varchar(20) COLLATE "default",
 "short_des" varchar(16) COLLATE "default",
 "descript" varchar(100) COLLATE "default"
@@ -1061,6 +1061,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_pollutant" (
 "poll_id" varchar(16) COLLATE "default" NOT NULL,
 "units_type" varchar(18) COLLATE "default",
 "crain" numeric(12,4),
+
 "cgw" numeric(12,4),
 "cii" numeric(12,4),
 "kd" numeric(12,4),
@@ -2320,9 +2321,9 @@ CREATE TABLE "SCHEMA_NAME"."subcatchment" (
 "nperv" numeric(12,4),
 "simp" numeric(12,4),
 "sperv" numeric(12,4),
-"zero" numeric(12,4),
+"zero" numeric(12,4) DEFAULT 0.00,
 "routeto" varchar(20) COLLATE "default",
-"rted" numeric(12,4),
+"rted" numeric(12,4) DEFAULT 100.00,
 "maxrate" numeric(12,4),
 "minrate" numeric(12,4),
 "decay" numeric(12,4),
@@ -2910,7 +2911,7 @@ SELECT rpt_nodeinflow_sum.id, rpt_nodeinflow_sum.result_id, rpt_nodeinflow_sum.n
 -- View structure for v_rpt_nodesurcharge_sum
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_rpt_nodesurcharge_sum" AS 
-SELECT rpt_nodesurcharge_sum.id, rpt_nodesurcharge_sum.result_id, rpt_nodesurcharge_sum.swnod_type, rpt_nodesurcharge_sum.hour_surch, rpt_nodesurcharge_sum.max_height, rpt_nodesurcharge_sum.min_depth, node.sector_id, node.the_geom FROM SCHEMA_NAME.node, (SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_nodesurcharge_sum ON (((result_selection.result_id)::text = (rpt_nodesurcharge_sum.result_id)::text)));
+SELECT rpt_nodesurcharge_sum.id, rpt_nodesurcharge_sum.result_id, rpt_nodesurcharge_sum.swnod_type, rpt_nodesurcharge_sum.hour_surch, rpt_nodesurcharge_sum.max_height, rpt_nodesurcharge_sum.min_depth, node.sector_id, node.the_geom 	FROM ((SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_nodesurcharge_sum ON (((result_selection.result_id)::text = (rpt_nodesurcharge_sum.result_id)::text))) JOIN SCHEMA_NAME.node ON (((rpt_nodesurcharge_sum.node_id)::text = (node.node_id)::text)));
 
 -- ----------------------------
 -- View structure for v_rpt_outfallflow_sum

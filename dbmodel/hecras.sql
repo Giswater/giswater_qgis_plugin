@@ -735,7 +735,9 @@ CREATE FUNCTION "gr_river_2dto3d"() RETURNS "text"
     AS 'DECLARE
 	river_line geometry;
 	line3d	geometry;
+	line3dSRID geometry;
 	row_id integer;
+	XS3dSRID integer;
 
 --	All fields to be copied
 	shape_leng numeric;
@@ -787,8 +789,11 @@ BEGIN
 --		Store the resulting 3d line
 		SELECT INTO line3d ST_multi(st_makeline) FROM line3d_CTE;
 
+		SELECT INTO XS3dSRID Find_SRID(''SCHEMA_NAME'', ''river3d'', ''geom'');
+		SELECT INTO line3dSRID ST_SetSRID(line3d,XS3dSRID);
+
 --		Insert 3d line in xscutlines3d
-		INSERT INTO SCHEMA_NAME.river3d (shape_leng, riv2did, hydroid, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, geom) VALUES (shape_leng, hydroid, row_id, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta,line3d);
+		INSERT INTO SCHEMA_NAME.river3d (shape_leng, riv2did, hydroid, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, geom) VALUES (shape_leng, hydroid, row_id, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, line3dSRID);
 		
 --		Insert result into outfile table
 --		INSERT INTO SCHEMA_NAME.outfile SELECT (''pp1 '' || ST_X(intersectMidpoints.geom) || ST_X(intersectMidpoints.geom) || intersectMidpoints.val || ''pp2'' || ''pp3'') FROM intersectMidpoints;
@@ -1277,7 +1282,10 @@ CREATE FUNCTION "gr_xs_2dto3d"() RETURNS "text"
     AS 'DECLARE
 	xscutlines_line geometry;
 	line3d	geometry;
+	line3dSRID geometry;
 	row_id integer;
+	XS3dSRID integer;
+
 
 --	All fields to be copied
 	shape_leng numeric;
@@ -1333,8 +1341,11 @@ BEGIN
 --		Store the resulting 3d line
 		SELECT INTO line3d ST_multi(st_makeline) FROM line3d_CTE;
 
+		SELECT INTO XS3dSRID Find_SRID(''SCHEMA_NAME'', ''xscutlines3d'', ''geom'');
+		SELECT INTO line3dSRID ST_SetSRID(line3d,XS3dSRID);
+
 --		Insert 3d line in xscutlines3d
-		INSERT INTO SCHEMA_NAME.xscutlines3d (shape_leng, xs2did, hydroid, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, geom) VALUES (shape_leng, hydroid, row_id, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename,line3d);
+		INSERT INTO SCHEMA_NAME.xscutlines3d (shape_leng, xs2did, hydroid, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, geom) VALUES (shape_leng, hydroid, row_id, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, line3dSRID);
 		
 
 	END LOOP;
@@ -1813,6 +1824,16 @@ ALTER SEQUENCE "flowpaths_gid_seq" OWNED BY "flowpaths"."gid";
 CREATE TABLE "linetype" (
     "name" character varying(7) NOT NULL
 );
+
+--
+-- TOC entry 3342 (class 0 OID 20999)
+-- Dependencies: 205
+-- Data for Name: linetype; Type: TABLE DATA; Schema: example_1; Owner: postgres
+--
+
+INSERT INTO linetype (name) VALUES ('right');
+INSERT INTO linetype (name) VALUES ('channel');
+INSERT INTO linetype (name) VALUES ('left');
 
 
 --
