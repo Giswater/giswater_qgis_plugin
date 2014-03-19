@@ -250,7 +250,7 @@ BEGIN
 		INSERT INTO  SCHEMA_NAME.inp_junction VALUES(NEW.node_id,NEW.y0,NEW.ysur,NEW.apond);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,elev=NEW.elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 	   UPDATE SCHEMA_NAME.inp_junction SET node_id=NEW.node_id,y0=NEW.y0,ysur=NEW.ysur,apond=NEW.apond WHERE node_id=OLD.node_id;
        RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
@@ -414,7 +414,7 @@ BEGIN
 		INSERT INTO  SCHEMA_NAME.inp_storage VALUES(NEW.node_id,NEW.storage_type,NEW.curve_id,NEW.a1,NEW.a2,NEW.a0,NEW.fevap,NEW.sh,NEW.hc,NEW.imd,NEW.y0,NEW.ysur,NEW.apond);
 		RETURN NEW;
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,elev=NEW.elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 	   UPDATE SCHEMA_NAME.inp_storage SET node_id=NEW.node_id, storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
        RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
@@ -465,6 +465,7 @@ $BODY$
 CREATE TRIGGER "update_v_inp_edit_weir" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_weir"
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_weir"();
+
 
 
 
