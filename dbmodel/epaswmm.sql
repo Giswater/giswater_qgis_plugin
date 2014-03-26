@@ -896,7 +896,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_loadings_pol_x_subc" (
 "poll_id" varchar(16) COLLATE "default" NOT NULL,
 "subc_id" varchar(16) COLLATE "default" NOT NULL,
-"ibuilddup" numeric(12,4)
+"ibuildup" numeric(12,4)
 )
 WITH (OIDS=FALSE)
 
@@ -980,9 +980,9 @@ CREATE TABLE "SCHEMA_NAME"."inp_orifice" (
 "flap" varchar(3) COLLATE "default",
 "shape" varchar(18) COLLATE "default",
 "geom1" numeric(12,4),
-"geom2" numeric(12,4),
-"geom3" numeric,
-"geom4" numeric
+"geom2" numeric(12,4) DEFAULT 0.00,
+"geom3" numeric(12,4) DEFAULT 0.00,
+"geom4" numeric(12,4) DEFAULT 0.00
 )
 WITH (OIDS=FALSE)
 
@@ -1380,6 +1380,9 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 -- Table structure for inp_typevalue_raingage
 -- ----------------------------
+
+
+
 CREATE TABLE "SCHEMA_NAME"."inp_typevalue_raingage" (
 "id" varchar(18) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default"
@@ -1723,9 +1726,9 @@ CREATE TABLE "SCHEMA_NAME"."inp_weir" (
 "cd2" numeric(12,4),
 "flap" varchar(3) COLLATE "default",
 "geom1" numeric(12,4),
-"geom2" numeric(12,4),
-"geom3" numeric(12,4),
-"geom4" numeric(12,4)
+"geom2" numeric(12,4) DEFAULT 0.00,
+"geom3" numeric(12,4) DEFAULT 0.00,
+"geom4" numeric(12,4) DEFAULT 0.00
 )
 WITH (OIDS=FALSE)
 
@@ -1782,7 +1785,6 @@ CREATE TABLE "SCHEMA_NAME"."raingage" (
 "fname" varchar(254) COLLATE "default",
 "sta" varchar(12) COLLATE "default",
 "units" varchar(3) COLLATE "default",
-"link" varchar(254) COLLATE "default",
 "the_geom" geometry (POINT, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
@@ -2336,7 +2338,6 @@ CREATE TABLE "SCHEMA_NAME"."subcatchment" (
 "conduct_2" numeric(12,4),
 "drytime_2" numeric(12,4),
 "sector_id" varchar(30) COLLATE "default",
-"link" varchar(254) COLLATE "default",
 "the_geom" geometry (MULTIPOLYGON, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
@@ -2438,6 +2439,7 @@ SELECT arc.arc_id, arc.z1, arc.z2, arc.arccat_id, arc.matcat_id, inp_conduit.bar
 
 -- ----------------------------
 -- View structure for v_inp_edit_divider
+
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_divider" AS 
 SELECT node.node_id, node.top_elev, node.ymax, inp_divider.divider_type, inp_divider.arc_id, inp_divider.curve_id, inp_divider.qmin, inp_divider.ht, inp_divider.cd, inp_divider.y0, inp_divider.ysur, inp_divider.apond, node.sector_id, node.the_geom FROM (SCHEMA_NAME.node JOIN SCHEMA_NAME.inp_divider ON (((node.node_id)::text = (inp_divider.node_id)::text)));
@@ -2596,7 +2598,7 @@ SELECT inp_lidusage_subc_x_lidco.subc_id, inp_lidusage_subc_x_lidco.lidco_id, in
 -- View structure for v_inp_loadings
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_loadings" AS 
-SELECT inp_loadings_pol_x_subc.poll_id, inp_loadings_pol_x_subc.subc_id, inp_loadings_pol_x_subc.ibuilddup AS ib, sector_selection.sector_id FROM ((SCHEMA_NAME.sector_selection JOIN SCHEMA_NAME.subcatchment ON (((subcatchment.sector_id)::text = (sector_selection.sector_id)::text))) JOIN SCHEMA_NAME.inp_loadings_pol_x_subc ON (((inp_loadings_pol_x_subc.subc_id)::text = (subcatchment.subc_id)::text)));
+SELECT inp_loadings_pol_x_subc.poll_id, inp_loadings_pol_x_subc.subc_id, inp_loadings_pol_x_subc.ibuildup, sector_selection.sector_id FROM ((SCHEMA_NAME.sector_selection JOIN SCHEMA_NAME.subcatchment ON (((subcatchment.sector_id)::text = (sector_selection.sector_id)::text))) JOIN SCHEMA_NAME.inp_loadings_pol_x_subc ON (((inp_loadings_pol_x_subc.subc_id)::text = (subcatchment.subc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_losses
@@ -3201,6 +3203,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_timeseries" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_timser_id" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
+
 -- Primary Key structure for table inp_transects
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."inp_transects" ADD PRIMARY KEY ("id");
@@ -3840,5 +3843,7 @@ ALTER TABLE "SCHEMA_NAME"."rpt_timestep_critelem" ADD FOREIGN KEY ("result_id") 
 -- Foreign Key structure for table "SCHEMA_NAME"."subcatchment"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
 
 
