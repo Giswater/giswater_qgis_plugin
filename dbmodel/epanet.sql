@@ -428,7 +428,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_reactions_gl
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_reactions_gl" (
-"react_type" varchar(18) COLLATE "default" NOT NULL,
+"react_type" varchar(30) COLLATE "default" NOT NULL,
 "parameter" varchar(20) COLLATE "default",
 "value" numeric
 )
@@ -596,7 +596,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_typevalue_reactions_gl
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_typevalue_reactions_gl" (
-"id" varchar(18) COLLATE "default" NOT NULL
+"id" varchar(30) COLLATE "default" NOT NULL
 )
 WITH (OIDS=FALSE)
 
@@ -1564,3 +1564,4 @@ ALTER TABLE "SCHEMA_NAME"."rpt_hydraulic_status" ADD FOREIGN KEY ("result_id") R
 -- Foreign Key structure for table "SCHEMA_NAME"."rpt_node"
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."rpt_node" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_result_cat" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
+

@@ -100,7 +100,7 @@ COMMIT;
 -- Records of inp_typevalue_storage
 -- ----------------------------
 BEGIN;
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_storage" VALUES ('FUCTIONAL', null);
+INSERT INTO "SCHEMA_NAME"."inp_typevalue_storage" VALUES ('FUNCTIONAL', null);
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_storage" VALUES ('TABULAR', null);
 COMMIT;
 
@@ -384,7 +384,7 @@ COMMIT;
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_value_weirs" VALUES ('SIDEFLOW', 'RECT_OPEN');
 INSERT INTO "SCHEMA_NAME"."inp_value_weirs" VALUES ('TRAPEZOIDAL', 'TRAPEZOIDAL');
-INSERT INTO "SCHEMA_NAME"."inp_value_weirs" VALUES ('TRASVERSE', 'RECT_OPEN');
+INSERT INTO "SCHEMA_NAME"."inp_value_weirs" VALUES ('TRANSVERSE', 'RECT_OPEN');
 INSERT INTO "SCHEMA_NAME"."inp_value_weirs" VALUES ('V-NOTCH', 'TRIANGULAR');
 COMMIT;
 
@@ -414,5 +414,6 @@ COMMIT;
 -- ----------------------------
 -- Alter Sequences Owned By 
 -- ----------------------------
+
 
 

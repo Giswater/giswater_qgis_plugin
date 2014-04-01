@@ -30,7 +30,6 @@ COMMIT;
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_energy" VALUES ('DEMAND CHARGE');
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_energy" VALUES ('GLOBAL');
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_energy" VALUES ('PUMP');
 COMMIT;
 
 -- ----------------------------
@@ -48,9 +47,9 @@ COMMIT;
 -- ----------------------------
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_reactions_gl" VALUES ('GLOBAL');
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_reactions_gl" VALUES ('LIMITING');
+INSERT INTO "SCHEMA_NAME"."inp_typevalue_reactions_gl" VALUES ('LIMITING POTENTIAL');
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_reactions_gl" VALUES ('ORDER');
-INSERT INTO "SCHEMA_NAME"."inp_typevalue_reactions_gl" VALUES ('ROUGHNESS');
+INSERT INTO "SCHEMA_NAME"."inp_typevalue_reactions_gl" VALUES ('ROUGHNESS CORRELATION');
 COMMIT;
 
 -- ----------------------------
@@ -192,8 +191,6 @@ COMMIT;
 -- ----------------------------
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_value_reactions_gl" VALUES ('BULK');
-INSERT INTO "SCHEMA_NAME"."inp_value_reactions_gl" VALUES ('CORRELATION');
-INSERT INTO "SCHEMA_NAME"."inp_value_reactions_gl" VALUES ('POTENTIAL');
 INSERT INTO "SCHEMA_NAME"."inp_value_reactions_gl" VALUES ('TANK');
 INSERT INTO "SCHEMA_NAME"."inp_value_reactions_gl" VALUES ('WALL');
 COMMIT;
@@ -265,4 +262,5 @@ COMMIT;
 BEGIN;
 INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 COMMIT;
+
 
