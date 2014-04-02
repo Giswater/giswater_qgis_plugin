@@ -1383,6 +1383,7 @@ WITH (OIDS=FALSE)
 
 
 
+
 CREATE TABLE "SCHEMA_NAME"."inp_typevalue_raingage" (
 "id" varchar(18) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default"
@@ -2454,7 +2455,7 @@ SELECT node.node_id, node.top_elev, node.ymax, inp_junction.y0, inp_junction.ysu
 -- View structure for v_inp_edit_orifice
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_orifice" AS 
-SELECT arc.arc_id, arc.z1, arc.z2, inp_orifice.ori_type, inp_orifice."offset" AS _offset, inp_orifice.cd, inp_orifice.orate, inp_orifice.flap, inp_orifice.shape, inp_orifice.geom1, inp_orifice.geom2, inp_orifice.geom3, inp_orifice.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text)));
+SELECT arc.arc_id, arc.z1, arc.z2, inp_orifice.ori_type, inp_orifice."offset", inp_orifice.cd, inp_orifice.orate, inp_orifice.flap, inp_orifice.shape, inp_orifice.geom1, inp_orifice.geom2, inp_orifice.geom3, inp_orifice.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_edit_outfall
@@ -2466,7 +2467,7 @@ SELECT node.node_id, node.top_elev, node.ymax, inp_outfall.outfall_type, inp_out
 -- View structure for v_inp_edit_outlet
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_outlet" AS 
-SELECT arc.arc_id, arc.z1, arc.z2, inp_outlet.outlet_type, inp_outlet."offset" AS _offset, inp_outlet.curve_id, inp_outlet.cd1, inp_outlet.cd2, inp_outlet.flap, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text)));
+SELECT arc.arc_id, arc.z1, arc.z2, inp_outlet.outlet_type, inp_outlet."offset", inp_outlet.curve_id, inp_outlet.cd1, inp_outlet.cd2, inp_outlet.flap, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_edit_pump
@@ -2484,7 +2485,7 @@ SELECT node.node_id, node.top_elev, node.ymax, inp_storage.storage_type, inp_sto
 -- View structure for v_inp_edit_weir
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_edit_weir" AS 
-SELECT arc.arc_id, arc.z1, arc.z2, inp_weir.weir_type, inp_weir."offset" AS _offset, inp_weir.cd, inp_weir.ec, inp_weir.cd2, inp_weir.flap, inp_weir.geom1, inp_weir.geom2, inp_weir.geom3, inp_weir.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_weir ON (((arc.arc_id)::text = (inp_weir.arc_id)::text)));
+SELECT arc.arc_id, arc.z1, arc.z2, inp_weir.weir_type, inp_weir."offset", inp_weir.cd, inp_weir.ec, inp_weir.cd2, inp_weir.flap, inp_weir.geom1, inp_weir.geom2, inp_weir.geom3, inp_weir.geom4, arc.sector_id, arc.the_geom FROM (SCHEMA_NAME.arc JOIN SCHEMA_NAME.inp_weir ON (((arc.arc_id)::text = (inp_weir.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_inp_evap_co
