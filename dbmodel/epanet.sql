@@ -4,6 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- ----------------------------
+-- Sequence structure for version_seq
+-- --------------------------
+CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
+ INCREMENT 1
+ MINVALUE 1
+ MAXVALUE 9223372036854775807
+ START 1
+ CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_backdrop_id_seq
@@ -139,6 +148,20 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_result_cat_id_seq"
  START 1
  CACHE 1;
 
+-- ----------------------------
+-- Table structure for version
+-- ----------------------------
+CREATE TABLE "SCHEMA_NAME"."version" (
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
+"giswater" varchar(16) COLLATE "default",
+"wsoftware" varchar(16) COLLATE "default",
+"postgres" varchar(16) COLLATE "default",
+"postgis" varchar(16) COLLATE "default",
+"date" timestamp(6) DEFAULT now()
+)
+WITH (OIDS=FALSE)
+;
+ 
 -- ----------------------------
 -- Table structure for arc
 -- ----------------------------

@@ -6,6 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
+-- Sequence structure for version_seq
+-- ---------------------------
+CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
+ INCREMENT 1
+ MINVALUE 1
+ MAXVALUE 9223372036854775807
+ START 1
+ CACHE 1;
+
+-- ----------------------------
 -- Sequence structure for inp_aquifer_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_aquifer_id_seq"
@@ -454,6 +464,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_storagevol_sum_id_seq"
 -- Sequence structure for rpt_subcatchwashoff_sum_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."rpt_subcatchwashoff_sum_id_seq"
+
  INCREMENT 1
  MINVALUE 1
  MAXVALUE 9223372036854775807
@@ -479,6 +490,20 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_timestep_critelem_id_seq"
  MAXVALUE 9223372036854775807
  START 1
  CACHE 1;
+ 
+  -- ----------------------------
+-- Table structure for version
+-- ----------------------------
+CREATE TABLE "SCHEMA_NAME"."version" (
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
+"giswater" varchar(16) COLLATE "default",
+"wsoftware" varchar(16) COLLATE "default",
+"postgres" varchar(16) COLLATE "default",
+"postgis" varchar(16) COLLATE "default",
+"date" timestamp(6) DEFAULT now()
+)
+WITH (OIDS=FALSE)
+;
 
 -- ----------------------------
 -- Table structure for arc
@@ -1201,6 +1226,7 @@ WITH (OIDS=FALSE)
 
 ;
 
+
 -- ----------------------------
 -- Table structure for inp_storage
 -- ----------------------------
@@ -1354,6 +1380,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_typevalue_outfall" (
 WITH (OIDS=FALSE)
 
 ;
+
 
 -- ----------------------------
 -- Table structure for inp_typevalue_outlet
@@ -1981,6 +2008,7 @@ CREATE TABLE "SCHEMA_NAME"."rpt_lidperformance_sum" (
 WITH (OIDS=FALSE)
 
 ;
+
 
 -- ----------------------------
 -- Table structure for rpt_nodedepth_sum
