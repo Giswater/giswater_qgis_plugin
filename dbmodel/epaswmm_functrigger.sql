@@ -5,31 +5,42 @@ This version of Giswater is provided by Giswater Association
 */
 
 -----------------------------
--- TOPOLOGY ARC-NODE
+-- ARC-NODE TOPOLOGY
 -----------------------------
 
-CREATE FUNCTION "SCHEMA_NAME".update_t_inp_arc_insert() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
+-- Function: SCHEMA_NAME.update_t_inp_arc_insert()
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_t_inp_arc_insert() RETURNS trigger
+LANGUAGE plpgsql AS $$
+
 DECLARE 
 	nodeRecord1 Record; 
 	nodeRecord2 Record; 
+	optionsRecord Record;
 	z1 double precision;
 	z2 double precision;
+	z_aux double precision;
+
  BEGIN 
 
-	 SELECT * INTO nodeRecord1 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_startpoint(NEW.the_geom), 0.5)
+	SELECT * INTO nodeRecord1 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_startpoint(NEW.the_geom), 0.5)
 		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-	 SELECT * INTO nodeRecord2 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_endpoint(NEW.the_geom), 0.5)
+	SELECT * INTO nodeRecord2 FROM "SCHEMA_NAME".node node WHERE node.the_geom && ST_Expand(ST_endpoint(NEW.the_geom), 0.5)
 		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
+	SELECT * INTO optionsRecord FROM "SCHEMA_NAME".inp_options LIMIT 1;
 
 --	Control de lineas de longitud 0
 	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
 
-		z1 = (nodeRecord1.top_elev - nodeRecord1.ymax + NEW.z1);
-		z2 = (nodeRecord2.top_elev - nodeRecord2.ymax + NEW.z2);
+		IF (optionsRecord.link_offsets = 'DEPTH') THEN
+			z1 := (nodeRecord1.top_elev - nodeRecord1.ymax + NEW.z1);
+			z2 := (nodeRecord2.top_elev - nodeRecord2.ymax + NEW.z2);
+		ELSE
+			z1 := NEW.z1;
+			z2 := NEW.z2;	
+		END IF;
 
 		IF (z1 > z2) THEN
 
@@ -38,7 +49,13 @@ DECLARE
 
 		ELSE 
 
+--			Update conduit direction
 			NEW.the_geom := ST_reverse(NEW.the_geom);
+			z_aux := NEW.z1;
+			NEW.z1 := NEW.z2;
+			NEW.z2 := z_aux;
+
+--			Update topology info
 			NEW.node_1 := nodeRecord2.node_id; 
 			NEW.node_2 := nodeRecord1.node_id;
 
@@ -53,22 +70,30 @@ DECLARE
 END; 
 $$;
 
+
 CREATE TRIGGER update_t_inp_insert_arc BEFORE INSERT OR UPDATE ON "SCHEMA_NAME"."arc"
 FOR EACH ROW 
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_arc_insert"();
 
 
-CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_update() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $_$DECLARE 
+-- Function: SCHEMA_NAME.update_t_inp_node_update()
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_t_inp_node_update() RETURNS trigger
+LANGUAGE plpgsql AS $$
+
+DECLARE 
 	querystring Varchar; 
 	arcrec Record; 
 	nodeRecord1 Record; 
 	nodeRecord2 Record; 
+	optionsRecord Record;
 	z1 double precision;
 	z2 double precision;
 
 BEGIN 
+
+--	Select options
+	SELECT * INTO optionsRecord FROM "SCHEMA_NAME".inp_options LIMIT 1;
 
 --	Select arcs with start-end on the updated node
 	querystring := 'SELECT * FROM "SCHEMA_NAME"."arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
@@ -95,14 +120,17 @@ BEGIN
 
 
 --				Search the upstream node
-				z1 = (NEW.top_elev - NEW.ymax + arcrec.z1);
-				z2 = (nodeRecord2.top_elev - nodeRecord2.ymax + arcrec.z2);
+				IF (optionsRecord.link_offsets = 'DEPTH') THEN
+					z1 = (NEW.top_elev - NEW.ymax + arcrec.z1);
+					z2 = (nodeRecord2.top_elev - nodeRecord2.ymax + arcrec.z2);
 
-				IF (z2 > z1) THEN
+--					Update direction if necessary
+					IF (z2 > z1) THEN
+						EXECUTE 'UPDATE "SCHEMA_NAME".arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE "SCHEMA_NAME".arc SET z1 = ' || arcrec.z2 || ', z2 = ' || arcrec.z1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+					END IF;
 
-					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET z1 = ' || arcrec.z2 || ', z2 = ' || arcrec.z1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
 				END IF;
 				
 			ELSE
@@ -113,15 +141,20 @@ BEGIN
 
 
 --				Search the upstream node
-				z1 = (nodeRecord1.top_elev - nodeRecord1.ymax + arcrec.z1);
-				z2 = (NEW.top_elev - NEW.ymax + arcrec.z2);
+				IF (optionsRecord.link_offsets = 'DEPTH') THEN
+					z1 = (nodeRecord1.top_elev - nodeRecord1.ymax + arcrec.z1);
+					z2 = (NEW.top_elev - NEW.ymax + arcrec.z2);
 
-				IF (z2 > z1) THEN
+--					Update direction if necessary
+					IF (z2 > z1) THEN
+						EXECUTE 'UPDATE "SCHEMA_NAME".arc SET node_1 = ' || quote_literal(NEW.node_id) || ', node_2 = ' || quote_literal(nodeRecord1.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE "SCHEMA_NAME".arc SET z1 = ' || arcrec.z2 || ', z2 = ' || arcrec.z1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
+						EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
+					END IF;
 
-					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET node_1 = ' || quote_literal(NEW.node_id) || ', node_2 = ' || quote_literal(nodeRecord1.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET z1 = ' || arcrec.z2 || ', z2 = ' || arcrec.z1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
-					EXECUTE 'UPDATE "SCHEMA_NAME".arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;
 				END IF;
+
+
 
 			END IF;
 
@@ -131,8 +164,8 @@ BEGIN
 
 	RETURN NEW;
 
-
-END; $_$;
+END; 
+$$;
 
 
 CREATE TRIGGER update_t_inp_update_node AFTER UPDATE ON "SCHEMA_NAME"."node"
@@ -140,11 +173,13 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_update"();
 
 
+-- Function: "SCHEMA_NAME".update_t_inp_node_delete()
+-- Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario in "PostGIS 2 Analisis Espacial Avanzado" 
+
 CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_delete() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$ --Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario
---in "PostGIS 2 Analisis Espacial Avanzado" 
- 
+    AS $$ 
+
 DECLARE 
 	querystring Varchar; 
 	arcrec Record; 
@@ -165,14 +200,16 @@ BEGIN
 END; 
 $$;
 
+
 CREATE TRIGGER update_t_inp_delete_node BEFORE DELETE ON "SCHEMA_NAME"."node"
 FOR EACH ROW 
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_delete"();
 
+
+
 ------------------------------------
 --  EDITING VIEWS
 ------------------------------------
-
 
 -- Function: SCHEMA_NAME.update_v_inp_edit_conduit()
 
@@ -205,7 +242,6 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_conduit"();
 
 
-
   
 -- Function: SCHEMA_NAME.update_v_inp_edit_divider()
 
@@ -235,7 +271,6 @@ $BODY$
 CREATE TRIGGER "update_v_inp_edit_divider" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_divider"
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_divider"();
-
 
 
   
@@ -270,7 +305,6 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_junction"();
 
 
-
   
 -- Function: SCHEMA_NAME.update_v_inp_edit_orifice()
 
@@ -301,7 +335,6 @@ $BODY$
 CREATE TRIGGER "update_v_inp_edit_orifice" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_orifice"
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_orifice"();
-
 
 
   
@@ -336,7 +369,6 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_outfall"();
 
 
-
   
 -- Function: SCHEMA_NAME.update_v_inp_edit_outlet()
 
@@ -367,7 +399,6 @@ $BODY$
 CREATE TRIGGER "update_v_inp_edit_outlet" INSTEAD OF INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."v_inp_edit_outlet"
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_outlet"();
-
 
 
   

@@ -9,6 +9,8 @@ This version of Giswater is provided by Giswater Association
 -- TOPOLOGY ARC-NODE
 -----------------------------
 
+-- Function: SCHEMA_NAME.update_t_inp_arc_insert()
+
 CREATE FUNCTION "SCHEMA_NAME".update_t_inp_arc_insert() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -45,6 +47,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_arc_insert"();
 
 
+-- Function: SCHEMA_NAME.update_t_inp_node_update()
 
 CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_update() RETURNS trigger
     LANGUAGE plpgsql
@@ -102,12 +105,13 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_update"();
 
 
 
+-- Function: "SCHEMA_NAME".update_t_inp_node_delete()
+-- Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario in "PostGIS 2 Analisis Espacial Avanzado" 
 
 CREATE FUNCTION "SCHEMA_NAME".update_t_inp_node_delete() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$ --Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario
---in "PostGIS 2 Analisis Espacial Avanzado" 
- 
+    AS $$
+	
 DECLARE 
 	querystring Varchar; 
 	arcrec Record; 
@@ -136,7 +140,6 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_delete"();
 ------------------------------------
 --  EDITING VIEWS
 ------------------------------------
-
 
 
 -- Function: SCHEMA_NAME.update_v_inp_edit_junction()
