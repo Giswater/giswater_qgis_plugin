@@ -1119,7 +1119,7 @@ SELECT inp_source.node_id, inp_source.sourc_type, inp_source.quality, inp_source
 -- View structure for v_inp_status
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_status" AS 
-SELECT inp_valve.arc_id, inp_valve.status FROM SCHEMA_NAME.inp_valve;
+SELECT inp_valve.arc_id, inp_valve.status FROM SCHEMA_NAME.inp_valve WHERE inp_valve.status::text = 'OPEN'::text OR inp_valve.status::text = 'CLOSED'::text;
 
 -- ----------------------------
 -- View structure for v_inp_tank
@@ -1454,6 +1454,26 @@ ALTER TABLE "SCHEMA_NAME"."result_selection" ADD PRIMARY KEY ("result_id");
 -- Primary Key structure for table rpt_result_cat
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."rpt_result_cat" ADD PRIMARY KEY ("result_id");
+
+-- ----------------------------
+-- Primary Key structure for table rpt_arc
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."rpt_arc" ADD PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table rpt_energy_usage
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."rpt_energy_usage" ADD PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table rpt_hydraulic_status
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."rpt_hydraulic_status" ADD PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Primary Key structure for table rpt_node
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."rpt_node" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table sector
