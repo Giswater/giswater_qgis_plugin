@@ -2048,6 +2048,36 @@ CREATE TABLE "xscutlines3d" (
 );
 
 
+-- ----------------------------
+-- Table structure for inp_project_id
+-- ----------------------------
+CREATE TABLE "inp_project_id" (
+"title" varchar(254) COLLATE "default",
+"author" varchar(50) COLLATE "default",
+"date" varchar(12) COLLATE "default"
+);
+
+
+CREATE SEQUENCE "version_seq"
+ INCREMENT 1
+ MINVALUE 1
+ MAXVALUE 9223372036854775807
+ START 1
+ CACHE 1;
+ 
+-- ----------------------------
+-- Table structure for version
+-- ----------------------------
+CREATE TABLE "version" (
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
+"giswater" varchar(16) COLLATE "default",
+"wsoftware" varchar(16) COLLATE "default",
+"postgres" varchar(255) COLLATE "default",
+"postgis" varchar(255) COLLATE "default",
+"date" timestamp(6) DEFAULT now()
+);
+
+
 --
 -- TOC entry 251 (class 1259 OID 152114)
 -- Name: xscutlines3d_gid_seq; Type: SEQUENCE; Schema: SCHEMA_NAME; Owner: -
@@ -2288,6 +2318,11 @@ ALTER TABLE ONLY "xscutlines3d"
 
 ALTER TABLE ONLY "xscutlines"
     ADD CONSTRAINT "xscutlines_pkey" PRIMARY KEY ("gid");
+	
+	
+ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
+
+ALTER TABLE "version" ADD PRIMARY KEY ("id");	
 
 
 --

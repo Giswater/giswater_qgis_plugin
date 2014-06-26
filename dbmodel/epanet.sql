@@ -1485,6 +1485,8 @@ ALTER TABLE "SCHEMA_NAME"."sector" ADD PRIMARY KEY ("sector_id");
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."sector_selection" ADD PRIMARY KEY ("sector_id");
 
+ALTER TABLE "SCHEMA_NAME"."version" ADD PRIMARY KEY ("id");
+
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."arc"
 -- ----------------------------

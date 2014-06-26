@@ -3607,6 +3607,8 @@ ALTER TABLE "SCHEMA_NAME"."sector_selection" ADD PRIMARY KEY ("sector_id");
 -- ----------------------------
 ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD PRIMARY KEY ("subc_id");
 
+ALTER TABLE "SCHEMA_NAME"."version" ADD PRIMARY KEY ("id");
+
 -- ----------------------------
 -- Foreign Key structure for table "SCHEMA_NAME"."arc"
 -- ----------------------------
