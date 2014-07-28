@@ -498,8 +498,8 @@ CREATE TABLE "SCHEMA_NAME"."version" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
 "giswater" varchar(16) COLLATE "default",
 "wsoftware" varchar(16) COLLATE "default",
-"postgres" varchar(255) COLLATE "default",
-"postgis" varchar(255) COLLATE "default",
+"postgres" varchar(512) COLLATE "default",
+"postgis" varchar(512) COLLATE "default",
 "date" timestamp(6) DEFAULT now()
 )
 WITH (OIDS=FALSE)
