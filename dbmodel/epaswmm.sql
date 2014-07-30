@@ -695,7 +695,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_dwf" (
 "id" int4 NOT NULL,
 "node_id" varchar(16) COLLATE "default",
-"value" numeric(12,4),
+"value" numeric(12,5),
 "pat1" varchar(16) COLLATE "default",
 "pat2" varchar(16) COLLATE "default",
 "pat3" varchar(16) COLLATE "default",
@@ -903,12 +903,12 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_lidusage_subc_x_lidco" (
 "subc_id" varchar(16) COLLATE "default" NOT NULL,
 "lidco_id" varchar(16) COLLATE "default" NOT NULL,
-"number" numeric(12,4),
+"number" int2,
 "area" numeric(16,6),
 "width" numeric(12,4),
 "initsat" numeric(12,4),
 "fromimp" numeric(12,4),
-"toperv" numeric(12,4),
+"toperv" int2,
 "rptfile" varchar(10) COLLATE "default"
 )
 WITH (OIDS=FALSE)

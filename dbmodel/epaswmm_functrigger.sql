@@ -465,8 +465,6 @@ FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_storage"();
 
 
-
-
 -- Function: SCHEMA_NAME.update_v_inp_edit_weir()
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_weir()
@@ -497,6 +495,11 @@ CREATE TRIGGER "update_v_inp_edit_weir" INSTEAD OF INSERT OR UPDATE OR DELETE ON
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_weir"();
 
+
+
+------------------------------------------------
+-- SUBCATCHMENT EXPORT
+------------------------------------------------
 
 -- Function: "SCHEMA_NAME".gw_dump_subcatchments()
 
@@ -551,5 +554,8 @@ END
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100
+
+
+
 
 
