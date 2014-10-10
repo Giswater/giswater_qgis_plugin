@@ -216,21 +216,59 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_delete"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_conduit()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'', '', NEW.z1,NEW.z2,NEW.arccat_id,NEW.matcat_id,'CONDUIT'::TEXT,NEW.sector_id,NEW.the_geom);
+--			Arc ID
+			IF (NEW.arc_id IS NULL) THEN
+				NEW.arc_id := (SELECT nextval('"SCHEMA_NAME".inp_arc_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+--			Arc catalog ID
+			IF (NEW.arccat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".cat_arc) = 0) THEN
+					RAISE EXCEPTION 'There are no arc catalog defined in the model, define at least one.';
+				END IF;
+				NEW.arccat_id := (SELECT id FROM "SCHEMA_NAME".cat_arc LIMIT 1);
+			END IF;
+		
+--			Material catalog ID
+			IF (NEW.matcat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".cat_mat) = 0) THEN
+					RAISE EXCEPTION 'There are no materials catalog defined in the model, define at least one.';
+				END IF;			
+				NEW.matcat_id := (SELECT id FROM "SCHEMA_NAME".cat_mat LIMIT 1);
+			END IF;
+	
+		INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'', '', NEW.z1,NEW.z2,NEW.arccat_id,NEW.matcat_id,'CONDUIT'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_conduit VALUES(NEW.arc_id,NEW.barrels,NEW.culvert,NEW.kentry,NEW.kexit,NEW.kavg,NEW.flap,NEW.q0,NEW.qmax);
 		RETURN NEW;
+	
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,arccat_id=NEW.arccat_id,matcat_id=NEW.matcat_id,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
-	   UPDATE SCHEMA_NAME.inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax WHERE arc_id=OLD.arc_id;
-       RETURN NEW;
+		UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,arccat_id=NEW.arccat_id,matcat_id=NEW.matcat_id,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE SCHEMA_NAME.inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax WHERE arc_id=OLD.arc_id;
+		RETURN NEW;
+	  
     ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
-	   DELETE FROM SCHEMA_NAME.inp_conduit WHERE arc_id=OLD.arc_id;
-	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+		DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
+		DELETE FROM SCHEMA_NAME.inp_conduit WHERE arc_id=OLD.arc_id;
+		RETURN NULL;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -248,21 +286,57 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_conduit"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_divider()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'DIVIDER'::TEXT,NEW.sector_id,NEW.the_geom);
+--	Control insertions ID	
+	IF TG_OP = 'INSERT' THEN
+
+--		Existing nodes
+		numNodes := (SELECT COUNT(*) FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1));
+
+--		If there is an existing node closer than 0.5 meters --> error
+		IF (numNodes = 0) THEN
+
+--			Node ID
+			IF (NEW.node_id IS NULL) THEN
+				NEW.node_id := (SELECT nextval('"SCHEMA_NAME".inp_node_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+--		Trigger error				
+		ELSE
+			SELECT node_id INTO auxNode_ID FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1) LIMIT 1;
+			RAISE EXCEPTION 'Existing node closer than 0.1 m, node_id = (%)', node_ID;
+		END IF;
+		
+		INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'DIVIDER'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_divider VALUES(NEW.node_id,NEW.divider_type,NEW.arc_id,NEW.curve_id,NEW.qmin,NEW.ht,NEW.cd,NEW.y0,NEW.ysur,NEW.apond);
 		RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,elev=NEW.elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-	   UPDATE SCHEMA_NAME.inp_divider SET node_id=NEW.node_id, divider_type=NEW.divider_type, arc_id=NEW.arc_id, curve_id=NEW.curve_id,qmin=NEW.qmin,ht=NEW.ht,cd=NEW.cd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
-       RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
-	   DELETE FROM SCHEMA_NAME.inp_divider WHERE node_id=OLD.node_id;
+    
+	ELSIF TG_OP = 'UPDATE' THEN
+		UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,elev=NEW.elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+		UPDATE SCHEMA_NAME.inp_divider SET node_id=NEW.node_id, divider_type=NEW.divider_type, arc_id=NEW.arc_id, curve_id=NEW.curve_id,qmin=NEW.qmin,ht=NEW.ht,cd=NEW.cd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
+		RETURN NEW;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
+		DELETE FROM SCHEMA_NAME.inp_divider WHERE node_id=OLD.node_id;
 	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+     
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -279,21 +353,57 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_divider"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_junction()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'JUNCTION'::TEXT,NEW.sector_id,NEW.the_geom);
+    --	Control insertions ID	
+	IF TG_OP = 'INSERT' THEN
+
+--		Existing nodes
+		numNodes := (SELECT COUNT(*) FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1));
+
+--		If there is an existing node closer than 0.5 meters --> error
+		IF (numNodes = 0) THEN
+
+--			Node ID
+			IF (NEW.node_id IS NULL) THEN
+				NEW.node_id := (SELECT nextval('"SCHEMA_NAME".inp_node_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+--		Trigger error				
+		ELSE
+			SELECT node_id INTO auxNode_ID FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1) LIMIT 1;
+			RAISE EXCEPTION 'Existing node closer than 0.1 m, node_id = (%)', node_ID;
+		END IF;
+
+		INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'JUNCTION'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_junction VALUES(NEW.node_id,NEW.y0,NEW.ysur,NEW.apond);
 		RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-	   UPDATE SCHEMA_NAME.inp_junction SET node_id=NEW.node_id,y0=NEW.y0,ysur=NEW.ysur,apond=NEW.apond WHERE node_id=OLD.node_id;
-       RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
-	   DELETE FROM SCHEMA_NAME.inp_junction WHERE node_id=OLD.node_id;
+    
+	ELSIF TG_OP = 'UPDATE' THEN
+		UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+		UPDATE SCHEMA_NAME.inp_junction SET node_id=NEW.node_id,y0=NEW.y0,ysur=NEW.ysur,apond=NEW.apond WHERE node_id=OLD.node_id;
+		RETURN NEW;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
+		DELETE FROM SCHEMA_NAME.inp_junction WHERE node_id=OLD.node_id;
 	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -311,21 +421,43 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_junction"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_orifice()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+	
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'ORIFICE'::TEXT,NEW.sector_id,NEW.the_geom);
+--			Arc ID
+			IF (NEW.arc_id IS NULL) THEN
+				NEW.arc_id := (SELECT nextval('"SCHEMA_NAME".inp_arc_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+			
+		INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'ORIFICE'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_orifice VALUES(NEW.arc_id,NEW.ori_type,NEW.offset,NEW.cd,NEW.orate,NEW.flap,NEW.shape,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
 		RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,categ_type=NEW.categ_type,systm_type=NEW.systm_type,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
-	   UPDATE SCHEMA_NAME.inp_orifice SET arc_id=NEW.arc_id,ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 WHERE arc_id=OLD.arc_id;
-       RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
-	   DELETE FROM SCHEMA_NAME.inp_orifice WHERE arc_id=OLD.arc_id;
+    
+	ELSIF TG_OP = 'UPDATE' THEN
+		UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,categ_type=NEW.categ_type,systm_type=NEW.systm_type,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE SCHEMA_NAME.inp_orifice SET arc_id=NEW.arc_id,ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 WHERE arc_id=OLD.arc_id;
+		RETURN NEW;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
+		DELETE FROM SCHEMA_NAME.inp_orifice WHERE arc_id=OLD.arc_id;
 	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -343,21 +475,58 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_orifice"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_outfall()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+	
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'OUTFALL'::TEXT,NEW.sector_id,NEW.the_geom);
+
+--	Control insertions ID	
+	IF TG_OP = 'INSERT' THEN
+
+--		Existing nodes
+		numNodes := (SELECT COUNT(*) FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1));
+
+--		If there is an existing node closer than 0.5 meters --> error
+		IF (numNodes = 0) THEN
+
+--			Node ID
+			IF (NEW.node_id IS NULL) THEN
+				NEW.node_id := (SELECT nextval('"SCHEMA_NAME".inp_node_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+--		Trigger error				
+		ELSE
+			SELECT node_id INTO auxNode_ID FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1) LIMIT 1;
+			RAISE EXCEPTION 'Existing node closer than 0.1 m, node_id = (%)', node_ID;
+		END IF;
+
+		INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'OUTFALL'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_outfall VALUES(NEW.node_id,NEW.outfall_type,NEW.stage,NEW.curve_id,NEW.timser_id,NEW.gate);
 		RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-	   UPDATE SCHEMA_NAME.inp_outfall SET node_id=NEW.node_id,outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate WHERE node_id=OLD.node_id;
-       RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
-	   DELETE FROM SCHEMA_NAME.inp_outfall WHERE node_id=OLD.node_id;
+   
+	ELSIF TG_OP = 'UPDATE' THEN
+		UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+		UPDATE SCHEMA_NAME.inp_outfall SET node_id=NEW.node_id,outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate WHERE node_id=OLD.node_id;
+		RETURN NEW;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
+		DELETE FROM SCHEMA_NAME.inp_outfall WHERE node_id=OLD.node_id;
 	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -375,21 +544,43 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_outfall"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_outlet()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'OUTLET'::TEXT,NEW.sector_id,NEW.the_geom);
-		INSERT INTO  SCHEMA_NAME.inp_outlet VALUES(NEW.arc_id,NEW.outlet_type,NEW."offset",NEW.curve_id,NEW.cd1,NEW.cd2,NEW.flap);
-		RETURN NEW;
+--			Arc ID
+			IF (NEW.arc_id IS NULL) THEN
+				NEW.arc_id := (SELECT nextval('"SCHEMA_NAME".inp_arc_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+	   INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'OUTLET'::TEXT,NEW.sector_id,NEW.the_geom);
+	   INSERT INTO  SCHEMA_NAME.inp_outlet VALUES(NEW.arc_id,NEW.outlet_type,NEW."offset",NEW.curve_id,NEW.cd1,NEW.cd2,NEW.flap);
+	   RETURN NEW;
+		
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+       UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
 	   UPDATE SCHEMA_NAME.inp_outlet SET arc_id=NEW.arc_id,outlet_type=NEW.outlet_type,"offset"=NEW."offset",curve_id=NEW.curve_id,cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap WHERE arc_id=OLD.arc_id;
        RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+       DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
 	   DELETE FROM SCHEMA_NAME.inp_outlet WHERE arc_id=OLD.arc_id;
-	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+	   RETURN NULL;
+	   
+    END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -407,21 +598,43 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_outlet"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_pump()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'PUMP'::TEXT,NEW.sector_id,NEW.the_geom);
-		INSERT INTO  SCHEMA_NAME.inp_pump VALUES(NEW.arc_id,NEW.curve_id,NEW.status,NEW.startup,NEW.shutoff);
-		RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+--			Arc ID
+			IF (NEW.arc_id IS NULL) THEN
+				NEW.arc_id := (SELECT nextval('"SCHEMA_NAME".inp_arc_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+       INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'PUMP'::TEXT,NEW.sector_id,NEW.the_geom);
+	   INSERT INTO  SCHEMA_NAME.inp_pump VALUES(NEW.arc_id,NEW.curve_id,NEW.status,NEW.startup,NEW.shutoff);
+	   RETURN NEW;
+    
+	ELSIF TG_OP = 'UPDATE' THEN
+       UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
 	   UPDATE SCHEMA_NAME.inp_pump SET arc_id=NEW.arc_id,curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff WHERE arc_id=OLD.arc_id;
        RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
-	   DELETE FROM SCHEMA_NAME.inp_pump WHERE arc_id=OLD.arc_id;
-	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+      DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
+	  DELETE FROM SCHEMA_NAME.inp_pump WHERE arc_id=OLD.arc_id;
+	  RETURN NULL;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -439,21 +652,57 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_pump"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_storage()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
-    IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'STORAGE'::TEXT,NEW.sector_id,NEW.the_geom);
+--	Control insertions ID	
+	IF TG_OP = 'INSERT' THEN
+
+--		Existing nodes
+		numNodes := (SELECT COUNT(*) FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1));
+
+--		If there is an existing node closer than 0.5 meters --> error
+		IF (numNodes = 0) THEN
+
+--			Node ID
+			IF (NEW.node_id IS NULL) THEN
+				NEW.node_id := (SELECT nextval('"SCHEMA_NAME".inp_node_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+
+--		Trigger error				
+		ELSE
+			SELECT node_id INTO auxNode_ID FROM "SCHEMA_NAME".node nodeOld WHERE nodeOld.the_geom && ST_Expand(NEW.the_geom, 0.1) LIMIT 1;
+			RAISE EXCEPTION 'Existing node closer than 0.1 m, node_id = (%)', node_ID;
+		END IF;
+
+		INSERT INTO  SCHEMA_NAME.node VALUES(NEW.node_id,NEW.top_elev,NEW.ymax,'STORAGE'::TEXT,NEW.sector_id,NEW.the_geom);
 		INSERT INTO  SCHEMA_NAME.inp_storage VALUES(NEW.node_id,NEW.storage_type,NEW.curve_id,NEW.a1,NEW.a2,NEW.a0,NEW.fevap,NEW.sh,NEW.hc,NEW.imd,NEW.y0,NEW.ysur,NEW.apond);
 		RETURN NEW;
+		
     ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-	   UPDATE SCHEMA_NAME.inp_storage SET node_id=NEW.node_id, storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
-       RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
-	   DELETE FROM SCHEMA_NAME.inp_storage WHERE node_id=OLD.node_id;
+		UPDATE SCHEMA_NAME.node SET node_id=NEW.node_id,top_elev=NEW.top_elev,ymax=NEW.ymax,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+		UPDATE SCHEMA_NAME.inp_storage SET node_id=NEW.node_id, storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
+		RETURN NEW;
+   
+	ELSIF TG_OP = 'DELETE' THEN
+		DELETE FROM SCHEMA_NAME.node WHERE node_id=OLD.node_id;
+		DELETE FROM SCHEMA_NAME.inp_storage WHERE node_id=OLD.node_id;
 	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -470,21 +719,43 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_storage"();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_weir()
   RETURNS trigger AS
 $BODY$
+
+DECLARE 
+	numNodes numeric;
+	sectorRecord record;
+	auxNode_ID varchar;
+
 BEGIN
     IF TG_OP = 'INSERT' THEN
-    INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'WEIR'::TEXT,NEW.sector_id,NEW.the_geom);
-		INSERT INTO  SCHEMA_NAME.inp_weir VALUES(NEW.arc_id,NEW.weir_type,NEW."offset",NEW.cd,NEW.ec,NEW.cd2,NEW.flap,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
-		RETURN NEW;
-    ELSIF TG_OP = 'UPDATE' THEN
-     UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+--			Arc ID
+			IF (NEW.arc_id IS NULL) THEN
+				NEW.arc_id := (SELECT nextval('"SCHEMA_NAME".inp_arc_id_seq'));
+			END IF;
+
+--			Sector ID
+			IF (NEW.sector_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM "SCHEMA_NAME".sector) = 0) THEN
+					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+				END IF;
+				NEW.sector_id := (SELECT sector_id FROM "SCHEMA_NAME".sector LIMIT 1);
+			END IF;
+    
+	   INSERT INTO  SCHEMA_NAME.arc VALUES(NEW.arc_id,'','',NEW.z1,NEW.z2,DEFAULT,DEFAULT,'WEIR'::TEXT,NEW.sector_id,NEW.the_geom);
+	   INSERT INTO  SCHEMA_NAME.inp_weir VALUES(NEW.arc_id,NEW.weir_type,NEW."offset",NEW.cd,NEW.ec,NEW.cd2,NEW.flap,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
+	   RETURN NEW;
+    
+	ELSIF TG_OP = 'UPDATE' THEN
+       UPDATE SCHEMA_NAME.arc SET arc_id=NEW.arc_id,z1=NEW.z1,z2=NEW.z2,sector_id=NEW.sector_id,the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
 	   UPDATE SCHEMA_NAME.inp_weir SET arc_id=NEW.arc_id,weir_type=NEW.weir_type,"offset"=NEW."offset",cd=NEW.cd,ec=NEW.ec,cd2=NEW.cd2,flap=NEW.flap,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 WHERE arc_id=OLD.arc_id;
        RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-     DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
+    
+	ELSIF TG_OP = 'DELETE' THEN
+       DELETE FROM SCHEMA_NAME.arc WHERE arc_id=OLD.arc_id;
 	   DELETE FROM SCHEMA_NAME.inp_weir WHERE arc_id=OLD.arc_id;
-	    RETURN NULL;
-      END IF;
-      RETURN NEW;
+	   RETURN NULL;
+    
+	END IF;
+    RETURN NEW;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
@@ -511,6 +782,7 @@ DECLARE
 	row_id varchar(16);
 	index_point integer;
 	point_aux geometry;
+
 
 BEGIN
 
@@ -552,96 +824,9 @@ BEGIN
 END
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
-  
--- Clone schema
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".clone_schema(source_schema text, dest_schema text) RETURNS void AS
-$$
- 
-DECLARE
-	rec_view record;
-	rec_fk record;
-	rec_table text;
-	tablename text;
-	default_ text;
-	column_ text;
-	msg text;
-BEGIN
 
-	-- Create destination schema
-	EXECUTE 'CREATE SCHEMA ' || dest_schema ;
-	 
-	-- Sequences
-	FOR rec_table IN
-		SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = source_schema
-	LOOP
-		EXECUTE 'CREATE SEQUENCE ' || dest_schema || '.' || rec_table;
-	END LOOP;
-	 
-	-- Tables
-	FOR rec_table IN
-		SELECT table_name FROM information_schema.TABLES WHERE table_schema = source_schema AND table_type = 'BASE TABLE' ORDER BY table_name
-	LOOP
-	  
-	  	-- Create table in destination schema
-		tablename := dest_schema || '.' || rec_table;
-		EXECUTE 'CREATE TABLE ' || tablename || ' (LIKE ' || source_schema || '.' || rec_table || ' INCLUDING CONSTRAINTS INCLUDING INDEXES INCLUDING DEFAULTS)';
-		
-		-- Set contraints
-		FOR column_, default_ IN
-			SELECT column_name, REPLACE(column_default, source_schema, dest_schema) 
-			FROM information_schema.COLUMNS 
-			WHERE table_schema = dest_schema AND table_name = rec_table AND column_default LIKE 'nextval(%' || source_schema || '%::regclass)'
-		LOOP
-			EXECUTE 'ALTER TABLE ' || tablename || ' ALTER COLUMN ' || column_ || ' SET DEFAULT ' || default_;
-		END LOOP;
-		
-		-- Copy table contents to destination schema
-		EXECUTE 'INSERT INTO ' || tablename || ' SELECT * FROM ' || source_schema || '.' || rec_table; 	
-		
-	END LOOP;
-	  
-	-- Loop again trough tables in order to set Foreign Keys
-	FOR rec_table IN
-		SELECT table_name FROM information_schema.TABLES WHERE table_schema = source_schema AND table_type = 'BASE TABLE' ORDER BY table_name
-	LOOP	  
-	  
-		tablename := dest_schema || '.' || rec_table;	  
-		FOR rec_fk IN
-			SELECT tc.constraint_name, tc.constraint_schema, tc.table_name, kcu.column_name,
-			ccu.table_name AS parent_table, ccu.column_name AS parent_column,
-			rc.update_rule AS on_update, rc.delete_rule AS on_delete
-			FROM information_schema.table_constraints tc
-				LEFT JOIN information_schema.key_column_usage kcu
-				ON tc.constraint_catalog = kcu.constraint_catalog
-				AND tc.constraint_schema = kcu.constraint_schema
-				AND tc.constraint_name = kcu.constraint_name
-			LEFT JOIN information_schema.referential_constraints rc
-				ON tc.constraint_catalog = rc.constraint_catalog
-				AND tc.constraint_schema = rc.constraint_schema
-				AND tc.constraint_name = rc.constraint_name
-			LEFT JOIN information_schema.constraint_column_usage ccu
-				ON rc.unique_constraint_catalog = ccu.constraint_catalog
-				AND rc.unique_constraint_schema = ccu.constraint_schema
-				AND rc.unique_constraint_name = ccu.constraint_name
-			WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.constraint_schema = source_schema AND tc.table_name = rec_table
-		LOOP
-			msg:= 'ALTER TABLE '||tablename||' ADD CONSTRAINT '||rec_fk.constraint_name||' FOREIGN KEY('||rec_fk.column_name||') 
-				REFERENCES '||dest_schema||'.'||rec_fk.parent_table||'('||rec_fk.parent_column||') ON DELETE '||rec_fk.on_delete||' ON UPDATE '||rec_fk.on_update;
-			EXECUTE msg;
-		END LOOP;		
-		
-	END LOOP;			
-		
-	-- Views
-	FOR rec_view IN
-		SELECT table_name, REPLACE(view_definition, source_schema, dest_schema) as definition FROM information_schema.VIEWS WHERE table_schema = source_schema
-	LOOP
-		EXECUTE 'CREATE VIEW ' || dest_schema || '.' || rec_view.table_name || ' AS ' || rec_view.definition;
-	END LOOP;
- 
-END;
- 
-$$ LANGUAGE plpgsql VOLATILE;
+
+
 

@@ -5,6 +5,29 @@ This version of Giswater is provided by Giswater Association
 */
 
 -- ----------------------------
+-- Sequence structure for inp_node_id_seq
+-- --------------------------
+
+CREATE SEQUENCE "SCHEMA_NAME"."inp_node_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+	
+-- ----------------------------
+-- Sequence structure for inp_arc_id_seq
+-- --------------------------
+
+CREATE SEQUENCE "SCHEMA_NAME"."inp_arc_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+-- ----------------------------
 -- Sequence structure for version_seq
 -- --------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
@@ -45,15 +68,6 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_curve_id_seq"
  CACHE 1;
 SELECT setval('"SCHEMA_NAME"."inp_curve_id_seq"', 1, true);
 
--- ----------------------------
--- Sequence structure for inp_global_id_seq
--- ----------------------------
-CREATE SEQUENCE "SCHEMA_NAME"."inp_global_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_labels_id_seq
