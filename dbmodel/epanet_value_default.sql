@@ -11,4 +11,4 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 
 ALTER TABLE "SCHEMA_NAME".node
-ALTER COLUMN elevation DEFAULT 0.00;
+ALTER COLUMN elevation SET DEFAULT 0.00;

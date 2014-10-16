@@ -31,136 +31,142 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_arc_id_seq"
 -- Sequence structure for version_seq
 -- --------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_backdrop_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_backdrop_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_controls_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_controls_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_curve_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_curve_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
-SELECT setval('"SCHEMA_NAME"."inp_curve_id_seq"', 1, true);
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+-- ----------------------------
+-- Sequence structure for inp_demand_id_seq
+-- ----------------------------
+CREATE SEQUENCE "SCHEMA_NAME"."inp_demand_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
 -- ----------------------------
 -- Sequence structure for inp_labels_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_labels_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
-SELECT setval('"SCHEMA_NAME"."inp_labels_id_seq"', 1, true);
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_rules_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_rules_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
-SELECT setval('"SCHEMA_NAME"."inp_rules_id_seq"', 1, true);
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_sector_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_sector_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
-SELECT setval('"SCHEMA_NAME"."inp_sector_id_seq"', 1, true);
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for inp_vertice_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."inp_vertice_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for rpt_arc_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."rpt_arc_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for rpt_energy_usage_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."rpt_energy_usage_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for rpt_hydraulic_status_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."rpt_hydraulic_status_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for rpt_node_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."rpt_node_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Sequence structure for rpt_result_cat_id_seq
 -- ----------------------------
 CREATE SEQUENCE "SCHEMA_NAME"."rpt_result_cat_id_seq"
- INCREMENT 1
- MINVALUE 1
- MAXVALUE 9223372036854775807
- START 1
- CACHE 1;
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 -- ----------------------------
 -- Table structure for version
@@ -255,6 +261,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_demand
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_demand" (
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_demand_id_seq'::regclass) NOT NULL,
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "demand" numeric,
 "pattern_id" varchar(16) COLLATE "default",
