@@ -472,9 +472,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_tank"();
 
 
 
-
 -- Function: SCHEMA_NAME.update_v_inp_edit_valve()
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_v_inp_edit_valve()
   RETURNS trigger AS
 $BODY$
@@ -533,5 +531,4 @@ CREATE TRIGGER "update_v_inp_edit_valve" INSTEAD OF INSERT OR UPDATE OR DELETE O
 FOR EACH ROW
 EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_valve"();
 
-  
-  
+ 
