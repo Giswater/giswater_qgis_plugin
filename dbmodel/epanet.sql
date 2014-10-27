@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = public, pg_catalog;
-
 -- ----------------------------
 -- Sequence structure for inp_node_id_seq
 -- --------------------------
@@ -241,8 +239,8 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_curve" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_id_seq'::regclass) NOT NULL,
 "curve_id" varchar(16) COLLATE "default" NOT NULL,
-"x_value" numeric,
-"y_value" numeric
+"x_value" numeric(12,4),
+"y_value" numeric(12,4)
 )
 WITH (OIDS=FALSE)
 
@@ -265,7 +263,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_demand" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_demand_id_seq'::regclass) NOT NULL,
 "node_id" varchar(16) COLLATE "default" NOT NULL,
-"demand" numeric,
+"demand" numeric(12,6),
 "pattern_id" varchar(16) COLLATE "default",
 "deman_type" varchar(18) COLLATE "default"
 )
@@ -313,7 +311,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_junction" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
-"demand" numeric,
+"demand" numeric(12,6),
 "pattern_id" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -353,22 +351,22 @@ CREATE TABLE "SCHEMA_NAME"."inp_options" (
 "units" varchar(20) COLLATE "default" NOT NULL,
 "headloss" varchar(20) COLLATE "default",
 "hydraulics" varchar(12) COLLATE "default",
-"specific_gravity" numeric,
-"viscosity" numeric,
-"trials" numeric,
-"accuracy" numeric,
+"specific_gravity" numeric(12,6),
+"viscosity" numeric(12,6),
+"trials" numeric(12,6),
+"accuracy" numeric(12,6),
 "unbalanced" varchar(12) COLLATE "default",
-"checkfreq" numeric,
-"maxcheck" numeric,
-"damplimit" numeric,
+"checkfreq" numeric(12,6),
+"maxcheck" numeric(12,6),
+"damplimit" numeric(12,6),
 "pattern" varchar(16) COLLATE "default",
-"demand_multiplier" numeric,
-"emitter_exponent" numeric,
+"demand_multiplier" numeric(12,6),
+"emitter_exponent" numeric(12,6),
 "quality" varchar(18) COLLATE "default",
-"diffusivity" numeric,
-"tolerance" numeric,
+"diffusivity" numeric(12,6),
+"tolerance" numeric(12,6),
 "hydraulics_fname" varchar(254) COLLATE "default",
-"unbalanced_n" numeric,
+"unbalanced_n" numeric(12,6),
 "node_id" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -414,7 +412,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_pipe" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
-"minorloss" numeric,
+"minorloss" numeric(12,6),
 "status" varchar(12) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -440,7 +438,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_pump" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "power" varchar COLLATE "default",
 "curve_id" varchar COLLATE "default",
-"speed" numeric,
+"speed" numeric(12,6),
 "pattern" varchar COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -516,7 +514,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_reservoir" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
-"head" numeric,
+"head" numeric(12,4),
 "pattern_id" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -540,7 +538,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_source" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "sourc_type" varchar(18) COLLATE "default",
-"quality" numeric,
+"quality" numeric(12,6),
 "pattern_id" varchar(16) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -564,11 +562,11 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_tank" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
-"initlevel" numeric,
-"minlevel" numeric,
-"maxlevel" numeric,
-"diameter" numeric,
-"minvol" numeric,
+"initlevel" numeric(12,4),
+"minlevel" numeric(12,4),
+"maxlevel" numeric(12,4),
+"diameter" numeric(12,4),
+"minvol" numeric(12,4),
 "curve_id" int4
 )
 WITH (OIDS=FALSE)
@@ -856,11 +854,11 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_valve" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "valv_type" varchar(18) COLLATE "default",
-"pressure" numeric,
-"flow" numeric,
-"coef_loss" numeric,
+"pressure" numeric(12,4),
+"flow" numeric(12,4),
+"coef_loss" numeric(12,4),
 "curve_id" int4,
-"minorloss" numeric,
+"minorloss" numeric(12,4),
 "status" varchar(12) COLLATE "default"
 )
 WITH (OIDS=FALSE)
@@ -1099,7 +1097,7 @@ SELECT inp_mixing.node_id, inp_mixing.mix_type, inp_mixing.value, sector_selecti
 -- View structure for v_inp_options
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_inp_options" AS 
-SELECT inp_options.units, inp_options.headloss, (((inp_options.hydraulics)::text || ' '::text) || (inp_options.hydraulics_fname)::text) AS hydraulics, inp_options.specific_gravity AS "specific gravity", inp_options.viscosity, inp_options.trials, inp_options.accuracy, (((inp_options.unbalanced)::text || ' '::text) || (inp_options.unbalanced_n)::text) AS unbalanced, inp_options.checkfreq, inp_options.maxcheck, inp_options.damplimit, inp_options.pattern, inp_options.demand_multiplier AS "demand multiplier", inp_options.emitter_exponent AS "emitter exponent", (((inp_options.quality) :: TEXT || ' ' :: TEXT) || (inp_options.node_id) :: TEXT) AS quality, inp_options.diffusivity, inp_options.tolerance FROM SCHEMA_NAME.inp_options;
+SELECT inp_options.units, inp_options.headloss, (((inp_options.hydraulics)::text || ' '::text) || (inp_options.hydraulics_fname)::text) AS hydraulics, inp_options.specific_gravity AS "specific gravity", inp_options.viscosity, inp_options.trials, inp_options.accuracy, (((inp_options.unbalanced)::text || ' '::text) || (inp_options.unbalanced_n)::text) AS unbalanced, inp_options.checkfreq, inp_options.maxcheck, inp_options.damplimit, inp_options.pattern, inp_options.demand_multiplier AS "demand multiplier", inp_options.emitter_exponent AS "emitter exponent", CASE WHEN inp_options.quality::text = 'TRACE'::text THEN ((inp_options.quality::text || ' '::text) || inp_options.node_id::text)::character varying ELSE inp_options.quality END AS quality, inp_options.diffusivity, inp_options.tolerance FROM SCHEMA_NAME.inp_options;
 
 -- ----------------------------
 -- View structure for v_inp_pipe

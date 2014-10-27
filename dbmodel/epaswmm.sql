@@ -977,12 +977,12 @@ CREATE TABLE "SCHEMA_NAME"."inp_options" (
 "wet_step" varchar(12) COLLATE "default",
 "dry_step" varchar(12) COLLATE "default",
 "routing_step" varchar(12) COLLATE "default",
-"lengthening_step" numeric,
-"variable_step" numeric,
+"lengthening_step" numeric(12,6),
+"variable_step" numeric(12,6),
 "inertial_damping" varchar(12) COLLATE "default",
 "normal_flow_limited" varchar(12) COLLATE "default",
-"min_surfarea" numeric,
-"min_slope" numeric,
+"min_surfarea" numeric(12,6),
+"min_slope" numeric(12,6),
 "allow_ponding" varchar(3) COLLATE "default",
 "tempdir" varchar(254) COLLATE "default"
 )
