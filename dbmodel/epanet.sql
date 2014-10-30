@@ -1244,7 +1244,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_curve_id" ADD PRIMARY KEY ("id");
 -- ----------------------------
 -- Primary Key structure for table inp_demand
 -- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."inp_demand" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "SCHEMA_NAME"."inp_demand" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table inp_emitter
