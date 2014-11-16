@@ -794,10 +794,10 @@ BEGIN
 
 
 --	Write inp Polygons header
-	INSERT INTO temp_subcatchments VALUES ('');
-	INSERT INTO temp_subcatchments VALUES ('[Polygons]');
-	INSERT INTO temp_subcatchments VALUES (';;Subcatchment   X-Coord            Y-Coord           ');
-	INSERT INTO temp_subcatchments VALUES (';;-------------- ------------------ ------------------');
+--	INSERT INTO temp_subcatchments VALUES ('');
+--	INSERT INTO temp_subcatchments VALUES ('[Polygons]');
+--	INSERT INTO temp_subcatchments VALUES (';;Subcatchment   X-Coord            Y-Coord           ');
+--	INSERT INTO temp_subcatchments VALUES (';;-------------- ------------------ ------------------');
 
 --	Dump node coordinates for every polygon
 	FOR row_id IN SELECT subc_id FROM "SCHEMA_NAME".subcatchment
