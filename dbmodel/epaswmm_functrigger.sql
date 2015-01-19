@@ -229,6 +229,14 @@ BEGIN
 			IF (NEW.arc_id IS NULL) THEN
 				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
 			END IF;
+			
+--			z1, z2
+			IF (NEW.z1 IS NULL) THEN 
+			    NEW.z1 = 0;
+			END IF;
+			IF (NEW.z2 IS NULL) THEN 
+			    NEW.z2 = 0;
+			END IF;
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -306,6 +314,14 @@ BEGIN
 			IF (NEW.node_id IS NULL) THEN
 				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
 			END IF;
+			
+--			top_elev, ymax
+			IF (NEW.top_elev IS NULL) THEN 
+			    NEW.top_elev = 0;
+			END IF;
+			IF (NEW.ymax IS NULL) THEN 
+			    NEW.ymax = 0;
+			END IF;
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -372,6 +388,14 @@ BEGIN
 			IF (NEW.node_id IS NULL) THEN
 				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
 			END IF;
+			
+--			top_elev, ymax
+			IF (NEW.top_elev IS NULL) THEN 
+			    NEW.top_elev = 0;
+			END IF;
+			IF (NEW.ymax IS NULL) THEN 
+			    NEW.ymax = 0;
+			END IF;
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -430,6 +454,14 @@ BEGIN
 --			Arc ID
 			IF (NEW.arc_id IS NULL) THEN
 				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
+			END IF;
+			
+--			z1, z2
+			IF (NEW.z1 IS NULL) THEN 
+			    NEW.z1 = 0;
+			END IF;
+			IF (NEW.z2 IS NULL) THEN 
+			    NEW.z2 = 0;
 			END IF;
 
 --			Sector ID
@@ -492,6 +524,14 @@ BEGIN
 			IF (NEW.node_id IS NULL) THEN
 				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
 			END IF;
+			
+--			top_elev, ymax
+			IF (NEW.top_elev IS NULL) THEN 
+			    NEW.top_elev = 0;
+			END IF;
+			IF (NEW.ymax IS NULL) THEN 
+			    NEW.ymax = 0;
+			END IF;
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -551,6 +591,14 @@ BEGIN
 			IF (NEW.arc_id IS NULL) THEN
 				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
 			END IF;
+			
+--			z1, z2
+			IF (NEW.z1 IS NULL) THEN 
+			    NEW.z1 = 0;
+			END IF;
+			IF (NEW.z2 IS NULL) THEN 
+			    NEW.z2 = 0;
+			END IF;
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -604,6 +652,14 @@ BEGIN
 			IF (NEW.arc_id IS NULL) THEN
 				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
 			END IF;
+			
+--			z1, z2
+			IF (NEW.z1 IS NULL) THEN 
+			    NEW.z1 = 0;
+			END IF;
+			IF (NEW.z2 IS NULL) THEN 
+			    NEW.z2 = 0;
+			END IF;			
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -665,6 +721,14 @@ BEGIN
 			IF (NEW.node_id IS NULL) THEN
 				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
 			END IF;
+				
+--			top_elev, ymax
+			IF (NEW.top_elev IS NULL) THEN 
+			    NEW.top_elev = 0;
+			END IF;
+			IF (NEW.ymax IS NULL) THEN 
+			    NEW.ymax = 0;
+			END IF;
 
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -724,6 +788,14 @@ BEGIN
 				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
 			END IF;
 
+--			z1, z2
+			IF (NEW.z1 IS NULL) THEN 
+			    NEW.z1 = 0;
+			END IF;
+			IF (NEW.z2 IS NULL) THEN 
+			    NEW.z2 = 0;
+			END IF;
+		
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
