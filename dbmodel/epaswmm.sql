@@ -1016,7 +1016,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_outfall" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "outfall_type" varchar(16) COLLATE "default",
-"stage" numeric(6,4),
+"stage" numeric(12,4),
 "curve_id" varchar(16) COLLATE "default",
 "timser_id" varchar(16) COLLATE "default",
 "gate" varchar(3) COLLATE "default"
