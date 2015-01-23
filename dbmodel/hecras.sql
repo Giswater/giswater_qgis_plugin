@@ -367,9 +367,7 @@ CREATE FUNCTION "gr_dump_sdf"("filename" character varying) RETURNS "text"
     AS '
 
 DECLARE
-	return_text text;
 	querystring varchar;
-	file varchar;
 
 BEGIN
 
@@ -377,20 +375,16 @@ BEGIN
 	DELETE FROM SCHEMA_NAME.outfile;
 
 --	Add header to outfile
-	return_text := SCHEMA_NAME.gr_dump_sdf_header();
+	PERFORM SCHEMA_NAME.gr_dump_sdf_header();
 
 --	Add River to outfile
-	return_text := SCHEMA_NAME.gr_dump_river_to_sdf();
+	PERFORM SCHEMA_NAME.gr_dump_river_to_sdf();
 
 --	Add XS to outfile table
-	return_text := SCHEMA_NAME.gr_dump_xs_to_sdf();
-
---	Create outputfile path
-	SELECT INTO return_text setting FROM pg_settings WHERE name = ''data_directory'';
+	PERFORM SCHEMA_NAME.gr_dump_xs_to_sdf();
 
 --	Export outfile table to sdf
-	file:= quote_literal(return_text || ''/'' || filename);
-	querystring := ''COPY (SELECT "Text" FROM SCHEMA_NAME.outfile ORDER BY index) TO '' || file;
+	querystring := ''COPY (SELECT "Text" FROM SCHEMA_NAME.outfile ORDER BY index) TO '' || quote_literal(filename);
 	EXECUTE querystring;
 
 --	Log
