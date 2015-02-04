@@ -207,12 +207,12 @@ END';
 CREATE FUNCTION "gr_dump_river_to_sdf"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	river_line geometry;
-	line3d	geometry;
+	river_line public.geometry;
+	line3d	public.geometry;
 	row_id integer;
 	row_id2 integer;
-	point_aux geometry;
-	point_aux_old geometry;
+	point_aux public.geometry;
+	point_aux_old public.geometry;
 	index_point integer;
 	
 
@@ -450,10 +450,10 @@ END
 CREATE FUNCTION "gr_dump_xs_to_sdf"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	xscutlines_line geometry;
-	line3d	geometry;
+	xscutlines_line public.geometry;
+	line3d	public.geometry;
 	row_id integer;
-	point_aux geometry;
+	point_aux public.geometry;
 
 --	All fields to be copied
 	shape_leng numeric;
@@ -727,9 +727,9 @@ END;';
 CREATE FUNCTION "gr_river_2dto3d"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	river_line geometry;
-	line3d	geometry;
-	line3dSRID geometry;
+	river_line public.geometry;
+	line3d	public.geometry;
+	line3dSRID public.geometry;
 	row_id integer;
 	XS3dSRID integer;
 
@@ -901,7 +901,7 @@ CREATE FUNCTION "gr_topology_cross"("geoml" "public"."geometry", "geom2" "public
     LANGUAGE "plpgsql" IMMUTABLE STRICT
     AS ' 
 DECLARE 
-geom_boundary Geometry; 
+geom_boundary public.geometry; 
 BEGIN 
 	IF (ST_IsClosed(geoml) OR ST_IsClosed(geom2)) THEN 
 		Return false; 
@@ -980,17 +980,17 @@ DECLARE
 	loopquery Varchar; 
 	nodeRecord1 Record; 
 	nodeRecord2 Record; 
-	geomlin Geometry; 
+	geomlin public.geometry; 
 	simplefeature Record; 
-	geomfrag Geometry; 
+	geomfrag public.geometry; 
 	elemfeature Record; 
-	elemgeom1 Geometry; 
+	elemgeom1 public.geometry; 
 	querystringUPDATE Varchar; 
 	querystringUPDATEREACH Varchar;
 	querystring Varchar; 
 	querystringinicial Varchar; 
 	ngeoms Integer; 
-	unionall Geometry; 
+	unionall public.geometry; 
 	array_len Integer; 
 	gids Integer[];
 	combinedName Varchar;
@@ -1274,9 +1274,9 @@ CREATE FUNCTION "gr_update_xscutlines_view"() RETURNS "trigger"
 CREATE FUNCTION "gr_xs_2dto3d"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	xscutlines_line geometry;
-	line3d	geometry;
-	line3dSRID geometry;
+	xscutlines_line public.geometry;
+	line3d	public.geometry;
+	line3dSRID public.geometry;
 	row_id integer;
 	XS3dSRID integer;
 
@@ -1359,11 +1359,11 @@ END
 CREATE FUNCTION "gr_xs_banks"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	bank_point geometry[2];
+	bank_point public.geometry[2];
 	bank_point_dist1 double precision;
 	bank_point_dist2 double precision;
 	number_of_bank_lines integer;
-	xscutlines_line geometry;
+	xscutlines_line public.geometry;
 	xscutlines_gid integer;
 BEGIN
 
@@ -1421,11 +1421,11 @@ END';
 CREATE FUNCTION "gr_xs_lengths"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	flowpath_point_old geometry[3];
-	flowpath_point_new geometry[3];
+	flowpath_point_old public.geometry[3];
+	flowpath_point_new public.geometry[3];
 	flowpath_point_dist double precision[3];
 	number_of_flowpath_lines integer;
-	xscutlines_line geometry;
+	xscutlines_line public.geometry;
 	xscutlines_gid integer;
 	river_code character varying(16);
 	index_row integer;
@@ -1511,13 +1511,13 @@ END
 CREATE FUNCTION "gr_xs_station"() RETURNS "text"
     LANGUAGE "plpgsql"
     AS 'DECLARE
-	stream_point geometry;
+	stream_point public.geometry;
 	stream_point_dist double precision;
 	stream_length double precision;
 	stream_downstream_length numeric;
 	number_of_stream_lines integer;
-	xscutlines_line geometry;
-	stream_line geometry;
+	xscutlines_line public.geometry;
+	stream_line public.geometry;
 	xscutlines_gid integer;
 BEGIN
 

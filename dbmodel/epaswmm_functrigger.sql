@@ -838,10 +838,10 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_v_inp_edit_weir"();
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_dump_subcatchments() RETURNS SETOF character varying LANGUAGE plpgsql AS $$
 DECLARE
-	subcatchment_polygon geometry;
+	subcatchment_polygon public.geometry;
 	row_id varchar(16);
 	index_point integer;
-	point_aux geometry;
+	point_aux public.geometry;
 
 BEGIN
 

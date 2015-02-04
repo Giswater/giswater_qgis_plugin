@@ -515,7 +515,7 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "matcat_id" varchar(16) COLLATE "default",
 "swmm_type" varchar(18) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
-"the_geom" geometry (LINESTRING, SRID_VALUE)
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -1791,7 +1791,7 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "ymax" numeric(12,4) DEFAULT 0.00,
 "swmm_type" varchar(18) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
-"the_geom" geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -1810,7 +1810,7 @@ CREATE TABLE "SCHEMA_NAME"."raingage" (
 "fname" varchar(254) COLLATE "default",
 "sta" varchar(12) COLLATE "default",
 "units" varchar(3) COLLATE "default",
-"the_geom" geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -2316,7 +2316,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."sector" (
 "sector_id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default",
-"the_geom" geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -2364,7 +2364,7 @@ CREATE TABLE "SCHEMA_NAME"."subcatchment" (
 "conduct_2" numeric(12,4),
 "drytime_2" numeric(12,4),
 "sector_id" varchar(30) COLLATE "default",
-"the_geom" geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
