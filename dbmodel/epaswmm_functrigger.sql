@@ -845,7 +845,7 @@ DECLARE
 
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	EXECUTE 'SET search_path TO '||quote_literal(current_schema)||', public';
 
 --	Create the temporal table
 	DROP TABLE IF EXISTS temp_subcatchments CASCADE;
