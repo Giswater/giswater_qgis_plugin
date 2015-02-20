@@ -178,7 +178,7 @@ EXECUTE PROCEDURE "SCHEMA_NAME"."update_t_inp_node_update"();
 -- Function: "SCHEMA_NAME".update_t_inp_node_delete()
 -- Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario in "PostGIS 2 Analisis Espacial Avanzado" 
 
-CREATE FUNCTION SCHEMA_NAME.update_t_inp_node_delete() RETURNS trigger LANGUAGE plpgsql AS $$ 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.update_t_inp_node_delete() RETURNS trigger LANGUAGE plpgsql AS $$ 
 
 DECLARE 
 	querystring Varchar; 
