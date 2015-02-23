@@ -845,8 +845,6 @@ DECLARE
 
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(CURRENT_SCHEMA)||', public';
-
 --	Create the temporal table
 	DROP TABLE IF EXISTS temp_subcatchments CASCADE;
 	CREATE TEMP TABLE temp_subcatchments("Text" character varying,
