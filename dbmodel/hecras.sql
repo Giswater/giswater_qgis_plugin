@@ -18,7 +18,7 @@ SET client_min_messages = warning;
 CREATE SCHEMA "SCHEMA_NAME";
 
 
-SET search_path = "SCHEMA_NAME", pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --
 -- TOC entry 2000 (class 1247 OID 151926)
