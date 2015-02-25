@@ -33,29 +33,20 @@ CREATE TYPE "linetype_enum" AS ENUM (
 
 
 --
--- TOC entry 1494 (class 1255 OID 151933)
--- Name: _gr_landuse_manning(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
---
-
-CREATE FUNCTION "_gr_landuse_manning"() RETURNS SETOF character
-    LANGUAGE "sql"
-    AS 'SELECT river.rivercode FROM SCHEMA_NAME.river';
-
-
---
 -- TOC entry 1495 (class 1255 OID 151934)
 -- Name: gr_clear(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_clear"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_clear"() RETURNS "text"
     LANGUAGE "sql"
-    AS 'SELECT SCHEMA_NAME.gr_clear_shapes();
-SELECT SCHEMA_NAME.gr_clear_tables();
-SELECT SCHEMA_NAME.gr_clear_dtm();
-SELECT SCHEMA_NAME.gr_clear_log();
-SELECT SCHEMA_NAME.gr_clear_error();
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_init()'',''SCHEMA_NAME empty schema'',CURRENT_TIMESTAMP);
-SELECT ''SCHEMA_NAME schema init finished''::text;';
+    AS $$
+SELECT gr_clear_shapes();
+SELECT gr_clear_tables();
+SELECT gr_clear_dtm();
+SELECT gr_clear_log();
+SELECT gr_clear_error();
+INSERT INTO log VALUES ('gr_init()','SCHEMA_NAME empty schema',CURRENT_TIMESTAMP);
+SELECT 'SCHEMA_NAME schema init finished'::text;$$;
 
 
 --
@@ -63,13 +54,13 @@ SELECT ''SCHEMA_NAME schema init finished''::text;';
 -- Name: gr_clear_dtm(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_clear_dtm"() RETURNS SETOF integer
+CREATE OR REPLACE FUNCTION "gr_clear_dtm"() RETURNS SETOF integer
     LANGUAGE "sql"
-    AS 'DELETE FROM SCHEMA_NAME.mdt;
---DELETE FROM SCHEMA_NAME.mdt_qgis;
---SELECT setval(''SCHEMA_NAME.mdt_rid_seq'', 1, false); 
-SELECT rid FROM SCHEMA_NAME.mdt;
-';
+    AS $$
+DELETE FROM mdt;
+--DELETE FROM mdt_qgis;
+--SELECT setval('mdt_rid_seq', 1, false); 
+SELECT rid FROM mdt;$$;
 
 
 --
@@ -77,10 +68,11 @@ SELECT rid FROM SCHEMA_NAME.mdt;
 -- Name: gr_clear_error(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_clear_error"() RETURNS character varying
+CREATE OR REPLACE FUNCTION "gr_clear_error"() RETURNS character varying
     LANGUAGE "sql"
-    AS 'DELETE FROM SCHEMA_NAME.error;
-SELECT ''Error registry clear''::text;';
+    AS $$
+DELETE FROM error;
+SELECT 'Error registry clear'::text;$$;
 
 
 --
@@ -88,10 +80,11 @@ SELECT ''Error registry clear''::text;';
 -- Name: gr_clear_log(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_clear_log"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_clear_log"() RETURNS "text"
     LANGUAGE "sql"
-    AS 'DELETE FROM SCHEMA_NAME.log;
-SELECT ''Log registry clear''::text;';
+    AS $$
+DELETE FROM log;
+SELECT 'Log registry clear'::text;$$;
 
 
 --
@@ -99,28 +92,29 @@ SELECT ''Log registry clear''::text;';
 -- Name: gr_clear_shapes(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_clear_shapes"() RETURNS SETOF "text"
+CREATE OR REPLACE FUNCTION "gr_clear_shapes"() RETURNS SETOF "text"
     LANGUAGE "sql"
-    AS 'DELETE FROM SCHEMA_NAME.banks;
-DELETE FROM SCHEMA_NAME.flowpaths;
-DELETE FROM SCHEMA_NAME.river;
-DELETE FROM SCHEMA_NAME.river3d;
-DELETE FROM SCHEMA_NAME.xscutlines;
-DELETE FROM SCHEMA_NAME.xscutlines3d;
-DELETE FROM SCHEMA_NAME."LandUse";
-DELETE FROM SCHEMA_NAME."IneffAreas";
-DELETE FROM SCHEMA_NAME."NodesTable";
+    AS $$
+DELETE FROM banks;
+DELETE FROM flowpaths;
+DELETE FROM river;
+DELETE FROM river3d;
+DELETE FROM xscutlines;
+DELETE FROM xscutlines3d;
+DELETE FROM "LandUse";
+DELETE FROM "IneffAreas";
+DELETE FROM "NodesTable";
 
---SELECT setval(''SCHEMA_NAME.banks_gid_seq'', 1, false);    
---SELECT setval(''SCHEMA_NAME.flowpaths_gid_seq'', 1, false);    
---SELECT setval(''SCHEMA_NAME.river_gid_seq'', 1, false);    
---SELECT setval(''SCHEMA_NAME.river3d_gid_seq'', 1, false);    
---SELECT setval(''SCHEMA_NAME.xscutlines_gid_seq'', 1, false);    
---SELECT setval(''SCHEMA_NAME.xscutlines3d_gid_seq'', 1, false);    
---SELECT setval(''SCHEMA_NAME.IneffAreas_gid_seq'', 1, false);
---SELECT setval(''SCHEMA_NAME.LandUse_gid_seq'', 1, false);
---SELECT setval(''SCHEMA_NAME.nodestable_objectid_seq'', 1, false);
-SELECT ''Shape tables empty''::text;';
+--SELECT setval('banks_gid_seq', 1, false);    
+--SELECT setval('flowpaths_gid_seq', 1, false);    
+--SELECT setval('river_gid_seq', 1, false);    
+--SELECT setval('river3d_gid_seq', 1, false);    
+--SELECT setval('xscutlines_gid_seq', 1, false);    
+--SELECT setval('xscutlines3d_gid_seq', 1, false);    
+--SELECT setval('IneffAreas_gid_seq', 1, false);
+--SELECT setval('LandUse_gid_seq', 1, false);
+--SELECT setval('nodestable_objectid_seq', 1, false);
+SELECT 'Shape tables empty'::text;$$;
 
 
 --
@@ -128,17 +122,17 @@ SELECT ''Shape tables empty''::text;';
 -- Name: gr_clear_tables(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_clear_tables"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_clear_tables"() RETURNS "text"
     LANGUAGE "sql"
-    AS '
+    AS $$
 --Delete table rows
-DELETE FROM SCHEMA_NAME."Manning";
-DELETE FROM SCHEMA_NAME."LUManning";
-DELETE FROM SCHEMA_NAME."IneffectivePositions";
-DELETE FROM SCHEMA_NAME."outfile";
+DELETE FROM "Manning";
+DELETE FROM "LUManning";
+DELETE FROM "IneffectivePositions";
+DELETE FROM "outfile";
 
-SELECT ''Tables empty''::text;
-  ';
+SELECT 'Tables empty'::text;
+  $$;
 
 
 --
@@ -146,27 +140,29 @@ SELECT ''Tables empty''::text;
 -- Name: gr_delete_case("text"); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_delete_case"("schema" "text") RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_delete_case"("schema" "text") RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 
 BEGIN
+
+	
 
 --	Check schema
 	IF (SELECT 1 FROM pg_namespace WHERE nspname = schema) THEN
 		EXECUTE(FORMAT($q$DROP SCHEMA IF EXISTS %s CASCADE$q$,quote_ident(schema)));
 	ELSE
-		INSERT INTO SCHEMA_NAME.error VALUES (''gr_delete_case('' || schema || '')'', ''Case '' || schema || '' does not exist.'',CURRENT_TIMESTAMP);
+		INSERT INTO error VALUES ('gr_delete_case(' || schema || ')', 'Case ' || schema || ' does not exist.',CURRENT_TIMESTAMP);
 	END IF;
 
 
 --	Log
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_delete_case('' || schema || '')'', ''Case '' || schema || '' deleted.'',CURRENT_TIMESTAMP);	
-	RETURN ''SCHEMA_NAME case '' || schema || '' deleted''::text;
+	INSERT INTO log VALUES ('gr_delete_case(' || schema || ')', 'Case ' || schema || ' deleted.',CURRENT_TIMESTAMP);	
+	RETURN 'SCHEMA_NAME case ' || schema || ' deleted'::text;
 
 
 
-END';
+END$$;
 
 
 --
@@ -174,9 +170,9 @@ END';
 -- Name: gr_downstream_distance(smallint, "text", numeric); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_downstream_distance"("fromnode" smallint, "rivercode" "text", "total_length" numeric) RETURNS numeric
+CREATE OR REPLACE FUNCTION "gr_downstream_distance"("fromnode" smallint, "rivercode" "text", "total_length" numeric) RETURNS numeric
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 
 	querystring Varchar; 
 	riverRecord Record;
@@ -184,7 +180,9 @@ CREATE FUNCTION "gr_downstream_distance"("fromnode" smallint, "rivercode" "text"
 
 BEGIN
 
-	querystring := ''SELECT river.gid AS gid, river.arclength AS length, river.tonode AS endnode FROM SCHEMA_NAME.river river WHERE river.rivercode = '' || quote_literal(rivercode) || '' AND river.fromnode = '' || fromnode;
+	
+
+	querystring := 'SELECT river.gid AS gid, river.arclength AS length, river.tonode AS endnode FROM river river WHERE river.rivercode = ' || quote_literal(rivercode) || ' AND river.fromnode = ' || fromnode;
 
 	EXECUTE querystring INTO riverRecord;
 
@@ -192,11 +190,11 @@ BEGIN
 		RETURN total_length;
 	ELSE
 		total_length := total_length + riverRecord.length;
-		length_aux := SCHEMA_NAME.gr_downstream_distance(riverRecord.endnode,rivercode,total_length);
+		length_aux := gr_downstream_distance(riverRecord.endnode,rivercode,total_length);
 		RETURN length_aux;
 	END IF; 
 
-END';
+END$$;
 
 
 --
@@ -204,9 +202,9 @@ END';
 -- Name: gr_dump_river_to_sdf(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_dump_river_to_sdf"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_dump_river_to_sdf"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	river_line public.geometry;
 	line3d	public.geometry;
 	row_id integer;
@@ -236,49 +234,49 @@ CREATE FUNCTION "gr_dump_river_to_sdf"() RETURNS "text"
 
 BEGIN
 
-
+	
 
 --	Write sdf XS header
-	INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-	INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''BEGIN STREAM NETWORK:'');
+	INSERT INTO outfile VALUES ('');
+	INSERT INTO outfile VALUES ('');
+	INSERT INTO outfile VALUES ('BEGIN STREAM NETWORK:');
 
 --	End point nodes
-	FOR row_id2 IN SELECT "OBJECTID" FROM SCHEMA_NAME."NodesTable"
+	FOR row_id2 IN SELECT "OBJECTID" FROM "NodesTable"
 	LOOP
-		SELECT INTO Coord_X "X" FROM SCHEMA_NAME."NodesTable" WHERE "OBJECTID" = row_id2;
-		SELECT INTO Coord_Y "Y" FROM SCHEMA_NAME."NodesTable" WHERE "OBJECTID" = row_id2;
-		SELECT INTO Coord_Z "Z" FROM SCHEMA_NAME."NodesTable" WHERE "OBJECTID" = row_id2;
-		SELECT INTO Node_ID "NodeID" FROM SCHEMA_NAME."NodesTable" WHERE "OBJECTID" = row_id2;
+		SELECT INTO Coord_X "X" FROM "NodesTable" WHERE "OBJECTID" = row_id2;
+		SELECT INTO Coord_Y "Y" FROM "NodesTable" WHERE "OBJECTID" = row_id2;
+		SELECT INTO Coord_Z "Z" FROM "NodesTable" WHERE "OBJECTID" = row_id2;
+		SELECT INTO Node_ID "NodeID" FROM "NodesTable" WHERE "OBJECTID" = row_id2;
 
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''ENDPOINT: ''  || Coord_X || '', '' || Coord_Y || '', '' || Coord_Z || '', '' || Node_ID);
+		INSERT INTO outfile VALUES ('ENDPOINT: '  || Coord_X || ', ' || Coord_Y || ', ' || Coord_Z || ', ' || Node_ID);
 	END LOOP;
 
 	
 --	For each line in river
-	FOR row_id IN SELECT gid FROM SCHEMA_NAME.river
+	FOR row_id IN SELECT gid FROM river
 	LOOP
 
 --		Get the geom and remain fields
-		SELECT INTO river_line geom FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO shape_leng river.shape_leng FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO hydroid river.hydroid FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO rivercode river.rivercode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO reachcode river.reachcode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO fromnode river.fromnode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO tonode river.tonode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO arclength river.arclength FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO fromsta river.fromsta FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO tosta river.tosta FROM SCHEMA_NAME.river WHERE gid = row_id;
+		SELECT INTO river_line geom FROM river WHERE gid = row_id;
+		SELECT INTO shape_leng river.shape_leng FROM river WHERE gid = row_id;
+		SELECT INTO hydroid river.hydroid FROM river WHERE gid = row_id;
+		SELECT INTO rivercode river.rivercode FROM river WHERE gid = row_id;
+		SELECT INTO reachcode river.reachcode FROM river WHERE gid = row_id;
+		SELECT INTO fromnode river.fromnode FROM river WHERE gid = row_id;
+		SELECT INTO tonode river.tonode FROM river WHERE gid = row_id;
+		SELECT INTO arclength river.arclength FROM river WHERE gid = row_id;
+		SELECT INTO fromsta river.fromsta FROM river WHERE gid = row_id;
+		SELECT INTO tosta river.tosta FROM river WHERE gid = row_id;
 
 --		Write particular River header
-		INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''REACH:'');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''STREAM ID: '' || rivercode);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''REACH ID: '' || reachcode);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''FROM POINT: '' || fromnode);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''TO POINT: '' || tonode);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''CENTERLINE:'');
+		INSERT INTO outfile VALUES ('');
+		INSERT INTO outfile VALUES ('REACH:');
+		INSERT INTO outfile VALUES ('STREAM ID: ' || rivercode);
+		INSERT INTO outfile VALUES ('REACH ID: ' || reachcode);
+		INSERT INTO outfile VALUES ('FROM POINT: ' || fromnode);
+		INSERT INTO outfile VALUES ('TO POINT: ' || tonode);
+		INSERT INTO outfile VALUES ('CENTERLINE:');
 
 --		Loop for river 2d nodes
 		index_point := 1;
@@ -288,9 +286,9 @@ BEGIN
 --			Insert result into outfile table
 			IF index_point > 1 THEN
 				shape_leng := shape_leng - ST_distance(point_aux,point_aux_old);
-				INSERT INTO SCHEMA_NAME.outfile VALUES (''        '' || ST_X(point_aux) || '', '' || ST_Y(point_aux) || '', 0.0, '' || shape_leng);
+				INSERT INTO outfile VALUES ('        ' || ST_X(point_aux) || ', ' || ST_Y(point_aux) || ', 0.0, ' || shape_leng);
 			ELSE
-				INSERT INTO SCHEMA_NAME.outfile VALUES (''        '' || ST_X(point_aux) || '', '' || ST_Y(point_aux) || '', 0.0, '' || shape_leng);
+				INSERT INTO outfile VALUES ('        ' || ST_X(point_aux) || ', ' || ST_Y(point_aux) || ', 0.0, ' || shape_leng);
 			END IF;
 
 			index_point := index_point + 1;
@@ -298,21 +296,21 @@ BEGIN
 		END LOOP;
 
 --		Close particular xs 
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''END:'');
+		INSERT INTO outfile VALUES ('END:');
 
 
 	END LOOP;
 
 --	Close XS section
-	INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''END STREAM NETWORK:'');
+	INSERT INTO outfile VALUES ('');
+	INSERT INTO outfile VALUES ('END STREAM NETWORK:');
 
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_dump_river_to_sdf()'',''River dump outfile finished.'',CURRENT_TIMESTAMP);
-	RETURN ''2d river dumping finished''::text;
+	INSERT INTO log VALUES ('gr_dump_river_to_sdf()','River dump outfile finished.',CURRENT_TIMESTAMP);
+	RETURN '2d river dumping finished'::text;
 
 END
-';
+$$;
 
 
 --
@@ -320,41 +318,43 @@ END
 -- Name: gr_dump_sdf(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_dump_sdf"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_dump_sdf"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 
 	return_text text;
 	querystring Varchar;
 
 BEGIN
 
+	
+
 --	Clear outfile table
-	DELETE FROM SCHEMA_NAME.outfile;
+	DELETE FROM outfile;
 
 --	Add header to outfile
-	return_text := SCHEMA_NAME.gr_dump_sdf_header();
+	return_text := gr_dump_sdf_header();
 
 --	Add River to outfile
-	return_text := SCHEMA_NAME.gr_dump_river_to_sdf();
+	return_text := gr_dump_river_to_sdf();
 
 --	Add XS to outfile table
-	return_text := SCHEMA_NAME.gr_dump_xs_to_sdf();
+	return_text := gr_dump_xs_to_sdf();
 
 --	Create outputfile path
-	SELECT INTO return_text setting FROM pg_settings WHERE name = ''data_directory'';
+	SELECT INTO return_text setting FROM pg_settings WHERE name = 'data_directory';
 
 --	Export outfile table to sdf
-	querystring := ''COPY (SELECT "Text" FROM SCHEMA_NAME.outfile ORDER BY index) TO '' || quote_literal(return_text || ''/SCHEMA_NAME_postgis.sdf'');
+	querystring := 'COPY (SELECT "Text" FROM outfile ORDER BY index) TO ' || quote_literal(return_text || '/SCHEMA_NAME_postgis.sdf');
 	EXECUTE querystring;
 
 --	Log
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_dump_sdf()'',''SDF table exported.'',CURRENT_TIMESTAMP);
+	INSERT INTO log VALUES ('gr_dump_sdf()','SDF table exported.',CURRENT_TIMESTAMP);
 
 
-	RETURN ''SDF table exported.''::text;
+	RETURN 'SDF table exported.'::text;
 END
-';
+$$;
 
 
 --
@@ -362,38 +362,40 @@ END
 -- Name: gr_dump_sdf(character varying); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_dump_sdf"("filename" character varying) RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_dump_sdf"("filename" character varying) RETURNS "text"
     LANGUAGE "plpgsql"
-    AS '
+    AS $$
 
 DECLARE
 	querystring varchar;
 
 BEGIN
 
+	
+
 --	Clear outfile table
-	DELETE FROM SCHEMA_NAME.outfile;
+	DELETE FROM outfile;
 
 --	Add header to outfile
-	PERFORM SCHEMA_NAME.gr_dump_sdf_header();
+	PERFORM gr_dump_sdf_header();
 
 --	Add River to outfile
-	PERFORM SCHEMA_NAME.gr_dump_river_to_sdf();
+	PERFORM gr_dump_river_to_sdf();
 
 --	Add XS to outfile table
-	PERFORM SCHEMA_NAME.gr_dump_xs_to_sdf();
+	PERFORM gr_dump_xs_to_sdf();
 
 --	Export outfile table to sdf
-	querystring := ''COPY (SELECT "Text" FROM SCHEMA_NAME.outfile ORDER BY index) TO '' || quote_literal(filename);
+	querystring := 'COPY (SELECT "Text" FROM outfile ORDER BY index) TO ' || quote_literal(filename);
 	EXECUTE querystring;
 
 --	Log
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_dump_sdf()'', ''SDF table exported: '' || querystring, CURRENT_TIMESTAMP);
-	RETURN ''SDF table exported.''::text;
+	INSERT INTO log VALUES ('gr_dump_sdf()', 'SDF table exported: ' || querystring, CURRENT_TIMESTAMP);
+	RETURN 'SDF table exported.'::text;
 
 END
 
-';
+$$;
 
 
 --
@@ -401,45 +403,46 @@ END
 -- Name: gr_dump_sdf_header(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_dump_sdf_header"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_dump_sdf_header"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 
 	return_text text;
 
 BEGIN
 
+	
+
 --	Write sdf XS header
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''#File generated by SCHEMA_NAME (GITS-UPC) for postGIS'');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''BEGIN HEADER:'');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''DTM TYPE: RASTER'');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''DTM:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''STREAM LAYER:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''NUMBER OF REACHES: '' || (SELECT COUNT(*) FROM SCHEMA_NAME.river));
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''CROSS-SECTION LAYER:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''NUMBER OF CROSS-SECTIONS: '' || (SELECT COUNT(*) FROM SCHEMA_NAME.xscutlines));
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''MAP PROJECTION:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''PROJECTION ZONE:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''DATUM:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''VERTICAL DATUM:  '');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''BEGIN SPATIAL EXTENT:'');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''XMIN: '' || (SELECT min(ST_xmin(ST_Envelope(geom))) FROM SCHEMA_NAME.xscutlines));
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''YMIN: '' || (SELECT min(ST_ymin(ST_Envelope(geom))) FROM SCHEMA_NAME.xscutlines));
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''XMAX: '' || (SELECT max(ST_xmax(ST_Envelope(geom))) FROM SCHEMA_NAME.xscutlines));
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''YMAX: '' || (SELECT max(ST_ymax(ST_Envelope(geom))) FROM SCHEMA_NAME.xscutlines));
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''END SPATIAL EXTENT:'');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''UNITS: METERS'');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''END HEADER:'');
+	INSERT INTO outfile VALUES ('#File generated by SCHEMA_NAME (GITS-UPC) for postGIS');
+	INSERT INTO outfile VALUES ('BEGIN HEADER:');
+	INSERT INTO outfile VALUES ('DTM TYPE: RASTER');
+	INSERT INTO outfile VALUES ('DTM:  ');
+	INSERT INTO outfile VALUES ('STREAM LAYER:  ');
+	INSERT INTO outfile VALUES ('NUMBER OF REACHES: ' || (SELECT COUNT(*) FROM river));
+	INSERT INTO outfile VALUES ('CROSS-SECTION LAYER:  ');
+	INSERT INTO outfile VALUES ('NUMBER OF CROSS-SECTIONS: ' || (SELECT COUNT(*) FROM xscutlines));
+	INSERT INTO outfile VALUES ('MAP PROJECTION:  ');
+	INSERT INTO outfile VALUES ('PROJECTION ZONE:  ');
+	INSERT INTO outfile VALUES ('DATUM:  ');
+	INSERT INTO outfile VALUES ('VERTICAL DATUM:  ');
+	INSERT INTO outfile VALUES ('BEGIN SPATIAL EXTENT:');
+	INSERT INTO outfile VALUES ('XMIN: ' || (SELECT min(ST_xmin(ST_Envelope(geom))) FROM xscutlines));
+	INSERT INTO outfile VALUES ('YMIN: ' || (SELECT min(ST_ymin(ST_Envelope(geom))) FROM xscutlines));
+	INSERT INTO outfile VALUES ('XMAX: ' || (SELECT max(ST_xmax(ST_Envelope(geom))) FROM xscutlines));
+	INSERT INTO outfile VALUES ('YMAX: ' || (SELECT max(ST_ymax(ST_Envelope(geom))) FROM xscutlines));
+	INSERT INTO outfile VALUES ('END SPATIAL EXTENT:');
+	INSERT INTO outfile VALUES ('UNITS: METERS');
+	INSERT INTO outfile VALUES ('END HEADER:');
 
 
 
 --	Log
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_dump_sdf_header()'',''SDF header dumped.'',CURRENT_TIMESTAMP);
+	INSERT INTO log VALUES ('gr_dump_sdf_header()','SDF header dumped.',CURRENT_TIMESTAMP);
 
 
-	RETURN ''SDF header exported.''::text;
-END
-';
+	RETURN 'SDF header exported.'::text;
+END$$;
 
 
 --
@@ -447,9 +450,9 @@ END
 -- Name: gr_dump_xs_to_sdf(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_dump_xs_to_sdf"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_dump_xs_to_sdf"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	xscutlines_line public.geometry;
 	line3d	public.geometry;
 	row_id integer;
@@ -471,91 +474,90 @@ CREATE FUNCTION "gr_dump_xs_to_sdf"() RETURNS "text"
 
 BEGIN
 
-
+	
 
 --	Write sdf XS header
-	INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-	INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''BEGIN CROSS-SECTIONS:'');
+	INSERT INTO outfile VALUES ('');
+	INSERT INTO outfile VALUES ('');
+	INSERT INTO outfile VALUES ('BEGIN CROSS-SECTIONS:');
 
 
 --	For each line in xscutlines
-	FOR row_id IN SELECT gid FROM SCHEMA_NAME.xscutlines
+	FOR row_id IN SELECT gid FROM xscutlines
 	LOOP
 
 --		Get the geom and remain fields
-		SELECT INTO xscutlines_line geom FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO shape_leng xscutlines.shape_leng FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO hydroid xscutlines.hydroid FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO profilem xscutlines.profilem FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO rivercode xscutlines.rivercode FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO reachcode xscutlines.reachcode FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO leftbank xscutlines.leftbank FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO rightbank xscutlines.rightbank FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO llength xscutlines.llength FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO chlength xscutlines.chlength FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO rlength xscutlines.rlength FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO nodename xscutlines.nodename FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
+		SELECT INTO xscutlines_line geom FROM xscutlines WHERE gid = row_id;
+		SELECT INTO shape_leng xscutlines.shape_leng FROM xscutlines WHERE gid = row_id;
+		SELECT INTO hydroid xscutlines.hydroid FROM xscutlines WHERE gid = row_id;
+		SELECT INTO profilem xscutlines.profilem FROM xscutlines WHERE gid = row_id;
+		SELECT INTO rivercode xscutlines.rivercode FROM xscutlines WHERE gid = row_id;
+		SELECT INTO reachcode xscutlines.reachcode FROM xscutlines WHERE gid = row_id;
+		SELECT INTO leftbank xscutlines.leftbank FROM xscutlines WHERE gid = row_id;
+		SELECT INTO rightbank xscutlines.rightbank FROM xscutlines WHERE gid = row_id;
+		SELECT INTO llength xscutlines.llength FROM xscutlines WHERE gid = row_id;
+		SELECT INTO chlength xscutlines.chlength FROM xscutlines WHERE gid = row_id;
+		SELECT INTO rlength xscutlines.rlength FROM xscutlines WHERE gid = row_id;
+		SELECT INTO nodename xscutlines.nodename FROM xscutlines WHERE gid = row_id;
 
 --		Write particular XS header
-		INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''CROSS-SECTION:'');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''STREAM ID: '' || rivercode);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''REACH ID: '' || reachcode);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''STATION: '' || profilem);
+		INSERT INTO outfile VALUES ('');
+		INSERT INTO outfile VALUES ('CROSS-SECTION:');
+		INSERT INTO outfile VALUES ('STREAM ID: ' || rivercode);
+		INSERT INTO outfile VALUES ('REACH ID: ' || reachcode);
+		INSERT INTO outfile VALUES ('STATION: ' || profilem);
 
 		IF nodename IS NULL THEN
-			INSERT INTO SCHEMA_NAME.outfile VALUES (''NODE NAME: '');
+			INSERT INTO outfile VALUES ('NODE NAME: ');
 		ELSE
-			INSERT INTO SCHEMA_NAME.outfile VALUES (''NODE NAME: '' || nodename);
+			INSERT INTO outfile VALUES ('NODE NAME: ' || nodename);
 		END IF;
 
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''BANK POSITIONS: '' || leftbank || '', '' || rightbank);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''REACH LENGTHS: '' || llength || '', '' || chlength || '', '' || rlength);
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''NVALUES:'');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''LEVEE POSITIONS:'');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''INEFFECTIVE POSITIONS:'');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''BLOCKED POSITIONS:'');
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''CUT LINE:'');
+		INSERT INTO outfile VALUES ('BANK POSITIONS: ' || leftbank || ', ' || rightbank);
+		INSERT INTO outfile VALUES ('REACH LENGTHS: ' || llength || ', ' || chlength || ', ' || rlength);
+		INSERT INTO outfile VALUES ('NVALUES:');
+		INSERT INTO outfile VALUES ('LEVEE POSITIONS:');
+		INSERT INTO outfile VALUES ('INEFFECTIVE POSITIONS:');
+		INSERT INTO outfile VALUES ('BLOCKED POSITIONS:');
+		INSERT INTO outfile VALUES ('CUT LINE:');
 
 --		Loop for xs 2d nodes
 		FOR point_aux IN SELECT (ST_dumppoints(xscutlines_line)).geom
 		LOOP
 
-			INSERT INTO SCHEMA_NAME.outfile VALUES (''        '' || ST_X(point_aux) || '', '' || ST_Y(point_aux));
+			INSERT INTO outfile VALUES ('        ' || ST_X(point_aux) || ', ' || ST_Y(point_aux));
 
 		END LOOP;
 	
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''SURFACE LINE:'');
+		INSERT INTO outfile VALUES ('SURFACE LINE:');
 
 --		Compute 3d crossection
 		WITH intersectLines AS
-			(SELECT ST_intersection(xscutlines_line,B.rast) AS geomval FROM SCHEMA_NAME.mdt as B WHERE ST_intersects(xscutlines_line, B.rast)),
+			(SELECT ST_intersection(xscutlines_line,B.rast) AS geomval FROM mdt as B WHERE ST_intersects(xscutlines_line, B.rast)),
 --		Compute midpoint for every intersection line
 		     intersectMidpoints AS
-			(SELECT ST_line_interpolate_point((geomval).geom,0.5) AS geom, (geomval).val AS val, ST_distance(ST_startpoint(ST_LineMerge(xscutlines_line)), ST_line_interpolate_point((geomval).geom,0.5)) AS distance FROM intersectLines WHERE ST_geometrytype((geomval).geom) = ''ST_LineString''),
+			(SELECT ST_line_interpolate_point((geomval).geom,0.5) AS geom, (geomval).val AS val, ST_distance(ST_startpoint(ST_LineMerge(xscutlines_line)), ST_line_interpolate_point((geomval).geom,0.5)) AS distance FROM intersectLines WHERE ST_geometrytype((geomval).geom) = 'ST_LineString'),
 --		Compute ordered midpoint using distance
 		     intersectMidpointsSort AS
 			(SELECT geom AS geom, val AS val, distance AS distance FROM intersectMidpoints ORDER BY distance)
 --		Insert result into outfile table
-		INSERT INTO SCHEMA_NAME.outfile SELECT (''        '' || ST_X(intersectMidpointsSort.geom) || '', '' || ST_Y(intersectMidpointsSort.geom) || '', '' || intersectMidpointsSort.val) FROM intersectMidpointsSort;
+		INSERT INTO outfile SELECT ('        ' || ST_X(intersectMidpointsSort.geom) || ', ' || ST_Y(intersectMidpointsSort.geom) || ', ' || intersectMidpointsSort.val) FROM intersectMidpointsSort;
 
 --		Close particular xs 
-		INSERT INTO SCHEMA_NAME.outfile VALUES (''END:'');
+		INSERT INTO outfile VALUES ('END:');
 
 
 	END LOOP;
 
 --	Close XS section
-	INSERT INTO SCHEMA_NAME.outfile VALUES ('''');
-	INSERT INTO SCHEMA_NAME.outfile VALUES (''END CROSS-SECTIONS:'');
+	INSERT INTO outfile VALUES ('');
+	INSERT INTO outfile VALUES ('END CROSS-SECTIONS:');
 
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_dump_xs_to_sdf()'',''Banks computation finished'',CURRENT_TIMESTAMP);
-	RETURN ''3d XS dumping finished''::text;
+	INSERT INTO log VALUES ('gr_dump_xs_to_sdf()','Banks computation finished',CURRENT_TIMESTAMP);
+	RETURN '3d XS dumping finished'::text;
 
-END
-';
+END$$;
 
 
 --
@@ -563,40 +565,42 @@ END
 -- Name: gr_export_geo(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_export_geo"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_export_geo"() RETURNS "text"
     LANGUAGE "sql"
-    AS '--Clear log
-SELECT SCHEMA_NAME.gr_clear_log();
+    AS $$
+
+--Clear log
+SELECT gr_clear_log();
 
 --Log
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_export_geo()'',''Empty log'',CURRENT_TIMESTAMP);
+INSERT INTO log VALUES ('gr_export_geo()','Empty log',CURRENT_TIMESTAMP);
 
 --Clear error
-SELECT SCHEMA_NAME.gr_clear_error();
+SELECT gr_clear_error();
 
 --Compute stream length
-SELECT SCHEMA_NAME.gr_stream_length();
+SELECT gr_stream_length();
 
 --XS station
-SELECT SCHEMA_NAME.gr_xs_station();
+SELECT gr_xs_station();
 
 --XS banks
-SELECT SCHEMA_NAME.gr_xs_banks();
+SELECT gr_xs_banks();
 
 --XS flowpaths
-SELECT SCHEMA_NAME.gr_xs_lengths();
+SELECT gr_xs_lengths();
 
 --Dump river & XS data to outfile and export to sdf
-SELECT SCHEMA_NAME.gr_dump_sdf();
+SELECT gr_dump_sdf();
 
 --Update 3d layers
-SELECT SCHEMA_NAME.gr_fill_3d_tables();
+SELECT gr_fill_3d_tables();
 
 --Log
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_export_geo()'',''Sdf file finished.'',CURRENT_TIMESTAMP);
+INSERT INTO log VALUES ('gr_export_geo()','Sdf file finished.',CURRENT_TIMESTAMP);
 
 --Return
-SELECT ''SCHEMA_NAME geometry export finished''::text;';
+SELECT 'SCHEMA_NAME geometry export finished'::text;$$;
 
 
 --
@@ -604,42 +608,42 @@ SELECT ''SCHEMA_NAME geometry export finished''::text;';
 -- Name: gr_export_geo(character varying); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_export_geo"("filename" character varying) RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_export_geo"("filename" character varying) RETURNS "text"
     LANGUAGE "sql"
-    AS '
+    AS $$
 
-SELECT SCHEMA_NAME.gr_clear_log();
+SELECT gr_clear_log();
 
 --Log
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_export_geo()'', ''Empty log'', CURRENT_TIMESTAMP);
+INSERT INTO log VALUES ('gr_export_geo()', 'Empty log', CURRENT_TIMESTAMP);
 
 --Clear error
-SELECT SCHEMA_NAME.gr_clear_error();
+SELECT gr_clear_error();
 
 --Compute stream length
-SELECT SCHEMA_NAME.gr_stream_length();
+SELECT gr_stream_length();
 
 --XS station
-SELECT SCHEMA_NAME.gr_xs_station();
+SELECT gr_xs_station();
 
 --XS banks
-SELECT SCHEMA_NAME.gr_xs_banks();
+SELECT gr_xs_banks();
 
 --XS flowpaths
-SELECT SCHEMA_NAME.gr_xs_lengths();
+SELECT gr_xs_lengths();
 
 --Dump river & XS data to outfile and export to sdf
-SELECT SCHEMA_NAME.gr_dump_sdf(filename);
+SELECT gr_dump_sdf(filename);
 
 --Update 3d layers
-SELECT SCHEMA_NAME.gr_fill_3d_tables();
+SELECT gr_fill_3d_tables();
 
 --Log
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_export_geo()'', ''Sdf file finished'', CURRENT_TIMESTAMP);
+INSERT INTO log VALUES ('gr_export_geo()', 'Sdf file finished', CURRENT_TIMESTAMP);
 
 --Return
-SELECT ''SCHEMA_NAME geometry export finished''::text;
-';
+SELECT 'SCHEMA_NAME geometry export finished'::text;
+$$;
 
 
 --
@@ -647,19 +651,21 @@ SELECT ''SCHEMA_NAME geometry export finished''::text;
 -- Name: gr_fill_3d_tables(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_fill_3d_tables"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_fill_3d_tables"() RETURNS "text"
     LANGUAGE "sql"
-    AS '--Insert XS in xscutlines3d
-SELECT SCHEMA_NAME.gr_xs_2dto3d();
+    AS $$
+
+--Insert XS in xscutlines3d
+SELECT gr_xs_2dto3d();
 
 --Insert River in river3d 
-SELECT SCHEMA_NAME.gr_river_2dto3d();
+SELECT gr_river_2dto3d();
 
 --Log
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_fill_3d_tables()'',''3d Tables filled.'',CURRENT_TIMESTAMP);
+INSERT INTO log VALUES ('gr_fill_3d_tables()','3d Tables filled.',CURRENT_TIMESTAMP);
 
 --Return
-SELECT ''3d tables filled''::text;';
+SELECT '3d tables filled'::text;$$;
 
 
 --
@@ -667,9 +673,9 @@ SELECT ''3d tables filled''::text;';
 -- Name: gr_open_case("text"); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_open_case"("schema" "text") RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_open_case"("schema" "text") RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	t_ex integer := 0;
 	trg_table character varying;
 	src_table character varying;
@@ -677,30 +683,32 @@ CREATE FUNCTION "gr_open_case"("schema" "text") RETURNS "text"
 
 BEGIN
 
+	
+
 --	Check schema
 	IF (SELECT 1 FROM pg_namespace WHERE nspname = schema) THEN
 
 --		Copy tables
-		FOR src_table IN EXECUTE(FORMAT($q$SELECT table_name FROM information_schema.TABLES WHERE table_schema = %s  AND table_type = ''BASE TABLE''$q$,quote_literal(schema)))
+		FOR src_table IN EXECUTE(FORMAT($q$SELECT table_name FROM information_schema.TABLES WHERE table_schema = %s  AND table_type = 'BASE TABLE'$q$,quote_literal(schema)))
 		LOOP
 
 --			Table name
-			trg_table := ''SCHEMA_NAME.'' || quote_ident(src_table);
+			trg_table := '' || quote_ident(src_table);
 
 
 --			Check the table name for raster table
-			IF (src_table = ''mdt'') THEN
-				src_table_aux := quote_ident(schema) || ''.mdt'';
+			IF (src_table = 'mdt') THEN
+				src_table_aux := quote_ident(schema) || '.mdt';
 				
 --				Delete old mdt table
-				DROP TABLE IF EXISTS SCHEMA_NAME.mdt;
+				DROP TABLE IF EXISTS mdt;
 				EXECUTE(FORMAT($q$CREATE TABLE %s (LIKE %s)$q$,trg_table,src_table_aux));
-				EXECUTE ''INSERT INTO '' || trg_table || ''(SELECT * FROM '' || src_table_aux || '')'';
+				EXECUTE 'INSERT INTO ' || trg_table || '(SELECT * FROM ' || src_table_aux || ')';
 
 			ELSE
 
-				EXECUTE ''DELETE FROM '' || trg_table;
-				EXECUTE ''INSERT INTO '' || trg_table || ''(SELECT * FROM '' || quote_ident(schema) || ''.'' || quote_ident(src_table) || '')'';
+				EXECUTE 'DELETE FROM ' || trg_table;
+				EXECUTE 'INSERT INTO ' || trg_table || '(SELECT * FROM ' || quote_ident(schema) || '.' || quote_ident(src_table) || ')';
 
 			END IF;
 
@@ -708,15 +716,15 @@ BEGIN
 
 
 	ELSE
-		INSERT INTO SCHEMA_NAME.error VALUES (''gr_open_case('' || schema || '')'', ''Case '' || schema || '' does not exist.'',CURRENT_TIMESTAMP);
+		INSERT INTO error VALUES ('gr_open_case(' || schema || ')', 'Case ' || schema || ' does not exist.',CURRENT_TIMESTAMP);
 	END IF;
 
 
 --	Log
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_open_case('' || schema || '')'', ''Case '' || schema || '' loaded'',CURRENT_TIMESTAMP);	
-	RETURN ''SCHEMA_NAME case '' || schema || '' load finished''::text;
+	INSERT INTO log VALUES ('gr_open_case(' || schema || ')', 'Case ' || schema || ' loaded',CURRENT_TIMESTAMP);	
+	RETURN 'SCHEMA_NAME case ' || schema || ' load finished'::text;
 
-END;';
+END;$$;
 
 
 --
@@ -724,9 +732,9 @@ END;';
 -- Name: gr_river_2dto3d(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_river_2dto3d"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_river_2dto3d"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	river_line public.geometry;
 	line3d	public.geometry;
 	line3dSRID public.geometry;
@@ -747,33 +755,35 @@ CREATE FUNCTION "gr_river_2dto3d"() RETURNS "text"
 
 BEGIN
 
+	
+
 --	Delete 3d tables
-	DELETE FROM SCHEMA_NAME.river3d;
+	DELETE FROM river3d;
 
 
 --	For each line in xscutlines
-	FOR row_id IN SELECT gid FROM SCHEMA_NAME.river
+	FOR row_id IN SELECT gid FROM river
 	LOOP
 
 --		Get the geom and remain fields
-		SELECT INTO river_line geom FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO shape_leng river.shape_leng FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO hydroid river.hydroid FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO rivercode river.rivercode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO reachcode river.reachcode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO fromnode river.fromnode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO tonode river.tonode FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO arclength river.arclength FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO fromsta river.fromsta FROM SCHEMA_NAME.river WHERE gid = row_id;
-		SELECT INTO tosta river.tosta FROM SCHEMA_NAME.river WHERE gid = row_id;
+		SELECT INTO river_line geom FROM river WHERE gid = row_id;
+		SELECT INTO shape_leng river.shape_leng FROM river WHERE gid = row_id;
+		SELECT INTO hydroid river.hydroid FROM river WHERE gid = row_id;
+		SELECT INTO rivercode river.rivercode FROM river WHERE gid = row_id;
+		SELECT INTO reachcode river.reachcode FROM river WHERE gid = row_id;
+		SELECT INTO fromnode river.fromnode FROM river WHERE gid = row_id;
+		SELECT INTO tonode river.tonode FROM river WHERE gid = row_id;
+		SELECT INTO arclength river.arclength FROM river WHERE gid = row_id;
+		SELECT INTO fromsta river.fromsta FROM river WHERE gid = row_id;
+		SELECT INTO tosta river.tosta FROM river WHERE gid = row_id;
 
 
 --		Compute 3d crossection
 		WITH intersectLines AS
-			(SELECT ST_intersection(river_line,B.rast) AS geomval FROM SCHEMA_NAME.mdt as B WHERE ST_intersects(river_line, B.rast)),
+			(SELECT ST_intersection(river_line,B.rast) AS geomval FROM mdt as B WHERE ST_intersects(river_line, B.rast)),
 --		Compute midpoint for every intersection line
 		     intersectMidpoints AS
-			(SELECT ST_line_interpolate_point((geomval).geom,0.5) AS geom, (geomval).val AS val, ST_distance(ST_startpoint(ST_LineMerge(river_line)), ST_line_interpolate_point((geomval).geom,0.5)) AS distance FROM intersectLines WHERE ST_geometrytype((geomval).geom) = ''ST_LineString''),
+			(SELECT ST_line_interpolate_point((geomval).geom,0.5) AS geom, (geomval).val AS val, ST_distance(ST_startpoint(ST_LineMerge(river_line)), ST_line_interpolate_point((geomval).geom,0.5)) AS distance FROM intersectLines WHERE ST_geometrytype((geomval).geom) = 'ST_LineString'),
 --		Compute ordered midpoint using distance
 		     intersectMidpointsSort AS
 			(SELECT geom AS geom, val AS val, distance AS distance FROM intersectMidpoints ORDER BY distance),
@@ -783,24 +793,23 @@ BEGIN
 --		Store the resulting 3d line
 		SELECT INTO line3d ST_multi(st_makeline) FROM line3d_CTE;
 
-		SELECT INTO XS3dSRID Find_SRID(''SCHEMA_NAME'', ''river3d'', ''geom'');
+		SELECT INTO XS3dSRID Find_SRID('SCHEMA_NAME', 'river3d', 'geom');
 		SELECT INTO line3dSRID ST_SetSRID(line3d,XS3dSRID);
 
 --		Insert 3d line in xscutlines3d
-		INSERT INTO SCHEMA_NAME.river3d (shape_leng, riv2did, hydroid, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, geom) VALUES (shape_leng, hydroid, row_id, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, line3dSRID);
+		INSERT INTO river3d (shape_leng, riv2did, hydroid, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, geom) VALUES (shape_leng, hydroid, row_id, rivercode, reachcode, fromnode, tonode, arclength, fromsta, tosta, line3dSRID);
 		
 --		Insert result into outfile table
---		INSERT INTO SCHEMA_NAME.outfile SELECT (''pp1 '' || ST_X(intersectMidpoints.geom) || ST_X(intersectMidpoints.geom) || intersectMidpoints.val || ''pp2'' || ''pp3'') FROM intersectMidpoints;
+--		INSERT INTO outfile SELECT ('pp1 ' || ST_X(intersectMidpoints.geom) || ST_X(intersectMidpoints.geom) || intersectMidpoints.val || 'pp2' || 'pp3') FROM intersectMidpoints;
 
 
 
 	END LOOP;
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_river_2dto3d()'',''River profiles computation finished'',CURRENT_TIMESTAMP);
-	RETURN ''3d river computation finished''::text;
+	INSERT INTO log VALUES ('gr_river_2dto3d()','River profiles computation finished',CURRENT_TIMESTAMP);
+	RETURN '3d river computation finished'::text;
 
-END
-';
+END$$;
 
 
 --
@@ -808,40 +817,41 @@ END
 -- Name: gr_save_case_as("text"); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_save_case_as"("schema" "text") RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_save_case_as"("schema" "text") RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	t_ex integer := 0;
 	trg_table character varying;
 	src_table character varying;
 BEGIN
 
+	
+
 --	Check schema
 	IF (SELECT 1 FROM pg_namespace WHERE nspname = schema) THEN
-		INSERT INTO SCHEMA_NAME.log VALUES (''gr_save_case_as('' || schema || '')'', ''Case '' || schema || '' overwritten'',CURRENT_TIMESTAMP);
-		PERFORM SCHEMA_NAME.gr_delete_case(schema);
+		INSERT INTO log VALUES ('gr_save_case_as(' || schema || ')', 'Case ' || schema || ' overwritten',CURRENT_TIMESTAMP);
+		PERFORM gr_delete_case(schema);
 	END IF;
 
 	EXECUTE(FORMAT($q$CREATE SCHEMA %s AUTHORIZATION postgres$q$,quote_ident(schema)));
 
 --	Create tables
-	FOR src_table IN SELECT table_name FROM information_schema.TABLES WHERE table_schema = ''SCHEMA_NAME'' AND table_type = ''BASE TABLE''
+	FOR src_table IN SELECT table_name FROM information_schema.TABLES WHERE table_schema = 'SCHEMA_NAME' AND table_type = 'BASE TABLE'
 	LOOP
 --		Check the table name
-		IF (src_table <> ''error'' AND src_table <> ''log'' AND src_table <> ''logfile'') THEN
-			trg_table := quote_ident(schema) || ''.'' || quote_ident(src_table);
-			EXECUTE(FORMAT($q$CREATE TABLE %s (LIKE SCHEMA_NAME.%I)$q$,trg_table,src_table));
-			EXECUTE ''INSERT INTO '' || trg_table || ''(SELECT * FROM SCHEMA_NAME.'' || quote_ident(src_table) || '')'';
+		IF (src_table <> 'error' AND src_table <> 'log' AND src_table <> 'logfile') THEN
+			trg_table := quote_ident(schema) || '.' || quote_ident(src_table);
+			EXECUTE(FORMAT($q$CREATE TABLE %s (LIKE %I)$q$,trg_table,src_table));
+			EXECUTE 'INSERT INTO ' || trg_table || '(SELECT * FROM ' || quote_ident(src_table) || ')';
 		END IF;
 	END LOOP;
 
 --	Log
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_save_case_as('' || schema || '')'', ''Case '' || schema || ''saved'',CURRENT_TIMESTAMP);	
-	RETURN ''SCHEMA_NAME schema save as finished''::text;
+	INSERT INTO log VALUES ('gr_save_case_as(' || schema || ')', 'Case ' || schema || 'saved',CURRENT_TIMESTAMP);	
+	RETURN 'SCHEMA_NAME schema save as finished'::text;
 
 
-END;
-';
+END;$$;
 
 
 --
@@ -849,15 +859,16 @@ END;
 -- Name: gr_stream_length(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_stream_length"() RETURNS SETOF numeric
+CREATE OR REPLACE FUNCTION "gr_stream_length"() RETURNS SETOF numeric
     LANGUAGE "sql"
-    AS 'UPDATE SCHEMA_NAME.river SET shape_leng=ST_Length(geom),
+    AS $$
+UPDATE river SET shape_leng=ST_Length(geom),
                          arclength=ST_Length(geom),
-                         fromsta=SCHEMA_NAME.gr_downstream_distance(tonode, rivercode, 0.0),
-                         tosta=SCHEMA_NAME.gr_downstream_distance(tonode, rivercode, 0.0)+ST_Length(geom);
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_stream_length()'',''Stream length computation finished'',CURRENT_TIMESTAMP);
-SELECT shape_leng FROM SCHEMA_NAME.river;
-';
+                         fromsta=gr_downstream_distance(tonode, rivercode, 0.0),
+                         tosta=gr_downstream_distance(tonode, rivercode, 0.0)+ST_Length(geom);
+INSERT INTO log VALUES ('gr_stream_length()','Stream length computation finished',CURRENT_TIMESTAMP);
+SELECT shape_leng FROM river;
+$$;
 
 
 --
@@ -865,31 +876,33 @@ SELECT shape_leng FROM SCHEMA_NAME.river;
 -- Name: gr_topology_check_node("public"."geometry"); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_topology_check_node"("punto" "public"."geometry", OUT "nodegid" integer, OUT "nodegeom" "public"."geometry") RETURNS "record"
+CREATE OR REPLACE FUNCTION "gr_topology_check_node"("punto" "public"."geometry", OUT "nodegid" integer, OUT "nodegeom" "public"."geometry") RETURNS "record"
     LANGUAGE "plpgsql" STRICT
-    AS ' 
+    AS $$ 
 DECLARE 
 	querystring Varchar; 
 	nodeRecord Record; 
 BEGIN 
-	querystring := ''SELECT nodes.'' || quote_ident(''OBJECTID'') || '' AS nodegid, nodes.geom as nodegeom FROM SCHEMA_NAME.''
-		|| quote_ident(''NodesTable'') || '' nodes WHERE nodes.geom && ST_EXPAND ($1, 1.0)''; 
+	
+	
+
+	querystring := 'SELECT nodes.' || quote_ident('OBJECTID') || ' AS nodegid, nodes.geom as nodegeom FROM '
+		|| quote_ident('NodesTable') || ' nodes WHERE nodes.geom && ST_EXPAND ($1, 1.0)'; 
 	EXECUTE querystring INTO nodeRecord USING punto; 
 
 	IF (nodeRecord.nodegid IS NULL) THEN 
-		EXECUTE ''INSERT INTO SCHEMA_NAME.'' || quote_ident(''NodesTable'') || '' (numarcs, geom) VALUES (1,$1)'' USING punto; 
-		EXECUTE ''SELECT currval ('' || quote_literal(''SCHEMA_NAME.nodestable_objectid_seq'') || '')'' INTO nodeRecord.nodegid; 
+		EXECUTE 'INSERT INTO ' || quote_ident('NodesTable') || ' (numarcs, geom) VALUES (1,$1)' USING punto; 
+		EXECUTE 'SELECT currval (' || quote_literal('nodestable_objectid_seq') || ')' INTO nodeRecord.nodegid; 
 		nodeRecord.nodegeom:= punto; 
 	ELSE 
-		EXECUTE ''UPDATE SCHEMA_NAME.'' || quote_ident(''NodesTable'') || '' SET numarcs = numarcs + 1 WHERE '' || quote_ident(''OBJECTID'') || '' = '' || nodeRecord.nodegid; 
+		EXECUTE 'UPDATE ' || quote_ident('NodesTable') || ' SET numarcs = numarcs + 1 WHERE ' || quote_ident('OBJECTID') || ' = ' || nodeRecord.nodegid; 
 	END IF;
  
 	nodegid:= nodeRecord.nodegid; 
 	nodegeom:= nodeRecord.nodegeom; 
 
 	RETURN; 
-END; 
-';
+END;$$;
 
 
 --
@@ -897,12 +910,15 @@ END;
 -- Name: gr_topology_cross("public"."geometry", "public"."geometry"); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_topology_cross"("geoml" "public"."geometry", "geom2" "public"."geometry") RETURNS boolean
+CREATE OR REPLACE FUNCTION "gr_topology_cross"("geoml" "public"."geometry", "geom2" "public"."geometry") RETURNS boolean
     LANGUAGE "plpgsql" IMMUTABLE STRICT
-    AS ' 
+    AS $$ 
 DECLARE 
 geom_boundary public.geometry; 
 BEGIN 
+
+	
+
 	IF (ST_IsClosed(geoml) OR ST_IsClosed(geom2)) THEN 
 		Return false; 
 	END IF;
@@ -916,8 +932,7 @@ BEGIN
 	ELSE 
 		RETURN false; 
 	END IF; 
-END; 
-';
+END;$$;
 
 
 --
@@ -925,9 +940,9 @@ END;
 -- Name: gr_topology_delete_river(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_topology_delete_river"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_topology_delete_river"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS '
+    AS $$
 --Function created modifying "tgg_functionborralinea" developed by Jose C. Martinez Llario
 --in "PostGIS 2 Analisis Espacial Avanzado" 
  
@@ -937,13 +952,15 @@ DECLARE
 	nodosactualizados Integer; 
 
 BEGIN 
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
 	nodosactualizados := 0; 
  
-	querystring := ''SELECT nodos.'' || quote_ident (''OBJECTID'') || '' AS '' || quote_ident (''OBJECTID'') || '', nodos.numarcs AS numarcs FROM SCHEMA_NAME.''
-			|| quote_ident (''NodesTable'') || '' nodos WHERE nodos.'' || quote_ident(''OBJECTID'') || '' = '' 
-			|| OLD.fromnode || '' OR nodos.'' || quote_ident(''OBJECTID'') || '' = '' || OLD.tonode; 
+	querystring := 'SELECT nodos.' || quote_ident ('OBJECTID') || ' AS ' || quote_ident ('OBJECTID') || ', nodos.numarcs AS numarcs FROM '
+			|| quote_ident ('NodesTable') || ' nodos WHERE nodos.' || quote_ident('OBJECTID') || ' = ' 
+			|| OLD.fromnode || ' OR nodos.' || quote_ident('OBJECTID') || ' = ' || OLD.tonode; 
 
-INSERT INTO SCHEMA_NAME.log VALUES (''gr_test()'',querystring,CURRENT_TIMESTAMP);
+INSERT INTO log VALUES ('gr_test()',querystring,CURRENT_TIMESTAMP);
 			
 
 	FOR nodosrec IN EXECUTE querystring
@@ -951,16 +968,15 @@ INSERT INTO SCHEMA_NAME.log VALUES (''gr_test()'',querystring,CURRENT_TIMESTAMP)
 		nodosactualizados := nodosactualizados + 1; 
 
 		IF (nodosrec.numarcs <= 1) THEN 
-			EXECUTE ''DELETE FROM SCHEMA_NAME.''|| quote_ident (''NodesTable'') || '' WHERE '' || quote_ident(''OBJECTID'') || '' = '' || nodosrec."OBJECTID"; 
+			EXECUTE 'DELETE FROM '|| quote_ident ('NodesTable') || ' WHERE ' || quote_ident('OBJECTID') || ' = ' || nodosrec."OBJECTID"; 
 		ELSE 
-			EXECUTE ''UPDATE SCHEMA_NAME.'' || quote_ident(''NodesTable'') || '' SET numarcs = numarcs - 1 WHERE '' || quote_ident(''OBJECTID'') || '' = '' || nodosrec."OBJECTID"; 
+			EXECUTE 'UPDATE ' || quote_ident('NodesTable') || ' SET numarcs = numarcs - 1 WHERE ' || quote_ident('OBJECTID') || ' = ' || nodosrec."OBJECTID"; 
 		END IF; 
 
 	END LOOP; 
 
 	RETURN OLD; 
-END; 
-';
+END;$$;
 
 
 --
@@ -968,9 +984,9 @@ END;
 -- Name: gr_topology_insert_river(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_topology_insert_river"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_topology_insert_river"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS ' 
+    AS $$ 
 
 --Function created modifying "tgg_functioninsertlinea" developed by Jose C. Martinez Llario
 --in "PostGIS 2 Analisis Espacial Avanzado" 
@@ -998,6 +1014,8 @@ DECLARE
  
 BEGIN 
 
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
 /* 
 Esta funcion varia su comportamiento en funcion desde don de ha sido llamada. Para ello analiza el valor de New.fromnode. 
 Si fromnode es NULL, entonces se acepta que fue llamada por un comando SQL Insert ejecutado por el usuario. 
@@ -1013,11 +1031,11 @@ comando SQL Insert ejecutado dentro de la funcion gr_insert_river().
 */
 
 	IF (NEW.fromnode is NULL OR NEW.fromnode = -1 OR NEW.fromnode = -3) THEN 
-		querystring:= ''INSERT INTO SCHEMA_NAME.river VALUES ($1.*)''; 
-		querystringUPDATE:= ''UPDATE SCHEMA_NAME.river SET fromnode = -1 WHERE gid = $1''; 
-		querystringUPDATEREACH:= ''UPDATE SCHEMA_NAME.river SET reachcode = concat(reachcode , $2) WHERE gid = $1''; 
-		querystringinicial:= ''SELECT * FROM SCHEMA_NAME.river t1 WHERE ST_EXPAND ($1,1.0
-					) && t1.geom AND t1.gid <> $2 AND (NOT SCHEMA_NAME.gr_topology_cross(t1.geom, $1)) AND ST_DISTANCE(t1.geom, $1) <= 1.0''; 
+		querystring:= 'INSERT INTO river VALUES ($1.*)'; 
+		querystringUPDATE:= 'UPDATE river SET fromnode = -1 WHERE gid = $1'; 
+		querystringUPDATEREACH:= 'UPDATE river SET reachcode = concat(reachcode , $2) WHERE gid = $1'; 
+		querystringinicial:= 'SELECT * FROM river t1 WHERE ST_EXPAND ($1,1.0
+					) && t1.geom AND t1.gid <> $2 AND (NOT gr_topology_cross(t1.geom, $1)) AND ST_DISTANCE(t1.geom, $1) <= 1.0'; 
 
 		ngeoms:= 0; 
 		unionall:= ST_startpoint(ST_LineMerge(NEW.geom)); 
@@ -1049,7 +1067,7 @@ comando SQL Insert ejecutado dentro de la funcion gr_insert_river().
 					
 					simplefeature      := NEW; 
 					simplefeature.geom := ST_multi(elemgeom1); 
-					simplefeature.gid  := nextval(''SCHEMA_NAME.river_gid_seq''); 
+					simplefeature.gid  := nextval('river_gid_seq'); 
 
 --					marca e1 nodo inicia1 a -2 
 					simplefeature.fromnode:= -2; 
@@ -1084,9 +1102,9 @@ comando SQL Insert ejecutado dentro de la funcion gr_insert_river().
 
 --		Solo cuando New.nodoinicial es -2, 0 en el caso en e1 que la geometria 
 --		insertada no interseque con ninguna geometria en 1a tabla (ngeoms = 0) 
-		nodeRecord1  := SCHEMA_NAME.gr_topology_check_node (ST_startpoint(ST_LineMerge(NEW.geom))); 
+		nodeRecord1  := gr_topology_check_node (ST_startpoint(ST_LineMerge(NEW.geom))); 
 		NEW.fromnode := nodeRecord1.nodegid; 
-		nodeRecord2  := SCHEMA_NAME.gr_topology_check_node (ST_endpoint(ST_LineMerge(NEW.geom))); 
+		nodeRecord2  := gr_topology_check_node (ST_endpoint(ST_LineMerge(NEW.geom))); 
 		NEW.tonode   := nodeRecord2.nodegid; 
 
 --		modifica los puntos inicial y final de la linea para que coincida con los 
@@ -1098,8 +1116,7 @@ comando SQL Insert ejecutado dentro de la funcion gr_insert_river().
 		RETURN NULL;
 	END IF;
 
-END; 
-';
+END;$$;
 
 
 --
@@ -1107,9 +1124,9 @@ END;
 -- Name: gr_topology_update_river(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_topology_update_river"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_topology_update_river"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS '--Function created modifying "tgg_functionactualizalinea" developed by Jose C. Martinez Llario
+    AS $$--Function created modifying "tgg_functionactualizalinea" developed by Jose C. Martinez Llario
 --in "PostGIS 2 Analisis Espacial Avanzado" 
 
 DECLARE 
@@ -1118,8 +1135,11 @@ DECLARE
 	marca Integer; 
 
 BEGIN 
-	querystringdelete:= ''DELETE FROM SCHEMA_NAME.river WHERE gid = $1''; 
-	querystringINSERT:= ''INSERT INTO SCHEMA_NAME.river VALUES ($1.*)'';
+
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	querystringdelete:= 'DELETE FROM river WHERE gid = $1'; 
+	querystringINSERT:= 'INSERT INTO river VALUES ($1.*)';
 
 	marca:= 0; 
 
@@ -1146,14 +1166,13 @@ BEGIN
 		RETURN NULL; 
 	END IF; 
 
---	El ''usuario no puede cambiar el valor de los nodos de forma manual 
+--	El 'usuario no puede cambiar el valor de los nodos de forma manual 
 	NEW.fromnode:= OLD.fromnode; 
 	NEW.tonode:= OLD.tonode; 
 
 RETURN NEW; 
 
-END; 
-';
+END;$$;
 
 
 --
@@ -1161,23 +1180,26 @@ END;
 -- Name: gr_update_banks_view(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_update_banks_view"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_update_banks_view"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS '
+    AS $$
    BEGIN
-      IF TG_OP = ''INSERT'' THEN
-        INSERT INTO  SCHEMA_NAME.banks VALUES(DEFAULT,DEFAULT,DEFAULT,NEW.geom);
+
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+      IF TG_OP = 'INSERT' THEN
+        INSERT INTO  banks VALUES(DEFAULT,DEFAULT,DEFAULT,NEW.geom);
         RETURN NEW;
-      ELSIF TG_OP = ''UPDATE'' THEN
-       UPDATE SCHEMA_NAME.banks SET geom=NEW.geom WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'UPDATE' THEN
+       UPDATE banks SET geom=NEW.geom WHERE gid=OLD.gid;
        RETURN NEW;
-      ELSIF TG_OP = ''DELETE'' THEN
-       DELETE FROM SCHEMA_NAME.banks WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'DELETE' THEN
+       DELETE FROM banks WHERE gid=OLD.gid;
        RETURN NULL;
       END IF;
       RETURN NEW;
     END;
-';
+$$;
 
 
 --
@@ -1185,22 +1207,25 @@ CREATE FUNCTION "gr_update_banks_view"() RETURNS "trigger"
 -- Name: gr_update_flowpaths_view(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_update_flowpaths_view"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_update_flowpaths_view"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS 'BEGIN
-      IF TG_OP = ''INSERT'' THEN
-        INSERT INTO  SCHEMA_NAME.flowpaths VALUES(DEFAULT,DEFAULT,NEW.linetype,NEW.geom);
+    AS $$BEGIN
+
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+      IF TG_OP = 'INSERT' THEN
+        INSERT INTO  flowpaths VALUES(DEFAULT,DEFAULT,NEW.linetype,NEW.geom);
         RETURN NEW;
-      ELSIF TG_OP = ''UPDATE'' THEN
-       UPDATE SCHEMA_NAME.flowpaths SET geom=NEW.geom, linetype=NEW.linetype WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'UPDATE' THEN
+       UPDATE flowpaths SET geom=NEW.geom, linetype=NEW.linetype WHERE gid=OLD.gid;
        RETURN NEW;
-      ELSIF TG_OP = ''DELETE'' THEN
-       DELETE FROM SCHEMA_NAME.flowpaths WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'DELETE' THEN
+       DELETE FROM flowpaths WHERE gid=OLD.gid;
        RETURN NULL;
       END IF;
       RETURN NEW;
     END;
-';
+$$;
 
 
 --
@@ -1208,9 +1233,9 @@ CREATE FUNCTION "gr_update_flowpaths_view"() RETURNS "trigger"
 -- Name: gr_update_nodestable(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_update_nodestable"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_update_nodestable"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS 'BEGIN
+    AS $$BEGIN
 
 	NEW."X"=ST_X(NEW.geom);
 	NEW."Y"=ST_Y(NEW.geom);
@@ -1218,7 +1243,7 @@ CREATE FUNCTION "gr_update_nodestable"() RETURNS "trigger"
 	NEW."NodeID" = NEW."OBJECTID";
 	RETURN NEW;
 
-END;';
+END;$$;
 
 
 --
@@ -1226,22 +1251,25 @@ END;';
 -- Name: gr_update_river_view(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_update_river_view"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_update_river_view"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS 'BEGIN
-      IF TG_OP = ''INSERT'' THEN
-        INSERT INTO  SCHEMA_NAME.river VALUES(DEFAULT,DEFAULT,DEFAULT,NEW.rivercode,NEW.reachcode,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,NEW.geom);
+    AS $$BEGIN
+
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+      IF TG_OP = 'INSERT' THEN
+        INSERT INTO  river VALUES(DEFAULT,DEFAULT,DEFAULT,NEW.rivercode,NEW.reachcode,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,NEW.geom);
         RETURN NEW;
-      ELSIF TG_OP = ''UPDATE'' THEN
-       UPDATE SCHEMA_NAME.river SET geom=NEW.geom,rivercode=NEW.rivercode,reachcode=NEW.reachcode WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'UPDATE' THEN
+       UPDATE river SET geom=NEW.geom,rivercode=NEW.rivercode,reachcode=NEW.reachcode WHERE gid=OLD.gid;
        RETURN NEW;
-      ELSIF TG_OP = ''DELETE'' THEN
-       DELETE FROM SCHEMA_NAME.river WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'DELETE' THEN
+       DELETE FROM river WHERE gid=OLD.gid;
        RETURN NULL;
       END IF;
       RETURN NEW;
     END;
-';
+$$;
 
 
 --
@@ -1249,21 +1277,24 @@ CREATE FUNCTION "gr_update_river_view"() RETURNS "trigger"
 -- Name: gr_update_xscutlines_view(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_update_xscutlines_view"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "gr_update_xscutlines_view"() RETURNS "trigger"
     LANGUAGE "plpgsql"
-    AS 'BEGIN
-      IF TG_OP = ''INSERT'' THEN
-        INSERT INTO  SCHEMA_NAME.xscutlines VALUES(DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,NEW.nodename,NEW.geom);
+    AS $$BEGIN
+
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+      IF TG_OP = 'INSERT' THEN
+        INSERT INTO  xscutlines VALUES(DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,DEFAULT,NEW.nodename,NEW.geom);
         RETURN NEW;
-      ELSIF TG_OP = ''UPDATE'' THEN
-       UPDATE SCHEMA_NAME.xscutlines SET geom=NEW.geom,nodename=NEW.nodename WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'UPDATE' THEN
+       UPDATE xscutlines SET geom=NEW.geom,nodename=NEW.nodename WHERE gid=OLD.gid;
        RETURN NEW;
-      ELSIF TG_OP = ''DELETE'' THEN
-       DELETE FROM SCHEMA_NAME.xscutlines WHERE gid=OLD.gid;
+      ELSIF TG_OP = 'DELETE' THEN
+       DELETE FROM xscutlines WHERE gid=OLD.gid;
        RETURN NULL;
       END IF;
       RETURN NEW;
-    END;';
+    END;$$;
 
 
 --
@@ -1271,9 +1302,9 @@ CREATE FUNCTION "gr_update_xscutlines_view"() RETURNS "trigger"
 -- Name: gr_xs_2dto3d(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_xs_2dto3d"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_xs_2dto3d"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	xscutlines_line public.geometry;
 	line3d	public.geometry;
 	line3dSRID public.geometry;
@@ -1297,35 +1328,37 @@ CREATE FUNCTION "gr_xs_2dto3d"() RETURNS "text"
 
 BEGIN
 
+	
+
 --	Delete 3d tables
-	DELETE FROM SCHEMA_NAME.xscutlines3d;
+	DELETE FROM xscutlines3d;
 
 
 --	For each line in xscutlines
-	FOR row_id IN SELECT gid FROM SCHEMA_NAME.xscutlines
+	FOR row_id IN SELECT gid FROM xscutlines
 	LOOP
 
 --		Get the geom and remain fields
-		SELECT INTO xscutlines_line geom FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO shape_leng xscutlines.shape_leng FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO hydroid xscutlines.hydroid FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO profilem xscutlines.profilem FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO rivercode xscutlines.rivercode FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO reachcode xscutlines.reachcode FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO leftbank xscutlines.leftbank FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO rightbank xscutlines.rightbank FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO llength xscutlines.llength FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO chlength xscutlines.chlength FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO rlength xscutlines.rlength FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
-		SELECT INTO nodename xscutlines.nodename FROM SCHEMA_NAME.xscutlines WHERE gid = row_id;
+		SELECT INTO xscutlines_line geom FROM xscutlines WHERE gid = row_id;
+		SELECT INTO shape_leng xscutlines.shape_leng FROM xscutlines WHERE gid = row_id;
+		SELECT INTO hydroid xscutlines.hydroid FROM xscutlines WHERE gid = row_id;
+		SELECT INTO profilem xscutlines.profilem FROM xscutlines WHERE gid = row_id;
+		SELECT INTO rivercode xscutlines.rivercode FROM xscutlines WHERE gid = row_id;
+		SELECT INTO reachcode xscutlines.reachcode FROM xscutlines WHERE gid = row_id;
+		SELECT INTO leftbank xscutlines.leftbank FROM xscutlines WHERE gid = row_id;
+		SELECT INTO rightbank xscutlines.rightbank FROM xscutlines WHERE gid = row_id;
+		SELECT INTO llength xscutlines.llength FROM xscutlines WHERE gid = row_id;
+		SELECT INTO chlength xscutlines.chlength FROM xscutlines WHERE gid = row_id;
+		SELECT INTO rlength xscutlines.rlength FROM xscutlines WHERE gid = row_id;
+		SELECT INTO nodename xscutlines.nodename FROM xscutlines WHERE gid = row_id;
 
 
 --		Compute 3d crossection
 		WITH intersectLines AS
-			(SELECT ST_intersection(xscutlines_line,B.rast) AS geomval FROM SCHEMA_NAME.mdt as B WHERE ST_intersects(xscutlines_line, B.rast)),
+			(SELECT ST_intersection(xscutlines_line,B.rast) AS geomval FROM mdt as B WHERE ST_intersects(xscutlines_line, B.rast)),
 --		Compute midpoint for every intersection line
 		     intersectMidpoints AS
-			(SELECT ST_line_interpolate_point((geomval).geom,0.5) AS geom, (geomval).val AS val, ST_distance(ST_startpoint(ST_LineMerge(xscutlines_line)), ST_line_interpolate_point((geomval).geom,0.5)) AS distance FROM intersectLines WHERE ST_geometrytype((geomval).geom) = ''ST_LineString''),
+			(SELECT ST_line_interpolate_point((geomval).geom,0.5) AS geom, (geomval).val AS val, ST_distance(ST_startpoint(ST_LineMerge(xscutlines_line)), ST_line_interpolate_point((geomval).geom,0.5)) AS distance FROM intersectLines WHERE ST_geometrytype((geomval).geom) = 'ST_LineString'),
 --		Compute ordered midpoint using distance
 		     intersectMidpointsSort AS
 			(SELECT geom AS geom, val AS val, distance AS distance FROM intersectMidpoints ORDER BY distance),
@@ -1335,20 +1368,19 @@ BEGIN
 --		Store the resulting 3d line
 		SELECT INTO line3d ST_multi(st_makeline) FROM line3d_CTE;
 
-		SELECT INTO XS3dSRID Find_SRID(''SCHEMA_NAME'', ''xscutlines3d'', ''geom'');
+		SELECT INTO XS3dSRID Find_SRID('SCHEMA_NAME', 'xscutlines3d', 'geom');
 		SELECT INTO line3dSRID ST_SetSRID(line3d,XS3dSRID);
 
 --		Insert 3d line in xscutlines3d
-		INSERT INTO SCHEMA_NAME.xscutlines3d (shape_leng, xs2did, hydroid, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, geom) VALUES (shape_leng, hydroid, row_id, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, line3dSRID);
+		INSERT INTO xscutlines3d (shape_leng, xs2did, hydroid, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, geom) VALUES (shape_leng, hydroid, row_id, profilem, rivercode, reachcode, leftbank, rightbank, llength, chlength, rlength, nodename, line3dSRID);
 		
 
 	END LOOP;
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_2dto3d()'',''Crossections profiles computation finished'',CURRENT_TIMESTAMP);
-	RETURN ''3d crossections computation finished''::text;
+	INSERT INTO log VALUES ('gr_xs_2dto3d()','Crossections profiles computation finished',CURRENT_TIMESTAMP);
+	RETURN '3d crossections computation finished'::text;
 
-END
-';
+END;$$;
 
 
 --
@@ -1356,9 +1388,9 @@ END
 -- Name: gr_xs_banks(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_xs_banks"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_xs_banks"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	bank_point public.geometry[2];
 	bank_point_dist1 double precision;
 	bank_point_dist2 double precision;
@@ -1367,30 +1399,32 @@ CREATE FUNCTION "gr_xs_banks"() RETURNS "text"
 	xscutlines_gid integer;
 BEGIN
 
+	
+
 --	Compute banks lengths
-	UPDATE SCHEMA_NAME.banks SET shape_leng = ST_length(ST_LineMerge(SCHEMA_NAME.banks.geom));
+	UPDATE banks SET shape_leng = ST_length(ST_LineMerge(banks.geom));
 
 --	Empty banks values
-	UPDATE SCHEMA_NAME.xscutlines SET leftbank = NULL, rightbank = NULL;
+	UPDATE xscutlines SET leftbank = NULL, rightbank = NULL;
 
 --	Log	
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_banks()'',''Begining banks intersections search'',CURRENT_TIMESTAMP);
+	INSERT INTO log VALUES ('gr_xs_banks()','Begining banks intersections search',CURRENT_TIMESTAMP);
 
 
 --	For each line in xscutlines
-	FOR xscutlines_line, xscutlines_gid IN SELECT geom, gid FROM SCHEMA_NAME.xscutlines
+	FOR xscutlines_line, xscutlines_gid IN SELECT geom, gid FROM xscutlines
 	LOOP
 
 --		Control of bank lines intersection number
-		SELECT COUNT(ST_intersection(SCHEMA_NAME.banks.geom,xscutlines_line)) INTO number_of_bank_lines FROM SCHEMA_NAME.banks  WHERE ST_intersects(SCHEMA_NAME.banks.geom,xscutlines_line); 
+		SELECT COUNT(ST_intersection(banks.geom,xscutlines_line)) INTO number_of_bank_lines FROM banks  WHERE ST_intersects(banks.geom,xscutlines_line); 
 
 		IF number_of_bank_lines <> 2 THEN
-			INSERT INTO SCHEMA_NAME.error VALUES (''gr_xs_banks()'',format(''Error: not exactly 2 bank lines in XS=%s'',xscutlines_gid),CURRENT_TIMESTAMP);
+			INSERT INTO error VALUES ('gr_xs_banks()',format('Error: not exactly 2 bank lines in XS=%s',xscutlines_gid),CURRENT_TIMESTAMP);
 		ELSE
 
 
 --			Bank points
-			bank_point := ARRAY(SELECT ST_intersection(SCHEMA_NAME.banks.geom,xscutlines_line) FROM SCHEMA_NAME.banks WHERE ST_intersects(SCHEMA_NAME.banks.geom,xscutlines_line));
+			bank_point := ARRAY(SELECT ST_intersection(banks.geom,xscutlines_line) FROM banks WHERE ST_intersects(banks.geom,xscutlines_line));
 		
 --			Banks position
 			SELECT INTO bank_point_dist1 ST_line_locate_point(ST_LineMerge(xscutlines_line), bank_point[1]);
@@ -1398,19 +1432,19 @@ BEGIN
 
 --			Set values
 			if bank_point_dist2 > bank_point_dist1 THEN
-				UPDATE SCHEMA_NAME.xscutlines SET leftbank= bank_point_dist1, rightbank=  bank_point_dist2 WHERE gid= xscutlines_gid;
+				UPDATE xscutlines SET leftbank= bank_point_dist1, rightbank=  bank_point_dist2 WHERE gid= xscutlines_gid;
 			ELSE
-				UPDATE SCHEMA_NAME.xscutlines SET leftbank= bank_point_dist2, rightbank=  bank_point_dist1 WHERE gid= xscutlines_gid;
+				UPDATE xscutlines SET leftbank= bank_point_dist2, rightbank=  bank_point_dist1 WHERE gid= xscutlines_gid;
 			END IF;
 
 		END IF;	
 
 	END LOOP;
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_banks()'',''Banks computation finished'',CURRENT_TIMESTAMP);
-	RETURN ''Banks computation finished''::text;
+	INSERT INTO log VALUES ('gr_xs_banks()','Banks computation finished',CURRENT_TIMESTAMP);
+	RETURN 'Banks computation finished'::text;
 
-END';
+END;$$;
 
 
 --
@@ -1418,9 +1452,9 @@ END';
 -- Name: gr_xs_lengths(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_xs_lengths"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_xs_lengths"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	flowpath_point_old public.geometry[3];
 	flowpath_point_new public.geometry[3];
 	flowpath_point_dist double precision[3];
@@ -1431,38 +1465,40 @@ CREATE FUNCTION "gr_xs_lengths"() RETURNS "text"
 	index_row integer;
 BEGIN
 
+	
+
 --	Compute flowpaths lengths
-	UPDATE SCHEMA_NAME.flowpaths SET shape_leng = ST_length(ST_LineMerge(SCHEMA_NAME.flowpaths.geom));
+	UPDATE flowpaths SET shape_leng = ST_length(ST_LineMerge(flowpaths.geom));
 
 --	Compute xscutlines length
-	UPDATE SCHEMA_NAME.xscutlines SET shape_leng = ST_length(ST_LineMerge(SCHEMA_NAME.xscutlines.geom));
+	UPDATE xscutlines SET shape_leng = ST_length(ST_LineMerge(xscutlines.geom));
 
 --	Empty flowpaths values
-	UPDATE SCHEMA_NAME.xscutlines SET llength = NULL, chlength = NULL, rlength = NULL;
+	UPDATE xscutlines SET llength = NULL, chlength = NULL, rlength = NULL;
 
 --	Log	
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_length()'',''Begining flowpaths intersections search'',CURRENT_TIMESTAMP);
+	INSERT INTO log VALUES ('gr_xs_length()','Begining flowpaths intersections search',CURRENT_TIMESTAMP);
 
 
 --	For each river in river layer
-	FOR river_code IN SELECT rivercode FROM SCHEMA_NAME.river GROUP BY rivercode 
+	FOR river_code IN SELECT rivercode FROM river GROUP BY rivercode 
 	LOOP
 
 --		For each line in xscutlines
 		index_row := 1;
-		FOR xscutlines_line, xscutlines_gid IN SELECT xscutlines.geom, xscutlines.gid FROM SCHEMA_NAME.xscutlines WHERE SCHEMA_NAME.xscutlines.rivercode = river_code ORDER BY profilem
+		FOR xscutlines_line, xscutlines_gid IN SELECT xscutlines.geom, xscutlines.gid FROM xscutlines WHERE xscutlines.rivercode = river_code ORDER BY profilem
 		LOOP
 
 --			Control of flowpaths lines intersection number
-			SELECT COUNT(ST_intersection(SCHEMA_NAME.flowpaths.geom,xscutlines_line)) INTO number_of_flowpath_lines FROM SCHEMA_NAME.flowpaths  WHERE ST_intersects(SCHEMA_NAME.flowpaths.geom,xscutlines_line); 
+			SELECT COUNT(ST_intersection(flowpaths.geom,xscutlines_line)) INTO number_of_flowpath_lines FROM flowpaths  WHERE ST_intersects(flowpaths.geom,xscutlines_line); 
 
 			IF number_of_flowpath_lines <> 3 THEN
-				INSERT INTO SCHEMA_NAME.error VALUES (''gr_xs_length()'',format(''Error: not exactly 3 flowpath lines in XS=%s'',xscutlines_gid),CURRENT_TIMESTAMP);
+				INSERT INTO error VALUES ('gr_xs_length()',format('Error: not exactly 3 flowpath lines in XS=%s',xscutlines_gid),CURRENT_TIMESTAMP);
 			ELSE
 
 
 --				Flowpath points
-				flowpath_point_new := ARRAY(SELECT ST_intersection(SCHEMA_NAME.flowpaths.geom,xscutlines_line) FROM SCHEMA_NAME.flowpaths WHERE ST_intersects(SCHEMA_NAME.flowpaths.geom,xscutlines_line));
+				flowpath_point_new := ARRAY(SELECT ST_intersection(flowpaths.geom,xscutlines_line) FROM flowpaths WHERE ST_intersects(flowpaths.geom,xscutlines_line));
 		
 --				Banks position
 				flowpath_point_dist := ARRAY(SELECT ST_line_locate_point(ST_LineMerge(xscutlines_line), x) FROM unnest(flowpath_point_new) x);
@@ -1472,9 +1508,9 @@ BEGIN
 
 --				Set values
 				if index_row > 1 THEN
-					UPDATE SCHEMA_NAME.xscutlines SET llength = ST_distance(flowpath_point_new[1],flowpath_point_old[1]), chlength = ST_distance(flowpath_point_new[2],flowpath_point_old[2]), rlength = ST_distance(flowpath_point_new[3],flowpath_point_old[3]) WHERE gid= xscutlines_gid;
+					UPDATE xscutlines SET llength = ST_distance(flowpath_point_new[1],flowpath_point_old[1]), chlength = ST_distance(flowpath_point_new[2],flowpath_point_old[2]), rlength = ST_distance(flowpath_point_new[3],flowpath_point_old[3]) WHERE gid= xscutlines_gid;
 				ELSE
-					UPDATE SCHEMA_NAME.xscutlines SET llength = 0.0, chlength = 0.0, rlength = 0.0 WHERE gid= xscutlines_gid;
+					UPDATE xscutlines SET llength = 0.0, chlength = 0.0, rlength = 0.0 WHERE gid= xscutlines_gid;
 				END IF;
 
 --				Update index and values
@@ -1487,20 +1523,10 @@ BEGIN
 
 	END LOOP;
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_flowpaths()'',''Flowpaths computation finished'',CURRENT_TIMESTAMP);
-	RETURN ''Flowpaths computation finished''::text;
+	INSERT INTO log VALUES ('gr_xs_flowpaths()','Flowpaths computation finished',CURRENT_TIMESTAMP);
+	RETURN 'Flowpaths computation finished'::text;
 
-END
-
-
-
-
-
-
-
-
-
-';
+END;$$;
 
 
 --
@@ -1508,9 +1534,9 @@ END
 -- Name: gr_xs_station(); Type: FUNCTION; Schema: SCHEMA_NAME; Owner: -
 --
 
-CREATE FUNCTION "gr_xs_station"() RETURNS "text"
+CREATE OR REPLACE FUNCTION "gr_xs_station"() RETURNS "text"
     LANGUAGE "plpgsql"
-    AS 'DECLARE
+    AS $$DECLARE
 	stream_point public.geometry;
 	stream_point_dist double precision;
 	stream_length double precision;
@@ -1521,47 +1547,49 @@ CREATE FUNCTION "gr_xs_station"() RETURNS "text"
 	xscutlines_gid integer;
 BEGIN
 
+	
+
 --	Empty station values
-	UPDATE SCHEMA_NAME.xscutlines SET profilem = NULL, rivercode = NULL, reachcode = NULL;
+	UPDATE xscutlines SET profilem = NULL, rivercode = NULL, reachcode = NULL;
 
 --	Log	
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_station()'',''Begining river intersections search'',CURRENT_TIMESTAMP);
+	INSERT INTO log VALUES ('gr_xs_station()','Begining river intersections search',CURRENT_TIMESTAMP);
 
 
 --	For each line in xscutlines
-	FOR xscutlines_line, xscutlines_gid IN SELECT geom, gid FROM SCHEMA_NAME.xscutlines
+	FOR xscutlines_line, xscutlines_gid IN SELECT geom, gid FROM xscutlines
 	LOOP
 
 --		Control of stream lines intersection number
-		SELECT COUNT(ST_intersection(SCHEMA_NAME.river.geom,xscutlines_line)) INTO number_of_stream_lines FROM SCHEMA_NAME.river WHERE ST_intersects(SCHEMA_NAME.river.geom,xscutlines_line); 
+		SELECT COUNT(ST_intersection(river.geom,xscutlines_line)) INTO number_of_stream_lines FROM river WHERE ST_intersects(river.geom,xscutlines_line); 
 
 		IF number_of_stream_lines <> 1 THEN
-			INSERT INTO SCHEMA_NAME.error VALUES (''gr_xs_station()'',format(''Error: not exactly 1 river lines in XS=%s'',xscutlines_gid),CURRENT_TIMESTAMP);
+			INSERT INTO error VALUES ('gr_xs_station()',format('Error: not exactly 1 river lines in XS=%s',xscutlines_gid),CURRENT_TIMESTAMP);
 		ELSE
 
 --			River and reach code
-			UPDATE SCHEMA_NAME.xscutlines SET rivercode = SCHEMA_NAME.river.rivercode, reachcode = SCHEMA_NAME.river.reachcode FROM SCHEMA_NAME.river WHERE ST_intersects(SCHEMA_NAME.river.geom,xscutlines_line) AND SCHEMA_NAME.xscutlines.gid= xscutlines_gid;
+			UPDATE xscutlines SET rivercode = river.rivercode, reachcode = river.reachcode FROM river WHERE ST_intersects(river.geom,xscutlines_line) AND xscutlines.gid= xscutlines_gid;
 
 --			Stream points
-			SELECT INTO stream_point ST_intersection(SCHEMA_NAME.river.geom,xscutlines_line) FROM SCHEMA_NAME.river WHERE ST_intersects(SCHEMA_NAME.river.geom,xscutlines_line);
-			SELECT INTO stream_length SCHEMA_NAME.river.shape_leng FROM SCHEMA_NAME.river WHERE ST_intersects(SCHEMA_NAME.river.geom,xscutlines_line);
-			SELECT INTO stream_line SCHEMA_NAME.river.geom FROM SCHEMA_NAME.river WHERE ST_intersects(SCHEMA_NAME.river.geom,xscutlines_line);
-			SELECT INTO stream_downstream_length SCHEMA_NAME.river.fromsta FROM SCHEMA_NAME.river WHERE ST_intersects(SCHEMA_NAME.river.geom,xscutlines_line);
+			SELECT INTO stream_point ST_intersection(river.geom,xscutlines_line) FROM river WHERE ST_intersects(river.geom,xscutlines_line);
+			SELECT INTO stream_length river.shape_leng FROM river WHERE ST_intersects(river.geom,xscutlines_line);
+			SELECT INTO stream_line river.geom FROM river WHERE ST_intersects(river.geom,xscutlines_line);
+			SELECT INTO stream_downstream_length river.fromsta FROM river WHERE ST_intersects(river.geom,xscutlines_line);
 
 --			Banks position
 			SELECT INTO stream_point_dist (1.0 - ST_line_locate_point(ST_LineMerge(stream_line), stream_point)) * stream_length + stream_downstream_length;
 
 --			Set values
-			UPDATE SCHEMA_NAME.xscutlines SET profilem = stream_point_dist WHERE gid= xscutlines_gid;
+			UPDATE xscutlines SET profilem = stream_point_dist WHERE gid= xscutlines_gid;
 
 		END IF;	
 
 	END LOOP;
 
-	INSERT INTO SCHEMA_NAME.log VALUES (''gr_xs_stream()'',''Station computation finished'',CURRENT_TIMESTAMP);
-	RETURN ''Station computation finished''::text;
+	INSERT INTO log VALUES ('gr_xs_stream()','Station computation finished',CURRENT_TIMESTAMP);
+	RETURN 'Station computation finished'::text;
 
-END';
+END;$$;
 
 
 SET default_tablespace = '';
