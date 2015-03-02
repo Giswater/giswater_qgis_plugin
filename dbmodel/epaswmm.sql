@@ -4,7 +4,20 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = public, pg_catalog;
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 10 (class 2615 OID 151924)
+-- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA "SCHEMA_NAME";
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 
 -- ----------------------------
 -- Sequence structure for inp_node_id_seq

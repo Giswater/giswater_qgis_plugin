@@ -4,6 +4,21 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 10 (class 2615 OID 151924)
+-- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA "SCHEMA_NAME";
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
 -- ----------------------------
 -- Sequence structure for inp_node_id_seq
 -- --------------------------
@@ -193,7 +208,7 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "matcat_id" varchar(16) COLLATE "default",
 "enet_type" varchar(18) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
-"the_geom" geometry (LINESTRING, SRID_VALUE)
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -873,7 +888,7 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "elevation" numeric(12,4),
 "enet_type" varchar(18) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
-"the_geom" geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
@@ -997,7 +1012,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."sector" (
 "sector_id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default",
-"the_geom" geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 )
 WITH (OIDS=FALSE)
 
