@@ -2,27 +2,25 @@
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
+
+
+VALUE DEFAULT FILE IS NOT VALID FOR ARC & NODE AND DERIVATES TABLES. 
+THIS MEANS THAT YOU ARE NOT ALLOWED TO MODIFY DEFAULT VALUE OF THIS TABLES:
+
+- ARC
+- CONDUIT
+- PUMP
+- ORIFICE
+- WEIR
+- OUTLET
+- NODE
+- JUNCTION
+- DIVIDER
+- OUTFALL
+- STORAGE
+
+
 */
-
--- Only numeric default values are allowed
-
-
--- ----------------------------
--- Default values of node
--- ----------------------------
-
-ALTER TABLE "SCHEMA_NAME".node
-ALTER COLUMN top_elev SET DEFAULT 0.00;
-
-ALTER TABLE "SCHEMA_NAME".node
-ALTER COLUMN ymax SET DEFAULT 0.00;
-
-
-ALTER TABLE "SCHEMA_NAME".arc
-ALTER COLUMN z1 SET DEFAULT 0.00;
-
-ALTER TABLE "SCHEMA_NAME"."arc"
-ALTER COLUMN z2 SET DEFAULT 0.00;
 
 
 -- ----------------------------
