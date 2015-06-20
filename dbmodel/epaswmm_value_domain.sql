@@ -234,7 +234,8 @@ INSERT INTO "SCHEMA_NAME"."inp_value_lidcontrol" VALUES ('PP');
 INSERT INTO "SCHEMA_NAME"."inp_value_lidcontrol" VALUES ('IT');
 INSERT INTO "SCHEMA_NAME"."inp_value_lidcontrol" VALUES ('RB');
 INSERT INTO "SCHEMA_NAME"."inp_value_lidcontrol" VALUES ('VS');
- 
+INSERT INTO "SCHEMA_NAME"."inp_value_lidcontrol" VALUES ('GR');
+INSERT INTO "SCHEMA_NAME"."inp_value_lidcontrol" VALUES ('DRAINMAT');
 
 -- ----------------------------
 -- Records of inp_value_mapunits
