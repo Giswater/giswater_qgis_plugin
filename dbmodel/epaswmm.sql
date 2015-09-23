@@ -519,9 +519,9 @@ WITH (OIDS=FALSE)
 -- Table structure for arc
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."arc" (
-"arc_id" varchar(16) COLLATE "default" NOT NULL,
-"node_1" varchar(16) COLLATE "default",
-"node_2" varchar(16) COLLATE "default",
+"arc_id" varchar(50) COLLATE "default" NOT NULL,
+"node_1" varchar(50) COLLATE "default",
+"node_2" varchar(50) COLLATE "default",
 "z1" numeric(12,4) DEFAULT 0.00,
 "z2" numeric(12,4) DEFAULT 0.00,
 "arccat_id" varchar(16) COLLATE "default",
@@ -619,7 +619,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_conduit
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_conduit" (
-"arc_id" varchar(16) COLLATE "default" NOT NULL,
+"arc_id" varchar(50) COLLATE "default" NOT NULL,
 "barrels" int2,
 "culvert" varchar(10) COLLATE "default",
 "kentry" numeric(12,4),
@@ -684,9 +684,9 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_divider
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_divider" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "divider_type" varchar(18) COLLATE "default",
-"arc_id" varchar(16) COLLATE "default",
+"arc_id" varchar(50) COLLATE "default",
 "curve_id" varchar(16) COLLATE "default",
 "qmin" numeric(16,6),
 "ht" numeric(12,4),
@@ -704,7 +704,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_dwf" (
 "id" int4 NOT NULL,
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "value" numeric(12,5),
 "pat1" varchar(16) COLLATE "default",
 "pat2" varchar(16) COLLATE "default",
@@ -720,7 +720,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_dwf_pol_x_node" (
 "poll_id" varchar(16) COLLATE "default" NOT NULL,
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "value" numeric(12,4),
 "pat1" varchar(16) COLLATE "default",
 "pat2" varchar(16) COLLATE "default",
@@ -788,7 +788,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."inp_groundwater" (
 "subc_id" varchar(16) COLLATE "default" NOT NULL,
 "aquif_id" varchar(16) NOT NULL,
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "surfel" numeric(10,4),
 "a1" numeric(10,4),
 "b1" numeric(10,4),
@@ -818,7 +818,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_inflows" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_inflows_id_seq'::regclass) NOT NULL,
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "timser_id" varchar(16) COLLATE "default",
 "sfactor" numeric(12,4),
 "base" numeric(12,4),
@@ -833,7 +833,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" (
 "poll_id" varchar(16) COLLATE "default" NOT NULL,
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "timser_id" varchar(16) COLLATE "default",
 "form_type" varchar(18) COLLATE "default",
 "mfactor" numeric(12,4),
@@ -849,7 +849,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_junction
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_junction" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "y0" numeric(12,4),
 "ysur" numeric(12,4),
 "apond" numeric(12,4)
@@ -1007,7 +1007,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_orifice
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_orifice" (
-"arc_id" varchar(16) COLLATE "default" NOT NULL,
+"arc_id" varchar(50) COLLATE "default" NOT NULL,
 "ori_type" varchar(18) COLLATE "default",
 "offset" numeric(12,4),
 "cd" numeric(12,4),
@@ -1027,7 +1027,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_outfall
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_outfall" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "outfall_type" varchar(16) COLLATE "default",
 "stage" numeric(12,4),
 "curve_id" varchar(16) COLLATE "default",
@@ -1042,7 +1042,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_outlet
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_outlet" (
-"arc_id" varchar(16) COLLATE "default" NOT NULL,
+"arc_id" varchar(50) COLLATE "default" NOT NULL,
 "outlet_type" varchar(16) COLLATE "default",
 "offset" numeric(12,4),
 "curve_id" varchar(16) COLLATE "default",
@@ -1125,7 +1125,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_pump
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_pump" (
-"arc_id" varchar(16) COLLATE "default" NOT NULL,
+"arc_id" varchar(50) COLLATE "default" NOT NULL,
 "curve_id" varchar(16) COLLATE "default",
 "status" varchar(3) COLLATE "default",
 "startup" numeric(12,4),
@@ -1139,7 +1139,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_rdii
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_rdii" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "hydro_id" varchar(16) COLLATE "default",
 "sewerarea" numeric(16,6)
 )
@@ -1241,7 +1241,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_storage
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_storage" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "storage_type" varchar(18) COLLATE "default",
 "curve_id" varchar(16) COLLATE "default",
 "a1" numeric(12,4),
@@ -1315,7 +1315,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_treatment_node_x_pol
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_treatment_node_x_pol" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "poll_id" varchar(16) COLLATE "default" NOT NULL,
 "function" varchar(100) COLLATE "default"
 )
@@ -1756,7 +1756,7 @@ WITH (OIDS=FALSE)
 -- Table structure for inp_weir
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."inp_weir" (
-"arc_id" varchar(16) COLLATE "default" NOT NULL,
+"arc_id" varchar(50) COLLATE "default" NOT NULL,
 "weir_type" varchar(18) COLLATE "default",
 "offset" numeric(12,4),
 "cd" numeric(12,4),
@@ -1799,7 +1799,7 @@ WITH (OIDS=FALSE)
 -- Table structure for node
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."node" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(50) COLLATE "default" NOT NULL,
 "top_elev" numeric(12,4) DEFAULT 0.00,
 "ymax" numeric(12,4) DEFAULT 0.00,
 "swmm_type" varchar(18) COLLATE "default",
@@ -1845,7 +1845,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_arcflow_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arcflow_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"arc_id" varchar(16) COLLATE "default",
+"arc_id" varchar(50) COLLATE "default",
 "arc_type" varchar(18) COLLATE "default",
 "max_flow" numeric(12,4),
 "time_days" varchar(10) COLLATE "default",
@@ -1864,7 +1864,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_condsurcharge_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_condsurcharge_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"arc_id" varchar(16) COLLATE "default",
+"arc_id" varchar(50) COLLATE "default",
 "both_ends" numeric(12,4),
 "upstream" numeric(12,4),
 "dnstream" numeric(12,4),
@@ -1905,7 +1905,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_flowclass_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_flowclass_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"arc_id" varchar(16) COLLATE "default",
+"arc_id" varchar(50) COLLATE "default",
 "length" numeric(12,4),
 "dry" numeric(12,4),
 "up_dry" numeric(12,4),
@@ -2026,7 +2026,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_nodedepth_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodedepth_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "swnod_type" varchar(18) COLLATE "default",
 "aver_depth" numeric(12,4),
 "max_depth" numeric(12,4),
@@ -2044,7 +2044,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_nodeflooding_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodeflooding_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "hour_flood" numeric(12,4),
 "max_rate" numeric(12,4),
 "time_days" varchar(10) COLLATE "default",
@@ -2062,7 +2062,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_nodeinflow_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodeinflow_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "swnod_type" varchar(18) COLLATE "default",
 "max_latinf" numeric(12,4),
 "max_totinf" numeric(12,4),
@@ -2081,7 +2081,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_nodesurcharge_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodesurcharge_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "swnod_type" varchar(18) COLLATE "default",
 "hour_surch" numeric(12,4),
 "max_height" numeric(12,4),
@@ -2097,7 +2097,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_outfallflow_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_outfallflow_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "flow_freq" numeric(12,4),
 "avg_flow" numeric(12,4),
 "max_flow" numeric(12,4),
@@ -2114,7 +2114,7 @@ CREATE TABLE "SCHEMA_NAME"."rpt_outfallload_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_outfallload_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
 "poll_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "value" numeric(12,4)
 )
 WITH (OIDS=FALSE)
@@ -2127,13 +2127,16 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_pumping_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_pumping_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"arc_id" varchar(16) COLLATE "default",
+"arc_id" varchar(50) COLLATE "default",
 "percent" numeric(12,4),
-"max_flow" numeric(12,4),
+"num_startup" int4,
+"min_flow" numeric(12,4),
 "avg_flow" numeric(12,4),
+"max_flow" numeric(12,4),
 "vol_ltr" numeric(12,4),
 "powus_kwh" numeric(12,4),
-"timoff_cur" numeric(12,4)
+"timoff_min" numeric(12,4),
+"timoff_max" numeric(12,4)
 )
 WITH (OIDS=FALSE)
 
@@ -2263,7 +2266,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "SCHEMA_NAME"."rpt_storagevol_sum" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_storagevol_sum_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16) COLLATE "default",
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "aver_vol" numeric(12,4),
 "avg_full" numeric(12,4),
 "ei_loss" numeric(12,4),
@@ -2350,7 +2353,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 CREATE TABLE "SCHEMA_NAME"."subcatchment" (
 "subc_id" varchar(16) COLLATE "default" NOT NULL,
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(50) COLLATE "default",
 "rg_id" varchar(16) COLLATE "default",
 "area" numeric(16,6),
 "imperv" numeric(12,4),
@@ -2371,6 +2374,7 @@ CREATE TABLE "SCHEMA_NAME"."subcatchment" (
 "drytime" numeric(12,4),
 "maxinfil" numeric(12,4),
 "suction" numeric(12,4),
+
 "conduct" numeric(12,4),
 "initdef" numeric(12,4),
 "curveno" numeric(12,4),
@@ -2970,7 +2974,7 @@ SELECT rpt_outfallload_sum.id, rpt_outfallload_sum.result_id, rpt_outfallload_su
 -- View structure for v_rpt_pumping_sum
 -- ----------------------------
 CREATE VIEW "SCHEMA_NAME"."v_rpt_pumping_sum" AS 
-SELECT rpt_pumping_sum.id, rpt_pumping_sum.result_id, rpt_pumping_sum.arc_id, rpt_pumping_sum.percent, rpt_pumping_sum.max_flow, rpt_pumping_sum.avg_flow, rpt_pumping_sum.vol_ltr, rpt_pumping_sum.powus_kwh, rpt_pumping_sum.timoff_cur, arc.sector_id, arc.the_geom FROM ((SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_pumping_sum ON (((result_selection.result_id)::text = (rpt_pumping_sum.result_id)::text))) JOIN SCHEMA_NAME.arc ON (((arc.arc_id)::text = (rpt_pumping_sum.arc_id)::text)));
+SELECT rpt_pumping_sum.id, rpt_pumping_sum.result_id, rpt_pumping_sum.arc_id, rpt_pumping_sum.percent,  rpt_pumping_sum.num_startup, rpt_pumping_sum.min_flow, rpt_pumping_sum.avg_flow, rpt_pumping_sum.max_flow, rpt_pumping_sum.vol_ltr, rpt_pumping_sum.powus_kwh, rpt_pumping_sum.timoff_min,  rpt_pumping_sum.timoff_max, arc.sector_id, arc.the_geom FROM ((SCHEMA_NAME.result_selection JOIN SCHEMA_NAME.rpt_pumping_sum ON (((result_selection.result_id)::text = (rpt_pumping_sum.result_id)::text))) JOIN SCHEMA_NAME.arc ON (((arc.arc_id)::text = (rpt_pumping_sum.arc_id)::text)));
 
 -- ----------------------------
 -- View structure for v_rpt_qualrouting
