@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pt_PT">
+<TS version="2.0" language="pt_BR">
 <context>
     <name>Giswater</name>
     <message>
@@ -13,7 +13,7 @@
     </message>           
     <message>
         <source>Copy network as</source>
-        <translation>Copy network as</translation>
+        <translation>Copiar</translation>
     </message>           
     <message>
         <source>Network configuration</source>
@@ -33,11 +33,11 @@
     </message>           
     <message>
         <source>Table wizard</source>
-        <translation>Table wizard</translation>
+        <translation>Assistente tabelas</translation>
     </message>           
     <message>
         <source>Undo wizard</source>
-        <translation>Undo wizard</translation>
+        <translation>Assistente desfazer</translation>
     </message>         
     <message>
         <source>Analysis</source>
@@ -45,15 +45,15 @@
     </message>               
     <message>
         <source>Result selector</source>
-        <translation>Result selector</translation>
+        <translation>Seleção resultados</translation>
     </message>           
     <message>
         <source>Flow trace node</source>
-        <translation>Flow trace node</translation>
+        <translation>Análise de fluxo (nó)</translation>
     </message>           
     <message>
         <source>Flow trace arc</source>
-        <translation>Flow trace arc</translation>
+        <translation>Análise de fluxo (link)</translation>
     </message>       
     <message>
         <source>Go2Epa</source>
@@ -81,111 +81,111 @@
     </message>        
     <message>
         <source>01_text</source>
-        <translation>Insert junction</translation>
+        <translation>Inserção conexão</translation>
     </message>      
     <message>
         <source>02_text</source>
-        <translation>Insert outfall</translation>
+        <translation>Inserção exutorio</translation>
     </message>   
     <message>
         <source>03_text</source>
-        <translation>Insert divider</translation>
+        <translation>Inserção divisor</translation>
     </message>      
     <message>
         <source>04_text</source>
-        <translation>Insert storage</translation>
+        <translation>Inserção armazenamento</translation>
     </message>      
     <message>
         <source>05_text</source>
-        <translation>Insert conduit</translation>
+        <translation>Inserção conduto</translation>
     </message>      
     <message>
         <source>06_text</source>
-        <translation>Insert pump</translation>
+        <translation>Inserção bomba</translation>
     </message>      
     <message>
         <source>07_text</source>
-        <translation>Insert orifice</translation>
+        <translation>Inserção orificio</translation>
     </message>      
     <message>
         <source>08_text</source>
-        <translation>Insert weir</translation>
+        <translation>Inserção vertedores</translation>
     </message>      
     <message>
         <source>09_text</source>
-        <translation>Insert outlet</translation>
+        <translation>Inserção bocais</translation>
     </message>      
     <message>
         <source>10_text</source>
-        <translation>Insert junction</translation>
+        <translation>Inserção conexão</translation>
     </message>      
     <message>
         <source>11_text</source>
-        <translation>Insert reservoir</translation>
+        <translation>Inserção reservatório</translation>
     </message>      
     <message>
         <source>12_text</source>
-        <translation>Insert tank</translation>
+        <translation>Inserção depósito</translation>
     </message>      
     <message>
         <source>13_text</source>
-        <translation>Insert pipe</translation>
+        <translation>Inserção tubulação</translation>
     </message>      
     <message>
         <source>14_text</source>
-        <translation>Insert pump</translation>
+        <translation>Inserção bomba</translation>
     </message> 
     <message>
         <source>15_text</source>
-        <translation>Insert xxx</translation>
+        <translation>Inserção válvula</translation>
     </message>   
     <message>
         <source>16_text</source>
-        <translation>Move node</translation>
+        <translation>Deslocamento nó</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Delete node</translation>
+        <translation>Apaga nó</translation>
     </message>      
     <message>
         <source>18_text</source>
-        <translation>Capture raster elevation</translation>
+        <translation>Captura cota nó</translation>
     </message>      
     <message>
         <source>19_text</source>
-        <translation>Edit arc</translation>
+        <translation>Edição link</translation>
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Table wizard</translation>
+        <translation>Assistente tabelas</translation>
     </message>      
     <message>
         <source>21_text</source>
-        <translation>Undo wizard</translation>
+        <translation>Assistente desfazer</translation>
     </message>      
     <message>
         <source>22_text</source>
-        <translation>Result selector</translation>
+        <translation>Seleção resultados</translation>
     </message>      
     <message>
         <source>23_text</source>
-        <translation>Simular</translation>
+        <translation>Go2epa</translation>
     </message>      
     <message>
         <source>24_text</source>
-        <translation>Simular express</translation>
+        <translation>Go2epa express</translation>
     </message>      
     <message>
         <source>25_text</source>
-        <translation>Connect tool</translation>
+        <translation>Ferramenta conexões</translation>
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Flow trace (from arc)</translation>
+        <translation>Análise de fluxo (link)</translation>
     </message>      
     <message>
         <source>27_text</source>
-        <translation>Flow trace (from node)</translation>
+        <translation>Análise de fluxo (nó)</translation>
     </message>    
 </context>
 </TS>

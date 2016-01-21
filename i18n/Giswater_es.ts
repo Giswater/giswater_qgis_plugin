@@ -77,7 +77,7 @@
     </message> 
     <message>
         <source>15_text</source>
-        <translation>Insert xxx</translation>
+        <translation>Insert valve</translation>
     </message>   
     <message>
         <source>16_text</source>
