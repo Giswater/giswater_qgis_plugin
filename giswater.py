@@ -18,8 +18,6 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 import os.path
 import sys  
 
-import resources_rc
-
 
 class Giswater(QObject):
     """QGIS Plugin Implementation."""
@@ -40,7 +38,7 @@ class Giswater(QObject):
         self.plugin_dir = os.path.dirname(__file__)
         self.pluginName = os.path.basename(self.plugin_dir)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value('locale/userLocale')
         locale_path = os.path.join(self.plugin_dir, 'i18n', 'Giswater_{}.qm'.format(locale))
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -65,26 +63,30 @@ class Giswater(QObject):
         ''' Load plugin settings
         '''      
         # Create plugin main menu
-        self.menu_name = self.settings.value('status/menu_name', 'Giswater')         
+        self.menu_name = self.tr('menu_name')        
     
         # Create edit, epanet and swmm toolbars or not?
         self.toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
         self.toolbar_epanet_enabled = bool(int(self.settings.value('status/toolbar_epanet_enabled', 1)))
         self.toolbar_swmm_enabled = bool(int(self.settings.value('status/toolbar_swmm_enabled', 1)))
         if self.toolbar_swmm_enabled:
-            self.toolbar_swmm_name = self.settings.value('status/toolbar_swmm_name', '')
+            self.toolbar_swmm_name = self.tr('toolbar_swmm_name')
             self.toolbar_swmm = self.iface.addToolBar(self.toolbar_swmm_name)
             self.toolbar_swmm.setObjectName(self.toolbar_swmm_name)   
         if self.toolbar_epanet_enabled:
-            self.toolbar_epanet_name = self.settings.value('status/toolbar_epanet_name', '')
+            self.toolbar_epanet_name = self.tr('toolbar_epanet_name')
             self.toolbar_epanet = self.iface.addToolBar(self.toolbar_epanet_name)
             self.toolbar_epanet.setObjectName(self.toolbar_epanet_name)   
         if self.toolbar_edit_enabled:
-            self.toolbar_edit_name = self.settings.value('status/toolbar_edit_name', '')
+            self.toolbar_edit_name = self.tr('toolbar_edit_name')
             self.toolbar_edit = self.iface.addToolBar(self.toolbar_edit_name)
             self.toolbar_edit.setObjectName(self.toolbar_edit_name)   
         
-                
+
+    def tr(self, message):
+        return QCoreApplication.translate('Giswater', message)
+        
+        
     def createAction(self, icon_index=None, text='', toolbar=None, menu=None, is_checkable=True, callback=None):
         
         parent = self.iface.mainWindow()
@@ -116,7 +118,8 @@ class Giswater(QObject):
           
         
     def addAction(self, index_action, toolbar):
-        text_action = self.settings.value('actions/'+index_action+'_text', '')
+        #text_action = self.settings.value('actions/'+index_action+'_text', '')
+        text_action = self.tr(index_action+'_text')
         self.createAction(index_action, text_action, toolbar, None)
         
         
@@ -132,35 +135,35 @@ class Giswater(QObject):
         for i in range(1,10):
             self.addAction(str(i).zfill(2), self.toolbar_swmm)
             
-        self.createAction(None, 'New network', None, self.menu_name, False)
-        self.createAction(None, 'Copy network as', None, self.menu_name, False)
+        self.createAction(None, self.tr('New network'), None, self.menu_name, False)
+        self.createAction(None, self.tr('Copy network as'), None, self.menu_name, False)
             
-        self.menu_network_configuration = QMenu('Network configuration')
-        action1 = self.createAction(None, 'Snapping tolerance', None, None, False)               
-        action2 = self.createAction(None, 'Node tolerance', None, None, False)         
+        self.menu_network_configuration = QMenu(self.tr('Network configuration'))
+        action1 = self.createAction(None, self.tr('Snapping tolerance'), None, None, False)               
+        action2 = self.createAction(None, self.tr('Node tolerance'), None, None, False)         
         self.menu_network_configuration.addAction(action1)
         self.menu_network_configuration.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_network_configuration.menuAction())  
            
-        self.menu_network_management = QMenu('Network management')
-        action1 = self.createAction('21', 'Table wizard', None, None, False)               
-        action2 = self.createAction('22', 'Undo wizard', None, None, False)         
+        self.menu_network_management = QMenu(self.tr('Network management'))
+        action1 = self.createAction('21', self.tr('Table wizard'), None, None, False)               
+        action2 = self.createAction('22', self.tr('Undo wizard'), None, None, False)         
         self.menu_network_management.addAction(action1)
         self.menu_network_management.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_network_management.menuAction())         
            
-        self.menu_analysis = QMenu('Analysis')          
-        action2 = self.createAction('25', 'Result selector', None, None, False)               
-        action3 = self.createAction('27', 'Flow trace node', None, None, False)         
-        action4 = self.createAction('26', 'Flow trace arc', None, None, False)         
+        self.menu_analysis = QMenu(self.tr('Analysis'))          
+        action2 = self.createAction('25', self.tr('Result selector'), None, None, False)               
+        action3 = self.createAction('27', self.tr('Flow trace node'), None, None, False)         
+        action4 = self.createAction('26', self.tr('Flow trace arc'), None, None, False)         
         self.menu_analysis.addAction(action2)
         self.menu_analysis.addAction(action3)
         self.menu_analysis.addAction(action4)
         self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
          
-        self.menu_go2epa = QMenu('Go2Epa')
-        action1 = self.createAction('23', 'Giswater interface', None, None, False)               
-        action2 = self.createAction('24', 'Run simulation', None, None, False)         
+        self.menu_go2epa = QMenu(self.tr('Go2Epa'))
+        action1 = self.createAction('23', self.tr('Giswater interface'), None, None, False)               
+        action2 = self.createAction('24', self.tr('Run simulation'), None, None, False)         
         self.menu_go2epa.addAction(action1)
         self.menu_go2epa.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
