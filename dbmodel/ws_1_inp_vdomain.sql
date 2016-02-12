@@ -5,24 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- ----------------------------
--- Records of inp_type_arc
--- ----------------------------
- 
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('PIPE', 'inp_pipe', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('PUMP', 'inp_pump', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('VALVE', 'inp_valve', null);
- 
-
--- ----------------------------
--- Records of inp_type_node
--- ----------------------------
- 
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('JUNCTION', 'inp_junction', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('RESERVOIR', 'inp_reservoir', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('TANK', 'inp_tank', null);
- 
-
 
 -- ----------------------------
 -- Records of inp_typevalue_energy
@@ -72,7 +54,7 @@ INSERT INTO "SCHEMA_NAME"."inp_typevalue_valve" VALUES ('PRV', 'Pressure Reducti
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_valve" VALUES ('PSV', 'Pressure Sustain Valve', 'Pressure');
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_valve" VALUES ('TCV', ' Throttle Control Valve', 'Losses');
 INSERT INTO "SCHEMA_NAME"."inp_typevalue_valve" VALUES ('VPG', 'General Purpose Valve', 'Losses');
- 
+INSERT INTO "SCHEMA_NAME"."inp_typevalue_valve" VALUES ('GTV', 'Gate Valve', 'Control'); 
 
 -- ----------------------------
 -- Records of inp_value_ampm
@@ -239,7 +221,6 @@ INSERT INTO "SCHEMA_NAME"."inp_value_yesno" VALUES ('YES');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('FULL');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('NO');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('YES');
- 
 
 
 -- ----------------------------
@@ -261,6 +242,17 @@ INSERT INTO "SCHEMA_NAME"."inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'AL
 -- ----------------------------
  
 INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
- 
+
+
+-- ----------------------------
+-- Records of inp_value_state
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('OBSOLETE', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('ON_SERVICE', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('RECONSTRUCT', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('REPLACE', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('PLANIFIED', '');
+
+
 
 

@@ -7,26 +7,27 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
--- Records of inp_type_arc
+-- Records of arc_type
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('CONDUIT', 'inp_conduit', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('ORIFICE', 'inp_orifice', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('OUTLET', 'inp_outlet', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('PUMP', 'inp_pump', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_arc" VALUES ('WEIR', 'inp_weir', null);
- 
+INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('1','CONDUIT', 'CONDUIT');
+INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('2','ORIFICE', 'VIRTUAL');
+INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('3','OUTLET', 'VIRTUAL');
+INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('4','PUMP', 'VIRTUAL');
+INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('5','WEIR', 'VIRTUAL');
+
 
 -- ----------------------------
--- Records of inp_type_node
+-- Records of node_type
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('DIVIDER', 'inp_divider', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('JUNCTION', 'inp_junction', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('OUTFALL', 'inp_outfall', null);
-INSERT INTO "SCHEMA_NAME"."inp_type_node" VALUES ('STORAGE', 'inp_storage', null);
+INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('1','JUNCTION');
+INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('2','OUTFALL');
+INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('3','DIVIDER');
+INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('4','STORAGE');
  
 
+ 
 -- ----------------------------
 -- Records of inp_typevalue_divider
 -- ----------------------------
@@ -292,6 +293,7 @@ INSERT INTO "SCHEMA_NAME"."inp_value_options_id" VALUES ('PARTIAL');
 INSERT INTO "SCHEMA_NAME"."inp_value_options_in" VALUES ('CURVE_NUMBER');
 INSERT INTO "SCHEMA_NAME"."inp_value_options_in" VALUES ('GREEN_AMPT');
 INSERT INTO "SCHEMA_NAME"."inp_value_options_in" VALUES ('HORTON');
+INSERT INTO "SCHEMA_NAME"."inp_value_options_in" VALUES ('MODIFIED_HORTON'); 
  
 
 -- ----------------------------
@@ -406,8 +408,8 @@ INSERT INTO "SCHEMA_NAME"."inp_value_yesno" VALUES ('YES');
 -- Records of inp_options
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '05:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:02', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null);
- 
+INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '05:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:02', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null, '0','0','5','5');
+
 
 -- ----------------------------
 -- Records of inp_report
@@ -416,10 +418,16 @@ INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'CURVE_NUMBER', 'DYNWAVE'
 INSERT INTO "SCHEMA_NAME"."inp_report" VALUES ('YES', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'ALL');
  
 
+-- ----------------------------
+-- Records of inp_value_state
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('OBSOLETE', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('ON_SERVICE', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('RECONSTRUCT', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('REPLACE', '');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('PLANIFIED', '');
 
--- ----------------------------
--- Alter Sequences Owned By 
--- ----------------------------
+
 
 
 
