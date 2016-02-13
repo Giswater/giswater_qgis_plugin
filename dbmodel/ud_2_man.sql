@@ -12,6 +12,16 @@ This version of Giswater is provided by Giswater Association
 -----
 
 
+CREATE TABLE "SCHEMA_NAME"."man_type_function" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+"custom_id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE)
+;
+
+
+
 CREATE TABLE "SCHEMA_NAME"."man_type_category" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "custom_id" varchar(16) COLLATE "default" NOT NULL,
@@ -104,44 +114,18 @@ WITH (OIDS=FALSE)
 
 
 
-
--- ----------------------------
--- Table structure for addtional type
--- ----------------------------
-
-CREATE TABLE "SCHEMA_NAME"."man_type_function" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"custom_id" varchar(16) COLLATE "default" NOT NULL,
-CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
-)
-WITH (OIDS=FALSE)
-;
-
-
-
-
-
 -- ----------------------------
 -- Table structure for node derivades
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."man_node_mhole" (
+CREATE TABLE "SCHEMA_NAME"."man_node_junction" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
-"func_type" varchar(16) COLLATE "default",
 "covercat_id" varchar(30) COLLATE "default",
 "stepcat_id" varchar(30) COLLATE "default",
 "step_n" int2,
 "stepcat_id2" varchar(30) COLLATE "default",
 "step_n2" int2,
 CONSTRAINT man_node_mhole_pkey PRIMARY KEY (node_id)
-)
-WITH (OIDS=FALSE)
-;
-
-
-CREATE TABLE "SCHEMA_NAME"."man_node_weir" (
-"node_id" varchar(16) COLLATE "default" NOT NULL,
-CONSTRAINT man_node_weir_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
 ;
@@ -178,14 +162,22 @@ CONSTRAINT man_arc_conduit_pkey PRIMARY KEY (arc_id)
 WITH (OIDS=FALSE)
 ;
 
-
-
 CREATE TABLE "SCHEMA_NAME"."man_arc_pump" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 CONSTRAINT man_arc_pump_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
 ;
+
+
+CREATE TABLE "SCHEMA_NAME"."man_arc_virtual" (
+"arc_id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT man_arc_virtual_pkey PRIMARY KEY (arc_id)
+)
+WITH (OIDS=FALSE)
+;
+
+
 
 
 

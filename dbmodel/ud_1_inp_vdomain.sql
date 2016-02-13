@@ -7,24 +7,24 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
--- Records of arc_type
+-- Records of inp_arc_type
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('1','CONDUIT', 'CONDUIT');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('2','ORIFICE', 'VIRTUAL');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('3','OUTLET', 'VIRTUAL');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('4','PUMP', 'VIRTUAL');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('5','WEIR', 'VIRTUAL');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('CONDUIT');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('ORIFICE');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('OUTLET');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('PUMP');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('WEIR');
 
 
 -- ----------------------------
--- Records of node_type
+-- Records of inp_node_type
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('1','JUNCTION');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('2','OUTFALL');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('3','DIVIDER');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('4','STORAGE');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('JUNCTION');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('OUTFALL');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('DIVIDER');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('STORAGE');
  
 
  

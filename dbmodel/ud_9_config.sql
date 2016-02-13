@@ -27,6 +27,15 @@ ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NA
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
+
+-----
+-- functionality
+-----
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("function_type") REFERENCES "SCHEMA_NAME"."man_type_function" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("function_type") REFERENCES "SCHEMA_NAME"."man_type_function" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
 -- ----------------------------
 -- cat_soil
 -- ----------------------------

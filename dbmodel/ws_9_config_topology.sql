@@ -5,6 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+-- configurar arc to node detect buffer area
+
+-- configurar node proximity
+
+
+
 -----------------------------
 -- TOPOLOGY ARC-NODE
 -----------------------------

@@ -106,7 +106,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_exit_seq"
 
 
 -- ----------------------------
--- Table main structure 
+-- Table system structure 
 -- ----------------------------
 
 CREATE TABLE "SCHEMA_NAME"."version" (
@@ -123,32 +123,26 @@ WITH (OIDS=FALSE)
  
 CREATE TABLE "SCHEMA_NAME"."arc_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
-"arc_type" varchar(18) COLLATE "default" NOT NULL,
 "type" varchar(18) COLLATE "default" NOT NULL,
-"epa_type" varchar(18) COLLATE "default" NOT NULL,
-"inp_table" varchar(18) COLLATE "default" NOT NULL,
 "man_table" varchar(18) COLLATE "default" NOT NULL,
+"epa_default" varchar(18) COLLATE "default" NOT NULL,
+"epa_table" varchar(18) COLLATE "default" NOT NULL,
 CONSTRAINT arc_type_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
-
 ;
 
 
 CREATE TABLE "SCHEMA_NAME"."node_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
-"node_type" varchar(18) COLLATE "default" NOT NULL,
 "type" varchar(18) COLLATE "default" NOT NULL,
-"epa_type" varchar(18) COLLATE "default" NOT NULL,
-"inp_table" varchar(18) COLLATE "default" NOT NULL,
 "man_table" varchar(18) COLLATE "default" NOT NULL,
+"epa_default" varchar(18) COLLATE "default" NOT NULL,
+"epa_table" varchar(18) COLLATE "default" NOT NULL,
 CONSTRAINT node_type_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
-
 ;
-
-
 
 
 -- ----------------------------
@@ -212,9 +206,11 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."cat_connec" (
 "id" varchar(30) COLLATE "default" NOT NULL,
+"type" varchar(30) COLLATE "default" NOT NULL,
 "matcat_id" varchar(16) COLLATE "default",
 "matcat_2" varchar(16) COLLATE "default",
 "matcat_3" varchar(16) COLLATE "default",
+"dnom" int2,
 "diameter" numeric (12,2),
 "geom2" numeric (12,2),
 "geom3" numeric (12,2),
@@ -335,31 +331,37 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "top_elev" numeric(12,4),
 "ymax" numeric(12,4),
 "nodecat_id" varchar(30) COLLATE "default",
+"epa_type" varchar(16) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
 "state" character varying(16),
-"annotation" character varying(512),
+"annotation" character varying(254),
 "observ" character varying(254),
-"text" character varying(100),
+"comment" character varying(254),
 "rotation" numeric (6,3),
+
+"function_type" varchar(18) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
-"category_type" varchar(16) COLLATE "default",
-"fluid_type" varchar(16) COLLATE "default",
-"location_type" varchar(16) COLLATE "default",
+"category_type" varchar(18) COLLATE "default",
+"fluid_type" varchar(18) COLLATE "default",
+"location_type" varchar(18) COLLATE "default",
 "builtdate" varchar(20) COLLATE "default",
-"link" character varying(512),
+"text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default",
-"descript" varchar(100) COLLATE "default",
+"descript" varchar(254) COLLATE "default",
+"link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-"value_db" numeric(12,4),
-"value_int2" int2,
-"value_int4" int4,
-"temp" varchar(30) COLLATE "default",
+
+"db" numeric(12,4),
+"i2" int2,
+"i4" int4,
+"t100" varchar(100) COLLATE "default",
+"t500" varchar(500) COLLATE "default",
+
 "the_geom" public.geometry (POINT, 25831),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 )
@@ -374,33 +376,39 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "y1" numeric (12,3),
 "y2" numeric (12,3),
 "arccat_id" varchar(30) COLLATE "default",
+"epa_type" varchar(16) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
 "state" character varying(16),
-"annotation" character varying(512),
+"annotation" character varying(254),
 "observ" character varying(254),
-"event" character varying(30),
+"comment" character varying(254),
 "rotation" numeric (6,3),
 "direction" character varying(2),
+"real_length" numeric (12,2),
+
+"function_type" varchar(18) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
-"category_type" varchar(16) COLLATE "default",
-"fluid_type" varchar(16) COLLATE "default",
-"location_type" varchar(16) COLLATE "default",
+"category_type" varchar(18) COLLATE "default",
+"fluid_type" varchar(18) COLLATE "default",
+"location_type" varchar(18) COLLATE "default",
 "builtdate" varchar(20) COLLATE "default",
-"link" character varying(512),
-"real_length" numeric (12,2),
+"text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default",
-"descript" varchar(100) COLLATE "default",
+"descript" varchar(254) COLLATE "default",
+"link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-"value_db" numeric(12,4),
-"value_int2" int2,
-"value_int4" int4,
-"temp" varchar(30) COLLATE "default",
+
+"db" numeric(12,4),
+"i2" int2,
+"i4" int4,
+"t100" varchar(100) COLLATE "default",
+"t500" varchar(500) COLLATE "default",
+
 "the_geom" public.geometry (LINESTRING, 25831),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 )
@@ -414,24 +422,25 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "connecat_id" varchar(30) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
 "state" character varying(16),
-"annotation" character varying(512),
+"annotation" character varying(254),
 "observ" character varying(254),
-"text" character varying(100),
+"comment" character varying(254),
 "rotation" numeric (6,3),
-"arc_id" varchar(16) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
+"soilcat_id" varchar(16) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
+"category_type" varchar(18) COLLATE "default",
+"fluid_type" varchar(18) COLLATE "default",
+"location_type" varchar(18) COLLATE "default",
 "builtdate" varchar(20) COLLATE "default",
-"link" character varying(512),
+"text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default",
-"descript" varchar(100) COLLATE "default",
+"descript" varchar(254) COLLATE "default",
+"link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-"value_db" numeric(12,4),
-"value_int2" int2,
-"value_int4" int4,
-"temp" varchar(30) COLLATE "default",
 the_geom public.geometry (POINT, 25831),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 )
@@ -455,24 +464,27 @@ CREATE TABLE "SCHEMA_NAME"."gully" (
 "catgully_id" varchar(18) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
 "state" character varying(16),
-"annotation" character varying(512),
+"annotation" character varying(254),
 "observ" character varying(254),
-"text" character varying(100),
+"comment" character varying(254),
 "rotation" numeric (6,3),
-"arc_id" varchar(16) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
+"soilcat_id" varchar(16) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
+"category_type" varchar(18) COLLATE "default",
+"fluid_type" varchar(18) COLLATE "default",
+"location_type" varchar(18) COLLATE "default",
 "builtdate" varchar(20) COLLATE "default",
-"link" character varying(512),
+"text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default",
-"descript" varchar(100) COLLATE "default",
+"descript" varchar(254) COLLATE "default",
+"link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-"value_db" numeric(12,4),
-"value_int2" int2,
-"value_int4" int4,
-"temp" varchar(30) COLLATE "default",
+the_geom public.geometry (POINT, 25831),
+
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 )
 WITH (OIDS=FALSE)
@@ -485,54 +497,22 @@ WITH (OIDS=FALSE)
 ------
 
 ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "SCHEMA_NAME"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "SCHEMA_NAME"."sys_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "SCHEMA_NAME"."sys_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHEMA_NAME"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."sys_node_epa" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."epa_node_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."sys_arc_epa" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-
-
-
--- ----------------------------
--- Records of arc_type
--- ----------------------------
-
-/*
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PIPE','PIPE','inp_pipe', 'man_arc_pipe');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('SHUTOFF VALVE','PIPE','inp_pipe', 'man_arc_valve');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('CHECK VALVE','PIPE','inp_pipe'. 'man_arc_valve'); 
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('FL-CONTR. VALVE','VALVE','inp_valve', 'man_arc_valve'); 
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PR-BREAK. VALVE', 'VALVE','inp_valve', 'man_arc_valve'); 
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PR-REDUC. VALVE', 'VALVE','inp_valve', 'man_arc_valve'); 
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PR-SUSTA. VALVE', 'VALVE','inp_valve', 'man_arc_valve');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('THROTTLE VALVE', 'VALVE','inp_valve', 'man_arc_valve'); 
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('GEN.PURP. VALVE', 'VALVE','inp_valve', 'man_arc_valve');
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PUMP','PUMP', 'PUMP','inp_pump', 'man_arc_pump'); 
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('FLOW METER','PIPE','inp_pipe', 'man_arc_flowmeter');  
-INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('FILTER','PIPE','inp_pipe', 'man_arc_filter'); 
-
-
-
--- ----------------------------
--- Records of node_type
--- ----------------------------
- 
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('RESERVOIR','RESERVOIR', 'inp_reservoir', 'man_node_tank');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('TANK','TANK', 'inp_tank', 'man_node_tank');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('HYDRANT','JUNCTION', 'inp_junction', 'man_node_hydrant');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('GREENHYDRANT','JUNCTION', 'inp_junction', 'man_node_valve');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('DISCHARGE','JUNCTION', 'inp_junction', 'man_node_valve');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('SUCTION','JUNCTION', 'inp_junction', 'man_node_valve');
-INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('JUNCTION','JUNCTION', 'inp`_junction', 'man_node_accessory');
-*/
-
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."epa_arc_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 

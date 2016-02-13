@@ -122,6 +122,18 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_result_cat_id_seq"
 -- Table structure INP
 -- ----------------------------
 
+CREATE TABLE "SCHEMA_NAME"."inp_arc_type" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
+) WITH (OIDS=FALSE) ;
+
+
+CREATE TABLE "SCHEMA_NAME"."inp_node_type" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
+) WITH (OIDS=FALSE) ;
+
+
 
 CREATE TABLE "SCHEMA_NAME"."inp_backdrop" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_backdrop_id_seq'::regclass) NOT NULL,
@@ -1064,8 +1076,19 @@ ALTER TABLE "SCHEMA_NAME"."sector_selection" ADD PRIMARY KEY ("sector_id");
 
 
 -- ----------------------------
+-- Foreign Key system structure
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+-- ----------------------------
 -- Foreign Key structure
 -- ----------------------------
+
+
 ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD FOREIGN KEY ("curve_id") REFERENCES "SCHEMA_NAME"."inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."inp_demand" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -7,6 +7,24 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
+-- Records of inp_arc_type
+-- ----------------------------
+ 
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('PIPE');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('PUMP');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('VALVE');
+
+
+-- ----------------------------
+-- Records of inp_node_type
+-- ----------------------------
+ 
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('JUNCTION');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('RESERVOIR');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('TANK');
+
+
+-- ----------------------------
 -- Records of inp_typevalue_energy
 -- ----------------------------
  

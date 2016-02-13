@@ -72,14 +72,6 @@ WITH (OIDS=FALSE)
 
 
 -- ----------------------------
--- Table structure for addtional type
--- ----------------------------
-
-
-
-
-
--- ----------------------------
 -- Table structure for node derivades
 -- ----------------------------
 
@@ -116,6 +108,13 @@ CONSTRAINT man_node_valve_pkey PRIMARY KEY (node_id)
 WITH (OIDS=FALSE)
 ;
 
+
+CREATE TABLE "SCHEMA_NAME"."man_node_meter" (
+"node_id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT man_node_meter_pkey PRIMARY KEY (node_id)
+)
+WITH (OIDS=FALSE)
+;
 
 
 -- ----------------------------
@@ -155,7 +154,7 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."man_arc_flowmeter" (
+CREATE TABLE "SCHEMA_NAME"."man_arc_meter" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 CONSTRAINT man_arc_flowmeter_pkey PRIMARY KEY (arc_id)
 )

@@ -452,6 +452,21 @@ WITH (OIDS=FALSE);
 -- Table structure
 -- ----------------------------
 
+
+CREATE TABLE "SCHEMA_NAME"."inp_arc_type" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
+) WITH (OIDS=FALSE) ;
+
+
+CREATE TABLE "SCHEMA_NAME"."inp_node_type" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
+) WITH (OIDS=FALSE) ;
+
+
+
+
 CREATE TABLE "sc_dr"."inp_adjustments" (
 "adj_type" varchar(16) COLLATE "default" NOT NULL,
 "value_1" numeric(12,4),
@@ -2564,6 +2579,14 @@ ALTER TABLE "sc_dr"."sector_selection" ADD PRIMARY KEY ("sector_id");
 ALTER TABLE "sc_dr"."subcatchment" ADD PRIMARY KEY ("subc_id");
 
 
+
+
+-- ----------------------------
+-- Foreign Key system structure
+-- ----------------------------
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 

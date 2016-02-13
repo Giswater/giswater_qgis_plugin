@@ -5,6 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+-- configurar arc to node detect buffer area
+
+-- desactivar/activaar direcció conductes en f() de slope
+
+-- configurar node proximity
+
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".update_t_inp_arc_insert() RETURNS trigger
