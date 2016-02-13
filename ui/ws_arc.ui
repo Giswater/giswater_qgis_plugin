@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -3250,7 +3250,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab_13">
       <attribute name="title">
@@ -3482,7 +3482,7 @@ p, li { white-space: pre-wrap; }
      </widget>
      <widget class="QWidget" name="tab_14">
       <attribute name="title">
-       <string> Flow meter</string>
+       <string> Measure instrument</string>
       </attribute>
       <widget class="QTextEdit" name="textEdit_16">
        <property name="geometry">
@@ -3553,7 +3553,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -3978,6 +3978,11 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
+     </widget>
+     <widget class="QWidget" name="tab_16">
+      <attribute name="title">
+       <string>Picture</string>
+      </attribute>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -4552,24 +4557,6 @@ p, li { white-space: pre-wrap; }
     <string>rotation</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_28">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>20</y>
-     <width>111</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>material</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="comboBox_21">
    <property name="geometry">
     <rect>
@@ -4578,24 +4565,6 @@ p, li { white-space: pre-wrap; }
      <width>150</width>
      <height>20</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_44">
-   <property name="geometry">
-    <rect>
-     <x>640</x>
-     <y>20</y>
-     <width>101</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>nom diam</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox">
@@ -4611,50 +4580,12 @@ p, li { white-space: pre-wrap; }
     <string>Verified</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_45">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>20</y>
-     <width>101</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>type</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_34">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>20</y>
-     <width>121</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>arc_type</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_46">
    <property name="geometry">
     <rect>
-     <x>750</x>
+     <x>730</x>
      <y>20</y>
-     <width>81</width>
+     <width>91</width>
      <height>20</height>
     </rect>
    </property>
@@ -4664,7 +4595,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string>nom pressure</string>
+    <string>cat_arc.pnom</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_11">
@@ -4738,6 +4669,80 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="margin">
     <number>3</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_44">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>20</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>cat_arc.dnom</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_28">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>20</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>cat_arc.matcat_id</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_50">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>20</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>cat_arc.arctype_id</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_45">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>20</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>epa_type</string>
    </property>
   </widget>
  </widget>
