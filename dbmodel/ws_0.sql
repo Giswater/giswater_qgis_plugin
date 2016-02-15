@@ -307,23 +307,24 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "observ" character varying(254),
 "comment" character varying(254),
 "rotation" numeric (6,3),
-
+													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
+													-- to MAN model
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
+
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 )
@@ -343,21 +344,23 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "observ" character varying(254),
 "comment" character varying(254),
 "rotation" numeric (6,3),
-"real_length" numeric (12,2),
-
+"custom_length" numeric (12,2),
+													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
+													-- to MAN model
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
+
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
@@ -380,11 +383,11 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "rotation" numeric (6,3),
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
@@ -434,19 +437,5 @@ ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."epa_arc_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-
-
--- ----------------------------
--- Records of system tables
--- ----------------------------
-sys_arc
-
-sys_node
-
-
--- INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('RESERVOIR','RESERVOIR', 'inp_reservoir', 'man_node_tank');
-
-
 
 

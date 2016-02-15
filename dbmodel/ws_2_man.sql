@@ -39,14 +39,6 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."man_type_direction" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"custom_id" varchar(16) COLLATE "default" NOT NULL,
-CONSTRAINT man_type_direction_pkey PRIMARY KEY (id)
-)
-WITH (OIDS=FALSE)
-;
-
 
 
 
@@ -77,6 +69,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_node_junction" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_junction_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
@@ -87,6 +80,7 @@ CREATE TABLE "SCHEMA_NAME"."man_node_tank" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "vmax" numeric (12,4),
 "area" numeric (12,4),
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_tank_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
@@ -95,6 +89,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_node_hydrant" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_hydrant_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
@@ -103,6 +98,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_node_valve" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_valve_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
@@ -111,6 +107,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_node_meter" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_meter_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
@@ -124,6 +121,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_arc_pipe" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_pipe_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -132,6 +130,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_arc_valve" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_valve_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -140,6 +139,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_arc_pump" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_pump_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -148,6 +148,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_arc_filter" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_filter_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -156,6 +157,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_arc_meter" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_flowmeter_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)

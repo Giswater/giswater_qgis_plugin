@@ -342,11 +342,12 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "function_type" varchar(18) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
@@ -378,16 +379,17 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "comment" character varying(254),
 "rotation" numeric (6,3),
 "direction" character varying(2),
-"real_length" numeric (12,2),
+"custom_length" numeric (12,2),
 
 "function_type" varchar(18) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
@@ -416,11 +418,11 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "rotation" numeric (6,3),
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
@@ -458,11 +460,11 @@ CREATE TABLE "SCHEMA_NAME"."gully" (
 "rotation" numeric (6,3),
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
-"workcat_id" varchar(255) COLLATE "default",
-"buildercat_id" varchar(30) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
 "location_type" varchar(18) COLLATE "default",
+"workcat_id" varchar(255) COLLATE "default",
+"buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
 "text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
@@ -494,7 +496,6 @@ ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHE
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."sys_node_epa" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."epa_node_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
 
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."sys_arc_epa" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
