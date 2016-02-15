@@ -322,8 +322,8 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
 "link" character varying(512),
-
 "verified" varchar(4) COLLATE "default",
+
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 )

@@ -11,56 +11,59 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_junction" AS 
-SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.verified, node.the_geom,
-inp_junction.demand, inp_junction.pattern_id
-FROM (SCHEMA_NAME.node
-JOIN SCHEMA_NAME.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
-
+SELECT node.node_id, node.elevation, node."depth", inp_junction.demand, inp_junction.pattern_id, node.sector_id, node.dma_id, node.the_geom 
+, node.node_type, node."state", node.observ, node.event,node_dat.soilcat_id,node_dat.pavcat_id
+FROM ("SCHEMA_NAME".node
+JOIN "SCHEMA_NAME".inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".node_dat ON (((node.node_id)::text = (node_dat.node_id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_reservoir" AS 
-SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.verified, node.the_geom,
-inp_reservoir.head, inp_reservoir.pattern_id
+SELECT inp_reservoir.node_id, node.elevation, node."depth", inp_reservoir.head, inp_reservoir.pattern_id, node.sector_id, node.dma_id, node.the_geom 
+, node.node_type, node."state", node.observ, node.event, node_dat.soilcat_id, node_dat.pavcat_id
 FROM (SCHEMA_NAME.node 
-JOIN SCHEMA_NAME.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)));
-
+JOIN SCHEMA_NAME.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".node_dat ON (((node.node_id)::text = (node_dat.node_id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_tank" AS 
-SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.verified, node.the_geom,
-inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id
-FROM (SCHEMA_NAME.inp_node 
-JOIN SCHEMA_NAME.tank ON (((inp_tank.node_id)::text = (node.node_id)::text)));
+SELECT node.node_id, node.elevation, node."depth", inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id, node.sector_id, node.dma_id, node.the_geom 
+, node.node_type ,node."state", node.observ, node.event,node_dat.soilcat_id,node_dat.pavcat_id
+FROM (SCHEMA_NAME.inp_tank 
+JOIN SCHEMA_NAME.node ON (((inp_tank.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".node_dat ON (((node.node_id)::text = (node_dat.node_id)::text)));
+
 
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_pipe" AS 
-SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.real_length, arc.verified, arc.the_geom,
-inp_pipe.minorloss, inp_pipe.status
-FROM (SCHEMA_NAME.arc 
-JOIN SCHEMA_NAME.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
+SELECT arc.arc_id, cat_arc.id AS arccat_id, inp_pipe.minorloss, inp_pipe.status, arc.sector_id, arc.dma_id, arc.the_geom 
+, arc.arc_type, arc."state", arc.observ, arc.event,	arc_dat.soilcat_id,	arc_dat.pavcat_id
+FROM ((SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)))
+JOIN SCHEMA_NAME.cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+JOIN "SCHEMA_NAME".arc_dat ON (((arc.arc_id)::text = (arc_dat.arc_id)::text)));
 
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_pump" AS 
-SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.real_length, arc.verified, arc.the_geom,
-inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.status, 
-FROM (SCHEMA_NAME.arc 
-JOIN SCHEMA_NAME.inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
+SELECT inp_pump.arc_id, cat_arc.id AS arccat_id, inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.status, arc.sector_id, arc.dma_id, arc.the_geom 
+, arc.arc_type, arc."state", arc.observ, arc.event, arc_dat.soilcat_id,	arc_dat.pavcat_id
+FROM ((SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)))
+JOIN SCHEMA_NAME.cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))   
+JOIN "SCHEMA_NAME".arc_dat ON (((arc.arc_id)::text = (arc_dat.arc_id)::text)));
 
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_valve" AS 
-SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.real_length, arc.verified, arc.the_geom,
-inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.status
-FROM (SCHEMA_NAME.arc 
-JOIN SCHEMA_NAME.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
+SELECT inp_valve.arc_id, cat_arc.id AS arccat_id, inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.status, arc.sector_id, arc.dma_id, arc.the_geom 
+, arc.arc_type, arc."state", arc.observ, arc.event, arc_dat.soilcat_id,	arc_dat.pavcat_id
+FROM ((SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)))
+JOIN SCHEMA_NAME.cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+JOIN "SCHEMA_NAME".arc_dat ON (((arc.arc_id)::text = (arc_dat.arc_id)::text)));
+
 
 
 
@@ -101,12 +104,12 @@ BEGIN
 				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
 			END IF;
 
-		INSERT INTO node 		 VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_junction VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
+		INSERT INTO node VALUES(NEW.node_id,NEW.elevation, NEW."depth", 'JUNCTION'::text,NEW.sector_id, NEW.dma_id,NEW.the_geom, NEW.node_type, NEW."state", NEW."observ", NEW.event);
+		INSERT INTO inp_junction VALUES(NEW.node_id,NEW.demand,NEW.pattern_id);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+		UPDATE node SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", sector_id=NEW.sector_id, dma_id=NEW.dma_id, the_geom=NEW.the_geom, node_type=NEW.node_type, "state"=NEW."state", "observ"=NEW."observ", event=NEW.event WHERE node_id=OLD.node_id;
 		UPDATE inp_junction SET node_id=NEW.node_id, demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -155,12 +158,12 @@ BEGIN
 				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
 			END IF;
 			
-		INSERT INTO node 		  VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, NEW.verified, NEW.the_geom);
+		INSERT INTO node VALUES(NEW.node_id, NEW.elevation, NEW."depth", 'RESERVOIR'::text, NEW.sector_id, NEW.dma_id, NEW.the_geom, NEW.node_type, NEW."state", NEW."observ", NEW.event);
 		INSERT INTO inp_reservoir VALUES(NEW.node_id, NEW.head, NEW.pattern_id);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+		UPDATE node SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", sector_id=NEW.sector_id, dma_id=NEW.dma_id,the_geom=NEW.the_geom, node_type=NEW.node_type, "state"=NEW."state", "observ"=NEW."observ", event=NEW.event WHERE node_id=OLD.node_id;
 		UPDATE inp_reservoir SET node_id=NEW.node_id, head=NEW.head, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
 		RETURN NEW;
 
@@ -208,12 +211,12 @@ BEGIN
 				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
 			END IF;
 
-		INSERT INTO node 	 VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, NEW.verified, NEW.the_geom);
+		INSERT INTO node VALUES(NEW.node_id, NEW.elevation, NEW."depth", 'TANK'::text, NEW.sector_id, NEW.dma_id, NEW.the_geom, NEW.node_type, NEW."state", NEW."observ", NEW.event);
 		INSERT INTO inp_tank VALUES(NEW.node_id,NEW.initlevel,NEW.minlevel,NEW.maxlevel,NEW.diameter,NEW.minvol,NEW.curve_id);
 		RETURN NEW;
    
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 	SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+		UPDATE node SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", sector_id=NEW.sector_id, dma_id=NEW.dma_id, the_geom=NEW.the_geom, node_type=NEW.node_type, "state"=NEW."state", "observ"=NEW."observ", event=NEW.event WHERE node_id=OLD.node_id;
 		UPDATE inp_tank SET node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
 		RETURN NEW;
 
@@ -274,12 +277,12 @@ BEGIN
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;
 	
-		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.real_length, NEW.verified, NEW.the_geom);
+		INSERT INTO arc VALUES(NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW.dma_id, NEW.the_geom, NEW.arc_type, NEW."state", NEW."observ", NEW.event);
 		INSERT INTO inp_pipe VALUES(NEW.arc_id, NEW.minorloss, NEW.status);
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 		SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, real_length=NEW.real_length, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE arc SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, enet_type='PIPE'::TEXT, sector_id=NEW.sector_id, dma_id=NEW.dma_id, the_geom=NEW.the_geom, arc_type=NEW.arc_type, "state"=NEW."state", "observ"=NEW."observ", event=NEW.event WHERE arc_id=OLD.arc_id;
 		UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -327,12 +330,12 @@ BEGIN
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;
 			
-		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.real_length, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_pump VALUES (NEW.arc_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
+		INSERT INTO arc VALUES(NEW.arc_id, null, null, NEW.arccat_id, 'PUMP'::TEXT, NEW.sector_id, NEW.dma_id, NEW.the_geom, NEW.arc_type, NEW."state", NEW."observ", NEW.event);
+		INSERT INTO inp_pump VALUES(NEW.arc_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 		SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, real_length=NEW.real_length, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE arc SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, enet_type='PUMP'::TEXT, sector_id=NEW.sector_id, dma_id=NEW.dma_id, the_geom=NEW.the_geom, arc_type=NEW.arctype, "state"=NEW."state", "observ"=NEW."observ", event=NEW.event WHERE arc_id=OLD.arc_id;
 		UPDATE inp_pump SET arc_id=NEW.arc_id, power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -380,12 +383,12 @@ BEGIN
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;
 			
-		INSERT INTO arc 	  VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.real_length, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_valve VALUES (NEW.arc_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
+		INSERT INTO arc VALUES(NEW.arc_id, null, null, NEW.arccat_id, 'VALVE'::TEXT, NEW.sector_id, NEW.dma_id, NEW.the_geom, NEW.arc_type, NEW."state", NEW."observ", NEW.event);
+		INSERT INTO inp_valve VALUES(NEW.arc_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
 		RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 		 SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, real_length=NEW.real_length, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE arc SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, enet_type='VALVE'::TEXT, sector_id=NEW.sector_id, dma_id=NEW.dma_id, the_geom=NEW.the_geom, arc_type=NEW.arc_type, "state"=NEW."state", "observ"=NEW."observ", event=NEW.event WHERE arc_id=OLD.arc_id;
 		UPDATE inp_valve SET arc_id=NEW.arc_id, valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
     
