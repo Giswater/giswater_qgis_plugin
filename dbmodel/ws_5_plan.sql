@@ -50,7 +50,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."plan_psector_seq"
   CACHE 1;
   
   
-CREATE SEQUENCE "SCHEMA_NAME".plan_arc_x_pavement_seq
+CREATE SEQUENCE "SCHEMA_NAME"."plan_arc_x_pavement_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -82,7 +82,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."price_compost_seq"
     CACHE 1;
 	
 
-CREATE SEQUENCE "SCHEMA_NAME".price_simple_value_seq
+CREATE SEQUENCE "SCHEMA_NAME"."price_simple_value_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -90,7 +90,7 @@ CREATE SEQUENCE "SCHEMA_NAME".price_simple_value_seq
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME".price_compost_value_seq
+CREATE SEQUENCE "SCHEMA_NAME"."price_compost_value_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -153,7 +153,7 @@ ALTER TABLE "SCHEMA_NAME".cat_pavement
 
 ----------------------------------------------
 -- TABLE STRUCTURE FOR PLAN
----------------------------------------------a
+---------------------------------------------
 CREATE TABLE "SCHEMA_NAME"."plan_arc_x_psector" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_arc_x_ps_seq'::regclass) NOT NULL,
 "arc_id" varchar(16) COLLATE "default",
@@ -228,17 +228,15 @@ CREATE TABLE "SCHEMA_NAME".plan_economic_selection  -- Used to show economic dat
   id character varying(16) NOT NULL,
   observ character varying(254),
   CONSTRAINT plan_economic_selection_pkey PRIMARY KEY (id),
-  CONSTRAINT plan_economic_selection_id_fkey FOREIGN KEY (id)
-      REFERENCES "SCHEMA_NAME".plan_value_state (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT
+  CONSTRAINT plan_economic_selection_id_fkey FOREIGN KEY (id) REFERENCES "SCHEMA_NAME".value_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 )
 WITH (
   OIDS=FALSE
 );
 
 
-DROP TABLE IF EXISTS "SCHEMA_NAME"."plan_psector_selection";   -- Used to show a defined range of psector features on map composer
-CREATE TABLE "SCHEMA_NAME".plan_psector_selection
+
+CREATE TABLE "SCHEMA_NAME".plan_psector_selection -- Used to show a defined range of psector features on map composer
 (
   id character varying(16) NOT NULL,
   observ character varying(254),
@@ -1079,11 +1077,3 @@ plan_psector.other;
 				GROUP BY wtotal.psector_id, wtotal.the_geom;
 				
 
-
--- ----------------------------
--- Records of plan_economic_selection
--- ----------------------------
-INSERT INTO "SCHEMA_NAME"."plan_economic_selection" VALUES ('ON_SERVICE');
-INSERT INTO "SCHEMA_NAME"."plan_economic_selection" VALUES ('RECONSTRUCT');
-INSERT INTO "SCHEMA_NAME"."plan_economic_selection" VALUES ('REPLACE');
-INSERT INTO "SCHEMA_NAME"."plan_economic_selection" VALUES ('PLANIFIED');

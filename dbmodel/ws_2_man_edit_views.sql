@@ -108,11 +108,9 @@ JOIN SCHEMA_NAME.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id):
 -----------------------------
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_junction() RETURNS trigger LANGUAGE plpgsql AS $$
-
 	
 BEGIN
-    
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		
 --	Control insertions ID	
 	IF TG_OP = 'INSERT' THEN
@@ -208,13 +206,16 @@ BEGIN
 			
 			
 		INSERT INTO node 		      VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation,
-										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 	
+											  null, null, null, null, null, 
+											  NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_node_junction VALUES (NEW.node_id, NEW.add_info);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE node 		     SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, 
-							      	 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+							      	 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+									 link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_node_junction SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -331,13 +332,16 @@ BEGIN
 			
 			
 		INSERT INTO node 		  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'TANK'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation,
-										  NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+										  NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+										  null, null, null, null, null, 
+										  NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_node_tank VALUES (NEW.node_id, NEW.vmax, NEW.area, NEW.add_info);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, 
-								 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+								 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								 link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_node_tank SET node_id=NEW.node_id, vmax=NEW.vmax, area=NEW.area, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -453,13 +457,16 @@ BEGIN
 			
 			
 		INSERT INTO node 		      VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation,
-										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+											  null, null, null, null, null, 
+											  NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_node_hydrant  VALUES (NEW.node_id, NEW.add_info);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE node 		     SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, 
-							      	 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+							      	 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
+									 link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_node_hydrant  SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -575,13 +582,15 @@ BEGIN
 			
 			
 		INSERT INTO node 		    VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation,
-									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+											null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_node_valve	VALUES (NEW.node_id, NEW.add_info);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE node 		  SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, 
-							      dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+							      dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								  link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_node_valve SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -696,13 +705,15 @@ BEGIN
 						
 			
 		INSERT INTO node 		    VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation,
-									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+											null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_node_meter	VALUES (NEW.node_id, NEW.add_info);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE node 		  SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, 
-							      dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+							      dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								  link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_node_meter SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -831,7 +842,8 @@ BEGIN
 			
 	
 		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.custom_length,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, null, null, null, null, null, null, null, null, null, NEW.verified, NEW.the_geom);
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, 
+											NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_arc_pipe	VALUES (NEW.arc_id, NEW.add_info);			 
 									 
 									 
@@ -839,7 +851,8 @@ BEGIN
     
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, custom_length=NEW.custom_length, 
-								dma=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link,	verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_arc_pipe SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -949,7 +962,8 @@ BEGIN
 			
 	
 		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, null, null, null, null, null, null, null, null, null, NEW.verified, NEW.the_geom);
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, 		
+											NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_arc_valve	VALUES (NEW.arc_id, NEW.add_info);			 
 									 
 									 
@@ -957,7 +971,8 @@ BEGIN
     
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
-								dma=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link,	verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_arc_valve SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -1067,7 +1082,8 @@ BEGIN
 						
 	
 		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, null, null, null, null, null, null, null, null, null, NEW.verified, NEW.the_geom);
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, 
+											NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_arc_pump	VALUES (NEW.arc_id, NEW.add_info);			 
 									 
 									 
@@ -1075,7 +1091,8 @@ BEGIN
     
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
-								dma=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, link=NEW.link,	verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_arc_pump SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -1179,16 +1196,19 @@ BEGIN
 						
 	
 		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, null, null, null, null, null, null, null, null, null, NEW.verified, NEW.the_geom);
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+											null, null, null, null, null, 	
+											NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_arc_valve	VALUES (NEW.arc_id, NEW.add_info);			 
 									 
 									 
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
-								dma=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type,	verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
-		UPDATE man_arc_filter SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
+		UPDATE arc 				SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
+								    dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+									link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+		UPDATE man_arc_filter 	SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
@@ -1291,7 +1311,9 @@ BEGIN
 						
 	
 		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, null, null, null, null, null, null, null, null, null, NEW.verified, NEW.the_geom);
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+											null, null, null, null, null, 
+											NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO man_arc_valve	VALUES (NEW.arc_id, NEW.add_info);			 
 									 
 									 
@@ -1299,7 +1321,8 @@ BEGIN
     
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
-								dma=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type,	verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
+								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
 		UPDATE man_arc_meter SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 

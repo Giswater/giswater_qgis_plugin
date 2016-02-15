@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
@@ -44,3 +43,33 @@ INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PUMP STATION','PUMP', 'man_arc_pum
 INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('FILTER','FILTER', 'man_arc_filter', 'PIPE', 'inp_pipe');
 INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('FLOW METER','MEASURE INSTRUMENT', 'man_arc_meter', 'PIPE', 'inp_pipe');
 
+
+
+-- ----------------------------
+-- Records of cat_mat
+-- ----------------------------
+
+
+
+
+-- ----------------------------
+-- Records of cat_arc
+-- ----------------------------
+
+
+
+
+-- ----------------------------
+-- Records of cat_node
+-- ----------------------------
+
+
+
+
+-- ----------------------------
+-- Records of value_state
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('ON_SERVICE');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('RECONSTRUCT');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('REPLACE');
+INSERT INTO "SCHEMA_NAME"."inp_value_state" VALUES ('PLANIFIED');

@@ -12,6 +12,7 @@ This version of Giswater is provided by Giswater Association
 --    GIS EDITING VIEWS
 ----------------------------
 
+DROP VIEW "SCHEMA_NAME".v_edit_node;
 CREATE VIEW "SCHEMA_NAME".v_edit_node AS
  SELECT node.node_id, 
     node.elevation, 
@@ -28,6 +29,19 @@ CREATE VIEW "SCHEMA_NAME".v_edit_node AS
     node.observ, 
     node."comment",
 	node.rotation,
+	node.dma_id,
+	node.soilcat_id,
+	node.category_type,
+	node.fluid_type,
+	node.location_type,
+	node.workcat_id,
+	node.buildercat_id,
+	node.builtdate,
+	node.text,
+	node.adress_01,
+	node.adress_02,
+	node.adress_03,
+	node.descript,
 	node.link,
 	node.verified,
 	node.the_geom
@@ -35,7 +49,7 @@ CREATE VIEW "SCHEMA_NAME".v_edit_node AS
    JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
-   
+ DROP VIEW "SCHEMA_NAME".v_edit_arc;
  CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
  SELECT arc.arc_id, 
     arc.arccat_id, 
@@ -53,6 +67,19 @@ CREATE VIEW "SCHEMA_NAME".v_edit_node AS
 	arc.rotation,
 	arc.direction,
 	arc.custom_length,
+	arc.dma_id,
+	arc.soilcat_id,
+	arc.category_type,
+	arc.fluid_type,
+	arc.location_type,
+	arc.workcat_id,
+	arc.buildercat_id,
+	arc.builtdate,
+	arc.text,
+	arc.adress_01,
+	arc.adress_02,
+	arc.adress_03,
+	arc.descript,
 	arc.link,
 	arc.verified,
 	arc.the_geom
@@ -60,8 +87,7 @@ CREATE VIEW "SCHEMA_NAME".v_edit_node AS
    JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
-   
-   
+     
    
 
 -- ----------------------------
@@ -70,10 +96,6 @@ CREATE VIEW "SCHEMA_NAME".v_edit_node AS
    
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".v_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
 
-DECLARE 
-	numNodes numeric;
-	sectorRecord record;
-	auxNode_ID varchar;
 
 BEGIN
 
@@ -113,7 +135,10 @@ BEGIN
 			END IF;
 			
 	
-	INSERT INTO node  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+	INSERT INTO node  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, 
+							  NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+							  NEW.text, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, 
+							  NEW.link, NEW.verified, NEW.the_geom);
 
 		
 	IF (NEW.enet_type='JUNCTION') THEN
@@ -163,7 +188,13 @@ BEGIN
 				END IF;
 				
 			END IF;
-		UPDATE node SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, WHERE node_id=OLD.node_id;
+		
+			UPDATE 	node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, 
+					dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
+					text=NEW.text, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
+					link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+
+
 			RETURN NEW;
     
 	ELSIF TG_OP = 'DELETE' THEN
@@ -185,21 +216,8 @@ CREATE TRIGGER v_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME
 
 
 
-
-
-
-
-
-
-
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 
-DECLARE 
-	numNodes numeric;
-	sectorRecord record;
-	auxNode_ID varchar;
 
 BEGIN
 
@@ -279,7 +297,10 @@ BEGIN
 				
 			END IF;
 		
-		UPDATE arc 	SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, custom_length=NEW.custom_length, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE arc 	SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, custom_length=NEW.custom_length, 
+						dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
+						text=NEW.text, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
+						link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
 
 		RETURN NEW;
     

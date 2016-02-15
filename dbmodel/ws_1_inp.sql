@@ -730,11 +730,11 @@ CREATE TABLE "SCHEMA_NAME"."sector_selection" (
 ;
 
 
-
 CREATE TABLE "SCHEMA_NAME"."state_selection" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "observ" varchar(254) COLLATE "default",
 CONSTRAINT state_selection_pkey PRIMARY KEY (id)
+  CONSTRAINT state_selection_id_fkey FOREIGN KEY (id) REFERENCES "SCHEMA_NAME".value_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 )WITH (OIDS=FALSE)
 ;
 
