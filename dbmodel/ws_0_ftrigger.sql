@@ -12,7 +12,7 @@ This version of Giswater is provided by Giswater Association
 -----------------------------
 
 
-CREATE OR REPLACE FUNCTION ws.node_update() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.node_update() RETURNS trigger LANGUAGE plpgsql AS $$
 
 DECLARE 
 	querystring Varchar; 
@@ -63,13 +63,13 @@ END;
 $$;
 
 
-CREATE TRIGGER node_update AFTER UPDATE ON "ws"."node" FOR EACH ROW EXECUTE PROCEDURE "ws"."node_update"();
+CREATE TRIGGER node_update AFTER UPDATE ON "wsp"."node" FOR EACH ROW EXECUTE PROCEDURE "wsp"."node_update"();
 
 
 
 
 
-CREATE OR REPLACE FUNCTION ws.node_delete() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.node_delete() RETURNS trigger LANGUAGE plpgsql AS $$
 	
 DECLARE 
 	querystring Varchar; 
@@ -93,4 +93,4 @@ $$;
 
 
 
-CREATE TRIGGER node_delete BEFORE DELETE ON "ws"."node" FOR EACH ROW EXECUTE PROCEDURE "ws"."node_delete"();
+CREATE TRIGGER node_delete BEFORE DELETE ON "wsp"."node" FOR EACH ROW EXECUTE PROCEDURE "wsp"."node_delete"();

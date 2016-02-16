@@ -10,57 +10,57 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 
 
-CREATE VIEW "ws"."v_edit_inp_junction" AS 
+CREATE VIEW "wsp"."v_edit_inp_junction" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
 inp_junction.demand, inp_junction.pattern_id
-FROM (ws.node
-JOIN ws.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
+FROM (wsp.node
+JOIN wsp.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
 
 
 
-CREATE VIEW "ws"."v_edit_inp_reservoir" AS 
+CREATE VIEW "wsp"."v_edit_inp_reservoir" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
 inp_reservoir.head, inp_reservoir.pattern_id
-FROM (ws.node 
-JOIN ws.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)));
+FROM (wsp.node 
+JOIN wsp.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)));
 
 
 
-CREATE VIEW "ws"."v_edit_inp_tank" AS 
+CREATE VIEW "wsp"."v_edit_inp_tank" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
 inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id
-FROM (ws.node 
-JOIN ws.inp_tank ON (((inp_tank.node_id)::text = (node.node_id)::text)));
+FROM (wsp.node 
+JOIN wsp.inp_tank ON (((inp_tank.node_id)::text = (node.node_id)::text)));
 
 
 
-CREATE VIEW "ws"."v_edit_inp_pipe" AS 
+CREATE VIEW "wsp"."v_edit_inp_pipe" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
 inp_pipe.minorloss, inp_pipe.status
-FROM (ws.arc 
-JOIN ws.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
+FROM (wsp.arc 
+JOIN wsp.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
 
 
 
-CREATE VIEW "ws"."v_edit_inp_pump" AS 
+CREATE VIEW "wsp"."v_edit_inp_pump" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
 inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.status
-FROM (ws.arc 
-JOIN ws.inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
+FROM (wsp.arc 
+JOIN wsp.inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
 
 
 
-CREATE VIEW "ws"."v_edit_inp_valve" AS 
+CREATE VIEW "wsp"."v_edit_inp_valve" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
 inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.status
-FROM (ws.arc 
-JOIN ws.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
+FROM (wsp.arc 
+JOIN wsp.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
 
 
 
@@ -70,14 +70,15 @@ JOIN ws.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION ws.v_edit_inp_junction() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.v_edit_inp_junction() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';	
 --	Control insertions ID	
 	IF TG_OP = 'INSERT' THEN
 --			Node ID
 			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
+				NEW.node_id := (SELECT nextval('node_id_seq'));
 			END IF;
 --			elevation, depth
 			IF (NEW.elevation IS NULL) THEN 
@@ -100,9 +101,29 @@ BEGIN
 				END IF;
 				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
 			END IF;
+--			State
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT id FROM value_state LIMIT 1);
+			END IF;
+--			Verified
+			IF (NEW.verified IS NULL) THEN
+				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
+			END IF;
+-- FEATURE INSERT
+		INSERT INTO node 		 VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
 
-		INSERT INTO node 		 VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+-- EPA INSERT
 		INSERT INTO inp_junction 	VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
+
+-- MANAGEMENT INSERT			
+		querystring := (SELECT man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+		IF (querystring='man_node_junction') THEN INSERT INTO  man_node_junction VALUES(NEW.node_id,null);
+		ELSIF (querystring='man_node_tank') THEN INSERT INTO  man_node_tank VALUES(NEW.node_id,null,null,null);
+		ELSIF (querystring='man_node_hdyrant') THEN INSERT INTO  man_node_hdyrant VALUES(NEW.node_id,null);
+		ELSIF (querystring='man_node_valve') THEN INSERT INTO  man_node_valve VALUES(NEW.node_id,null);
+		END IF;
+
+
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -124,14 +145,15 @@ $$;
 
 
  
-CREATE OR REPLACE FUNCTION ws.v_edit_inp_reservoir() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.v_edit_inp_reservoir() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 --	Control insertions ID	
 	IF TG_OP = 'INSERT' THEN
 --			Node ID
 			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
+				NEW.node_id := (SELECT nextval('node_id_seq'));
 			END IF;
 --			elevation, depth
 			IF (NEW.elevation IS NULL) THEN 
@@ -154,9 +176,29 @@ BEGIN
 				END IF;
 				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
 			END IF;
-			
-		INSERT INTO node 		  VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+--			State
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT id FROM value_state LIMIT 1);
+			END IF;
+--			Verified
+			IF (NEW.verified IS NULL) THEN
+				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
+			END IF;
+
+-- FEATURE INSERT
+		INSERT INTO node 		  VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+
+-- EPA INSERT
 		INSERT INTO inp_reservoir VALUES(NEW.node_id, NEW.head, NEW.pattern_id);
+
+-- MANAGEMENT INSERT			
+		querystring := (SELECT man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+		IF (querystring='man_node_junction') THEN INSERT INTO  man_node_junction VALUES(NEW.node_id,null);
+		ELSIF (querystring='man_node_tank') THEN INSERT INTO  man_node_tank VALUES(NEW.node_id,null,null,null);
+		ELSIF (querystring='man_node_hdyrant') THEN INSERT INTO  man_node_hdyrant VALUES(NEW.node_id,null);
+		ELSIF (querystring='man_node_valve') THEN INSERT INTO  man_node_valve VALUES(NEW.node_id,null);
+		END IF;
+
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -177,14 +219,15 @@ $$;
   
   
 
-CREATE OR REPLACE FUNCTION ws.v_edit_inp_tank() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.v_edit_inp_tank() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 --	Control insertions ID	
 	IF TG_OP = 'INSERT' THEN
 --			Node ID
 			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('inp_node_id_seq'));
+				NEW.node_id := (SELECT nextval('node_id_seq'));
 			END IF;
 --			elevation, depth
 			IF (NEW.elevation IS NULL) THEN 
@@ -207,9 +250,29 @@ BEGIN
 				END IF;
 				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
 			END IF;
+--			State
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT id FROM value_state LIMIT 1);
+			END IF;
+--			Verified
+			IF (NEW.verified IS NULL) THEN
+				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
+			END IF;
 
-		INSERT INTO node 	 VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+-- FEATURE INSERT
+		INSERT INTO node 	 VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+
+-- EPA INSERT		
 		INSERT INTO inp_tank VALUES(NEW.node_id,NEW.initlevel,NEW.minlevel,NEW.maxlevel,NEW.diameter,NEW.minvol,NEW.curve_id);
+
+-- MANAGEMENT INSERT			
+		querystring := (SELECT man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+		IF (querystring='man_node_junction') THEN INSERT INTO  man_node_junction VALUES(NEW.node_id,null);
+		ELSIF (querystring='man_node_tank') THEN INSERT INTO  man_node_tank VALUES(NEW.node_id,null,null,null);
+		ELSIF (querystring='man_node_hdyrant') THEN INSERT INTO  man_node_hdyrant VALUES(NEW.node_id,null);
+		ELSIF (querystring='man_node_valve') THEN INSERT INTO  man_node_valve VALUES(NEW.node_id,null);
+		END IF;
+
 		RETURN NEW;
    
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -229,11 +292,11 @@ $$;
 
 
 
-CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE "ws".v_edit_inp_junction();
+CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_junction();
  
-CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_inp_reservoir FOR EACH ROW EXECUTE PROCEDURE "ws".v_edit_inp_reservoir();
+CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_reservoir FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_reservoir();
 
-CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_inp_tank FOR EACH ROW EXECUTE PROCEDURE "ws".v_edit_inp_tank();
+CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_tank FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_tank();
 
 
   
@@ -245,13 +308,14 @@ CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_e
 -----------------------------
   
 
-CREATE OR REPLACE FUNCTION ws.v_edit_inp_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.v_edit_inp_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	IF TG_OP = 'INSERT' THEN
 --			Arc ID
 			IF (NEW.arc_id IS NULL) THEN
-				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
+				NEW.arc_id := (SELECT nextval('arc_id_seq'));
 			END IF;
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -266,6 +330,14 @@ BEGIN
 					RAISE EXCEPTION 'There are no arcs catalog defined in the model, define at least one.';
 				END IF;			
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+			END IF;
+--			State
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT id FROM value_state LIMIT 1);
+			END IF;
+--			Verified
+			IF (NEW.verified IS NULL) THEN
+				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;
 	
 		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
@@ -292,13 +364,14 @@ $$;
   
   
 
-CREATE OR REPLACE FUNCTION ws.v_edit_inp_pump() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.v_edit_inp_pump() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	IF TG_OP = 'INSERT' THEN
 --			Arc ID
 			IF (NEW.arc_id IS NULL) THEN
-				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
+				NEW.arc_id := (SELECT nextval('arc_id_seq'));
 			END IF;
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -314,6 +387,15 @@ BEGIN
 				END IF;			
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;	
+--			State
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT id FROM value_state LIMIT 1);
+			END IF;
+--			Verified
+			IF (NEW.verified IS NULL) THEN
+				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
+			END IF;
+
 		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO inp_pump VALUES (NEW.arc_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
 		RETURN NEW;
@@ -338,14 +420,15 @@ $$;
 
  
 
-CREATE OR REPLACE FUNCTION ws.v_edit_inp_valve() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION wsp.v_edit_inp_valve() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     IF TG_OP = 'INSERT' THEN
 --			Arc ID
 			IF (NEW.arc_id IS NULL) THEN
-				NEW.arc_id := (SELECT nextval('inp_arc_id_seq'));
+				NEW.arc_id := (SELECT nextval('arc_id_seq'));
 			END IF;
 --			Sector ID
 			IF (NEW.sector_id IS NULL) THEN
@@ -361,7 +444,15 @@ BEGIN
 				END IF;			
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;
-			
+--			State
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT id FROM value_state LIMIT 1);
+			END IF;
+--			Verified
+			IF (NEW.verified IS NULL) THEN
+				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
+			END IF;	
+	
 		INSERT INTO arc 	  VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,  null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO inp_valve VALUES (NEW.arc_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
 		RETURN NEW;
@@ -384,11 +475,11 @@ $$;
 
 
 
-CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE "ws".v_edit_inp_pipe();
+CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_pipe();
 
-CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE "ws".v_edit_inp_valve();
+CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_valve();
 
-CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws".v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE "ws".v_edit_inp_pump();
+CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_pump();
 
    
   

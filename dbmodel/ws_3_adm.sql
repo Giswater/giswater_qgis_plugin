@@ -9,21 +9,21 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 
 
-CREATE SEQUENCE "ws".adm_log_node_seq
+CREATE SEQUENCE "wsp".adm_log_node_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
 
-  CREATE SEQUENCE "ws".adm_log_arc_seq
+  CREATE SEQUENCE "wsp".adm_log_arc_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
 
-  CREATE SEQUENCE "ws".adm_log_connec_seq
+  CREATE SEQUENCE "wsp".adm_log_connec_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -33,7 +33,7 @@ CREATE SEQUENCE "ws".adm_log_node_seq
 
 
 
-CREATE TABLE "ws"."adm_list_user" (
+CREATE TABLE "wsp"."adm_list_user" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "name" varchar(40) COLLATE "default" NOT NULL,
 "surname_1" varchar(40) COLLATE "default" NOT NULL,
@@ -48,8 +48,8 @@ CONSTRAINT admin_list_user_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE ws.adm_log_node(
-"id" int8 DEFAULT nextval('"ws".adm_log_node_seq'::regclass) NOT NULL,
+CREATE TABLE wsp.adm_log_node(
+"id" int8 DEFAULT nextval('"wsp".adm_log_node_seq'::regclass) NOT NULL,
 
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "elevation" numeric(12,4),
@@ -88,8 +88,8 @@ CONSTRAINT adm_log_node_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE ws.adm_log_arc(
-"id" int8 DEFAULT nextval('"ws".adm_log_arc_seq'::regclass) NOT NULL,
+CREATE TABLE wsp.adm_log_arc(
+"id" int8 DEFAULT nextval('"wsp".adm_log_arc_seq'::regclass) NOT NULL,
 
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "node_1" varchar(16) COLLATE "default",
@@ -129,8 +129,8 @@ CONSTRAINT adm_log_arc_pkey PRIMARY KEY (id)
  
 
 
-CREATE TABLE ws.adm_log_connec(
-"id" int8 DEFAULT nextval('"ws".adm_log_connec_seq'::regclass) NOT NULL,
+CREATE TABLE wsp.adm_log_connec(
+"id" int8 DEFAULT nextval('"wsp".adm_log_connec_seq'::regclass) NOT NULL,
 
 "connec_id" varchar(16) COLLATE "default" NOT NULL,
 "elevation" numeric(12,4),

@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 -----------------
 -- CATALOGS
 -----------------
-CREATE TABLE "ws"."cat_connec" (
+CREATE TABLE "wsp"."cat_connec" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "matcat_id" varchar(16) COLLATE "default",
 "matcat_2" varchar(16) COLLATE "default",
@@ -31,7 +31,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "ws"."cat_soil" (
+CREATE TABLE "wsp"."cat_soil" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
@@ -42,7 +42,7 @@ CONSTRAINT cat_soil_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "ws"."cat_builder" (
+CREATE TABLE "wsp"."cat_builder" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
@@ -53,7 +53,7 @@ CONSTRAINT cat_builder_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "ws"."cat_work" (
+CREATE TABLE "wsp"."cat_work" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
@@ -63,7 +63,7 @@ CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "ws"."cat_man_cover" (
+CREATE TABLE "wsp"."cat_man_cover" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
@@ -80,7 +80,7 @@ CONSTRAINT cat_man_cover_pkey PRIMARY KEY (id)
 -----------
 -- TYPE
 -----------
-CREATE TABLE "ws"."man_type_category" (
+CREATE TABLE "wsp"."man_type_category" (
 "id" varchar(20) COLLATE "default" NOT NULL,
 "observ" varchar(50) COLLATE "default",
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
@@ -88,7 +88,7 @@ CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "ws"."man_type_fluid" (
+CREATE TABLE "wsp"."man_type_fluid" (
 "id" varchar(20) COLLATE "default" NOT NULL,
 "observ" varchar(50) COLLATE "default",
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
@@ -96,7 +96,7 @@ CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "ws"."man_type_location" (
+CREATE TABLE "wsp"."man_type_location" (
 "id" varchar(20) COLLATE "default" NOT NULL,
 "observ" varchar(50) COLLATE "default",
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
@@ -110,19 +110,18 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 -- Table structure
 --------------------
 
-CREATE TABLE "ws"."dma" (
+CREATE TABLE "wsp"."dma" (
 "dma_id" varchar(30) COLLATE "default" NOT NULL,
-"sector_id" varchar(30) COLLATE "default" NOT NULL,
+"sector_id" varchar(30) COLLATE "default",
 "descript" varchar(255) COLLATE "default",
 "observ" character varying(512),
-"event" character varying(30),
 "the_geom" public.geometry (MULTIPOLYGON, 25831),
 CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 )WITH (OIDS=FALSE);
 
 
-CREATE TABLE "ws"."connec" (
-"connec_id" varchar DEFAULT nextval('"ws".connec_seq'::regclass) NOT NULL,
+CREATE TABLE "wsp"."connec" (
+"connec_id" varchar DEFAULT nextval('"wsp".connec_seq'::regclass) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
 "connecat_id" varchar(30) COLLATE "default",
@@ -153,8 +152,8 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 
 
-CREATE TABLE "ws"."link" (
-link_id varchar (16) DEFAULT nextval('"ws".link_seq'::regclass) NOT NULL,
+CREATE TABLE "wsp"."link" (
+link_id varchar (16) DEFAULT nextval('"wsp".link_seq'::regclass) NOT NULL,
 connec_id varchar(16) COLLATE "default",
 the_geom public.geometry (LINESTRING, 25831),
 CONSTRAINT link_pkey PRIMARY KEY (link_id)
@@ -165,7 +164,7 @@ CONSTRAINT link_pkey PRIMARY KEY (link_id)
 -- -----------------------------------
 -- Table structure for node derivades
 -- -----------------------------------
-CREATE TABLE "ws"."man_node_junction" (
+CREATE TABLE "wsp"."man_node_junction" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_junction_pkey PRIMARY KEY (node_id)
@@ -173,7 +172,7 @@ CONSTRAINT man_node_junction_pkey PRIMARY KEY (node_id)
 
 
 
-CREATE TABLE "ws"."man_node_tank" (
+CREATE TABLE "wsp"."man_node_tank" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "vmax" numeric (12,4),
 "area" numeric (12,4),
@@ -183,7 +182,7 @@ CONSTRAINT man_node_tank_pkey PRIMARY KEY (node_id)
 
 
 
-CREATE TABLE "ws"."man_node_hydrant" (
+CREATE TABLE "wsp"."man_node_hydrant" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_hydrant_pkey PRIMARY KEY (node_id)
@@ -191,7 +190,7 @@ CONSTRAINT man_node_hydrant_pkey PRIMARY KEY (node_id)
 
 
 
-CREATE TABLE "ws"."man_node_valve" (
+CREATE TABLE "wsp"."man_node_valve" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_valve_pkey PRIMARY KEY (node_id)
@@ -199,7 +198,7 @@ CONSTRAINT man_node_valve_pkey PRIMARY KEY (node_id)
 
 
 
-CREATE TABLE "ws"."man_node_meter" (
+CREATE TABLE "wsp"."man_node_meter" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_node_meter_pkey PRIMARY KEY (node_id)
@@ -210,7 +209,7 @@ CONSTRAINT man_node_meter_pkey PRIMARY KEY (node_id)
 -- ----------------------------------
 -- Table structure for arc derivades
 -- ----------------------------------
-CREATE TABLE "ws"."man_arc_pipe" (
+CREATE TABLE "wsp"."man_arc_pipe" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_pipe_pkey PRIMARY KEY (arc_id)
@@ -218,7 +217,7 @@ CONSTRAINT man_arc_pipe_pkey PRIMARY KEY (arc_id)
 
 
 
-CREATE TABLE "ws"."man_arc_valve" (
+CREATE TABLE "wsp"."man_arc_valve" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_valve_pkey PRIMARY KEY (arc_id)
@@ -226,7 +225,7 @@ CONSTRAINT man_arc_valve_pkey PRIMARY KEY (arc_id)
 
 
 
-CREATE TABLE "ws"."man_arc_pump" (
+CREATE TABLE "wsp"."man_arc_pump" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_pump_pkey PRIMARY KEY (arc_id)
@@ -234,7 +233,7 @@ CONSTRAINT man_arc_pump_pkey PRIMARY KEY (arc_id)
 
 
 
-CREATE TABLE "ws"."man_arc_filter" (
+CREATE TABLE "wsp"."man_arc_filter" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_filter_pkey PRIMARY KEY (arc_id)
@@ -242,7 +241,7 @@ CONSTRAINT man_arc_filter_pkey PRIMARY KEY (arc_id)
 
 
 
-CREATE TABLE "ws"."man_arc_meter" (
+CREATE TABLE "wsp"."man_arc_meter" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "add_info" varchar(255) COLLATE "default",
 CONSTRAINT man_arc_meter_pkey PRIMARY KEY (arc_id)
@@ -256,60 +255,60 @@ CONSTRAINT man_arc_meter_pkey PRIMARY KEY (arc_id)
 -- FK
 --------
 
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("connecat_id") REFERENCES "ws"."cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("connecat_id") REFERENCES "wsp"."cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("sector_id") REFERENCES "ws"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."dma" ADD FOREIGN KEY ("sector_id") REFERENCES "ws"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("sector_id") REFERENCES "wsp"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."dma" ADD FOREIGN KEY ("sector_id") REFERENCES "wsp"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."link" ADD FOREIGN KEY ("connec_id") REFERENCES "ws"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "wsp"."link" ADD FOREIGN KEY ("connec_id") REFERENCES "wsp"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("dma_id") REFERENCES "ws"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("dma_id") REFERENCES "ws"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("dma_id") REFERENCES "ws"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("dma_id") REFERENCES "wsp"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("dma_id") REFERENCES "wsp"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("dma_id") REFERENCES "wsp"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("soilcat_id") REFERENCES "ws"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("soilcat_id") REFERENCES "ws"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("soilcat_id") REFERENCES "ws"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("soilcat_id") REFERENCES "wsp"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("soilcat_id") REFERENCES "wsp"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("soilcat_id") REFERENCES "wsp"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("category_type") REFERENCES "ws"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("category_type") REFERENCES "ws"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("category_type") REFERENCES "ws"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("category_type") REFERENCES "wsp"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("category_type") REFERENCES "wsp"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("category_type") REFERENCES "wsp"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("fluid_type") REFERENCES "ws"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("fluid_type") REFERENCES "ws"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("fluid_type") REFERENCES "ws"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("fluid_type") REFERENCES "wsp"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("fluid_type") REFERENCES "wsp"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("fluid_type") REFERENCES "wsp"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("location_type") REFERENCES "ws"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("location_type") REFERENCES "ws"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("location_type") REFERENCES "ws"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("location_type") REFERENCES "wsp"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("location_type") REFERENCES "wsp"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("location_type") REFERENCES "wsp"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("workcat_id") REFERENCES "ws"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("workcat_id") REFERENCES "ws"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("workcat_id") REFERENCES "ws"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("workcat_id") REFERENCES "wsp"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("workcat_id") REFERENCES "wsp"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("workcat_id") REFERENCES "wsp"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."node" ADD FOREIGN KEY ("buildercat_id") REFERENCES "ws"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("buildercat_id") REFERENCES "ws"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("buildercat_id") REFERENCES "ws"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
-ALTER TABLE "ws"."man_node_junction" ADD FOREIGN KEY ("node_id") REFERENCES "ws"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "ws"."man_node_tank" ADD FOREIGN KEY ("node_id") REFERENCES "ws"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "ws"."man_node_hydrant" ADD FOREIGN KEY ("node_id") REFERENCES "ws"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "ws"."man_node_valve" ADD FOREIGN KEY ("node_id") REFERENCES "ws"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("buildercat_id") REFERENCES "wsp"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("buildercat_id") REFERENCES "wsp"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("buildercat_id") REFERENCES "wsp"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
+ALTER TABLE "wsp"."man_node_junction" ADD FOREIGN KEY ("node_id") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."man_arc_pipe" ADD FOREIGN KEY ("arc_id") REFERENCES "ws"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."man_node_tank" ADD FOREIGN KEY ("node_id") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."man_arc_valve" ADD FOREIGN KEY ("arc_id") REFERENCES "ws"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."man_node_hydrant" ADD FOREIGN KEY ("node_id") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."man_arc_pump" ADD FOREIGN KEY ("arc_id") REFERENCES "ws"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."man_node_valve" ADD FOREIGN KEY ("node_id") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."man_arc_filter" ADD FOREIGN KEY ("arc_id") REFERENCES "ws"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ws"."man_arc_meter" ADD FOREIGN KEY ("arc_id") REFERENCES "ws"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "wsp"."man_arc_pipe" ADD FOREIGN KEY ("arc_id") REFERENCES "wsp"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "wsp"."man_arc_valve" ADD FOREIGN KEY ("arc_id") REFERENCES "wsp"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "wsp"."man_arc_pump" ADD FOREIGN KEY ("arc_id") REFERENCES "wsp"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "wsp"."man_arc_filter" ADD FOREIGN KEY ("arc_id") REFERENCES "wsp"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "wsp"."man_arc_meter" ADD FOREIGN KEY ("arc_id") REFERENCES "wsp"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
