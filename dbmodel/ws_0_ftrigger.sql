@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -12,7 +12,7 @@ This version of Giswater is provided by Giswater Association
 -----------------------------
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.node_update() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION ws.node_update() RETURNS trigger LANGUAGE plpgsql AS $$
 
 DECLARE 
 	querystring Varchar; 
@@ -63,13 +63,13 @@ END;
 $$;
 
 
-CREATE TRIGGER node_update AFTER UPDATE ON "SCHEMA_NAME"."node" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."node_update"();
+CREATE TRIGGER node_update AFTER UPDATE ON "ws"."node" FOR EACH ROW EXECUTE PROCEDURE "ws"."node_update"();
 
 
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.node_delete() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION ws.node_delete() RETURNS trigger LANGUAGE plpgsql AS $$
 	
 DECLARE 
 	querystring Varchar; 
@@ -93,4 +93,4 @@ $$;
 
 
 
-CREATE TRIGGER node_delete BEFORE DELETE ON "SCHEMA_NAME"."node" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."node_delete"();
+CREATE TRIGGER node_delete BEFORE DELETE ON "ws"."node" FOR EACH ROW EXECUTE PROCEDURE "ws"."node_delete"();

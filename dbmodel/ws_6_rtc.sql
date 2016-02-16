@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 -- Sequences structure
 -- ----------------------------
   
-CREATE SEQUENCE "SCHEMA_NAME"."rtc_scada_x_value_seq"
+CREATE SEQUENCE "ws"."rtc_scada_x_value_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -18,14 +18,14 @@ CREATE SEQUENCE "SCHEMA_NAME"."rtc_scada_x_value_seq"
     CACHE 1;
  
 
-CREATE SEQUENCE "SCHEMA_NAME"."rtc_hydrometer_x_value_seq"
+CREATE SEQUENCE "ws"."rtc_hydrometer_x_value_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rtc_dma_parameters_seq"
+CREATE SEQUENCE "ws"."rtc_dma_parameters_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -38,7 +38,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rtc_dma_parameters_seq"
 -- --------------------------
 
 
-CREATE TABLE "SCHEMA_NAME".cat_scada
+CREATE TABLE "ws".cat_scada
 (
 id character varying(16) NOT NULL,
 data_type character varying(30),
@@ -57,7 +57,7 @@ WITH (
   );
 
 
-CREATE TABLE "SCHEMA_NAME".cat_hydrometer
+CREATE TABLE "ws".cat_hydrometer
 (
 id character varying(16) NOT NULL,
 text1 character varying(100),
@@ -80,7 +80,7 @@ WITH (
 -- --------------------------
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_scada_arc
+CREATE TABLE "ws".rtc_scada_arc
 (
   scada_id character varying(16) NOT NULL,
   scdcat_id character varying(16),
@@ -93,7 +93,7 @@ WITH (
   
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_scada_node
+CREATE TABLE "ws".rtc_scada_node
 (
   scada_id character varying(16) NOT NULL,
   scdcat_id character varying(16),
@@ -106,9 +106,9 @@ WITH (
 
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_scada_x_value
+CREATE TABLE "ws".rtc_scada_x_value
 (
-  id int8 DEFAULT nextval('"SCHEMA_NAME".rtc_scada_x_value_seq'::regclass) NOT NULL,
+  id int8 DEFAULT nextval('"ws".rtc_scada_x_value_seq'::regclass) NOT NULL,
   scada_id character varying(16),
   value numeric (12,6),
   status varchar (3),
@@ -121,7 +121,7 @@ WITH (
   
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_hydrometer_x_connec
+CREATE TABLE "ws".rtc_hydrometer_x_connec
 (
   hydrometer_id character varying(16) NOT NULL,
   connec_id character varying(16),
@@ -134,9 +134,9 @@ WITH (
 
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_hydrometer_x_value
+CREATE TABLE "ws".rtc_hydrometer_x_value
 (
-  id int8 DEFAULT nextval('"SCHEMA_NAME".rtc_hydrometer_x_value_seq'::regclass) NOT NULL,
+  id int8 DEFAULT nextval('"ws".rtc_hydrometer_x_value_seq'::regclass) NOT NULL,
   hydrometer_id character varying(16),
   value numeric (12,6),
   date timestamp (6) without time zone,
@@ -147,7 +147,7 @@ WITH (
   );
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_period
+CREATE TABLE "ws".rtc_period
 (
   id character varying(16) NOT NULL,
   starttime timestamp (6) without time zone,
@@ -161,8 +161,8 @@ WITH (
   );
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_dma_parameters (
-  id int8 DEFAULT nextval('"SCHEMA_NAME".rtc_dma_parameters_seq'::regclass) NOT NULL,
+CREATE TABLE "ws".rtc_dma_parameters (
+  id int8 DEFAULT nextval('"ws".rtc_dma_parameters_seq'::regclass) NOT NULL,
   dma_id character varying(16),
   period_id character varying(16),
   scada_value numeric (12,6),
@@ -177,7 +177,7 @@ WITH (
   );
 
 
-CREATE TABLE "SCHEMA_NAME".rtc_inp_demand
+CREATE TABLE "ws".rtc_inp_demand
 (
   node_id varchar(16) COLLATE "default" NOT NULL,
   value numeric (12,6),
@@ -196,20 +196,20 @@ WITH (
 -- foreign keys
 -- -----------------------------
 
-ALTER TABLE "SCHEMA_NAME"."rtc_scada_arc" ADD FOREIGN KEY ("scdcat_id") REFERENCES "SCHEMA_NAME"."cat_scada" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."rtc_scada_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_scada_arc" ADD FOREIGN KEY ("scdcat_id") REFERENCES "ws"."cat_scada" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_scada_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "ws"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."rtc_scada_node" ADD FOREIGN KEY ("scdcat_id") REFERENCES "SCHEMA_NAME"."cat_scada" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."rtc_scada_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_scada_node" ADD FOREIGN KEY ("scdcat_id") REFERENCES "ws"."cat_scada" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_scada_node" ADD FOREIGN KEY ("node_id") REFERENCES "ws"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("link") REFERENCES "SCHEMA_NAME"."link" ("link_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."connec" ADD FOREIGN KEY ("link") REFERENCES "ws"."link" ("link_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."rtc_hydrometer_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."rtc_hydrometer_x_connec" ADD FOREIGN KEY ("hydrocat_id") REFERENCES "SCHEMA_NAME"."cat_hydrometer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_hydrometer_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "ws"."connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_hydrometer_x_connec" ADD FOREIGN KEY ("hydrocat_id") REFERENCES "ws"."cat_hydrometer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."rtc_dma_parameters" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."rtc_dma_parameters" ADD FOREIGN KEY ("period_id") REFERENCES "SCHEMA_NAME"."rtc_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_dma_parameters" ADD FOREIGN KEY ("dma_id") REFERENCES "ws"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_dma_parameters" ADD FOREIGN KEY ("period_id") REFERENCES "ws"."rtc_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."rtc_inp_demand" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."rtc_inp_demand" ADD FOREIGN KEY ("node_id") REFERENCES "ws"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 

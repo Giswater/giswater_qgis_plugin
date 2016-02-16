@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 -- schema
 -- ------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".clone_schema(source_schema text, dest_schema text) RETURNS void LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "ws".clone_schema(source_schema text, dest_schema text) RETURNS void LANGUAGE plpgsql AS $$
  
 DECLARE
 	rec_view record;
@@ -105,9 +105,9 @@ $$;
 -- ------------------------------------------------------------
 
 
--- Function:  sanejament.flow_trace(character varying)
+-- Function:  ws.flow_trace(character varying)
 
-CREATE OR REPLACE FUNCTION  sanejament.flow_trace(node_id_arg character varying)
+CREATE OR REPLACE FUNCTION  ws.flow_trace(node_id_arg character varying)
   RETURNS void AS
 $BODY$DECLARE
                 node_id_var varchar(16);
@@ -132,8 +132,8 @@ BEGIN
 
  
 --             Create table for node results
-                DROP TABLE IF EXISTS sanejament.node_flow_trace CASCADE;
-                CREATE TABLE sanejament.node_flow_trace
+                DROP TABLE IF EXISTS ws.node_flow_trace CASCADE;
+                CREATE TABLE ws.node_flow_trace
                 (
 --								id int4 DEFAULT nextval('node_flow_trace_seq'::regclass) NOT NULL,
                                 node_id character varying(16) NOT NULL,
@@ -141,7 +141,7 @@ BEGIN
 --								the_geom public.geometry (POINT, SRID_VALUE),
 --                              CONSTRAINT node_flow_trace_pkey PRIMARY KEY (id),
                                 CONSTRAINT node_flow_trace_id_fkey FOREIGN KEY (node_id)
-                                                REFERENCES sanejament.node (node_id) MATCH SIMPLE
+                                                REFERENCES ws.node (node_id) MATCH SIMPLE
                                                 ON UPDATE CASCADE ON DELETE CASCADE
                 )
 
@@ -151,15 +151,15 @@ BEGIN
 
 
 --             Create table for arc results
-                DROP TABLE IF EXISTS sanejament.arc_flow_trace CASCADE;
-                CREATE TABLE sanejament.arc_flow_trace
+                DROP TABLE IF EXISTS ws.arc_flow_trace CASCADE;
+                CREATE TABLE ws.arc_flow_trace
                 (
 --								id int4 DEFAULT nextval('arc_flow_trace_seq'::regclass) NOT NULL,
                                 arc_id character varying(16) NOT NULL,
                                 flow_trace numeric(12,4) DEFAULT 0.00,    								
 --                              CONSTRAINT arc_flow_trace_pkey PRIMARY KEY (id),
                                 CONSTRAINT arc_flow_trace_id_fkey FOREIGN KEY (arc_id)
-                                                REFERENCES sanejament.arc (arc_id) MATCH SIMPLE
+                                                REFERENCES ws.arc (arc_id) MATCH SIMPLE
                                                 ON UPDATE CASCADE ON DELETE CASCADE
                 )
                 WITH (
@@ -177,10 +177,10 @@ BEGIN
  
  
 --             Insert into node in table
-                INSERT INTO sanejament.node_flow_trace VALUES(node_id_arg,1.0);
+                INSERT INTO ws.node_flow_trace VALUES(node_id_arg,1.0);
  
 --             Copy nodes into temp flow trace table
-                FOR node_id_var IN SELECT node_id FROM sanejament.node
+                FOR node_id_var IN SELECT node_id FROM ws.node
                 LOOP
  
                                INSERT INTO temp_flow_trace VALUES(node_id_var, 0);
@@ -188,7 +188,7 @@ BEGIN
  
 
  --             Compute the tributary area using DFS
-                PERFORM sanejament.flow_trace_recursive(node_id_arg, 1);
+                PERFORM ws.flow_trace_recursive(node_id_arg, 1);
                              
 
 END;
@@ -198,10 +198,10 @@ $BODY$
 
 
 
--- Function:  sanejament.flow_trace_recursive(character varying, integer)
--- DROP FUNCTION  sanejament.flow_trace_recursive(character varying, integer);
+-- Function:  ws.flow_trace_recursive(character varying, integer)
+-- DROP FUNCTION  ws.flow_trace_recursive(character varying, integer);
 
-CREATE OR REPLACE FUNCTION  sanejament.flow_trace_recursive(node_id_arg character varying, num_row integer)
+CREATE OR REPLACE FUNCTION  ws.flow_trace_recursive(node_id_arg character varying, num_row integer)
   RETURNS void AS
 $BODY$DECLARE
                 first_track_id_var integer = 0;
@@ -234,15 +234,15 @@ BEGIN
                                 UPDATE temp_flow_trace SET first_track_id = num_row WHERE node_id = node_id_arg;
                                
 --                             Loop for all the upstream nodes
-                                FOR rec_table IN SELECT arc_id, node_1 FROM sanejament.arc WHERE node_2 = node_id_arg
+                                FOR rec_table IN SELECT arc_id, node_1 FROM ws.arc WHERE node_2 = node_id_arg
                                 LOOP
  
 --                                             Insert into tables
-                                                INSERT INTO sanejament.node_flow_trace VALUES(rec_table.node_1,1.0);
-                                                INSERT INTO sanejament.arc_flow_trace VALUES(rec_table.arc_id,1.0);
+                                                INSERT INTO ws.node_flow_trace VALUES(rec_table.node_1,1.0);
+                                                INSERT INTO ws.arc_flow_trace VALUES(rec_table.arc_id,1.0);
  
 --                                             Call recursive function weighting with the pipe capacity
-                                                PERFORM sanejament.flow_trace_recursive(rec_table.node_1, num_row);
+                                                PERFORM ws.flow_trace_recursive(rec_table.node_1, num_row);
                                 END LOOP;
                
                 END IF;
@@ -255,10 +255,10 @@ $BODY$
   
 
 
--- Function:  sanejament.flow_exit(character varying)
--- DROP FUNCTION  sanejament.flow_exit(character varying);
+-- Function:  ws.flow_exit(character varying)
+-- DROP FUNCTION  ws.flow_exit(character varying);
 
-CREATE OR REPLACE FUNCTION  sanejament.flow_exit(node_id_arg character varying)
+CREATE OR REPLACE FUNCTION  ws.flow_exit(node_id_arg character varying)
   RETURNS void AS
 $BODY$DECLARE
                 node_id_var varchar(16);
@@ -282,8 +282,8 @@ $BODY$DECLARE
 BEGIN
  
 --             Create table for node results
-                DROP TABLE IF EXISTS sanejament.node_flow_exit CASCADE;
-                CREATE TABLE sanejament.node_flow_exit
+                DROP TABLE IF EXISTS ws.node_flow_exit CASCADE;
+                CREATE TABLE ws.node_flow_exit
                 (
 --								id int4 DEFAULT nextval('node_flow_exit_seq'::regclass) NOT NULL,
                                 node_id character varying(16) NOT NULL,
@@ -291,7 +291,7 @@ BEGIN
 --								the_geom public.geometry (POINT, SRID_VALUE),
 --                              CONSTRAINT node_flow_exit_pkey PRIMARY KEY (id),
                                 CONSTRAINT node_flow_exit_id_fkey FOREIGN KEY (node_id)
-                                                REFERENCES sanejament.node (node_id) MATCH SIMPLE
+                                                REFERENCES ws.node (node_id) MATCH SIMPLE
                                                 ON UPDATE CASCADE ON DELETE CASCADE
                 )
                 WITH (
@@ -300,8 +300,8 @@ BEGIN
 
 
 --             Create table for arc results
-                DROP TABLE IF EXISTS sanejament.arc_flow_exit CASCADE;
-                CREATE TABLE sanejament.arc_flow_exit
+                DROP TABLE IF EXISTS ws.arc_flow_exit CASCADE;
+                CREATE TABLE ws.arc_flow_exit
                 (
 --								id int4 DEFAULT nextval('arc_flow_exit_seq'::regclass) NOT NULL,
                                 arc_id character varying(16) NOT NULL,
@@ -309,7 +309,7 @@ BEGIN
 --								the_geom public.geometry (LINESTRING, SRID_VALUE),
 --								CONSTRAINT arc_flow_exit_pkey PRIMARY KEY (id),
                                 CONSTRAINT arc_flow_exit_id_fkey FOREIGN KEY (arc_id)
-                                                REFERENCES sanejament.arc (arc_id) MATCH SIMPLE
+                                                REFERENCES ws.arc (arc_id) MATCH SIMPLE
                                                 ON UPDATE CASCADE ON DELETE CASCADE
                 )
                 WITH (
@@ -327,10 +327,10 @@ BEGIN
  
  
 --             Insert into node in table
-                INSERT INTO sanejament.node_flow_exit VALUES(node_id_arg,1.0);
+                INSERT INTO ws.node_flow_exit VALUES(node_id_arg,1.0);
  
 --             Copy nodes into temp flow trace table
-                FOR node_id_var IN SELECT node_id FROM sanejament.node
+                FOR node_id_var IN SELECT node_id FROM ws.node
                 LOOP
  
                                 INSERT INTO temp_flow_exit VALUES(node_id_var, 0);
@@ -339,7 +339,7 @@ BEGIN
  
  
 --             Compute the tributary area using DFS
-                PERFORM sanejament.flow_exit_recursive(node_id_arg, 1);
+                PERFORM ws.flow_exit_recursive(node_id_arg, 1);
  
  
                                
@@ -351,11 +351,11 @@ $BODY$
  
   
  
--- Function:  sanejament.flow_exit_recursive(character varying, integer)
+-- Function:  ws.flow_exit_recursive(character varying, integer)
  
--- DROP FUNCTION  sanejament.flow_exit_recursive(character varying, integer);
+-- DROP FUNCTION  ws.flow_exit_recursive(character varying, integer);
  
-CREATE OR REPLACE FUNCTION  sanejament.flow_exit_recursive(node_id_arg character varying, num_row integer)
+CREATE OR REPLACE FUNCTION  ws.flow_exit_recursive(node_id_arg character varying, num_row integer)
   RETURNS void AS
 $BODY$DECLARE
                 first_track_id_var integer = 0;
@@ -387,15 +387,15 @@ BEGIN
                                 UPDATE temp_flow_exit SET first_track_id = num_row WHERE node_id = node_id_arg;
                                
 --                             Loop for all the upstream nodes
-                                FOR rec_table IN SELECT arc_id, node_2 FROM sanejament.arc WHERE node_1 = node_id_arg
+                                FOR rec_table IN SELECT arc_id, node_2 FROM ws.arc WHERE node_1 = node_id_arg
                                 LOOP
  
 --                                             Insert into tables
-                                                INSERT INTO sanejament.node_flow_exit VALUES(rec_table.node_2,1.0);
-                                                INSERT INTO sanejament.arc_flow_exit VALUES(rec_table.arc_id,1.0);
+                                                INSERT INTO ws.node_flow_exit VALUES(rec_table.node_2,1.0);
+                                                INSERT INTO ws.arc_flow_exit VALUES(rec_table.arc_id,1.0);
  
 --                                             Call recursive function weighting with the pipe capacity
-                                                PERFORM sanejament.flow_exit_recursive(rec_table.node_2, num_row);
+                                                PERFORM ws.flow_exit_recursive(rec_table.node_2, num_row);
  
  
                                 END LOOP;

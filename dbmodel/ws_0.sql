@@ -12,11 +12,11 @@ SET client_min_messages = warning;
 
 --
 -- TOC entry 10 (class 2615 OID 151924)
--- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
+-- Name: ws; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA "SCHEMA_NAME";
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+ CREATE SCHEMA "ws";
+SET search_path = "ws", public, pg_catalog;
 
 
 -- ----------------------------
@@ -24,7 +24,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- --------------------------
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
+CREATE SEQUENCE "ws"."version_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -32,7 +32,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."node_id_seq"
+CREATE SEQUENCE "ws"."node_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -40,14 +40,14 @@ CREATE SEQUENCE "SCHEMA_NAME"."node_id_seq"
     CACHE 1;
 	
 
-CREATE SEQUENCE "SCHEMA_NAME"."arc_id_seq"
+CREATE SEQUENCE "ws"."arc_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."connec_seq"
+CREATE SEQUENCE "ws"."connec_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -55,14 +55,14 @@ CREATE SEQUENCE "SCHEMA_NAME"."connec_seq"
     CACHE 1;
 
  
-CREATE SEQUENCE "SCHEMA_NAME"."link_seq"
+CREATE SEQUENCE "ws"."link_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."node_flow_trace_seq"
+CREATE SEQUENCE "ws"."node_flow_trace_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -70,7 +70,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."node_flow_trace_seq"
   CACHE 1;
   
 
-CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_trace_seq"
+CREATE SEQUENCE "ws"."arc_flow_trace_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -78,7 +78,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_trace_seq"
   CACHE 1;
   
 
-CREATE SEQUENCE "SCHEMA_NAME"."node_flow_exit_seq"
+CREATE SEQUENCE "ws"."node_flow_exit_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -86,7 +86,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."node_flow_exit_seq"
   CACHE 1;
   
 
-CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_exit_seq"
+CREATE SEQUENCE "ws"."arc_flow_exit_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -99,8 +99,8 @@ CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_exit_seq"
 -- Table system structure 
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."version" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
+CREATE TABLE "ws"."version" (
+"id" int4 DEFAULT nextval('"ws".version_seq'::regclass) NOT NULL,
 "giswater" varchar(16) COLLATE "default",
 "wsoftware" varchar(16) COLLATE "default",
 "postgres" varchar(512) COLLATE "default",
@@ -111,7 +111,7 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 WITH (OIDS=FALSE)
 ;
  
-CREATE TABLE "SCHEMA_NAME"."arc_type" (
+CREATE TABLE "ws"."arc_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
 "type" varchar(18) COLLATE "default" NOT NULL,
 "man_table" varchar(18) COLLATE "default" NOT NULL,
@@ -123,7 +123,7 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."node_type" (
+CREATE TABLE "ws"."node_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
 "type" varchar(18) COLLATE "default" NOT NULL,
 "man_table" varchar(18) COLLATE "default" NOT NULL,
@@ -142,9 +142,9 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_mat" (
-"id" varchar(16) COLLATE "default",
-"descript" varchar(100) COLLATE "default",
+CREATE TABLE "ws"."cat_mat" (
+"id" varchar(30) COLLATE "default",
+"descript" varchar(512) COLLATE "default",
 "roughness" numeric(12,4),
 "link" varchar(512) COLLATE "default",
 "url" varchar(512) COLLATE "default",
@@ -156,16 +156,15 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_arc" (
+CREATE TABLE "ws"."cat_arc" (
 "id" varchar(30) COLLATE "default" NOT NULL, 
 "arctype_id" varchar(16) COLLATE "default",
 "matcat_id" varchar(16) COLLATE "default",
-"pn_atm" int2,
-"dnom" int4,
+"pnom" varchar(16) COLLATE "default",
+"dnom" varchar(16) COLLATE "default",
 "dint" numeric(12,5),
 "dext" numeric(12,5),
-"short_des" varchar(16) COLLATE "default",
-"descript" varchar(255) COLLATE "default",
+"descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
 "url" varchar(512) COLLATE "default",
 "picture" varchar(512) COLLATE "default",
@@ -177,22 +176,21 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_node" (
+CREATE TABLE "ws"."cat_node" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "nodetype_id" varchar(16) COLLATE "default",
 "matcat_id" varchar(16) COLLATE "default",
 "matcat_2" varchar(16) COLLATE "default",
 "matcat_3" varchar(16) COLLATE "default",
-"pnom" int4,
-"dnom" int4,
-"dnom_2" int4,
-"dnom_3" int4,
+"pnom" varchar(16) COLLATE "default",
+"dnom" varchar(16) COLLATE "default",
+"dnom_2" varchar(16) COLLATE "default",
+"dnom_3" varchar(16) COLLATE "default",
 "geom1" numeric (12,2),
 "geom2" numeric (12,2),
 "geom3" numeric (12,2),
 "value" numeric (12,2),
-"short_des" varchar(30) COLLATE "default",
-"descript" varchar(255) COLLATE "default",
+"descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
 "url" varchar(512) COLLATE "default",
 "picture" varchar(512) COLLATE "default",
@@ -210,10 +208,10 @@ WITH (OIDS=FALSE)
 -- Table structure for GIS features
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."sector" (
+CREATE TABLE "ws"."sector" (
 "sector_id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default",
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"the_geom" public.geometry (MULTIPOLYGON, 25831),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 )
 WITH (OIDS=FALSE)
@@ -221,7 +219,7 @@ WITH (OIDS=FALSE)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."node" (
+CREATE TABLE "ws"."node" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -251,14 +249,14 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-"the_geom" public.geometry (POINT, SRID_VALUE),
+"the_geom" public.geometry (POINT, 25831),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."arc" (
+CREATE TABLE "ws"."arc" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "node_1" varchar(16) COLLATE "default",
 "node_2" varchar(16) COLLATE "default",
@@ -289,7 +287,7 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"the_geom" public.geometry (LINESTRING, 25831),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -298,7 +296,7 @@ WITH (OIDS=FALSE)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."value_state" (
+CREATE TABLE "ws"."value_state" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "observ" varchar(254) COLLATE "default",
  CONSTRAINT value_state_pkey PRIMARY KEY (id)
@@ -312,21 +310,19 @@ CREATE TABLE "SCHEMA_NAME"."value_state" (
 -- FK
 ------
 
-ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "SCHEMA_NAME"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "ws"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "ws"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "ws"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "ws"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHEMA_NAME"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."epa_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "ws"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "ws"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."node" ADD FOREIGN KEY ("state") REFERENCES "ws"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."epa_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "ws"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "ws"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "ws"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "ws"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ws"."arc" ADD FOREIGN KEY ("state") REFERENCES "ws"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
