@@ -79,8 +79,8 @@ CREATE VIEW "wsp".v_edit_node AS
 	arc.adress_03,
 	arc.descript,
 	cat_arc.svg AS "cat.svg",
-	arc.link,
 	arc.rotation,
+	arc.link,
 	arc.verified,
 	arc.the_geom
    FROM ("wsp".arc
