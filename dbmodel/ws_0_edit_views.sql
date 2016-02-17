@@ -27,7 +27,6 @@ CREATE VIEW "wsp".v_edit_node AS
 	node.annotation, 
 	node.observ, 
 	node."comment",
-	node.rotation,
 	node.dma_id,
 	node.soilcat_id,
 	node.category_type,
@@ -41,6 +40,8 @@ CREATE VIEW "wsp".v_edit_node AS
 	node.adress_02,
 	node.adress_03,
 	node.descript,
+	cat_node.svg AS "cat.svg"
+	node.rotation,
 	node.link,
 	node.verified,
 	node.the_geom
@@ -63,7 +64,6 @@ CREATE VIEW "wsp".v_edit_node AS
 	arc.annotation, 
 	arc.observ, 
 	arc."comment",
-	arc.rotation,
 	arc.custom_length,
 	arc.dma_id,
 	arc.soilcat_id,
@@ -78,7 +78,9 @@ CREATE VIEW "wsp".v_edit_node AS
 	arc.adress_02,
 	arc.adress_03,
 	arc.descript,
+	cat_arc.svg AS "cat.svg",
 	arc.link,
+	arc.rotation,
 	arc.verified,
 	arc.the_geom
    FROM ("wsp".arc

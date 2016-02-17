@@ -6,97 +6,159 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
--- View structure for v_edit_man
+-- View structure for v_edit_man_node
 -- ----------------------------
 
 
 CREATE VIEW "wsp"."v_edit_man_junction" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.link, node.verified, node.the_geom,
-man_node_junction.add_info
+node.node_id, node.elevation, node."depth", node.nodecat_id, 
+cat_node.nodetype_id AS "cat.nodetype",
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+man_node_junction.add_info,
+cat_node.svg AS "cat.svg",
+node.rotation, node.link, node.verified, node.the_geom
 FROM (wsp.node
-JOIN wsp.man_node_junction ON (((man_node_junction.node_id)::text = (node.node_id)::text)));
+JOIN wsp.man_node_junction ON (((man_node_junction.node_id)::text = (node.node_id)::text))
+JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 
 CREATE VIEW "wsp"."v_edit_man_tank" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.link, node.verified, node.the_geom,
-man_node_tank.vmax, man_node_tank.area, man_node_tank.add_info
+node.node_id, node.elevation, node."depth", node.nodecat_id,
+cat_node.nodetype_id AS "cat.nodetype",
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,
+cat_node.svg AS "cat.svg",
+node.rotation, node.link, node.verified, node.the_geom
 FROM (wsp.node 
-JOIN wsp.man_node_tank ON (((man_node_tank.node_id)::text = (node.node_id)::text)));
+JOIN wsp.man_node_tank ON (((man_node_tank.node_id)::text = (node.node_id)::text))
+JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+
 
 
 
 CREATE VIEW "wsp"."v_edit_man_hydrant" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.link, node.verified, node.the_geom,
-man_node_hydrant.add_info
+node.node_id, node.elevation, node."depth", node.nodecat_id, 
+cat_node.nodetype_id AS "cat.nodetype",
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+man_node_hydrant.add_info,
+cat_node.svg AS "cat.svg",
+node.rotation, node.link, node.verified, node.the_geom
 FROM (wsp.node 
-JOIN wsp.man_node_hydrant ON (((man_node_hydrant.node_id)::text = (node.node_id)::text)));
+JOIN wsp.man_node_hydrant ON (((man_node_hydrant.node_id)::text = (node.node_id)::text))
+JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+
 
 
 
 CREATE VIEW "wsp"."v_edit_man_nodevalve" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.link, node.verified, node.the_geom,
-man_node_valve.add_info
+node.node_id, node.elevation, node."depth", node.nodecat_id, 
+cat_node.nodetype_id AS "cat.nodetype",
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+man_node_valve.add_info,
+cat_node.svg AS "cat.svg",
+node.rotation, node.link, node.verified, node.the_geom
 FROM (wsp.node
-JOIN wsp.man_node_valve ON (((man_node_valve.node_id)::text = (node.node_id)::text)));
+JOIN wsp.man_node_valve ON (((man_node_valve.node_id)::text = (node.node_id)::text))
+JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+
 
 
 
 CREATE VIEW "wsp"."v_edit_man_nodemeter" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.link, node.verified, node.the_geom,
-man_node_meter.add_info
+node.node_id, node.elevation, node."depth", node.nodecat_id, 
+cat_node.nodetype_id AS "cat.nodetype",
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+man_node_meter.add_info,
+cat_node.svg AS "cat.svg",
+node.rotation, node.link, node.verified, node.the_geom
 FROM (wsp.node
-JOIN wsp.man_node_meter ON (((man_node_meter.node_id)::text = (node.node_id)::text)));
+JOIN wsp.man_node_meter ON (((man_node_meter.node_id)::text = (node.node_id)::text))
+JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 
 
+-- ----------------------------
+-- View structure for v_edit_man_arc
+-- ----------------------------
 
 
 CREATE VIEW "wsp"."v_edit_man_pipe" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, st_length2d(arc.the_geom)::numeric(12,2) AS gis_length, arc.custom_length, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.link, arc.verified, arc.the_geom,
-man_arc_pipe.add_info
+arc.arc_id, arc.arccat_id, 
+cat_arc.arctype_id AS "cat.arctype",
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, st_length2d(arc.the_geom)::numeric(12,2) AS gis_length, arc.custom_length, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
+man_arc_pipe.add_info,
+cat_arc.svg AS "cat.svg",
+arc.rotation, arc.link, arc.verified, arc.the_geom,
 FROM (wsp.arc 
-JOIN wsp.man_arc_pipe ON (((man_arc_pipe.arc_id)::text = (arc.arc_id)::text)));
+JOIN wsp.man_arc_pipe ON (((man_arc_pipe.arc_id)::text = (arc.arc_id)::text))
+JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+
+
 
 
 CREATE VIEW "wsp"."v_edit_man_arcvalve" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.link, arc.verified, arc.the_geom,
+arc.arc_id, arc.arccat_id, 
+cat_arc.arctype_id AS "cat.arctype",
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
 man_arc_valve.add_info
+cat_arc.svg AS "cat.svg",
+arc.rotation, arc.link, arc.verified, arc.the_geom,
 FROM (wsp.arc 
-JOIN wsp.man_arc_valve ON (((man_arc_valve.arc_id)::text = (arc.arc_id)::text)));
+JOIN wsp.man_arc_valve ON (((man_arc_valve.arc_id)::text = (arc.arc_id)::text))
+JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+
+
 
 
 CREATE VIEW "wsp"."v_edit_man_pump" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.link, arc.verified, arc.the_geom,
-man_arc_pump.add_info
+arc.arc_id, arc.arccat_id, 
+cat_arc.arctype_id AS "cat.arctype",
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
+man_arc_filter.add_info
+cat_arc.svg AS "cat.svg",
+arc.rotation, arc.link, arc.verified, arc.the_geom,
 FROM (wsp.arc 
-JOIN wsp.man_arc_pump ON (((man_arc_pump.arc_id)::text = (arc.arc_id)::text)));
+JOIN wsp.man_arc_pump ON (((man_arc_pump.arc_id)::text = (arc.arc_id)::text))
+JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+
+
 
 
 CREATE VIEW "wsp"."v_edit_man_filter" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.link, arc.verified, arc.the_geom,
+arc.arc_id, arc.arccat_id, 
+cat_arc.arctype_id AS "cat.arctype",
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
 man_arc_filter.add_info
+cat_arc.svg AS "cat.svg",
+arc.rotation, arc.link, arc.verified, arc.the_geom,
 FROM (wsp.arc 
-JOIN wsp.man_arc_filter ON (((man_arc_filter.arc_id)::text = (arc.arc_id)::text)));
+JOIN wsp.man_arc_filter ON (((man_arc_filter.arc_id)::text = (arc.arc_id)::text))
+JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+
 
 
 
 CREATE VIEW "wsp"."v_edit_man_arcmeter" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.link, arc.verified, arc.the_geom,
+arc.arc_id, arc.arccat_id, 
+cat_arc.arctype_id AS "cat.arctype",
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
 man_arc_meter.add_info
+cat_arc.svg AS "cat.svg",
+arc.rotation, arc.link, arc.verified, arc.the_geom,
 FROM (wsp.arc 
-JOIN wsp.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id)::text)));
+JOIN wsp.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id)::text))
+JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
 
@@ -104,7 +166,7 @@ JOIN wsp.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id)::text)))
 
 
 -----------------------------
--- TRIGGERS EDITING VIEWS FOR NODE
+-- TRIGGERS EDITING VIEWS FOR EDIT MAN NODE
 -----------------------------
 
 CREATE OR REPLACE FUNCTION wsp.v_edit_man_junction() RETURNS trigger LANGUAGE plpgsql AS $$
@@ -841,7 +903,7 @@ CREATE TRIGGER v_edit_man_nodemeter INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws
   
   
 -----------------------------
--- TRIGGERS EDITING VIEWS FOR ARC
+-- TRIGGERS EDITING VIEWS FOR EDIT MAN ARC
 -----------------------------
   
 
