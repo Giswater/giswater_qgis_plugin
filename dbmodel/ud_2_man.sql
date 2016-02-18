@@ -71,42 +71,71 @@ WITH (OIDS=FALSE)
 -- Table structure for additional catalog
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."cat_man_cover" (
-"id" varchar(16) COLLATE "default" NOT NULL,
+CREATE TABLE "SCHEMA_NAME"."cat_mat_step" (
+"id" varchar(30) COLLATE "default" NOT NULL,
 "type" varchar(16) COLLATE "default",
 "descript" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default"
+"comment" varchar(512) COLLATE "default",
+CONSTRAINT cat_mat_step_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_man_step" (
-"id" varchar(16) COLLATE "default" NOT NULL,
+CREATE TABLE "SCHEMA_NAME"."cat_mat_cover" (
+"id" varchar(30) COLLATE "default" NOT NULL,
 "type" varchar(16) COLLATE "default",
 "descript" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default"
-)
-WITH (OIDS=FALSE)
-;
-
-
-CREATE TABLE "SCHEMA_NAME"."cat_man_hydrometer" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"type" varchar(16) COLLATE "default",
-"descript" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default"
+"comment" varchar(512) COLLATE "default",
+CONSTRAINT cat_mat_cover_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
 
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_man_flap" (
+CREATE TABLE "SCHEMA_NAME"."cat_cover" (
+"id" varchar(30) COLLATE "default" NOT NULL,
+"type" varchar(16) COLLATE "default",
+"catmatcover_id"(30) COLLATE "default",
+"descript" varchar(50) COLLATE "default",
+"comment" varchar(512) COLLATE "default",
+CONSTRAINT cat_cover_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE)
+;
+
+
+CREATE TABLE "SCHEMA_NAME"."cat_step" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+"type" varchar(16) COLLATE "default",
+"catmatstep_id"(30) COLLATE "default",
+"descript" varchar(50) COLLATE "default",
+"comment" varchar(512) COLLATE "default",
+CONSTRAINT cat_step_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE)
+;
+
+
+CREATE TABLE "SCHEMA_NAME"."cat_hydrometer" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "type" varchar(16) COLLATE "default",
 "descript" varchar(50) COLLATE "default",
-"comment" varchar(512) COLLATE "default"
+"comment" varchar(512) COLLATE "default",
+CONSTRAINT cat_hydrometer_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE)
+;
+
+
+
+CREATE TABLE "SCHEMA_NAME"."cat_flap" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+"type" varchar(16) COLLATE "default",
+"descript" varchar(50) COLLATE "default",
+"comment" varchar(512) COLLATE "default",
+CONSTRAINT cat_flap_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
@@ -125,7 +154,21 @@ CREATE TABLE "SCHEMA_NAME"."man_node_junction" (
 "step_n" int2,
 "stepcat_id2" varchar(30) COLLATE "default",
 "step_n2" int2,
-CONSTRAINT man_node_mhole_pkey PRIMARY KEY (node_id)
+CONSTRAINT man_node_junction_pkey PRIMARY KEY (node_id)
+)
+WITH (OIDS=FALSE)
+;
+
+
+CREATE TABLE "SCHEMA_NAME"."man_node_system" (
+"node_id" varchar(16) COLLATE "default" NOT NULL,
+"covercat_id" varchar(30) COLLATE "default",
+"stepcat_id" varchar(30) COLLATE "default",
+"step_n" int2,
+"stepcat_id2" varchar(30) COLLATE "default",
+"step_n2" int2,
+"arc_id" varchar(16) COLLATE "default",
+CONSTRAINT man_node_system_pkey PRIMARY KEY (node_id)
 )
 WITH (OIDS=FALSE)
 ;
@@ -147,6 +190,14 @@ WITH (OIDS=FALSE)
 ;
 
 
+CREATE TABLE "SCHEMA_NAME"."man_node_meter" (
+"node_id" varchar(16) COLLATE "default" NOT NULL,
+"arc_id" varchar(16) COLLATE "default" NOT NULL,
+CONSTRAINT man_node_meter_pkey PRIMARY KEY (node_id)
+)
+WITH (OIDS=FALSE)
+;
+
 
 -- ----------------------------
 -- Table structure for arc derivades
@@ -157,6 +208,7 @@ CREATE TABLE "SCHEMA_NAME"."man_arc_conduit" (
 "func_type" varchar(16) COLLATE "default",
 "hydrocat_id" varchar(30) COLLATE "default",
 "flapcat_id" varchar(30) COLLATE "default",
+"node_id" varchar(16) COLLATE "default",
 CONSTRAINT man_arc_conduit_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -164,6 +216,7 @@ WITH (OIDS=FALSE)
 
 CREATE TABLE "SCHEMA_NAME"."man_arc_pump" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
+"node_id" varchar(16) COLLATE "default",
 CONSTRAINT man_arc_pump_pkey PRIMARY KEY (arc_id)
 )
 WITH (OIDS=FALSE)
@@ -186,17 +239,20 @@ WITH (OIDS=FALSE)
 -- FK
 --------
 
-ALTER TABLE "SCHEMA_NAME"."man_node_mhole" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."man_node_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."man_node_weir" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."man_node_system" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."man_node_system" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_node_storage" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_node_outfall" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+ALTER TABLE "SCHEMA_NAME"."man_node_meter" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."man_node_meter" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_arc_conduit" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."man_arc_conduit" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."arc" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_arc_pump" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
+ALTER TABLE "SCHEMA_NAME"."man_arc_pump" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;

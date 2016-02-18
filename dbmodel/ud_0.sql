@@ -339,7 +339,6 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "comment" character varying(254),
 "rotation" numeric (6,3),
 
-"function_type" varchar(18) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
@@ -381,7 +380,6 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "direction" character varying(2),
 "custom_length" numeric (12,2),
 
-"function_type" varchar(18) COLLATE "default",
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",

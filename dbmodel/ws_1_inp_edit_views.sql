@@ -110,7 +110,7 @@ BEGIN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;
 -- FEATURE INSERT
-		INSERT INTO node 		 VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO node 		 VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
 -- EPA INSERT
 		INSERT INTO inp_junction 	VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
@@ -186,7 +186,7 @@ BEGIN
 			END IF;
 
 -- FEATURE INSERT
-		INSERT INTO node 		  VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO node 		  VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
 -- EPA INSERT
 		INSERT INTO inp_reservoir VALUES(NEW.node_id, NEW.head, NEW.pattern_id);
@@ -260,7 +260,7 @@ BEGIN
 			END IF;
 
 -- FEATURE INSERT
-		INSERT INTO node 	 VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO node 	 VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, null, null, null,NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
 -- EPA INSERT		
 		INSERT INTO inp_tank VALUES(NEW.node_id,NEW.initlevel,NEW.minlevel,NEW.maxlevel,NEW.diameter,NEW.minvol,NEW.curve_id);
@@ -340,12 +340,12 @@ BEGIN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;
 	
-		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, null, null,NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO inp_pipe VALUES(NEW.arc_id, NEW.minorloss, NEW.status);
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 		SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, custom_length=NEW.custom_length, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
+		UPDATE arc 		SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
 		UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -396,7 +396,7 @@ BEGIN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;
 
-		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO inp_pump VALUES (NEW.arc_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
 		RETURN NEW;
 
@@ -453,7 +453,7 @@ BEGIN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;	
 	
-		INSERT INTO arc 	  VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,  null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO arc 	  VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 		INSERT INTO inp_valve VALUES (NEW.arc_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
 		RETURN NEW;
 

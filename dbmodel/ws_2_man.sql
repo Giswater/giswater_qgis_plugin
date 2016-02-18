@@ -63,7 +63,17 @@ CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "wsp"."cat_man_cover" (
+CREATE TABLE "wsp"."cat_owner" (
+"id" varchar(30) COLLATE "default" NOT NULL,
+"descript" varchar(512) COLLATE "default",
+"link" varchar(512) COLLATE "default",
+"picture" varchar(512) COLLATE "default",
+CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
+)WITH (OIDS=FALSE);
+
+
+
+CREATE TABLE "wsp"."cat_cover" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
@@ -139,7 +149,7 @@ CREATE TABLE "wsp"."connec" (
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
-"text" varchar(50) COLLATE "default",
+"owner_id" varchar(30) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
@@ -289,6 +299,10 @@ ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("workcat_id") REFERENCES "wsp"."cat_
 ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("buildercat_id") REFERENCES "wsp"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("buildercat_id") REFERENCES "wsp"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("buildercat_id") REFERENCES "wsp"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("ownercat_id") REFERENCES "wsp"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("ownercat_id") REFERENCES "wsp"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "wsp"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 ALTER TABLE "wsp"."man_node_junction" ADD FOREIGN KEY ("node_id") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

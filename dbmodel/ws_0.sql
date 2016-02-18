@@ -142,7 +142,7 @@ WITH (OIDS=FALSE)
 -- ----------------------------
 
 
-CREATE TABLE "wsp"."cat_mat" (
+CREATE TABLE "wsp"."cat_mat_arc" (
 "id" varchar(30) COLLATE "default",
 "descript" varchar(512) COLLATE "default",
 "roughness" numeric(12,4),
@@ -154,6 +154,20 @@ CONSTRAINT cat_mat_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
+
+CREATE TABLE "wsp"."cat_mat_node" (
+"id" varchar(30) COLLATE "default",
+"descript" varchar(512) COLLATE "default",
+"roughness" numeric(12,4),
+"link" varchar(512) COLLATE "default",
+"url" varchar(512) COLLATE "default",
+"picture" varchar(512) COLLATE "default",
+"svg" varchar(50) COLLATE "default",
+CONSTRAINT cat_mat_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE)
+;
+
 
 
 CREATE TABLE "wsp"."cat_arc" (
@@ -230,7 +244,6 @@ CREATE TABLE "wsp"."node" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"rotation" numeric (6,3),
 													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
@@ -240,13 +253,14 @@ CREATE TABLE "wsp"."node" (
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
+"ownercat_id" varchar(30) COLLATE "default",
 													-- to MAN model
-"text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
 
+"rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(16) COLLATE "default" NOT NULL,
 "the_geom" public.geometry (POINT, 25831),
@@ -267,7 +281,6 @@ CREATE TABLE "wsp"."arc" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"rotation" numeric (6,3),
 "custom_length" numeric (12,2),
 													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
@@ -278,13 +291,14 @@ CREATE TABLE "wsp"."arc" (
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
+"ownercat_id" varchar(30) COLLATE "default",
 													-- to MAN model
-"text" varchar(50) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
 
+"rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(16) COLLATE "default" NOT NULL,
 "the_geom" public.geometry (LINESTRING, 25831),
@@ -316,10 +330,10 @@ CREATE TABLE "wsp"."value_verified" (
 -- FK
 ------
 
-ALTER TABLE "wsp"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "wsp"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "wsp"."cat_mat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "wsp"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "wsp"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "wsp"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "wsp"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "wsp"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "wsp"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "wsp"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "wsp"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "wsp"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
