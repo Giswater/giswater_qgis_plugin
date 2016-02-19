@@ -45,9 +45,17 @@ INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('FLOW METER','MEASURE INSTRUMENT', 
 -- ----------------------------
 -- Records of cat_mat
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME"."cat_mat" VALUES ('N/I', null, null, null, null, null, null);
-INSERT INTO "SCHEMA_NAME"."cat_mat" VALUES ('PVC', 'PVC', 0.011, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pvc.svg');
-INSERT INTO "SCHEMA_NAME"."cat_mat" VALUES ('IRON', 'IRON', 0.011, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'iron.svg');
+INSERT INTO "SCHEMA_NAME"."cat_mat_node" VALUES ('N/I', null, null, null, null, null, null);
+INSERT INTO "SCHEMA_NAME"."cat_mat_node" VALUES ('PVC', 'PVC', 0.011, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pvc.svg');
+INSERT INTO "SCHEMA_NAME"."cat_mat_node" VALUES ('IRON', 'IRON', 0.011, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'iron.svg');
+
+
+-- ----------------------------
+-- Records of cat_mat
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."cat_mat_arc" VALUES ('N/I', null, null, null, null, null, null);
+INSERT INTO "SCHEMA_NAME"."cat_mat_arc" VALUES ('PVC', 'PVC', 0.011, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pvc.svg');
+INSERT INTO "SCHEMA_NAME"."cat_mat_arc" VALUES ('IRON', 'IRON', 0.011, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'iron.svg');
 
 
 -- ----------------------------
@@ -130,9 +138,9 @@ INSERT INTO "SCHEMA_NAME"."cat_work" VALUES ('WORK NO DATA', null, null, null);
 
 
 -- ----------------------------
--- Records of cat_man_cover
+-- Records of cat_owner
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME"."cat_man_cover" VALUES ('COVER NO DATA', null, null, null, null, null);
+INSERT INTO "SCHEMA_NAME"."cat_owner" VALUES ('OWNER NO DATA', null, null, null);
 
 
 -- ----------------------------

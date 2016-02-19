@@ -51,7 +51,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_pattern_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-	
+
 
 CREATE SEQUENCE "SCHEMA_NAME"."inp_rules_id_seq"
     START WITH 1
@@ -115,7 +115,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_result_cat_id_seq"
     NO MAXVALUE
     CACHE 1;
 
-	
+
 
 -- ----------------------------
 -- Table structure INP
@@ -779,11 +779,11 @@ JOIN SCHEMA_NAME.state_selection ON (((node."state")::text = (state_selection.id
 
 
 CREATE VIEW "SCHEMA_NAME"."v_inp_pipe" AS 
-SELECT arc.arc_id, arc.node_1, arc.node_2, (st_length2d(arc.the_geom))::numeric(16,3) AS length, cat_arc.dint AS diameter, cat_mat.roughness, inp_pipe.minorloss, inp_pipe.status, sector_selection.sector_id 
+SELECT arc.arc_id, arc.node_1, arc.node_2, (st_length2d(arc.the_geom))::numeric(16,3) AS length, cat_arc.dint AS diameter, cat_mat_arc.roughness, inp_pipe.minorloss, inp_pipe.status, sector_selection.sector_id 
 FROM (((((SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.inp_pipe ON (((arc.arc_id)::text = (inp_pipe.arc_id)::text)))
 JOIN SCHEMA_NAME.cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)))  
-JOIN SCHEMA_NAME.cat_mat ON (((cat_arc.matcat_id)::text = (cat_mat.id)::text)))
+JOIN SCHEMA_NAME.cat_mat_arc ON (((cat_arc.matcat_id)::text = (cat_mat_arc.id)::text)))
 JOIN SCHEMA_NAME.state_selection ON (((arc."state")::text = (state_selection.id)::text))) 
 JOIN SCHEMA_NAME.sector_selection ON (((arc.sector_id)::text = (sector_selection.sector_id)::text)));
 

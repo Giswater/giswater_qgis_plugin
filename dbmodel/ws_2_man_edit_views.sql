@@ -13,7 +13,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_junction" AS
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
-node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.ownercat_id,
 man_node_junction.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
@@ -26,7 +26,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_tank" AS
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id,
 cat_node.nodetype_id AS "cat.nodetype",
-node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,  node.ownercat_id,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node 
@@ -38,7 +38,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_hydrant" AS
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
-node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,  node.ownercat_id,
 man_node_hydrant.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
@@ -51,7 +51,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_nodevalve" AS
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
-node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.ownercat_id, 
 man_node_valve.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
@@ -64,14 +64,13 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_nodemeter" AS
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
-node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, 
+node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,  node.ownercat_id,
 man_node_meter.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node
 JOIN SCHEMA_NAME.man_node_meter ON (((man_node_meter.node_id)::text = (node.node_id)::text))
 JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
-
 
 
 -- ----------------------------
@@ -82,7 +81,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_pipe" AS
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
-arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, st_length2d(arc.the_geom)::numeric(12,2) AS gis_length, arc.custom_length, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, man_arc_pipe.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, st_length2d(arc.the_geom)::numeric(12,2) AS gis_length, arc.custom_length, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.ownercat_id, man_arc_pipe.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_arc_pipe ON (((man_arc_pipe.arc_id)::text = (arc.arc_id)::text))
 JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
@@ -92,8 +91,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_arcvalve" AS
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
-arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_valve.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.ownercat_id, man_arc_valve.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_arc_valve ON (((man_arc_valve.arc_id)::text = (arc.arc_id)::text))
 JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
@@ -103,8 +101,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_pump" AS
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
-arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_pump.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.ownercat_id, man_arc_pump.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_arc_pump ON (((man_arc_pump.arc_id)::text = (arc.arc_id)::text))
 JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
@@ -114,8 +111,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_filter" AS
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
-arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_filter.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.ownercat_id, man_arc_filter.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_arc_filter ON (((man_arc_filter.arc_id)::text = (arc.arc_id)::text))
 JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
@@ -125,8 +121,7 @@ CREATE VIEW "SCHEMA_NAME"."v_edit_man_arcmeter" AS
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
-arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_meter.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, arc.ownercat_id, man_arc_meter.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id)::text))
 JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
@@ -238,16 +233,24 @@ BEGIN
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
 			END IF;	
 
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;	
+
 --			Verified
 			IF (NEW.verified IS NULL) THEN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;
 		
 -- FEATURE INSERT
-		INSERT INTO node 		      VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
-										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 	
+		INSERT INTO node 		      VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 	
 											  null, null, null, null, null,
-											  NEW.link, NEW.verified, NEW.the_geom);
+											  NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_node_junction VALUES (NEW.node_id, NEW.add_info);
 
@@ -260,9 +263,9 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		     SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, 
+		UPDATE node 		     SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", 
 							      	 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-									 link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+									 rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_node_junction SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -277,7 +280,7 @@ END;
 $$;
 
 
- 
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_tank() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 	
 BEGIN
@@ -378,6 +381,14 @@ BEGIN
 				END IF;
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
 			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;	
 			
 --			Verified
 			IF (NEW.verified IS NULL) THEN
@@ -385,10 +396,10 @@ BEGIN
 			END IF;
 
 -- FEATURE INSERT
-		INSERT INTO node 		  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'TANK'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
-										  NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+		INSERT INTO node 		  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'TANK'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+										  NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
 										  null, null, null, null, null, 
-										  NEW.link, NEW.verified, NEW.the_geom);
+										  NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
 -- MANAGEMENT INSERT
 		INSERT INTO man_node_tank VALUES (NEW.node_id, NEW.vmax, NEW.area, NEW.add_info);
@@ -402,9 +413,9 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, 
+		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 								 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								 link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								 rotation=NEW.rotation,link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_node_tank SET node_id=NEW.node_id, vmax=NEW.vmax, area=NEW.area, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -417,8 +428,8 @@ BEGIN
     RETURN NEW;
 END;
 $$;
-
-   
+ 
+  
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_hydrant() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
@@ -520,6 +531,14 @@ BEGIN
 				END IF;
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
 			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;	
 			
 --			Verified
 			IF (NEW.verified IS NULL) THEN
@@ -527,10 +546,10 @@ BEGIN
 			END IF;
 
 -- FEATURE INSERT
-		INSERT INTO node 		      VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
-										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+		INSERT INTO node 		      VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+										      NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
 											  null, null, null, null, null, 
-											  NEW.link, NEW.verified, NEW.the_geom);
+											  NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_node_hydrant  VALUES (NEW.node_id, NEW.add_info);
 
@@ -543,9 +562,9 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		     SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, 
+		UPDATE node 		     SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 							      	 dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
-									 link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+									 rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_node_hydrant  SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -660,7 +679,15 @@ BEGIN
 					RAISE EXCEPTION 'There are no builders defined in the model, define at least one.';
 				END IF;
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
-			END IF;	
+			END IF;
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;		
 			
 --			Verified
 			IF (NEW.verified IS NULL) THEN
@@ -668,10 +695,10 @@ BEGIN
 			END IF;
 
 -- FEATURE INSERT
-		INSERT INTO node 		    VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
-									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+		INSERT INTO node 		    VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
 											null, null, null, null, null,
-											NEW.link, NEW.verified, NEW.the_geom);
+											NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_node_valve	VALUES (NEW.node_id, NEW.add_info);
 
@@ -685,9 +712,9 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		  SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, 
+		UPDATE node 		  SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", 
 							      dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								  link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								  rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_node_valve SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -804,16 +831,24 @@ BEGIN
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
 			END IF;	
 
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;	
+
 --			Verified
 			IF (NEW.verified IS NULL) THEN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;
 						
 -- FEATURE INSERT
-		INSERT INTO node 		    VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
-									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+		INSERT INTO node 		    VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+									        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
 										null, null, null, null, null, 
-										NEW.link, NEW.verified, NEW.the_geom);
+										NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_node_meter	VALUES (NEW.node_id, NEW.add_info);
 
@@ -827,9 +862,9 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		  SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, 
+		UPDATE node 		  SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 							      dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								  link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								  rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_node_meter SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
        RETURN NEW;
 
@@ -856,7 +891,6 @@ CREATE TRIGGER v_edit_man_nodevalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SC
 CREATE TRIGGER v_edit_man_nodemeter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_nodemeter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_nodemeter();
   
   
-
   
 -----------------------------
 -- TRIGGERS EDITING VIEWS FOR EDIT MAN ARC
@@ -951,6 +985,14 @@ BEGIN
 				END IF;
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
 			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;	
 						
 --			Verified
 			IF (NEW.verified IS NULL) THEN
@@ -958,9 +1000,10 @@ BEGIN
 			END IF;
 			
 -- FEATURE INSERT
-		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.custom_length,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, 
-											NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length,
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
+											null, null, null, null, null, 
+											NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_arc_pipe	VALUES (NEW.arc_id, NEW.add_info);	
 
@@ -974,9 +1017,9 @@ BEGIN
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, custom_length=NEW.custom_length, 
+		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, 
 								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_arc_pipe SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -988,7 +1031,7 @@ BEGIN
 	END IF;
     RETURN NEW;
 END;
-$$; 
+$$;
   
   
 
@@ -1072,6 +1115,14 @@ BEGIN
 					RAISE EXCEPTION 'There are no works defined in the model, define at least one.';
 				END IF;
 				NEW.workcat_id := (SELECT id FROM cat_work LIMIT 1);
+			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
 			END IF;				
 			
 --			Buildercat_id
@@ -1088,9 +1139,10 @@ BEGIN
 			END IF;
 
 -- FEATURE INSERT
-		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, 		
-											NEW.link, NEW.verified, NEW.the_geom);
+		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null,
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
+											null, null, null, null, null, 		
+											NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
 -- MANAGEMENT INSERT
 		INSERT INTO man_arc_valve	VALUES (NEW.arc_id, NEW.add_info);
@@ -1105,9 +1157,9 @@ BEGIN
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
+		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_arc_valve SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -1121,7 +1173,7 @@ BEGIN
 END;
 $$;
   
-  
+    
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_pump() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
@@ -1203,6 +1255,14 @@ BEGIN
 					RAISE EXCEPTION 'There are no works defined in the model, define at least one.';
 				END IF;
 				NEW.workcat_id := (SELECT id FROM cat_work LIMIT 1);
+			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
 			END IF;				
 			
 --			Buildercat_id
@@ -1220,8 +1280,9 @@ BEGIN
 
 -- FEATURE INSERT
 		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, null, null, null, null, null, 
-											NEW.link, NEW.verified, NEW.the_geom);
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
+											null, null, null, null, null, 
+											NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_arc_pump	VALUES (NEW.arc_id, NEW.add_info);			 
 
@@ -1235,9 +1296,9 @@ BEGIN
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
+		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_arc_pump SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -1333,6 +1394,14 @@ BEGIN
 					RAISE EXCEPTION 'There are no works defined in the model, define at least one.';
 				END IF;
 				NEW.workcat_id := (SELECT id FROM cat_work LIMIT 1);
+			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
 			END IF;				
 			
 --			Buildercat_id
@@ -1349,10 +1418,10 @@ BEGIN
 			END IF;	
 
 -- FEATURE INSERT
-		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null,
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
 											null, null, null, null, null, 	
-											NEW.link, NEW.verified, NEW.the_geom);
+											NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 -- MANAGEMENT INSERT
 		INSERT INTO man_arc_valve	VALUES (NEW.arc_id, NEW.add_info);			 
 
@@ -1366,9 +1435,9 @@ BEGIN
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 				SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
+		UPDATE arc 				SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 								    dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-									link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+									rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_arc_filter 	SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -1473,16 +1542,24 @@ BEGIN
 				END IF;
 				NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
 			END IF;	
+
+--			Ownercat_id
+			IF (NEW.ownercat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
+					RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
+				END IF;
+				NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
+			END IF;	
 					
 --			Verified
 			IF (NEW.verified IS NULL) THEN
 				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
 			END IF;	
 -- FEATURE INSERT	
-		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, null,
-											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+		INSERT INTO arc 	 		VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null,
+											NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 
 											null, null, null, null, null, 
-											NEW.link, NEW.verified, NEW.the_geom);
+											NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
 -- MANAGEMENT INSERT
 		INSERT INTO man_arc_valve	VALUES (NEW.arc_id, NEW.add_info);	
@@ -1497,9 +1574,9 @@ BEGIN
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation,
+		UPDATE arc 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment",
 								dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
-								link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
+								rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
 		UPDATE man_arc_meter SET arc_id=NEW.arc_id, add_info=NEW.add_info WHERE arc_id=OLD.arc_id;
 		RETURN NEW;
 
@@ -1524,5 +1601,5 @@ CREATE TRIGGER v_edit_map_pump 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEM
 CREATE TRIGGER v_edit_map_filter 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_filter 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_filter();
    
 CREATE TRIGGER v_edit_man_arcmeter 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_arcmeter 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_arcmeter();
-     
-     
+  
+   

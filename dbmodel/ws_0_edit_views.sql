@@ -76,13 +76,12 @@ CREATE VIEW "SCHEMA_NAME".v_edit_node AS
 	arc.adress_03,
 	arc.descript,
 	cat_arc.svg AS "cat.svg",
-	arc.link,
 	arc.rotation,
+	arc.link,
 	arc.verified,
 	arc.the_geom
    FROM ("SCHEMA_NAME".arc
    JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
-
 
 
 -- ----------------------------
@@ -196,7 +195,6 @@ BEGIN
     RETURN NEW;
 END;
 $$;
-
 
 
 

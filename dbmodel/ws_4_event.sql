@@ -37,7 +37,6 @@ CREATE SEQUENCE "SCHEMA_NAME".event_x_connec_seq
   NO MAXVALUE
   CACHE 1;
 
-
 CREATE SEQUENCE "SCHEMA_NAME".event_x_file_seq
   START WITH 1
   INCREMENT BY 1
@@ -47,8 +46,8 @@ CREATE SEQUENCE "SCHEMA_NAME".event_x_file_seq
 
 
 CREATE TABLE "SCHEMA_NAME"."cat_event" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"type" varchar(16) COLLATE "default",
+"id" varchar(30) COLLATE "default" NOT NULL,
+"type" varchar(30) COLLATE "default",
 "descript" varchar(50) COLLATE "default",
 "comment" varchar(512) COLLATE "default",
 CONSTRAINT cat_event_pkey PRIMARY KEY (id)
@@ -57,10 +56,14 @@ CONSTRAINT cat_event_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."event" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_id_seq'::regclass) NOT NULL,
+"start_date" timestamp(6),
+"end_date" timestamp(6),
 "date" timestamp(6) DEFAULT now(),
 "user" varchar(16) COLLATE "default",
-"eventcat_id" varchar(16) COLLATE "default",
+"eventcat_id" varchar(30) COLLATE "default",
+"category" varchar(16) COLLATE "default",
 "comment" varchar(512) COLLATE "default",
+"tag" varchar(16) COLLATE "default",
 CONSTRAINT event_pkey PRIMARY KEY (id)
 )WITH (OIDS=FALSE);
 
@@ -96,6 +99,7 @@ CREATE TABLE "SCHEMA_NAME"."event_x_file" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_x_file_seq'::regclass) NOT NULL,
 "event_id" int8,
 "path" varchar(512) COLLATE "default",
+"text" varchar(512) COLLATE "default",
 CONSTRAINT event_x_file_pkey PRIMARY KEY (id)
 ) WITH (OIDS=FALSE) ;
 
@@ -147,6 +151,9 @@ CREATE TABLE "SCHEMA_NAME"."event_node_x_picture" (
 "date" timestamp(6) DEFAULT now(),
 "user" varchar(16) COLLATE "default",
 "comment" varchar(512) COLLATE "default",
+"tag" varchar(16) COLLATE "default",
+"xcoord" numeric (12,3),
+"ycoord" numeric (12,3),
 CONSTRAINT event_node_x_picture_pkey PRIMARY KEY (id)
 )WITH (OIDS=FALSE);
 
@@ -158,6 +165,9 @@ CREATE TABLE "SCHEMA_NAME"."event_arc_x_picture" (
 "date" timestamp(6) DEFAULT now(),
 "user" varchar(16) COLLATE "default",
 "comment" varchar(512) COLLATE "default",
+"tag" varchar(16) COLLATE "default",
+"xcoord" numeric (12,3),
+"ycoord" numeric (12,3),
 CONSTRAINT event_arc_x_picture_pkey PRIMARY KEY (id)
 )WITH (OIDS=FALSE);
 
@@ -169,6 +179,9 @@ CREATE TABLE "SCHEMA_NAME"."event_connec_x_picture" (
 "date" timestamp(6) DEFAULT now(),
 "user" varchar(16) COLLATE "default",
 "comment" varchar(512) COLLATE "default",
+"tag" varchar(16) COLLATE "default",
+"xcoord" numeric (12,3),
+"ycoord" numeric (12,3),
 CONSTRAINT event_connec_x_picture_pkey PRIMARY KEY (id)
 ) WITH (OIDS=FALSE);
 

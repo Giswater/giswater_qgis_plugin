@@ -15,7 +15,7 @@ SET client_min_messages = warning;
 -- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA IF NOT EXISTS "SCHEMA_NAME";
+CREATE SCHEMA "SCHEMA_NAME";
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
@@ -38,7 +38,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."node_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-	
+
 
 CREATE SEQUENCE "SCHEMA_NAME"."arc_id_seq"
     START WITH 1
@@ -110,7 +110,7 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
-
+ 
  
 CREATE TABLE "SCHEMA_NAME"."arc_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
@@ -141,7 +141,7 @@ WITH (OIDS=FALSE)
 -- Table structure for CATALOGS
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."cat_mat" (
+CREATE TABLE "SCHEMA_NAME"."cat_mat_arc" (
 "id" varchar(30) COLLATE "default",
 "descript" varchar(512) COLLATE "default",
 "roughness" numeric(12,4),
@@ -149,7 +149,21 @@ CREATE TABLE "SCHEMA_NAME"."cat_mat" (
 "url" varchar(512) COLLATE "default",
 "picture" varchar(512) COLLATE "default",
 "svg" varchar(50) COLLATE "default",
-CONSTRAINT cat_mat_pkey PRIMARY KEY (id)
+CONSTRAINT cat_mat_arc_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE)
+;
+
+
+CREATE TABLE "SCHEMA_NAME"."cat_mat_node" (
+"id" varchar(30) COLLATE "default",
+"descript" varchar(512) COLLATE "default",
+"roughness" numeric(12,4),
+"link" varchar(512) COLLATE "default",
+"url" varchar(512) COLLATE "default",
+"picture" varchar(512) COLLATE "default",
+"svg" varchar(50) COLLATE "default",
+CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
@@ -225,7 +239,6 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"rotation" numeric (6,3),
 													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
 "soilcat_id" varchar(16) COLLATE "default",
@@ -235,13 +248,15 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
+"ownercat_id" varchar(30) COLLATE "default",
 													-- to MAN model
-"text" varchar(50) COLLATE "default",
+"text" varchar(254) COLLATE "default",
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
 
+"rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(16) COLLATE "default" NOT NULL,
 "the_geom" public.geometry (POINT, 25831),
@@ -262,7 +277,6 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"rotation" numeric (6,3),
 "custom_length" numeric (12,2),
 													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
@@ -273,13 +287,15 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "workcat_id" varchar(255) COLLATE "default",
 "buildercat_id" varchar(30) COLLATE "default",
 "builtdate" timestamp (6) without time zone,
+"ownercat_id" varchar(30) COLLATE "default",
 													-- to MAN model
-"text" varchar(50) COLLATE "default",
+"text" varchar(254) COLLATE "default",                                                    
 "adress_01" varchar(50) COLLATE "default",
 "adress_02" varchar(50) COLLATE "default",
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
 
+"rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(16) COLLATE "default" NOT NULL,
 "the_geom" public.geometry (LINESTRING, 25831),
@@ -308,10 +324,10 @@ CREATE TABLE "SCHEMA_NAME"."value_verified" (
 -- FK
 ------
 
-ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "SCHEMA_NAME"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHEMA_NAME"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
