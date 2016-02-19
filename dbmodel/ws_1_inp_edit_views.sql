@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -10,59 +10,52 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 
 
-CREATE VIEW "wsp"."v_edit_inp_junction" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_inp_junction" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
 inp_junction.demand, inp_junction.pattern_id
-FROM (wsp.node
-JOIN wsp.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
+FROM (SCHEMA_NAME.node
+JOIN SCHEMA_NAME.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
 
 
-
-CREATE VIEW "wsp"."v_edit_inp_reservoir" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_inp_reservoir" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
 inp_reservoir.head, inp_reservoir.pattern_id
-FROM (wsp.node 
-JOIN wsp.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)));
+FROM (SCHEMA_NAME.node 
+JOIN SCHEMA_NAME.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)));
 
 
-
-CREATE VIEW "wsp"."v_edit_inp_tank" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_inp_tank" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
 inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id
-FROM (wsp.node 
-JOIN wsp.inp_tank ON (((inp_tank.node_id)::text = (node.node_id)::text)));
+FROM (SCHEMA_NAME.node 
+JOIN SCHEMA_NAME.inp_tank ON (((inp_tank.node_id)::text = (node.node_id)::text)));
 
 
-
-CREATE VIEW "wsp"."v_edit_inp_pipe" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_inp_pipe" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
 inp_pipe.minorloss, inp_pipe.status
-FROM (wsp.arc 
-JOIN wsp.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
 
 
-
-CREATE VIEW "wsp"."v_edit_inp_pump" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_inp_pump" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
 inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.status
-FROM (wsp.arc 
-JOIN wsp.inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
 
 
-
-CREATE VIEW "wsp"."v_edit_inp_valve" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_inp_valve" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
 inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.status
-FROM (wsp.arc 
-JOIN wsp.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
-
-
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
 
 
 
@@ -70,7 +63,7 @@ JOIN wsp.inp_valve ON (((arc.arc_id)::text = (inp_valve.arc_id)::text)));
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_inp_junction() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_junction() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';	
@@ -142,10 +135,8 @@ END;
 $$;
 
 
-
-
  
-CREATE OR REPLACE FUNCTION wsp.v_edit_inp_reservoir() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_reservoir() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -217,9 +208,8 @@ END;
 $$;
 
   
-  
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_inp_tank() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_tank() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -291,16 +281,12 @@ END;
 $$;
 
 
-
-CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_junction();
+CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_junction();
  
-CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_reservoir FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_reservoir();
+CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_reservoir FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_reservoir();
 
-CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_tank FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_tank();
+CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_tank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_tank();
 
-
-  
-  
   
   
 -----------------------------
@@ -308,7 +294,7 @@ CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_
 -----------------------------
   
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_inp_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -359,12 +345,9 @@ BEGIN
 END;
 $$;
   
-  
+   
 
-  
-  
-
-CREATE OR REPLACE FUNCTION wsp.v_edit_inp_pump() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_pump() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -415,12 +398,9 @@ BEGIN
 END;
 $$;
 
- 
   
 
- 
-
-CREATE OR REPLACE FUNCTION wsp.v_edit_inp_valve() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_valve() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -474,16 +454,10 @@ $$;
 
 
 
+CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_pipe();
 
-CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_pipe();
+CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_valve();
 
-CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_valve();
-
-CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_inp_pump();
-
-   
-  
-  
-   
+CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_pump(); 
    
    

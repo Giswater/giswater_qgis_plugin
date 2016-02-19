@@ -1,29 +1,29 @@
-﻿/*
+/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
  */
 
+ 
 -- ----------------------------
 -- Structure for log
 -- ----------------------------
 
-
-CREATE SEQUENCE "wsp".adm_log_node_seq
+CREATE SEQUENCE "SCHEMA_NAME".adm_log_node_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
 
-  CREATE SEQUENCE "wsp".adm_log_arc_seq
+  CREATE SEQUENCE "SCHEMA_NAME".adm_log_arc_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
 
-  CREATE SEQUENCE "wsp".adm_log_connec_seq
+  CREATE SEQUENCE "SCHEMA_NAME".adm_log_connec_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -31,9 +31,7 @@ CREATE SEQUENCE "wsp".adm_log_node_seq
   CACHE 1;
 
 
-
-
-CREATE TABLE "wsp"."adm_list_user" (
+CREATE TABLE "SCHEMA_NAME"."adm_list_user" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "name" varchar(40) COLLATE "default" NOT NULL,
 "surname_1" varchar(40) COLLATE "default" NOT NULL,
@@ -47,10 +45,8 @@ CONSTRAINT admin_list_user_pkey PRIMARY KEY (id)
 
 
 
-
-CREATE TABLE wsp.adm_log_node(
-"id" int8 DEFAULT nextval('"wsp".adm_log_node_seq'::regclass) NOT NULL,
-
+CREATE TABLE SCHEMA_NAME.adm_log_node(
+"id" int8 DEFAULT nextval('"SCHEMA_NAME".adm_log_node_seq'::regclass) NOT NULL,
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -78,7 +74,6 @@ CREATE TABLE wsp.adm_log_node(
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
 "the_geom" public.geometry (POINT, 25831),
-
 "operation" character varying(6),
 "user" varchar (20),
 "date" timestamp (6) without time zone,
@@ -87,10 +82,8 @@ CONSTRAINT adm_log_node_pkey PRIMARY KEY (id)
   
 
 
-
-CREATE TABLE wsp.adm_log_arc(
-"id" int8 DEFAULT nextval('"wsp".adm_log_arc_seq'::regclass) NOT NULL,
-
+CREATE TABLE SCHEMA_NAME.adm_log_arc(
+"id" int8 DEFAULT nextval('"SCHEMA_NAME".adm_log_arc_seq'::regclass) NOT NULL,
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "node_1" varchar(16) COLLATE "default",
 "node_2" varchar(16) COLLATE "default",
@@ -119,7 +112,6 @@ CREATE TABLE wsp.adm_log_arc(
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
 "the_geom" public.geometry (LINESTRING, 25831),
-
 "operation" character varying(6),
 "user" varchar (20),
 "date" timestamp (6) without time zone,
@@ -128,10 +120,8 @@ CONSTRAINT adm_log_arc_pkey PRIMARY KEY (id)
   
  
 
-
-CREATE TABLE wsp.adm_log_connec(
-"id" int8 DEFAULT nextval('"wsp".adm_log_connec_seq'::regclass) NOT NULL,
-
+CREATE TABLE SCHEMA_NAME.adm_log_connec(
+"id" int8 DEFAULT nextval('"SCHEMA_NAME".adm_log_connec_seq'::regclass) NOT NULL,
 "connec_id" varchar(16) COLLATE "default" NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -158,14 +148,11 @@ CREATE TABLE wsp.adm_log_connec(
 "link" character varying(512),
 "verified" varchar(4) COLLATE "default",
 "the_geom" public.geometry (POINT, 25831),
-
 "operation" character varying(6),
 "user" varchar (20),
 "date" timestamp (6) without time zone,
 CONSTRAINT adm_log_connec_pkey PRIMARY KEY (id)
 )WITH (OIDS=FALSE);
-  
-
-
  
+
  

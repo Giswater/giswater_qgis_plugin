@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -9,8 +9,7 @@ This version of Giswater is provided by Giswater Association
 -- View structure for v_edit_man_node
 -- ----------------------------
 
-
-CREATE VIEW "wsp"."v_edit_man_junction" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_junction" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
@@ -18,27 +17,24 @@ node.sector_id, node."state", node.annotation, node.observ, node.comment, node.d
 man_node_junction.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
-FROM (wsp.node
-JOIN wsp.man_node_junction ON (((man_node_junction.node_id)::text = (node.node_id)::text))
-JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+FROM (SCHEMA_NAME.node
+JOIN SCHEMA_NAME.man_node_junction ON (((man_node_junction.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
-
-CREATE VIEW "wsp"."v_edit_man_tank" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_tank" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id,
 cat_node.nodetype_id AS "cat.nodetype",
 node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
-FROM (wsp.node 
-JOIN wsp.man_node_tank ON (((man_node_tank.node_id)::text = (node.node_id)::text))
-JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+FROM (SCHEMA_NAME.node 
+JOIN SCHEMA_NAME.man_node_tank ON (((man_node_tank.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_hydrant" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_hydrant" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
@@ -46,14 +42,12 @@ node.sector_id, node."state", node.annotation, node.observ, node.comment, node.d
 man_node_hydrant.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
-FROM (wsp.node 
-JOIN wsp.man_node_hydrant ON (((man_node_hydrant.node_id)::text = (node.node_id)::text))
-JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+FROM (SCHEMA_NAME.node 
+JOIN SCHEMA_NAME.man_node_hydrant ON (((man_node_hydrant.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_nodevalve" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_nodevalve" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
@@ -61,14 +55,12 @@ node.sector_id, node."state", node.annotation, node.observ, node.comment, node.d
 man_node_valve.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
-FROM (wsp.node
-JOIN wsp.man_node_valve ON (((man_node_valve.node_id)::text = (node.node_id)::text))
-JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+FROM (SCHEMA_NAME.node
+JOIN SCHEMA_NAME.man_node_valve ON (((man_node_valve.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_nodemeter" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_nodemeter" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
@@ -76,10 +68,9 @@ node.sector_id, node."state", node.annotation, node.observ, node.comment, node.d
 man_node_meter.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
-FROM (wsp.node
-JOIN wsp.man_node_meter ON (((man_node_meter.node_id)::text = (node.node_id)::text))
-JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
-
+FROM (SCHEMA_NAME.node
+JOIN SCHEMA_NAME.man_node_meter ON (((man_node_meter.node_id)::text = (node.node_id)::text))
+JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 
@@ -87,81 +78,58 @@ JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 -- View structure for v_edit_man_arc
 -- ----------------------------
 
-
-CREATE VIEW "wsp"."v_edit_man_pipe" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_pipe" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
-arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, st_length2d(arc.the_geom)::numeric(12,2) AS gis_length, arc.custom_length, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_pipe.add_info,
-cat_arc.svg AS "cat.svg",
-arc.rotation, arc.link, arc.verified, arc.the_geom,
-FROM (wsp.arc 
-JOIN wsp.man_arc_pipe ON (((man_arc_pipe.arc_id)::text = (arc.arc_id)::text))
-JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, st_length2d(arc.the_geom)::numeric(12,2) AS gis_length, arc.custom_length, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, man_arc_pipe.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.man_arc_pipe ON (((man_arc_pipe.arc_id)::text = (arc.arc_id)::text))
+JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_arcvalve" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_arcvalve" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
 arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_valve.add_info
-cat_arc.svg AS "cat.svg",
-arc.rotation, arc.link, arc.verified, arc.the_geom,
-FROM (wsp.arc 
-JOIN wsp.man_arc_valve ON (((man_arc_valve.arc_id)::text = (arc.arc_id)::text))
-JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+man_arc_valve.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.man_arc_valve ON (((man_arc_valve.arc_id)::text = (arc.arc_id)::text))
+JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_pump" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_pump" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
 arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_filter.add_info
-cat_arc.svg AS "cat.svg",
-arc.rotation, arc.link, arc.verified, arc.the_geom,
-FROM (wsp.arc 
-JOIN wsp.man_arc_pump ON (((man_arc_pump.arc_id)::text = (arc.arc_id)::text))
-JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+man_arc_pump.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.man_arc_pump ON (((man_arc_pump.arc_id)::text = (arc.arc_id)::text))
+JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_filter" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_filter" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
 arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_filter.add_info
-cat_arc.svg AS "cat.svg",
-arc.rotation, arc.link, arc.verified, arc.the_geom,
-FROM (wsp.arc 
-JOIN wsp.man_arc_filter ON (((man_arc_filter.arc_id)::text = (arc.arc_id)::text))
-JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+man_arc_filter.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.man_arc_filter ON (((man_arc_filter.arc_id)::text = (arc.arc_id)::text))
+JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
-
-
-CREATE VIEW "wsp"."v_edit_man_arcmeter" AS 
+CREATE VIEW "SCHEMA_NAME"."v_edit_man_arcmeter" AS 
 SELECT 
 arc.arc_id, arc.arccat_id, 
 cat_arc.arctype_id AS "cat.arctype",
 arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.dma_id, arc.soilcat_id, arc.category_type, arc.fluid_type, arc.location_type, arc.workcat_id, arc.buildercat_id, arc.builtdate, 
-man_arc_meter.add_info
-cat_arc.svg AS "cat.svg",
-arc.rotation, arc.link, arc.verified, arc.the_geom,
-FROM (wsp.arc 
-JOIN wsp.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id)::text))
-JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
-
-
-
+man_arc_meter.add_info, cat_arc.svg AS "cat.svg", arc.link, arc.verified, arc.the_geom
+FROM (SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.man_arc_meter ON (((man_arc_meter.arc_id)::text = (arc.arc_id)::text))
+JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
 
@@ -169,7 +137,7 @@ JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 -- TRIGGERS EDITING VIEWS FOR EDIT MAN NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_junction() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_junction() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -309,10 +277,8 @@ END;
 $$;
 
 
-
-
  
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_tank() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_tank() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 	
 BEGIN
 
@@ -452,10 +418,9 @@ BEGIN
 END;
 $$;
 
- 
-  
+   
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_hydrant() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_hydrant() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 
@@ -596,8 +561,7 @@ $$;
 
 
 
-
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_nodevalve() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_nodevalve() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 	
 BEGIN
 
@@ -739,7 +703,7 @@ $$;
 
 
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_nodemeter() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_nodemeter() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 	
 BEGIN
 
@@ -881,33 +845,24 @@ $$;
 
 
 
-
-
-
-
-CREATE TRIGGER v_edit_man_junction 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_junction 	FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_junction();
+CREATE TRIGGER v_edit_man_junction 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_junction 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_junction();
  
-CREATE TRIGGER v_edit_man_tank 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_tank 		FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_tank();
+CREATE TRIGGER v_edit_man_tank 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tank 		FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_tank();
 
-CREATE TRIGGER v_edit_man_hydrant 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_hydrant 	FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_hydrant();
+CREATE TRIGGER v_edit_man_hydrant 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_hydrant 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_hydrant();
 
-CREATE TRIGGER v_edit_man_nodevalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_nodevalve FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_nodevalve();
+CREATE TRIGGER v_edit_man_nodevalve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_nodevalve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_nodevalve();
 
-CREATE TRIGGER v_edit_man_nodemeter INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_nodemeter FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_nodemeter();
+CREATE TRIGGER v_edit_man_nodemeter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_nodemeter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_nodemeter();
   
   
 
-
-
-
-  
   
 -----------------------------
 -- TRIGGERS EDITING VIEWS FOR EDIT MAN ARC
 -----------------------------
   
-
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 
@@ -1033,16 +988,11 @@ BEGIN
 	END IF;
     RETURN NEW;
 END;
-$$;
+$$; 
   
   
 
-  
-  
-  
-  
-
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_arcvalve() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_arcvalve() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 	
 BEGIN
 
@@ -1173,12 +1123,7 @@ $$;
   
   
 
-  
-  
- 
-  
-
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_pump() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_pump() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 
@@ -1307,7 +1252,8 @@ END;
 $$;
 
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_filter() RETURNS trigger LANGUAGE plpgsql AS $$
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_filter() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 
@@ -1437,7 +1383,8 @@ END;
 $$;
 
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_man_arcmeter() RETURNS trigger LANGUAGE plpgsql AS $$
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_arcmeter() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 
@@ -1568,18 +1515,14 @@ $$;
 
 
 
+CREATE TRIGGER v_edit_man_pipe 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pipe 		FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_pipe();
 
+CREATE TRIGGER v_edit_man_arcvalve 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_arcvalve 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_arcvalve();
 
-CREATE TRIGGER v_edit_man_pipe 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_pipe 		FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_pipe();
+CREATE TRIGGER v_edit_map_pump 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pump 		FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_pump();
 
-CREATE TRIGGER v_edit_man_arcvalve 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_arcvalve 	FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_arcvalve();
-
-CREATE TRIGGER v_edit_map_pump 		INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_pump 		FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_pump();
-
-CREATE TRIGGER v_edit_map_filter 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_filter 	FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_filter();
+CREATE TRIGGER v_edit_map_filter 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_filter 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_filter();
    
-CREATE TRIGGER v_edit_man_arcmeter 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_man_arcmeter 	FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_man_arcmeter();
-  
-   
-   
-   
+CREATE TRIGGER v_edit_man_arcmeter 	INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_arcmeter 	FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_arcmeter();
+     
+     

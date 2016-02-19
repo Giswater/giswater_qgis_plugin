@@ -1,21 +1,18 @@
-﻿/*
+/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-
-
-
 ----------------------------
 --    GIS EDITING VIEWS
 ----------------------------
 
-CREATE VIEW "wsp".v_edit_node AS
+CREATE VIEW "SCHEMA_NAME".v_edit_node AS
  SELECT node.node_id, 
 	node.elevation, 
-	node.depth, 
+	node."depth", 
 	node.nodecat_id,
 	cat_node.nodetype_id AS "cat.nodetype",
 	cat_node.matcat_id AS "cat.material",
@@ -40,17 +37,17 @@ CREATE VIEW "wsp".v_edit_node AS
 	node.adress_02,
 	node.adress_03,
 	node.descript,
-	cat_node.svg AS "cat.svg"
+	cat_node.svg AS "cat.svg",
 	node.rotation,
 	node.link,
 	node.verified,
 	node.the_geom
-   FROM ("wsp".node
-   JOIN "wsp".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+   FROM ("SCHEMA_NAME".node
+   JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 
- CREATE VIEW "wsp".v_edit_arc AS
+ CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
  SELECT arc.arc_id, 
 	arc.arccat_id, 
 	cat_arc.arctype_id AS "cat.arctype",
@@ -83,8 +80,8 @@ CREATE VIEW "wsp".v_edit_node AS
 	arc.rotation,
 	arc.verified,
 	arc.the_geom
-   FROM ("wsp".arc
-   JOIN "wsp".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+   FROM ("SCHEMA_NAME".arc
+   JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
 
@@ -92,7 +89,7 @@ CREATE VIEW "wsp".v_edit_node AS
 -- Function trigger definition
 -- ----------------------------
    
-CREATE OR REPLACE FUNCTION "wsp".v_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".v_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -203,7 +200,7 @@ $$;
 
 
 
-CREATE OR REPLACE FUNCTION wsp.v_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE querystring Varchar; 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -258,8 +255,6 @@ BEGIN
 		ELSIF (querystring='man_arc_meter') THEN INSERT INTO  man_arc_meter VALUES(NEW.arc_id,null);
 		END IF;
 
-
-		
 		RETURN NEW;
     
 	ELSIF TG_OP = 'UPDATE' THEN
@@ -297,16 +292,17 @@ BEGIN
 		DELETE FROM arc WHERE arc_id=OLD.arc_id;
 	    RETURN NULL;
      
-	 END IF;
-     RETURN NEW;
+	END IF;
+    
+    RETURN NEW;
+    
 END;
 $$;
 
 
 
-CREATE TRIGGER v_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_node FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_node();
+CREATE TRIGGER v_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_node FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_node();
 
-CREATE TRIGGER v_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "wsp".v_edit_arc FOR EACH ROW EXECUTE PROCEDURE "wsp".v_edit_arc();
-
+CREATE TRIGGER v_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_arc FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_arc();
    
    

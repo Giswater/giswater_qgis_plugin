@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -12,11 +12,11 @@ SET client_min_messages = warning;
 
 --
 -- TOC entry 10 (class 2615 OID 151924)
--- Name: wsp; Type: SCHEMA; Schema: -; Owner: -
+-- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
 --
 
- CREATE SCHEMA "wsp";
-SET search_path = "wsp", public, pg_catalog;
+CREATE SCHEMA IF NOT EXISTS "SCHEMA_NAME";
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- ----------------------------
@@ -24,7 +24,7 @@ SET search_path = "wsp", public, pg_catalog;
 -- --------------------------
 
 
-CREATE SEQUENCE "wsp"."version_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -32,7 +32,7 @@ CREATE SEQUENCE "wsp"."version_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "wsp"."node_id_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."node_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -40,14 +40,14 @@ CREATE SEQUENCE "wsp"."node_id_seq"
     CACHE 1;
 	
 
-CREATE SEQUENCE "wsp"."arc_id_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."arc_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "wsp"."connec_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."connec_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -55,14 +55,14 @@ CREATE SEQUENCE "wsp"."connec_seq"
     CACHE 1;
 
  
-CREATE SEQUENCE "wsp"."link_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."link_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "wsp"."node_flow_trace_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."node_flow_trace_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -70,7 +70,7 @@ CREATE SEQUENCE "wsp"."node_flow_trace_seq"
   CACHE 1;
   
 
-CREATE SEQUENCE "wsp"."arc_flow_trace_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_trace_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -78,7 +78,7 @@ CREATE SEQUENCE "wsp"."arc_flow_trace_seq"
   CACHE 1;
   
 
-CREATE SEQUENCE "wsp"."node_flow_exit_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."node_flow_exit_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -86,7 +86,7 @@ CREATE SEQUENCE "wsp"."node_flow_exit_seq"
   CACHE 1;
   
 
-CREATE SEQUENCE "wsp"."arc_flow_exit_seq"
+CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_exit_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -99,10 +99,10 @@ CREATE SEQUENCE "wsp"."arc_flow_exit_seq"
 -- Table system structure 
 -- ----------------------------
 
-CREATE TABLE "wsp"."version" (
-"id" int4 DEFAULT nextval('"wsp".version_seq'::regclass) NOT NULL,
+CREATE TABLE "SCHEMA_NAME"."version" (
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
 "giswater" varchar(16) COLLATE "default",
-"wspoftware" varchar(16) COLLATE "default",
+"wsoftware" varchar(16) COLLATE "default",
 "postgres" varchar(512) COLLATE "default",
 "postgis" varchar(512) COLLATE "default",
 "date" timestamp(6) DEFAULT now(),
@@ -110,8 +110,9 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
 ;
+
  
-CREATE TABLE "wsp"."arc_type" (
+CREATE TABLE "SCHEMA_NAME"."arc_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
 "type" varchar(18) COLLATE "default" NOT NULL,
 "man_table" varchar(18) COLLATE "default" NOT NULL,
@@ -123,7 +124,7 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "wsp"."node_type" (
+CREATE TABLE "SCHEMA_NAME"."node_type" (
 "id" varchar(18) COLLATE "default" NOT NULL,
 "type" varchar(18) COLLATE "default" NOT NULL,
 "man_table" varchar(18) COLLATE "default" NOT NULL,
@@ -136,13 +137,11 @@ WITH (OIDS=FALSE)
 
 
 
-
 -- ----------------------------
 -- Table structure for CATALOGS
 -- ----------------------------
 
-
-CREATE TABLE "wsp"."cat_mat" (
+CREATE TABLE "SCHEMA_NAME"."cat_mat" (
 "id" varchar(30) COLLATE "default",
 "descript" varchar(512) COLLATE "default",
 "roughness" numeric(12,4),
@@ -156,7 +155,7 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "wsp"."cat_arc" (
+CREATE TABLE "SCHEMA_NAME"."cat_arc" (
 "id" varchar(30) COLLATE "default" NOT NULL, 
 "arctype_id" varchar(16) COLLATE "default",
 "matcat_id" varchar(16) COLLATE "default",
@@ -172,11 +171,10 @@ CREATE TABLE "wsp"."cat_arc" (
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE)
-
 ;
 
 
-CREATE TABLE "wsp"."cat_node" (
+CREATE TABLE "SCHEMA_NAME"."cat_node" (
 "id" varchar(30) COLLATE "default" NOT NULL,
 "nodetype_id" varchar(16) COLLATE "default",
 "matcat_id" varchar(16) COLLATE "default",
@@ -202,13 +200,11 @@ WITH (OIDS=FALSE)
 
 
 
-
-
 -- ----------------------------
 -- Table structure for GIS features
 -- ----------------------------
 
-CREATE TABLE "wsp"."sector" (
+CREATE TABLE "SCHEMA_NAME"."sector" (
 "sector_id" varchar(30) COLLATE "default" NOT NULL,
 "descript" varchar(100) COLLATE "default",
 "the_geom" public.geometry (MULTIPOLYGON, 25831),
@@ -218,8 +214,7 @@ WITH (OIDS=FALSE)
 ;
 
 
-
-CREATE TABLE "wsp"."node" (
+CREATE TABLE "SCHEMA_NAME"."node" (
 "node_id" varchar(16) COLLATE "default" NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -256,7 +251,7 @@ WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "wsp"."arc" (
+CREATE TABLE "SCHEMA_NAME"."arc" (
 "arc_id" varchar(16) COLLATE "default" NOT NULL,
 "node_1" varchar(16) COLLATE "default",
 "node_2" varchar(16) COLLATE "default",
@@ -294,17 +289,14 @@ WITH (OIDS=FALSE)
 ;
 
 
-
-
-CREATE TABLE "wsp"."value_state" (
+CREATE TABLE "SCHEMA_NAME"."value_state" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "observ" varchar(254) COLLATE "default",
  CONSTRAINT value_state_pkey PRIMARY KEY (id)
 ) WITH (OIDS=FALSE) ;
 
 
-
-CREATE TABLE "wsp"."value_verified" (
+CREATE TABLE "SCHEMA_NAME"."value_verified" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "observ" varchar(254) COLLATE "default",
  CONSTRAINT value_verified_pkey PRIMARY KEY (id)
@@ -316,21 +308,21 @@ CREATE TABLE "wsp"."value_verified" (
 -- FK
 ------
 
-ALTER TABLE "wsp"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "wsp"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "wsp"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "SCHEMA_NAME"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "wsp"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "wsp"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "wsp"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "wsp"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "wsp"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("state") REFERENCES "wsp"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."node" ADD FOREIGN KEY ("verified") REFERENCES "wsp"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHEMA_NAME"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("verified") REFERENCES "SCHEMA_NAME"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "wsp"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "wsp"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "wsp"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("state") REFERENCES "wsp"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "wsp"."arc" ADD FOREIGN KEY ("verified") REFERENCES "wsp"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("verified") REFERENCES "SCHEMA_NAME"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

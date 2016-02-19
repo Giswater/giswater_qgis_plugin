@@ -5,13 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 -----------------------------
 -- NODE PROXIMITY
 -----------------------------
 
-
-CREATE OR REPLACE FUNCTION "wsp".node_proximity() RETURNS trigger
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".node_proximity() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 
@@ -34,12 +32,8 @@ END;
 $$;
 
 
-CREATE TRIGGER node_proximity_insert BEFORE INSERT ON "wsp"."node" FOR EACH ROW EXECUTE PROCEDURE "wsp"."node_proximity"();
-CREATE TRIGGER node_proximity_update AFTER UPDATE ON "wsp"."node" FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "wsp"."node_proximity"();
-
-
-
-
+CREATE TRIGGER node_proximity_insert BEFORE INSERT ON "SCHEMA_NAME"."node" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."node_proximity"();
+CREATE TRIGGER node_proximity_update AFTER UPDATE ON "SCHEMA_NAME"."node" FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."node_proximity"();
 
 
 
@@ -47,7 +41,7 @@ CREATE TRIGGER node_proximity_update AFTER UPDATE ON "wsp"."node" FOR EACH ROW W
 -- ARC-NODE TOPOLOGY
 -----------------------------
 
-CREATE OR REPLACE FUNCTION wsp.arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $$
 
 DECLARE 
 	nodeRecord1 Record; 
@@ -86,11 +80,7 @@ END;
 $$;
 
 
-
-CREATE TRIGGER arc_searchnodes_insert BEFORE INSERT ON "wsp"."arc" FOR EACH ROW EXECUTE PROCEDURE "wsp"."arc_searchnodes"();
-CREATE TRIGGER arc_searchnodes_update AFTER UPDATE ON "wsp"."arc" FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "wsp"."arc_searchnodes"();
-
-
-
+CREATE TRIGGER arc_searchnodes_insert BEFORE INSERT ON "SCHEMA_NAME"."arc" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."arc_searchnodes"();
+CREATE TRIGGER arc_searchnodes_update AFTER UPDATE ON "SCHEMA_NAME"."arc" FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."arc_searchnodes"();
 
 
