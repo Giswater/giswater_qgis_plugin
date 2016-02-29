@@ -18,6 +18,8 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 import os.path
 import sys  
 
+from generic_map_tool import GenericMapTool
+
 
 class Giswater(QObject):
     """QGIS Plugin Implementation."""
@@ -55,8 +57,11 @@ class Giswater(QObject):
         self.loadPluginSettings()            
         
         # Declare instance attributes
-        self.actions = {}
         self.icon_folder = self.plugin_dir+'/icons/'        
+        self.actions = {}
+        
+        # {function_name, map_tool}
+        self.map_tools = {}
     
     
     def loadPluginSettings(self):
@@ -87,9 +92,11 @@ class Giswater(QObject):
         return QCoreApplication.translate('Giswater', message)
         
         
-    def createAction(self, icon_index=None, text='', toolbar=None, menu=None, is_checkable=True, callback=None):
+    def createAction(self, icon_index=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
-        parent = self.iface.mainWindow()
+        if parent is None:
+            parent = self.iface.mainWindow()
+
         icon = None
         if icon_index is not None:
             icon_path = self.icon_folder+icon_index+'.png'
@@ -100,9 +107,7 @@ class Giswater(QObject):
             action = QAction(text, parent) 
         else:
             action = QAction(icon, text, parent)  
-        #action.toggled.connect(callback)
-        action.setCheckable(is_checkable)
-        
+                                    
         if toolbar is not None:
             toolbar.addAction(action)  
              
@@ -113,28 +118,55 @@ class Giswater(QObject):
             self.actions[icon_index] = action
         else:
             self.actions[text] = action
-        
+            
+        if function_name is not None:
+            try:
+                callback_function = getattr(self, function_name)
+                action.toggled.connect(callback_function)               
+                action.setCheckable(is_checkable)          
+            except AttributeError:
+                print "Callback function not found: "+function_name
+                action.setEnabled(False)                
+        else:
+            action.setEnabled(False)
+            
         return action
           
         
-    def addAction(self, index_action, toolbar):
+    def addAction(self, index_action, toolbar, parent):
         #text_action = self.settings.value('actions/'+index_action+'_text', '')
         text_action = self.tr(index_action+'_text')
-        self.createAction(index_action, text_action, toolbar, None)
+        function_name = self.settings.value('actions/'+str(index_action)+'_function')
+        action = self.createAction(index_action, text_action, toolbar, None, True, function_name, parent)
+        self.map_tool = GenericMapTool(self.iface, action, self.settings, index_action) 
+        self.map_tools[function_name] = self.map_tool             
+        
+        return action         
         
         
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""  
+        
+        parent = self.iface.mainWindow()
         # Edit&Analysis toolbar 
-        for i in range(16,28):
-            self.addAction(str(i), self.toolbar_edit)
+        if self.toolbar_edit_enabled:      
+            self.ag_edit = QActionGroup(parent);
+            for i in range(16,28):
+                self.addAction(str(i), self.toolbar_edit, self.ag_edit)
+                
         # Epanet toolbar
-        for i in range(10,16):
-            self.addAction(str(i), self.toolbar_epanet)
+        if self.toolbar_epanet_enabled:  
+            self.ag_epanet = QActionGroup(parent);
+            for i in range(10,16):
+                self.addAction(str(i), self.toolbar_epanet, self.ag_epanet)
+                
         # SWMM toolbar
-        for i in range(1,10):
-            self.addAction(str(i).zfill(2), self.toolbar_swmm)
+        if self.toolbar_swmm_enabled:        
+            for i in range(1,10):
+                self.ag_swmm = QActionGroup(parent);                
+                self.addAction(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)                    
             
+        # Menu entries
         self.createAction(None, self.tr('New network'), None, self.menu_name, False)
         self.createAction(None, self.tr('Copy network as'), None, self.menu_name, False)
             
@@ -168,6 +200,38 @@ class Giswater(QObject):
         self.menu_go2epa.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
     
+                     
+    
+    # Water supply callback functions
+    def ws_generic(self, is_checked, function_name):
+        
+        map_tool = self.map_tools[function_name]
+        if is_checked:
+            self.iface.mapCanvas().setMapTool(map_tool)
+            print function_name+" has been checked"
+#             sender = self.sender()
+#             print sender.text()
+        else:
+            self.iface.mapCanvas().unsetMapTool(map_tool)
+            #print function_name+" has been unchecked" 
+                    
+        
+    def ws_junction(self, is_checked):
+        function_name = sys._getframe().f_code.co_name
+        self.ws_generic(is_checked, function_name)
+                        
+    def ws_reservoir(self, is_checked):
+        function_name = sys._getframe().f_code.co_name
+        self.ws_generic(is_checked, function_name)
+        
+        
+        
+    # Urban drainage callback functions        
+    def ud_junction(self, b):
+        
+        print sys._getframe().f_code.co_name
+        #self.iface.mapCanvas().setMapTool(self.toolPoint)
+            
     
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -175,21 +239,11 @@ class Giswater(QObject):
             self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
             self.iface.removePluginMenu(self.menu_name, action)
             self.iface.removeToolBarIcon(action)
-            
         if self.toolbar_edit_enabled:    
             del self.toolbar_edit
         if self.toolbar_epanet_enabled:    
             del self.toolbar_epanet
         if self.toolbar_swmm_enabled:    
             del self.toolbar_swmm
-                        
-    
-    def runPoint(self, b):
-        if b:
-            self.iface.mapCanvas().setMapTool(self.toolPoint)
-        else:
-            self.iface.mapCanvas().unsetMapTool(self.toolPoint)
-        if self.actionRectangleEnabled:         
-            self.actionRectangle.setChecked(False)
-            self.selectionButton.setDefaultAction(self.selectionButton.sender())
+            
             

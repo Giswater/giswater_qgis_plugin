@@ -3,10 +3,24 @@
 <TS version="2.0" language="pt_BR">
 <context>
     <name>Giswater</name>
+    
     <message>
         <source>menu_name</source>
         <translation>Giswater</translation>
     </message>   
+    <message>
+        <source>toolbar_edit_name</source>
+        <translation>Giswater - Edit</translation>
+    </message>        
+    <message>
+        <source>toolbar_epanet_name</source>
+        <translation>Giswater - EPANET</translation>
+    </message>    
+    <message>
+        <source>toolbar_swmm_name</source>
+        <translation>Giswater - SWMM</translation>
+    </message>  
+    
     <message>
         <source>New network</source>
         <translation>Inserir</translation>
@@ -45,15 +59,15 @@
     </message>               
     <message>
         <source>Result selector</source>
-        <translation>SeleÁ„o resultados</translation>
+        <translation>Sele√ß√£o resultados</translation>
     </message>           
     <message>
         <source>Flow trace node</source>
-        <translation>An·lise de fluxo (nÛ)</translation>
+        <translation>An√°lise de fluxo (n√≥)</translation>
     </message>           
     <message>
         <source>Flow trace arc</source>
-        <translation>An·lise de fluxo (link)</translation>
+        <translation>An√°lise de fluxo (link)</translation>
     </message>       
     <message>
         <source>Go2Epa</source>
@@ -66,94 +80,83 @@
     <message>
         <source>Run simulation</source>
         <translation>Run simulation</translation>
-    </message>               
-    <message>
-        <source>toolbar_edit_name</source>
-        <translation>Giswater - Edit</translation>
-    </message>        
-    <message>
-        <source>toolbar_epanet_name</source>
-        <translation>Giswater - EPANET</translation>
-    </message>    
-    <message>
-        <source>toolbar_swmm_name</source>
-        <translation>Giswater - SWMM</translation>
-    </message>        
+    </message>   
+    
     <message>
         <source>01_text</source>
-        <translation>InserÁ„o conex„o</translation>
+        <translation>Inser√ß√£o conex√£o</translation>
     </message>      
     <message>
         <source>02_text</source>
-        <translation>InserÁ„o exutorio</translation>
+        <translation>Inser√ß√£o exutorio</translation>
     </message>   
     <message>
         <source>03_text</source>
-        <translation>InserÁ„o divisor</translation>
+        <translation>Inser√ß√£o divisor</translation>
     </message>      
     <message>
         <source>04_text</source>
-        <translation>InserÁ„o armazenamento</translation>
+        <translation>Inser√ß√£o armazenamento</translation>
     </message>      
     <message>
         <source>05_text</source>
-        <translation>InserÁ„o conduto</translation>
+        <translation>Inser√ß√£o conduto</translation>
     </message>      
     <message>
         <source>06_text</source>
-        <translation>InserÁ„o bomba</translation>
+        <translation>Inser√ß√£o bomba</translation>
     </message>      
     <message>
         <source>07_text</source>
-        <translation>InserÁ„o orificio</translation>
+        <translation>Inser√ß√£o orificio</translation>
     </message>      
     <message>
         <source>08_text</source>
-        <translation>InserÁ„o vertedores</translation>
+        <translation>Inser√ß√£o vertedores</translation>
     </message>      
     <message>
         <source>09_text</source>
-        <translation>InserÁ„o bocais</translation>
+        <translation>Inser√ß√£o bocais</translation>
     </message>      
     <message>
         <source>10_text</source>
-        <translation>InserÁ„o conex„o</translation>
+        <translation>Inser√ß√£o conex√£o</translation>
     </message>      
     <message>
         <source>11_text</source>
-        <translation>InserÁ„o reservatÛrio</translation>
+        <translation>Inser√ß√£o reservat√≥rio</translation>
     </message>      
     <message>
         <source>12_text</source>
-        <translation>InserÁ„o depÛsito</translation>
+        <translation>Inser√ß√£o dep√≥sito</translation>
     </message>      
     <message>
         <source>13_text</source>
-        <translation>InserÁ„o tubulaÁ„o</translation>
+        <translation>Inser√ß√£o tubula√ß√£o</translation>
     </message>      
     <message>
         <source>14_text</source>
-        <translation>InserÁ„o bomba</translation>
+        <translation>Inser√ß√£o bomba</translation>
     </message> 
     <message>
         <source>15_text</source>
-        <translation>InserÁ„o v·lvula</translation>
+        <translation>Inser√ß√£o v√°lvula</translation>
     </message>   
     <message>
         <source>16_text</source>
-        <translation>Deslocamento nÛ</translation>
+        <translation>Deslocamento n√≥</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Apaga nÛ</translation>
+        <translation>Apaga n√≥</translation>
     </message>      
     <message>
         <source>18_text</source>
-        <translation>Captura cota nÛ</translation>
+        <translation>Captura cota n√≥</translation>
     </message>      
     <message>
         <source>19_text</source>
-        <translation>EdiÁ„o link</translation>
+        <translation>Edi√ß√£o link</translation>
     </message>      
     <message>
         <source>20_text</source>
@@ -165,7 +168,7 @@
     </message>      
     <message>
         <source>22_text</source>
-        <translation>SeleÁ„o resultados</translation>
+        <translation>Sele√ß√£o resultados</translation>
     </message>      
     <message>
         <source>23_text</source>
@@ -177,15 +180,15 @@
     </message>      
     <message>
         <source>25_text</source>
-        <translation>Ferramenta conexıes</translation>
+        <translation>Ferramenta conex√µes</translation>
     </message>      
     <message>
         <source>26_text</source>
-        <translation>An·lise de fluxo (link)</translation>
+        <translation>An√°lise de fluxo (link)</translation>
     </message>      
     <message>
         <source>27_text</source>
-        <translation>An·lise de fluxo (nÛ)</translation>
+        <translation>An√°lise de fluxo (n√≥)</translation>
     </message>    
 </context>
 </TS>

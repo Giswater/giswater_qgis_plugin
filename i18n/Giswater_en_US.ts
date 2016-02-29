@@ -3,10 +3,24 @@
 <TS version="2.0" language="en_US">
 <context>
     <name>Giswater</name>
+    
     <message>
         <source>menu_name</source>
         <translation>Giswater</translation>
     </message>   
+    <message>
+        <source>toolbar_edit_name</source>
+        <translation>Giswater - Edit</translation>
+    </message>        
+    <message>
+        <source>toolbar_epanet_name</source>
+        <translation>Giswater - Water supply</translation>
+    </message>    
+    <message>
+        <source>toolbar_swmm_name</source>
+        <translation>Giswater - Urban drainage</translation>
+    </message>    
+    
     <message>
         <source>New network</source>
         <translation>Add network</translation>
@@ -67,18 +81,7 @@
         <source>Run simulation</source>
         <translation>Run simulation</translation>
     </message>       
-    <message>
-        <source>toolbar_edit_name</source>
-        <translation>Giswater - Edit</translation>
-    </message>        
-    <message>
-        <source>toolbar_epanet_name</source>
-        <translation>Giswater - EPANET</translation>
-    </message>    
-    <message>
-        <source>toolbar_swmm_name</source>
-        <translation>Giswater - SWMM</translation>
-    </message>        
+    
     <message>
         <source>01_text</source>
         <translation>Insert junction</translation>

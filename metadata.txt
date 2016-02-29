@@ -11,7 +11,7 @@ name=giswater
 qgisMinimumVersion=2.8
 description=giswater plugin description
 about=About...
-version=0.1
+version=0.2
 author=David Erill
 email=derill@bgeo.es
 

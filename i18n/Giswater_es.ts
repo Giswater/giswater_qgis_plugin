@@ -1,24 +1,87 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="es">
 <context>
     <name>Giswater</name>
+    
     <message>
         <source>menu_name</source>
         <translation>Giswater</translation>
     </message>   
     <message>
         <source>toolbar_edit_name</source>
-        <translation>Giswater - Edit</translation>
+        <translation>Giswater - Edición</translation>
     </message>        
     <message>
         <source>toolbar_epanet_name</source>
-        <translation>Giswater - EPANET</translation>
-    </message>    
+        <translation>Giswater - Suministro de agua</translation>
+    </message>       
     <message>
         <source>toolbar_swmm_name</source>
-        <translation>Giswater - SWMM</translation>
+        <translation>Giswater - Drenaje urbano</translation>
+    </message>   
+
+    <message>
+        <source>New network</source>
+        <translation>Add network</translation>
+    </message>           
+    <message>
+        <source>Copy network as</source>
+        <translation>Copy network as</translation>
+    </message>           
+    <message>
+        <source>Network configuration</source>
+        <translation>Network configuration</translation>
+    </message>           
+    <message>
+        <source>Snapping tolerance</source>
+        <translation>Snapping tolerance</translation>
+    </message>           
+    <message>
+        <source>Node tolerance</source>
+        <translation>Node tolerance</translation>
+    </message>           
+    <message>
+        <source>Network management</source>
+        <translation>Network management</translation>
+    </message>           
+    <message>
+        <source>Table wizard</source>
+        <translation>Table wizard</translation>
+    </message>           
+    <message>
+        <source>Undo wizard</source>
+        <translation>Undo wizard</translation>
+    </message>  
+    <message>
+        <source>Analysis</source>
+        <translation>Analysis</translation>
     </message>        
+    <message>
+        <source>Result selector</source>
+        <translation>Result selector</translation>
+    </message>           
+    <message>
+        <source>Flow trace node</source>
+        <translation>Flow trace node</translation>
+    </message>           
+    <message>
+        <source>Flow trace arc</source>
+        <translation>Flow trace arc</translation>
+    </message>  
+    <message>
+        <source>Go2Epa</source>
+        <translation>Go2Epa</translation>
+    </message>                 
+    <message>
+        <source>Giswater interface</source>
+        <translation>Giswater interface</translation>
+    </message>           
+    <message>
+        <source>Run simulation</source>
+        <translation>Run simulation</translation>
+    </message>    
+    
     <message>
         <source>01_text</source>
         <translation>Insert junction</translation>
