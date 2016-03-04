@@ -17,8 +17,10 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 
 import os.path
 import sys  
+from functools import partial
 
 from generic_map_tool import GenericMapTool
+from dao.pg_dao import PgDao
 
 
 class Giswater(QObject):
@@ -54,7 +56,10 @@ class Giswater(QObject):
         self.settings.setIniCodec(sys.getfilesystemencoding())
         
         # load plugin settings
-        self.loadPluginSettings()            
+        self.loadPluginSettings()       
+        
+        # Connect to Database
+        self.setDatabaseConnection()     
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -65,8 +70,8 @@ class Giswater(QObject):
     
     
     def loadPluginSettings(self):
-        ''' Load plugin settings
-        '''      
+        """ Load plugin settings """
+        
         # Create plugin main menu
         self.menu_name = self.tr('menu_name')        
     
@@ -86,6 +91,9 @@ class Giswater(QObject):
             self.toolbar_edit_name = self.tr('toolbar_edit_name')
             self.toolbar_edit = self.iface.addToolBar(self.toolbar_edit_name)
             self.toolbar_edit.setObjectName(self.toolbar_edit_name)   
+            
+        self.connection_name = self.settings.value('db/connection_name', 'giswater')
+        self.schema_name = self.settings.value('db/schema_name', 'ws')
         
 
     def tr(self, message):
@@ -121,9 +129,10 @@ class Giswater(QObject):
             
         if function_name is not None:
             try:
-                callback_function = getattr(self, function_name)
-                action.toggled.connect(callback_function)               
                 action.setCheckable(is_checkable)          
+                callback_function = getattr(self, 'ws_generic')  
+                action.toggled.connect(partial(callback_function, function_name))
+                #function_name = sys._getframe().f_code.co_name                
             except AttributeError:
                 print "Callback function not found: "+function_name
                 action.setEnabled(False)                
@@ -134,18 +143,21 @@ class Giswater(QObject):
           
         
     def addAction(self, index_action, toolbar, parent):
-        #text_action = self.settings.value('actions/'+index_action+'_text', '')
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
         action = self.createAction(index_action, text_action, toolbar, None, True, function_name, parent)
         self.map_tool = GenericMapTool(self.iface, action, self.settings, index_action) 
+        self.map_tool.setDao(self.dao)
         self.map_tools[function_name] = self.map_tool             
         
         return action         
         
         
     def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""  
+        """ Create the menu entries and toolbar icons inside the QGIS GUI """  
+        
+        if self.dao is None:
+            return
         
         parent = self.iface.mainWindow()
         # Edit&Analysis toolbar 
@@ -200,31 +212,48 @@ class Giswater(QObject):
         self.menu_go2epa.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
     
-                     
-    
-    # Water supply callback functions
-    def ws_generic(self, is_checked, function_name):
+     
+    def setDatabaseConnection(self):
+                               
+        # look for connection data in QGIS configuration (if exists)
+        self.dao = None        
+        qgis_settings = QSettings()     
+        root_conn = "/PostgreSQL/connections/"          
+        qgis_settings.beginGroup(root_conn);           
+        groups = qgis_settings.childGroups();                                
+        if self.connection_name in groups:      
+            root = self.connection_name+"/"  
+            host = qgis_settings.value(root+"host", '')
+            port = qgis_settings.value(root+"port", '')            
+            db = qgis_settings.value(root+"database", '')
+            user = qgis_settings.value(root+"username", '')
+            pwd = qgis_settings.value(root+"password", '') 
+        else:
+            message = self.tr('Database connection name not found. Please check configuration file')
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
+            return False
+
+        # Connect to Database 
+        self.dao = PgDao()     
+        self.dao.set_params(host, port, db, user, pwd)
+        self.dao.set_schema_name(self.schema_name)
+        status = self.dao.init_db()
         
+        return status
+
+        
+    def ws_generic(self, function_name):   
+        """ Water supply generic callback function  """
+        # Get sender (selected action) and map tool associated 
+        sender = self.sender()            
         map_tool = self.map_tools[function_name]
-        if is_checked:
+        if sender.isChecked():
             self.iface.mapCanvas().setMapTool(map_tool)
-            print function_name+" has been checked"
-#             sender = self.sender()
-#             print sender.text()
+            #print function_name+" has been checked"
         else:
             self.iface.mapCanvas().unsetMapTool(map_tool)
-            #print function_name+" has been unchecked" 
-                    
-        
-    def ws_junction(self, is_checked):
-        function_name = sys._getframe().f_code.co_name
-        self.ws_generic(is_checked, function_name)
-                        
-    def ws_reservoir(self, is_checked):
-        function_name = sys._getframe().f_code.co_name
-        self.ws_generic(is_checked, function_name)
-        
-        
+                                
+       
         
     # Urban drainage callback functions        
     def ud_junction(self, b):
@@ -234,7 +263,7 @@ class Giswater(QObject):
             
     
     def unload(self):
-        """Removes the plugin menu item and icon from QGIS GUI."""
+        """ Removes the plugin menu item and icon from QGIS GUI """
         for action_index, action in self.actions.iteritems():
             self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
             self.iface.removePluginMenu(self.menu_name, action)
