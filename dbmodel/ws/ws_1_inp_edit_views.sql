@@ -70,441 +70,131 @@ JOIN SCHEMA_NAME.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_junction() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE 
+    node_table varchar;
+    man_table varchar;
+    v_sql varchar;
 
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    node_table:= TG_ARGV[0];
+    RAISE NOTICE 'node_table: %', node_table;
     
---	Control insertions ID	
-	IF TG_OP = 'INSERT' THEN
---		Node ID
+    -- Control insertions ID
+    IF TG_OP = 'INSERT' THEN
+
+        -- Node ID
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id := (SELECT nextval('node_id_seq'));
         END IF;
---		elevation, depth
+        -- elevation, depth
         IF (NEW.elevation IS NULL) THEN 
             NEW.elevation = 0;
         END IF;
         IF (NEW.depth IS NULL) THEN 
             NEW.depth = 0;
         END IF;
---		Node Catalog ID
+        -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
             END IF;
             NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
         END IF;
---		Sector ID
+        -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
         END IF;
---		State
+        -- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT id FROM value_state LIMIT 1);
         END IF;
---		Verified
+        -- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT id FROM value_verified LIMIT 1);
         END IF;
             
--- FEATURE INSERT
-		INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+        -- FEATURE INSERT
+        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION', NEW.sector_id, NEW."state", 
+                                NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, 
+                                null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
--- EPA INSERT
-		INSERT INTO inp_junction VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
+        -- EPA INSERT
+        IF node_table = 'inp_junction' THEN        
+            INSERT INTO inp_junction VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
+        ELSIF node_table = 'inp_tank' THEN        
+            INSERT INTO inp_tank VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);            
+        ELSIF node_table = 'inp_reservoir' THEN
+            INSERT INTO inp_reservoir VALUES (NEW.node_id, NEW.head, NEW.pattern_id);
+        ELSIF node_table = 'inp_tank' THEN            
+            INSERT INTO inp_tank VALUES (NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id);
+        ELSIF node_table = 'inp_pump' THEN          
+            INSERT INTO inp_pump VALUES (NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
+        ELSIF node_table = 'inp_valve' THEN     
+            INSERT INTO inp_valve VALUES (NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
+        ELSIF node_table = 'inp_shortpipe' THEN     
+            INSERT INTO inp_shortpipe VALUES (NEW.node_id, NEW.minorloss, NEW.to_arc, NEW.status);
+        END IF;
 
--- MANAGEMENT INSERT			
-		querystring := (SELECT man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-		IF (querystring='man_node_junction') THEN INSERT INTO man_node_junction VALUES(NEW.node_id,null);
-		ELSIF (querystring='man_node_tank') THEN INSERT INTO man_node_tank VALUES(NEW.node_id,null,null,null);
-		ELSIF (querystring='man_node_hdyrant') THEN INSERT INTO man_node_hdyrant VALUES(NEW.node_id,null);
-		ELSIF (querystring='man_node_valve') THEN INSERT INTO man_node_valve VALUES(NEW.node_id,null);
-		END IF;
+        -- MANAGEMENT INSERT
+        man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+        v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||NEW.node_id||')';
+        RETURN NEW;
 
-		RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        UPDATE node 
+        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
+            annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+        WHERE node_id=OLD.node_id;
 
-	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-		UPDATE inp_junction SET node_id=NEW.node_id, demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
+        IF node_table = 'inp_junction' OR node_table = 'inp_tank' THEN
+            UPDATE inp_junction SET node_id=NEW.node_id, demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
+        ELSIF node_table = 'inp_reservoir' THEN
+            UPDATE inp_reservoir SET node_id=NEW.node_id, head=NEW.head, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;  
+        ELSIF node_table = 'inp_tank' THEN
+            UPDATE inp_tank SET node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
+        ELSIF node_table = 'inp_pump' THEN          
+            UPDATE inp_pump SET node_id=NEW.node_id, power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE node_id=OLD.node_id;
+        ELSIF node_table = 'inp_valve' THEN     
+            UPDATE inp_valve SET node_id=NEW.node_id, valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status WHERE node_id=OLD.node_id;
+        ELSIF node_table = 'inp_shortpipe' THEN     
+            UPDATE inp_shortpipe SET node_id=NEW.node_id, minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;  
+        END IF;
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM inp_junction WHERE node_id=OLD.node_id;
-	    RETURN NULL;
+        DELETE FROM node WHERE node_id = OLD.node_id;
+        EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||OLD.node_id;
+        RETURN NULL;
     
-	END IF;
+    END IF;
        
 END;
 $$;
 
 
+CREATE TRIGGER v_edit_inp_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_shortpipe 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_shortpipe');
+
+CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_valve 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_valve');
+
+CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pump 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_pump');
+
+CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_junction 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_junction');
  
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_reservoir() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
+CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_reservoir 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_reservoir');
 
-BEGIN
-
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
---	Control insertions ID	
-	IF TG_OP = 'INSERT' THEN
---			Node ID
-			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('node_id_seq'));
-			END IF;
---			elevation, depth
-			IF (NEW.elevation IS NULL) THEN 
-			    NEW.elevation = 0;
-			END IF;	
-			IF (NEW.depth IS NULL) THEN 
-			    NEW.depth = 0;
-			END IF;
---			Node Catalog ID
-			IF (NEW.nodecat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-					RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-				END IF;			
-				NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
-			END IF;
---			Sector ID
-			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-				END IF;
-				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-			END IF;
---			State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state LIMIT 1);
-			END IF;
---			Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-			END IF;
-
--- FEATURE INSERT
-		INSERT INTO node 		  VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
-
--- EPA INSERT
-		INSERT INTO inp_reservoir VALUES(NEW.node_id, NEW.head, NEW.pattern_id);
-
--- MANAGEMENT INSERT			
-		querystring := (SELECT man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-		IF (querystring='man_node_junction') THEN INSERT INTO  man_node_junction VALUES(NEW.node_id,null);
-		ELSIF (querystring='man_node_tank') THEN INSERT INTO  man_node_tank VALUES(NEW.node_id,null,null,null);
-		ELSIF (querystring='man_node_hdyrant') THEN INSERT INTO  man_node_hdyrant VALUES(NEW.node_id,null);
-		ELSIF (querystring='man_node_valve') THEN INSERT INTO  man_node_valve VALUES(NEW.node_id,null);
-		END IF;
-
-		RETURN NEW;
-
-	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-		UPDATE inp_reservoir SET node_id=NEW.node_id, head=NEW.head, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
-		RETURN NEW;
-
-	ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM inp_reservoir WHERE node_id=OLD.node_id;
-	    RETURN NULL;
-     
-	END IF;
-    RETURN NEW;
-    
-END;
-$$;
-
-  
-  
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_tank() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
-
-BEGIN
-
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
---	Control insertions ID	
-	IF TG_OP = 'INSERT' THEN
---			Node ID
-			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('node_id_seq'));
-			END IF;
---			elevation, depth
-			IF (NEW.elevation IS NULL) THEN 
-			    NEW.elevation = 0;
-			END IF;
-			IF (NEW.depth IS NULL) THEN 
-			    NEW.depth = 0;
-			END IF;
---			Node Catalog ID
-			IF (NEW.nodecat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-					RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-				END IF;			
-				NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
-			END IF;
---			Sector ID
-			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-				END IF;
-				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-			END IF;
---			State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state LIMIT 1);
-			END IF;
---			Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-			END IF;
-
--- FEATURE INSERT
-		INSERT INTO node 	 VALUES(NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, null, null, null,NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
-
--- EPA INSERT		
-		INSERT INTO inp_tank VALUES(NEW.node_id,NEW.initlevel,NEW.minlevel,NEW.maxlevel,NEW.diameter,NEW.minvol,NEW.curve_id);
-
--- MANAGEMENT INSERT			
-		querystring := (SELECT man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-		IF (querystring='man_node_junction') THEN INSERT INTO  man_node_junction VALUES(NEW.node_id,null);
-		ELSIF (querystring='man_node_tank') THEN INSERT INTO  man_node_tank VALUES(NEW.node_id,null,null,null);
-		ELSIF (querystring='man_node_hdyrant') THEN INSERT INTO  man_node_hdyrant VALUES(NEW.node_id,null);
-		ELSIF (querystring='man_node_valve') THEN INSERT INTO  man_node_valve VALUES(NEW.node_id,null);
-		END IF;
-
-		RETURN NEW;
-   
-	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 	SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-		UPDATE inp_tank SET node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
-		RETURN NEW;
-
-    ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM inp_tank WHERE node_id=OLD.node_id;
-	    RETURN NULL;
-		
-	END IF;
-    RETURN NEW;
-    
-END;
-$$;
-
-  
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_pump() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
-
-BEGIN
-
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	IF TG_OP = 'INSERT' THEN
---			node ID
-			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('node_id_seq'));
-			END IF;
-
---			elevation, depth
-			IF (NEW.elevation IS NULL) THEN 
-			    NEW.elevation = 0;
-			END IF;
-			IF (NEW.depth IS NULL) THEN 
-			    NEW.depth = 0;
-			END IF;
-
---			Sector ID
-			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-				END IF;
-				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-			END IF;	
---			node catalog ID
-			IF (NEW.nodecat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-					RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-				END IF;			
-				NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
-			END IF;	
-
---			State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state LIMIT 1);
-			END IF;
---			Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-			END IF;
-
-		INSERT INTO node 	 VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'PUMP'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_pump VALUES (NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
-		RETURN NEW;
-
-    ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		SET node_id=NEW.node_id, elevation=NEW.elevation, depth=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-		UPDATE inp_pump SET node_id=NEW.node_id, power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE node_id=OLD.node_id;
-		RETURN NEW;
-
-    ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM inp_pump WHERE node_id=OLD.node_id;
-	    RETURN NULL;
-		
-    END IF;
-    RETURN NEW;
-    
-END;
-$$;
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_valve() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
-
-BEGIN
-
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
-    IF TG_OP = 'INSERT' THEN
---			node ID
-			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('node_id_seq'));
-			END IF;
-
---			elevation, depth
-			IF (NEW.elevation IS NULL) THEN 
-			    NEW.elevation = 0;
-			END IF;
-			IF (NEW.depth IS NULL) THEN 
-			    NEW.depth = 0;
-			END IF;
-
---			Sector ID
-			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-				END IF;
-				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-			END IF;
---			node catalog ID
-			IF (NEW.nodecat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-					RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-				END IF;			
-				NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
-			END IF;
---			State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state LIMIT 1);
-			END IF;
---			Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-			END IF;	
-	
-		INSERT INTO node 	  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'VALVE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_valve VALUES (NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
-		RETURN NEW;
-
-    ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, depth=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-		UPDATE inp_valve SET node_id=NEW.node_id, valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status WHERE node_id=OLD.node_id;
-		RETURN NEW;
-    
-	ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM inp_valve WHERE node_id=OLD.node_id;
-	    RETURN NULL;
-    
-	END IF;
-    RETURN NEW;
-    
-END;
-$$;
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_shortpipe() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
-
-BEGIN
-
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-
-    IF TG_OP = 'INSERT' THEN
---			node ID
-			IF (NEW.node_id IS NULL) THEN
-				NEW.node_id := (SELECT nextval('node_id_seq'));
-			END IF;
-
---			elevation, depth
-			IF (NEW.elevation IS NULL) THEN 
-			    NEW.elevation = 0;
-			END IF;
-			IF (NEW.depth IS NULL) THEN 
-			    NEW.depth = 0;
-			END IF;
-
---			Sector ID
-			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-				END IF;
-				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-			END IF;
---			node catalog ID
-			IF (NEW.nodecat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-					RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-				END IF;			
-				NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
-			END IF;
---			State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state LIMIT 1);
-			END IF;
---			Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-			END IF;	
-	
-		INSERT INTO node 	  VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", null, null, null, null, null, null, null, null, null, null, null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_shortpipe VALUES (NEW.node_id, NEW.minorloss, NEW.to_arc, NEW.status);
-		RETURN NEW;
-
-    ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE node 		 SET node_id=NEW.node_id, elevation=NEW.elevation, depth=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE node_id=OLD.node_id;
-		UPDATE inp_shortpipe SET node_id=NEW.node_id, minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;
-		RETURN NEW;
-    
-	ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM node WHERE node_id=OLD.node_id;
-		DELETE FROM inp_shortpipe WHERE node_id=OLD.node_id;
-	    RETURN NULL;
-    
-	END IF;
-    RETURN NEW;
-    
-END;
-$$;
-
-
-
-CREATE TRIGGER v_edit_inp_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_shortpipe FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_valve();
-
-CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_valve();
-
-CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pump FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_pump();
-
-CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_junction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_junction();
- 
-CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_reservoir FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_reservoir();
-
-CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_tank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_tank();
+CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_tank 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_tank');
 
   
   
@@ -512,56 +202,71 @@ CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_
 -- TRIGGERS EDITING VIEWS FOR ARC
 -----------------------------
    
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE querystring Varchar; 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE 
+    arc_table varchar;
+    man_table varchar;
+    v_sql varchar;
 
 BEGIN
 
-	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    arc_table:= TG_ARGV[0];
     
-	IF TG_OP = 'INSERT' THEN
---			Arc ID
-			IF (NEW.arc_id IS NULL) THEN
-				NEW.arc_id := (SELECT nextval('arc_id_seq'));
-			END IF;
---			Sector ID
-			IF (NEW.sector_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-					RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-				END IF;
-				NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-			END IF;
---			Arc catalog ID
-			IF (NEW.arccat_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-					RAISE EXCEPTION 'There are no arcs catalog defined in the model, define at least one.';
-				END IF;			
-				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
-			END IF;
---			State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT id FROM value_state LIMIT 1);
-			END IF;
---			Verified
-			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-			END IF;
-	
-		INSERT INTO arc 	 VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::TEXT, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, null, null,NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
-		INSERT INTO inp_pipe VALUES(NEW.arc_id, NEW.minorloss, NEW.status);
-		RETURN NEW;
+    IF TG_OP = 'INSERT' THEN
+        -- Arc ID
+        IF (NEW.arc_id IS NULL) THEN
+            NEW.arc_id := (SELECT nextval('arc_id_seq'));
+        END IF;
+        -- Sector ID
+        IF (NEW.sector_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+            END IF;
+            NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
+        END IF;
+        -- Arc catalog ID
+        IF (NEW.arccat_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+                RAISE EXCEPTION 'There are no arcs catalog defined in the model, define at least one.';
+            END IF;			
+            NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+        END IF;
+        -- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT id FROM value_state LIMIT 1);
+        END IF;
+        -- Verified
+        IF (NEW.verified IS NULL) THEN
+            NEW.verified := (SELECT id FROM value_verified LIMIT 1);
+        END IF;
+
+        INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE', NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", 
+            NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, 
+            null, null,NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+
+        IF arc_table = 'inp_pipe' THEN   
+            INSERT INTO inp_pipe VALUES (NEW.arc_id, NEW.minorloss, NEW.status);
+        END IF;
+        RETURN NEW;
     
-	ELSIF TG_OP = 'UPDATE' THEN
-		UPDATE arc 		SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom WHERE arc_id=OLD.arc_id;
-		UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
-		RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        UPDATE arc 
+        SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
+            "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 
+             verified=NEW.verified, the_geom=NEW.the_geom 
+        WHERE arc_id = OLD.arc_id;
+        IF arc_table = 'inp_pipe' THEN   
+            UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
+        END IF;
+        RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM arc WHERE arc_id=OLD.arc_id;
-		DELETE FROM inp_pipe WHERE arc_id=OLD.arc_id;
-	    RETURN NULL;
+        DELETE FROM arc WHERE arc_id = OLD.arc_id;
+        EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '||OLD.arc_id;
+        RETURN NULL;
     
-	END IF;
+    END IF;
     RETURN NEW;
     
 END;
@@ -569,6 +274,7 @@ $$;
   
 
 
-CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pipe FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_pipe();   
+CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pipe 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_arc('inp_pipe');   
    
    
