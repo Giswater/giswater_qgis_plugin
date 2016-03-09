@@ -129,8 +129,9 @@ class Giswater(QObject):
             
         if function_name is not None:
             try:
-                action.setCheckable(is_checkable)          
-                callback_function = getattr(self, 'ws_generic')  
+                action.setCheckable(is_checkable)         
+                water_soft = function_name[:2] 
+                callback_function = getattr(self, water_soft+'_generic')  
                 action.toggled.connect(partial(callback_function, function_name))
                 #function_name = sys._getframe().f_code.co_name                
             except AttributeError:
@@ -146,8 +147,7 @@ class Giswater(QObject):
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
         action = self.createAction(index_action, text_action, toolbar, None, True, function_name, parent)
-        self.map_tool = GenericMapTool(self.iface, action, self.settings, index_action) 
-        self.map_tool.setDao(self.dao)
+        self.map_tool = GenericMapTool(self.iface, self.settings, action, index_action, self.dao) 
         self.map_tools[function_name] = self.map_tool             
         
         return action         
@@ -249,18 +249,22 @@ class Giswater(QObject):
         map_tool = self.map_tools[function_name]
         if sender.isChecked():
             self.iface.mapCanvas().setMapTool(map_tool)
-            #print function_name+" has been checked"
+            #print function_name+" has been checked"       
         else:
             self.iface.mapCanvas().unsetMapTool(map_tool)
-                                
-       
-        
-    # Urban drainage callback functions        
-    def ud_junction(self, b):
-        
-        print sys._getframe().f_code.co_name
-        #self.iface.mapCanvas().setMapTool(self.toolPoint)
             
+            
+    def ud_generic(self, function_name):   
+        """ Urban drainage generic callback function  """
+        # Get sender (selected action) and map tool associated 
+        sender = self.sender()            
+        map_tool = self.map_tools[function_name]
+        if sender.isChecked():
+            self.iface.mapCanvas().setMapTool(map_tool)
+            print function_name+" has been checked"       
+        else:
+            self.iface.mapCanvas().unsetMapTool(map_tool)
+                                            
     
     def unload(self):
         """ Removes the plugin menu item and icon from QGIS GUI """

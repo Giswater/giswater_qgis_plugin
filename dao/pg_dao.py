@@ -39,7 +39,7 @@ class PgDao():
     def get_schema_name(self):
         return self.schema_name        
         
-    def query_sql(self, sql):
+    def get_rows(self, sql):
         self.cursor.execute(sql)
         rows = self.cursor.fetchall()              
         return rows
