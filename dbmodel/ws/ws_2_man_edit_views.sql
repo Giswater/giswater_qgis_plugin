@@ -297,7 +297,7 @@ FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_man_node('man_meter');
 -- TRIGGERS EDITING VIEWS FOR EDIT MAN ARC
 -----------------------------
   
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_pipe() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_man_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     arc_table varchar;
     man_table varchar;

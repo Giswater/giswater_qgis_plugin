@@ -71,14 +71,12 @@ ALTER VIEW v_edit_inp_valve ALTER state SET DEFAULT 'ON SERVICE';
 ALTER VIEW v_edit_inp_valve ALTER state SET DEFAULT 'TO REVIEW';
 
 ALTER VIEW v_edit_inp_shortpipe ALTER annotation SET DEFAULT 0;
-ALTER VIEW v_edit_inp_shortpipe ALTER depth SET DEFAULT 0;
 ALTER VIEW v_edit_inp_shortpipe ALTER state SET DEFAULT 'ON SERVICE';
 ALTER VIEW v_edit_inp_shortpipe ALTER state SET DEFAULT 'TO REVIEW';
 
 ALTER VIEW v_edit_inp_pipe ALTER annotation SET DEFAULT 0;
-ALTER VIEW v_edit_inp_pipe ALTER depth SET DEFAULT 0;
 ALTER VIEW v_edit_inp_pipe ALTER state SET DEFAULT 'ON SERVICE';
 ALTER VIEW v_edit_inp_pipe ALTER state SET DEFAULT 'TO REVIEW';
 
-ALTER VIEW v_edit_inp_arc ALTER state SET DEFAULT 'ON SERVICE';
-ALTER VIEW v_edit_inp_arc ALTER state SET DEFAULT 'TO REVIEW';
+ALTER VIEW v_edit_inp_pipe ALTER state SET DEFAULT 'ON SERVICE';
+ALTER VIEW v_edit_inp_pipe ALTER state SET DEFAULT 'TO REVIEW';
