@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_doc_x_node AS
 SELECT 
 doc.id,
@@ -43,3 +42,4 @@ connec.the_geom
 FROM SCHEMA_NAME.doc
 JOIN SCHEMA_NAME.doc_x_connec ON doc_x_connec.doc_id::text = doc.id::text
 JOIN SCHEMA_NAME.connec ON connec.connec_id::text = doc_x_connec.connec_id::text;
+

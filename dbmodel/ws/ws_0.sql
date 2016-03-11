@@ -122,6 +122,11 @@ CREATE TABLE "SCHEMA_NAME"."node_type" (
 CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE "SCHEMA_NAME"."config" (
+"id" varchar(50) COLLATE "default" NOT NULL,
+"value" text COLLATE "default",
+CONSTRAINT "config_pkey" PRIMARY KEY ("id")
+);
 
 
 -- ----------------------------
@@ -273,10 +278,9 @@ CREATE TABLE "SCHEMA_NAME"."value_state" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."value_verified" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"observ" varchar(254) COLLATE "default",
- CONSTRAINT value_verified_pkey PRIMARY KEY (id)
+CREATE TABLE "SCHEMA_NAME"."config" (
+"node_tolerance" numeric(4,2),
+"snapping_tolerance" numeric(4,2)
 );
 
 
