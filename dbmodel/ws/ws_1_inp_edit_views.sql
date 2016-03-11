@@ -89,13 +89,6 @@ BEGIN
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id := (SELECT nextval('node_id_seq'));
         END IF;
-        -- elevation, depth
-        IF (NEW.elevation IS NULL) THEN 
-            NEW.elevation = 0;
-        END IF;
-        IF (NEW.depth IS NULL) THEN 
-            NEW.depth = 0;
-        END IF;
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
@@ -109,14 +102,6 @@ BEGIN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
-        END IF;
-        -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT id FROM value_state LIMIT 1);
-        END IF;
-        -- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT id FROM value_verified LIMIT 1);
         END IF;
             
         -- FEATURE INSERT
@@ -229,17 +214,10 @@ BEGIN
         IF (NEW.arccat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
                 RAISE EXCEPTION 'There are no arcs catalog defined in the model, define at least one.';
-            END IF;			
+            END IF;	
             NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
         END IF;
-        -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT id FROM value_state LIMIT 1);
-        END IF;
-        -- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT id FROM value_verified LIMIT 1);
-        END IF;
+
 
         INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE', NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", 
             NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, 

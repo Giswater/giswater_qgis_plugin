@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 -- ----------------------------
 -- Records of event event_type table
 -- ----------------------------
@@ -14,7 +13,6 @@ INSERT INTO "SCHEMA_NAME"."event_type" VALUES ('INSPECTION', '');
 INSERT INTO "SCHEMA_NAME"."event_type" VALUES ('REPAIR', '');
 INSERT INTO "SCHEMA_NAME"."event_type" VALUES ('RECONSTRUCT', '');
 INSERT INTO "SCHEMA_NAME"."event_type" VALUES ('OTHER', '');
-
 
 
 -- ----------------------------
@@ -27,7 +25,6 @@ INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('BAD', 4,'Excelent');
 INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('VERY BAD', 5,'Excelent');
 
 
-
 -- ----------------------------
 -- Records of cat_event
 -- ----------------------------
@@ -35,3 +32,4 @@ INSERT INTO "SCHEMA_NAME"."cat_event" VALUES ('EV01', 'INSPECTION','Inspecció 2
 INSERT INTO "SCHEMA_NAME"."cat_event" VALUES ('EV02', 'INSPECTION','Inspecció 2015', 'Prova');
 INSERT INTO "SCHEMA_NAME"."cat_event" VALUES ('EV03', 'INSPECTION','Inspecció 2016', 'Prova');
 INSERT INTO "SCHEMA_NAME"."cat_event" VALUES ('EV04', 'REPAIR','Reparació 2015', 'Prova');
+

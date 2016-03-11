@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 -- ----------------------------
 -- Views to node
 -- ----------------------------
@@ -115,7 +114,6 @@ event_x_pump.observ,
 node.the_geom;
 
 
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_filter AS
 SELECT 
 event_x_filter.id,
@@ -135,7 +133,6 @@ event_x_filter.node_id,
 event_x_filter.state,
 event_x_filter.observ,
 node.the_geom;
-
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_meter AS
@@ -160,14 +157,9 @@ node.the_geom;
 
 
 
-
-
-
-
 -- ----------------------------
 -- Views to arc
 -- ----------------------------
-
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_pipe AS
 SELECT 
@@ -188,8 +180,6 @@ event_x_pipe.arc_id,
 event_x_pipe.state,
 event_x_pipe.observ,
 arc.the_geom;
-
-
 
 
 
@@ -222,7 +212,6 @@ connec.the_geom;
 -- ----------------------------
 -- Views to element
 -- ----------------------------
-
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_register AS
 SELECT 
@@ -310,5 +299,4 @@ event_x_step.element_id,
 event_x_step.state,
 event_x_step.observ,
 node.the_geom;
-
 

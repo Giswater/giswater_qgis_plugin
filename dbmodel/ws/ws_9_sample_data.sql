@@ -19,11 +19,9 @@ INSERT INTO "SCHEMA_NAME"."inp_junction" VALUES ('2', null, null);
 INSERT INTO "SCHEMA_NAME"."inp_junction" VALUES ('3', null, null);
 INSERT INTO "SCHEMA_NAME"."inp_junction" VALUES ('4', null, null);
 
-
 INSERT INTO "SCHEMA_NAME"."arc" VALUES ('2', '2', '3', 'PVC63-PN10', 'PIPE', '01', 'ON_SERVICE', 'ttt', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'TO REVIEW', '0102000020E76400000200000003FAB991BFDA19410565BE58498F514147D00D125AF11941EE2F01383E8F5141');
 INSERT INTO "SCHEMA_NAME"."arc" VALUES ('3', '3', '4', 'PVC63-PN10', 'PIPE', '01', 'ON_SERVICE', 'rrr', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'TO REVIEW', '0102000020E76400000200000047D00D125AF11941EE2F01383E8F51419A14AD49BC121A410E278422738E5141');
 
 INSERT INTO "SCHEMA_NAME"."inp_pipe" VALUES ('2', null, null);
 INSERT INTO "SCHEMA_NAME"."inp_pipe" VALUES ('3', null, null);
-
 

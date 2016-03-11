@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 -- ----------------------------
 -- Sequences
 -- --------------------------
@@ -16,9 +15,6 @@ CREATE SEQUENCE "SCHEMA_NAME".event_id_seq
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
-
-
-
 
 CREATE SEQUENCE "SCHEMA_NAME".event_x_junction_seq
   START WITH 1
@@ -41,8 +37,6 @@ CREATE SEQUENCE "SCHEMA_NAME".event_x_hydrant_seq
   NO MAXVALUE
   CACHE 1;
  
-
-
 CREATE SEQUENCE "SCHEMA_NAME".event_x_pump_seq
   START WITH 1
   INCREMENT BY 1
@@ -70,23 +64,13 @@ CREATE SEQUENCE "SCHEMA_NAME".event_x_meter_seq
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
-
-
-  
-  
-  
-  
   
 CREATE SEQUENCE "SCHEMA_NAME".event_x_pipe_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
   NO MAXVALUE
-  CACHE 1;
-
-  
-  
-  
+  CACHE 1;  
 
 CREATE SEQUENCE "SCHEMA_NAME".event_x_register_seq
   START WITH 1
@@ -115,8 +99,6 @@ CREATE SEQUENCE "SCHEMA_NAME".event_x_step_seq
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
-
-
 
 CREATE SEQUENCE "SCHEMA_NAME".event_x_connec_seq
   START WITH 1
@@ -153,7 +135,6 @@ CONSTRAINT cat_event_pkey PRIMARY KEY (id)
 -- ----------------------------
 -- Table structure for GIS features
 -- ----------------------------
-
 
 CREATE TABLE "SCHEMA_NAME"."event" (
 "id" varchar(30) DEFAULT nextval('"SCHEMA_NAME".event_id_seq'::regclass) NOT NULL,
@@ -237,10 +218,6 @@ CREATE TABLE "SCHEMA_NAME"."event_x_meter" (
 CONSTRAINT event_x_meter_pkey PRIMARY KEY (id)
 );
 
-
-
-
-
 CREATE TABLE "SCHEMA_NAME"."event_x_pipe" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_x_pipe_seq'::regclass) NOT NULL,
 "event_id" varchar(30) COLLATE "default" NOT NULL,
@@ -250,10 +227,6 @@ CREATE TABLE "SCHEMA_NAME"."event_x_pipe" (
 "date" timestamp(6) DEFAULT now(),
 CONSTRAINT event_x_pipe_pkey PRIMARY KEY (id)
 );
-
-
-
-
 
 CREATE TABLE "SCHEMA_NAME"."event_x_register" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_x_register_seq'::regclass) NOT NULL,
@@ -295,10 +268,6 @@ CREATE TABLE "SCHEMA_NAME"."event_x_step" (
 CONSTRAINT event_x_step_pkey PRIMARY KEY (id)
 );
 
-
-
-
-
 CREATE TABLE "SCHEMA_NAME"."event_x_connec" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_x_connec_seq'::regclass) NOT NULL,
 "event_id" varchar(30) COLLATE "default" NOT NULL,
@@ -311,21 +280,16 @@ CONSTRAINT event_x_connec_pkey PRIMARY KEY (id)
 
 
 
-
-
 -- ----------------------------
 -- Table structure for event_value
 -- ----------------------------
+
 CREATE TABLE "SCHEMA_NAME"."event_value" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "value" int2,
 "descript" varchar(100) COLLATE "default" NOT NULL,
 CONSTRAINT event_value_pkey PRIMARY KEY (id)
 );
-
-
-
-
 
 
 ALTER TABLE "SCHEMA_NAME"."cat_event" ADD FOREIGN KEY ("eventtype_id") REFERENCES "SCHEMA_NAME"."event_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -359,15 +323,9 @@ ALTER TABLE "SCHEMA_NAME"."event_x_meter" ADD FOREIGN KEY ("event_id") REFERENCE
 ALTER TABLE "SCHEMA_NAME"."event_x_meter" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_meter" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."event_value" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
-
-
 ALTER TABLE "SCHEMA_NAME"."event_x_pipe" ADD FOREIGN KEY ("event_id") REFERENCES "SCHEMA_NAME"."event" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_pipe" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_pipe" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."event_value" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
-
 
 ALTER TABLE "SCHEMA_NAME"."event_x_register" ADD FOREIGN KEY ("event_id") REFERENCES "SCHEMA_NAME"."event" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_register" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -385,10 +343,7 @@ ALTER TABLE "SCHEMA_NAME"."event_x_step" ADD FOREIGN KEY ("event_id") REFERENCES
 ALTER TABLE "SCHEMA_NAME"."event_x_step" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_step" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."event_value" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
-
 ALTER TABLE "SCHEMA_NAME"."event_x_connec" ADD FOREIGN KEY ("event_id") REFERENCES "SCHEMA_NAME"."event" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."event_x_connec" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."event_value" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
 
