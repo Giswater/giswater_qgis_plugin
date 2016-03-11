@@ -20,6 +20,7 @@ import sys
 from functools import partial
 
 from generic_map_tool import GenericMapTool
+from point_map_tool import PointMapTool
 from dao.pg_dao import PgDao
 
 
@@ -147,8 +148,12 @@ class Giswater(QObject):
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
         action = self.createAction(index_action, text_action, toolbar, None, True, function_name, parent)
-        self.map_tool = GenericMapTool(self.iface, self.settings, action, index_action, self.dao) 
-        self.map_tools[function_name] = self.map_tool             
+        if int(index_action) == 13:
+            map_tool = GenericMapTool(self.iface, self.settings, action, index_action, self.dao)
+        else:
+            map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.dao)         
+            
+        self.map_tools[function_name] = map_tool             
         
         return action         
         

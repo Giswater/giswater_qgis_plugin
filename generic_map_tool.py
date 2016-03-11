@@ -49,7 +49,8 @@ class GenericMapTool(QgsMapTool):
         
     def canvasReleaseEvent(self, e):
         
-        # TODO: This check only applies if we're drawing an arc  
+        # TODO: This check only applies if we're drawing an arc 
+        self.endPoint = self.toMapCoordinates(e.pos())         
         if self.startPoint.x() == self.endPoint.x() or self.startPoint.y() == self.endPoint.y():
             print "You have to draw a line"
             return     
