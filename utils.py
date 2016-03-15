@@ -1,10 +1,15 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLineEdit, QComboBox
+from PyQt4.QtCore import *   # @UnusedWildImport
 from qgis.gui import QgsMessageBar
 
 #    
 # Utility funcions    
 #
+def tr(context, message):
+    return QCoreApplication.translate(context, message)
+
+
 def setDialog(p_dialog):
     
     global _dialog

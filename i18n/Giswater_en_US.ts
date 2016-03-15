@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US">
 <context>
-    <name>Giswater</name>
+    <name>giswater</name>
     
     <message>
         <source>menu_name</source>
@@ -189,6 +189,19 @@
     <message>
         <source>27_text</source>
         <translation>Flow trace (from node)</translation>
-    </message>    
+    </message>  
+    
 </context>
+
+
+<context>
+    <name>ws_node</name>
+    
+    <message>
+        <source>label_depth</source>
+        <translation>Depth</translation>
+    </message>   
+    
+</context>    
+
 </TS>

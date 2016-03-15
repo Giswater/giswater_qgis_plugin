@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pt_BR">
 <context>
-    <name>Giswater</name>
+    <name>giswater</name>
     
     <message>
         <source>menu_name</source>
@@ -190,5 +190,18 @@
         <source>27_text</source>
         <translation>Análise de fluxo (nó)</translation>
     </message>    
+   
 </context>
+
+
+<context>
+    <name>ws_node</name>
+    
+    <message>
+        <source>label_depth</source>
+        <translation>Profundidade</translation>
+    </message>   
+    
+</context>    
+    
 </TS>
