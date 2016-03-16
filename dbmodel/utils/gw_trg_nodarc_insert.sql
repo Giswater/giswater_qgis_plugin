@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_nodarc_insert() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_nodarc_insert() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     epa_table Varchar; 
     arcrec Record;

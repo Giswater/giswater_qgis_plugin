@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_nodarc_update() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_nodarc_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     numArcs Integer;
 

@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_update_arc() RETURNS trigger AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_update_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     arcrec Record;
     rec Record;
@@ -15,7 +15,7 @@ BEGIN
     RETURN NEW; 
     
 END; 
-$BODY$  
+$$  
 
 
 -- CREATE TRIGGER gw_trg_connec_update_arc BEFORE UPDATE ON "SCHEMA_NAME"."arc" FOR EACH ROW  WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_connec_update_arc"();

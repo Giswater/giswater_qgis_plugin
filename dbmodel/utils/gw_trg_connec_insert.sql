@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_insert() RETURNS trigger AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_insert() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     arcrec Record;
     rec Record;
@@ -27,7 +27,7 @@ BEGIN
 
     RETURN NEW; 
 END; 
-$BODY$
+$$
 
 
 -- CREATE TRIGGER gw_trg_connec_insert BEFORE INSERT ON "SCHEMA_NAME"."connec" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_connec_insert"();
