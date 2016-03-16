@@ -9,15 +9,15 @@ This version of Giswater is provided by Giswater Association
 --    GIS EDITING VIEWS
 ----------------------------
 
-CREATE VIEW "SCHEMA_NAME".v_edit_node AS
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_node AS
 SELECT node.node_id, 
 node.elevation, 
 node.depth, 
 node.nodecat_id,
-cat_node.nodetype_id AS "cat.nodetype",
-cat_node.matcat_id AS "cat.material",
-cat_node.pnom AS "cat.pnom",
-cat_node.dnom AS "cat.dnom",
+cat_node.nodetype_id AS "cat_nodetype_id",
+cat_node.matcat_id AS "cat_matcat_id",
+cat_node.pnom AS "cat_pnom",
+cat_node.dnom AS "cat_dnom",
 node.epa_type,
 node.sector_id, 
 node."state", 
@@ -37,7 +37,7 @@ node.adress_01,
 node.adress_02,
 node.adress_03,
 node.descript,
-cat_node.svg AS "cat.svg",
+cat_node.svg AS "cat_svg",
 node.rotation,
 node.link,
 node.verified,
@@ -48,11 +48,10 @@ FROM ("SCHEMA_NAME".node JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::tex
 CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
 SELECT arc.arc_id, 
 arc.arccat_id, 
-cat_arc.arctype_id AS "cat.arctype",
-cat_arc.matcat_id AS "cat.material",
-cat_arc.pnom AS "cat.pnom",
-cat_arc.dnom AS "cat.dnom",
-st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+cat_arc.arctype_id AS "cat_arctype_id",
+cat_arc.matcat_id AS "cat_matcat_id",
+cat_arc.pnom AS "cat_pnom",
+cat_arc.dnom AS "cat_dnom",
 arc.epa_type,
 arc.sector_id, 
 arc."state", 
@@ -73,11 +72,12 @@ arc.adress_01,
 arc.adress_02,
 arc.adress_03,
 arc.descript,
-cat_arc.svg AS "cat.svg",
+cat_arc.svg AS "cat_svg",
 arc.rotation,
 arc.link,
 arc.verified,
-arc.the_geom
+arc.the_geom,
+st_length2d(arc.the_geom)::numeric(12,2) AS gis_length
 FROM ("SCHEMA_NAME".arc JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
@@ -91,6 +91,8 @@ DECLARE
     inp_table varchar;
     man_table varchar;
     v_sql varchar;
+    old_nodetype varchar;
+    new_nodetype varchar;
 
 BEGIN
 
@@ -103,13 +105,7 @@ BEGIN
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id:= (SELECT nextval('node_id_seq'));
         END IF;
-        -- elevation, depth
-        IF (NEW.elevation IS NULL) THEN 
-            NEW.elevation = 0;
-        END IF;
-        IF (NEW.depth IS NULL) THEN 
-            NEW.depth:= 0;
-        END IF;
+
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
@@ -118,22 +114,28 @@ BEGIN
             NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
             NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
         END IF;
+
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
-            NEW.sector_id:= (SELECT sector_id FROM sector LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+            END IF;
         END IF;
-        -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state:= (SELECT id FROM value_state LIMIT 1);
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+            END IF;
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+            END IF;
         END IF;
-        -- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified:= (SELECT id FROM value_verified LIMIT 1);
-        END IF;
-        
+
         NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);
         
         -- FEATURE INSERT
@@ -150,12 +152,12 @@ BEGIN
         ELSIF (NEW.epa_type = 'VALVE') THEN inp_table:= 'inp_valve';
         ELSIF (NEW.epa_type = 'SHORT_PIPE') THEN inp_table:= 'inp_shortpipe';
         END IF;
-        v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||NEW.node_id||')';
+        v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         EXECUTE v_sql;
 
         -- MANAGEMENT INSERT
         man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-        v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||NEW.node_id||')';
+        v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         EXECUTE v_sql;
             
         RETURN NEW;
@@ -171,21 +173,42 @@ BEGIN
                 inp_table:= 'inp_tank';                
             ELSIF (OLD.epa_type = 'RESERVOIR') THEN
                 inp_table:= 'inp_reservoir';    
+            ELSIF (OLD.epa_type = 'SHORT_PIPE') THEN
+                inp_table:= 'inp_shortpipe';    
+            ELSIF (OLD.epa_type = 'VALVE') THEN
+                inp_table:= 'inp_valve';    
+            ELSIF (OLD.epa_type = 'PUMP') THEN
+                inp_table:= 'inp_pump';  
             END IF;
             v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
             EXECUTE v_sql;
+
             IF (NEW.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';   
             ELSIF (NEW.epa_type = 'TANK') THEN
                 inp_table:= 'inp_tank';     
             ELSIF (NEW.epa_type = 'RESERVOIR') THEN
                 inp_table:= 'inp_reservoir';  
+            ELSIF (NEW.epa_type = 'SHORT_PIPE') THEN
+                inp_table:= 'inp_shortpipe';    
+            ELSIF (NEW.epa_type = 'VALVE') THEN
+                inp_table:= 'inp_valve';    
+            ELSIF (NEW.epa_type = 'PUMP') THEN
+                inp_table:= 'inp_pump';  
             END IF;
             v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
             EXECUTE v_sql;
 
         END IF;
-    
+
+        IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
+            old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
+            new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
+            IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
+                RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
+            END IF;
+        END IF;
+
         UPDATE node 
         SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", 
             dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
@@ -237,15 +260,20 @@ BEGIN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
-            NEW.sector_id:= (SELECT sector_id FROM sector LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+            END IF;
         END IF;
-        -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state:= (SELECT id FROM value_state LIMIT 1);
-        END IF;
-        -- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified:= (SELECT id FROM value_verified LIMIT 1);
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+            END IF;
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+            END IF;
         END IF;
         
         NEW.epa_type:= (SELECT epa_default FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
@@ -274,19 +302,12 @@ BEGIN
          
             IF (OLD.epa_type = 'PIPE') THEN
                 inp_table:= 'inp_pipe';            
-            ELSIF (OLD.epa_type = 'PUMP') THEN
-                inp_table:= 'inp_pump';                
-            ELSIF (OLD.epa_type = 'VALVE') THEN
-                inp_table:= 'inp_valve';    
             END IF;
             v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
             EXECUTE v_sql;
+
             IF (NEW.epa_type = 'PIPE') THEN
                 inp_table:= 'inp_pipe';   
-            ELSIF (NEW.epa_type = 'PUMP') THEN
-                inp_table:= 'inp_pump';     
-            ELSIF (NEW.epa_type = 'VALVE') THEN
-                inp_table:= 'inp_valve';  
             END IF;
             v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
             EXECUTE v_sql;
@@ -302,11 +323,12 @@ BEGIN
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN
+     
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
         RETURN NULL;
      
      END IF;
-     RETURN NEW;
+
 END;
 $$;
 

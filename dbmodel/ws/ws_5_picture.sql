@@ -17,13 +17,6 @@ CREATE SEQUENCE "SCHEMA_NAME".picture_seq
   CACHE 1;
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_tag" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"comment" varchar(512) COLLATE "default",
-CONSTRAINT cat_tag_pkey PRIMARY KEY (id)
-);
-
-
 CREATE TABLE "SCHEMA_NAME"."picture" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".picture_seq'::regclass) NOT NULL,
 "table_name" varchar(30) COLLATE "default",

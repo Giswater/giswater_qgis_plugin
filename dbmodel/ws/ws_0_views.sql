@@ -6,29 +6,29 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node1 AS 
- SELECT arc.arc_id, arc.node_1, 
+SELECT arc.arc_id, arc.node_1, 
 node.elevation AS elevation1, 
-node.depth AS depth1,
+node.depth AS depth1, 
 (cat_arc.dext)/1000 AS dext, 
 node.depth - (cat_arc.dext)/1000 AS r1
- FROM SCHEMA_NAME.arc
+FROM SCHEMA_NAME.arc
 JOIN SCHEMA_NAME.node ON arc.node_1::text = node.node_id::text
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node2 AS 
- SELECT arc.arc_id, arc.node_2, 
+SELECT arc.arc_id, arc.node_2, 
 node.elevation AS elevation2, 
 node.depth AS depth2,
 (cat_arc.dext)/1000 AS dext, 
 node.depth - (cat_arc.dext)/1000 AS r2
-  FROM SCHEMA_NAME.arc
+FROM SCHEMA_NAME.arc
 JOIN SCHEMA_NAME.node ON arc.node_2::text = node.node_id::text
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node AS 
- SELECT 
+SELECT 
 v_arc_x_node1.arc_id,
 v_arc_x_node1.node_1,
 v_arc_x_node1.elevation1,
@@ -42,7 +42,7 @@ arc."state",
 arc.sector_id,
 arc.the_geom
 FROM SCHEMA_NAME.v_arc_x_node1
-   JOIN SCHEMA_NAME.v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
-   JOIN SCHEMA_NAME.arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text; 
+JOIN SCHEMA_NAME.v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
+JOIN SCHEMA_NAME.arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text; 
    
    

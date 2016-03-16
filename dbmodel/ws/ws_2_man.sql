@@ -16,12 +16,6 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."element_x_arc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 CREATE SEQUENCE "SCHEMA_NAME"."element_x_node_seq"
     START WITH 1
@@ -57,7 +51,6 @@ CONSTRAINT element_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."cat_mat_element" (
 "id" varchar(30) COLLATE "default",
-"elementtype_id" varchar(30) COLLATE "default",
 "descript" varchar(512) COLLATE "default",
 "link" varchar(512) COLLATE "default",
 "url" varchar(512) COLLATE "default",
@@ -207,7 +200,7 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "adress_03" varchar(50) COLLATE "default",
 "descript" varchar(254) COLLATE "default",
 "link" character varying(512),
-"verified" varchar(4) COLLATE "default",
+"verified" varchar(16) COLLATE "default",
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
@@ -215,7 +208,7 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 CREATE TABLE "SCHEMA_NAME"."link" (
 link_id varchar (16) DEFAULT nextval('"SCHEMA_NAME".link_seq'::regclass) NOT NULL,
-connec_id varchar(16) COLLATE "default",
+connec_id varchar(16) COLLATE "default" NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
 CONSTRAINT link_pkey PRIMARY KEY (link_id)
 );
@@ -296,8 +289,7 @@ CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
 
 CREATE TABLE "SCHEMA_NAME"."element" (
 "element_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_seq'::regclass) NOT NULL,
-"elementcat_id" varchar(16) COLLATE "default",
-"node_id" varchar(30) COLLATE "default",
+"elementcat_id" varchar(30) COLLATE "default",
 "state" character varying(16) NOT NULL,
 "annotation" character varying(254),
 "observ" character varying(254),
@@ -312,6 +304,22 @@ CREATE TABLE "SCHEMA_NAME"."element" (
 "link" character varying(512),
 "verified" varchar(16) COLLATE "default" NOT NULL,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
+);
+
+
+CREATE TABLE "SCHEMA_NAME"."element_x_node" (
+"id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_node_seq'::regclass) NOT NULL,
+"element_id" varchar(16) COLLATE "default",
+"node_id" varchar(16) COLLATE "default",
+CONSTRAINT element_x_node_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "SCHEMA_NAME"."element_x_connec" (
+"id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_connec_seq'::regclass) NOT NULL,
+"element_id" varchar(16) COLLATE "default",
+"connec_id" varchar(16) COLLATE "default",
+CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 );
 
 
@@ -374,11 +382,17 @@ ALTER TABLE "SCHEMA_NAME"."man_pipe" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHE
 
 
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("elementcat_id") REFERENCES "SCHEMA_NAME"."cat_element" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("location_type") REFERENCES "SCHEMA_NAME"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("workcat_id") REFERENCES "SCHEMA_NAME"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("buildercat_id") REFERENCES "SCHEMA_NAME"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("verified") REFERENCES "SCHEMA_NAME"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+ALTER TABLE "SCHEMA_NAME"."element_x_node" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."element_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "SCHEMA_NAME"."element_x_connec" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."element_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 

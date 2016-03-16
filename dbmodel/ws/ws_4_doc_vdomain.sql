@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
--- Records of event type system table
+-- Records of doc type table
 -- ----------------------------
 
-INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('AS_BUILT', 'doc_unique');
-INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('INCIDENT', 'doc_unique');
-INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('WORK RAPPORT', 'doc_unique');
-INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('OTHER', 'doc_unique');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('AS_BUILT');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('INCIDENT');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('WORK RAPPORT');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('OTHER');
 

@@ -123,8 +123,12 @@ CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE "SCHEMA_NAME"."config" (
-"id" varchar(50) COLLATE "default" NOT NULL,
-"value" text COLLATE "default",
+"id" varchar(18) COLLATE "default" NOT NULL,
+"node_tolerance" numeric (10,5),
+"snapping_tolerance" numeric (10,5),
+"node_buffering" numeric (10,5),
+"connec_buffering" numeric (10,5),
+"arc_toporepair" numeric (10,5),
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
@@ -211,8 +215,8 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
+													-- to INP model
 "soilcat_id" varchar(16) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
@@ -247,8 +251,8 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "observ" character varying(254),
 "comment" character varying(254),
 "custom_length" numeric (12,2),
-													-- to INP model
 "dma_id" varchar(30) COLLATE "default",
+													-- to INP model
 "soilcat_id" varchar(16) COLLATE "default",
 "category_type" varchar(18) COLLATE "default",
 "fluid_type" varchar(18) COLLATE "default",
@@ -278,9 +282,10 @@ CREATE TABLE "SCHEMA_NAME"."value_state" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."config" (
-"node_tolerance" numeric(4,2),
-"snapping_tolerance" numeric(4,2)
+CREATE TABLE "SCHEMA_NAME"."value_verified" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+"observ" varchar(254) COLLATE "default",
+ CONSTRAINT value_verified_pkey PRIMARY KEY (id)
 );
 
 

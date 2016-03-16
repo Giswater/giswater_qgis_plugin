@@ -42,11 +42,9 @@ INSERT INTO "SCHEMA_NAME"."node_type" VALUES ('FLOW METER','MEASURE INSTRUMENT',
 INSERT INTO "SCHEMA_NAME"."arc_type" VALUES ('PIPE','PIPE','PIPE', 'man_pipe', 'inp_pipe', 'event_x_pipe');
 
 
-
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-
 INSERT INTO "SCHEMA_NAME"."element_type" VALUES ('REGISTER', 'event_x_register');
 INSERT INTO "SCHEMA_NAME"."element_type" VALUES ('MANHOLE', 'event_x_manhole');
 INSERT INTO "SCHEMA_NAME"."element_type" VALUES ('COVER', 'event_x_cover');

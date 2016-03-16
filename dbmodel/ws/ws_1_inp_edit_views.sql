@@ -11,7 +11,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_junction" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
+node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
 inp_junction.demand, inp_junction.pattern_id
 FROM (SCHEMA_NAME.node
 JOIN SCHEMA_NAME.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
@@ -19,7 +19,7 @@ JOIN SCHEMA_NAME.inp_junction ON (((inp_junction.node_id)::text = (node.node_id)
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_reservoir" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
+node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
 inp_reservoir.head, inp_reservoir.pattern_id
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)));
@@ -27,7 +27,7 @@ JOIN SCHEMA_NAME.inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_i
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_tank" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
+node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
 inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.inp_tank ON (((inp_tank.node_id)::text = (node.node_id)::text)));
@@ -35,7 +35,7 @@ JOIN SCHEMA_NAME.inp_tank ON (((inp_tank.node_id)::text = (node.node_id)::text))
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_pump" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
+node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
 inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.status
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.inp_pump ON (((node.node_id)::text = (inp_pump.node_id)::text)));
@@ -43,7 +43,7 @@ JOIN SCHEMA_NAME.inp_pump ON (((node.node_id)::text = (inp_pump.node_id)::text))
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_valve" AS 
 SELECT 
-node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
+node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
 inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.status
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.inp_valve ON (((node.node_id)::text = (inp_valve.node_id)::text)));
@@ -51,7 +51,7 @@ JOIN SCHEMA_NAME.inp_valve ON (((node.node_id)::text = (inp_valve.node_id)::text
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_shortpipe" AS 
 SELECT 
-node.node_id, node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.rotation, node.link, node.verified, node.the_geom,
+node.node_id,  node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
 inp_shortpipe.minorloss, inp_shortpipe.to_arc, inp_shortpipe.status
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.inp_shortpipe ON (((inp_shortpipe.node_id)::text = (node.node_id)::text)));
@@ -59,7 +59,7 @@ JOIN SCHEMA_NAME.inp_shortpipe ON (((inp_shortpipe.node_id)::text = (node.node_i
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_inp_pipe" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.rotation, arc.custom_length, arc.link, arc.verified, arc.the_geom,
+arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.verified, arc.the_geom,
 inp_pipe.minorloss, inp_pipe.status
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));
@@ -75,6 +75,9 @@ DECLARE
     node_table varchar;
     man_table varchar;
     v_sql varchar;
+    sectorRecord Record;
+    dmaRecord Record;
+
 
 BEGIN
 
@@ -101,7 +104,20 @@ BEGIN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+            END IF;
+        END IF;
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+            END IF;
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+            END IF;
         END IF;
             
         -- FEATURE INSERT
@@ -128,10 +144,20 @@ BEGIN
 
         -- MANAGEMENT INSERT
         man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-        v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||NEW.node_id||')';
+        v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+        EXECUTE v_sql;
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+        IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
+            old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
+            new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
+            IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
+                RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
+            END IF;
+        END IF;
+
         UPDATE node 
         SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
@@ -154,7 +180,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id = OLD.node_id;
-        EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||OLD.node_id;
+        EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||quote_literal(OLD.node_id);
         RETURN NULL;
     
     END IF;
@@ -199,16 +225,10 @@ BEGIN
     arc_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
+    
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id := (SELECT nextval('arc_id_seq'));
-        END IF;
-        -- Sector ID
-        IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-            END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
         END IF;
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
@@ -217,7 +237,26 @@ BEGIN
             END IF;	
             NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
         END IF;
-
+        -- Sector ID
+        IF (NEW.sector_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+            END IF;
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+            END IF;
+        END IF;
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+            END IF;
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+            END IF;
+        END IF;
 
         INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE', NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", 
             NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, 
@@ -241,18 +280,17 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
-        EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '||OLD.arc_id;
+        EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '|| quote_literal(OLD.arc_id);
         RETURN NULL;
     
     END IF;
-    RETURN NEW;
     
 END;
 $$;
-  
+
 
 
 CREATE TRIGGER v_edit_inp_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pipe 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_arc('inp_pipe');   
-   
+
    

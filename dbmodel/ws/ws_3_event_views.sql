@@ -14,7 +14,7 @@ SELECT
 event_x_junction.id,
 event_x_junction.event_id,
 event_x_junction.node_id,
-event_x_junction.state,
+event_x_junction.value,
 event_x_junction.observ,
 max(event_x_junction.date) AS date,
 node.the_geom
@@ -25,7 +25,7 @@ GROUP BY
 event_x_junction.id,
 event_x_junction.event_id,
 event_x_junction.node_id,
-event_x_junction.state,
+event_x_junction.value,
 event_x_junction.observ,
 node.the_geom;
 
@@ -35,7 +35,7 @@ SELECT
 event_x_tank.id,
 event_x_tank.event_id,
 event_x_tank.node_id,
-event_x_tank.state,
+event_x_tank.value,
 event_x_tank.observ,
 max(event_x_tank.date) AS date,
 node.the_geom
@@ -46,7 +46,7 @@ GROUP BY
 event_x_tank.id,
 event_x_tank.event_id,
 event_x_tank.node_id,
-event_x_tank.state,
+event_x_tank.value,
 event_x_tank.observ,
 node.the_geom;
 
@@ -56,7 +56,7 @@ SELECT
 event_x_hydrant.id,
 event_x_hydrant.event_id,
 event_x_hydrant.node_id,
-event_x_hydrant.state,
+event_x_hydrant.value,
 event_x_hydrant.observ,
 max(event_x_hydrant.date) AS date,
 node.the_geom
@@ -67,7 +67,7 @@ GROUP BY
 event_x_hydrant.id,
 event_x_hydrant.event_id,
 event_x_hydrant.node_id,
-event_x_hydrant.state,
+event_x_hydrant.value,
 event_x_hydrant.observ,
 node.the_geom;
 
@@ -77,7 +77,7 @@ SELECT
 event_x_valve.id,
 event_x_valve.event_id,
 event_x_valve.node_id,
-event_x_valve.state,
+event_x_valve.value,
 event_x_valve.observ,
 max(event_x_valve.date) AS date,
 node.the_geom
@@ -88,7 +88,7 @@ GROUP BY
 event_x_valve.id,
 event_x_valve.event_id,
 event_x_valve.node_id,
-event_x_valve.state,
+event_x_valve.value,
 event_x_valve.observ,
 node.the_geom;
 
@@ -98,7 +98,7 @@ SELECT
 event_x_pump.id,
 event_x_pump.event_id,
 event_x_pump.node_id,
-event_x_pump.state,
+event_x_pump.value,
 event_x_pump.observ,
 max(event_x_pump.date) AS date,
 node.the_geom
@@ -109,7 +109,7 @@ GROUP BY
 event_x_pump.id,
 event_x_pump.event_id,
 event_x_pump.node_id,
-event_x_pump.state,
+event_x_pump.value,
 event_x_pump.observ,
 node.the_geom;
 
@@ -119,7 +119,7 @@ SELECT
 event_x_filter.id,
 event_x_filter.event_id,
 event_x_filter.node_id,
-event_x_filter.state,
+event_x_filter.value,
 event_x_filter.observ,
 max(event_x_filter.date) AS date,
 node.the_geom
@@ -130,7 +130,7 @@ GROUP BY
 event_x_filter.id,
 event_x_filter.event_id,
 event_x_filter.node_id,
-event_x_filter.state,
+event_x_filter.value,
 event_x_filter.observ,
 node.the_geom;
 
@@ -140,7 +140,7 @@ SELECT
 event_x_meter.id,
 event_x_meter.event_id,
 event_x_meter.node_id,
-event_x_meter.state,
+event_x_meter.value,
 event_x_meter.observ,
 max(event_x_meter.date) AS date,
 node.the_geom
@@ -151,7 +151,7 @@ GROUP BY
 event_x_meter.id,
 event_x_meter.event_id,
 event_x_meter.node_id,
-event_x_meter.state,
+event_x_meter.value,
 event_x_meter.observ,
 node.the_geom;
 
@@ -166,7 +166,7 @@ SELECT
 event_x_pipe.id,
 event_x_pipe.event_id,
 event_x_pipe.arc_id,
-event_x_pipe.state,
+event_x_pipe.value,
 event_x_pipe.observ,
 max(event_x_pipe.date) AS date,
 arc.the_geom
@@ -177,7 +177,7 @@ GROUP BY
 event_x_pipe.id,
 event_x_pipe.event_id,
 event_x_pipe.arc_id,
-event_x_pipe.state,
+event_x_pipe.value,
 event_x_pipe.observ,
 arc.the_geom;
 
@@ -192,7 +192,7 @@ SELECT
 event_x_connec.id,
 event_x_connec.event_id,
 event_x_connec.connec_id,
-event_x_connec.state,
+event_x_connec.value,
 event_x_connec.observ,
 max(event_x_connec.date) AS date,
 connec.the_geom
@@ -203,100 +203,7 @@ GROUP BY
 event_x_connec.id,
 event_x_connec.event_id,
 event_x_connec.connec_id,
-event_x_connec.state,
+event_x_connec.value,
 event_x_connec.observ,
 connec.the_geom;
-
-
-
--- ----------------------------
--- Views to element
--- ----------------------------
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_register AS
-SELECT 
-event_x_register.id,
-event_x_register.event_id,
-event_x_register.element_id,
-event_x_register.state,
-event_x_register.observ,
-max(event_x_register.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_register
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_register.event_id::text
-JOIN SCHEMA_NAME.element ON element.element_id::text = event_x_register.element_id::text
-JOIN SCHEMA_NAME.node ON element.node_id::text = node.node_id::text
-GROUP BY
-event_x_register.id,
-event_x_register.event_id,
-event_x_register.element_id,
-event_x_register.state,
-event_x_register.observ,
-node.the_geom;
-
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_manhole AS
-SELECT 
-event_x_manhole.id,
-event_x_manhole.event_id,
-event_x_manhole.element_id,
-event_x_manhole.state,
-event_x_manhole.observ,
-max(event_x_manhole.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_manhole
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_manhole.event_id::text
-JOIN SCHEMA_NAME.element ON element.element_id::text = event_x_manhole.element_id::text
-JOIN SCHEMA_NAME.node ON element.node_id::text = node.node_id::text
-GROUP BY
-event_x_manhole.id,
-event_x_manhole.event_id,
-event_x_manhole.element_id,
-event_x_manhole.state,
-event_x_manhole.observ,
-node.the_geom;
-
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_cover AS
-SELECT 
-event_x_cover.id,
-event_x_cover.event_id,
-event_x_cover.element_id,
-event_x_cover.state,
-event_x_cover.observ,
-max(event_x_cover.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_cover
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_cover.event_id::text
-JOIN SCHEMA_NAME.element ON element.element_id::text = event_x_cover.element_id::text
-JOIN SCHEMA_NAME.node ON element.node_id::text = node.node_id::text
-GROUP BY
-event_x_cover.id,
-event_x_cover.event_id,
-event_x_cover.element_id,
-event_x_cover.state,
-event_x_cover.observ,
-node.the_geom;
-
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_step AS
-SELECT 
-event_x_step.id,
-event_x_step.event_id,
-event_x_step.element_id,
-event_x_step.state,
-event_x_step.observ,
-max(event_x_step.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_step
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_step.event_id::text
-JOIN SCHEMA_NAME.element ON element.element_id::text = event_x_step.element_id::text
-JOIN SCHEMA_NAME.node ON element.node_id::text = node.node_id::text
-GROUP BY
-event_x_step.id,
-event_x_step.event_id,
-event_x_step.element_id,
-event_x_step.state,
-event_x_step.observ,
-node.the_geom;
 

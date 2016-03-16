@@ -27,6 +27,7 @@ SELECT
 node.node_id, node.elevation, node."depth", node.nodecat_id,
 cat_node.nodetype_id AS "cat.nodetype",
 node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate,  node.ownercat_id,
+man_tank.vmax, man_tank.area, man_tank.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node 
@@ -62,7 +63,7 @@ JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text))
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_pump" AS 
 SELECT 
-node.node_id, node.nodecat_id, 
+node.node_id, node.elevation, node."depth", node.nodecat_id, 
 cat_node.nodetype_id AS "cat.nodetype",
 node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.ownercat_id, 
 man_pump.add_info,
@@ -75,7 +76,7 @@ JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text))
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_filter" AS 
 SELECT 
-node.node_id, node.nodecat_id, 
+node.node_id, node.elevation, node."depth", node.nodecat_id,  
 cat_node.nodetype_id AS "cat.nodetype",
 node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.soilcat_id, node.category_type, node.fluid_type, node.location_type, node.workcat_id, node.buildercat_id, node.builtdate, node.ownercat_id, 
 man_filter.add_info,
@@ -155,72 +156,22 @@ BEGIN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
-            NEW.sector_id:= (SELECT sector_id FROM sector LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+            END IF;
         END IF;
-        
-        -- DMA ID
+
+        -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dmas defined in the model, define at least one.';
+                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
             END IF;
-            NEW.dma_id:= (SELECT dma_id FROM dma LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+            END IF;
         END IF;
-        
-        -- Soil ID
-        IF (NEW.soilcat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_soil) = 0) THEN
-                RAISE EXCEPTION 'There are no soils defined in the model, define at least one.';
-            END IF;
-            NEW.soilcat_id:= (SELECT id FROM cat_soil LIMIT 1);
-        END IF;
-        
-        -- Category type
-        IF (NEW.category_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM man_type_category) = 0) THEN
-                RAISE EXCEPTION 'There are no categorys defined in the model, define at least one.';
-            END IF;
-            NEW.category_type:= (SELECT id FROM man_type_category LIMIT 1);
-        END IF;
-
-        -- Fluid type
-        IF (NEW.fluid_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM man_type_fluid) = 0) THEN
-                RAISE EXCEPTION 'There are no fluids defined in the model, define at least one.';
-            END IF;
-            NEW.fluid_type:= (SELECT id FROM man_type_fluid LIMIT 1);
-        END IF;
-
-        -- Location type
-        IF (NEW.location_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM man_type_location) = 0) THEN
-                RAISE EXCEPTION 'There are no locations defined in the model, define at least one.';
-            END IF;
-            NEW.location_type:= (SELECT id FROM man_type_location LIMIT 1);
-        END IF;
-
-        -- Workcat_id
-        IF (NEW.workcat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_work) = 0) THEN
-                RAISE EXCEPTION 'There are no works defined in the model, define at least one.';
-            END IF;
-            NEW.workcat_id:= (SELECT id FROM cat_work LIMIT 1);
-        END IF;
-        
-        -- Buildercat_id
-        IF (NEW.buildercat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_builder) = 0) THEN
-                RAISE EXCEPTION 'There are no builders defined in the model, define at least one.';
-            END IF;
-            NEW.buildercat_id:= (SELECT id FROM cat_builder LIMIT 1);
-        END IF;	
-
-        -- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
-                RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
-            END IF;
-            NEW.ownercat_id:= (SELECT id FROM cat_owner LIMIT 1);
-        END IF;	
 
         -- FEATURE INSERT
         INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
@@ -232,16 +183,25 @@ BEGIN
         IF man_table = 'man_tank' THEN        
             INSERT INTO man_tank VALUES (NEW.node_id, NEW.vmax, NEW.area, NEW.add_info);
         ELSE
-            v_sql:= 'INSERT INTO'||man_table||' VALUES ('||NEW.node_id||', '||NEW.add_info||')';
+            v_sql:= 'INSERT INTO'||man_table||' VALUES ('||quote_literal(NEW.node_id)||', '||NEW.add_info||')';
             EXECUTE v_sql;
         END IF;
 
         -- EPA INSERT
         epa_table:= (SELECT epa_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-        v_sql:= 'INSERT INTO '||epa_table||' (node_id) VALUES ('||NEW.node_id||')';
+        v_sql:= 'INSERT INTO '||epa_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+        IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
+            old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
+            new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
+            IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
+                RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
+            END IF;
+        END IF;
+
         UPDATE node
         SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", 
              dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
@@ -251,19 +211,17 @@ BEGIN
         IF man_table = 'man_tank' THEN        
             UPDATE man_tank SET node_id=NEW.node_id, vmax=NEW.vmax, area=NEW.area, add_info=NEW.add_info WHERE node_id=OLD.node_id;
         ELSE
-            v_sql:= 'UPDATE '||man_table||' SET node_id='||NEW.node_id||', add_info='||NEW.add_info||' WHERE node_id='||OLD.node_id;
+            v_sql:= 'UPDATE '||man_table||' SET node_id='||quote_literal(NEW.node_id)||', add_info='||NEW.add_info||' WHERE node_id='||quote_literal(OLD.node_id);
             EXECUTE v_sql;
         END IF;
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id=OLD.node_id;
-        EXECUTE 'DELETE FROM '||man_table||' WHERE node_id='||OLD.node_id;
+        EXECUTE 'DELETE FROM '||man_table||' WHERE node_id='||quote_literal(OLD.node_id);
         RETURN NULL;
     
     END IF;
-    
-    RETURN NEW;
     
 END;
 $$;
@@ -328,77 +286,23 @@ BEGIN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
             END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+            END IF;
         END IF;
 
-        -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT id FROM value_state LIMIT 1);
-        END IF;
-        
-        -- DMA ID
+        -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dmas defined in the model, define at least one.';
+                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma LIMIT 1);
-        END IF;
-        
-        -- Soil ID
-        IF (NEW.soilcat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_soil) = 0) THEN
-                RAISE EXCEPTION 'There are no soils defined in the model, define at least one.';
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
             END IF;
-            NEW.soilcat_id := (SELECT id FROM cat_soil LIMIT 1);
-        END IF;
-        
-        -- Category type
-        IF (NEW.category_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM man_type_category) = 0) THEN
-                RAISE EXCEPTION 'There are no categorys defined in the model, define at least one.';
-            END IF;
-            NEW.category_type := (SELECT id FROM man_type_category LIMIT 1);
         END IF;
 
-        -- Fluid type
-        IF (NEW.fluid_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM man_type_fluid) = 0) THEN
-                RAISE EXCEPTION 'There are no fluids defined in the model, define at least one.';
-            END IF;
-            NEW.fluid_type := (SELECT id FROM man_type_fluid LIMIT 1);
-        END IF;
-
-        -- Location type
-        IF (NEW.location_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM man_type_location) = 0) THEN
-                RAISE EXCEPTION 'There are no locations defined in the model, define at least one.';
-            END IF;
-            NEW.location_type := (SELECT id FROM man_type_location LIMIT 1);
-        END IF;
-
-        -- Workcat_id
-        IF (NEW.workcat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_work) = 0) THEN
-                RAISE EXCEPTION 'There are no works defined in the model, define at least one.';
-            END IF;
-            NEW.workcat_id := (SELECT id FROM cat_work LIMIT 1);
-        END IF;
-        
-        -- Buildercat_id
-        IF (NEW.buildercat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_builder) = 0) THEN
-                RAISE EXCEPTION 'There are no builders defined in the model, define at least one.';
-            END IF;
-            NEW.buildercat_id := (SELECT id FROM cat_builder LIMIT 1);
-        END IF;
-
-        -- Ownercat_id
-        IF (NEW.ownercat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_owner) = 0) THEN
-                RAISE EXCEPTION 'There are no owners defined in the model, define at least one.';
-            END IF;
-            NEW.ownercat_id := (SELECT id FROM cat_owner LIMIT 1);
-        END IF;
 
         -- FEATURE INSERT
         INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", 
@@ -430,12 +334,10 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM arc WHERE arc_id=OLD.arc_id;
-        EXECUTE 'DELETE FROM '||man_table||' WHERE arc_id = '||OLD.arc_id;        
+        EXECUTE 'DELETE FROM '||man_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);        
         RETURN NULL;
 
     END IF;
-    
-    RETURN NEW;
     
 END;
 $$;

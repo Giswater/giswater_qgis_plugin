@@ -5,11 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- ------------------------------------------------------------
--- Clone
--- schema
--- ------------------------------------------------------------
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".clone_schema(source_schema text, dest_schema text) RETURNS void LANGUAGE plpgsql AS $$
 DECLARE
 	rec_view record;
