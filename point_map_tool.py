@@ -1,71 +1,79 @@
 # -*- coding: utf-8 -*-
 from qgis.gui import * # @UnusedWildImport
-
-from ui.generic_dialog import GenericDialog
-import utils
+from qgis.core import (QgsFeatureRequest, QgsExpression)
+from PyQt4.QtCore import *   # @UnusedWildImport
+from PyQt4.QtGui import *    # @UnusedWildImport
 
 
 class PointMapTool(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, dao):
+    def __init__(self, iface, settings, action, index_action, controller):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
-        self.dao = dao        
         self.srid = self.settings.value('status/srid')
         self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
+        self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name()            
+        self.view_name = "v_edit_node"            
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
-        
-        
-    def setDao(self, dao):
-        self.dao = dao
-    
+           
         
     def canvasPressEvent(self, e):
-            
         pass
         
 
     def canvasReleaseEvent(self, e):
+           
+        # Get clicked point and current layer               
+        self.point = self.toMapCoordinates(e.pos())             
+        layer = self.iface.activeLayer()     
         
-        # Create new dialog
-        self.dlg = GenericDialog()
-        
-        #p = self.toMapCoordinates(e.pos())      
-        #action = self.iface.actionPan()
-        #action.trigger()
-        
-        self.dlg.lblInfo.setText("You have selected a '"+self.elem_type+"'")
-        
-        self.schema_name = self.dao.get_schema_name()
-        
-        # Define and execute query to populate first combo box: cboOptions
-        sql = "SELECT id, man_table, epa_table FROM "+self.schema_name+".arc_type WHERE type = '"+self.elem_type+"' UNION "
-        sql+= "SELECT id, man_table, epa_table FROM "+self.schema_name+".node_type WHERE type = '"+self.elem_type+"' ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils.fillComboBox(self.dlg.cboOptions, rows)
-        
-        # Define signals
-        self.dlg.cboOptions.currentIndexChanged.connect(self.getCatalog)
-        self.dlg.btnAccept.clicked.connect(self.do_test)
-        
-        # Show dialog
-        self.dlg.show()                
+        # Insert new node into the point
+        status = self.insertNode(int(self.point.x()), int(self.point.y()))  
+        if status:
+            # Get node_id of that new node. Open its feature form
+            last_id = self.getLastId(layer.name(), "node_id")  
+            if last_id != -1:
+                filter_expr = "node_id = "+str(last_id)     
+                expr = QgsExpression(filter_expr)
+                f_request = QgsFeatureRequest(expr)
+                f_iterator = layer.getFeatures(f_request)
+                for feature in f_iterator: 
+                    self.openFeatureForm(layer, feature)
+                    break
+            else:
+                print "Error getting last node inserted"
+        else:
+            print "Error inserting node"            
+            
+     
+    def insertNode(self, x, y):
+        """ Insert a new node in the selected coordinates """
+        if self.elem_type is not None:        
+            the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+self.srid+")";
+            sql = "INSERT INTO "+self.schema_name+"."+self.view_name+" (epa_type, the_geom) VALUES ('"+self.elem_type+"', "+the_geom+");";
+            status = self.dao.execute_sql(sql)   
+            return status  
+        else:
+            print "self.elem_type is None"
+      
 
+    def getLastId(self, view_name, field_name):
+        # Get last feature inserted       
+        last_id = -1 
+        sql = "SELECT max(cast("+field_name+" as int)) FROM "+self.schema_name+"."+view_name;
+        row = self.dao.get_row(sql)  
+        if row:
+            if row[0] is not None:
+                last_id = int(row[0])  
+        return last_id
     
-    def getCatalog(self):
-        """ Define and execute query to populate second combo box: cboOptions_2 """
-        elem_type_id = self.dlg.cboOptions.currentText() 
-        sql = "SELECT id FROM "+self.schema_name+".cat_arc WHERE arctype_id = '"+elem_type_id+"' UNION "
-        sql+= "SELECT id FROM "+self.schema_name+".cat_node WHERE nodetype_id = '"+elem_type_id+"' ORDER BY id"   
-        rows = self.dao.get_rows(sql)
-        utils.fillComboBox(self.dlg.cboOptions_2, rows)     
         
-        
-    def do_test(self):
-        pass
+    def openFeatureForm(self, layer, feature):
+        """ Open feature form """      
+        self.iface.openFeatureForm(layer, feature)
         
         

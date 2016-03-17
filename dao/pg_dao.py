@@ -2,7 +2,6 @@
 #import logging
 import psycopg2
 import psycopg2.extras
-from owslib.csw import schema
 
 
 class PgDao():
@@ -21,7 +20,7 @@ class PgDao():
             status = True
         except psycopg2.DatabaseError, e:
             #self.logger.warning('{pg_dao} Error %s' % e)
-            print ('{pg_dao} Error %s' % e)
+            print '{pg_dao} Error %s' % e
             status = False
         return status
 
@@ -45,15 +44,33 @@ class PgDao():
         return rows
     
     def get_row(self, sql):
-        self.cursor.execute(sql)
-        row = self.cursor.fetchone()
-        return row
+        row = None
+        try:
+            self.cursor.execute(sql)
+            row = self.cursor.fetchone()
+        except Exception as e:
+            print "get_row: {0}".format(e)
+            self.rollback()             
+        finally:
+            return row            
 
-    def execute_sql(self, sql):
-        self.cursor.execute(sql) 
+    def execute_sql(self, sql, autocommit=True):
+        status = True
+        try:
+            self.cursor.execute(sql) 
+            self.commit()
+        except Exception as e:
+            print "execute_sql: {0}".format(e)      
+            status = False
+            self.rollback() 
+        finally:
+            return status
 
     def commit(self):
         self.conn.commit()
+        
+    def rollback(self):
+        self.conn.rollback()
         
     def checkTable(self, schemaName, tableName):
         exists = True

@@ -3,6 +3,7 @@ from PyQt4.QtGui import QLineEdit, QComboBox
 from PyQt4.QtCore import *   # @UnusedWildImport
 from qgis.gui import QgsMessageBar
 
+
 #    
 # Utility funcions    
 #
@@ -33,12 +34,6 @@ def isFirstTime():
     return first
 
 
-def setCursor(p_cursor):
-    
-    global cursor
-    cursor = p_cursor
-
-
 def fillComboBox(widget, rows):
     widget.clear()
     widget.addItem('')     
@@ -46,35 +41,21 @@ def fillComboBox(widget, rows):
         widget.addItem(row[0])    
 
 
-def setSelectedItem(combo, row):  
-    elem = _dialog.findChild(QComboBox, combo)
-    if elem:
-        index = elem.findText(row[0])
-        elem.setCurrentIndex(index);        
+def setSelectedItem(widget_name, value):  
+    widget = _dialog.findChild(QComboBox, widget_name)
+    if widget:
+        index = widget.findText(value)
+        widget.setCurrentIndex(index);        
 
 
-def getSelectedItem(param_elem):
+def getSelectedItem(widget_name):
     
-    elem = _dialog.findChild(QComboBox, param_elem)
-    if not elem.currentText():
-        elem_text = "null"
-    else:
-        elem_text = "'"+elem.currentText()+"'"    
-    elem_text = param_elem+"="+elem_text
-    return elem_text    
-
-
-def getValue(param_elem):
-    
-    elem = _dialog.findChild(QLineEdit, param_elem)
-    if elem:    
-        if elem.text():
-            elem_text = param_elem + " = "+elem.text().replace(",", ".")              
-        else:
-            elem_text = param_elem + " = null"
-    else:
-        elem_text = param_elem + " = null"
-    return elem_text
+    widget_text = "null"    
+    widget = _dialog.findChild(QComboBox, widget_name)
+    if widget:
+        if widget.currentText():
+            widget_text = widget.currentText()    
+    return widget_text    
 
 
 def isNull(param_elem):

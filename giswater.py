@@ -19,14 +19,14 @@ import os.path
 import sys  
 from functools import partial
 
-from generic_map_tool import GenericMapTool
+from line_map_tool import LineMapTool
 from point_map_tool import PointMapTool
-from dao.pg_dao import PgDao
+from controller import DaoController
+import utils
 
 
 class Giswater(QObject):
-    """QGIS Plugin Implementation."""
-
+   
     def __init__(self, iface):
         """Constructor.
 
@@ -39,28 +39,23 @@ class Giswater(QObject):
         
         # Save reference to the QGIS interface
         self.iface = iface
+        self.legend = iface.legendInterface()    
+            
         # initialize plugin directory
-        self.plugin_dir = os.path.dirname(__file__)
-        self.pluginName = os.path.basename(self.plugin_dir)
+        self.plugin_dir = os.path.dirname(__file__)    
+        self.plugin_name = os.path.basename(self.plugin_dir)   
+
         # initialize locale
         locale = QSettings().value('locale/userLocale')
-        locale_path = os.path.join(self.plugin_dir, 'i18n', 'Giswater_{}.qm'.format(locale))
+        locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
-        
+         
         # load local settings of the plugin
-        settingFile = os.path.join(self.plugin_dir, 'config', 'giswater.config')
-        self.settings = QSettings(settingFile, QSettings.IniFormat)
-        self.settings.setIniCodec(sys.getfilesystemencoding())
-        
-        # load plugin settings
         self.loadPluginSettings()       
-        
-        # Connect to Database
-        self.setDatabaseConnection()     
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -68,11 +63,23 @@ class Giswater(QObject):
         
         # {function_name, map_tool}
         self.map_tools = {}
-    
+       
+        # Set controller to handle settings and database
+        self.controller = DaoController()
+        self.controller.setSettings(self.settings, self.plugin_name)
+        
+        # Connect to Database
+        self.controller.setDatabaseConnection()     
+        
     
     def loadPluginSettings(self):
         """ Load plugin settings """
         
+        # Get config file
+        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
+        self.settings = QSettings(setting_file, QSettings.IniFormat)
+        self.settings.setIniCodec(sys.getfilesystemencoding())
+                
         # Create plugin main menu
         self.menu_name = self.tr('menu_name')        
     
@@ -92,13 +99,10 @@ class Giswater(QObject):
             self.toolbar_edit_name = self.tr('toolbar_edit_name')
             self.toolbar_edit = self.iface.addToolBar(self.toolbar_edit_name)
             self.toolbar_edit.setObjectName(self.toolbar_edit_name)   
-            
-        self.connection_name = self.settings.value('db/connection_name', 'giswater')
-        self.schema_name = self.settings.value('db/schema_name', 'ws')
-        
+
 
     def tr(self, message):
-        return QCoreApplication.translate('Giswater', message)
+        return utils.tr(self.plugin_name, message)
         
         
     def createAction(self, icon_index=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
@@ -148,11 +152,11 @@ class Giswater(QObject):
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
         action = self.createAction(index_action, text_action, toolbar, None, True, function_name, parent)
+        # TODO: Parametrize it
         if int(index_action) == 13:
-            map_tool = GenericMapTool(self.iface, self.settings, action, index_action, self.dao)
+            map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
         else:
-            map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.dao)         
-            
+            map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)         
         self.map_tools[function_name] = map_tool             
         
         return action         
@@ -161,7 +165,7 @@ class Giswater(QObject):
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """  
         
-        if self.dao is None:
+        if self.controller is None:
             return
         
         parent = self.iface.mainWindow()
@@ -216,59 +220,64 @@ class Giswater(QObject):
         self.menu_go2epa.addAction(action1)
         self.menu_go2epa.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
-    
-     
-    def setDatabaseConnection(self):
-                               
-        # look for connection data in QGIS configuration (if exists)
-        self.dao = None        
-        qgis_settings = QSettings()     
-        root_conn = "/PostgreSQL/connections/"          
-        qgis_settings.beginGroup(root_conn);           
-        groups = qgis_settings.childGroups();                                
-        if self.connection_name in groups:      
-            root = self.connection_name+"/"  
-            host = qgis_settings.value(root+"host", '')
-            port = qgis_settings.value(root+"port", '')            
-            db = qgis_settings.value(root+"database", '')
-            user = qgis_settings.value(root+"username", '')
-            pwd = qgis_settings.value(root+"password", '') 
-        else:
-            message = self.tr('Database connection name not found. Please check configuration file')
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
-            return False
-
-        # Connect to Database 
-        self.dao = PgDao()     
-        self.dao.set_params(host, port, db, user, pwd)
-        self.dao.set_schema_name(self.schema_name)
-        status = self.dao.init_db()
         
-        return status
+        self.legend.currentLayerChanged.connect(self.layerActivated)
+        self.layerActivated(None)
+        
+    
+    def disableActions(self):
+        for i in range(10,16):
+            action = self.actions[str(i)]
+            action.setEnabled(False)
+            
+        
+    def layerActivated(self, layer):
+        if layer is None:
+            layer = self.iface.activeLayer() 
+        self.disableActions()
+        self.current_layer = layer
+        try:
+            list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
+            if type(list_index_action) is list:
+                for index_action in list_index_action:
+                    if index_action != '-1':
+                        self.actions[index_action].setEnabled(True)
+            elif type(list_index_action) is unicode:
+                index_action = str(list_index_action)
+                if index_action != '-1':
+                    self.actions[index_action].setEnabled(True)                
+        except AttributeError:
+            print "layerActivated: AttributeError"
 
         
     def ws_generic(self, function_name):   
-        """ Water supply generic callback function  """
+        """ Water supply generic callback function """
         # Get sender (selected action) and map tool associated 
-        sender = self.sender()            
-        map_tool = self.map_tools[function_name]
-        if sender.isChecked():
-            self.iface.mapCanvas().setMapTool(map_tool)
-            #print function_name+" has been checked"       
-        else:
-            self.iface.mapCanvas().unsetMapTool(map_tool)
+        try:
+            sender = self.sender()            
+            map_tool = self.map_tools[function_name]
+            if sender.isChecked():
+                self.iface.mapCanvas().setMapTool(map_tool)
+                #print function_name+" has been checked"       
+            else:
+                self.iface.mapCanvas().unsetMapTool(map_tool)
+        except AttributeError:
+            print "ws_generic: AttributeError"
             
             
     def ud_generic(self, function_name):   
-        """ Urban drainage generic callback function  """
+        """ Urban drainage generic callback function """
         # Get sender (selected action) and map tool associated 
-        sender = self.sender()            
-        map_tool = self.map_tools[function_name]
-        if sender.isChecked():
-            self.iface.mapCanvas().setMapTool(map_tool)
-            print function_name+" has been checked"       
-        else:
-            self.iface.mapCanvas().unsetMapTool(map_tool)
+        try:        
+            sender = self.sender()            
+            map_tool = self.map_tools[function_name]
+            if sender.isChecked():
+                self.iface.mapCanvas().setMapTool(map_tool)
+                print function_name+" has been checked"       
+            else:
+                self.iface.mapCanvas().unsetMapTool(map_tool)
+        except AttributeError:
+            print "ud_generic: AttributeError"                
                                             
     
     def unload(self):
