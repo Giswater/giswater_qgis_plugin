@@ -10,6 +10,12 @@ This version of Giswater is provided by Giswater Association
 -- Default values of column views
 -- ----------------------------
 
+ALTER TABLE "SCHEMA_NAME".node ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE "SCHEMA_NAME".node ALTER verified SET DEFAULT 'TO REVIEW';
+
+ALTER TABLE "SCHEMA_NAME".arc ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE "SCHEMA_NAME".arc ALTER verified SET DEFAULT 'TO REVIEW';
+
 ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER elevation SET DEFAULT 0.00;
 ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER depth SET DEFAULT 0.00;
 ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER state SET DEFAULT 'ON_SERVICE';

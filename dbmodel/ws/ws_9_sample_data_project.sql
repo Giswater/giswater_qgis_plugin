@@ -1554,17 +1554,20 @@ INSERT INTO "SCHEMA_NAME".man_valve VALUES ('1096', NULL);
 
 
 
-SELECT pg_catalog.setval('element_x_node_seq', 52, true);
-SELECT pg_catalog.setval('event_id_seq', 3, true);
-SELECT pg_catalog.setval('event_x_cover_seq', 32, true);
-SELECT pg_catalog.setval('event_x_filter_seq', 2, true);
-SELECT pg_catalog.setval('event_x_hydrant_seq', 6, true);
-SELECT pg_catalog.setval('event_x_junction_seq', 151, true);
-SELECT pg_catalog.setval('event_x_meter_seq', 4, true);
-SELECT pg_catalog.setval('event_x_pipe_seq', 216, true);
-SELECT pg_catalog.setval('event_x_pump_seq', 3, true);
-SELECT pg_catalog.setval('event_x_register_seq', 33, true);
-SELECT pg_catalog.setval('event_x_tank_seq', 2, true);
-SELECT pg_catalog.setval('event_x_valve_seq', 32, true);
-SELECT pg_catalog.setval('inp_pattern_id_seq', 3, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".element_x_node_seq', 52, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_id_seq', 3, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_cover_seq', 32, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_filter_seq', 2, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_hydrant_seq', 6, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_junction_seq', 151, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_meter_seq', 4, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_pipe_seq', 216, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_pump_seq', 3, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_register_seq', 33, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_tank_seq', 2, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_valve_seq', 32, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".inp_pattern_id_seq', 3, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".node_id_seq', 1100, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".arc_id_seq', 2200, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".connec_seq', 3300, true);
 

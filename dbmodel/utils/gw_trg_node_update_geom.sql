@@ -46,6 +46,6 @@ END;
 $$;
 
 
-CREATE TRIGGER gw_trg_node_update_geom BEFORE UPDATE ON "SCHEMA_NAME"."node" 
+CREATE TRIGGER gw_trg_node_update_geom AFTER UPDATE ON "SCHEMA_NAME"."node" 
 FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update_geom"();
 

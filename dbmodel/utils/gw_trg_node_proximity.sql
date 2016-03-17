@@ -22,7 +22,7 @@ BEGIN
 
     -- If there is an existing node closer than 'rec.node_tolerance' meters --> error
     IF (numNodes > 0) THEN
-        RAISE EXCEPTION 'Please, check your project or modify the configuration propierties. Exists one o more nodes closer than minimum configured, node_id';
+        RAISE EXCEPTION '[%]: Please, check your project or modify the configuration propierties. Exists one o more nodes closer than minimum configured, node_id', TG_NAME;
     END IF;
 
     RETURN NEW;

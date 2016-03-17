@@ -20,7 +20,7 @@ BEGIN
             RETURN NEW; 
         ELSE
             -- node is a nodarc2 but don't have two arcs and shouldn't be updated
-            RAISE EXCEPCION 'The node have not two arcs. Please check it';            
+            RAISE EXCEPCION '[%]; The node have not two arcs. Please check it', TG_NAME;            
             RETURN NULL;
         END IF;
     END IF;

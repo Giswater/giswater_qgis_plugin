@@ -42,7 +42,7 @@ node.rotation,
 node.link,
 node.verified,
 node.the_geom
-FROM ("SCHEMA_NAME".node JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+FROM ("SCHEMA_NAME".node LEFT JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
@@ -78,7 +78,7 @@ arc.link,
 arc.verified,
 arc.the_geom,
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length
-FROM ("SCHEMA_NAME".arc JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+FROM ("SCHEMA_NAME".arc LEFT JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
 
@@ -98,7 +98,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
-    --Control insertions ID
+    -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
 
         -- Node ID
@@ -111,8 +111,10 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
             END IF;
-            NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
-            NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
+            --NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
+            --NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
+        --ELSE
+            --NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);        
         END IF;
 
         -- Sector ID
@@ -125,6 +127,7 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
             END IF;
         END IF;
+        
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
@@ -135,14 +138,11 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
             END IF;
         END IF;
-
-        NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);
         
         -- FEATURE INSERT
         INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, 
-                                NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
@@ -210,8 +210,9 @@ BEGIN
         END IF;
 
         UPDATE node 
-        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", 
-            dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
+        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
+            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
+            fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id = OLD.node_id;
@@ -247,14 +248,18 @@ BEGIN
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
         END IF;
+        
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
                 RAISE EXCEPTION 'There are no arc catalog defined in the model, define at least one.';
             END IF;
-            NEW.arccat_id:= (SELECT id FROM cat_arc LIMIT 1);
-            NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);                           
+            --NEW.arccat_id:= (SELECT id FROM cat_arc LIMIT 1);
+            --NEW.epa_type:= 'PIPE';
+        --ELSE
+            --NEW.epa_type:= (SELECT epa_default FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);        
         END IF;
+        
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
@@ -265,6 +270,7 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
             END IF;
         END IF;
+        
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
@@ -275,8 +281,6 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
             END IF;
         END IF;
-        
-        NEW.epa_type:= (SELECT epa_default FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
     
         -- FEATURE INSERT
         INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length, 
@@ -315,8 +319,9 @@ BEGIN
         END IF;
     
         UPDATE arc 
-        SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, 
-            dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
+        SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", 
+            "comment"=NEW."comment", custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
+            location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE arc_id=OLD.arc_id;

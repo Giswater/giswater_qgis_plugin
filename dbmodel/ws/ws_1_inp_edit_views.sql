@@ -74,16 +74,16 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_node() RETURNS trigger LANGUAG
 DECLARE 
     node_table varchar;
     man_table varchar;
+    epa_type varchar;
     v_sql varchar;
-    sectorRecord Record;
-    dmaRecord Record;
-
+    old_nodetype varchar;
+    new_nodetype varchar;    
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     node_table:= TG_ARGV[0];
-    RAISE NOTICE 'node_table: %', node_table;
+    epa_type:= TG_ARGV[1];
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -97,7 +97,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
             END IF;
-            NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
+            --NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
         END IF;
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
@@ -121,9 +121,12 @@ BEGIN
         END IF;
             
         -- FEATURE INSERT
-        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION', NEW.sector_id, NEW."state", 
-                                NEW.annotation, NEW."observ", null, null, null, null, null, null, null, null, null, null, null, 
-                                null, null, null, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+        v_sql:= 'INSERT INTO node (node_id, epa_type, sector_id, dma_id) VALUES 
+            ('||quote_literal(NEW.node_id)||', '||quote_literal(epa_type)||', '||quote_literal(NEW.sector_id)||', '||quote_literal(NEW.dma_id)||')';
+        EXECUTE v_sql;
+        UPDATE node 
+        SET the_geom=NEW.the_geom 
+        WHERE node_id=NEW.node_id;
 
         -- EPA INSERT
         IF node_table = 'inp_junction' THEN        
@@ -144,8 +147,10 @@ BEGIN
 
         -- MANAGEMENT INSERT
         man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
-        v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-        EXECUTE v_sql;
+        IF man_table IS NOT NULL THEN        
+            v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+            --RAISE NOTICE 'sql: %', v_sql;
+            EXECUTE v_sql;
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -160,7 +165,7 @@ BEGIN
 
         UPDATE node 
         SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, "observ"=NEW."observ", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
         IF node_table = 'inp_junction' OR node_table = 'inp_tank' THEN
@@ -190,22 +195,22 @@ $$;
 
 
 CREATE TRIGGER v_edit_inp_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_shortpipe 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_shortpipe');
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_shortpipe', 'SHORTPIPE');
 
 CREATE TRIGGER v_edit_inp_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_valve 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_valve');
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_valve', 'VALVE');
 
 CREATE TRIGGER v_edit_inp_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pump 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_pump');
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_pump', 'PUMP');
 
 CREATE TRIGGER v_edit_inp_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_junction 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_junction');
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_junction', 'JUNCTION');
  
 CREATE TRIGGER v_edit_inp_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_reservoir 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_reservoir');
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_reservoir', 'RESERVOIR');
 
 CREATE TRIGGER v_edit_inp_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_tank 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_tank');
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".v_edit_inp_node('inp_tank', 'TANK');
 
   
   
@@ -217,7 +222,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.v_edit_inp_arc() RETURNS trigger LANGUAGE
 DECLARE 
     arc_table varchar;
     man_table varchar;
-    v_sql varchar;
+    v_sql varchar;    
 
 BEGIN
 

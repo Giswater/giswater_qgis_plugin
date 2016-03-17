@@ -17,9 +17,9 @@ node.sector_id, node."state", node.annotation, node.observ, node.comment, node.d
 man_junction.add_info,
 cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
-FROM (SCHEMA_NAME.node
+FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.man_junction ON (((man_junction.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_tank" AS 
@@ -32,7 +32,7 @@ cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.man_tank ON (((man_tank.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_hydrant" AS 
@@ -45,7 +45,7 @@ cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.man_hydrant ON (((man_hydrant.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_valve" AS 
@@ -58,7 +58,7 @@ cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node
 JOIN SCHEMA_NAME.man_valve ON (((man_valve.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_pump" AS 
@@ -71,7 +71,7 @@ cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.man_pump ON (((man_pump.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_filter" AS 
@@ -84,7 +84,7 @@ cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node 
 JOIN SCHEMA_NAME.man_filter ON (((man_filter.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 CREATE VIEW "SCHEMA_NAME"."v_edit_man_meter" AS 
@@ -97,7 +97,7 @@ cat_node.svg AS "cat.svg",
 node.rotation, node.link, node.verified, node.the_geom
 FROM (SCHEMA_NAME.node
 JOIN SCHEMA_NAME.man_meter ON (((man_meter.node_id)::text = (node.node_id)::text))
-JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+JOIN SCHEMA_NAME.cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
 
 
@@ -115,7 +115,7 @@ cat_arc.svg AS "cat.svg",
 arc.rotation, arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_pipe ON (((man_pipe.arc_id)::text = (arc.arc_id)::text))
-JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+JOIN SCHEMA_NAME.cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
 
 

@@ -28,16 +28,17 @@ BEGIN
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
         -- Control of same node initial and final
         IF (nodeRecord1.node_id = nodeRecord2.node_id) THEN
-            RAISE EXCEPTION 'One or more features has the same Node as Node1 and Node2. Please check your project and repair it!';
+            RAISE EXCEPTION '[%]: One or more features has the same Node as Node1 and Node2. Please check your project and repair it!', TG_NAME;
         ELSE
             -- Update coordinates
-            NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-            NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
-            NEW.node_1 := nodeRecord1.node_id; 
-            NEW.node_2 := nodeRecord2.node_id;
+            NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+            NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
+            NEW.node_1:= nodeRecord1.node_id; 
+            NEW.node_2:= nodeRecord2.node_id;
             RETURN NEW;
         END IF;
     ELSE
+            RAISE EXCEPTION '[%]: Arc was not inserted', TG_NAME;
         RETURN NULL;
     END IF;
 
