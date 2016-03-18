@@ -34,9 +34,10 @@ def isFirstTime():
     return first
 
 
-def fillComboBox(widget, rows):
+def fillComboBox(widget, rows, allow_nulls=True):
     widget.clear()
-    widget.addItem('')     
+    if allow_nulls:
+        widget.addItem('')     
     for row in rows:
         widget.addItem(row[0])    
 
@@ -45,6 +46,8 @@ def setSelectedItem(widget_name, value):
     widget = _dialog.findChild(QComboBox, widget_name)
     if widget:
         index = widget.findText(value)
+        if index == -1:
+            index = 0
         widget.setCurrentIndex(index);        
 
 

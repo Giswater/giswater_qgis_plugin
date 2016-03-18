@@ -16,13 +16,18 @@ def formOpen(dialog, layer, feature):
     global node_dialog
     utils.setDialog(dialog)
     node_dialog = NodeDialog(iface, dialog, layer, feature)
-    setSignals()
+    initConfig()
 
     
-def setSignals():
-         
-    # Buttons
-    #node_dialog.dialog.findChild(QComboBox, "cat_nodetype_id").currentIndexChanged.connect(node_dialog.changeNodeType) 
+def initConfig():
+     
+    node_dialog.dialog.findChild(QComboBox, "nodecat_id").setVisible(False)         
+    node_dialog.dialog.findChild(QComboBox, "cat_nodetype_id").activated.connect(node_dialog.changeNodeType)    
+    node_dialog.changeNodeType(-1)  
+    nodecat_id = utils.getSelectedItem("nodecat_id")
+    utils.setSelectedItem("nodecat_id_dummy", nodecat_id)            
+    node_dialog.dialog.findChild(QComboBox, "nodecat_id_dummy").activated.connect(node_dialog.changeNodeCat)          
+
     node_dialog.dialog.findChild(QPushButton, "btnAccept").clicked.connect(node_dialog.save)            
     node_dialog.dialog.findChild(QPushButton, "btnClose").clicked.connect(node_dialog.close)        
         
@@ -73,7 +78,7 @@ class NodeDialog():
             message = self.controller.getLastError()
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return 
-            
+             
         self.schema_name = self.controller.getSchemaName()            
         self.dao = self.controller.getDao()
              
@@ -113,7 +118,7 @@ class NodeDialog():
     
     def fillNodeType(self):
         """ Define and execute query to populate combo 'cat_nodetype_id' """
-        current_value = utils.getSelectedItem('cat_nodetype_id')
+        current_value = utils.getSelectedItem("cat_nodetype_id")
         sql = "SELECT id, man_table, epa_table FROM "+self.schema_name+".arc_type WHERE type = '"+self.epa_type+"' UNION "
         sql+= "SELECT id, man_table, epa_table FROM "+self.schema_name+".node_type WHERE type = '"+self.epa_type+"' ORDER BY id"
         rows = self.dao.get_rows(sql)
@@ -123,13 +128,19 @@ class NodeDialog():
             
             
     def changeNodeType(self, index):
-        """ Define and execute query to populate combo 'nodecat_id' """
-        cat_nodetype_id = utils.getSelectedItem('cat_nodetype_id')
+        """ Define and execute query to populate combo 'nodecat_id_dummy' """
+        cat_nodetype_id = utils.getSelectedItem("cat_nodetype_id")
         sql = "SELECT id FROM "+self.schema_name+".cat_arc WHERE arctype_id = '"+cat_nodetype_id+"' UNION "
         sql+= "SELECT id FROM "+self.schema_name+".cat_node WHERE nodetype_id = '"+cat_nodetype_id+"' ORDER BY id"   
         rows = self.dao.get_rows(sql)
-        self.cbo_nodecat_id = self.dialog.findChild(QComboBox, "nodecat_id")
-        utils.fillComboBox(self.cbo_nodecat_id, rows)                 
+        self.cbo_nodecat_id = self.dialog.findChild(QComboBox, "nodecat_id_dummy")
+        utils.fillComboBox(self.cbo_nodecat_id, rows)  
+        
+                       
+    def changeNodeCat(self, index):
+        """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
+        dummy = utils.getSelectedItem("nodecat_id_dummy")
+        utils.setSelectedItem("nodecat_id", dummy)           
     
     
     def setTabsVisibility(self):
