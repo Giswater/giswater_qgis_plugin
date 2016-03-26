@@ -95,28 +95,28 @@ BEGIN
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no nodes catalog defined in the model, define at least one.', TG_NAME;
             END IF;
             --NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
         END IF;
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no sectors defined in the model, define at least one.', TG_NAME;
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the sectors!', TG_NAME;
             END IF;
         END IF;
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no dma defined in the model, define at least one.', TG_NAME;
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the dma!', TG_NAME;
             END IF;
         END IF;
             
@@ -159,7 +159,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
             IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
-                RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
+                RAISE EXCEPTION '[%]: Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog', TG_NAME;
             END IF;
         END IF;
 
@@ -238,28 +238,28 @@ BEGIN
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-                RAISE EXCEPTION 'There are no arcs catalog defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no arcs catalog defined in the model, define at least one.', TG_NAME;
             END IF;	
             NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
         END IF;
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no sectors defined in the model, define at least one.';
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the sectors!', TG_NAME;
             END IF;
         END IF;
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no dma defined in the model, define at least one.';
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the dma!', TG_NAME;
             END IF;
         END IF;
 
