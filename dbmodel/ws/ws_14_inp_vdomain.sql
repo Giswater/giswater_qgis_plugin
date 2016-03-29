@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
  
 INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('PIPE');
-INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('UNDEFINED');
+INSERT INTO "SCHEMA_NAME"."inp_arc_type" VALUES ('NOT DEFINED');
 
 -- ----------------------------
 -- Records of inp_node_type
@@ -21,8 +21,8 @@ INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('RESERVOIR');
 INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('TANK');
 INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('PUMP');
 INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('VALVE');
-INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('SHORT_PIPE');
-INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('UNDEFINED');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('SHORTPIPE');
+INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('NOT DEFINED');
 
 
 -- ----------------------------
@@ -198,21 +198,29 @@ INSERT INTO "SCHEMA_NAME"."inp_value_reactions_gl" VALUES ('WALL');
  
 
 -- ----------------------------
--- Records of inp_value_st_pipe
+-- Records of inp_value_status_pipe
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."inp_value_st_pipe" VALUES ('CLOSED');
-INSERT INTO "SCHEMA_NAME"."inp_value_st_pipe" VALUES ('CV');
-INSERT INTO "SCHEMA_NAME"."inp_value_st_pipe" VALUES ('OPEN');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_pipe" VALUES ('CLOSED');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_pipe" VALUES ('CV');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_pipe" VALUES ('OPEN');
  
 
 -- ----------------------------
--- Records of inp_value_status
+-- Records of inp_value_status_pump
 -- ----------------------------
  
-INSERT INTO "SCHEMA_NAME"."inp_value_status" VALUES ('ACTIVE');
-INSERT INTO "SCHEMA_NAME"."inp_value_status" VALUES ('CLOSED');
-INSERT INTO "SCHEMA_NAME"."inp_value_status" VALUES ('OPEN');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_pump" VALUES ('CLOSED');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_pump" VALUES ('OPEN');
+
+
+-- ----------------------------
+-- Records of inp_value_status_valve
+-- ----------------------------
+ 
+INSERT INTO "SCHEMA_NAME"."inp_value_status_valve" VALUES ('ACTIVE');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_valve" VALUES ('CLOSED');
+INSERT INTO "SCHEMA_NAME"."inp_value_status_valve" VALUES ('OPEN');
  
 
 -- ----------------------------
@@ -241,25 +249,4 @@ INSERT INTO "SCHEMA_NAME"."inp_value_yesno" VALUES ('YES');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('FULL');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('NO');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('YES');
-
-
--- ----------------------------
--- Records of inp_options
--- ----------------------------
- 
-INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('LPS', 'H-W', '', '1', '1', '40', '0.001', 'CONTINUE', '2', '10', '0', '', '1', '0.5', 'NONE', '1', '0.01', '', '40');
- 
-
--- ----------------------------
--- Records of inp_report
--- ----------------------------
- 
-INSERT INTO "SCHEMA_NAME"."inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES');
- 
-
--- ----------------------------
--- Records of inp_times
--- ----------------------------
- 
-INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 

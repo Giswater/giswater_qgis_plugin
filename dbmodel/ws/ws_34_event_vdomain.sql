@@ -18,8 +18,8 @@ INSERT INTO "SCHEMA_NAME"."event_type" VALUES ('OTHER', '');
 -- Records of event_value
 -- ----------------------------
 INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('EXCELENT', 1,'Excelent');
-INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('GOOD', 2,'Excelent');
-INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('NORMAL', 3,'Excelent');
-INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('BAD', 4,'Excelent');
-INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('VERY BAD', 5,'Excelent');
+INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('GOOD', 2,'Good');
+INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('NORMAL', 3,'Normal');
+INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('BAD', 4,'Bad');
+INSERT INTO "SCHEMA_NAME"."event_value" VALUES ('VERY BAD', 5,'Very bad');
 

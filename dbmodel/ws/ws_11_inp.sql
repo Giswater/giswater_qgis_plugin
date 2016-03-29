@@ -597,15 +597,19 @@ CREATE TABLE "SCHEMA_NAME"."inp_value_reactions_gl" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_st_pipe" (
+CREATE TABLE "SCHEMA_NAME"."inp_value_status_pipe" (
 "id" varchar(18) COLLATE "default" NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_status" (
-"id" varchar(16) COLLATE "default" NOT NULL
+CREATE TABLE "SCHEMA_NAME"."inp_value_status_pump" (
+"id" varchar(18) COLLATE "default" NOT NULL
 );
 
+
+CREATE TABLE "SCHEMA_NAME"."inp_value_status_valve" (
+"id" varchar(18) COLLATE "default" NOT NULL
+);
 
 CREATE TABLE "SCHEMA_NAME"."inp_value_times" (
 "id" varchar(18) COLLATE "default" NOT NULL
@@ -857,8 +861,6 @@ ALTER TABLE "SCHEMA_NAME"."inp_value_opti_units" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_param_energy" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_reactions_el" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_reactions_gl" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_st_pipe" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_status" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_times" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_yesno" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_yesnofull" ADD PRIMARY KEY ("id");

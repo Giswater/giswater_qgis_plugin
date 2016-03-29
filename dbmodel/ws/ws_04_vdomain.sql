@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 -- Records of value_state
 -- ----------------------------
+INSERT INTO "SCHEMA_NAME"."value_state" VALUES ('OBSOLETE');
 INSERT INTO "SCHEMA_NAME"."value_state" VALUES ('ON_SERVICE');
 INSERT INTO "SCHEMA_NAME"."value_state" VALUES ('RECONSTRUCT');
 INSERT INTO "SCHEMA_NAME"."value_state" VALUES ('REPLACE');
@@ -19,4 +20,11 @@ INSERT INTO "SCHEMA_NAME"."value_state" VALUES ('PLANIFIED');
 -- ----------------------------
 INSERT INTO "SCHEMA_NAME"."value_verified" VALUES ('TO REVIEW');
 INSERT INTO "SCHEMA_NAME"."value_verified" VALUES ('VERIFIED');
+
+
+-- ----------------------------
+-- Records of value_yesno
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."value_yesno" VALUES ('NO');
+INSERT INTO "SCHEMA_NAME"."value_yesno" VALUES ('YES');
 

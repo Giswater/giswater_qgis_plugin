@@ -58,33 +58,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."link_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."node_flow_trace_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-  
-CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_trace_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-  
-CREATE SEQUENCE "SCHEMA_NAME"."node_flow_exit_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-  
-CREATE SEQUENCE "SCHEMA_NAME"."arc_flow_exit_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
+
 
 
 
@@ -286,6 +260,12 @@ CREATE TABLE "SCHEMA_NAME"."value_verified" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "observ" varchar(254) COLLATE "default",
  CONSTRAINT value_verified_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE "SCHEMA_NAME"."value_yesno" (
+"id" varchar(16) COLLATE "default" NOT NULL,
+"observ" varchar(254) COLLATE "default",
+ CONSTRAINT value_yesno_pkey PRIMARY KEY (id)
 );
 
 
