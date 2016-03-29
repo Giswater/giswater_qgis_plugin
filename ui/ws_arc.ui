@@ -2835,7 +2835,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>100</width>
+     <width>81</width>
      <height>20</height>
     </rect>
    </property>
@@ -2859,9 +2859,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QComboBox" name="v_edit_arc_arccat_id">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>240</x>
      <y>20</y>
-     <width>140</width>
+     <width>181</width>
      <height>20</height>
     </rect>
    </property>
@@ -2874,9 +2874,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="cat_arc_pnom">
    <property name="geometry">
     <rect>
-     <x>730</x>
+     <x>759</x>
      <y>20</y>
-     <width>90</width>
+     <width>71</width>
      <height>20</height>
     </rect>
    </property>
@@ -2965,9 +2965,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="cat_arc_dnom">
    <property name="geometry">
     <rect>
-     <x>630</x>
+     <x>680</x>
      <y>20</y>
-     <width>90</width>
+     <width>71</width>
      <height>20</height>
     </rect>
    </property>
@@ -2983,9 +2983,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="cat_arc_matcat_id">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>560</x>
      <y>20</y>
-     <width>110</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -2998,31 +2998,12 @@ p, li { white-space: pre-wrap; }
     <string>cat_arc.matcat_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_arc_arctype_id">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>20</y>
-     <width>120</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>cat_arc.arctype_id</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="v_edit_arc_epa_type">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>430</x>
      <y>20</y>
-     <width>101</width>
+     <width>121</width>
      <height>20</height>
     </rect>
    </property>
@@ -3044,6 +3025,21 @@ p, li { white-space: pre-wrap; }
    <item>
     <property name="text">
      <string>Verified</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QComboBox" name="catarctype_id">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>20</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>arctype_id</string>
     </property>
    </item>
   </widget>

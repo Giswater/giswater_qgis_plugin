@@ -10257,9 +10257,9 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>560</x>
+     <x>550</x>
      <y>20</y>
-     <width>71</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -10278,9 +10278,9 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>740</x>
+     <x>750</x>
      <y>20</y>
-     <width>81</width>
+     <width>71</width>
      <height>20</height>
     </rect>
    </property>
@@ -10299,9 +10299,9 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>640</x>
+     <x>670</x>
      <y>20</y>
-     <width>91</width>
+     <width>71</width>
      <height>20</height>
     </rect>
    </property>
@@ -10350,32 +10350,10 @@ p, li { white-space: pre-wrap; }
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="epa_type">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>20</y>
-     <width>121</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QComboBox" name="nodecat_id">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>230</x>
      <y>0</y>
      <width>181</width>
      <height>20</height>
@@ -10385,7 +10363,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QComboBox" name="cat_nodetype_id">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>90</x>
      <y>20</y>
      <width>131</width>
      <height>20</height>
@@ -10398,11 +10376,32 @@ p, li { white-space: pre-wrap; }
   <widget class="QComboBox" name="nodecat_id_dummy">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>230</x>
      <y>20</y>
      <width>181</width>
      <height>20</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="epa_type">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>20</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

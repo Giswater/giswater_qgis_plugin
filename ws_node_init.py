@@ -134,7 +134,7 @@ class NodeDialog():
         sql+= "SELECT id FROM "+self.schema_name+".cat_node WHERE nodetype_id = '"+cat_nodetype_id+"' ORDER BY id"   
         rows = self.dao.get_rows(sql)
         self.cbo_nodecat_id = self.dialog.findChild(QComboBox, "nodecat_id_dummy")
-        utils.fillComboBox(self.cbo_nodecat_id, rows)  
+        utils.fillComboBox(self.cbo_nodecat_id, rows, False)  
         
                        
     def changeNodeCat(self, index):
