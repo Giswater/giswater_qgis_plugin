@@ -97,3 +97,4 @@ INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:0
 -- ----------------------------
 INSERT INTO "SCHEMA_NAME"."state_selection" VALUES ('ON_SERVICE');
 
+

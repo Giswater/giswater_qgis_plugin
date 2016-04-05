@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     inp_table varchar;
     man_table varchar;
@@ -29,10 +29,10 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
                 RAISE EXCEPTION 'There are no arc catalog defined in the model, define at least one.';
             END IF;
-            --NEW.arccat_id:= (SELECT id FROM cat_arc LIMIT 1);
-            --NEW.epa_type:= 'PIPE';
-        --ELSE
-            --NEW.epa_type:= (SELECT epa_default FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);        
+            NEW.arccat_id:= (SELECT id FROM cat_arc LIMIT 1);
+            NEW.epa_type:= 'PIPE';
+        ELSE
+            NEW.epa_type:= (SELECT epa_default FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);        
         END IF;
         
         -- Sector ID
@@ -58,12 +58,20 @@ BEGIN
         END IF;
     
         -- FEATURE INSERT
-        INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length, 
+        INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.y1, NEW.y2, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.direction, NEW.custom_length,
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.est_y1, NEW.est_y2, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
         -- EPA INSERT
-        IF (NEW.epa_type = 'PIPE') THEN 
-            inp_table:= 'inp_pipe';
+        IF (NEW.epa_type = 'CONDUIT') THEN 
+            inp_table:= 'inp_conduit';
+        ELSIF (NEW.epa_type = 'PUMP') THEN 
+            inp_table:= 'inp_pump';
+		ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+			inp_table:= 'inp_orifice';
+		ELSIF (NEW.epa_type = 'WEIR') THEN 
+            inp_table:= 'inp_weir';
+		ELSIF (NEW.epa_type = 'OUTLET') THEN 
+            inp_table:= 'inp_outlet';
         END IF;
         v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
         EXECUTE v_sql;
@@ -79,26 +87,42 @@ BEGIN
     
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
-            IF (OLD.epa_type = 'PIPE') THEN
-                inp_table:= 'inp_pipe';            
-            END IF;
+            IF (OLD.epa_type = 'CONDUIT') THEN 
+            inp_table:= 'inp_conduit';
+			ELSIF (OLD.epa_type = 'PUMP') THEN 
+            inp_table:= 'inp_pump';
+			ELSIF (OLD.epa_type = 'ORIFICE') THEN 
+			inp_table:= 'inp_orifice';
+			ELSIF (OLD.epa_type = 'WEIR') THEN 
+            inp_table:= 'inp_weir';
+			ELSIF (OLD.epa_type = 'OUTLET') THEN 
+            inp_table:= 'inp_outlet';
+			END IF;
             v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
             EXECUTE v_sql;
 
-            IF (NEW.epa_type = 'PIPE') THEN
-                inp_table:= 'inp_pipe';   
-            END IF;
+			IF (NEW.epa_type = 'CONDUIT') THEN 
+            inp_table:= 'inp_conduit';
+			ELSIF (NEW.epa_type = 'PUMP') THEN 
+			inp_table:= 'inp_pump';
+			ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+			inp_table:= 'inp_orifice';
+			ELSIF (NEW.epa_type = 'WEIR') THEN 
+            inp_table:= 'inp_weir';
+			ELSIF (NEW.epa_type = 'OUTLET') THEN 
+            inp_table:= 'inp_outlet';
+			END IF;
             v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
             EXECUTE v_sql;
 
         END IF;
     
         UPDATE arc 
-        SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", 
-            "comment"=NEW."comment", custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
+        SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", 
+            "comment"=NEW."comment", direction=NEW.direction, custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
             location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+            rotation=NEW.rotation, link=NEW.link, est_y1=NEW.est_y1, ests_y2=NEW.est_y2, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE arc_id=OLD.arc_id;
         RETURN NEW;
 
@@ -115,7 +139,7 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_arc
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_arc();
+CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_arc
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_arc();
 
       

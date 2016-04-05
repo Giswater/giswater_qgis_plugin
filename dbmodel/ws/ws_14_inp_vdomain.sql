@@ -250,3 +250,6 @@ INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('FULL');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('NO');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesnofull" VALUES ('YES');
 
+
+
+

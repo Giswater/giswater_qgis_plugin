@@ -8,25 +8,25 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 -- Records of type_connec
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME".type_connec VALUES ('DOMESTIC', NULL);
-INSERT INTO "SCHEMA_NAME".type_connec VALUES ('TRADE', NULL);
-INSERT INTO "SCHEMA_NAME".type_connec VALUES ('INDUSTRIAL', NULL);
+INSERT INTO "sample_ud".type_connec VALUES ('DOMESTIC', NULL);
+INSERT INTO "sample_ud".type_connec VALUES ('TRADE', NULL);
+INSERT INTO "sample_ud".type_connec VALUES ('INDUSTRIAL', NULL);
 
 
 -- ----------------------------
 -- Records of man_type_category
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME"."man_type_category" VALUES ('NO CATEGORY DATA', null);
+INSERT INTO "sample_ud"."man_type_category" VALUES ('NO CATEGORY DATA', null);
 
 
 -- ----------------------------
 -- Records of man_type_fluid
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME"."man_type_fluid" VALUES ('NO FLUID DATA', null);
+INSERT INTO "sample_ud"."man_type_fluid" VALUES ('NO FLUID DATA', null);
 
 
 -- ----------------------------
 -- Records of man_type_location
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME"."man_type_location" VALUES ('NO LOCATION DATA', null);
+INSERT INTO "sample_ud"."man_type_location" VALUES ('NO LOCATION DATA', null);
 

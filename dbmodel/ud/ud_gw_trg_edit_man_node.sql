@@ -11,7 +11,8 @@ CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_man_node() RETURNS trigger LANG
 DECLARE
     epa_table varchar;
     man_table varchar;
-	old_nodetype varchar;
+    epa_type varchar;
+    old_nodetype varchar;
     new_nodetype varchar;
     v_sql varchar;
 
@@ -19,6 +20,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     man_table:= TG_ARGV[0];
+    epa_type:= TG_ARGV[1];
     --RAISE NOTICE 'man_table: %', man_table;    
 
     -- Control insertions ID
@@ -60,23 +62,26 @@ BEGIN
         END IF;
 
         -- FEATURE INSERT
-        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, 'JUNCTION'::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, 
-								NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 	
+        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW."ymax", NEW.nodecat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+                                NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, 	
                                 null, null, null, null, null,
                                 NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
         
         -- MANAGEMENT INSERT
-        IF man_table = 'man_tank' THEN        
-            INSERT INTO man_tank VALUES (NEW.node_id, NEW.vmax, NEW.area, NEW.add_info);
-        ELSE
-            v_sql:= 'INSERT INTO'||man_table||' VALUES ('||quote_literal(NEW.node_id)||', '||NEW.add_info||')';
-            EXECUTE v_sql;
+        IF man_table = 'man_junction' THEN        
+		INSERT INTO man_junction VALUES (NEW.node_id, NEW.add_info);
+		ELSIF man_table = 'man_storage' THEN		
+		INSERT INTO man_storage VALUES (NEW.node_id, NEW.add_info);
+		ELSIF man_table = 'man_outfall' THEN		
+		INSERT INTO man_outfall VALUES (NEW.node_id, NEW.add_info);
         END IF;
 
         -- EPA INSERT
         epa_table:= (SELECT epa_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
         v_sql:= 'INSERT INTO '||epa_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         RETURN NEW;
+
+
 
     ELSIF TG_OP = 'UPDATE' THEN
 
@@ -87,20 +92,24 @@ BEGIN
                 RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
             END IF;
         END IF;
-
+        
+        -- FEATURE UPDATE
         UPDATE node
-        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", 
+        SET node_id=NEW.node_id, top_elev=NEW.top_elev, "ymax"=NEW."ymax", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", 
              dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, 
              rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
-        
-        IF man_table = 'man_tank' THEN        
-            UPDATE man_tank SET node_id=NEW.node_id, vmax=NEW.vmax, area=NEW.area, add_info=NEW.add_info WHERE node_id=OLD.node_id;
-        ELSE
-            v_sql:= 'UPDATE '||man_table||' SET node_id='||quote_literal(NEW.node_id)||', add_info='||quote_literal(NEW.add_info)||' WHERE node_id='||quote_literal(OLD.node_id);
-            EXECUTE v_sql;
+
+        -- MANAGEMENT UPDATE
+        IF man_table = 'man_junction' THEN        
+		UPDATE man_junction SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
+		ELSIF man_table = 'man_storage' THEN		
+		UPDATE man_storage SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
+		ELSIF man_table = 'man_outfall' THEN		
+		UPDATE man_outfall SET node_id=NEW.node_id, add_info=NEW.add_info WHERE node_id=OLD.node_id;
         END IF;
         RETURN NEW;
+        
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id=OLD.node_id;
@@ -115,26 +124,14 @@ $$;
 
 
 CREATE TRIGGER gw_trg_edit_man_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_junction
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_junction');
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_junction', 'JUNCTION');
  
-CREATE TRIGGER gw_trg_edit_man_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_tank 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_tank');
+CREATE TRIGGER gw_trg_edit_man_node_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_storage 
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_storage', 'STORAGE');
 
-CREATE TRIGGER gw_trg_edit_man_node_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_hydrant 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_hydrant');
+CREATE TRIGGER gw_trg_edit_man_node_outfall INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_outfall 
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_outfall', 'OUTFALL');
 
-CREATE TRIGGER gw_trg_edit_man_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_valve 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_valve');
-
-CREATE TRIGGER gw_trg_edit_man_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_pump 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_pump');
-
-CREATE TRIGGER gw_trg_edit_man_node_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_filter 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_filter');
-
-CREATE TRIGGER gw_trg_edit_man_node_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_meter 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_meter');
-  
   
   
    

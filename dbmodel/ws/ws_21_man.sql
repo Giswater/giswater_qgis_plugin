@@ -153,7 +153,7 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."type_connnec" (
+CREATE TABLE "SCHEMA_NAME"."type_connec" (
 "id" varchar(20) COLLATE "default" NOT NULL,
 "observ" varchar(50) COLLATE "default",
 CONSTRAINT type_connec_pkey PRIMARY KEY (id)
@@ -176,11 +176,14 @@ CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."connec" (
-"connec_id" varchar DEFAULT nextval('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
+"connec_id" varchar (16) DEFAULT nextval('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
 "connecat_id" varchar(30) COLLATE "default",
 "sector_id" varchar(30) COLLATE "default",
+"code" varchar(30) COLLATE "default",
+"n_hydrometer" int4,
+"demand" numeric(12,8),
 "state" character varying(16),
 "annotation" character varying(254),
 "observ" character varying(254),
@@ -332,7 +335,7 @@ ALTER TABLE "SCHEMA_NAME"."cat_element" ADD FOREIGN KEY ("elementtype_id") REFER
 ALTER TABLE "SCHEMA_NAME"."cat_element" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_element" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."cat_connec" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_connec" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."type_connnec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."cat_connec" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."type_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("connecat_id") REFERENCES "SCHEMA_NAME"."cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -6,7 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 
    
-CREATE OR REPLACE FUNCTION "sample_ud".gw_trg_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
+
+CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_node()
+  RETURNS trigger AS
+$BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
@@ -25,16 +28,21 @@ BEGIN
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id:= (SELECT nextval('node_id_seq'));
         END IF;
-
+        
+        -- elev
+        IF (NEW.elev IS NOT NULL) THEN   	
+			RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
+		END IF;
+        
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
             END IF;
-            --NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
-            --NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
-        --ELSE
-            --NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);        
+            NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
+            NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
+        ELSE
+            NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);        
         END IF;
 
         -- Sector ID
@@ -58,19 +66,21 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
             END IF;
         END IF;
+
+
         
         -- FEATURE INSERT
-        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+        NEW.elev=NEW.top_elev-NEW.ymax;
+
+        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.elev, NEW.sander, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.est_top_elev, NEW.est_ymax, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
-        ELSIF (NEW.epa_type = 'TANK') THEN inp_table:= 'inp_tank';
-        ELSIF (NEW.epa_type = 'RESERVOIR') THEN inp_table:= 'inp_reservoir';
-        ELSIF (NEW.epa_type = 'PUMP') THEN inp_table:= 'inp_pump';
-        ELSIF (NEW.epa_type = 'VALVE') THEN inp_table:= 'inp_valve';
-        ELSIF (NEW.epa_type = 'SHORTPIPE') THEN inp_table:= 'inp_shortpipe';
+        ELSIF (NEW.epa_type = 'DIVIDER') THEN inp_table:= 'inp_divider';
+        ELSIF (NEW.epa_type = 'OUTFALL') THEN inp_table:= 'inp_outfall';
+        ELSIF (NEW.epa_type = 'STORAGE') THEN inp_table:= 'inp_storage';
         END IF;
         v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         EXECUTE v_sql;
@@ -85,36 +95,36 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
+
+	IF (NEW.elev <> OLD.elev) THEN
+	RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
+	END IF;
+
+        NEW.elev=NEW.top_elev-NEW.ymax;
+ 
+
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';            
-            ELSIF (OLD.epa_type = 'TANK') THEN
-                inp_table:= 'inp_tank';                
-            ELSIF (OLD.epa_type = 'RESERVOIR') THEN
-                inp_table:= 'inp_reservoir';    
-            ELSIF (OLD.epa_type = 'SHORTPIPE') THEN
-                inp_table:= 'inp_shortpipe';    
-            ELSIF (OLD.epa_type = 'VALVE') THEN
-                inp_table:= 'inp_valve';    
-            ELSIF (OLD.epa_type = 'PUMP') THEN
-                inp_table:= 'inp_pump';  
-            END IF;
+            ELSIF (OLD.epa_type = 'DIVIDER') THEN
+                inp_table:= 'inp_divider';                
+            ELSIF (OLD.epa_type = 'OUTFALL') THEN
+                inp_table:= 'inp_outfall';    
+            ELSIF (OLD.epa_type = 'STORAGE') THEN
+                inp_table:= 'inp_storage';    
+			END IF;
             v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
             EXECUTE v_sql;
 
             IF (NEW.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';   
-            ELSIF (NEW.epa_type = 'TANK') THEN
-                inp_table:= 'inp_tank';     
-            ELSIF (NEW.epa_type = 'RESERVOIR') THEN
-                inp_table:= 'inp_reservoir';  
-            ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-                inp_table:= 'inp_shortpipe';    
-            ELSIF (NEW.epa_type = 'VALVE') THEN
-                inp_table:= 'inp_valve';    
-            ELSIF (NEW.epa_type = 'PUMP') THEN
-                inp_table:= 'inp_pump';  
+            ELSIF (NEW.epa_type = 'DIVIDER') THEN
+                inp_table:= 'inp_divider';     
+            ELSIF (NEW.epa_type = 'OUTFALL') THEN
+                inp_table:= 'inp_outfall';  
+            ELSIF (NEW.epa_type = 'STORAGE') THEN
+                inp_table:= 'inp_storage';
             END IF;
             v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
             EXECUTE v_sql;
@@ -130,11 +140,11 @@ BEGIN
         END IF;
 
         UPDATE node 
-        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
+        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, elev=NEW.elev, sander=NEW.sander, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+            est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id = OLD.node_id;
                 
         RETURN NEW;
@@ -148,8 +158,9 @@ BEGIN
     END IF;
 
 END;
-$$;
-
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
 
 CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_node

@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+
   
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 

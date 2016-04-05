@@ -38,6 +38,12 @@ BEGIN
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id := (SELECT nextval('node_id_seq'));
         END IF;
+		
+		 -- elev
+        IF (NEW.elev IS NOT NULL) THEN   	
+			RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
+		END IF;
+		
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
@@ -45,6 +51,7 @@ BEGIN
             END IF;
             --NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
         END IF;
+		
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
@@ -55,6 +62,7 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
             END IF;
         END IF;
+		
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
@@ -67,34 +75,34 @@ BEGIN
         END IF;
             
         -- FEATURE INSERT
-         INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, 
-								null, null, null, null, null ,null, null, 
+		NEW.elev=NEW.top_elev-NEW.ymax;
+				
+        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.elev, NEW.nodecat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, 
+								null, null, null, null, null ,null, null,
                                 null, null, null, null, null,
-                                NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+                                NEW.rotation, NEW.link, NEW.est_top_elev, NEW.est_ymax, NEW.verified, NEW.the_geom);
 
         -- EPA INSERT
         IF node_table = 'inp_junction' THEN        
-            INSERT INTO inp_junction VALUES (NEW.node_id, NEW.demand, NEW.pattern_id);
-        ELSIF node_table = 'inp_reservoir' THEN
-            INSERT INTO inp_reservoir VALUES (NEW.node_id, NEW.head, NEW.pattern_id);
-        ELSIF node_table = 'inp_tank' THEN            
-            INSERT INTO inp_tank VALUES (NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id);
-        ELSIF node_table = 'inp_pump' THEN          
-            INSERT INTO inp_pump VALUES (NEW.node_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern, NEW.status);
-        ELSIF node_table = 'inp_valve' THEN     
-            INSERT INTO inp_valve VALUES (NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status);
-        ELSIF node_table = 'inp_shortpipe' THEN     
-            INSERT INTO inp_shortpipe VALUES (NEW.node_id, NEW.minorloss, NEW.to_arc, NEW.status);
+			INSERT INTO  inp_junction VALUES(NEW.node_id,NEW.y0,NEW.ysur,NEW.apond);
+        ELSIF node_table = 'inp_divider' THEN        
+			INSERT INTO  inp_divider VALUES(NEW.node_id,NEW.divider_type,NEW.arc_id,NEW.curve_id,NEW.qmin,NEW.ht,NEW.cd,NEW.y0,NEW.ysur,NEW.apond);           
+        ELSIF node_table = 'inp_storage' THEN
+			INSERT INTO  inp_storage VALUES(NEW.node_id,NEW.storage_type,NEW.curve_id,NEW.a1,NEW.a2,NEW.a0,NEW.fevap,NEW.sh,NEW.hc,NEW.imd,NEW.y0,NEW.ysur,NEW.apond);
+        ELSIF node_table = 'inp_outfall' THEN            
+			INSERT INTO  inp_outfall VALUES(NEW.node_id,NEW.outfall_type,NEW.stage,NEW.curve_id,NEW.timser_id,NEW.gate);
         END IF;
 
         -- MANAGEMENT INSERT
         man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
         IF man_table IS NOT NULL THEN        
             v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-            --RAISE NOTICE 'sql: %', v_sql;
             EXECUTE v_sql;
-		END IF;
+        END IF;
         RETURN NEW;
+
+		RETURN NULL;
+
 
     ELSIF TG_OP = 'UPDATE' THEN
 
@@ -106,26 +114,22 @@ BEGIN
             END IF;
         END IF;
 
-        IF node_table = 'inp_junction' THEN
-            UPDATE inp_junction SET node_id=NEW.node_id, demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
-        ELSIF node_table = 'inp_reservoir' THEN
-            UPDATE inp_reservoir SET node_id=NEW.node_id, head=NEW.head, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;  
-        ELSIF node_table = 'inp_tank' THEN
-            UPDATE inp_tank SET node_id=NEW.node_id, initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
-        ELSIF node_table = 'inp_pump' THEN          
-            UPDATE inp_pump SET node_id=NEW.node_id, power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern=NEW.pattern, status=NEW.status WHERE node_id=OLD.node_id;
-        ELSIF node_table = 'inp_valve' THEN     
-            UPDATE inp_valve SET node_id=NEW.node_id, valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status WHERE node_id=OLD.node_id;
-        ELSIF node_table = 'inp_shortpipe' THEN     
-            UPDATE inp_shortpipe SET node_id=NEW.node_id, minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;  
-        END IF;
-        		
-		UPDATE node 
-        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+        UPDATE node 
+        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, elev=NEW.elev, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
+            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, link=NEW.link, est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
-		RETURN NEW;
-		
+
+        IF node_table = 'inp_junction' THEN
+            UPDATE inp_junction SET node_id=NEW.node_id, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
+        ELSIF node_table = 'inp_divider' THEN
+            UPDATE inp_divider SET node_id=NEW.node_id, divider_type=NEW.divider_type, arc_id=NEW.arc_id, curve_id=NEW.curve_id,qmin=NEW.qmin,ht=NEW.ht,cd=NEW.cd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id; 
+        ELSIF node_table = 'inp_storage' THEN
+            UPDATE inp_storage SET node_id=NEW.node_id, storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
+        ELSIF node_table = 'inp_outlfall' THEN          
+            UPDATE inp_outfall SET node_id=NEW.node_id,outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate WHERE node_id=OLD.node_id;
+        END IF;
+        RETURN NEW;
+
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id = OLD.node_id;
         EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||quote_literal(OLD.node_id);
@@ -137,23 +141,19 @@ END;
 $$;
 
 
-CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_shortpipe 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_shortpipe', 'SHORTPIPE');
-
-CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_valve 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_valve', 'VALVE');
-
-CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_pump 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_pump', 'PUMP');
 
 CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_junction 
 FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
  
-CREATE TRIGGER gw_trg_edit_inp_node_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_reservoir 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_reservoir', 'RESERVOIR');
+CREATE TRIGGER gw_trg_edit_inp_node_divider INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_divider
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_divider', 'DIVIDER');
 
-CREATE TRIGGER gw_trg_edit_inp_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_tank 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_tank', 'TANK');
+CREATE TRIGGER gw_trg_edit_inp_node_outfall INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_outfall
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_outfall', 'OUTFALL');
+
+CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_storage 
+FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_storage', 'STORAGE');
+
 
   
   

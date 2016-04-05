@@ -116,4 +116,3 @@ arc.rotation, arc.link, arc.verified, arc.the_geom
 FROM (SCHEMA_NAME.arc 
 JOIN SCHEMA_NAME.man_pipe ON (((man_pipe.arc_id)::text = (arc.arc_id)::text))
 JOIN SCHEMA_NAME.cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
-
