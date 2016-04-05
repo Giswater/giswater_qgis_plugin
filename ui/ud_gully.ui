@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -54,7 +54,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_14">
+    <widget class="QLabel" name="label_dma_id">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -90,7 +90,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_12">
+    <widget class="QLabel" name="label_buildercat_id">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -126,7 +126,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_6">
+    <widget class="QLabel" name="label_state">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -162,7 +162,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_32">
+    <widget class="QLabel" name="label_fluid_type">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -201,7 +201,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_16">
+    <widget class="QLabel" name="label_soilcat_id">
      <property name="geometry">
       <rect>
        <x>414</x>
@@ -247,7 +247,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_36">
+    <widget class="QLabel" name="label_address_03">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -283,7 +283,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_37">
+    <widget class="QLabel" name="label_address_02">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -329,7 +329,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
+    <widget class="QLabel" name="label_workcat_id">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -375,7 +375,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_38">
+    <widget class="QLabel" name="label_addres_01">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -421,7 +421,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="label_ymax">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -451,7 +451,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="label_top_elev">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -481,7 +481,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="label_sector_id">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -537,7 +537,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_33">
+    <widget class="QLabel" name="label_location_type">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -613,7 +613,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_34">
+    <widget class="QLabel" name="label_owner">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -649,7 +649,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_13">
+    <widget class="QLabel" name="label_builtdate">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -685,7 +685,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_31">
+    <widget class="QLabel" name="label_category_type">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -764,7 +764,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_10">
+    <widget class="QLabel" name="label_annotation">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -830,7 +830,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_42">
+    <widget class="QLabel" name="label_comment">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -866,7 +866,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_43">
+    <widget class="QLabel" name="label_link">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -912,7 +912,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_44">
+    <widget class="QLabel" name="label_descript">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -948,7 +948,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_11">
+    <widget class="QLabel" name="label_observ">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -1019,7 +1019,7 @@
     <attribute name="title">
      <string>Document</string>
     </attribute>
-    <widget class="QLabel" name="label_141">
+    <widget class="QLabel" name="label_to">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1055,7 +1055,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_81">
+    <widget class="QLabel" name="label_tag">
      <property name="geometry">
       <rect>
        <x>500</x>
@@ -1104,7 +1104,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_63">
+    <widget class="QLabel" name="label_user">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1200,7 +1200,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_76">
+    <widget class="QLabel" name="label_event">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1236,7 +1236,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_140">
+    <widget class="QLabel" name="label_document">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1287,7 +1287,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_152">
+    <widget class="QLabel" name="label_to_2">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1346,7 +1346,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_101">
+    <widget class="QLabel" name="label_user_2">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1392,7 +1392,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_153">
+    <widget class="QLabel" name="label_picture">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1428,7 +1428,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_102">
+    <widget class="QLabel" name="label_tag_2">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1509,7 +1509,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_103">
+    <widget class="QLabel" name="label_user_3">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1545,7 +1545,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_154">
+    <widget class="QLabel" name="label_event_3">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1604,7 +1604,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_104">
+    <widget class="QLabel" name="label_event_2">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1650,7 +1650,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_105">
+    <widget class="QLabel" name="label_event_type">
      <property name="geometry">
       <rect>
        <x>500</x>
@@ -1706,7 +1706,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_155">
+    <widget class="QLabel" name="label_to_3">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1767,7 +1767,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_156">
+    <widget class="QLabel" name="label_log">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1803,7 +1803,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_106">
+    <widget class="QLabel" name="label_user_4">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1862,7 +1862,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_107">
+    <widget class="QLabel" name="label_event_type_2">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1918,7 +1918,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_157">
+    <widget class="QLabel" name="label_to_4">
      <property name="geometry">
       <rect>
        <x>150</x>
