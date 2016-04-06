@@ -11,7 +11,7 @@ This version of Giswater is provided by Giswater Association
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     node_table varchar;
     man_table varchar;
@@ -137,23 +137,23 @@ END;
 $$;
 
 
-CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_shortpipe 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_shortpipe', 'SHORTPIPE');
+CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_shortpipe 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_shortpipe', 'SHORTPIPE');
 
-CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_valve 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_valve', 'VALVE');
+CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_valve 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_valve', 'VALVE');
 
-CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_pump 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_pump', 'PUMP');
+CREATE TRIGGER gw_trg_edit_inp_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pump 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_pump', 'PUMP');
 
-CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_junction 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
+CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_junction 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
  
-CREATE TRIGGER gw_trg_edit_inp_node_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_reservoir 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_reservoir', 'RESERVOIR');
+CREATE TRIGGER gw_trg_edit_inp_node_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_reservoir 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_reservoir', 'RESERVOIR');
 
-CREATE TRIGGER gw_trg_edit_inp_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_tank 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_tank', 'TANK');
+CREATE TRIGGER gw_trg_edit_inp_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_tank 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_tank', 'TANK');
 
   
   

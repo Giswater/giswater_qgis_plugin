@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
    
-CREATE OR REPLACE FUNCTION "sample_ud".gw_trg_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     inp_table varchar;
     man_table varchar;
@@ -30,11 +30,7 @@ BEGIN
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-            END IF;
-            --NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
-            --NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
-        --ELSE
-            --NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);        
+            END IF;   
         END IF;
 
         -- Sector ID
@@ -152,6 +148,7 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_node
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_node();
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON SCHEMA_NAME.v_edit_node
+FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_edit_node();
+
       

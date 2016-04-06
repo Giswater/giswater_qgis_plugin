@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_man_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
     epa_table varchar;
     man_table varchar;
@@ -114,26 +114,26 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_edit_man_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_junction
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_junction');
+CREATE TRIGGER gw_trg_edit_man_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_junction
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_junction');
  
-CREATE TRIGGER gw_trg_edit_man_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_tank 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_tank');
+CREATE TRIGGER gw_trg_edit_man_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tank 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_tank');
 
-CREATE TRIGGER gw_trg_edit_man_node_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_hydrant 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_hydrant');
+CREATE TRIGGER gw_trg_edit_man_node_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_hydrant 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_hydrant');
 
-CREATE TRIGGER gw_trg_edit_man_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_valve 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_valve');
+CREATE TRIGGER gw_trg_edit_man_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_valve 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_valve');
 
-CREATE TRIGGER gw_trg_edit_man_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_pump 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_pump');
+CREATE TRIGGER gw_trg_edit_man_node_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pump 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_pump');
 
-CREATE TRIGGER gw_trg_edit_man_node_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_filter 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_filter');
+CREATE TRIGGER gw_trg_edit_man_node_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_filter 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_filter');
 
-CREATE TRIGGER gw_trg_edit_man_node_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_man_meter 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_man_node('man_meter');
+CREATE TRIGGER gw_trg_edit_man_node_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_meter 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_meter');
   
   
   
