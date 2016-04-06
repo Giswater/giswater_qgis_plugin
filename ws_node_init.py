@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.gui import (QgsMessageBar)
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import *   # @UnusedWildImport
+from PyQt4.QtGui import *    # @UnusedWildImport
 from qgis.utils import iface
 import os.path
 import sys  
@@ -27,7 +27,8 @@ def initConfig():
     nodecat_id = utils.getSelectedItem("nodecat_id")
     utils.setSelectedItem("nodecat_id_dummy", nodecat_id)            
     node_dialog.dialog.findChild(QComboBox, "nodecat_id_dummy").activated.connect(node_dialog.changeNodeCat)          
-
+    node_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(node_dialog.changeEpaType)    
+    
     node_dialog.dialog.findChild(QPushButton, "btnAccept").clicked.connect(node_dialog.save)            
     node_dialog.dialog.findChild(QPushButton, "btnClose").clicked.connect(node_dialog.close)        
         
@@ -45,7 +46,7 @@ class NodeDialog():
         
     def initConfig(self):    
         
-        self.epa_type = self.dialog.findChild(QWidget, "epa_type").text()
+        self.epa_type = utils.getSelectedItem("epa_type")
             
         # initialize plugin directory
         user_folder = os.path.expanduser("~") 
@@ -135,12 +136,20 @@ class NodeDialog():
         rows = self.dao.get_rows(sql)
         self.cbo_nodecat_id = self.dialog.findChild(QComboBox, "nodecat_id_dummy")
         utils.fillComboBox(self.cbo_nodecat_id, rows, False)  
+        self.changeNodeCat(0)       
         
                        
     def changeNodeCat(self, index):
         """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
         dummy = utils.getSelectedItem("nodecat_id_dummy")
-        utils.setSelectedItem("nodecat_id", dummy)           
+        utils.setSelectedItem("nodecat_id", dummy)   
+        
+                
+    def changeEpaType(self, index):
+        """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
+        epa_type = utils.getSelectedItem("epa_type")
+        self.save()
+        self.iface.openFeatureForm(self.layer, self.feature)        
     
     
     def setTabsVisibility(self):
