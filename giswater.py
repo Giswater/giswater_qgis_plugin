@@ -22,19 +22,17 @@ from functools import partial
 from line_map_tool import LineMapTool
 from point_map_tool import PointMapTool
 from controller import DaoController
-import utils
 
 
 class Giswater(QObject):
    
     def __init__(self, iface):
-        """Constructor.
-
+        ''' Constructor 
         :param iface: An interface instance that will be passed to this class
             which provides the hook by which you can manipulate the QGIS
             application at run time.
         :type iface: QgsInterface
-        """
+        '''
         super(Giswater, self).__init__()
         
         # Save reference to the QGIS interface
@@ -54,8 +52,15 @@ class Giswater(QObject):
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
          
-        # load local settings of the plugin
-        self.loadPluginSettings()       
+        # Load local settings of the plugin
+        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
+        self.settings = QSettings(setting_file, QSettings.IniFormat)
+        self.settings.setIniCodec(sys.getfilesystemencoding())    
+        
+        # Set controller to handle settings and database
+        self.controller = DaoController(self.settings, self.plugin_name)
+        self.controller.set_database_connection()     
+        self.dao = self.controller.getDao()           
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -63,26 +68,97 @@ class Giswater(QObject):
         
         # {function_name, map_tool}
         self.map_tools = {}
-       
-        # Set controller to handle settings and database
-        self.controller = DaoController()
-        self.controller.setSettings(self.settings, self.plugin_name)
         
-        # Connect to Database
-        self.controller.setDatabaseConnection()     
+        # Define signals
+        self.set_signals()
         
+
+    def set_signals(self): 
+        ''' Define widget and event signals '''
+        self.legend.currentLayerChanged.connect(self.current_layer_changed)
+        self.current_layer_changed(None)
     
-    def loadPluginSettings(self):
-        """ Load plugin settings """
+                   
+    def tr(self, message):
+        if self.controller:
+            return self.controller.tr(message)
         
-        # Get config file
-        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
-        self.settings = QSettings(setting_file, QSettings.IniFormat)
-        self.settings.setIniCodec(sys.getfilesystemencoding())
+        
+    def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
+        
+        if parent is None:
+            parent = self.iface.mainWindow()
+
+        icon = None
+        if index_action is not None:
+            icon_path = self.icon_folder+index_action+'.png'
+            if os.path.exists(icon_path):        
+                icon = QIcon(icon_path)
                 
+        if icon is None:
+            action = QAction(text, parent) 
+        else:
+            action = QAction(icon, text, parent)  
+                                    
+        if toolbar is not None:
+            toolbar.addAction(action)  
+             
+        if menu is not None:
+            self.iface.addPluginToMenu(menu, action)
+            
+        if index_action is not None:         
+            self.actions[index_action] = action
+        else:
+            self.actions[text] = action
+            
+        if function_name is not None:
+            try:
+                action.setCheckable(is_checkable) 
+                if int(index_action) < 16:    
+                    water_soft = function_name[:2] 
+                    callback_function = getattr(self, water_soft+'_generic')  
+                    action.toggled.connect(partial(callback_function, function_name))
+                    #function_name = sys._getframe().f_code.co_name    
+                else:                    
+                    callback_function = getattr(self, function_name)  
+                    action.toggled.connect(callback_function)
+            except AttributeError:
+                print index_action+". Callback function not found: "+function_name
+                action.setEnabled(False)                
+        else:
+            action.setEnabled(False)
+            
+        return action
+          
+        
+    def add_action(self, index_action, toolbar, parent):
+        
+        action = None
+        text_action = self.tr(index_action+'_text')
+        function_name = self.settings.value('actions/'+str(index_action)+'_function')
+        # Only create action if is defined in configuration file
+        if function_name:
+            action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+            # TODO: Parametrize it
+            if int(index_action) == 13:
+                map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
+            else:
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)         
+            self.map_tools[function_name] = map_tool       
+        
+        return action         
+        
+        
+    def initGui(self):
+        ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
+        
+        parent = self.iface.mainWindow()
+        if self.controller is None:
+            return
+        
         # Create plugin main menu
-        self.menu_name = self.tr('menu_name')        
-    
+        self.menu_name = self.tr('menu_name')    
+                
         # Create edit, epanet and swmm toolbars or not?
         self.toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
         self.toolbar_epanet_enabled = bool(int(self.settings.value('status/toolbar_epanet_enabled', 1)))
@@ -98,162 +174,113 @@ class Giswater(QObject):
         if self.toolbar_edit_enabled:
             self.toolbar_edit_name = self.tr('toolbar_edit_name')
             self.toolbar_edit = self.iface.addToolBar(self.toolbar_edit_name)
-            self.toolbar_edit.setObjectName(self.toolbar_edit_name)   
-
-
-    def tr(self, message):
-        return utils.tr(self.plugin_name, message)
-        
-        
-    def createAction(self, icon_index=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
-        
-        if parent is None:
-            parent = self.iface.mainWindow()
-
-        icon = None
-        if icon_index is not None:
-            icon_path = self.icon_folder+icon_index+'.png'
-            if os.path.exists(icon_path):        
-                icon = QIcon(icon_path)
-                
-        if icon is None:
-            action = QAction(text, parent) 
-        else:
-            action = QAction(icon, text, parent)  
-                                    
-        if toolbar is not None:
-            toolbar.addAction(action)  
-             
-        if menu is not None:
-            self.iface.addPluginToMenu(menu, action)
-            
-        if icon_index is not None:         
-            self.actions[icon_index] = action
-        else:
-            self.actions[text] = action
-            
-        if function_name is not None:
-            try:
-                action.setCheckable(is_checkable)         
-                water_soft = function_name[:2] 
-                callback_function = getattr(self, water_soft+'_generic')  
-                action.toggled.connect(partial(callback_function, function_name))
-                #function_name = sys._getframe().f_code.co_name                
-            except AttributeError:
-                print "Callback function not found: "+function_name
-                action.setEnabled(False)                
-        else:
-            action.setEnabled(False)
-            
-        return action
-          
-        
-    def addAction(self, index_action, toolbar, parent):
-        text_action = self.tr(index_action+'_text')
-        function_name = self.settings.value('actions/'+str(index_action)+'_function')
-        action = self.createAction(index_action, text_action, toolbar, None, True, function_name, parent)
-        # TODO: Parametrize it
-        if int(index_action) == 13:
-            map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
-        else:
-            map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)         
-        self.map_tools[function_name] = map_tool             
-        
-        return action         
-        
-        
-    def initGui(self):
-        """ Create the menu entries and toolbar icons inside the QGIS GUI """  
-        
-        if self.controller is None:
-            return
-        
-        parent = self.iface.mainWindow()
+            self.toolbar_edit.setObjectName(self.toolbar_edit_name)      
+                    
         # Edit&Analysis toolbar 
         if self.toolbar_edit_enabled:      
             self.ag_edit = QActionGroup(parent);
             for i in range(16,28):
-                self.addAction(str(i), self.toolbar_edit, self.ag_edit)
+                self.add_action(str(i), self.toolbar_edit, self.ag_edit)
                 
         # Epanet toolbar
         if self.toolbar_epanet_enabled:  
             self.ag_epanet = QActionGroup(parent);
             for i in range(10,16):
-                self.addAction(str(i), self.toolbar_epanet, self.ag_epanet)
+                self.add_action(str(i), self.toolbar_epanet, self.ag_epanet)
                 
         # SWMM toolbar
         if self.toolbar_swmm_enabled:        
             for i in range(1,10):
                 self.ag_swmm = QActionGroup(parent);                
-                self.addAction(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)                    
+                self.add_action(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)                    
             
         # Menu entries
-        self.createAction(None, self.tr('New network'), None, self.menu_name, False)
-        self.createAction(None, self.tr('Copy network as'), None, self.menu_name, False)
+        self.create_action(None, self.tr('New network'), None, self.menu_name, False)
+        self.create_action(None, self.tr('Copy network as'), None, self.menu_name, False)
             
         self.menu_network_configuration = QMenu(self.tr('Network configuration'))
-        action1 = self.createAction(None, self.tr('Snapping tolerance'), None, None, False)               
-        action2 = self.createAction(None, self.tr('Node tolerance'), None, None, False)         
+        action1 = self.create_action(None, self.tr('Snapping tolerance'), None, None, False)               
+        action2 = self.create_action(None, self.tr('Node tolerance'), None, None, False)         
         self.menu_network_configuration.addAction(action1)
         self.menu_network_configuration.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_network_configuration.menuAction())  
            
         self.menu_network_management = QMenu(self.tr('Network management'))
-        action1 = self.createAction('21', self.tr('Table wizard'), None, None, False)               
-        action2 = self.createAction('22', self.tr('Undo wizard'), None, None, False)         
+        action1 = self.create_action('21', self.tr('Table wizard'), None, None, False)               
+        action2 = self.create_action('22', self.tr('Undo wizard'), None, None, False)         
         self.menu_network_management.addAction(action1)
         self.menu_network_management.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_network_management.menuAction())         
            
         self.menu_analysis = QMenu(self.tr('Analysis'))          
-        action2 = self.createAction('25', self.tr('Result selector'), None, None, False)               
-        action3 = self.createAction('27', self.tr('Flow trace node'), None, None, False)         
-        action4 = self.createAction('26', self.tr('Flow trace arc'), None, None, False)         
+        action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
+        action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
+        action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
         self.menu_analysis.addAction(action2)
         self.menu_analysis.addAction(action3)
         self.menu_analysis.addAction(action4)
         self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
          
-        self.menu_go2epa = QMenu(self.tr('Go2Epa'))
-        action1 = self.createAction('23', self.tr('Giswater interface'), None, None, False)               
-        action2 = self.createAction('24', self.tr('Run simulation'), None, None, False)         
-        self.menu_go2epa.addAction(action1)
-        self.menu_go2epa.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
-        
-        self.legend.currentLayerChanged.connect(self.layerActivated)
-        self.layerActivated(None)
-        
-    
-    def disableActions(self):
-        for i in range(10,16):
-            action = self.actions[str(i)]
-            action.setEnabled(False)
+#         self.menu_go2epa = QMenu(self.tr('Go2Epa'))
+#         action1 = self.create_action('23', self.tr('Giswater interface'), None, None, False)               
+#         action2 = self.create_action('24', self.tr('Run simulation'), None, None, False)         
+#         self.menu_go2epa.addAction(action1)
+#         self.menu_go2epa.addAction(action2)
+#         self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
             
-        
-    def layerActivated(self, layer):
+
+    def unload(self):
+        ''' Removes the plugin menu item and icon from QGIS GUI '''
+        for action_index, action in self.actions.iteritems():
+            self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
+            self.iface.removePluginMenu(self.menu_name, action)
+            self.iface.removeToolBarIcon(action)
+        if self.toolbar_edit_enabled:    
+            del self.toolbar_edit
+        if self.toolbar_epanet_enabled:    
+            del self.toolbar_epanet
+        if self.toolbar_swmm_enabled:    
+            del self.toolbar_swmm
+            
+    
+    
+    ''' Slots '''
+            
+    def disable_actions(self):
+        ''' Utility to disable all actions '''
+        for i in range(1,27):
+            key = str(i)
+            if key in self.actions:
+                action = self.actions[key]
+                action.setEnabled(False)
+                
+                            
+    def current_layer_changed(self, layer):
+        ''' Manage new layer selected '''
+        self.disable_actions()
         if layer is None:
             layer = self.iface.activeLayer() 
-        self.disableActions()
         self.current_layer = layer
         try:
             list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
-            if type(list_index_action) is list:
-                for index_action in list_index_action:
+            print list_index_action
+            if list_index_action:
+                if type(list_index_action) is list:
+                    for index_action in list_index_action:
+                        if index_action != '-1':
+                            self.actions[index_action].setEnabled(True)
+                elif type(list_index_action) is unicode:
+                    index_action = str(list_index_action)
                     if index_action != '-1':
-                        self.actions[index_action].setEnabled(True)
-            elif type(list_index_action) is unicode:
-                index_action = str(list_index_action)
-                if index_action != '-1':
-                    self.actions[index_action].setEnabled(True)                
-        except AttributeError:
-            print "layerActivated: AttributeError"
-
-        
+                        self.actions[index_action].setEnabled(True)                
+        except AttributeError, e:
+            print "current_layer_changed: "+str(e)
+                        
+                
     def ws_generic(self, function_name):   
-        """ Water supply generic callback function """
-        # Get sender (selected action) and map tool associated 
+        ''' Water supply generic callback function '''
         try:
+            # Get sender (selected action) and map tool associated 
             sender = self.sender()            
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
@@ -266,9 +293,9 @@ class Giswater(QObject):
             
             
     def ud_generic(self, function_name):   
-        """ Urban drainage generic callback function """
-        # Get sender (selected action) and map tool associated 
+        ''' Urban drainage generic callback function '''
         try:        
+            # Get sender (selected action) and map tool associated 
             sender = self.sender()            
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
@@ -278,19 +305,70 @@ class Giswater(QObject):
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError:
             print "ud_generic: AttributeError"                
-                                            
+            
+            
+    def mg_generic(self, function_name):   
+        ''' Management generic callback function '''
+        try:        
+            # Get sender (selected action) and map tool associated 
+            sender = self.sender()            
+            map_tool = self.map_tools[function_name]
+            if sender.isChecked():
+                self.iface.mapCanvas().setMapTool(map_tool)
+                print function_name+" has been checked"       
+            else:
+                self.iface.mapCanvas().unsetMapTool(map_tool)
+        except AttributeError:
+            print "mg_generic: AttributeError"                
+                                 
+                                                   
+    ''' Management bar functions '''                                
+    def move_node(self):
+        print "move_node"
+        ''' TODO: 16. User select nodes from 'v_edit_node' and triggers function: 'gw_fct_node2nodarc' '''
+        # Get selected features
+        node_list = [1, 2, 3]
+        # Convert list to node
+        node_json = None
+        #sql = "SELECT sample_ws.gw_fct_node2nodarc("+node_json+")"
+        #result = self.dao.execute_sql(sql)
+        
+        
+    def delete_node(self):
+        ''' 17. Show warning to the user '''
+        print "delete_node"
+        msg = self.tr('delete_node')
+        reply = QMessageBox.question(None, self.tr('17_text'), msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            print "delete"
+        else:
+            print "no"     
     
-    def unload(self):
-        """ Removes the plugin menu item and icon from QGIS GUI """
-        for action_index, action in self.actions.iteritems():
-            self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
-            self.iface.removePluginMenu(self.menu_name, action)
-            self.iface.removeToolBarIcon(action)
-        if self.toolbar_edit_enabled:    
-            del self.toolbar_edit
-        if self.toolbar_epanet_enabled:    
-            del self.toolbar_epanet
-        if self.toolbar_swmm_enabled:    
-            del self.toolbar_swmm
+        
+    def change_elem_type(self):
+        ''' TODO: 28. User select one node. A form is opened showing current node_type.type 
+        Combo to select new node_type.type
+        Combo to select catalog id
+        Trigger 'gw_trg_edit_node' has to be disabled temporarily '''
+        pass
+        
+        
+    def connec_tool(self):
+        ''' TODO: 20. User select connections from connec_id and triggers function: 'gw_fct_link_insert' '''
+        pass
+        #sql = "SELECT gw_fct_link_insert(connec_json)"  
+        #result = self.dao.execute_sql(sql)       
+        
+        
+    def table_wizard(self):
+        ''' TODO: 21. ''' 
+        pass
+        
+        
+    def flow_trace(self):
+        ''' TODO: 26 - 27. Returns json with 2 lists: node_id, arc_id  
+        Select these features in its corresponding layers '''
+        pass
+   
             
             
