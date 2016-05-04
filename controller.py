@@ -7,7 +7,10 @@ from dao.pg_dao import PgDao
 
 class DaoController():
     
-    
+    def __init__(self, settings, plugin_name):
+        self.settings = settings      
+        self.plugin_name = plugin_name               
+        
     def getDao(self):
         return self.dao
         
@@ -20,14 +23,14 @@ class DaoController():
     def tr(self, message):
         return QCoreApplication.translate(self.plugin_name, message)                
     
-    
-    def setSettings(self, settings, plugin_name):
-        self.settings = settings
+    def set_settings(self, settings):
+        self.settings = settings      
+        
+    def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
-                
     
-    def setDatabaseConnection(self):
-        """ Look for connection data in QGIS configuration (if exists) """    
+    
+    def set_database_connection(self):
         
         # Initialize variables
         self.dao = None 
@@ -35,6 +38,7 @@ class DaoController():
         self.connection_name = self.settings.value('db/connection_name', self.plugin_name)
         self.schema_name = self.settings.value('db/schema_name', 'ws')
         
+        # Look for connection data in QGIS configuration (if exists)    
         qgis_settings = QSettings()     
         root_conn = "/PostgreSQL/connections/"          
         qgis_settings.beginGroup(root_conn);           
