@@ -11,7 +11,7 @@ name=giswater
 qgisMinimumVersion=2.8
 description=giswater plugin description
 about=About...
-version=0.2
+version=0.3
 author=David Erill
 email=derill@bgeo.es
 
@@ -28,7 +28,7 @@ tags=giswater, water, hydraulic, model
 homepage=https://www.giswater.org
 repository=https://github.com/giswater/giswater_qgis_plugin
 category=Plugins
-icon=icon_giswater.png
+icon=icons/giswater.png
 # experimental flag
 experimental=True
 
