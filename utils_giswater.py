@@ -32,6 +32,9 @@ def isFirstTime():
 
 
 def fillComboBox(widget, rows, allow_nulls=True):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
     if allow_nulls:
         widget.addItem('')     
@@ -39,11 +42,14 @@ def fillComboBox(widget, rows, allow_nulls=True):
         widget.addItem(row[0])    
         
         
-def getStringValue(widget_name):
-    elem = _dialog.findChild(QLineEdit, widget_name)
-    if elem:    
-        if elem.text():
-            elem_text = widget_name + " = '"+elem.text()+"'"
+def getStringValue(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QLineEdit, widget)        
+    widget_name = widget.objectName()
+    if widget:    
+        if widget.text():
+            elem_text = widget_name + " = '"+widget.text()+"'"
         else:
             elem_text = widget_name + " = null"
     else:
@@ -51,11 +57,13 @@ def getStringValue(widget_name):
     return elem_text
 
 
-def getStringValue2(widget_name):
-    elem = _dialog.findChild(QLineEdit, widget_name)
-    if elem:
-        if elem.text():
-            elem_text = "'"+elem.text()+"'"
+def getStringValue2(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QLineEdit, widget)          
+    if widget:
+        if widget.text():
+            elem_text = "'"+widget.text()+"'"
         else:
             elem_text = "null"
     else:
@@ -63,48 +71,84 @@ def getStringValue2(widget_name):
     return elem_text      
 
 
-def setText(widget_name, text):
-    elem = _dialog.findChild(QWidget, widget_name)   
-    if not elem:
+def setText(widget, text):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
         return    
     value = unicode(text)
     if value == 'None':    
-        elem.setText("")         
+        widget.setText("")         
     else:
-        elem.setText(value)     
+        widget.setText(value)     
 
 
-def setSelectedItem(widget_name, value):  
-    widget = _dialog.findChild(QComboBox, widget_name)
-    if widget:
-        index = widget.findText(value)
-        if index == -1:
-            index = 0
-        widget.setCurrentIndex(index);        
+def getWidgetText(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
+        return None   
+    text = None
+    if type(widget) is QLineEdit:
+        text = getStringValue2(widget)
+    elif type(widget) is QComboBox:
+        text = getSelectedItem(widget)
+    return text
 
 
-def getSelectedItem(widget_name):
+def setWidgetText(widget, text):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)       
+    if not widget:
+        return
+    if type(widget) is QLineEdit:
+        setText(widget, text)
+    elif type(widget) is QComboBox:
+        setSelectedItem(widget, text)
+
+
+def getSelectedItem(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QComboBox, widget)        
     widget_text = "null"    
-    widget = _dialog.findChild(QComboBox, widget_name)
     if widget:
         if widget.currentText():
             widget_text = widget.currentText()    
     return widget_text    
 
 
-def isNull(widget_name):
-    elem = _dialog.findChild(QLineEdit, widget_name)
+def setSelectedItem(widget, text):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QComboBox, widget)    
+    if widget:
+        index = widget.findText(text)
+        if index == -1:
+            index = 0
+        widget.setCurrentIndex(index);        
+
+
+def isNull(widget):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QLineEdit, widget)    
     empty = True    
-    if elem:    
-        if elem.text():
+    if widget:    
+        if widget.text():
             empty = False
     return empty    
 
 
-def setWidgetVisible(widget_name, visible=True):
-    elem = _dialog.findChild(QWidget, widget_name)        
-    if elem:
-        elem.setVisible(visible)
+def setWidgetVisible(widget, visible=True):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)    
+    if widget:
+        widget.setVisible(visible)
 
 
 def showInfo(text, duration = None):

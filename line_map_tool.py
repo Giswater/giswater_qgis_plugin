@@ -9,6 +9,7 @@ from PyQt4.Qt import * # @UnusedWildImport
 class LineMapTool(QgsMapTool):
 
     def __init__(self, iface, settings, action, index_action, controller):
+        ''' Class constructor '''
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
@@ -32,7 +33,42 @@ class LineMapTool(QgsMapTool):
         self.start_point = self.end_point = None
         self.isEmittingPoint = False
         self.rubberBand.reset(QGis.Polygon)
+        
+        
+    def show_line(self, start_point, end_point):
+        
+        self.rubberBand.reset(QGis.Line)
+        if start_point.x() == end_point.x() or start_point.y() == end_point.y():
+            return
+        point1 = QgsPoint(start_point.x(), start_point.y())
+        point2 = QgsPoint(end_point.x(), end_point.y())
+        self.rubberBand.addPoint(point1, False)
+        self.rubberBand.addPoint(point2, True)
+        self.rubberBand.show()        
+               
+        
+    def insert_arc(self, start_point, end_point):
+        ''' Insert a new arc in the selected coordinates '''
+        if self.elem_type is not None:        
+            the_geom = "ST_GeomFromText('LINESTRING("+str(start_point.x())+" "+str(start_point.y())+", "+str(end_point.x())+" "+str(end_point.y())+")', "+self.srid+")";
+            sql = "INSERT INTO "+self.schema_name+"."+self.view_name+" (epa_type, the_geom) VALUES ('"+self.elem_type+"', "+the_geom+");";
+            status = self.dao.execute_sql(sql)   
+            return status  
+                    
+
+    def get_last_id(self, view_name, field_name):
+        ''' Get id of the last feature inserted '''    
+        last_id = -1 
+        sql = "SELECT max(cast("+field_name+" as int)) FROM "+self.schema_name+"."+view_name;
+        row = self.dao.get_row(sql)  
+        if row:
+            if row[0] is not None:
+                last_id = int(row[0])  
+        return last_id
     
+    
+    
+    ''' QgsMapTools inherited event functions '''
         
     def canvasPressEvent(self, e):
 
@@ -40,7 +76,7 @@ class LineMapTool(QgsMapTool):
         self.start_point = self.toMapCoordinates(e.pos())
         self.end_point = self.start_point
         self.isEmittingPoint = True
-        self.showLine(self.start_point, self.end_point)
+        self.show_line(self.start_point, self.end_point)
                        
     
     def canvasMoveEvent(self, e):
@@ -48,7 +84,7 @@ class LineMapTool(QgsMapTool):
         if not self.isEmittingPoint:
             return
         self.end_point = self.toMapCoordinates(e.pos())
-        self.showLine(self.start_point, self.end_point)        
+        self.show_line(self.start_point, self.end_point)        
         
         
     def canvasReleaseEvent(self, e):
@@ -64,62 +100,22 @@ class LineMapTool(QgsMapTool):
         self.rubberBand.hide()
  
         # Insert new arc 
-        status = self.insertArc(self.start_point, self.end_point)  
+        status = self.insert_arc(self.start_point, self.end_point)  
         if status:
             # Get node_id of that new node. Open its feature form
-            last_id = self.getLastId(layer.name(), "arc_id")  
+            last_id = self.get_last_id(layer.name(), "arc_id")  
             if last_id != -1:
                 filter_expr = "arc_id = "+str(last_id)     
                 expr = QgsExpression(filter_expr)
                 f_request = QgsFeatureRequest(expr)
                 f_iterator = layer.getFeatures(f_request)
                 for feature in f_iterator: 
-                    self.openFeatureForm(layer, feature)
+                    self.iface.openFeatureForm(layer, feature)
                     break
             else:
                 print "Error getting last node inserted"
         else:
             print "Error inserting node"   
-            
-        
-        
-    def showLine(self, start_point, end_point):
-        
-        self.rubberBand.reset(QGis.Line)
-        if start_point.x() == end_point.x() or start_point.y() == end_point.y():
-            return
-        point1 = QgsPoint(start_point.x(), start_point.y())
-        point2 = QgsPoint(end_point.x(), end_point.y())
-        self.rubberBand.addPoint(point1, False)
-        self.rubberBand.addPoint(point2, True)
-        self.rubberBand.show()        
-               
-        
-    def insertArc(self, start_point, end_point):
-        """ Insert a new arc in the selected coordinates """
-        if self.elem_type is not None:        
-            the_geom = "ST_GeomFromText('LINESTRING("+str(start_point.x())+" "+str(start_point.y())+", "+str(end_point.x())+" "+str(end_point.y())+")', "+self.srid+")";
-            print the_geom
-            sql = "INSERT INTO "+self.schema_name+"."+self.view_name+" (epa_type, the_geom) VALUES ('"+self.elem_type+"', "+the_geom+");";
-            status = self.dao.execute_sql(sql)   
-            return status  
-        else:
-            print "self.elem_type is None"
-                    
-
-    def getLastId(self, view_name, field_name):
-        # Get last feature inserted       
-        last_id = -1 
-        sql = "SELECT max(cast("+field_name+" as int)) FROM "+self.schema_name+"."+view_name;
-        row = self.dao.get_row(sql)  
-        if row:
-            if row[0] is not None:
-                last_id = int(row[0])  
-        return last_id
     
-        
-    def openFeatureForm(self, layer, feature):
-        """ Open feature form """      
-        self.iface.openFeatureForm(layer, feature)        
         
         

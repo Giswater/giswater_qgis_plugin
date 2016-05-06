@@ -52,7 +52,25 @@ class PgDao():
             print "get_row: {0}".format(e)
             self.rollback()             
         finally:
-            return row            
+            return row     
+        
+    def get_column_name(self, index):
+        name = None
+        try:
+            name = self.cursor.description[index][0]
+        except Exception as e:
+            print "get_column_name: {0}".format(e)        
+        finally:
+            return name
+        
+    def get_columns_length(self):
+        total = None
+        try:
+            total = len(self.cursor.description)
+        except Exception as e:
+            print "get_columns_length: {0}".format(e)        
+        finally:
+            return total
 
     def execute_sql(self, sql, autocommit=True):
         status = True
