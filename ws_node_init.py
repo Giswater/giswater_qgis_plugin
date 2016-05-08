@@ -11,23 +11,24 @@ from controller import DaoController
 
 
 def formOpen(dialog, layer, feature):
+    ''' Function called when a node is inserted of clicked in the map '''
     
-    # Create class to manage Feature Form interaction  
     global node_dialog
     utils_giswater.setDialog(dialog)
+    # Create class to manage Feature Form interaction  
     node_dialog = NodeDialog(iface, dialog, layer, feature)
-    initConfig()
+    init_config()
 
     
-def initConfig():
+def init_config():
      
     node_dialog.dialog.findChild(QComboBox, "nodecat_id").setVisible(False)         
-    node_dialog.dialog.findChild(QComboBox, "cat_nodetype_id").activated.connect(node_dialog.changeNodeType)    
-    node_dialog.changeNodeType(-1)  
+    node_dialog.dialog.findChild(QComboBox, "cat_nodetype_id").activated.connect(node_dialog.change_node_type)    
+    node_dialog.change_node_type(-1)  
     nodecat_id = utils_giswater.getSelectedItem("nodecat_id")
     utils_giswater.setSelectedItem("nodecat_id_dummy", nodecat_id)            
-    node_dialog.dialog.findChild(QComboBox, "nodecat_id_dummy").activated.connect(node_dialog.changeNodeCat)          
-    node_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(node_dialog.changeEpaType)    
+    node_dialog.dialog.findChild(QComboBox, "nodecat_id_dummy").activated.connect(node_dialog.change_node_cat)          
+    node_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(node_dialog.change_epa_type)    
     
     node_dialog.dialog.findChild(QPushButton, "btnAccept").clicked.connect(node_dialog.save)            
     node_dialog.dialog.findChild(QPushButton, "btnClose").clicked.connect(node_dialog.close)        
@@ -37,14 +38,15 @@ def initConfig():
 class NodeDialog():   
     
     def __init__(self, iface, dialog, layer, feature):
+        ''' Constructor class '''
         self.iface = iface
         self.dialog = dialog
         self.layer = layer
         self.feature = feature
-        self.initConfig()
+        self.init_config()
     
         
-    def initConfig(self):    
+    def init_config(self):    
         
         self.node_id = utils_giswater.getStringValue2("node_id")
         self.epa_type = utils_giswater.getSelectedItem("epa_type")
@@ -84,31 +86,31 @@ class NodeDialog():
         self.dao = self.controller.getDao()
              
         # Manage tab visibility
-        self.setTabsVisibility()
+        self.set_tabs_visibility()
         
         # Manage i18n
-        self.translateForm()
+        self.translate_form()
         
         # Fill combo 'node type' from 'epa_type'
-        self.fillNodeType()
+        self.fill_node_type()
         
         # Load data from related tables
-        self.loadData()
+        self.load_data()
         
         # Set layer in editing mode
         self.layer.startEditing()
             
             
-    def translateForm(self):
+    def translate_form(self):
         
         # Get objects of type: QLabel
         context_name = 'ws_node'
         widget_list = self.dialog.findChildren(QLabel)
         for widget in widget_list:
-            self.translateWidget(context_name, widget)
+            self.translate_widget(context_name, widget)
             
             
-    def translateWidget(self, context_name, widget):
+    def translate_widget(self, context_name, widget):
         
         if widget:
             widget_name = widget.objectName()
@@ -117,21 +119,115 @@ class NodeDialog():
                 widget.setText(text)        
         
    
-    def loadData(self):
-        # Tab 'Add. info'
+    def load_tab_add_info(self):
+        ''' Load data from tab 'Add. info' '''
         if self.epa_type == 'TANK':
             sql = "SELECT vmax, area FROM "+self.schema_name+".man_tank WHERE node_id = "+self.node_id
             row = self.dao.get_row(sql)
-            if row:
+            if row:             
                 utils_giswater.setText("man_tank_vmax", str(row[0]))
                 utils_giswater.setText("man_tank_area", str(row[1]))
+   
+   
+    def load_tab_analysis(self):
+        ''' Load data from tab 'Analysis' '''
+        
+        if self.epa_type == 'JUNCTION':                           
+            sql = "SELECT demand, pattern_id"
+            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE node_id = "+self.node_id
+            row = self.dao.get_row(sql)
+            if row:
+                for i in range(self.dao.get_columns_length()):
+                    widget_name = self.epa_table+"_"+self.dao.get_column_name(i)
+                    utils_giswater.setText(widget_name, str(row[i]))
+                    
+        elif self.epa_type == 'TANK':
+            # Load combo widgets
+            combo = self.epa_table+"_curve_id"
+            sql = "SELECT id FROM "+self.schema_name+".inp_curve_id ORDER BY id"
+            rows = self.dao.get_rows(sql)
+            utils_giswater.fillComboBox(combo, rows)
+                        
+            self.fields_tank = ['initlevel', 'minlevel', 'maxlevel', 'diameter', 'minvol', 'curve_id']            
+            sql = "SELECT "
+            for i in range(len(self.fields_tank)):
+                sql+= self.fields_tank[i]+", "
+            sql = sql[:-2]
+            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE node_id = "+self.node_id
+            row = self.dao.get_row(sql)
+            #print sql            
+            if row:
+                for i in range(len(self.fields_tank)):
+                    widget_name = self.epa_table+"_"+self.fields_tank[i]
+                    utils_giswater.setWidgetText(widget_name, str(row[i]))
         
         
+    def load_data(self):
+        ''' Load data from related tables '''
         
-    ''' Slots '''  
+        self.load_tab_add_info()
+        self.load_tab_analysis()
+        
+        ''' TODO:
+        self.load_tab_document()
+        self.load_tab_picture()
+        self.load_tab_event()
+        self.load_tab_log()
+        self.load_tab_rtc()
+        '''        
+        
+
+    def save_tab_add_info(self):
+        ''' Save tab from tab 'Add. info' '''                
+        if self.epa_type == 'TANK':
+            vmax = utils_giswater.getStringValue2("man_tank_vmax")
+            area = utils_giswater.getStringValue2("man_tank_area")
+            sql = "UPDATE "+self.schema_name+".man_tank SET vmax = "+str(vmax)+ ", area = "+str(area)
+            sql+= " WHERE node_id = "+str(self.node_id)
+            self.dao.execute_sql(sql)
+                
+
+    def save_tab_analysis(self):
+        ''' Save tab from tab 'Analysis' '''                
+
+        if self.epa_type == 'JUNCTION':
+            demand = utils_giswater.getStringValue2(self.epa_table+"_demand")
+            sql = "UPDATE "+self.schema_name+"."+self.epa_table+" SET"
+            sql+= " demand = "+str(demand)
+            sql+= " WHERE node_id = "+str(self.node_id)          
+            self.dao.execute_sql(sql)
+            
+        if self.epa_type == 'TANK':
+            values = []
+            sql = "UPDATE "+self.schema_name+"."+self.epa_table+" SET "
+            for i in range(len(self.fields_tank)):
+                widget_name = self.epa_table+"_"+self.fields_tank[i]              
+                values.append(utils_giswater.getWidgetText(widget_name))
+                sql+= self.fields_tank[i]+" = "+str(values[i])+", "
+            sql = sql[:-2]                
+            sql+= " WHERE node_id = "+str(self.node_id)        
+            self.dao.execute_sql(sql)
+                
+                
+    def save_data(self):
+        ''' Save data from related tables '''
+        self.save_tab_add_info()
+        self.save_tab_analysis()
+        
+        ''' TODO:
+        self.save_tab_document()
+        self.save_tab_picture()
+        self.save_tab_event()
+        self.save_tab_log()
+        self.save_tab_rtc()
+        '''        
+                
+           
+        
+    ''' Slot functions '''  
     
-    def fillNodeType(self):
-        """ Define and execute query to populate combo 'cat_nodetype_id' """
+    def fill_node_type(self):
+        ''' Define and execute query to populate combo 'cat_nodetype_id' '''
         cat_nodetype_id = utils_giswater.getSelectedItem("cat_nodetype_id")     
         sql = "SELECT id, man_table, epa_table FROM "+self.schema_name+".arc_type WHERE epa_default = '"+self.epa_type+"' UNION "
         sql+= "SELECT id, man_table, epa_table FROM "+self.schema_name+".node_type WHERE epa_default = '"+self.epa_type+"' ORDER BY id"
@@ -141,48 +237,54 @@ class NodeDialog():
         utils_giswater.setSelectedItem('cat_nodetype_id', cat_nodetype_id)
             
             
-    def changeNodeType(self, index):
-        """ Define and execute query to populate combo 'nodecat_id_dummy' """
+    def change_node_type(self, index):
+        ''' Define and execute query to populate combo 'nodecat_id_dummy' '''
         cat_nodetype_id = utils_giswater.getSelectedItem("cat_nodetype_id")     
         sql = "SELECT id FROM "+self.schema_name+".cat_arc WHERE arctype_id = '"+cat_nodetype_id+"' UNION "
         sql+= "SELECT id FROM "+self.schema_name+".cat_node WHERE nodetype_id = '"+cat_nodetype_id+"' ORDER BY id"   
         rows = self.dao.get_rows(sql)
         self.cbo_nodecat_id = self.dialog.findChild(QComboBox, "nodecat_id_dummy")
         utils_giswater.fillComboBox(self.cbo_nodecat_id, rows, False)  
-        self.changeNodeCat(0)       
+        self.change_node_cat(0)       
         
                        
-    def changeNodeCat(self, index):
-        """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
+    def change_node_cat(self, index):
+        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
         dummy = utils_giswater.getSelectedItem("nodecat_id_dummy")
         utils_giswater.setSelectedItem("nodecat_id", dummy)   
         
                 
-    def changeEpaType(self, index):
-        """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
+    def change_epa_type(self, index):
+        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
         epa_type = utils_giswater.getSelectedItem("epa_type")
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
     
     
-    def setTabsVisibility(self):
+    def set_tabs_visibility(self):
         
         man_visible = False
         index_tab = 0      
         if self.epa_type == 'JUNCTION':
             index_tab = 0
-        if self.epa_type == 'RESERVOIR' or self.epa_type == 'HYDRANT':
+            self.epa_table = 'inp_junction'
+        elif self.epa_type == 'RESERVOIR' or self.epa_type == 'HYDRANT':
             index_tab = 1
-        if self.epa_type == 'TANK':
+            self.epa_table = 'inp_reservoir'
+        elif self.epa_type == 'TANK':
             index_tab = 2
+            self.epa_table = 'inp_tank'
             man_visible = True           
-        if self.epa_type == 'PUMP':
+        elif self.epa_type == 'PUMP':
             index_tab = 3
-        if self.epa_type == 'VALVE':
+            self.epa_table = 'inp_pump'
+        elif self.epa_type == 'VALVE':
             index_tab = 4
-        if self.epa_type == 'SHORTPIPE' or self.epa_type == 'FILTER':
+            self.epa_table = 'inp_valve'
+        elif self.epa_type == 'SHORTPIPE' or self.epa_type == 'FILTER':
             index_tab = 5
-        if self.epa_type == 'MEASURE INSTRUMENT':
+            self.epa_table = 'inp_shortpipe'
+        elif self.epa_type == 'MEASURE INSTRUMENT':
             index_tab = 6
         
         # Tab 'Add. info': Manage visibility of these widgets 
@@ -201,19 +303,16 @@ class NodeDialog():
             
                
     def save(self):
-        if self.epa_type == 'TANK':
-            vmax = utils_giswater.getStringValue2("man_tank_vmax")
-            area = utils_giswater.getStringValue2("man_tank_area")
-            sql = "UPDATE "+self.schema_name+".man_tank SET vmax = "+str(vmax)+ ", area = "+str(area)
-            sql+= " WHERE node_id = "+str(self.node_id)
-            print sql
-            self.dao.execute_sql(sql)
+        ''' Save feature '''
+        self.save_data()
+                                
         self.dialog.accept()
         self.layer.commitChanges()    
         self.close()     
         
         
     def close(self):
+        ''' Close form without saving '''
         self.layer.rollBack()   
         self.dialog.parent().setVisible(False)    
 
