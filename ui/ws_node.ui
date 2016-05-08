@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1249,7 +1249,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_analysis_junction">
       <attribute name="title">
@@ -9741,7 +9741,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnAccept">
+  <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
      <x>670</x>
@@ -9754,7 +9754,7 @@ p, li { white-space: pre-wrap; }
     <string>Accept</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnClose">
+  <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
      <x>750</x>

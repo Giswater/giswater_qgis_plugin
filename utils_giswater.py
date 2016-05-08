@@ -71,6 +71,20 @@ def getStringValue2(widget):
     return elem_text      
 
 
+def getText(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QLineEdit, widget)          
+    if widget:
+        if widget.text():
+            elem_text = widget.text()
+        else:
+            elem_text = "null"
+    else:
+        elem_text = "null"
+    return elem_text      
+
+
 def setText(widget, text):
     
     if type(widget) is str:
@@ -84,7 +98,7 @@ def setText(widget, text):
         widget.setText(value)     
 
 
-def getWidgetText(widget):
+def getWidgetText(widget, add_quote=False):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)      
@@ -92,9 +106,11 @@ def getWidgetText(widget):
         return None   
     text = None
     if type(widget) is QLineEdit:
-        text = getStringValue2(widget)
+        text = getText(widget)
     elif type(widget) is QComboBox:
         text = getSelectedItem(widget)
+    if add_quote and text <> "null":
+        text = "'"+text+"'"  
     return text
 
 
@@ -117,7 +133,7 @@ def getSelectedItem(widget):
     widget_text = "null"    
     if widget:
         if widget.currentText():
-            widget_text = widget.currentText()    
+            widget_text = widget.currentText()       
     return widget_text    
 
 
