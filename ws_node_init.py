@@ -8,7 +8,7 @@ from ws_parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a node is inserted of clicked in the map '''
+    ''' Function called when a node is identified in the map '''
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -24,7 +24,7 @@ def init_config():
     feature_dialog.change_node_type()  
     feature_dialog.dialog.findChild(QComboBox, "cat_nodetype_id").activated.connect(feature_dialog.change_node_type)    
     feature_dialog.dialog.findChild(QComboBox, "nodecat_id_dummy").activated.connect(feature_dialog.change_node_cat)          
-    feature_dialog.setSelectedItem("nodecat_id_dummy", nodecat_id)   
+    utils_giswater.setSelectedItem("nodecat_id_dummy", nodecat_id)   
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
     
     feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)    
@@ -67,13 +67,56 @@ class NodeDialog(ParentDialog):
         
         # Set layer in editing mode
         self.layer.startEditing()
+        
+    
+    def set_tabs_visibility(self):
+        ''' Hide some 'tabs' depending 'epa_type' '''
+        
+        man_visible = False
+        index_tab = 0      
+        if self.epa_type == 'JUNCTION':
+            index_tab = 0
+            self.epa_table = 'inp_junction'
+        elif self.epa_type == 'RESERVOIR' or self.epa_type == 'HYDRANT':
+            index_tab = 1
+            self.epa_table = 'inp_reservoir'
+        elif self.epa_type == 'TANK':
+            index_tab = 2
+            self.epa_table = 'inp_tank'
+            man_visible = True           
+        elif self.epa_type == 'PUMP':
+            index_tab = 3
+            self.epa_table = 'inp_pump'
+        elif self.epa_type == 'VALVE':
+            index_tab = 4
+            self.epa_table = 'inp_valve'
+        elif self.epa_type == 'SHORTPIPE' or self.epa_type == 'FILTER':
+            index_tab = 5
+            self.epa_table = 'inp_shortpipe'
+        elif self.epa_type == 'MEASURE INSTRUMENT':
+            index_tab = 6
+        
+        # Tab 'Add. info': Manage visibility of these widgets 
+        utils_giswater.setWidgetVisible("label_man_tank_vmax", man_visible) 
+        utils_giswater.setWidgetVisible("label_man_tank_area", man_visible) 
+        utils_giswater.setWidgetVisible("man_tank_vmax", man_visible) 
+        utils_giswater.setWidgetVisible("man_tank_area", man_visible) 
+                    
+        # Move 'visible' tab to last position and remove previous ones
+        self.tab_analysis.tabBar().moveTab(index_tab, 5);
+        for i in range(0, self.tab_analysis.count() - 1):
+            self.tab_analysis.removeTab(0)    
+        self.tab_event.tabBar().moveTab(index_tab, 6);
+        for i in range(0, self.tab_event.count() - 1):
+            self.tab_event.removeTab(0)           
             
    
     def load_tab_add_info(self):
         ''' Load data from tab 'Add. info' '''
         
         if self.epa_type == 'TANK':
-            sql = "SELECT vmax, area FROM "+self.schema_name+".man_tank WHERE node_id = '"+self.id+"'"
+            sql = "SELECT vmax, area" 
+            sql+= " FROM "+self.schema_name+".man_tank WHERE "+self.field_id+" = '"+self.id+"'"
             row = self.dao.get_row(sql)
             if row:             
                 utils_giswater.setWidgetText("man_tank_vmax", str(row[0]))
@@ -116,7 +159,7 @@ class NodeDialog(ParentDialog):
             for i in range(len(self.fields_tank)):
                 sql+= self.fields_tank[i]+", "
             sql = sql[:-2]
-            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE node_id = '"+self.id+"'"
+            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE "+self.field_id+" = '"+self.id+"'"
             row = self.dao.get_row(sql)      
             if row:
                 for i in range(len(self.fields_tank)):
@@ -130,7 +173,8 @@ class NodeDialog(ParentDialog):
         if self.epa_type == 'TANK':
             vmax = utils_giswater.getWidgetText("man_tank_vmax", False)
             area = utils_giswater.getWidgetText("man_tank_area", False)
-            sql = "UPDATE "+self.schema_name+".man_tank SET vmax = "+str(vmax)+ ", area = "+str(area)
+            sql = "UPDATE "+self.schema_name+".man_tank SET" 
+            sql+= " vmax = "+str(vmax)+ ", area = "+str(area)
             sql+= " WHERE node_id = '"+self.id+"'"
             self.dao.execute_sql(sql)
                 
@@ -199,46 +243,4 @@ class NodeDialog(ParentDialog):
         epa_type = utils_giswater.getWidgetText("epa_type", False)
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
-    
-    
-    def set_tabs_visibility(self):
-        ''' Hide some 'tabs' depending 'epa_type' '''
-        
-        man_visible = False
-        index_tab = 0      
-        if self.epa_type == 'JUNCTION':
-            index_tab = 0
-            self.epa_table = 'inp_junction'
-        elif self.epa_type == 'RESERVOIR' or self.epa_type == 'HYDRANT':
-            index_tab = 1
-            self.epa_table = 'inp_reservoir'
-        elif self.epa_type == 'TANK':
-            index_tab = 2
-            self.epa_table = 'inp_tank'
-            man_visible = True           
-        elif self.epa_type == 'PUMP':
-            index_tab = 3
-            self.epa_table = 'inp_pump'
-        elif self.epa_type == 'VALVE':
-            index_tab = 4
-            self.epa_table = 'inp_valve'
-        elif self.epa_type == 'SHORTPIPE' or self.epa_type == 'FILTER':
-            index_tab = 5
-            self.epa_table = 'inp_shortpipe'
-        elif self.epa_type == 'MEASURE INSTRUMENT':
-            index_tab = 6
-        
-        # Tab 'Add. info': Manage visibility of these widgets 
-        utils_giswater.setWidgetVisible("label_man_tank_vmax", man_visible) 
-        utils_giswater.setWidgetVisible("label_man_tank_area", man_visible) 
-        utils_giswater.setWidgetVisible("man_tank_vmax", man_visible) 
-        utils_giswater.setWidgetVisible("man_tank_area", man_visible) 
-                    
-        # Move 'visible' tab to last position and remove previous ones
-        self.tab_analysis.tabBar().moveTab(index_tab, 5);
-        for i in range(0, self.tab_analysis.count() - 1):
-            self.tab_analysis.removeTab(0)    
-        self.tab_event.tabBar().moveTab(index_tab, 6);
-        for i in range(0, self.tab_event.count() - 1):
-            self.tab_event.removeTab(0)    
-
+  
