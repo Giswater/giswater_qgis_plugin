@@ -22,6 +22,7 @@ from functools import partial
 from line_map_tool import LineMapTool
 from point_map_tool import PointMapTool
 from controller import DaoController
+from map_tools.move_node import MoveNode
 
 
 class Giswater(QObject):
@@ -84,6 +85,14 @@ class Giswater(QObject):
             return self.controller.tr(message)
         
         
+    def showInfo(self, text, duration = 5):
+        self.iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)            
+        
+        
+    def showWarning(self, text, duration = 5):
+        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)            
+        
+        
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
         if parent is None:
@@ -114,7 +123,7 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) < 16:    
+                if int(index_action) <= 28:    
                     water_soft = function_name[:2] 
                     callback_function = getattr(self, water_soft+'_generic')  
                     action.toggled.connect(partial(callback_function, function_name))
@@ -132,19 +141,25 @@ class Giswater(QObject):
           
         
     def add_action(self, index_action, toolbar, parent):
+        ''' Add new action into specified toolbar 
+        This action has to be defined in the configuration file ''' 
         
         action = None
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
-        # Only create action if is defined in configuration file
         if function_name:
+            map_tool = None
             action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-            # TODO: Parametrize it
             if int(index_action) == 13:
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
+            elif int(index_action) == 16:
+                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller)         
+            elif int(index_action) in (10, 11, 12, 15, 17):
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)   
             else:
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)         
-            self.map_tools[function_name] = map_tool       
+                pass
+            if map_tool:      
+                self.map_tools[function_name] = map_tool       
         
         return action         
         
@@ -257,21 +272,21 @@ class Giswater(QObject):
                             
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
+        
         self.disable_actions()
         if layer is None:
             layer = self.iface.activeLayer() 
         self.current_layer = layer
         try:
             list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
-            print list_index_action
             if list_index_action:
                 if type(list_index_action) is list:
                     for index_action in list_index_action:
-                        if index_action != '-1':
+                        if index_action != '-1' and str(index_action) in self.actions:
                             self.actions[index_action].setEnabled(True)
                 elif type(list_index_action) is unicode:
                     index_action = str(list_index_action)
-                    if index_action != '-1':
+                    if index_action != '-1' and str(index_action) in self.actions:
                         self.actions[index_action].setEnabled(True)                
         except AttributeError, e:
             print "current_layer_changed: "+str(e)
@@ -281,15 +296,15 @@ class Giswater(QObject):
         ''' Water supply generic callback function '''
         try:
             # Get sender (selected action) and map tool associated 
-            sender = self.sender()            
+            sender = self.sender()                            
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
                 self.iface.mapCanvas().setMapTool(map_tool)
-                #print function_name+" has been checked"       
+                print function_name+" has been checked (ws_generic)"       
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
-        except AttributeError:
-            print "ws_generic: AttributeError"
+        except AttributeError as e:
+            self.showWarning("AttributeError: "+str(e))     
             
             
     def ud_generic(self, function_name):   
@@ -311,38 +326,32 @@ class Giswater(QObject):
         ''' Management generic callback function '''
         try:        
             # Get sender (selected action) and map tool associated 
-            sender = self.sender()            
-            map_tool = self.map_tools[function_name]
-            if sender.isChecked():
-                self.iface.mapCanvas().setMapTool(map_tool)
-                print function_name+" has been checked"       
-            else:
-                self.iface.mapCanvas().unsetMapTool(map_tool)
-        except AttributeError:
-            print "mg_generic: AttributeError"                
+            sender = self.sender()  
+            if function_name in self.map_tools:          
+                map_tool = self.map_tools[function_name]
+                if sender.isChecked():
+                    self.iface.mapCanvas().setMapTool(map_tool)
+                    #print function_name+" has been checked (mg_generic)"       
+                else:
+                    self.iface.mapCanvas().unsetMapTool(map_tool)
+                    #print function_name+" has been unchecked (mg_generic)"  
+        except AttributeError as e:
+            self.showWarning("AttributeError: "+str(e))            
+        except KeyError as e:
+            self.showWarning("KeyError: "+str(e))   
                                  
                                                    
     ''' Management bar functions '''                                
-    def move_node(self):
-        print "move_node"
-        ''' TODO: 16. User select nodes from 'v_edit_node' and triggers function: 'gw_fct_node2nodarc' '''
-        # Get selected features
-        node_list = [1, 2, 3]
-        # Convert list to node
-        node_json = None
-        #sql = "SELECT sample_ws.gw_fct_node2nodarc("+node_json+")"
-        #result = self.dao.execute_sql(sql)
-        
         
     def delete_node(self):
-        ''' 17. Show warning to the user '''
+        ''' Button 17. Show warning to the user '''
         print "delete_node"
-        msg = self.tr('delete_node')
-        reply = QMessageBox.question(None, self.tr('17_text'), msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            print "delete"
-        else:
-            print "no"     
+#         msg = self.tr('delete_node')
+#         reply = QMessageBox.question(None, self.tr('17_text'), msg, QMessageBox.Yes, QMessageBox.No)
+#         if reply == QMessageBox.Yes:
+#             print "delete"
+#         else:
+#             print "no"     
     
         
     def change_elem_type(self):
