@@ -44,8 +44,6 @@ class ConnecDialog(ParentDialog):
         self.field_id = "connec_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)     
         
-        # Get widget controls    
-        
         # Manage i18n
         self.translate_form('ws_connec')        
         
@@ -55,18 +53,8 @@ class ConnecDialog(ParentDialog):
         # Set layer in editing mode
         self.layer.startEditing()
                
-   
-    def load_tab_analysis(self):
-        ''' Load data from tab 'Analysis' '''
-        pass
-    
-
-    def save_tab_analysis(self):
-        ''' Save tab from tab 'Analysis' '''   
-        pass
-                        
-                        
-        
+                     
+                    
     ''' TODO: Slot functions '''  
          
 

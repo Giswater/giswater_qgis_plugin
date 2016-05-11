@@ -263,7 +263,6 @@ class Giswater(QObject):
         self.current_layer = layer
         try:
             list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
-            print list_index_action
             if list_index_action:
                 if type(list_index_action) is list:
                     for index_action in list_index_action:
@@ -274,6 +273,8 @@ class Giswater(QObject):
                     if index_action != '-1':
                         self.actions[index_action].setEnabled(True)                
         except AttributeError, e:
+            print "current_layer_changed: "+str(e)
+        except KeyError, e:
             print "current_layer_changed: "+str(e)
                         
                 

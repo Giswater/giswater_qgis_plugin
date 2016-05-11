@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -994,16 +994,6 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="builtdate">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>220</y>
-       <width>161</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QComboBox" name="ownercat_id">
      <property name="geometry">
       <rect>
@@ -1012,6 +1002,23 @@
        <width>160</width>
        <height>20</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="builtdate">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>220</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
      </property>
     </widget>
    </widget>
@@ -1108,7 +1115,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_elevation_2">
+    <widget class="QLineEdit" name="demand">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1148,7 +1155,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_depth_2">
+    <widget class="QLineEdit" name="n_hydrometer">
      <property name="geometry">
       <rect>
        <x>380</x>
@@ -1188,7 +1195,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_depth_3">
+    <widget class="QLineEdit" name="code">
      <property name="geometry">
       <rect>
        <x>640</x>
@@ -1298,7 +1305,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="doc_date_2">
+    <widget class="QDateEdit" name="date_document_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1307,8 +1314,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QDateTimeEdit" name="doc_date">
+    <widget class="QDateEdit" name="date_document_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1316,6 +1333,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QComboBox" name="cat_doc_type">
