@@ -77,9 +77,6 @@ BEGIN
 --		Insert new record into arc table
 		INSERT INTO "SCHEMA_NAME".arc SELECT rec_aux2.*;
 
-
-
-
 	END IF;
 
 	RETURN;
@@ -89,11 +86,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION "SCHEMA_NAME".gw_fct_node2arc(character varying)
-  OWNER TO geoserver;
-
-
-
-
-
-
