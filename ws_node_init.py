@@ -45,7 +45,7 @@ class NodeDialog(ParentDialog):
         ''' Custom form initial configuration for 'Node' '''
         
         # Define class variables
-        self.field_id = "arc_id"        
+        self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)
         self.epa_type = utils_giswater.getWidgetText("epa_type", False)        
         
@@ -117,7 +117,7 @@ class NodeDialog(ParentDialog):
         if self.epa_type == 'TANK':
             sql = "SELECT vmax, area" 
             sql+= " FROM "+self.schema_name+".man_tank WHERE "+self.field_id+" = '"+self.id+"'"
-            row = self.dao.get_row(sql)
+            row = self.dao.get_row(sql)           
             if row:             
                 utils_giswater.setWidgetText("man_tank_vmax", str(row[0]))
                 utils_giswater.setWidgetText("man_tank_area", str(row[1]))
@@ -173,11 +173,18 @@ class NodeDialog(ParentDialog):
         if self.epa_type == 'TANK':
             vmax = utils_giswater.getWidgetText("man_tank_vmax", False)
             area = utils_giswater.getWidgetText("man_tank_area", False)
-            sql = "UPDATE "+self.schema_name+".man_tank SET" 
+            sql= " UPDATE "+self.schema_name+".man_tank SET" 
             sql+= " vmax = "+str(vmax)+ ", area = "+str(area)
-            sql+= " WHERE node_id = '"+self.id+"'"
+            sql+= " WHERE node_id = '"+self.id+"';"
             self.dao.execute_sql(sql)
-                
+            total = self.dao.get_rowcount()
+            # Perform an INSERT if any record has been updated
+            # TODO: If trigger was working correctly this wouldn't be necessary!
+            if total == 0:
+                sql = "INSERT INTO "+self.schema_name+".man_tank (node_id, vmax, area) VALUES"
+                sql+= " ('"+self.id+"', "+str(vmax)+ ", "+str(area)+");"     
+                self.dao.execute_sql(sql)
+
 
     def save_tab_analysis(self):
         ''' Save tab from tab 'Analysis' '''        
