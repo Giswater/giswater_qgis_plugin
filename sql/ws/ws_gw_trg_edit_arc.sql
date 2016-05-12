@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -12,6 +12,7 @@ DECLARE
     inp_table varchar;
     man_table varchar;
     v_sql varchar;
+
 
 BEGIN
 
@@ -27,51 +28,50 @@ BEGIN
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-                RAISE EXCEPTION 'There are no arc catalog defined in the model, define at least one.';
-            END IF;
-            --NEW.arccat_id:= (SELECT id FROM cat_arc LIMIT 1);
-            --NEW.epa_type:= 'PIPE';
-        --ELSE
-            --NEW.epa_type:= (SELECT epa_default FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);        
+                RAISE EXCEPTION '[%]: There are no arc catalog defined in the model, define at least one.', TG_NAME;
+            END IF; 
         END IF;
         
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no sectors defined in the model, define at least one.', TG_NAME;
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the sectors!', TG_NAME;
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+                RAISE EXCEPTION '[%]: There are no dma defined in the model, define at least one.', TG_NAME;
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the dma!', TG_NAME;
             END IF;
         END IF;
     
         -- FEATURE INSERT
         INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length, 
-                                NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+                            NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
+                            NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
+
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
             inp_table:= 'inp_pipe';
+            v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+            EXECUTE v_sql;
         END IF;
-        v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
-        EXECUTE v_sql;
-        
+
         -- MAN INSERT      
         man_table := (SELECT arc_type.man_table FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
-        v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
-        EXECUTE v_sql;
+        IF man_table IS NOT NULL THEN
+            v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||NEW.arc_id||')';    
+            EXECUTE v_sql;
+        END IF;
         
         RETURN NEW;
     
@@ -81,15 +81,15 @@ BEGIN
          
             IF (OLD.epa_type = 'PIPE') THEN
                 inp_table:= 'inp_pipe';            
+                v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+                EXECUTE v_sql;
             END IF;
-            v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
-            EXECUTE v_sql;
 
             IF (NEW.epa_type = 'PIPE') THEN
                 inp_table:= 'inp_pipe';   
+                v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+                EXECUTE v_sql;
             END IF;
-            v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
-            EXECUTE v_sql;
 
         END IF;
     
@@ -110,7 +110,10 @@ BEGIN
      END IF;
 
 END;
-$$;
+$BODY$
+  LANGUAGE 'plpgsql' VOLATILE COST 100
+;
+
 
 
 

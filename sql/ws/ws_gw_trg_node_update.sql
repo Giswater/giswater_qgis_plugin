@@ -1,11 +1,11 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update_geom() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     querystring Varchar; 
     arcrec Record; 
@@ -46,6 +46,8 @@ END;
 $$;
 
 
-CREATE TRIGGER gw_trg_node_update_geom AFTER UPDATE ON "SCHEMA_NAME"."node" 
-FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update_geom"();
+-- CREATE TRIGGER gw_trg_node_update_geom AFTER UPDATE ON "SCHEMA_NAME"."node" 
+-- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update_geom"();
 
+CREATE TRIGGER gw_trg_node_update AFTER UPDATE ON "SCHEMA_NAME"."node" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();

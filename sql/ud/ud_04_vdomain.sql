@@ -29,7 +29,6 @@ INSERT INTO "SCHEMA_NAME"."value_yesno" VALUES ('NO');
 INSERT INTO "SCHEMA_NAME"."value_yesno" VALUES ('YES');
 
 
-
 -- ----------------------------
 -- Records of connec_type
 -- ----------------------------
@@ -54,11 +53,3 @@ INSERT INTO "SCHEMA_NAME"."man_type_fluid" VALUES ('NO FLUID DATA', null);
 -- Records of man_type_location
 -- ----------------------------
 INSERT INTO "SCHEMA_NAME"."man_type_location" VALUES ('NO LOCATION DATA', null);
-
-
--- ----------------------------
--- Records of selector_valve
--- ----------------------------
-INSERT INTO "SCHEMA_NAME"."man_selector_valve" VALUES ('SHUTOFF VALVE');
-
-

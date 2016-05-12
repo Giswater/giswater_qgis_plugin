@@ -10,16 +10,20 @@ This version of Giswater is provided by Giswater Association
 -- Default values of column views
 -- ----------------------------
 
-ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER elevation SET DEFAULT 0.00;
-ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER depth SET DEFAULT 0.00;
+
+ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER top_elev SET DEFAULT 0.00;
+ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER ymax SET DEFAULT 0.00;
 ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER state SET DEFAULT 'ON_SERVICE';
 ALTER VIEW "SCHEMA_NAME".v_edit_node ALTER verified SET DEFAULT 'TO REVIEW';
 
+
+ALTER VIEW "SCHEMA_NAME".v_edit_arc ALTER y1 SET DEFAULT 0.00;
+ALTER VIEW "SCHEMA_NAME".v_edit_arc ALTER y2 SET DEFAULT 0.00;
 ALTER VIEW "SCHEMA_NAME".v_edit_arc ALTER state SET DEFAULT 'ON_SERVICE';
 ALTER VIEW "SCHEMA_NAME".v_edit_arc ALTER verified SET DEFAULT 'TO REVIEW';
 
-ALTER VIEW "SCHEMA_NAME".v_edit_connec ALTER elevation SET DEFAULT 0.00;
-ALTER VIEW "SCHEMA_NAME".v_edit_connec ALTER depth SET DEFAULT 0.00;
+
+ALTER VIEW "SCHEMA_NAME".v_edit_connec ALTER top_elev SET DEFAULT 0.00;
+ALTER VIEW "SCHEMA_NAME".v_edit_connec ALTER ymax SET DEFAULT 0.00;
 ALTER VIEW "SCHEMA_NAME".v_edit_connec ALTER state SET DEFAULT 'ON_SERVICE';
 ALTER VIEW "SCHEMA_NAME".v_edit_connec ALTER verified SET DEFAULT 'TO REVIEW';
-

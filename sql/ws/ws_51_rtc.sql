@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
  */
@@ -42,10 +42,10 @@ units character varying(12),
 text1 character varying(100),
 text2 character varying(100),
 text3 character varying(100),
-"link" varchar(512) COLLATE "default",
-"url" varchar(512) COLLATE "default",
-"picture" varchar(512) COLLATE "default",
-"svg" varchar(50) COLLATE "default",
+"link" varchar(512)  ,
+"url" varchar(512)  ,
+"picture" varchar(512)  ,
+"svg" varchar(50)  ,
 CONSTRAINT cat_scada_pkey PRIMARY KEY (id)
 );
 
@@ -55,10 +55,10 @@ id character varying(16) NOT NULL,
 text1 character varying(100),
 text2 character varying(100),
 text3 character varying(100),
-"link" varchar(512) COLLATE "default",
-"url" varchar(512) COLLATE "default",
-"picture" varchar(512) COLLATE "default",
-"svg" varchar(50) COLLATE "default",
+"link" varchar(512)  ,
+"url" varchar(512)  ,
+"picture" varchar(512)  ,
+"svg" varchar(50)  ,
 CONSTRAINT cat_hydrometer_pkey PRIMARY KEY (id)
 );
 
@@ -102,13 +102,13 @@ CREATE TABLE "SCHEMA_NAME".rtc_hydrometer_x_value (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".cat_period (
+CREATE TABLE "SCHEMA_NAME".rtc_cat_period (
   id character varying(16) NOT NULL,
   starttime timestamp (6) without time zone,
   endtime timestamp (6) without time zone,
   period character varying(16),
   comment character varying(100),
-  CONSTRAINT cat_period_pkey PRIMARY KEY (id)
+  CONSTRAINT rtc_cat_period_pkey PRIMARY KEY (id)
 );
 
 
@@ -125,9 +125,9 @@ CREATE TABLE "SCHEMA_NAME".rtc_dma_parameters (
 
 
 CREATE TABLE "SCHEMA_NAME".rtc_inp_demand (
-  node_id varchar(16) COLLATE "default" NOT NULL,
+  node_id varchar(16)   NOT NULL,
   value numeric (12,6),
-  text varchar(100) COLLATE "default",
+  text varchar(100)  ,
   CONSTRAINT rtc_demand_pkey PRIMARY KEY (node_id)
 );
 
@@ -144,7 +144,7 @@ ALTER TABLE "SCHEMA_NAME"."rtc_hydrometer_x_connec" ADD FOREIGN KEY ("hydrocat_i
 ALTER TABLE "SCHEMA_NAME"."rtc_hydrometer_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."rtc_dma_parameters" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."rtc_dma_parameters" ADD FOREIGN KEY ("periodcat_id") REFERENCES "SCHEMA_NAME"."cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."rtc_dma_parameters" ADD FOREIGN KEY ("periodcat_id") REFERENCES "SCHEMA_NAME"."rtc_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."rtc_inp_demand" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

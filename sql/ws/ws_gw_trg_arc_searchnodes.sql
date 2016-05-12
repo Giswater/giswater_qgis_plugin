@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -16,12 +16,12 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Get snapping_tolerance from config table
-    SELECT snapping_tolerance INTO rec FROM config;    
+    SELECT arc_searchnodes INTO rec FROM config;    
 
-    SELECT * INTO nodeRecord1 FROM node WHERE node.the_geom && ST_Expand(ST_startpoint(NEW.the_geom), rec.snapping_tolerance)
-    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+    SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+	    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-    SELECT * INTO nodeRecord2 FROM node WHERE node.the_geom && ST_Expand(ST_endpoint(NEW.the_geom), rec.snapping_tolerance)
+    SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
     -- Control of length line
@@ -51,5 +51,9 @@ CREATE TRIGGER gw_trg_arc_searchnodes_insert BEFORE INSERT ON "SCHEMA_NAME"."arc
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
 
 CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
-FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
+
+-- CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
+-- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
+
 

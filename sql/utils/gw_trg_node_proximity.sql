@@ -15,10 +15,14 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     -- Get node tolerance from config table
-    SELECT node_tolerance INTO rec FROM config;
-    
-    -- Existing nodes
-    numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(NEW.the_geom, rec.node_tolerance));
+    SELECT node_proximity INTO rec FROM config;
+  
+ -- Existing nodes  
+	-- numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(NEW.the_geom, rec.node_proximity));
+	DROP TABLE IF EXISTS table_holder;
+    CREATE TEMP TABLE table_holder AS SELECT * FROM node WHERE  ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity);
+    numNodes:= (SELECT COUNT(*) FROM table_holder WHERE table_holder.node_id != NEW.node_id);
+
 
     -- If there is an existing node closer than 'rec.node_tolerance' meters --> error
     IF (numNodes > 0) THEN
@@ -34,6 +38,8 @@ $$;
 CREATE TRIGGER gw_trg_node_proximity_insert BEFORE INSERT ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_proximity"();
 
-CREATE TRIGGER gw_trg_node_proximity_update BEFORE UPDATE ON "SCHEMA_NAME"."node" 
-FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_proximity"();
+-- CREATE TRIGGER gw_trg_node_proximity_update BEFORE UPDATE ON "SCHEMA_NAME"."node" 
+-- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_proximity"();
 
+CREATE TRIGGER gw_trg_node_proximity_update BEFORE UPDATE ON "SCHEMA_NAME"."node" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_proximity"();

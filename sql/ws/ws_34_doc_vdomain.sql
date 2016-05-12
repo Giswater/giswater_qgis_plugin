@@ -5,6 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-INSERT INTO "SCHEMA_NAME"."config" VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,null,null,null);
+-- ----------------------------
+-- Records of doc type table
+-- ----------------------------
 
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('AS_BUILT');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('INCIDENT');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('WORK RAPPORT');
+INSERT INTO "SCHEMA_NAME"."doc_type" VALUES ('OTHER');
 
