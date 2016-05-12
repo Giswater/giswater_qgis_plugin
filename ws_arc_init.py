@@ -8,7 +8,7 @@ from ws_parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when an arc is inserted of clicked in the map '''
+    ''' Function called when an arc is identified in the map '''
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -67,7 +67,14 @@ class ArcDialog(ParentDialog):
         
         # Set layer in editing mode
         self.layer.startEditing()
-               
+
+
+    def set_tabs_visibility(self):
+        ''' Hide some 'tabs' depending 'epa_type' '''
+          
+        if self.epa_type == 'PIPE':
+            self.epa_table = 'inp_pipe'
+                           
    
     def load_tab_analysis(self):
         ''' Load data from tab 'Analysis' '''
@@ -78,7 +85,7 @@ class ArcDialog(ParentDialog):
             for i in range(len(self.fields_pipe)):
                 sql+= self.fields_pipe[i]+", "
             sql = sql[:-2]
-            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE arc_id = '"+self.id+"'"
+            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE "+self.field_id+" = '"+self.id+"'"
             row = self.dao.get_row(sql)
             if row:
                 for i in range(len(self.fields_pipe)):
@@ -99,7 +106,7 @@ class ArcDialog(ParentDialog):
                 values.append(value)
                 sql+= self.fields_pipe[i]+" = "+str(values[i])+", "
             sql = sql[:-2]      
-            sql+= " WHERE arc_id = '"+self.id+"'"        
+            sql+= " WHERE "+self.field_id+" = '"+self.id+"'"        
             self.dao.execute_sql(sql)        
                         
                         
@@ -138,13 +145,4 @@ class ArcDialog(ParentDialog):
         epa_type = utils_giswater.getWidgetText("epa_type", False)
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
-    
-    
-    def set_tabs_visibility(self):
-        ''' Hide some 'tabs' depending 'epa_type' '''
-          
-        if self.epa_type == 'PIPE':
-            self.epa_table = 'inp_pipe'
-
-
 
