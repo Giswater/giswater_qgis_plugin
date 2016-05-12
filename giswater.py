@@ -293,6 +293,8 @@ class Giswater(QObject):
                         self.actions[index_action].setEnabled(True)                
         except AttributeError, e:
             print "current_layer_changed: "+str(e)
+        except KeyError, e:
+            print "current_layer_changed: "+str(e)
                         
                 
     def ws_generic(self, function_name):   
