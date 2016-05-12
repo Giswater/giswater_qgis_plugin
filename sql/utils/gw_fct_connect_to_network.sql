@@ -1,6 +1,5 @@
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_json json) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_param varchar[]) RETURNS void AS $BODY$
 DECLARE
-    connec_array   varchar[];
     connec_id_aux  varchar;
     arc_geom       geometry;
     candidate_line integer;
@@ -14,9 +13,6 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-    -- Convert JSON to array to loop
-    connec_array := ARRAY(SELECT trim(elem::text, '"') FROM json_array_elements(connec_json->'connec') elem); 
-   
     -- Main loop
     FOREACH connec_id_aux IN ARRAY connec_array
     LOOP
@@ -29,7 +25,6 @@ BEGIN
 
         -- Get arc geometry
         SELECT the_geom INTO arc_geom FROM arc WHERE arc_id = arc_id_aux;
-
 
         -- Compute link
         IF arc_geom IS NOT NULL THEN
