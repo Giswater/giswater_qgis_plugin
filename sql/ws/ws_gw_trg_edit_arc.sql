@@ -5,14 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_trg_edit_arc"() RETURNS "pg_catalog"."trigger" AS $BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
     v_sql varchar;
-
 
 BEGIN
 
@@ -113,6 +110,7 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100
 ;
+
 
 
 

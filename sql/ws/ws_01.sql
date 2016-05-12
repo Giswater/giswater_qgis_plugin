@@ -457,17 +457,18 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."vnode" (
-"vnode_id" varchar (16) DEFAULT nextval('"SCHEMA_NAME".vnode_seq'::regclass) NOT NULL,
-"userdefined_pos" boolean, 
-"vnode_type" varchar(30)  ,
-"sector_id" varchar(30)  ,
-"state" character varying(16),
-"annotation" character varying(254),
-"the_geom" public.geometry (POINT, SRID_VALUE),
-CONSTRAINT vnode_pkey PRIMARY KEY (vnode_id)
-);
 
+CREATE TABLE "SCHEMA_NAME"."vnode" (
+"vnode_id" varchar(16) DEFAULT nextval('"test_ws".vnode_seq'::regclass) NOT NULL,
+"connec_id" varchar(30),
+"userdefined_pos" bool,
+"vnode_type" varchar(30),
+"sector_id" varchar(30),
+"state" varchar(16),
+"annotation" varchar(254),
+"the_geom" "public"."geometry",
+CONSTRAINT "vnode_pkey" PRIMARY KEY ("vnode_id")
+);
 
 
 CREATE TABLE "SCHEMA_NAME"."link" (
@@ -695,6 +696,8 @@ ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("buildercat_id") REFERENCES 
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 ALTER TABLE "SCHEMA_NAME"."man_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

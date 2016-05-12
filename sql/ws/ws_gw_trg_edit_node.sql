@@ -5,14 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-   
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node() RETURNS trigger LANGUAGE plpgsql AS $$
+   CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_trg_edit_node"() RETURNS "pg_catalog"."trigger" AS $BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
     v_sql varchar;
     old_nodetype varchar;
     new_nodetype varchar;
+
 
 BEGIN
 
@@ -152,7 +152,6 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100
 ;
-
 
 
 
