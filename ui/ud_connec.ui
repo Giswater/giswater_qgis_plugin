@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>6</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -994,7 +994,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_12">
+    <widget class="QDateEdit" name="builtdate">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1002,6 +1002,9 @@
        <width>161</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QComboBox" name="comboBox_16">
@@ -1015,11 +1018,69 @@
      </property>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Add info</string>
+    </attribute>
+    <widget class="QTextEdit" name="element">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>90</y>
+       <width>771</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;element.element_id, cat_element.type, cat_element.id, element.builtdate, element.state,  element.enddate,  element.annotation,  element.link&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_elements">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Elements:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+   </widget>
    <widget class="QWidget" name="tab_7">
     <attribute name="title">
      <string>Document</string>
     </attribute>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_14">
+    <widget class="QDateEdit" name="date_document_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1027,6 +1088,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QTableWidget" name="tableWidget_12">
@@ -1088,7 +1159,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_45">
+    <widget class="QComboBox" name="doc_tag">
      <property name="geometry">
       <rect>
        <x>600</x>
@@ -1242,7 +1313,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_40">
+    <widget class="QComboBox" name="doc_user">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1252,7 +1323,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_43">
+    <widget class="QComboBox" name="doc_event">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1262,7 +1333,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_13">
+    <widget class="QDateEdit" name="date_document_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1271,13 +1342,23 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_9">
     <attribute name="title">
      <string>Picture</string>
     </attribute>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_16">
+    <widget class="QDateEdit" name="date_picture_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1285,6 +1366,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="line_7">
@@ -1300,7 +1391,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_48">
+    <widget class="QComboBox" name="picture_user">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1346,7 +1437,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_49">
+    <widget class="QComboBox" name="picture_tag">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1392,7 +1483,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_15">
+    <widget class="QDateEdit" name="date_picture_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1400,6 +1491,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_to_2">
@@ -1489,7 +1590,7 @@
     <attribute name="title">
      <string>Event</string>
     </attribute>
-    <widget class="QComboBox" name="comboBox_52">
+    <widget class="QComboBox" name="event_eventcat_id">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1581,7 +1682,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_17">
+    <widget class="QDateEdit" name="date_event_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1589,6 +1690,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="line_8">
@@ -1604,7 +1715,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_51">
+    <widget class="QComboBox" name="event_user">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1686,7 +1797,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_18">
+    <widget class="QDateEdit" name="date_event_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1695,8 +1806,25 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="time">
+      <time>
+       <hour>0</hour>
+       <minute>0</minute>
+       <second>0</second>
+      </time>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_50">
+    <widget class="QComboBox" name="cat_event_eventtype_id">
      <property name="geometry">
       <rect>
        <x>600</x>
@@ -1819,7 +1947,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_20">
+    <widget class="QDateEdit" name="date_log_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1827,6 +1955,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QTableWidget" name="tableWidget_15">
@@ -1852,7 +1990,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_19">
+    <widget class="QDateEdit" name="date_log_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1861,8 +1999,18 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_53">
+    <widget class="QComboBox" name="log_user">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1944,7 +2092,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_54">
+    <widget class="QComboBox" name="log_event">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1959,7 +2107,7 @@
     <attribute name="title">
      <string>IPTU</string>
     </attribute>
-    <widget class="QComboBox" name="comboBox_56">
+    <widget class="QComboBox" name="iptu">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -2064,7 +2212,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_30">
+    <widget class="QDateEdit" name="date_iptu_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2072,6 +2220,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_to_5">
@@ -2110,7 +2268,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_31">
+    <widget class="QDateEdit" name="date_iptu_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -2118,6 +2276,16 @@
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>

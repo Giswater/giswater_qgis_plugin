@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -994,7 +994,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="builtdate">
+    <widget class="QDateEdit" name="builtdate">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1002,6 +1002,9 @@
        <width>161</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QTextEdit" name="comment">
@@ -1249,7 +1252,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_analysis_junction">
       <attribute name="title">
@@ -7009,7 +7012,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>Document</string>
     </attribute>
-    <widget class="QDateTimeEdit" name="doc_date_from">
+    <widget class="QDateEdit" name="date_document_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -7017,6 +7020,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_documents">
@@ -7124,7 +7137,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="doc_date_to">
+    <widget class="QDateEdit" name="date_document_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -7132,6 +7145,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_doc_user">
@@ -7267,7 +7290,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>Picture</string>
     </attribute>
-    <widget class="QDateTimeEdit" name="picture_date_2">
+    <widget class="QDateEdit" name="date_picture_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -7275,6 +7298,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_picture_user">
@@ -7405,7 +7438,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="date_picture_from">
+    <widget class="QDateEdit" name="date_picture_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -7413,6 +7446,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="line_12">
@@ -7489,7 +7532,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="page_event_feature">
       <attribute name="title">
@@ -7567,7 +7610,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user">
+      <widget class="QComboBox" name="event_junction_user">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -7577,7 +7620,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date">
+      <widget class="QDateEdit" name="date_event_junction_from">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -7585,6 +7628,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="Line" name="line_5">
@@ -7600,7 +7653,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id">
+      <widget class="QComboBox" name="event_junction_eventcat_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -7692,7 +7745,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id">
+      <widget class="QComboBox" name="cat_junction_event_eventtype_id">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -7702,7 +7755,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_2">
+      <widget class="QDateEdit" name="date_event_junction_to">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -7710,6 +7763,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>3</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_to_3">
@@ -7799,7 +7862,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id_3">
+      <widget class="QComboBox" name="cat_event_hydrant_eventtype_id">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -7809,7 +7872,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user_3">
+      <widget class="QComboBox" name="event_hydrant_user">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -7819,7 +7882,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id_3">
+      <widget class="QComboBox" name="event_hydrant_eventcat_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -7829,7 +7892,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_5">
+      <widget class="QDateEdit" name="date_event_hydrant_from">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -7837,6 +7900,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_result_3">
@@ -7875,7 +7948,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_6">
+      <widget class="QDateEdit" name="date_event_hydrant_to">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -7883,6 +7956,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="Line" name="line_3">
@@ -8007,6 +8090,284 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </widget>
+     <widget class="QWidget" name="page_event_pump">
+      <attribute name="title">
+       <string>Pump</string>
+      </attribute>
+      <widget class="QDateEdit" name="date_event_pump_from">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_event_eventcat_id_6">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>55</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>Event</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_event_user_6">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>55</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>User</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QDateEdit" name="date_event_pump_to">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>20</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_to_9">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>20</y>
+         <width>31</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>to</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="event_x_pump_state_observ">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>130</y>
+         <width>705</width>
+         <height>231</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="Line" name="line_16">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>90</y>
+         <width>705</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="cat_event_pump_eventtype_id">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>55</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="event_pump_eventcat_id">
+       <property name="geometry">
+        <rect>
+         <x>373</x>
+         <y>55</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="event_pump_user">
+       <property name="geometry">
+        <rect>
+         <x>133</x>
+         <y>55</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_result_7">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>108</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Event:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_cat_event_pump_eventtype_id">
+       <property name="geometry">
+        <rect>
+         <x>508</x>
+         <y>55</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>Event_type</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+     </widget>
      <widget class="QWidget" name="page_event_tank">
       <attribute name="title">
        <string>Tank</string>
@@ -8047,7 +8408,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id_2">
+      <widget class="QComboBox" name="cat_event_tank_eventtype_id">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -8152,7 +8513,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id_2">
+      <widget class="QComboBox" name="event_tank_eventcat_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -8162,7 +8523,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user_2">
+      <widget class="QComboBox" name="event_tank_user">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -8172,7 +8533,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_3">
+      <widget class="QDateEdit" name="date_event_tank_from">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -8180,6 +8541,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_to_4">
@@ -8218,7 +8589,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_4">
+      <widget class="QDateEdit" name="date_event_tank_to">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -8226,267 +8597,12 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_cat_event_eventtype_id_2">
-       <property name="geometry">
-        <rect>
-         <x>508</x>
-         <y>55</y>
-         <width>90</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>Event_type</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="page_event_pump">
-      <attribute name="title">
-       <string>Pump</string>
-      </attribute>
-      <widget class="QDateTimeEdit" name="event_date_11">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>20</y>
-         <width>121</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_event_eventcat_id_6">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>55</y>
-         <width>90</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>Event</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_event_user_6">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>55</y>
-         <width>90</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>User</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QDateTimeEdit" name="event_date_12">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>20</y>
-         <width>121</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_to_9">
-       <property name="geometry">
-        <rect>
-         <x>160</x>
-         <y>20</y>
-         <width>31</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>to</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QTableWidget" name="event_x_pump_state_observ">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>705</width>
-         <height>231</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="Line" name="line_16">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>90</y>
-         <width>705</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id_6">
-       <property name="geometry">
-        <rect>
-         <x>610</x>
-         <y>55</y>
-         <width>111</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="event_eventcat_id_6">
-       <property name="geometry">
-        <rect>
-         <x>373</x>
-         <y>55</y>
-         <width>111</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="event_user_6">
-       <property name="geometry">
-        <rect>
-         <x>133</x>
-         <y>55</y>
-         <width>111</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_result_7">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>108</y>
-         <width>90</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Event:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_cat_event_eventtype_id_6">
        <property name="geometry">
         <rect>
          <x>508</x>
@@ -8609,7 +8725,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id_4">
+      <widget class="QComboBox" name="cat_event_valve_eventtype_id">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -8619,7 +8735,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id_4">
+      <widget class="QComboBox" name="event_valve_eventcat_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -8629,7 +8745,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user_4">
+      <widget class="QComboBox" name="event_valve_user">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -8639,7 +8755,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_7">
+      <widget class="QDateEdit" name="date_event_valve_from">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -8647,6 +8763,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_result_4">
@@ -8698,7 +8824,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_8">
+      <widget class="QDateEdit" name="date_event_valve_to">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -8706,6 +8832,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_cat_event_eventtype_id_4">
@@ -8785,7 +8921,7 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>Filter</string>
       </attribute>
-      <widget class="QDateTimeEdit" name="event_date_13">
+      <widget class="QDateEdit" name="date_event_filter_from">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -8793,6 +8929,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_event_eventcat_id_7">
@@ -8867,7 +9013,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_14">
+      <widget class="QDateEdit" name="date_event_filter_to">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -8875,6 +9021,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLabel" name="label_to_10">
@@ -8936,7 +9092,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id_7">
+      <widget class="QComboBox" name="cat_event_filter_eventtype_id">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -8946,7 +9102,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id_7">
+      <widget class="QComboBox" name="event_filter_eventcat_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -8956,7 +9112,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user_7">
+      <widget class="QComboBox" name="event_filter_user">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -9079,7 +9235,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id_5">
+      <widget class="QComboBox" name="event_measure_eventcat_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -9125,7 +9281,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user_5">
+      <widget class="QComboBox" name="event_measure_user">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -9256,7 +9412,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_10">
+      <widget class="QDateEdit" name="date_event_measure_to">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -9265,8 +9421,18 @@ p, li { white-space: pre-wrap; }
          <height>22</height>
         </rect>
        </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
       </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id_5">
+      <widget class="QComboBox" name="cat_event_measure_eventtype_id">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -9276,7 +9442,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="event_date_9">
+      <widget class="QDateEdit" name="date_event_measure_from">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -9284,6 +9450,16 @@ p, li { white-space: pre-wrap; }
          <width>121</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QTableWidget" name="event_x_meter_state_observ">
@@ -9418,7 +9594,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="log_date_from">
+    <widget class="QDateEdit" name="date_log_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -9427,8 +9603,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QDateTimeEdit" name="log_date_to">
+    <widget class="QDateEdit" name="date_log_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -9436,6 +9622,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_149">
@@ -9515,7 +9711,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>RTC</string>
     </attribute>
-    <widget class="QDateTimeEdit" name="rtc_date_to">
+    <widget class="QDateEdit" name="date_rtc_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -9523,6 +9719,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_to_8">
@@ -9574,7 +9780,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="rtc_date_from">
+    <widget class="QDateEdit" name="date_rtc_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -9582,6 +9788,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_result_6">
@@ -9808,6 +10024,32 @@ p, li { white-space: pre-wrap; }
      <width>111</width>
      <height>20</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_accept_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Accept</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_close_2">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>10</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close</string>
    </property>
   </widget>
  </widget>
