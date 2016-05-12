@@ -22,6 +22,7 @@ from functools import partial
 from line_map_tool import LineMapTool
 from point_map_tool import PointMapTool
 from controller import DaoController
+from map_tools.move_node import MoveNode
 
 
 class Giswater(QObject):
@@ -60,7 +61,8 @@ class Giswater(QObject):
         # Set controller to handle settings and database
         self.controller = DaoController(self.settings, self.plugin_name)
         self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()           
+        self.dao = self.controller.getDao()     
+        self.schema_name = self.controller.getSchemaName()      
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -82,6 +84,14 @@ class Giswater(QObject):
     def tr(self, message):
         if self.controller:
             return self.controller.tr(message)
+        
+        
+    def showInfo(self, text, duration = 5):
+        self.iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)            
+        
+        
+    def showWarning(self, text, duration = 5):
+        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)            
         
         
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
@@ -114,14 +124,13 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) < 16:    
+                if int(index_action) in (17, 20):    
+                    callback_function = getattr(self, function_name)  
+                    action.triggered.connect(callback_function)
+                else:                    
                     water_soft = function_name[:2] 
                     callback_function = getattr(self, water_soft+'_generic')  
                     action.toggled.connect(partial(callback_function, function_name))
-                    #function_name = sys._getframe().f_code.co_name    
-                else:                    
-                    callback_function = getattr(self, function_name)  
-                    action.toggled.connect(callback_function)
             except AttributeError:
                 print index_action+". Callback function not found: "+function_name
                 action.setEnabled(False)                
@@ -132,19 +141,25 @@ class Giswater(QObject):
           
         
     def add_action(self, index_action, toolbar, parent):
+        ''' Add new action into specified toolbar 
+        This action has to be defined in the configuration file ''' 
         
         action = None
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
-        # Only create action if is defined in configuration file
         if function_name:
+            map_tool = None
             action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-            # TODO: Parametrize it
             if int(index_action) == 13:
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
+            elif int(index_action) == 16:
+                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller)         
+            elif int(index_action) in (10, 11, 12, 14, 15):
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)   
             else:
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)         
-            self.map_tools[function_name] = map_tool       
+                pass
+            if map_tool:      
+                self.map_tools[function_name] = map_tool       
         
         return action         
         
@@ -192,7 +207,12 @@ class Giswater(QObject):
         if self.toolbar_swmm_enabled:        
             for i in range(1,10):
                 self.ag_swmm = QActionGroup(parent);                
-                self.add_action(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)                    
+                self.add_action(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)     
+        
+        # Disable all actions when opening QGIS
+        # TODO: Do it also when opening an existing project        
+        self.disable_actions()       
+        self.current_layer_changed(self.iface.activeLayer())                
             
         # Menu entries
         self.create_action(None, self.tr('New network'), None, self.menu_name, False)
@@ -248,7 +268,7 @@ class Giswater(QObject):
             
     def disable_actions(self):
         ''' Utility to disable all actions '''
-        for i in range(1,27):
+        for i in range(1,40):
             key = str(i)
             if key in self.actions:
                 action = self.actions[key]
@@ -257,23 +277,25 @@ class Giswater(QObject):
                             
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
+        
         self.disable_actions()
         if layer is None:
             layer = self.iface.activeLayer() 
         self.current_layer = layer
         try:
             list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
-            print list_index_action
             if list_index_action:
                 if type(list_index_action) is list:
                     for index_action in list_index_action:
-                        if index_action != '-1':
+                        if index_action != '-1' and str(index_action) in self.actions:
                             self.actions[index_action].setEnabled(True)
                 elif type(list_index_action) is unicode:
                     index_action = str(list_index_action)
-                    if index_action != '-1':
+                    if index_action != '-1' and str(index_action) in self.actions:
                         self.actions[index_action].setEnabled(True)                
         except AttributeError, e:
+            print "current_layer_changed: "+str(e)
+        except KeyError, e:
             print "current_layer_changed: "+str(e)
                         
                 
@@ -281,15 +303,15 @@ class Giswater(QObject):
         ''' Water supply generic callback function '''
         try:
             # Get sender (selected action) and map tool associated 
-            sender = self.sender()            
+            sender = self.sender()                            
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
                 self.iface.mapCanvas().setMapTool(map_tool)
-                #print function_name+" has been checked"       
+                print function_name+" has been checked (ws_generic)"       
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
-        except AttributeError:
-            print "ws_generic: AttributeError"
+        except AttributeError as e:
+            self.showWarning("AttributeError: "+str(e))     
             
             
     def ud_generic(self, function_name):   
@@ -311,38 +333,56 @@ class Giswater(QObject):
         ''' Management generic callback function '''
         try:        
             # Get sender (selected action) and map tool associated 
-            sender = self.sender()            
-            map_tool = self.map_tools[function_name]
-            if sender.isChecked():
-                self.iface.mapCanvas().setMapTool(map_tool)
-                print function_name+" has been checked"       
-            else:
-                self.iface.mapCanvas().unsetMapTool(map_tool)
-        except AttributeError:
-            print "mg_generic: AttributeError"                
+            sender = self.sender()  
+            if function_name in self.map_tools:          
+                map_tool = self.map_tools[function_name]
+                if sender.isChecked():
+                    self.iface.mapCanvas().setMapTool(map_tool)
+                    print function_name+" has been checked (mg_generic)"       
+                else:
+                    self.iface.mapCanvas().unsetMapTool(map_tool)
+                    print function_name+" has been unchecked (mg_generic)"  
+        except AttributeError as e:
+            self.showWarning("AttributeError: "+str(e))            
+        except KeyError as e:
+            self.showWarning("KeyError: "+str(e))   
                                  
                                                    
     ''' Management bar functions '''                                
-    def move_node(self):
-        print "move_node"
-        ''' TODO: 16. User select nodes from 'v_edit_node' and triggers function: 'gw_fct_node2nodarc' '''
-        # Get selected features
-        node_list = [1, 2, 3]
-        # Convert list to node
-        node_json = None
-        #sql = "SELECT sample_ws.gw_fct_node2nodarc("+node_json+")"
-        #result = self.dao.execute_sql(sql)
+        
+    def mg_delete_node(self):
+        ''' Button 17. Show warning to the user '''
+        print "mg_delete_node"
+#         msg = self.tr('delete_node')
+#         reply = QMessageBox.question(None, self.tr('17_text'), msg, QMessageBox.Yes, QMessageBox.No)
+#         if reply == QMessageBox.Yes:
+#             print "delete"
+#         else:
+#             print "no"     
         
         
-    def delete_node(self):
-        ''' 17. Show warning to the user '''
-        print "delete_node"
-        msg = self.tr('delete_node')
-        reply = QMessageBox.question(None, self.tr('17_text'), msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            print "delete"
-        else:
-            print "no"     
+    def mg_connec_tool(self):
+        ''' Button 20. User select connections from layer 'connec' 
+        and executes function: 'gw_fct_connect_to_network' '''      
+
+        # Get selected features (from layer 'connec')
+        aux = "{"         
+        layer = self.iface.activeLayer()  
+        if layer.selectedFeatureCount() == 0:
+            self.showInfo(self.controller.tr("You have to select at least one feature!"))
+            return 
+        features = layer.selectedFeatures()
+        for feature in features:
+            connec_id = feature.attribute('connec_id') 
+            aux+= str(connec_id)+", "
+        connec_array = aux[:-2]+"}"
+        
+        # Execute function
+        sql = "SELECT "+self.schema_name+".gw_fct_connect_to_network('"+connec_array+"');"  
+        self.dao.execute_sql(sql) 
+        
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh() 
     
         
     def change_elem_type(self):
@@ -351,14 +391,6 @@ class Giswater(QObject):
         Combo to select catalog id
         Trigger 'gw_trg_edit_node' has to be disabled temporarily '''
         pass
-        
-        
-    def connec_tool(self):
-        ''' TODO: 20. User select connections from connec_id and triggers function: 'gw_fct_link_insert' '''
-        pass
-        #sql = "SELECT gw_fct_link_insert(connec_json)"  
-        #result = self.dao.execute_sql(sql)       
-        
         
     def table_wizard(self):
         ''' TODO: 21. ''' 

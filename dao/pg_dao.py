@@ -83,6 +83,9 @@ class PgDao():
             self.rollback() 
         finally:
             return status
+        
+    def get_rowcount(self):
+        return self.cursor.rowcount        
 
     def commit(self):
         self.conn.commit()
@@ -96,5 +99,14 @@ class PgDao():
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
-        return exists             
+        return exists         
+    
+    def check_view(self, schemaName, viewName):
+        exists = True
+        sql = "SELECT * FROM pg_views WHERE schemaname = '"+schemaName+"' AND viewname = '"+viewName+"'"    
+        self.cursor.execute(sql)         
+        if self.cursor.rowcount == 0:      
+            exists = False
+        return exists        
+            
 

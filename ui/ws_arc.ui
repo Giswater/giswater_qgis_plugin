@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2800,7 +2800,7 @@ p, li { white-space: pre-wrap; }
     <string>arc_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="arc_rotation">
+  <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
      <x>760</x>
@@ -2862,7 +2862,7 @@ p, li { white-space: pre-wrap; }
     <string>GIS length</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="arc_custom_length">
+  <widget class="QLineEdit" name="custom_length">
    <property name="geometry">
     <rect>
      <x>640</x>
@@ -2969,7 +2969,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="arc_verified">
+  <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
      <x>10</x>
