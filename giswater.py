@@ -61,7 +61,8 @@ class Giswater(QObject):
         # Set controller to handle settings and database
         self.controller = DaoController(self.settings, self.plugin_name)
         self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()           
+        self.dao = self.controller.getDao()     
+        self.schema_name = self.controller.getSchemaName()      
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -210,7 +211,8 @@ class Giswater(QObject):
         
         # Disable all actions when opening QGIS
         # TODO: Do it also when opening an existing project        
-        self.disable_actions()               
+        self.disable_actions()       
+        self.current_layer_changed(self.iface.activeLayer())                
             
         # Menu entries
         self.create_action(None, self.tr('New network'), None, self.menu_name, False)
@@ -360,14 +362,27 @@ class Giswater(QObject):
         
         
     def mg_connec_tool(self):
-        ''' Button 20. User select connections from layer 'connec' and executes function: 'gw_fct_connect_to_network' '''
-        print "mg_connec_tool"        
-        # Get selected features (connec)
-        # Convert to json object
-        # Execute function 'gw_fct_connect_to_network'
-        #sql = "SELECT gw_fct_connect_to_network(connec_json)"  
-        #result = self.dao.execute_sql(sql)       
+        ''' Button 20. User select connections from layer 'connec' 
+        and executes function: 'gw_fct_connect_to_network' '''      
+
+        # Get selected features (from layer 'connec')
+        aux = "{"         
+        layer = self.iface.activeLayer()  
+        if layer.selectedFeatureCount() == 0:
+            self.showInfo(self.controller.tr("You have to select at least one feature!"))
+            return 
+        features = layer.selectedFeatures()
+        for feature in features:
+            connec_id = feature.attribute('connec_id') 
+            aux+= str(connec_id)+", "
+        connec_array = aux[:-2]+"}"
         
+        # Execute function
+        sql = "SELECT "+self.schema_name+".gw_fct_connect_to_network('"+connec_array+"');"  
+        self.dao.execute_sql(sql) 
+        
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh() 
     
         
     def change_elem_type(self):
