@@ -5,8 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-
 -----------------------------
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
@@ -29,8 +27,8 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-		RAISE EXCEPTION '[%]:Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC', TG_NAME;
-		RETURN NEW;
+        RAISE EXCEPTION '[%]: Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC', TG_NAME;
+        RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 
@@ -55,13 +53,13 @@ BEGIN
         ELSIF node_table = 'inp_shortpipe' THEN     
             UPDATE inp_shortpipe SET node_id=NEW.node_id, minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE node_id=OLD.node_id;  
         END IF;
-        		
-		UPDATE node 
+        
+        UPDATE node 
         SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
-		RETURN NEW;
-		
+        RETURN NEW;
+        
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id = OLD.node_id;
         EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||quote_literal(OLD.node_id);
@@ -90,6 +88,5 @@ FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_reservoir
 
 CREATE TRIGGER gw_trg_edit_inp_node_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_tank 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_tank', 'TANK');
-
   
   

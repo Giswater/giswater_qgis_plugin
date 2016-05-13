@@ -4,8 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-
    
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
@@ -20,7 +18,7 @@ BEGIN
     
     IF TG_OP = 'INSERT' THEN
     RAISE EXCEPTION '[%]:Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC', TG_NAME;
-	RETURN NEW;
+    RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
         UPDATE arc 

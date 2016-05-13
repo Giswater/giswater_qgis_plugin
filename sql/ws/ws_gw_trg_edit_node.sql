@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-   CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_trg_edit_node"() RETURNS "pg_catalog"."trigger" AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_trg_edit_node"() RETURNS "pg_catalog"."trigger" AS $BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
@@ -68,7 +68,9 @@ BEGIN
         ELSIF (NEW.epa_type = 'VALVE') THEN inp_table:= 'inp_valve';
         ELSIF (NEW.epa_type = 'SHORTPIPE') THEN inp_table:= 'inp_shortpipe';
         END IF;
-        v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+        IF inp_table IS NOT NULL THEN        
+            v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+        END IF;
         EXECUTE v_sql;
 
         -- MANAGEMENT INSERT
@@ -152,7 +154,6 @@ END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100
 ;
-
 
 
 
