@@ -4,23 +4,30 @@
 
 
 <context>
+
     <name>giswater</name>
+    
     <message>
         <source>menu_name</source>
         <translation>Giswater</translation>
     </message>   
     <message>
-        <source>toolbar_edit_name</source>
+        <source>toolbar_ed_name</source>
         <translation>Giswater - Edit</translation>
-    </message>        
+    </message>     
     <message>
-        <source>toolbar_epanet_name</source>
+        <source>toolbar_mg_name</source>
+        <translation>Giswater - Management</translation>
+    </message>       
+    <message>
+        <source>toolbar_ws_name</source>
         <translation>Giswater - Water supply</translation>
     </message>    
     <message>
-        <source>toolbar_swmm_name</source>
+        <source>toolbar_ud_name</source>
         <translation>Giswater - Urban drainage</translation>
     </message>    
+    
     <message>
         <source>New network</source>
         <translation>Add network</translation>
@@ -80,7 +87,8 @@
     <message>
         <source>Run simulation</source>
         <translation>Run simulation</translation>
-    </message>       
+    </message>    
+    
     <message>
         <source>01_text</source>
         <translation>Insert junction</translation>
@@ -91,7 +99,7 @@
     </message>   
     <message>
         <source>03_text</source>
-        <translation>Insert divider</translation>
+        <translation>Insert virtual arc</translation>
     </message>      
     <message>
         <source>04_text</source>
@@ -111,7 +119,7 @@
     </message>      
     <message>
         <source>08_text</source>
-        <translation>Insert weir</translation>
+        <translation>Insert filter</translation>
     </message>      
     <message>
         <source>09_text</source>
@@ -161,7 +169,7 @@
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Table wizard</translation>
+        <translation>Connec tool</translation>
     </message>      
     <message>
         <source>21_text</source>
@@ -191,7 +199,41 @@
         <source>27_text</source>
         <translation>Flow trace (from node)</translation>
     </message> 
+    <message>
+        <source>28_text</source>
+        <translation>Change node type</translation>
+    </message>     
+    <message>
+        <source>29_text</source>
+        <translation>Insert measure instrument</translation>
+    </message>       
 
+    <message>
+        <source>30_text</source>
+        <translation>Select for plan</translation>
+    </message>  
+    <message>
+        <source>31_text</source>
+        <translation>Refresh (plan)</translation>
+    </message> 
+    <message>
+        <source>32_text</source>
+        <translation>Search plus</translation>
+    </message> 
+    <message>
+        <source>33_text</source>
+        <translation>Add element</translation>
+    </message> 
+    <message>
+        <source>34_text</source>
+        <translation>Add file</translation>
+    </message> 
+    <message>
+        <source>35_text</source>
+        <translation>Event</translation>
+    </message>     
+
+    
     <message>
         <source>delete_node</source>
         <translation>You are going to delete this node. Its related arcs will also we deleted.\n Are you sure?</translation>
@@ -202,7 +244,9 @@
 
 
 <context>
+
     <name>ws_node</name>
+    
     <message>
         <source>label_top_elev</source>
         <translation>Elevation</translation>
@@ -242,7 +286,7 @@
     <message>
         <source>label_observ</source>
         <translation>Observation</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_comment</source>
         <translation>Comment</translation>
@@ -302,7 +346,7 @@
     <message>
         <source>label_v_inp_edit_junction_demand</source>
         <translation>Demand</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_v_inp_edit_junction_pattern_id</source>
         <translation>Pattern</translation>
@@ -318,7 +362,7 @@
     <message>
         <source>label_rpt_head</source>
         <translation>Head</translation>
-    </message>  	
+    </message> 
     <message>
         <source>label_rpt_pressure</source>
         <translation>Pressure</translation>
@@ -354,7 +398,7 @@
     <message>
         <source>label_rpt_head_2</source>
         <translation>Head</translation>
-    </message>  	
+    </message> 
     <message>
         <source>label_rpt_pressure_2</source>
         <translation>Pressure</translation>
@@ -378,7 +422,7 @@
     <message>
         <source>label_v_inp_edit_tank_minlevel</source>
         <translation>Minlevel</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_v_inp_edit_tank_maxlevel</source>
         <translation>Maxlevel</translation>
@@ -406,7 +450,7 @@
     <message>
         <source>label_rpt_head_3</source>
         <translation>Head</translation>
-    </message>  	
+    </message> 
     <message>
         <source>label_rpt_pressure_3</source>
         <translation>Pressure</translation>
@@ -422,11 +466,11 @@
     <message>
         <source>label_max_result_3</source>
         <translation>Maximum:</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_v_inp_edit_pump_power</source>
         <translation>Power</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_v_inp_edit_pump_speed</source>
         <translation>Speed</translation>
@@ -454,7 +498,7 @@
     <message>
         <source>label_head_loss_6</source>
         <translation>Head loss</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_settings_6</source>
         <translation>Settings</translation>
@@ -486,7 +530,7 @@
     <message>
         <source>label_rpt_elevation_20</source>
         <translation>Pressure</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_rpt_elevation_33</source>
         <translation>Node 1</translation>
@@ -558,7 +602,7 @@
     <message>
         <source>label_head_loss_5</source>
         <translation>Head loss</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_settings_5</source>
         <translation>Settings</translation>
@@ -590,7 +634,7 @@
     <message>
         <source>label_rpt_elevation_17</source>
         <translation>Pressure</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_rpt_elevation_27</source>
         <translation>Node 1</translation>
@@ -910,15 +954,16 @@
     <message>
         <source>label_result_6</source>
         <translation>RTC:</translation>
-    </message>  
-    </context>    
+    </message> 
+    
+</context>    
 
 
 
-
-
-    <context>
+ <context>
+ 
     <name>ws_arc</name>
+    
     <message>
         <source>label_arc_node_1</source>
         <translation>Node 1</translation>
@@ -954,7 +999,7 @@
     <message>
         <source>label_arc_annotation</source>
         <translation>Annotation</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_arc_observ</source>
         <translation>Observation</translation>
@@ -1126,15 +1171,16 @@
     <message>
         <source>label_rtc</source>
         <translation>RTC:</translation>
-    </message>  
-    </context>  
+    </message>
+    
+</context>  
 
 
 
+<context>
 
-
-    <context>
     <name>ws_connec</name>
+    
     <message>
         <source>label_connec_elevation</source>
         <translation>Elevation</translation>
@@ -1303,14 +1349,15 @@
         <source>label_84</source>
         <translation>IPTU:</translation>
     </message>  
-    </context> 
+    
+</context> 
 
 
 
+<context>
 
-
-    <context>
     <name>ud_node</name>
+    
     <message>
         <source>label_top_elev</source>
         <translation>Elevation</translation>
@@ -1980,7 +2027,7 @@
         <translation>Time hour</translation>
     </message>
     <message>
-        <source>label_max_veloc</source>
+        <source>label_max_veloc_3</source>
         <translation>Max veloc</translation>
     </message>   
     <message>
@@ -2111,13 +2158,15 @@
         <source>label_scada</source>
         <translation>Scada:</translation>
     </message>
-    </context>
+    
+</context>
 
 
 
+<context>
 
-    <context>
     <name>ud_arc</name>
+    
     <message>
         <source>label_node_1</source>
         <translation>Node 1</translation>
@@ -2395,7 +2444,7 @@
         <translation>Time days</translation>
     </message>
     <message>
-        <source>label_time_hour</source>
+        <source>label_time_hour_2</source>
         <translation>Time hour</translation>
     </message>
     <message>
@@ -2626,13 +2675,15 @@
         <source>label_iptu_2</source>
         <translation>IPTU:</translation>
     </message>
-    </context>  
+    
+</context>  
 
 
 
+<context>
 
-    <context>
     <name>ud_connec</name>
+    
     <message>
         <source>label_top_elev</source>
         <translation>Elevation</translation>
@@ -2676,10 +2727,6 @@
     <message>
         <source>label_descript</source>
         <translation>Descript</translation>
-    </message>
-    <message>
-        <source>label_workcat_id</source>
-        <translation>Work</translation>
     </message>
     <message>
         <source>label_link</source>
@@ -2801,14 +2848,15 @@
         <source>label_iptu_2</source>
         <translation>IPTU:</translation>
     </message>
-    </context> 
+    
+</context> 
 
 
 
+<context>
 
-
-    <context>
     <name>ud_gully</name>
+    
     <message>
         <source>label_top_elev</source>
         <translation>Elevation</translation>
@@ -2965,7 +3013,8 @@
         <source>label_log</source>
         <translation>Log:</translation>
     </message>
-    </context>
+    
+</context>
 
 
 </TS>
