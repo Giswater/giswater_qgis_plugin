@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>6</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2218,7 +2218,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_15">
+    <widget class="QTableWidget" name="tbl_log">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2253,7 +2253,7 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_8">
+    <widget class="QTableWidget" name="tbl_dae">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2304,7 +2304,7 @@ p, li { white-space: pre-wrap; }
       <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>IPTU:</string>
+      <string>DAE:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>

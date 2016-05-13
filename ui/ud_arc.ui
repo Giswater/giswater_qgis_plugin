@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>8</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -1133,7 +1133,7 @@
     <attribute name="title">
      <string>Add info</string>
     </attribute>
-    <widget class="QTextEdit" name="element">
+    <widget class="QTextEdit" name="tbl_elements">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -6449,7 +6449,7 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_20">
+    <widget class="QTableWidget" name="tbl_log">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -6665,7 +6665,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_21">
+    <widget class="QTableWidget" name="tbl_scada">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -6729,7 +6729,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>IPTU</string>
     </attribute>
-    <widget class="QTableWidget" name="tableWidget_8">
+    <widget class="QTableWidget" name="tbl_iptu">
      <property name="geometry">
       <rect>
        <x>20</x>

@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>7</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2764,7 +2764,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_15">
+    <widget class="QTableWidget" name="tbl_log">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2904,7 +2904,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="element_6">
+    <widget class="QTextEdit" name="tbl_rtc">
      <property name="geometry">
       <rect>
        <x>20</x>
