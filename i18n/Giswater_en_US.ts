@@ -132,7 +132,7 @@
     </message>      
     <message>
         <source>11_text</source>
-        <translation>Insert reservoir</translation>
+        <translation>Insert hydrant</translation>
     </message>      
     <message>
         <source>12_text</source>
@@ -165,7 +165,7 @@
     </message>      
     <message>
         <source>19_text</source>
-        <translation>Edit arc</translation>
+        <translation>Arc topo repair</translation>
     </message>      
     <message>
         <source>20_text</source>
@@ -189,15 +189,15 @@
     </message>      
     <message>
         <source>25_text</source>
-        <translation>Connect tool</translation>
+        <translation>Result selector</translation>
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Flow trace (from arc)</translation>
+        <translation>Flow trace</translation>
     </message>      
     <message>
         <source>27_text</source>
-        <translation>Flow trace (from node)</translation>
+        <translation>Flow exit</translation>
     </message> 
     <message>
         <source>28_text</source>

@@ -218,7 +218,9 @@ class Giswater(QObject):
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
             self.ag_mg = QActionGroup(parent);
-            for i in range(16,29):
+            self.add_action('16', self.toolbar_mg, self.ag_mg)
+            self.add_action('28', self.toolbar_mg, self.ag_mg)            
+            for i in range(17,28):
                 self.add_action(str(i), self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
