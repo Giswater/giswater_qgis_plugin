@@ -184,6 +184,7 @@ CREATE TABLE "SCHEMA_NAME"."config" (
 "nodeinsert_arcendpoint" boolean,
 "nodeinsert_nodetype_vdefault" varchar (30),
 "orphannode_delete" boolean,
+"vnode_update_tolerance" double precision,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 

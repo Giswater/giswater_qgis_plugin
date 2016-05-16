@@ -157,6 +157,7 @@ CREATE TABLE "SCHEMA_NAME"."config" (
 "nodeinsert_arcendpoint" boolean,
 "nodeinsert_catalog_vdefault" varchar (30),
 "orphannode_delete" boolean,
+"vnode_update_tolerance" double precision,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
@@ -345,7 +346,7 @@ CONSTRAINT man_type_street_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "SCHEMA_NAME"."streetaxis" (
-"id" varchar (16),   NOT NULL,
+"id" varchar (16) NOT NULL,
 "type" varchar(18)  ,
 "name" varchar(100)  ,
 CONSTRAINT streeaxis_pkey PRIMARY KEY (id)
@@ -484,7 +485,7 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."vnode" (
-"vnode_id" varchar(16) DEFAULT nextval('"test_ws".vnode_seq'::regclass) NOT NULL,
+"vnode_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".vnode_seq'::regclass) NOT NULL,
 "arc_id" varchar(16),
 "userdefined_pos" bool,
 "vnode_type" varchar(30),
@@ -538,9 +539,9 @@ CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 CREATE TABLE "SCHEMA_NAME"."man_valve" (
 "node_id" varchar(16)   NOT NULL,
 "type" varchar(30)  ,
-"opened" boolean,
-"acessibility" boolean,
-"broken" boolean,
+"opened" boolean DEFAULT false,
+"acessibility" boolean DEFAULT false,
+"broken" boolean DEFAULT false,
 "add_info" varchar(255)  ,
 CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 );
@@ -725,8 +726,6 @@ ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "S
 
 ALTER TABLE "SCHEMA_NAME"."streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."man_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."man_tank" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
