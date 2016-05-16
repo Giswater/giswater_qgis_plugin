@@ -1,44 +1,36 @@
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying, OUT node_arg varchar[], OUT arc_arg varchar[], OUT valve_arg varchar[]) AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying) RETURNS "pg_catalog"."int4" AS $BODY$
 DECLARE
-
     node_1_aux text;
     node_2_aux text;
     controlValue integer;
     exists_id text;
- 
 
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    -- Create the temporal table for computing nodes
-    DROP TABLE IF EXISTS temp_mincut_node CASCADE;
-    CREATE TABLE temp_mincut_node (
+    -- Create the temporal table for computing nodes        
+    CREATE TABLE IF NOT EXISTS temp_mincut_node (
         node_id character varying(16) NOT NULL,
         -- Force indexed column (for performance)
         CONSTRAINT temp_mincut_node_pkey PRIMARY KEY (node_id)
     );
 
-
     -- Create the temporal table for computing pipes
-    DROP TABLE IF EXISTS temp_mincut_arc CASCADE;
-    CREATE TABLE temp_mincut_arc (
+    CREATE TABLE IF NOT EXISTS temp_mincut_arc (
         arc_id character varying(16) NOT NULL,
         -- Force indexed column (for performance)
         CONSTRAINT temp_mincut_arc_pkey PRIMARY KEY (arc_id)
     );
 
-
     -- Create the temporal table for computing valves
-    DROP TABLE IF EXISTS temp_mincut_valve CASCADE;
-    CREATE TABLE temp_mincut_valve (
+    CREATE TABLE IF NOT EXISTS temp_mincut_valve (
         valve_id character varying(16) NOT NULL,
         -- Force indexed column (for performance)
         CONSTRAINT temp_mincut_valve_pkey PRIMARY KEY (valve_id)
     );
-
+       
 
     -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
@@ -113,17 +105,7 @@ BEGIN
 
     END IF;
 
-
-    -- Convert result to array
-    SELECT array_agg(node_id) INTO node_arg FROM temp_mincut_node;
-    SELECT array_agg(arc_id) INTO arc_arg FROM temp_mincut_arc;
-    SELECT array_agg(valve_id) INTO valve_arg FROM temp_mincut_valve;
-
-    -- Delete auxiliar tables
-    DROP TABLE IF EXISTS temp_mincut_node CASCADE;
-    DROP TABLE IF EXISTS temp_mincut_arc CASCADE;
-    DROP TABLE IF EXISTS temp_mincut_valve CASCADE;
-
+    RETURN 0;
 
 END;
 $BODY$
@@ -139,7 +121,6 @@ DECLARE
     exists_id character varying;
     rec_table record;
     controlValue integer;
-
 
 BEGIN
 
