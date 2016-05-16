@@ -1,9 +1,12 @@
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying) RETURNS "pg_catalog"."int4" AS $BODY$
+﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying) RETURNS "pg_catalog"."int4" AS $BODY$
 DECLARE
-    node_1_aux text;
-    node_2_aux text;
-    controlValue integer;
-    exists_id text;
+    node_1_aux		text;
+    node_2_aux		text;
+    controlValue	integer;
+    exists_id		text;
+    polygon_aux		geometry;
+    polygon_aux2	geometry;
+    srid_schema		text;
 
 BEGIN
 
@@ -31,6 +34,22 @@ BEGIN
         CONSTRAINT temp_mincut_valve_pkey PRIMARY KEY (valve_id)
     );
        
+    -- Create the temporal table to store polygon, the table should copy the SRID
+    srid_schema := find_srid('SCHEMA_NAME', 'arc', 'the_geom')::text;
+    EXECUTE format('
+	CREATE TABLE IF NOT EXISTS SCHEMA_NAME.temp_mincut_polygon (
+		polygon_id character varying(16) NOT NULL,
+		the_geom geometry(MULTIPOLYGON,%s),
+		CONSTRAINT temp_mincut_polygon_pkey PRIMARY KEY (polygon_id)
+	)'
+    ,srid_schema);
+
+    
+    CREATE TABLE IF NOT EXISTS temp_mincut_polygon (
+        polygon_id character varying(16) NOT NULL,
+        the_geom geometry(POLYGON,find_srid("SCHEMA_NAME", arc, the_geom) ),
+        CONSTRAINT temp_mincut_polygon_pkey PRIMARY KEY (polygon_id)
+    );
 
     -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
@@ -104,6 +123,21 @@ BEGIN
         END IF;
 
     END IF;
+
+    -- Contruct concave hull for included lines
+    polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT a.the_geom FROM arc AS a, temp_mincut_arc AS b WHERE a.arc_id = b.arc_id)), 0.80));
+
+    -- Concave hull for not included lines
+--    polygon_aux2 := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM arc WHERE arc_id NOT IN (SELECT a.arc_id FROM temp_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 0.80));
+    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM arc WHERE arc_id NOT IN (SELECT a.arc_id FROM temp_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 10, 'join=mitre mitre_limit=1.0'));
+
+
+    -- Substract
+    polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
+
+    -- Insert into polygon table
+    DELETE FROM temp_mincut_polygon WHERE polygon_id = '1';
+    INSERT INTO temp_mincut_polygon VALUES('1',polygon_aux);
 
     RETURN 0;
 
