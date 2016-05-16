@@ -161,6 +161,7 @@ CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
 
+
 -- ----------------------------
 -- Table: Catalogs
 -- ----------------------------
@@ -303,6 +304,7 @@ CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
 -- Table: value domain (type)
 -----------
 
+
 CREATE TABLE "SCHEMA_NAME"."man_type_category" (
 "id" varchar(20)   NOT NULL,
 "observ" varchar(50)  ,
@@ -329,6 +331,26 @@ CREATE TABLE "SCHEMA_NAME"."connec_type" (
 "observ" varchar(50)  ,
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
+
+
+CREATE TABLE "SCHEMA_NAME"."man_type_street" (
+"id" varchar(20)   NOT NULL,
+"observ" varchar(50)  ,
+CONSTRAINT man_type_street_pkey PRIMARY KEY (id)
+);
+
+
+-- ----------------------------
+-- Table: GIS environment
+-- ----------------------------
+
+CREATE TABLE "SCHEMA_NAME"."streetaxis" (
+"id" varchar (16),   NOT NULL,
+"type" varchar(18)  ,
+"name" varchar(100)  ,
+CONSTRAINT streeaxis_pkey PRIMARY KEY (id)
+);
+
 
 
 
@@ -451,6 +473,8 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "adress_01" varchar(50)  ,
 "adress_02" varchar(50)  ,
 "adress_03" varchar(50)  ,
+"streetaxis_id" varchar (16)  ,
+"postnumber" varchar (16)  ,
 "descript" varchar(254)  ,
 "link" character varying(512),
 "verified" varchar(16)  ,
@@ -461,7 +485,7 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 CREATE TABLE "SCHEMA_NAME"."vnode" (
 "vnode_id" varchar(16) DEFAULT nextval('"test_ws".vnode_seq'::regclass) NOT NULL,
-"connec_id" varchar(30),
+"arc_id" varchar(16),
 "userdefined_pos" bool,
 "vnode_type" varchar(30),
 "sector_id" varchar(30),
@@ -699,8 +723,10 @@ ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCH
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."man_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."man_tank" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

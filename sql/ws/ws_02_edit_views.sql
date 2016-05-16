@@ -113,14 +113,17 @@ connec.ownercat_id,
 connec.adress_01,
 connec.adress_02,
 connec.adress_03,
+streetaxis.name,
+connec.postnumber,
 connec.descript,
 cat_connec.svg AS "cat_svg",
 connec.rotation,
 connec.link,
 connec.verified,
 connec.the_geom
-FROM ("SCHEMA_NAME".connec LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text)));
-
+FROM ("SCHEMA_NAME".connec 
+LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
+JOIN "SCHEMA_NAME".streetaxis ON (((connec.streetaxis_id)::text = (streetaxis.id)::text)));
 
 
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
