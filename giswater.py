@@ -9,9 +9,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.utils import active_plugins
 from qgis.gui import (QgsMessageBar)
-from qgis.core import (QgsGeometry, QgsPoint, QgsLogger)
+from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 
@@ -73,13 +72,13 @@ class Giswater(QObject):
         
         # Define signals
         self.set_signals()
-        
+               
 
     def set_signals(self): 
         ''' Define widget and event signals '''
-        self.legend.currentLayerChanged.connect(self.current_layer_changed)
-        self.current_layer_changed(None)
-    
+        self.iface.projectRead.connect(self.project_read)                
+        self.legend.currentLayerChanged.connect(self.current_layer_changed)       
+        
                    
     def tr(self, message):
         if self.controller:
@@ -124,13 +123,13 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20):    
+                if int(index_action) in (17, 20, 26):    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
-                else:                    
+                else:        
                     water_soft = function_name[:2] 
                     callback_function = getattr(self, water_soft+'_generic')  
-                    action.toggled.connect(partial(callback_function, function_name))
+                    action.triggered.connect(partial(callback_function, function_name))
             except AttributeError:
                 print index_action+". Callback function not found: "+function_name
                 action.setEnabled(False)                
@@ -173,6 +172,10 @@ class Giswater(QObject):
         
         # Create plugin main menu
         self.menu_name = self.tr('menu_name')    
+        
+        # Get table or view related with 'arc' and 'node'
+        self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
+        self.table_node = self.settings.value('db/table_node', 'v_edit_node')        
                 
         # Create edit, epanet and swmm toolbars or not?
         self.toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
@@ -209,10 +212,8 @@ class Giswater(QObject):
                 self.ag_swmm = QActionGroup(parent);                
                 self.add_action(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)     
         
-        # Disable all actions when opening QGIS
-        # TODO: Do it also when opening an existing project        
-        self.disable_actions()       
-        self.current_layer_changed(self.iface.activeLayer())                
+        # Project initialization
+        self.project_read()               
             
         # Menu entries
         self.create_action(None, self.tr('New network'), None, self.menu_name, False)
@@ -232,14 +233,14 @@ class Giswater(QObject):
         self.menu_network_management.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_network_management.menuAction())         
            
-        self.menu_analysis = QMenu(self.tr('Analysis'))          
-        action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
-        action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
-        action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
-        self.menu_analysis.addAction(action2)
-        self.menu_analysis.addAction(action3)
-        self.menu_analysis.addAction(action4)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
+#         self.menu_analysis = QMenu(self.tr('Analysis'))          
+#         action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
+#         action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
+#         action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
+#         self.menu_analysis.addAction(action2)
+#         self.menu_analysis.addAction(action3)
+#         self.menu_analysis.addAction(action4)
+#         self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
          
 #         self.menu_go2epa = QMenu(self.tr('Go2Epa'))
 #         action1 = self.create_action('23', self.tr('Giswater interface'), None, None, False)               
@@ -272,12 +273,44 @@ class Giswater(QObject):
             key = str(i)
             if key in self.actions:
                 action = self.actions[key]
-                action.setEnabled(False)
-                
-                            
+                action.setEnabled(False)         
+
+                                
+    def project_read(self): 
+        ''' Function executed when a user opens a QGIS project (*.qgs) '''
+        
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return    
+        
+        # Initialize variables
+        self.layer_arc = None
+        self.layer_node = None
+        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
+        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
+        
+        # Iterate over all layers to get 'arc' and 'node' layer '''      
+        for cur_layer in layers:     
+            uri = cur_layer.dataProvider().dataSourceUri().lower()   
+            pos_ini = uri.find('table=')
+            pos_fi = uri.find('" ')  
+            uri_table = uri   
+            if pos_ini <> -1 and pos_fi <> -1:
+                uri_table = uri[pos_ini+6:pos_fi+1]                           
+                if uri_table == table_arc:  
+                    self.layer_arc = cur_layer
+                if uri_table == table_node:  
+                    self.layer_node = cur_layer
+        
+        # Disable toolbar actions and manage current layer selected
+        self.disable_actions()       
+        self.current_layer_changed(self.iface.activeLayer())   
+                               
+                               
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
-        
+
         self.disable_actions()
         if layer is None:
             layer = self.iface.activeLayer() 
@@ -397,10 +430,78 @@ class Giswater(QObject):
         pass
         
         
-    def flow_trace(self):
-        ''' TODO: 26 - 27. Returns json with 2 lists: node_id, arc_id  
-        Select these features in its corresponding layers '''
-        pass
+    def mg_flow_trace(self):
+        ''' Button 26. User select one node or arc.
+        SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
+        Returns and integer: error code
+        Get these id's and select them in its corresponding layers '''
+        
+        # Get selected features and layer type: 'arc' or 'node'   
+        elem_type = self.current_layer.name().lower()
+        count = self.current_layer.selectedFeatureCount()     
+        if count == 0:
+            self.showInfo(self.controller.tr("You have to select at least one feature!"))
+            return 
+        elif count > 1:  
+            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))      
+         
+        features = self.current_layer.selectedFeatures()
+        feature = features[0]
+        elem_id = feature.attribute(elem_type+'_id')   
+        
+        # Execute SQL function
+        function_name = "gw_fct_mincut"
+        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"  
+        result = self.dao.get_row(sql) 
+        self.dao.commit()        
+        
+        # Manage SQL execution result
+        if result is None:
+            self.showWarning(self.controller.tr("Uncatched error"))
+            return   
+        elif result[0] == 0:
+            # Get 'arc' and 'node' list and select them 
+            self.mg_flow_trace_select_features(self.layer_arc, 'arc')                         
+            self.mg_flow_trace_select_features(self.layer_node, 'node')   
+            # Drop temporary tables 
+            sql = "DROP TABLE IF EXISTS temp_mincut_node CASCADE;"
+            sql+= "DROP TABLE IF EXISTS temp_mincut_arc CASCADE;"
+            sql+= "DROP TABLE IF EXISTS temp_mincut_valve CASCADE;" 
+            self.dao.execute_sql(sql)  
+        elif result[0] == 1:
+            self.showWarning(self.controller.tr("Parametrize error type 1"))   
+            return
+        else:
+            self.showWarning(self.controller.tr("Undefined error"))    
+            return        
+    
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh()   
    
+   
+    def mg_flow_trace_select_features(self, layer, elem_type):
+        
+        sql = "SELECT * FROM "+self.schema_name+".temp_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"  
+        rows = self.dao.get_rows(sql)
+        self.dao.commit()
+        
+        # Build an expression to select them
+        aux = "\""+elem_type+"_id\" IN ("
+        for elem in rows:
+            aux+= elem[0]+", "
+        aux = aux[:-2]+")"
+        
+        # Get a featureIterator from this expression:
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            self.showWarning("Expression Error: "+str(expr.parserErrorString()))
+            return        
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        
+        # Build a list of feature id's from the previous result
+        id_list = [i.id() for i in it]
+        
+        # Select features with these id's 
+        layer.setSelectedFeatures(id_list)       
             
             
