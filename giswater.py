@@ -372,6 +372,10 @@ class Giswater(QObject):
         function_name = "gw_fct_delete_node"
         sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"  
         result = self.dao.get_row(sql) 
+        self.dao.commit()
+                    
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh()    
         
         # Manage SQL execution result
         if result is None:
@@ -386,9 +390,6 @@ class Giswater(QObject):
             self.showWarning(self.controller.tr("Parametrize error type 3"))   
         else:
             self.showWarning(self.controller.tr("Undefined error"))               
-                    
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()    
         
         
     def mg_connec_tool(self):
