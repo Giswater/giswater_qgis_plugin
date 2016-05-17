@@ -404,12 +404,13 @@ CONSTRAINT man_type_street_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "SCHEMA_NAME"."streetaxis" (
-"id" varchar(16) NOT NULL,
-"type" varchar(18)  ,
-"name" varchar(100)  ,
+"id" varchar (16) NOT NULL,
+"type" varchar(18),
+"name" varchar(100),
+"text" text,
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
 CONSTRAINT streeaxis_pkey PRIMARY KEY (id)
 );
-
 
 -- ----------------------------
 -- Table: GIS features
@@ -825,7 +826,7 @@ ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SC
 ALTER TABLE "SCHEMA_NAME"."streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."man_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."man_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."man_storage" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
