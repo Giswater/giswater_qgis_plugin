@@ -351,14 +351,44 @@ class Giswater(QObject):
     ''' Management bar functions '''                                
         
     def mg_delete_node(self):
-        ''' Button 17. Show warning to the user '''
-        print "mg_delete_node"
-#         msg = self.tr('delete_node')
-#         reply = QMessageBox.question(None, self.tr('17_text'), msg, QMessageBox.Yes, QMessageBox.No)
-#         if reply == QMessageBox.Yes:
-#             print "delete"
-#         else:
-#             print "no"     
+        ''' Button 17. User select one node. 
+        Execute SQL function 'gw_fct_delete_node' 
+        Show warning (if any) '''
+
+        # Get selected features (from layer 'connec')          
+        layer = self.iface.activeLayer()  
+        count = layer.selectedFeatureCount()     
+        if count == 0:
+            self.showInfo(self.controller.tr("You have to select at least one feature!"))
+            return 
+        elif count > 1:  
+            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))      
+        
+        features = layer.selectedFeatures()
+        feature = features[0]
+        node_id = feature.attribute('node_id')   
+        
+        # Execute SQL function
+        function_name = "gw_fct_delete_node"
+        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"  
+        result = self.dao.get_row(sql) 
+        
+        # Manage SQL execution result
+        if result is None:
+            self.showWarning(self.controller.tr("Uncatched error"))   
+        elif result[0] == 0:
+            self.showInfo(self.controller.tr("Node deleted successfully"))    
+        elif result[0] == 1:
+            self.showWarning(self.controller.tr("Parametrize error type 1"))   
+        elif result[0] == 2:
+            self.showWarning(self.controller.tr("Parametrize error type 2"))   
+        elif result[0] == 3:
+            self.showWarning(self.controller.tr("Parametrize error type 3"))   
+        else:
+            self.showWarning(self.controller.tr("Undefined error"))               
+                    
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh()    
         
         
     def mg_connec_tool(self):

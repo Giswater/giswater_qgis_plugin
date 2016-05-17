@@ -1,4 +1,4 @@
--- Function: "SCHEMA_NAME".gw_fct_node2arc(character varying)
+-- Function: SCHEMA_NAME.gw_fct_node2arc(character varying)
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node2arc(character varying);
 
@@ -8,46 +8,44 @@ RETURNS void AS
 $BODY$
 DECLARE
 
-	node_geom      geometry;
-	arc_id_aux     varchar;
-	arc_geom       geometry;
-	link           geometry;
-	end_point      geometry;
-	start_point    geometry;
-	epa_type_aux   varchar;
-	line1          geometry;
-	line2          geometry;
-	rec_aux        record;
-	rec_aux2       "SCHEMA_NAME".arc;
-	
+	node_geom	geometry;
+	arc_id_aux	varchar;
+	arc_geom	geometry;
+	epa_type_aux	varchar;
+	line1		geometry;
+	line2		geometry;
+	rec_aux		record;
+	rec_aux2	"SCHEMA_NAME".arc;
+	intersect_loc	double precision;
 
 
 BEGIN
 
+--	Search path
+	SET search_path = "SCHEMA_NAME", public;
 
 --	Get connec geometry
-	SELECT the_geom INTO node_geom FROM "SCHEMA_NAME".node WHERE node_id = node_id_arg;
+	SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
 
 --	Get node tolerance from config table
-	SELECT node_proximity INTO rec_aux FROM "SCHEMA_NAME".config;
+	SELECT node2arc INTO rec_aux FROM config;
     
 --	Find closest pipe inside tolerance
-	SELECT arc_id, the_geom, epa_type INTO arc_id_aux, arc_geom, epa_type_aux  FROM "SCHEMA_NAME".arc AS a WHERE ST_DWithin(node_geom, a.the_geom, rec_aux.node_proximity) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
+	SELECT arc_id, the_geom, epa_type INTO arc_id_aux, arc_geom, epa_type_aux  FROM arc AS a WHERE ST_DWithin(node_geom, a.the_geom, rec_aux.node2arc) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
 
 
 --	Compute cut
 	IF arc_geom IS NOT NULL AND (epa_type_aux = 'PIPE' OR epa_type_aux = 'CONDUIT') THEN
 
---		Line end point
-		start_point:= ST_StartPoint(arc_geom);
-		end_point := ST_EndPoint(arc_geom);
+--		Locate position of the nearest point
+		intersect_loc := ST_Line_Locate_Point(arc_geom, node_geom);
 
 --		Compute pieces
-		line1 := ST_MakeLine(start_point, node_geom);
-		line2 := ST_MakeLine(node_geom, end_point);
+		line1 := ST_LineSubstring(arc_geom, 0.0, intersect_loc);
+		line2 := ST_LineSubstring(arc_geom, intersect_loc, 1.0);
 
 --		Get arc data
-		SELECT * INTO rec_aux2 FROM "SCHEMA_NAME".arc WHERE arc_id = arc_id_aux;
+		SELECT * INTO rec_aux2 FROM arc WHERE arc_id = arc_id_aux;
 
 --		New arc_id
 		rec_aux2.arc_id := nextval('SCHEMA_NAME.arc_id_seq');
@@ -56,7 +54,7 @@ BEGIN
 		IF ST_Length(line1) > ST_Length(line2) THEN
 
 --			Update pipe
-			UPDATE "SCHEMA_NAME".arc SET (node_2, the_geom) = (node_id_arg, line1) WHERE arc_id = arc_id_aux;
+			UPDATE arc SET (node_2, the_geom) = (node_id_arg, line1) WHERE arc_id = arc_id_aux;
 
 --			Insert new
 			rec_aux2.the_geom := line2;
@@ -66,7 +64,7 @@ BEGIN
 		ELSE
 
 --			Update pipe
-			UPDATE "SCHEMA_NAME".arc SET (node_1, the_geom) = (node_id_arg, line2) WHERE arc_id = arc_id_aux;
+			UPDATE arc SET (node_1, the_geom) = (node_id_arg, line2) WHERE arc_id = arc_id_aux;
 
 --			Insert new
 			rec_aux2.the_geom := line1;
@@ -75,7 +73,10 @@ BEGIN
 		END IF;
 
 --		Insert new record into arc table
-		INSERT INTO "SCHEMA_NAME".arc SELECT rec_aux2.*;
+		INSERT INTO arc SELECT rec_aux2.*;
+
+
+
 
 	END IF;
 
@@ -86,3 +87,11 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION "SCHEMA_NAME".gw_fct_node2arc(character varying)
+  OWNER TO geoserver;
+
+
+
+
+
+

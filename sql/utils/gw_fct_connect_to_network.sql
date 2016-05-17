@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_param varchar[]) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array varchar[]) RETURNS void AS $BODY$
 DECLARE
     connec_id_aux  varchar;
     arc_geom       geometry;
@@ -21,7 +21,15 @@ BEGIN
         SELECT the_geom INTO connect_geom FROM connec WHERE connec_id = connec_id_aux;
 
         -- Find closest arc
-        SELECT arc_id INTO arc_id_aux FROM arc ORDER BY the_geom <-> connect_geom LIMIT 1;
+        --SELECT arc_id INTO arc_id_aux FROM arc ORDER BY the_geom <-> connect_geom LIMIT 1;
+
+	-- Improved version for curved lines (not perfect!)
+	WITH index_query AS
+	(
+		SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM arc ORDER BY the_geom <-> connect_geom LIMIT 10
+	)
+	SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
+        
 
         -- Get arc geometry
         SELECT the_geom INTO arc_geom FROM arc WHERE arc_id = arc_id_aux;
