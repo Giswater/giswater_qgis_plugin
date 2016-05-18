@@ -481,6 +481,11 @@ CONSTRAINT link_pkey PRIMARY KEY (link_id)
 );
 
 
+CREATE TABLE "SCHEMA_NAME"."mincut_polygon" (
+polygon_id varchar (16) NOT NULL,
+the_geom public.geometry (MULTIPOLYGON, SRID_VALUE),
+CONSTRAINT mincut_polygon_pkey PRIMARY KEY (polygon_id)
+);
 
 
 -- -----------------------------------

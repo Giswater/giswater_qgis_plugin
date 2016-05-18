@@ -41,10 +41,10 @@ BEGIN
     -- Create the temporal table to store polygon, the table should copy the SRID
     srid_schema := find_srid('SCHEMA_NAME', 'arc', 'the_geom')::text;
     EXECUTE format('
-	CREATE TABLE IF NOT EXISTS SCHEMA_NAME.temp_mincut_polygon (
+	CREATE TABLE IF NOT EXISTS SCHEMA_NAME.mincut_polygon (
 		polygon_id character varying(16) NOT NULL,
 		the_geom geometry(MULTIPOLYGON,%s),
-		CONSTRAINT temp_mincut_polygon_pkey PRIMARY KEY (polygon_id)
+		CONSTRAINT mincut_polygon_pkey PRIMARY KEY (polygon_id)
 	)'
     ,srid_schema);
 
@@ -134,8 +134,8 @@ BEGIN
     polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
 
     -- Insert into polygon table
-    DELETE FROM temp_mincut_polygon WHERE polygon_id = '1';
-    INSERT INTO temp_mincut_polygon VALUES('1',polygon_aux);
+    DELETE FROM mincut_polygon WHERE polygon_id = '1';
+    INSERT INTO mincut_polygon VALUES('1',polygon_aux);
 
     RETURN 0;
 
