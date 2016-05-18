@@ -153,7 +153,7 @@ class Giswater(QObject):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
             elif int(index_action) == 16:
                 map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller)         
-            elif int(index_action) in (10, 11, 12, 14, 15):
+            elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)   
             else:
                 pass
@@ -177,40 +177,62 @@ class Giswater(QObject):
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')        
                 
-        # Create edit, epanet and swmm toolbars or not?
-        self.toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
-        self.toolbar_epanet_enabled = bool(int(self.settings.value('status/toolbar_epanet_enabled', 1)))
-        self.toolbar_swmm_enabled = bool(int(self.settings.value('status/toolbar_swmm_enabled', 1)))
-        if self.toolbar_swmm_enabled:
-            self.toolbar_swmm_name = self.tr('toolbar_swmm_name')
-            self.toolbar_swmm = self.iface.addToolBar(self.toolbar_swmm_name)
-            self.toolbar_swmm.setObjectName(self.toolbar_swmm_name)   
-        if self.toolbar_epanet_enabled:
-            self.toolbar_epanet_name = self.tr('toolbar_epanet_name')
-            self.toolbar_epanet = self.iface.addToolBar(self.toolbar_epanet_name)
-            self.toolbar_epanet.setObjectName(self.toolbar_epanet_name)   
-        if self.toolbar_edit_enabled:
-            self.toolbar_edit_name = self.tr('toolbar_edit_name')
-            self.toolbar_edit = self.iface.addToolBar(self.toolbar_edit_name)
-            self.toolbar_edit.setObjectName(self.toolbar_edit_name)      
+        # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
+        self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
+        self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
+        self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
+        self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
+        if self.toolbar_ud_enabled:
+            self.toolbar_ud_name = self.tr('toolbar_ud_name')
+            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
+            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
+        if self.toolbar_ws_enabled:
+            self.toolbar_ws_name = self.tr('toolbar_ws_name')
+            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
+            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
+        if self.toolbar_mg_enabled:
+            self.toolbar_mg_name = self.tr('toolbar_mg_name')
+            self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
+            self.toolbar_mg.setObjectName(self.toolbar_mg_name)      
+        if self.toolbar_ed_enabled:
+            self.toolbar_ed_name = self.tr('toolbar_ed_name')
+            self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
+            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
+                
+        # UD toolbar
+        if self.toolbar_ud_enabled:        
+            self.ag_ud = QActionGroup(parent);
+            self.add_action('01', self.toolbar_ud, self.ag_ud)   
+            self.add_action('02', self.toolbar_ud, self.ag_ud)   
+            self.add_action('04', self.toolbar_ud, self.ag_ud)   
+            self.add_action('05', self.toolbar_ud, self.ag_ud)   
+            self.add_action('03', self.toolbar_ud, self.ag_ud)   
+                
+        # WS toolbar
+        if self.toolbar_ws_enabled:  
+            self.ag_ws = QActionGroup(parent);
+            self.add_action('10', self.toolbar_ws, self.ag_ws)
+            self.add_action('11', self.toolbar_ws, self.ag_ws)
+            self.add_action('12', self.toolbar_ws, self.ag_ws)
+            self.add_action('14', self.toolbar_ws, self.ag_ws)
+            self.add_action('15', self.toolbar_ws, self.ag_ws)
+            self.add_action('08', self.toolbar_ws, self.ag_ws)
+            self.add_action('29', self.toolbar_ws, self.ag_ws)
+            self.add_action('13', self.toolbar_ws, self.ag_ws)
+                
+        # MANAGEMENT toolbar 
+        if self.toolbar_mg_enabled:      
+            self.ag_mg = QActionGroup(parent);
+            self.add_action('16', self.toolbar_mg, self.ag_mg)
+            self.add_action('28', self.toolbar_mg, self.ag_mg)            
+            for i in range(17,28):
+                self.add_action(str(i), self.toolbar_mg, self.ag_mg)
                     
-        # Edit&Analysis toolbar 
-        if self.toolbar_edit_enabled:      
-            self.ag_edit = QActionGroup(parent);
-            for i in range(16,28):
-                self.add_action(str(i), self.toolbar_edit, self.ag_edit)
-                
-        # Epanet toolbar
-        if self.toolbar_epanet_enabled:  
-            self.ag_epanet = QActionGroup(parent);
-            for i in range(10,16):
-                self.add_action(str(i), self.toolbar_epanet, self.ag_epanet)
-                
-        # SWMM toolbar
-        if self.toolbar_swmm_enabled:        
-            for i in range(1,10):
-                self.ag_swmm = QActionGroup(parent);                
-                self.add_action(str(i).zfill(2), self.toolbar_swmm, self.ag_swmm)     
+        # EDIT toolbar 
+        if self.toolbar_ed_enabled:      
+            self.ag_ed = QActionGroup(parent);
+            for i in range(30,36):
+                self.add_action(str(i), self.toolbar_ed, self.ag_ed)
         
         # Project initialization
         self.project_read()               
@@ -256,12 +278,14 @@ class Giswater(QObject):
             self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
             self.iface.removePluginMenu(self.menu_name, action)
             self.iface.removeToolBarIcon(action)
-        if self.toolbar_edit_enabled:    
-            del self.toolbar_edit
-        if self.toolbar_epanet_enabled:    
-            del self.toolbar_epanet
-        if self.toolbar_swmm_enabled:    
-            del self.toolbar_swmm
+        if self.toolbar_ud_enabled:    
+            del self.toolbar_ud
+        if self.toolbar_ws_enabled:    
+            del self.toolbar_ws
+        if self.toolbar_mg_enabled:    
+            del self.toolbar_mg
+        if self.toolbar_ed_enabled:    
+            del self.toolbar_ed
             
     
     
@@ -270,7 +294,7 @@ class Giswater(QObject):
     def disable_actions(self):
         ''' Utility to disable all actions '''
         for i in range(1,40):
-            key = str(i)
+            key = str(i).zfill(2)
             if key in self.actions:
                 action = self.actions[key]
                 action.setEnabled(False)         
