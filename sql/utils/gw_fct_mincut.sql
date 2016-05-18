@@ -19,6 +19,7 @@ BEGIN
         -- Force indexed column (for performance)
         CONSTRAINT temp_mincut_node_pkey PRIMARY KEY (node_id)
     );
+    DELETE FROM temp_mincut_node;
 
     -- Create the temporal table for computing pipes
     CREATE TABLE IF NOT EXISTS temp_mincut_arc (
@@ -26,6 +27,8 @@ BEGIN
         -- Force indexed column (for performance)
         CONSTRAINT temp_mincut_arc_pkey PRIMARY KEY (arc_id)
     );
+    DELETE FROM temp_mincut_arc;
+   
 
     -- Create the temporal table for computing valves
     CREATE TABLE IF NOT EXISTS temp_mincut_valve (
@@ -33,6 +36,7 @@ BEGIN
         -- Force indexed column (for performance)
         CONSTRAINT temp_mincut_valve_pkey PRIMARY KEY (valve_id)
     );
+    DELETE FROM temp_mincut_valve;
        
     -- Create the temporal table to store polygon, the table should copy the SRID
     srid_schema := find_srid('SCHEMA_NAME', 'arc', 'the_geom')::text;
@@ -44,14 +48,8 @@ BEGIN
 	)'
     ,srid_schema);
 
-    
-    CREATE TABLE IF NOT EXISTS temp_mincut_polygon (
-        polygon_id character varying(16) NOT NULL,
-        the_geom geometry(POLYGON,find_srid("SCHEMA_NAME", arc, the_geom) ),
-        CONSTRAINT temp_mincut_polygon_pkey PRIMARY KEY (polygon_id)
-    );
 
-    -- The element to isolate could be an arc or a node
+     -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
 
         -- Check an existing arc
