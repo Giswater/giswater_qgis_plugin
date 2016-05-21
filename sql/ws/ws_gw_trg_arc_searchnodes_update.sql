@@ -1,15 +1,18 @@
-﻿/*
+/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
-    nodeRecord1 record; 
-    nodeRecord2 record; 
-    rec record;    
+    nodeRecord1	record; 
+    nodeRecord2	record; 
+    rec		record;  
+    vnoderec	record;
+    newPoint	geometry;    
+    connecPoint	geometry;
 
 BEGIN 
 
@@ -26,64 +29,43 @@ BEGIN
 
     -- Control of length line
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
-   
-
         -- Control of same node initial and final
         IF (nodeRecord1.node_id = nodeRecord2.node_id) THEN
-        
             RAISE EXCEPTION '[%]: One or more features has the same Node as Node1 and Node2. Please check your project and repair it!', TG_NAME;
-
         ELSE
-        
             -- Update coordinates
             NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
             NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
             NEW.node_1:= nodeRecord1.node_id; 
             NEW.node_2:= nodeRecord2.node_id;
-            
+
+            -- Select arcs with start-end on the updated node
+            FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
+            LOOP
+
+                -- Update vnode geometry
+                newPoint := ST_Line_Interpolate_Point(NEW.the_geom, ST_Line_Locate_Point(OLD.the_geom, vnoderec.the_geom));
+                UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+
+                -- Update link
+                connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+                UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+
+            END LOOP; 
+
+
             RETURN NEW;
-            
         END IF;
-
-    -- Check auto insert end nodes
-    ELSEIF (nodeRecord1.node_id IS NOT NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
-
-	INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
-	    VALUES (
-	        (SELECT nextval('SCHEMA_NAME.node_id_seq')),
-	        (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
-	        'JUNCTION', 
-	        (SELECT nodeinsert_catalog_vdefault FROM config), 
-	        (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
-	        ST_endpoint(NEW.the_geom)
-	    );
-
-	INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('SCHEMA_NAME.node_id_seq')));
-	INSERT INTO man_junction (node_id) VALUES ((SELECT currval('SCHEMA_NAME.node_id_seq')));
-
-	-- Update coordinates
-            NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-            NEW.node_1:= nodeRecord1.node_id; 
-            NEW.node_2:= (SELECT currval('SCHEMA_NAME.node_id_seq'));
-            
-            RETURN NEW;
-
-
-	RETURN NEW;
-
-    -- Error, no existing nodes
     ELSE
-        RAISE EXCEPTION '[%]: Arc was not inserted', TG_NAME;
+            RAISE EXCEPTION '[%]: Arc was not inserted', TG_NAME;
         RETURN NULL;
     END IF;
 
-END;
+END; 
 $$;
 
-
-
-CREATE TRIGGER gw_trg_arc_searchnodes_insert BEFORE INSERT ON "SCHEMA_NAME"."arc" 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
+CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes_update"();
 
 -- CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
 -- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
