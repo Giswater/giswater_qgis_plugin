@@ -105,7 +105,6 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_x_connec_seq"
 
 
 
-
 -- ----------------------------
 -- Table: system structure 
 -- ----------------------------
@@ -305,6 +304,7 @@ CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
 -- Table: value domain (type)
 -----------
 
+
 CREATE TABLE "SCHEMA_NAME"."man_type_category" (
 "id" varchar(20)   NOT NULL,
 "observ" varchar(50)  ,
@@ -370,7 +370,7 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "node_id" varchar(16)   NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
---"node_type" varchar(30),
+"node_type" varchar(30),
 "nodecat_id" varchar(30),
 "epa_type" varchar(16)  ,
 "sector_id" varchar(30)  ,
@@ -622,6 +622,7 @@ CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 );
 
 
+
 -- ----------------------------------
 -- Table: value domain
 -- ----------------------------------
@@ -646,6 +647,7 @@ CREATE TABLE "SCHEMA_NAME"."value_yesno" (
 );
 
 
+
 -- ----------------------------------
 -- Table: selector
 -- ----------------------------------
@@ -655,6 +657,7 @@ CREATE TABLE "SCHEMA_NAME"."man_selector_valve" (
 "id" varchar(16)   NOT NULL,
  CONSTRAINT man_selector_valve_pkey PRIMARY KEY (id)
 );
+
 
 
 ------
@@ -667,7 +670,7 @@ ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("arctype_id") REFERENCES "S
 ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("nodetype_id") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
---ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("node_type") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("node_type") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHEMA_NAME"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -729,7 +732,6 @@ ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCH
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
 ALTER TABLE "SCHEMA_NAME"."streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."man_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -771,7 +773,4 @@ CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);
 CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
 CREATE INDEX link_index ON link USING GIST (the_geom);
-
-
-
 

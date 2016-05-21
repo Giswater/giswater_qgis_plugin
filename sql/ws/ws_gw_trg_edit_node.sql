@@ -27,12 +27,12 @@ BEGIN
         END IF;
 
         -- Node type
-        --IF (NEW.node_type IS NULL) THEN
-        --    IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-        --        RAISE EXCEPTION '[%]: There are no nodes types defined in the model, define at least one.', TG_NAME;
-        -- END IF;
-        -- NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
-        --END IF;
+        IF (NEW.node_type IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+                RAISE EXCEPTION '[%]: There are no nodes types defined in the model, define at least one.', TG_NAME;
+            END IF;
+            NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+        END IF;
 
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
@@ -63,12 +63,8 @@ BEGIN
             END IF;            
         END IF;
         
-        -- FEATURE INSERT
-        --INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
-        --                        NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-        --                        NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);        
-        
-        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+        -- FEATURE INSERT      
+        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
@@ -136,9 +132,9 @@ BEGIN
 
         END IF;
 
-        --IF (NEW.node_type <> OLD.node_type) THEN  
-        --        RAISE EXCEPTION '[%]:Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog',TG_NAME;
-        --END IF;
+        IF (NEW.node_type <> OLD.node_type) THEN  
+                RAISE EXCEPTION '[%]: Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog',TG_NAME;
+        END IF;
 
         IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
@@ -148,9 +144,8 @@ BEGIN
             END IF;
         END IF;
 
-        --SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state",         
         UPDATE node 
-        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
+        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,

@@ -14,10 +14,7 @@ SELECT
 node.node_id, 
 node.elevation, 
 node.depth, 
-
-cat_node.nodetype_id AS "cat_nodetype_id",
---node.node_type,
-
+node.node_type,
 node.nodecat_id,
 cat_node.matcat_id AS "cat_matcat_id",
 cat_node.pnom AS "cat_pnom",

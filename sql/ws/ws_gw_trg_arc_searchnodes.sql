@@ -1,11 +1,11 @@
-﻿/*
+/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $BODY$
 DECLARE 
     nodeRecord1 record; 
     nodeRecord2 record; 
@@ -19,14 +19,13 @@ BEGIN
     SELECT arc_searchnodes INTO rec FROM config;    
 
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
-	    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
     SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
     -- Control of length line
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
-   
 
         -- Control of same node initial and final
         IF (nodeRecord1.node_id = nodeRecord2.node_id) THEN
@@ -48,28 +47,25 @@ BEGIN
     -- Check auto insert end nodes
     ELSEIF (nodeRecord1.node_id IS NOT NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
 
-	INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
-	    VALUES (
-	        (SELECT nextval('SCHEMA_NAME.node_id_seq')),
-	        (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
-	        'JUNCTION', 
-	        (SELECT nodeinsert_catalog_vdefault FROM config), 
-	        (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
-	        ST_endpoint(NEW.the_geom)
-	    );
+        INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
+            VALUES (
+                (SELECT nextval('SCHEMA_NAME.node_id_seq')),
+                (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
+                'JUNCTION', 
+                (SELECT nodeinsert_catalog_vdefault FROM config), 
+                (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
+                ST_endpoint(NEW.the_geom)
+            );
 
-	INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('SCHEMA_NAME.node_id_seq')));
-	INSERT INTO man_junction (node_id) VALUES ((SELECT currval('SCHEMA_NAME.node_id_seq')));
+        INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('SCHEMA_NAME.node_id_seq')));
+        INSERT INTO man_junction (node_id) VALUES ((SELECT currval('SCHEMA_NAME.node_id_seq')));
 
-	-- Update coordinates
-            NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-            NEW.node_1:= nodeRecord1.node_id; 
-            NEW.node_2:= (SELECT currval('SCHEMA_NAME.node_id_seq'));
-            
-            RETURN NEW;
-
-
-	RETURN NEW;
+        -- Update coordinates
+        NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+        NEW.node_1:= nodeRecord1.node_id; 
+        NEW.node_2:= (SELECT currval('SCHEMA_NAME.node_id_seq'));
+                
+        RETURN NEW;
 
     -- Error, no existing nodes
     ELSE
@@ -78,14 +74,10 @@ BEGIN
     END IF;
 
 END;
-$$;
+$BODY$;
 
 
 
 CREATE TRIGGER gw_trg_arc_searchnodes_insert BEFORE INSERT ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
-
--- CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
--- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom) )) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
-
 
