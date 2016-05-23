@@ -132,10 +132,6 @@ BEGIN
 
         END IF;
 
-        IF (NEW.node_type <> OLD.node_type) THEN  
-                RAISE EXCEPTION '[%]: Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog',TG_NAME;
-        END IF;
-
         IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
@@ -161,7 +157,7 @@ BEGIN
         RETURN NULL;
    
     END IF;
-
+    
 END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100
