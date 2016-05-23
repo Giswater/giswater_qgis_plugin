@@ -8,25 +8,27 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 class PointMapTool(QgsMapTool):
 
     def __init__(self, iface, settings, action, index_action, controller):
-        ''' Class constructor '''        
+        ''' Class constructor '''    
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
         self.srid = self.settings.value('status/srid')
-        self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
+        self.node_type = self.settings.value('insert_values/'+str(index_action)+'_node_type')
+        self.epa_type = self.settings.value('insert_values/'+str(index_action)+'_epa_type')
         self.dao = controller.getDao()   
-        self.schema_name = self.dao.get_schema_name()            
-        self.view_name = "v_edit_node"            
+        self.schema_name = self.dao.get_schema_name()   
+        self.table_node = self.settings.value('db/table_node', 'v_edit_node')          
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action) 
             
      
     def insert_node(self, x, y):
         ''' Insert a new node in the selected coordinates '''
-        if self.elem_type is not None:        
+        if self.node_type is not None:        
             the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+self.srid+")";
-            sql = "INSERT INTO "+self.schema_name+"."+self.view_name+" (epa_type, the_geom) VALUES ('"+self.elem_type+"', "+the_geom+");";
+            sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
+            sql+= " VALUES ('"+self.node_type+"', '"+self.epa_type+"', "+the_geom+");";
             status = self.dao.execute_sql(sql)   
             return status  
       
