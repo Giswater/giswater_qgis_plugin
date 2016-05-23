@@ -9876,7 +9876,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>71</width>
+     <width>61</width>
      <height>20</height>
     </rect>
    </property>
@@ -9986,30 +9986,17 @@ p, li { white-space: pre-wrap; }
   <widget class="QComboBox" name="nodecat_id">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>240</x>
      <y>0</y>
      <width>181</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="cat_nodetype_id">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>20</y>
-     <width>131</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="frame">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QComboBox" name="nodecat_id_dummy">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>240</x>
      <y>20</y>
      <width>181</width>
      <height>20</height>
@@ -10022,6 +10009,26 @@ p, li { white-space: pre-wrap; }
      <x>430</x>
      <y>20</y>
      <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="node_type_dummy">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>20</y>
+     <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="node_type">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>0</y>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
