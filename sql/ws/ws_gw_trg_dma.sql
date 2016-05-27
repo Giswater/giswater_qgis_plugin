@@ -4,8 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_dma() RETURNS trigger LANGUAGE plpgsql  AS
-$BODY$
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_dma() RETURNS trigger LANGUAGE plpgsql AS $BODY$
 DECLARE 
     v_sql varchar;
     geom_column varchar;
@@ -16,8 +16,8 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    --Dynamic SQL
-    v_sql := 'SELECT
+    -- Dynamic SQL
+    v_sql:= 'SELECT
                  tc.table_name,
                  kcu.column_name
              FROM 
@@ -32,33 +32,29 @@ BEGIN
                  ccu.table_schema=' || quote_literal(TG_TABLE_SCHEMA) || ' AND
                  ccu.table_name=' || quote_literal('dma') || ' AND
                  ccu.column_name=' || quote_literal('dma_id');
-                 
 
---RAISE EXCEPTION 'v_sql=%',  v_sql;
-
-
-    --Loop for all the tables with a foreign key in dma_id
+    -- Loop for all the tables with a foreign key in dma_id
     FOR r IN EXECUTE v_sql
     LOOP
 
         --Find the geometry column name
-        v_sql := 'SELECT f_geometry_column FROM geometry_columns WHERE f_table_schema=' || quote_literal(TG_TABLE_SCHEMA) || ' AND f_table_name=' || quote_literal(r.table_name); 
+        v_sql:= 'SELECT f_geometry_column FROM geometry_columns WHERE f_table_schema=' || quote_literal(TG_TABLE_SCHEMA) || ' AND f_table_name=' || quote_literal(r.table_name); 
         EXECUTE v_sql INTO geom_column;
 
-	--In case of no geom
-	IF geom_column IS NOT NULL THEN
+        -- In case of no geom
+        IF geom_column IS NOT NULL THEN
 
-            --Check orphan
-            v_sql := 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)=0';
+            -- Check orphan
+            v_sql:= 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)=0';
             EXECUTE v_sql INTO num_dmas;
 
             IF num_dmas > 0 THEN
-	        RAISE NOTICE 'num_dmas= %', num_dmas;        
---	        RAISE EXCEPTION 'There are features in table % outside of the dma polygons', r.table_name;
+                RAISE NOTICE 'num_dmas= %', num_dmas;        
+                -- RAISE EXCEPTION 'There are features in table % outside of the dma polygons', r.table_name;
             END IF;
 
-            --Update dma id       
-            v_sql := 'UPDATE ' || quote_ident(r.table_name) || ' SET ' || quote_ident(r.column_name) || ' = (SELECT dma_id FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)';
+            -- Update dma id       
+            v_sql:= 'UPDATE ' || quote_ident(r.table_name) || ' SET ' || quote_ident(r.column_name) || ' = (SELECT dma_id FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)';
             EXECUTE v_sql;
 
         END IF;
@@ -66,15 +62,10 @@ BEGIN
     END LOOP;
 
     RETURN NEW;
-    
 
 END;
 $BODY$;
 
 
-CREATE TRIGGER gw_trg_dma
- AFTER INSERT OR UPDATE OR DELETE
- ON "SCHEMA_NAME"."dma"
-
-FOR EACH ROW
-  EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_dma"();
+CREATE TRIGGER gw_trg_dma AFTER INSERT OR UPDATE OR DELETE ON "SCHEMA_NAME"."dma"
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_dma"();
