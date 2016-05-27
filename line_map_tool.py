@@ -15,10 +15,10 @@ class LineMapTool(QgsMapTool):
         self.settings = settings
         self.index_action = index_action
         self.srid = self.settings.value('status/srid')
-        self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
+        self.epa_type = self.settings.value('insert_values/'+str(index_action)+'_epa_type')
         self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name() 
-        self.view_name = "v_edit_arc"                    
+        self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')                         
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 
@@ -49,9 +49,11 @@ class LineMapTool(QgsMapTool):
         
     def insert_arc(self, start_point, end_point):
         ''' Insert a new arc in the selected coordinates '''
-        if self.elem_type is not None:        
-            the_geom = "ST_GeomFromText('LINESTRING("+str(start_point.x())+" "+str(start_point.y())+", "+str(end_point.x())+" "+str(end_point.y())+")', "+self.srid+")";
-            sql = "INSERT INTO "+self.schema_name+"."+self.view_name+" (epa_type, the_geom) VALUES ('"+self.elem_type+"', "+the_geom+");";
+        if self.epa_type is not None:        
+            the_geom = "ST_GeomFromText('LINESTRING("+str(start_point.x())+" "+str(start_point.y())+", "
+            the_geom+= str(end_point.x())+" "+str(end_point.y())+")', "+self.srid+")";
+            sql = "INSERT INTO "+self.schema_name+"."+self.table_arc+" (epa_type, the_geom)"
+            sql+= " VALUES ('"+self.epa_type+"', "+the_geom+");";
             status = self.dao.execute_sql(sql)   
             return status  
                     
