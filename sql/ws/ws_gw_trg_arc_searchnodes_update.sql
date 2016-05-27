@@ -64,7 +64,7 @@ BEGIN
 END; 
 $$;
 
-CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
+CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE OF the_geom ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes_update"();
 
 -- CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
