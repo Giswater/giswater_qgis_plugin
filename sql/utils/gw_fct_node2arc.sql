@@ -42,6 +42,11 @@ BEGIN
         line1 := ST_LineSubstring(arc_geom, 0.0, intersect_loc);
         line2 := ST_LineSubstring(arc_geom, intersect_loc, 1.0);
 
+        -- Check if any of the 'lines' are in fact a point
+        IF (ST_GeometryType(line1) = 'ST_Point') OR (ST_GeometryType(line2) = 'ST_Point') THEN
+            RETURN 1;
+        END IF;
+
         --	Get arc data
         SELECT * INTO rec_aux2 FROM arc WHERE arc_id = arc_id_aux;
 

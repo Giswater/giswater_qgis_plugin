@@ -39,13 +39,25 @@ class MoveNode(QgsMapTool):
         if status:
             # Execute function
             sql = "SELECT "+self.schema_name+".gw_fct_node2arc('"+node_id+"')"
-            status = self.dao.execute_sql(sql)   
-            return status  
+            result = self.dao.get_row(sql) 
+            self.dao.commit()
+            if result is None:
+                self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
+            elif result[0] == 0:
+                self.showInfo(self.controller.tr("Node moved successfully"))                
+            elif result[0] == 1:
+                print self.controller.tr("Node already related with 2 arcs")
+        else:
+            self.showWarning(self.controller.tr("Move node: Error updating geometry"))   
 
 
     def showInfo(self, text, duration = 3):
         self.iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)    
-        
+    
+
+    def showWarning(self, text, duration = 3):
+        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)    
+                
     
     ''' QgsMapTool inherited event functions '''    
        
@@ -73,9 +85,10 @@ class MoveNode(QgsMapTool):
         node_id = feature.attribute('node_id') 
         
         # Move selected node to the current point
-        status = self.move_node(node_id, int(self.point.x()), int(self.point.y()))  
-        if not status:
-            self.showWarning(self.controller.tr("move_node_error"))          
+        status = self.move_node(node_id, int(self.point.x()), int(self.point.y()))       
+            
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh()               
         
         
     def canvasPressEvent(self, e):
