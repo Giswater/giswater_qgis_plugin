@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node2arc(node_id_arg character varying) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_node2arc"(node_id_arg varchar) RETURNS "pg_catalog"."int2" AS $BODY$
 DECLARE
     node_geom	geometry;
     arc_id_aux	varchar;
@@ -36,7 +36,7 @@ BEGIN
     IF arc_geom IS NOT NULL AND (epa_type_aux = 'PIPE' OR epa_type_aux = 'CONDUIT') THEN
 
         --	Locate position of the nearest point
-        intersect_loc := ST_Line_Locate_Point(arc_geom, node_geom);
+        intersect_loc := ST_LineLocatePoint(arc_geom, node_geom);
 
         --	Compute pieces
         line1 := ST_LineSubstring(arc_geom, 0.0, intersect_loc);
@@ -74,7 +74,7 @@ BEGIN
 
     END IF;
 
-    RETURN;
+    RETURN 0;
         
 END;
 $BODY$
