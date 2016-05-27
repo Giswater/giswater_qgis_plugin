@@ -238,6 +238,7 @@ class Giswater(QObject):
         self.project_read()               
             
         # Menu entries
+        '''
         self.create_action(None, self.tr('New network'), None, self.menu_name, False)
         self.create_action(None, self.tr('Copy network as'), None, self.menu_name, False)
             
@@ -255,28 +256,28 @@ class Giswater(QObject):
         self.menu_network_management.addAction(action2)
         self.iface.addPluginToMenu(self.menu_name, self.menu_network_management.menuAction())         
            
-#         self.menu_analysis = QMenu(self.tr('Analysis'))          
-#         action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
-#         action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
-#         action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
-#         self.menu_analysis.addAction(action2)
-#         self.menu_analysis.addAction(action3)
-#         self.menu_analysis.addAction(action4)
-#         self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
+        self.menu_analysis = QMenu(self.tr('Analysis'))          
+        action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
+        action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
+        action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
+        self.menu_analysis.addAction(action2)
+        self.menu_analysis.addAction(action3)
+        self.menu_analysis.addAction(action4)
+        self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
          
-#         self.menu_go2epa = QMenu(self.tr('Go2Epa'))
-#         action1 = self.create_action('23', self.tr('Giswater interface'), None, None, False)               
-#         action2 = self.create_action('24', self.tr('Run simulation'), None, None, False)         
-#         self.menu_go2epa.addAction(action1)
-#         self.menu_go2epa.addAction(action2)
-#         self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
-            
+        self.menu_go2epa = QMenu(self.tr('Go2Epa'))
+        action1 = self.create_action('23', self.tr('Giswater interface'), None, None, False)               
+        action2 = self.create_action('24', self.tr('Run simulation'), None, None, False)         
+        self.menu_go2epa.addAction(action1)
+        self.menu_go2epa.addAction(action2)
+        self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
+        '''
 
     def unload(self):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         for action_index, action in self.actions.iteritems():
-            self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
-            self.iface.removePluginMenu(self.menu_name, action)
+            #self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
+            #self.iface.removePluginMenu(self.menu_name, action)
             self.iface.removeToolBarIcon(action)
         if self.toolbar_ud_enabled:    
             del self.toolbar_ud
@@ -436,15 +437,15 @@ class Giswater(QObject):
         
         # Manage SQL execution result
         if result is None:
-            self.showWarning(self.controller.tr("Uncatched error"))   
+            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
         elif result[0] == 0:
             self.showInfo(self.controller.tr("Node deleted successfully"))    
         elif result[0] == 1:
-            self.showWarning(self.controller.tr("Parametrize error type 1"))   
+            self.showWarning(self.controller.tr("Nonexistent node id: ")+node_id)   
         elif result[0] == 2:
-            self.showWarning(self.controller.tr("Parametrize error type 2"))   
+            self.showWarning(self.controller.tr("Pipes has different types"))   
         elif result[0] == 3:
-            self.showWarning(self.controller.tr("Parametrize error type 3"))   
+            self.showWarning(self.controller.tr("Node has not 2 arcs"))   
         else:
             self.showWarning(self.controller.tr("Undefined error"))               
         
@@ -512,7 +513,7 @@ class Giswater(QObject):
         
         # Manage SQL execution result
         if result is None:
-            self.showWarning(self.controller.tr("Uncatched error"))
+            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
             return   
         elif result[0] == 0:
             # Get 'arc' and 'node' list and select them 
@@ -523,9 +524,6 @@ class Giswater(QObject):
             sql+= "DROP TABLE IF EXISTS temp_mincut_arc CASCADE;"
             sql+= "DROP TABLE IF EXISTS temp_mincut_valve CASCADE;" 
             self.dao.execute_sql(sql)  
-        elif result[0] == 1:
-            self.showWarning(self.controller.tr("Parametrize error type 1"))   
-            return
         else:
             self.showWarning(self.controller.tr("Undefined error"))    
             return        
