@@ -1572,3 +1572,10 @@ SELECT pg_catalog.setval('"SCHEMA_NAME".node_id_seq', 1100, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".arc_id_seq', 2200, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".connec_seq', 3300, true);
 
+
+-- Update to automatically fill field node.node_type
+UPDATE node
+SET node_type = cat_node.nodetype_id
+FROM cat_node
+WHERE node.nodecat_id = cat_node."id"
+
