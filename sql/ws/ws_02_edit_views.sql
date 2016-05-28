@@ -116,7 +116,7 @@ connec.adress_01,
 connec.adress_02,
 connec.adress_03,
 connec.streetaxis_id,
-streetaxis.name,
+ext_streetaxis.name,
 connec.postnumber,
 connec.descript,
 cat_connec.svg AS "cat_svg",
@@ -126,7 +126,7 @@ connec.verified,
 connec.the_geom
 FROM ("SCHEMA_NAME".connec 
 LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
-LEFT JOIN "SCHEMA_NAME".streetaxis ON (((connec.streetaxis_id)::text = (streetaxis.id)::text)));
+LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text)));
 
 
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
