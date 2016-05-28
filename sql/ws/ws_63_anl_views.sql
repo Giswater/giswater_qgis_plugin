@@ -12,15 +12,15 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_anl_mincut_connec AS 
 SELECT
-anl_mincut_node.node_id,
-anl_mincut_node.the_geom
-FROM SCHEMA_NAME.anl_mincut_node;
+connec.connec_id,
+--anl_mincut_node.node_id,
+connec.the_geom
+FROM SCHEMA_NAME.connec;
 
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_anl_mincut_hydrometer AS 
 SELECT
-anl_mincut_node.node_id,
-anl_mincut_node.the_geom
-FROM SCHEMA_NAME.anl_mincut_node;
+ext_rtc_hydrometer.hydrometer_id
+FROM SCHEMA_NAME.ext_rtc_hydrometer;
 
