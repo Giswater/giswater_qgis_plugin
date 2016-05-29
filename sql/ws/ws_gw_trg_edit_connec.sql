@@ -59,6 +59,12 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
+
         UPDATE connec 
         SET connec_id=NEW.connec_id, elevation=NEW.elevation, "depth"=NEW."depth", connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, code=NEW.code, n_hydrometer=NEW.n_hydrometer, demand=NEW.demand, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 

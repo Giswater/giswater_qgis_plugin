@@ -21,6 +21,14 @@ BEGIN
     RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
+
+
         UPDATE arc 
         SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
             "observ"=NEW."observ", "comment"=NEW."comment", dma=NEW.dma_id, custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 

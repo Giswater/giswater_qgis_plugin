@@ -31,6 +31,12 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
 	
 	    IF (NEW.node_type <> OLD.node_type) THEN  
                 RAISE EXCEPTION '[%]:Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog',TG_NAME;

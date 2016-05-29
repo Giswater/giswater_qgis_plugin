@@ -95,6 +95,11 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
 
 	IF (NEW.elev <> OLD.elev) THEN
 	RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
