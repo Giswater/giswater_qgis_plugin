@@ -8,7 +8,7 @@
 *.db
 test
 _*
-
+data/
 
 #################
 ## Eclipse
