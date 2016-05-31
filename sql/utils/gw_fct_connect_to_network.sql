@@ -63,7 +63,7 @@ BEGIN
                 SELECT sector_id INTO sector_aux FROM sector WHERE (the_geom @ sector.the_geom) LIMIT 1;
                 
                 -- Insert new vnode
-                INSERT INTO vnode (sector_id, userdefined_pos, the_geom) VALUES (sector_aux, FALSE, vnode);
+                INSERT INTO vnode (sector_id, arc_id, vnode_type, userdefined_pos, the_geom) VALUES (sector_aux, arc_id_aux, 'connec', FALSE, vnode);
                 vnode_id := currval('vnode_seq');
 
                 -- Delete old link
