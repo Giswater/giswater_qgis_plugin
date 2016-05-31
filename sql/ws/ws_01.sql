@@ -143,6 +143,7 @@ CREATE TABLE "SCHEMA_NAME"."config" (
 "nodeinsert_catalog_vdefault" varchar (30),
 "orphannode_delete" boolean,
 "vnode_update_tolerance" double precision,
+"nodetype_change_enabled" boolean,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
