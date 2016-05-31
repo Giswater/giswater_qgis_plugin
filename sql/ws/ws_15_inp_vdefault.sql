@@ -59,9 +59,8 @@ INSERT INTO "SCHEMA_NAME"."inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'AL
 INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 
 
--- ----------------------------
--- Default values of state selection
--- ----------------------------
-INSERT INTO "SCHEMA_NAME"."inp_selector_state" VALUES ('ON_SERVICE');
+
+
+
 
 
