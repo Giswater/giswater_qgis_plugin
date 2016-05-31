@@ -12,6 +12,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_junction AS 
 SELECT
 event_x_junction.id,
+event.eventcat_id,
 event_x_junction.event_id,
 event_x_junction.node_id,
 event_x_junction.value,
@@ -23,6 +24,7 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_junction.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_junction.node_id::text
 GROUP BY
 event_x_junction.id,
+event.eventcat_id,
 event_x_junction.event_id,
 event_x_junction.node_id,
 event_x_junction.value,
@@ -30,9 +32,27 @@ event_x_junction.observ,
 node.the_geom;
 
 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_junction AS 
+SELECT
+event_x_junction.id,
+event.eventcat_id,
+event_x_junction.event_id,
+event_x_junction.node_id,
+event_x_junction.value,
+event_x_junction.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_junction
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_junction.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_junction.node_id::text;
+
+
+
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_tank AS
 SELECT
 event_x_tank.id,
+event.eventcat_id,
 event_x_tank.event_id,
 event_x_tank.node_id,
 event_x_tank.value,
@@ -44,6 +64,7 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_tank.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_tank.node_id::text
 GROUP BY
 event_x_tank.id,
+event.eventcat_id,
 event_x_tank.event_id,
 event_x_tank.node_id,
 event_x_tank.value,
@@ -51,9 +72,27 @@ event_x_tank.observ,
 node.the_geom;
 
 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_tank AS
+SELECT
+event_x_tank.id,
+event.eventcat_id,
+event_x_tank.event_id,
+event_x_tank.node_id,
+event_x_tank.value,
+event_x_tank.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_tank
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_tank.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_tank.node_id::text;
+
+
+
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_hydrant AS
 SELECT
 event_x_hydrant.id,
+event.eventcat_id,
 event_x_hydrant.event_id,
 event_x_hydrant.node_id,
 event_x_hydrant.value,
@@ -65,6 +104,7 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_hydrant.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_hydrant.node_id::text
 GROUP BY
 event_x_hydrant.id,
+event.eventcat_id,
 event_x_hydrant.event_id,
 event_x_hydrant.node_id,
 event_x_hydrant.value,
@@ -72,9 +112,27 @@ event_x_hydrant.observ,
 node.the_geom;
 
 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_hydrant AS
+SELECT
+event_x_hydrant.id,
+event.eventcat_id,
+event_x_hydrant.event_id,
+event_x_hydrant.node_id,
+event_x_hydrant.value,
+event_x_hydrant.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_hydrant
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_hydrant.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_hydrant.node_id::text;
+
+
+
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_valve AS
 SELECT
 event_x_valve.id,
+event.eventcat_id,
 event_x_valve.event_id,
 event_x_valve.node_id,
 event_x_valve.value,
@@ -86,6 +144,7 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_valve.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_valve.node_id::text
 GROUP BY
 event_x_valve.id,
+event.eventcat_id,
 event_x_valve.event_id,
 event_x_valve.node_id,
 event_x_valve.value,
@@ -93,9 +152,27 @@ event_x_valve.observ,
 node.the_geom;
 
 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_valve AS
+SELECT
+event_x_valve.id,
+event.eventcat_id,
+event_x_valve.event_id,
+event_x_valve.node_id,
+event_x_valve.value,
+event_x_valve.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_valve
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_valve.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_valve.node_id::text;
+
+
+
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_pump AS
 SELECT 
 event_x_pump.id,
+event.eventcat_id,
 event_x_pump.event_id,
 event_x_pump.node_id,
 event_x_pump.value,
@@ -107,6 +184,7 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_pump.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_pump.node_id::text
 GROUP BY
 event_x_pump.id,
+event.eventcat_id,
 event_x_pump.event_id,
 event_x_pump.node_id,
 event_x_pump.value,
@@ -114,9 +192,27 @@ event_x_pump.observ,
 node.the_geom;
 
 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_pump AS
+SELECT 
+event_x_pump.id,
+event.eventcat_id,
+event_x_pump.event_id,
+event_x_pump.node_id,
+event_x_pump.value,
+event_x_pump.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_pump
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_pump.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_pump.node_id::text;
+
+
+
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_filter AS
 SELECT 
 event_x_filter.id,
+event.eventcat_id,
 event_x_filter.event_id,
 event_x_filter.node_id,
 event_x_filter.value,
@@ -128,6 +224,7 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_filter.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_filter.node_id::text
 GROUP BY
 event_x_filter.id,
+event.eventcat_id,
 event_x_filter.event_id,
 event_x_filter.node_id,
 event_x_filter.value,
@@ -135,9 +232,28 @@ event_x_filter.observ,
 node.the_geom;
 
 
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_filter AS
+SELECT 
+event_x_filter.id,
+event.eventcat_id,
+event_x_filter.event_id,
+event_x_filter.node_id,
+event_x_filter.value,
+event_x_filter.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_filter
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_filter.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_filter.node_id::text;
+
+
+
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_meter AS
 SELECT 
 event_x_meter.id,
+event.eventcat_id,
 event_x_meter.event_id,
 event_x_meter.node_id,
 event_x_meter.value,
@@ -149,11 +265,29 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_meter.event_id::text
 JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_meter.node_id::text
 GROUP BY
 event_x_meter.id,
+event.eventcat_id,
 event_x_meter.event_id,
 event_x_meter.node_id,
 event_x_meter.value,
 event_x_meter.observ,
 node.the_geom;
+
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_meter AS
+SELECT 
+event_x_meter.id,
+event.eventcat_id,
+event_x_meter.event_id,
+event_x_meter.node_id,
+event_x_meter.value,
+event_x_meter.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_meter
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_meter.event_id::text
+JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_meter.node_id::text;
+
 
 
 
@@ -164,6 +298,7 @@ node.the_geom;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_pipe AS
 SELECT 
 event_x_pipe.id,
+event.eventcat_id,
 event_x_pipe.event_id,
 event_x_pipe.arc_id,
 event_x_pipe.value,
@@ -175,11 +310,27 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_pipe.event_id::text
 JOIN SCHEMA_NAME.arc ON arc.arc_id::text = event_x_pipe.arc_id::text
 GROUP BY
 event_x_pipe.id,
+event.eventcat_id,
 event_x_pipe.event_id,
 event_x_pipe.arc_id,
 event_x_pipe.value,
 event_x_pipe.observ,
 arc.the_geom;
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_pipe AS
+SELECT 
+event_x_pipe.id,
+event.eventcat_id,
+event_x_pipe.event_id,
+event_x_pipe.arc_id,
+event_x_pipe.value,
+event_x_pipe.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_pipe
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_pipe.event_id::text
+JOIN SCHEMA_NAME.arc ON arc.arc_id::text = event_x_pipe.arc_id::text;
 
 
 
@@ -190,6 +341,7 @@ arc.the_geom;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_connec AS
 SELECT 
 event_x_connec.id,
+event.eventcat_id,
 event_x_connec.event_id,
 event_x_connec.connec_id,
 event_x_connec.value,
@@ -201,9 +353,24 @@ JOIN SCHEMA_NAME.event ON event.id::text = event_x_connec.event_id::text
 JOIN SCHEMA_NAME.connec ON connec.connec_id::text = event_x_connec.connec_id::text
 GROUP BY
 event_x_connec.id,
+event.eventcat_id,
 event_x_connec.event_id,
 event_x_connec.connec_id,
 event_x_connec.value,
 event_x_connec.observ,
 connec.the_geom;
 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_connec AS
+SELECT 
+event_x_connec.id,
+event.eventcat_id,
+event_x_connec.event_id,
+event_x_connec.connec_id,
+event_x_connec.value,
+event_x_connec.observ,
+event.user,
+event.date
+FROM SCHEMA_NAME.event_x_connec
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_connec.event_id::text
+JOIN SCHEMA_NAME.connec ON connec.connec_id::text = event_x_connec.connec_id::text;
