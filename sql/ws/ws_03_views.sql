@@ -47,4 +47,37 @@ JOIN SCHEMA_NAME.arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text;
 
 
 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_node AS 
+SELECT
+element_x_node.id,
+element_x_node.node_id,
+element.elementcat_id,
+element_x_node.element_id,
+element.state,
+element.observ,
+element.comment,
+element.builtdate,
+element.enddate
+FROM SCHEMA_NAME.element_x_node
+JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_node.element_id::text;
+
+
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_connec AS
+SELECT
+element_x_connec.id,
+element_x_connec.connec_id,
+element.elementcat_id,
+element_x_connec.element_id,
+element.state,
+element.observ,
+element.comment,
+element.builtdate,
+element.enddate
+FROM SCHEMA_NAME.element_x_connec
+JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_connec.element_id::text;
+
+
+
    
