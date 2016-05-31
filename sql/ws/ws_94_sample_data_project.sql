@@ -3397,7 +3397,7 @@ INSERT INTO "SCHEMA_NAME".rtc_scada_x_dma VALUES (2, '02', 'dma_01', 1);
 INSERT INTO "SCHEMA_NAME".rtc_scada_x_sector VALUES (1, '01', 'sector_01', 1);
 INSERT INTO "SCHEMA_NAME".rtc_scada_x_sector VALUES (2, '02', 'sector_01', 1);
 
-
+UPDATE "SCHEMA_NAME".node SET node_type = cat_node.nodetype_id FROM "SCHEMA_NAME".cat_node WHERE "SCHEMA_NAME".node.nodecat_id = "SCHEMA_NAME".cat_node."id";
 
 SELECT pg_catalog.setval('"SCHEMA_NAME".element_x_node_seq', 52, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".element_x_connec_seq', 52, true);
