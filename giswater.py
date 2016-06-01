@@ -304,7 +304,6 @@ class Giswater(QObject):
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface)
-                self.search_plus.initGui()     
                 self.search_plus.removeMemoryLayers()   
             status = self.search_plus.populateGui()
             self.actions['32'].setEnabled(status) 

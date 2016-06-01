@@ -37,6 +37,7 @@ class SearchPlus(QObject):
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)            
             return False        
         self.settings = QSettings(self.setting_file, QSettings.IniFormat)
+        self.stylesFolder = self.plugin_dir+"/styles/"         
             
         # load plugin settings
         self.loadPluginSettings()      
@@ -60,6 +61,7 @@ class SearchPlus(QObject):
         self.PORTAL_LAYER = self.settings.value('layers/PORTAL_LAYER', '').lower()
         self.PORTAL_FIELD_CODE = self.settings.value('layers/PORTAL_FIELD_CODE', '').lower()
         self.PORTAL_FIELD_NUMBER = self.settings.value('layers/PORTAL_FIELD_NUMBER', '').lower()   
+        self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()         
         
         # get initial Scale
         self.defaultZoomScale = self.settings.value('status/defaultZoomScale', 2500)
@@ -85,7 +87,7 @@ class SearchPlus(QObject):
         ''' Get the translation for a string using Qt translation API '''
         return QCoreApplication.translate('SearchPlus', message)
 
-
+                         
     def populateGui(self):
         ''' Populate the interface with values get from layers '''  
         
@@ -323,15 +325,14 @@ class SearchPlus(QObject):
         self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
         
         # Load style
-        #self.loadStyle(self.portalMemLayer, self.QML_PORTAL)         
+        self.loadStyle(self.portalMemLayer, self.QML_PORTAL)         
           
 
-    def run(self):
-        ''' Run method activated byt the toolbar action button '''         
-        if self.dlg and not self.dlg.isVisible():
-            print "run"
-            self.populateGui()       
-            self.dlg.show()
+    def loadStyle(self, layer, qml):
+    
+        path_qml = self.stylesFolder+qml      
+        if os.path.exists(path_qml): 
+            layer.loadNamedStyle(path_qml)      
             
                 
     def removeMemoryLayers(self):
@@ -341,8 +342,8 @@ class SearchPlus(QObject):
             layer_name = cur_layer.name().lower()         
             if "selected_" in layer_name:
                 QgsMapLayerRegistry.instance().removeMapLayer(cur_layer.id())  
-                
-                 
+                     
+                     
     def unload(self):
         ''' Removes dialog '''       
         if self.dlg:
