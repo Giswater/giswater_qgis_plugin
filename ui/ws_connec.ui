@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="menu">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -1112,7 +1112,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="n_hydrometer">
+    <widget class="QLineEdit" name="n_nhydrometer">
      <property name="geometry">
       <rect>
        <x>380</x>
@@ -2304,7 +2304,7 @@ p, li { white-space: pre-wrap; }
       <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>DAE:</string>
+      <string>IPTU:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -2468,12 +2468,12 @@ p, li { white-space: pre-wrap; }
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
+  <widget class="QLineEdit" name="connec_id">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>61</width>
+     <width>101</width>
      <height>20</height>
     </rect>
    </property>
@@ -2481,65 +2481,38 @@ p, li { white-space: pre-wrap; }
     <string>connec_id</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="connecat_id">
+  <widget class="QComboBox" name="cat_connectype_id">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>130</x>
      <y>20</y>
-     <width>191</width>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_dnom">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <widget class="QLineEdit" name="lineEdit_35">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>450</x>
      <y>20</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="cat_pnom">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>20</y>
-     <width>61</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <italic>true</italic>
+     <italic>false</italic>
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>arc_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_matcat_id">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <widget class="QLineEdit" name="matcat_id">
    <property name="geometry">
     <rect>
-     <x>560</x>
+     <x>580</x>
      <y>20</y>
      <width>111</width>
      <height>20</height>
@@ -2551,16 +2524,44 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>cat_connec.matcat_id</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="cat_connectype_id">
+  <widget class="QComboBox" name="connecat_id_dummy">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>290</x>
      <y>20</y>
      <width>141</width>
-     <height>22</height>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="dnom">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>20</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>cat_connec.dnom</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="connecat_id">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>0</y>
+     <width>141</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>

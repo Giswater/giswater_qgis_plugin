@@ -22,7 +22,6 @@ def init_config():
     # Manage visibility 
     feature_dialog.dialog.findChild(QComboBox, "node_type").setVisible(False)    
     feature_dialog.dialog.findChild(QComboBox, "nodecat_id").setVisible(False)    
-    feature_dialog.dialog.findChild(QComboBox, "epa_type").setEnabled(False)     
     
     # Manage 'nodecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id")
@@ -36,7 +35,8 @@ def init_config():
     feature_dialog.dialog.findChild(QComboBox, "node_type_dummy").activated.connect(feature_dialog.change_node_type_id)  
     feature_dialog.change_node_type_id(-1)  
       
-    # Set button signals      
+    # Set 'epa_type' and button signals      
+    feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)  
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
 
@@ -63,6 +63,7 @@ class NodeDialog(ParentDialog):
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
         self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")         
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")            
              
         # Manage tab visibility
         self.set_tabs_visibility()
@@ -81,8 +82,13 @@ class NodeDialog(ParentDialog):
         
     
     def set_tabs_visibility(self):
-        ''' Hide some 'tabs' depending 'epa_type' '''
+        ''' Hide some tabs '''
         
+        self.tab_main.removeTab(7)      
+        self.tab_main.removeTab(4)      
+        self.tab_main.removeTab(2) 
+             
+        # Hide some tabs depending 'epa_type'
         man_visible = False
         index_tab = 0      
         if self.epa_type == 'JUNCTION':
@@ -119,7 +125,8 @@ class NodeDialog(ParentDialog):
             self.tab_analysis.removeTab(0)    
         self.tab_event.tabBar().moveTab(index_tab, 6);
         for i in range(0, self.tab_event.count() - 1):
-            self.tab_event.removeTab(0)           
+            self.tab_event.removeTab(0)      
+            
             
    
     def load_tab_add_info(self):
@@ -239,6 +246,9 @@ class NodeDialog(ParentDialog):
             node_type_type = row[0]
             sql = "SELECT id FROM "+self.schema_name+".node_type"
             sql+= " WHERE type = '"+node_type_type+"' ORDER BY id"
+            sql = "SELECT node_type.id"
+            sql+= " FROM "+self.schema_name+".node_type INNER JOIN "+self.schema_name+".cat_node ON node_type.id = cat_node.nodetype_id"
+            sql+= " WHERE type = '"+node_type_type+"' GROUP BY node_type.id ORDER BY node_type.id"
             rows = self.dao.get_rows(sql)              
             utils_giswater.fillComboBox("node_type_dummy", rows, False)
             utils_giswater.setWidgetText("node_type_dummy", self.node_type)
@@ -264,9 +274,8 @@ class NodeDialog(ParentDialog):
         utils_giswater.setWidgetText("nodecat_id", nodecat_id_dummy)           
         
                 
-    def change_node_type_refresh(self, index):
-        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
-        node_type = utils_giswater.getWidgetText("node_type", False)
+    def change_epa_type(self, index):
+        ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
   
