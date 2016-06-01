@@ -5,6 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-INSERT INTO "SCHEMA_NAME"."config" VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false);
+-- ----------------------------
+-- Records of rtc_value_coefficient
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."rtc_value_coefficient" VALUES ('MAX');
+INSERT INTO "SCHEMA_NAME"."rtc_value_coefficient" VALUES ('AVG');
+INSERT INTO "SCHEMA_NAME"."rtc_value_coefficient" VALUES ('MIN');
 
 

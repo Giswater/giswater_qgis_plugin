@@ -5,6 +5,14 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-INSERT INTO "SCHEMA_NAME"."config" VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false);
+-- ----------------------------
+-- Default values of sector selection
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."inp_selector_sector" VALUES ('sector_01');
 
+
+-- ----------------------------
+-- Default values of period selection
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."rtc_selector_period" VALUES ('5');
 
