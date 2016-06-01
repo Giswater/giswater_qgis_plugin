@@ -22,7 +22,6 @@ def init_config():
     # Manage visibility 
     feature_dialog.dialog.findChild(QComboBox, "node_type").setVisible(False)    
     feature_dialog.dialog.findChild(QComboBox, "nodecat_id").setVisible(False)    
-    feature_dialog.dialog.findChild(QComboBox, "epa_type").setEnabled(False)     
     
     # Manage 'nodecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id")
@@ -36,7 +35,8 @@ def init_config():
     feature_dialog.dialog.findChild(QComboBox, "node_type_dummy").activated.connect(feature_dialog.change_node_type_id)  
     feature_dialog.change_node_type_id(-1)  
       
-    # Set button signals      
+    # Set 'epa_type' and button signals      
+    feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)  
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
 
@@ -61,6 +61,7 @@ class NodeDialog(ParentDialog):
         self.epa_type = utils_giswater.getWidgetText("epa_type", False)      
         
         # Get widget controls
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")            
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
         self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")         
              
@@ -119,7 +120,7 @@ class NodeDialog(ParentDialog):
             self.tab_analysis.removeTab(0)    
         self.tab_event.tabBar().moveTab(index_tab, 6);
         for i in range(0, self.tab_event.count() - 1):
-            self.tab_event.removeTab(0)           
+            self.tab_event.removeTab(0)      
             
    
     def load_tab_add_info(self):
@@ -264,9 +265,8 @@ class NodeDialog(ParentDialog):
         utils_giswater.setWidgetText("nodecat_id", nodecat_id_dummy)           
         
                 
-    def change_node_type_refresh(self, index):
-        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
-        node_type = utils_giswater.getWidgetText("node_type", False)
+    def change_epa_type(self, index):
+        ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
   
