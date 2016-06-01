@@ -61,9 +61,9 @@ class NodeDialog(ParentDialog):
         self.epa_type = utils_giswater.getWidgetText("epa_type", False)      
         
         # Get widget controls
-        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")            
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
         self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")         
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")            
              
         # Manage tab visibility
         self.set_tabs_visibility()
@@ -82,8 +82,13 @@ class NodeDialog(ParentDialog):
         
     
     def set_tabs_visibility(self):
-        ''' Hide some 'tabs' depending 'epa_type' '''
+        ''' Hide some tabs '''
         
+        self.tab_main.removeTab(7)      
+        self.tab_main.removeTab(4)      
+        self.tab_main.removeTab(2) 
+             
+        # Hide some tabs depending 'epa_type'
         man_visible = False
         index_tab = 0      
         if self.epa_type == 'JUNCTION':
@@ -121,6 +126,7 @@ class NodeDialog(ParentDialog):
         self.tab_event.tabBar().moveTab(index_tab, 6);
         for i in range(0, self.tab_event.count() - 1):
             self.tab_event.removeTab(0)      
+            
             
    
     def load_tab_add_info(self):

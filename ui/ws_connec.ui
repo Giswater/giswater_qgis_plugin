@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="menu">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1015,7 +1015,7 @@
      </property>
      <property name="date">
       <date>
-       <year>2000</year>
+       <year>2016</year>
        <month>1</month>
        <day>1</day>
       </date>
@@ -2527,7 +2527,7 @@ p, li { white-space: pre-wrap; }
     <string>cat_connec.matcat_id</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="conneccat_id_dummy">
+  <widget class="QComboBox" name="connecat_id_dummy">
    <property name="geometry">
     <rect>
      <x>290</x>
@@ -2555,7 +2555,7 @@ p, li { white-space: pre-wrap; }
     <string>cat_connec.dnom</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="conneccat_id">
+  <widget class="QComboBox" name="connecat_id">
    <property name="geometry">
     <rect>
      <x>290</x>
