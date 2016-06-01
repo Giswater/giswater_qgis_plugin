@@ -177,7 +177,10 @@ class Giswater(QObject):
         
         # Get table or view related with 'arc' and 'node'
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
-        self.table_node = self.settings.value('db/table_node', 'v_edit_node')        
+        self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
+        
+        # Get SRID
+        self.srid = self.settings.value('status/srid')             
                 
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
@@ -303,7 +306,7 @@ class Giswater(QObject):
         # Create SearchPlus object
         try:
             if self.search_plus is None:
-                self.search_plus = SearchPlus(self.iface)
+                self.search_plus = SearchPlus(self.iface, self.srid)
                 self.search_plus.removeMemoryLayers()   
             status = self.search_plus.populateGui()
             self.actions['32'].setEnabled(status) 

@@ -11,11 +11,11 @@ from search_plus_dockwidget import SearchPlusDockWidget
 class SearchPlus(QObject):
 
 
-    def __init__(self, iface):
+    def __init__(self, iface, srid):
         ''' Constructor '''
         
-        # Save reference to the QGIS interface
         self.iface = iface
+        self.srid = srid
         
         # initialize plugin directory and locale
         self.plugin_dir = os.path.dirname(__file__)
@@ -61,7 +61,7 @@ class SearchPlus(QObject):
         self.PORTAL_LAYER = self.settings.value('layers/PORTAL_LAYER', '').lower()
         self.PORTAL_FIELD_CODE = self.settings.value('layers/PORTAL_FIELD_CODE', '').lower()
         self.PORTAL_FIELD_NUMBER = self.settings.value('layers/PORTAL_FIELD_NUMBER', '').lower()   
-        self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()         
+        self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()            
         
         # get initial Scale
         self.defaultZoomScale = self.settings.value('status/defaultZoomScale', 2500)
@@ -242,7 +242,7 @@ class SearchPlus(QObject):
         
         # Create memory layer if not already set
         if mem_layer is None: 
-            uri = geom_type+"?crs=epsg:25831" 
+            uri = geom_type+"?crs=epsg:"+self.srid 
             mem_layer = QgsVectorLayer(uri, "selected_"+layer.name(), "memory")                     
          
             # Copy attributes from main layer to memory layer
