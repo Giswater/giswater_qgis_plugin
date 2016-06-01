@@ -22,6 +22,7 @@ from line_map_tool import LineMapTool
 from point_map_tool import PointMapTool
 from controller import DaoController
 from map_tools.move_node import MoveNode
+from search.search_plus import SearchPlus
 
 
 class Giswater(QObject):
@@ -66,6 +67,7 @@ class Giswater(QObject):
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
+        self.search_plus = None
         
         # {function_name, map_tool}
         self.map_tools = {}
@@ -123,7 +125,7 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20, 26):    
+                if int(index_action) in (17, 20, 26, 32):    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 else:        
@@ -233,51 +235,15 @@ class Giswater(QObject):
             self.ag_ed = QActionGroup(parent);
             for i in range(30,36):
                 self.add_action(str(i), self.toolbar_ed, self.ag_ed)
-        
+                
         # Project initialization
         self.project_read()               
-            
-        # Menu entries
-        '''
-        self.create_action(None, self.tr('New network'), None, self.menu_name, False)
-        self.create_action(None, self.tr('Copy network as'), None, self.menu_name, False)
-            
-        self.menu_network_configuration = QMenu(self.tr('Network configuration'))
-        action1 = self.create_action(None, self.tr('Snapping tolerance'), None, None, False)               
-        action2 = self.create_action(None, self.tr('Node tolerance'), None, None, False)         
-        self.menu_network_configuration.addAction(action1)
-        self.menu_network_configuration.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_network_configuration.menuAction())  
-           
-        self.menu_network_management = QMenu(self.tr('Network management'))
-        action1 = self.create_action('21', self.tr('Table wizard'), None, None, False)               
-        action2 = self.create_action('22', self.tr('Undo wizard'), None, None, False)         
-        self.menu_network_management.addAction(action1)
-        self.menu_network_management.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_network_management.menuAction())         
-           
-        self.menu_analysis = QMenu(self.tr('Analysis'))          
-        action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
-        action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
-        action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
-        self.menu_analysis.addAction(action2)
-        self.menu_analysis.addAction(action3)
-        self.menu_analysis.addAction(action4)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
-         
-        self.menu_go2epa = QMenu(self.tr('Go2Epa'))
-        action1 = self.create_action('23', self.tr('Giswater interface'), None, None, False)               
-        action2 = self.create_action('24', self.tr('Run simulation'), None, None, False)         
-        self.menu_go2epa.addAction(action1)
-        self.menu_go2epa.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
-        '''
+
 
     def unload(self):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         for action_index, action in self.actions.iteritems():
-            #self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
-            #self.iface.removePluginMenu(self.menu_name, action)
+            self.iface.removePluginMenu(self.menu_name, action)
             self.iface.removeToolBarIcon(action)
         if self.toolbar_ud_enabled:    
             del self.toolbar_ud
@@ -287,6 +253,8 @@ class Giswater(QObject):
             del self.toolbar_mg
         if self.toolbar_ed_enabled:    
             del self.toolbar_ed
+            if self.search_plus is not None:
+                self.search_plus.unload()
             
     
     
@@ -294,7 +262,7 @@ class Giswater(QObject):
             
     def disable_actions(self):
         ''' Utility to disable all actions '''
-        for i in range(1,40):
+        for i in range(1,30):
             key = str(i).zfill(2)
             if key in self.actions:
                 action = self.actions[key]
@@ -331,6 +299,19 @@ class Giswater(QObject):
         # Disable toolbar actions and manage current layer selected
         self.disable_actions()       
         self.current_layer_changed(self.iface.activeLayer())   
+        
+        # Create SearchPlus object
+        try:
+            if self.search_plus is None:
+                self.search_plus = SearchPlus(self.iface)
+                self.search_plus.removeMemoryLayers()   
+            status = self.search_plus.populateGui()
+            self.actions['32'].setEnabled(status) 
+            self.actions['32'].setCheckable(False) 
+            if not status:
+                self.search_plus.dlg.setVisible(False)                     
+        except:
+            pass       
                                
                                
     def current_layer_changed(self, layer):
@@ -404,8 +385,16 @@ class Giswater(QObject):
             self.showWarning("AttributeError: "+str(e))            
         except KeyError as e:
             self.showWarning("KeyError: "+str(e))   
-                                 
+            
+                                            
                                                    
+    ''' Edit bar functions '''  
+    def ed_search_plus(self):   
+        if self.search_plus is not None:
+            #self.iface.mainWindow().addDockWidget(Qt.TopDockWidgetArea, self.search_plus.dlg)
+            self.search_plus.dlg.setVisible(True)            
+             
+                                  
     ''' Management bar functions '''                                
         
     def mg_delete_node(self):
