@@ -246,6 +246,9 @@ class NodeDialog(ParentDialog):
             node_type_type = row[0]
             sql = "SELECT id FROM "+self.schema_name+".node_type"
             sql+= " WHERE type = '"+node_type_type+"' ORDER BY id"
+            sql = "SELECT node_type.id"
+            sql+= " FROM "+self.schema_name+".node_type INNER JOIN "+self.schema_name+".cat_node ON node_type.id = cat_node.nodetype_id"
+            sql+= " WHERE type = '"+node_type_type+"' GROUP BY node_type.id ORDER BY node_type.id"
             rows = self.dao.get_rows(sql)              
             utils_giswater.fillComboBox("node_type_dummy", rows, False)
             utils_giswater.setWidgetText("node_type_dummy", self.node_type)
