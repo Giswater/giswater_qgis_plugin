@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from qgis.utils import active_plugins
-from qgis.gui import QgsMessageBar, QgsTextAnnotationItem
-from qgis.core import QgsCredentials, QgsDataSourceURI, QgsGeometry, QgsPoint, QgsMessageLog, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer
+from qgis.gui import QgsMessageBar
+from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer
 from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt, pyqtSignal, QPyNullVariant
-from PyQt4.QtGui import QAction, QIcon, QDockWidget, QTextDocument, QIntValidator
 
 import operator
 import os.path
@@ -43,11 +41,13 @@ class SearchPlus(QObject):
         # load plugin settings
         self.loadPluginSettings()      
         
-        # Declare instance attributes
-        self.actions = []
-        self.streetLayer = None   
-        self.portalLayer = None           
-        self.portalMemLayer = None    
+        # create dialog
+        self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
+        
+        # set signals
+        self.dlg.cboStreet.currentIndexChanged.connect(self.getStreetNumbers)
+        self.dlg.cboStreet.currentIndexChanged.connect(self.zoomOnStreet)
+        self.dlg.cboNumber.currentIndexChanged.connect(self.displayStreetData)        
     
     
     def loadPluginSettings(self):
@@ -59,7 +59,7 @@ class SearchPlus(QObject):
         self.STREET_FIELD_NAME = self.settings.value('layers/STREET_FIELD_NAME', '').lower()
         self.PORTAL_LAYER = self.settings.value('layers/PORTAL_LAYER', '').lower()
         self.PORTAL_FIELD_CODE = self.settings.value('layers/PORTAL_FIELD_CODE', '').lower()
-        self.PORTAL_FIELD_NUMBER = self.settings.value('layers/PORTAL_FIELD_NUMBER', '').lower()    
+        self.PORTAL_FIELD_NUMBER = self.settings.value('layers/PORTAL_FIELD_NUMBER', '').lower()   
         
         # get initial Scale
         self.defaultZoomScale = self.settings.value('status/defaultZoomScale', 2500)
@@ -69,7 +69,8 @@ class SearchPlus(QObject):
         ''' Iterate over all layers to get the ones set in config file '''
         
         self.streetLayer = None
-        self.portalLayer = None
+        self.portalLayer = None     
+        self.portalMemLayer = None            
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:            
             name = cur_layer.name().lower()
@@ -85,21 +86,6 @@ class SearchPlus(QObject):
         return QCoreApplication.translate('SearchPlus', message)
 
 
-    def initGui(self):
-        ''' Create the dock widget and dock it but hide it waiting the ond of qgis loading '''
-        
-        self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-        self.iface.mainWindow().addDockWidget(Qt.TopDockWidgetArea, self.dlg)
-        self.dlg.setVisible(True)
-        
-        # add first level combo box events
-        self.dlg.cboStreet.currentIndexChanged.connect(self.getStreetNumbers)
-        self.dlg.cboStreet.currentIndexChanged.connect(self.zoomOnStreet)
-        
-        # add events to show information o the canvas
-        self.dlg.cboNumber.currentIndexChanged.connect(self.displayStreetData)
-            
-                 
     def populateGui(self):
         ''' Populate the interface with values get from layers '''  
         
@@ -113,15 +99,15 @@ class SearchPlus(QObject):
         self.getLayers()       
                 
         # tab Streets      
-        self.populateStreets()
+        status = self.populateStreets()
+        return status
         
                     
     def populateStreets(self):
         
         # Check if we have this search option available
-        if self.streetLayer is None or self.portalLayer is None:
-            self.dlg.searchPlusTabMain.removeTab(0)  
-            return
+        if self.streetLayer is None or self.portalLayer is None:  
+            return False
 
         # Get layer features
         layer = self.streetLayer
@@ -147,6 +133,8 @@ class SearchPlus(QObject):
             record = records_sorted[i]
             self.dlg.cboStreet.addItem(record[1], record)
         self.dlg.cboStreet.blockSignals(False)    
+        
+        return True
         
                  
     def zoomOnStreet(self):
@@ -186,7 +174,7 @@ class SearchPlus(QObject):
         records = [[-1, '']]
         
         # Set filter expression
-        layer = self.portalLayer       
+        layer = self.portalLayer  
         idx_field_code = layer.fieldNameIndex(self.PORTAL_FIELD_CODE)            
         idx_field_number = layer.fieldNameIndex(self.PORTAL_FIELD_NUMBER)   
         aux = self.PORTAL_FIELD_CODE+"='"+str(code)+"'" 
@@ -337,28 +325,27 @@ class SearchPlus(QObject):
         # Load style
         #self.loadStyle(self.portalMemLayer, self.QML_PORTAL)         
           
-    
+
     def run(self):
         ''' Run method activated byt the toolbar action button '''         
         if self.dlg and not self.dlg.isVisible():
             print "run"
             self.populateGui()       
             self.dlg.show()
-    
-    
+            
+                
     def removeMemoryLayers(self):
         ''' Iterate over all layers and remove memory ones '''         
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:     
             layer_name = cur_layer.name().lower()         
             if "selected_" in layer_name:
-                QgsMapLayerRegistry.instance().removeMapLayer(cur_layer.id())   
-                     
-                     
+                QgsMapLayerRegistry.instance().removeMapLayer(cur_layer.id())  
+                
+                 
     def unload(self):
         ''' Removes dialog '''       
         if self.dlg:
             self.dlg.deleteLater()
-            del self.dlg
-            
+            del self.dlg            
                                                          

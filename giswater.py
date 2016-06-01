@@ -67,6 +67,7 @@ class Giswater(QObject):
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
+        self.search_plus = None
         
         # {function_name, map_tool}
         self.map_tools = {}
@@ -237,7 +238,7 @@ class Giswater(QObject):
                 
         # Project initialization
         self.project_read()               
-
+                
 
     def unload(self):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
@@ -300,9 +301,18 @@ class Giswater(QObject):
         self.current_layer_changed(self.iface.activeLayer())   
         
         # Create SearchPlus object
-        self.search_plus = SearchPlus(self.iface)
-        self.search_plus.initGui()     
-        self.search_plus.populateGui()           
+        try:
+            if self.search_plus is None:
+                self.search_plus = SearchPlus(self.iface)
+                self.search_plus.initGui()     
+                self.search_plus.removeMemoryLayers()   
+            status = self.search_plus.populateGui()
+            self.actions['32'].setEnabled(status) 
+            self.actions['32'].setCheckable(False) 
+            if not status:
+                self.search_plus.dlg.setVisible(False)                     
+        except:
+            pass       
                                
                                
     def current_layer_changed(self, layer):
@@ -382,7 +392,8 @@ class Giswater(QObject):
     ''' Edit bar functions '''  
     def ed_search_plus(self):   
         if self.search_plus is not None:
-            print "ed_search_plus"
+            #self.iface.mainWindow().addDockWidget(Qt.TopDockWidgetArea, self.search_plus.dlg)
+            self.search_plus.dlg.setVisible(True)            
              
                                   
     ''' Management bar functions '''                                
