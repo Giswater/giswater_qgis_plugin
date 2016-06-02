@@ -26,6 +26,14 @@ BEGIN
             NEW.node_id:= (SELECT nextval('node_id_seq'));
         END IF;
 
+        -- Node type
+        IF (NEW.node_type IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+                RAISE EXCEPTION '[%]: There are no nodes types defined in the model, define at least one.', TG_NAME;
+            END IF;
+            NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+        END IF;
+
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
@@ -55,8 +63,8 @@ BEGIN
             END IF;            
         END IF;
         
-        -- FEATURE INSERT
-        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+        -- FEATURE INSERT      
+        INSERT INTO node VALUES (NEW.node_id, NEW.elevation, NEW."depth", NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
@@ -70,8 +78,8 @@ BEGIN
         END IF;
         IF inp_table IS NOT NULL THEN        
             v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+            EXECUTE v_sql;
         END IF;
-        EXECUTE v_sql;
 
         -- MANAGEMENT INSERT
         man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
@@ -119,8 +127,8 @@ BEGIN
             END IF;
             IF inp_table IS NOT NULL THEN
                 v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+                EXECUTE v_sql;
             END IF;
-            EXECUTE v_sql;
 
         END IF;
 
@@ -133,7 +141,7 @@ BEGIN
         END IF;
 
         UPDATE node 
-        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
+        SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
@@ -149,7 +157,7 @@ BEGIN
         RETURN NULL;
    
     END IF;
-
+    
 END;
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100

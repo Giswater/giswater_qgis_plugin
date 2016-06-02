@@ -18,18 +18,27 @@ def formOpen(dialog, layer, feature):
 
     
 def init_config():
-     
+    
+    # Manage visibility 
+    feature_dialog.dialog.findChild(QComboBox, "node_type").setVisible(False)    
     feature_dialog.dialog.findChild(QComboBox, "nodecat_id").setVisible(False)    
+    
+    # Manage 'nodecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id")
-    feature_dialog.change_node_type()  
-    feature_dialog.dialog.findChild(QComboBox, "cat_nodetype_id").activated.connect(feature_dialog.change_node_type)    
     feature_dialog.dialog.findChild(QComboBox, "nodecat_id_dummy").activated.connect(feature_dialog.change_node_cat)          
     utils_giswater.setSelectedItem("nodecat_id_dummy", nodecat_id)   
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
     
-    feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)    
+    # Manage 'node_type'
+    node_type_id = utils_giswater.getWidgetText("node_type")
+    utils_giswater.setSelectedItem("node_type_dummy", node_type_id)   
+    feature_dialog.dialog.findChild(QComboBox, "node_type_dummy").activated.connect(feature_dialog.change_node_type_id)  
+    feature_dialog.change_node_type_id(-1)  
+      
+    # Set 'epa_type' and button signals      
+    feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)  
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
-    feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)        
+    feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
 
 
      
@@ -46,12 +55,15 @@ class NodeDialog(ParentDialog):
         
         # Define class variables
         self.field_id = "node_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)
-        self.epa_type = utils_giswater.getWidgetText("epa_type", False)        
+        self.id = utils_giswater.getWidgetText(self.field_id, False)  
+        self.node_type = utils_giswater.getWidgetText("node_type", False)        
+        self.nodecat_id = utils_giswater.getWidgetText("nodecat_id", False)        
+        self.epa_type = utils_giswater.getWidgetText("epa_type", False)      
         
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
         self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")         
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")            
              
         # Manage tab visibility
         self.set_tabs_visibility()
@@ -59,8 +71,8 @@ class NodeDialog(ParentDialog):
         # Manage i18n
         self.translate_form('ws_node')        
         
-        # Fill combo 'node type' from 'epa_type'
-        self.fill_node_type()
+        # Define and execute query to populate combo 'node_type_dummy'
+        self.fill_node_type_id()
         
         # Load data from related tables
         self.load_data()
@@ -70,8 +82,13 @@ class NodeDialog(ParentDialog):
         
     
     def set_tabs_visibility(self):
-        ''' Hide some 'tabs' depending 'epa_type' '''
+        ''' Hide some tabs '''
         
+        self.tab_main.removeTab(7)      
+        self.tab_main.removeTab(4)      
+        self.tab_main.removeTab(2) 
+             
+        # Hide some tabs depending 'epa_type'
         man_visible = False
         index_tab = 0      
         if self.epa_type == 'JUNCTION':
@@ -108,7 +125,8 @@ class NodeDialog(ParentDialog):
             self.tab_analysis.removeTab(0)    
         self.tab_event.tabBar().moveTab(index_tab, 6);
         for i in range(0, self.tab_event.count() - 1):
-            self.tab_event.removeTab(0)           
+            self.tab_event.removeTab(0)      
+            
             
    
     def load_tab_add_info(self):
@@ -218,36 +236,46 @@ class NodeDialog(ParentDialog):
         
     ''' Slot functions '''  
     
-    def fill_node_type(self):
-        ''' Define and execute query to populate combo 'cat_nodetype_id' '''
-        cat_nodetype_id = utils_giswater.getWidgetText("cat_nodetype_id", False)     
-        sql = "SELECT id, man_table, epa_table FROM "+self.schema_name+".node_type"
-        sql+= " WHERE epa_default = '"+self.epa_type+"' ORDER BY id"
-        rows = self.dao.get_rows(sql)     
-        utils_giswater.fillComboBox("cat_nodetype_id", rows)
-        utils_giswater.setWidgetText("cat_nodetype_id", cat_nodetype_id)
-            
-            
-    def change_node_type(self):
-        ''' Define and execute query to populate combo 'nodecat_id_dummy' '''
-        cat_nodetype_id = utils_giswater.getWidgetText("cat_nodetype_id", True)    
-        sql = "SELECT id FROM "+self.schema_name+".cat_node"
-        sql+= " WHERE nodetype_id = "+cat_nodetype_id+" ORDER BY id"   
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodecat_id_dummy", rows, False)  
-        # Select first item by default
-        self.change_node_cat()       
+    def fill_node_type_id(self):
+        ''' Define and execute query to populate combo 'node_type_dummy' '''
+        # Get node_type.type from node_type.id
+        sql = "SELECT type FROM "+self.schema_name+".node_type"
+        sql+= " WHERE id = '"+self.node_type+"'"
+        row = self.dao.get_row(sql)
+        if row: 
+            node_type_type = row[0]
+            sql = "SELECT id FROM "+self.schema_name+".node_type"
+            sql+= " WHERE type = '"+node_type_type+"' ORDER BY id"
+            sql = "SELECT node_type.id"
+            sql+= " FROM "+self.schema_name+".node_type INNER JOIN "+self.schema_name+".cat_node ON node_type.id = cat_node.nodetype_id"
+            sql+= " WHERE type = '"+node_type_type+"' GROUP BY node_type.id ORDER BY node_type.id"
+            rows = self.dao.get_rows(sql)              
+            utils_giswater.fillComboBox("node_type_dummy", rows, False)
+            utils_giswater.setWidgetText("node_type_dummy", self.node_type)
         
+        
+    def change_node_type_id(self, index):
+        ''' Define and execute query to populate combo 'cat_nodetype_id' '''
+        node_type_id = utils_giswater.getWidgetText("node_type_dummy", False)    
+        if node_type_id:        
+            utils_giswater.setWidgetText("node_type", node_type_id)    
+            sql = "SELECT id FROM "+self.schema_name+".cat_node"
+            sql+= " WHERE nodetype_id = '"+node_type_id+"' ORDER BY id"
+            rows = self.dao.get_rows(sql)    
+            utils_giswater.fillComboBox("nodecat_id_dummy", rows, False)    
+            if index == -1:  
+                utils_giswater.setWidgetText("nodecat_id_dummy", self.nodecat_id)    
+            self.change_node_cat()
+                           
                        
     def change_node_cat(self):
         ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
-        dummy = utils_giswater.getWidgetText("nodecat_id_dummy")
-        utils_giswater.setWidgetText("nodecat_id", dummy)           
+        nodecat_id_dummy = utils_giswater.getWidgetText("nodecat_id_dummy")
+        utils_giswater.setWidgetText("nodecat_id", nodecat_id_dummy)           
         
                 
     def change_epa_type(self, index):
-        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
-        epa_type = utils_giswater.getWidgetText("epa_type", False)
+        ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
   

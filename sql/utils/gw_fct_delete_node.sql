@@ -1,6 +1,5 @@
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_delete_node(node_id_arg character varying) RETURNS integer AS $BODY$
 DECLARE
-
     epa_type_aux	varchar;
     rec_aux		record;
     intersect_loc	double precision;
@@ -63,7 +62,6 @@ BEGIN
 
                 arc_geom := ST_MakeLine(pointArray2);
 
-
                 -- Cascade bug
                 DELETE FROM event_x_junction WHERE node_id = node_id_arg;
                 DELETE FROM event_x_pipe WHERE arc_id = myRecord1.arc_id OR arc_id = myRecord2.arc_id;
@@ -106,7 +104,6 @@ BEGIN
             RETURN 3;
         END IF;
 
-
     -- The arc_id was not found
     ELSE 
         RAISE EXCEPTION 'Nonexistent node ID --> %', node_id_arg
@@ -114,9 +111,7 @@ BEGIN
         RETURN 1;
     END IF;
 
-
     RETURN 0;
-
 
 END;
 $BODY$

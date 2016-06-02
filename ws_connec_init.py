@@ -44,6 +44,14 @@ class ConnecDialog(ParentDialog):
         self.field_id = "connec_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)     
         
+        # Get widget controls
+        self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
+        self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")         
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")     
+        
+        # Manage tab visibility
+        self.set_tabs_visibility()                
+        
         # Manage i18n
         self.translate_form('ws_connec')        
         
@@ -56,5 +64,9 @@ class ConnecDialog(ParentDialog):
                      
                     
     ''' TODO: Slot functions '''  
+    
+    def set_tabs_visibility(self):
+        ''' Hide some tabs '''     
+        self.tab_main.removeTab(3)                 
          
 

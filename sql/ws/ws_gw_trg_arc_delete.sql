@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".ws_gw_trg_arc_delete() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
-
-	rec		record;
-	numArcs		integer;
+    rec record;
+    numArcs integer;
+    
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -21,15 +21,14 @@ BEGIN
     IF rec.orphannode_delete THEN
     
         SELECT count(*) INTO numArcs FROM arc WHERE node_1 = OLD.node_1 OR node_2 = OLD.node_1;
-	IF numArcs = 0 THEN
-
-	    DELETE FROM node WHERE node_id = OLD.node_1;
-	END IF;
+        IF numArcs = 0 THEN
+            DELETE FROM node WHERE node_id = OLD.node_1;
+        END IF;
 
         SELECT count(*) INTO numArcs FROM arc WHERE node_1 = OLD.node_2 OR node_2 = OLD.node_2;
-	IF numArcs = 0 THEN
-	    DELETE FROM node WHERE node_id = OLD.node_2;
-	END IF;
+        IF numArcs = 0 THEN
+            DELETE FROM node WHERE node_id = OLD.node_2;
+        END IF;
 
     END IF;
 
@@ -37,6 +36,7 @@ BEGIN
 
 END;
 $$;
+
 
 CREATE TRIGGER gw_trg_arc_delete AFTER DELETE ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."ws_gw_trg_arc_delete"();

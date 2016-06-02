@@ -47,11 +47,14 @@ class ArcDialog(ParentDialog):
         # Define class variables
         self.field_id = "arc_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)
-        self.epa_type = utils_giswater.getWidgetText("epa_type", False)        
+        self.epa_type = utils_giswater.getWidgetText("epa_type", False)    
+        if self.epa_type == 'PIPE':
+            self.epa_table = 'inp_pipe'
         
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
-        self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")         
+        self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")   
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")                   
              
         # Manage tab visibility
         self.set_tabs_visibility()
@@ -70,11 +73,13 @@ class ArcDialog(ParentDialog):
 
 
     def set_tabs_visibility(self):
-        ''' Hide some 'tabs' depending 'epa_type' '''
-          
-        if self.epa_type == 'PIPE':
-            self.epa_table = 'inp_pipe'
-                           
+        ''' Hide some tabs '''
+            
+        self.tab_main.removeTab(7)      
+        self.tab_main.removeTab(4)      
+        self.tab_main.removeTab(2)      
+        self.tab_main.removeTab(1)      
+            
    
     def load_tab_analysis(self):
         ''' Load data from tab 'Analysis' '''

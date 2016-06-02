@@ -10,11 +10,12 @@ This version of Giswater is provided by Giswater Association
 ----------------------------
 
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_node AS
-SELECT node.node_id, 
+SELECT 
+node.node_id, 
 node.elevation, 
 node.depth, 
+node.node_type,
 node.nodecat_id,
-cat_node.nodetype_id AS "cat_nodetype_id",
 cat_node.matcat_id AS "cat_matcat_id",
 cat_node.pnom AS "cat_pnom",
 cat_node.dnom AS "cat_dnom",
@@ -46,7 +47,8 @@ FROM ("SCHEMA_NAME".node LEFT JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)
 
 
 CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
-SELECT arc.arc_id,
+SELECT 
+arc.arc_id,
 arc.node_1,
 arc.node_2,
 arc.arccat_id, 
@@ -113,14 +115,18 @@ connec.ownercat_id,
 connec.adress_01,
 connec.adress_02,
 connec.adress_03,
+connec.streetaxis_id,
+streetaxis.name,
+connec.postnumber,
 connec.descript,
 cat_connec.svg AS "cat_svg",
 connec.rotation,
 connec.link,
 connec.verified,
 connec.the_geom
-FROM ("SCHEMA_NAME".connec LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text)));
-
+FROM ("SCHEMA_NAME".connec 
+LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
+LEFT JOIN "SCHEMA_NAME".streetaxis ON (((connec.streetaxis_id)::text = (streetaxis.id)::text)));
 
 
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS

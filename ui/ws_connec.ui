@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="menu">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -2527,7 +2527,11 @@ p, li { white-space: pre-wrap; }
     <string>cat_connec.matcat_id</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QComboBox" name="conneccat_id_dummy">
+=======
+  <widget class="QComboBox" name="connecat_id_dummy">
+>>>>>>> 0ec364491b202d32e39b4df173acad2e550fb2e3
    <property name="geometry">
     <rect>
      <x>290</x>
@@ -2555,7 +2559,11 @@ p, li { white-space: pre-wrap; }
     <string>cat_connec.dnom</string>
    </property>
   </widget>
+<<<<<<< HEAD
   <widget class="QComboBox" name="conneccat_id">
+=======
+  <widget class="QComboBox" name="connecat_id">
+>>>>>>> 0ec364491b202d32e39b4df173acad2e550fb2e3
    <property name="geometry">
     <rect>
      <x>290</x>
