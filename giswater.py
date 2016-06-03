@@ -18,8 +18,8 @@ import os.path
 import sys  
 from functools import partial
 
-from line_map_tool import LineMapTool
-from point_map_tool import PointMapTool
+from map_tools.line_map_tool import LineMapTool
+from map_tools.point_map_tool import PointMapTool
 from controller import DaoController
 from map_tools.move_node import MoveNode
 
