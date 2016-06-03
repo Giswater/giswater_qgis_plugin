@@ -4,21 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-
---
--- TOC entry 10 (class 2615 OID 151924)
--- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA "SCHEMA_NAME";
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
-
 -- ----------------------------
 -- Sequences
 -- --------------------------
@@ -105,6 +90,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_x_connec_seq"
 
 
 
+
 -- ----------------------------
 -- Table: system structure 
 -- ----------------------------
@@ -157,6 +143,7 @@ CREATE TABLE "SCHEMA_NAME"."config" (
 "nodeinsert_catalog_vdefault" varchar (30),
 "orphannode_delete" boolean,
 "vnode_update_tolerance" double precision,
+"nodetype_change_enabled" boolean,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
@@ -333,25 +320,6 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_type_street" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
-CONSTRAINT man_type_street_pkey PRIMARY KEY (id)
-);
-
-
--- ----------------------------
--- Table: GIS environment
--- ----------------------------
-
-CREATE TABLE "SCHEMA_NAME"."streetaxis" (
-"id" varchar (16) NOT NULL,
-"type" varchar(18),
-"name" varchar(100),
-"text" text,
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
-CONSTRAINT streeaxis_pkey PRIMARY KEY (id)
-);
 
 
 
@@ -448,6 +416,8 @@ CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 );
 
 
+
+
 CREATE TABLE "SCHEMA_NAME"."connec" (
 "connec_id" varchar (16) DEFAULT nextval('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
 "elevation" numeric(12,4),
@@ -492,9 +462,10 @@ CREATE TABLE "SCHEMA_NAME"."vnode" (
 "sector_id" varchar(30),
 "state" varchar(16),
 "annotation" varchar(254),
-"the_geom" "public"."geometry",
+"the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT "vnode_pkey" PRIMARY KEY ("vnode_id")
 );
+
 
 
 CREATE TABLE "SCHEMA_NAME"."link" (
@@ -507,11 +478,6 @@ CONSTRAINT link_pkey PRIMARY KEY (link_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."mincut_polygon" (
-polygon_id varchar (16) NOT NULL,
-the_geom public.geometry (MULTIPOLYGON, SRID_VALUE),
-CONSTRAINT mincut_polygon_pkey PRIMARY KEY (polygon_id)
-);
 
 
 -- -----------------------------------
@@ -622,7 +588,6 @@ CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 );
 
 
-
 -- ----------------------------------
 -- Table: value domain
 -- ----------------------------------
@@ -647,7 +612,6 @@ CREATE TABLE "SCHEMA_NAME"."value_yesno" (
 );
 
 
-
 -- ----------------------------------
 -- Table: selector
 -- ----------------------------------
@@ -657,7 +621,6 @@ CREATE TABLE "SCHEMA_NAME"."man_selector_valve" (
 "id" varchar(16)   NOT NULL,
  CONSTRAINT man_selector_valve_pkey PRIMARY KEY (id)
 );
-
 
 
 ------
@@ -732,8 +695,7 @@ ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCH
 ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."man_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -773,4 +735,7 @@ CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);
 CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
 CREATE INDEX link_index ON link USING GIST (the_geom);
+
+
+
 

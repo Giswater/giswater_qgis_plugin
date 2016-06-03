@@ -116,7 +116,7 @@ connec.adress_01,
 connec.adress_02,
 connec.adress_03,
 connec.streetaxis_id,
-streetaxis.name,
+ext_streetaxis.name,
 connec.postnumber,
 connec.descript,
 cat_connec.svg AS "cat_svg",
@@ -126,7 +126,7 @@ connec.verified,
 connec.the_geom
 FROM ("SCHEMA_NAME".connec 
 LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
-LEFT JOIN "SCHEMA_NAME".streetaxis ON (((connec.streetaxis_id)::text = (streetaxis.id)::text)));
+LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text)));
 
 
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
@@ -142,3 +142,18 @@ FROM ("SCHEMA_NAME".link
 LEFT JOIN "SCHEMA_NAME".connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_valve AS 
+SELECT 
+node.node_id,
+cat_node.nodetype_id,
+man_valve.type,
+man_valve.opened,
+man_valve.acessibility,
+man_valve.broken,
+node.the_geom
+FROM SCHEMA_NAME.node
+JOIN SCHEMA_NAME.cat_node ON node.nodecat_id::text=cat_node.id::text
+JOIN SCHEMA_NAME.man_valve ON node.node_id::text=man_valve.node_id::text
+JOIN SCHEMA_NAME.man_selector_valve ON cat_node.nodetype_id::text=man_selector_valve.id::text;

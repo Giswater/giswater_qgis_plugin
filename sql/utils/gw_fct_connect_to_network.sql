@@ -1,4 +1,12 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array varchar[]) RETURNS void AS $BODY$
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array varchar[]) RETURNS void AS $BODY$
 DECLARE
     connec_id_aux  varchar;
     arc_geom       geometry;
@@ -55,7 +63,7 @@ BEGIN
                 SELECT sector_id INTO sector_aux FROM sector WHERE (the_geom @ sector.the_geom) LIMIT 1;
                 
                 -- Insert new vnode
-                INSERT INTO vnode (sector_id, userdefined_pos, the_geom) VALUES (sector_aux, FALSE, vnode);
+                INSERT INTO vnode (sector_id, arc_id, vnode_type, userdefined_pos, the_geom) VALUES (sector_aux, arc_id_aux, 'connec', FALSE, vnode);
                 vnode_id := currval('vnode_seq');
 
                 -- Delete old link

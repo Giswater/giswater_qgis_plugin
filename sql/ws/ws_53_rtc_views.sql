@@ -5,59 +5,44 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- ----------------------------
--- Views to node
--- ----------------------------
-/*
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_x_node AS 
+
+CREATE VIEW "SCHEMA_NAME".v_ui_hydrometer_x_connec AS
 SELECT
-rtc_scada_node.node_id,
-rtc_scada_node.scada_id,
-cat_scada.data_type,
-cat_scada.units,
-rtc_scada_x_value.value,
-rtc_scada_x_value.status,
-max(rtc_scada_x_value.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.node
-JOIN SCHEMA_NAME.rtc_scada_node ON node.node_id = rtc_scada_node.node_id::text
-JOIN SCHEMA_NAME.cat_scada ON rtc_scada_node.scadacat_id = cat_scada.id::text
-JOIN SCHEMA_NAME.rtc_scada_x_value ON rtc_scada_x_value.scada_id = rtc_scada_node.node_id::text
-GROUP BY
-rtc_scada_node.node_id,
-rtc_scada_node.scada_id,
-cat_scada.data_type,
-cat_scada.units,
-rtc_scada_x_value.value,
-rtc_scada_x_value.status,
-node.the_geom;
+ext_rtc_hydrometer.hydrometer_id,
+rtc_hydrometer_x_connec.connec_id,
+ext_rtc_hydrometer.cat_hydrometer_id,
+ext_rtc_hydrometer.text
+FROM "SCHEMA_NAME".ext_rtc_hydrometer
+JOIN "SCHEMA_NAME".rtc_hydrometer_x_connec ON "SCHEMA_NAME".rtc_hydrometer_x_connec.hydrometer_id="SCHEMA_NAME".ext_rtc_hydrometer.hydrometer_id;
 
 
--- ----------------------------
--- View structure to INP
--- ----------------------------
 
-CREATE VIEW v_rtc_hydrometer
-hydrometer_id,
+CREATE VIEW "SCHEMA_NAME".v_rtc_hydrometer AS
+SELECT
+ext_rtc_hydrometer.hydrometer_id,
 connec.dma_id,
-rtc_hydrometer_x_data.sum
-(rtc_hydrometer_x_data.sum/cat_period.period_seconds) AS value
-FROM rtc_hydrometer
-JOIN rtc_hydrometer_x_data
-JOIN cat_period
-JOIN rtc_hydrometer_x_connec
-JOIN connec
-JOIN rtc_selector_period
+ext_rtc_hydrometer_x_data.sum as m3_period,
+((ext_rtc_hydrometer_x_data.sum*1000)/(ext_cat_period.period_seconds)) AS lps
+FROM "SCHEMA_NAME".ext_rtc_hydrometer
+JOIN "SCHEMA_NAME".ext_rtc_hydrometer_x_data ON "SCHEMA_NAME".ext_rtc_hydrometer_x_data.hydrometer_id = "SCHEMA_NAME".ext_rtc_hydrometer.hydrometer_id
+JOIN "SCHEMA_NAME".ext_cat_period ON "SCHEMA_NAME".ext_rtc_hydrometer_x_data.cat_period_id = "SCHEMA_NAME".ext_cat_period.id
+JOIN "SCHEMA_NAME".rtc_hydrometer_x_connec ON "SCHEMA_NAME".rtc_hydrometer_x_connec.hydrometer_id="SCHEMA_NAME".ext_rtc_hydrometer.hydrometer_id
+JOIN "SCHEMA_NAME".connec ON "SCHEMA_NAME".connec.connec_id = "SCHEMA_NAME".rtc_hydrometer_x_connec.connec_id
+JOIN "SCHEMA_NAME".rtc_selector_period ON  "SCHEMA_NAME".rtc_selector_period.id = "SCHEMA_NAME".ext_cat_period.id;
 
 
-CREATE VIEW v_rtc_hydrometer_dma
-v_rtc_hydrometer.dma_id
-sum (rtc_hydrometer_x_data.sum) as total
+
+CREATE VIEW "SCHEMA_NAME".v_rtc_hydrometer_dma AS
+SELECT
+v_rtc_hydrometer.dma_id,
+sum (v_rtc_hydrometer.m3_period) as m3_period,
+sum (v_rtc_hydrometer.lps) as lps
 FROM v_rtc_hydrometer
 GROUP BY 
-dma_id
+dma_id;
 
 
+/*
 CREATE VIEW v_rtc_scada_dma
 rtc_scada_x_dma.dma_id,
 sum (rtc_scada_x_data.sum*rtc_scada_x_dma.sign) as total

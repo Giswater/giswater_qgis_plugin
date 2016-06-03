@@ -1,4 +1,11 @@
-﻿CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying) RETURNS "pg_catalog"."int4" AS $BODY$
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying) RETURNS "pg_catalog"."int4" AS $BODY$
 DECLARE
     node_1_aux		text;
     node_2_aux		text;

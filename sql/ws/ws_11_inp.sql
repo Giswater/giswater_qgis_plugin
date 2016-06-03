@@ -576,10 +576,6 @@ CREATE TABLE "SCHEMA_NAME"."inp_value_opti_qual" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_opti_unb" (
-"id" varchar(20)   NOT NULL
-);
-
 
 CREATE TABLE "SCHEMA_NAME"."inp_value_opti_unbal" (
 "id" varchar(20)   NOT NULL
@@ -867,7 +863,6 @@ ALTER TABLE "SCHEMA_NAME"."inp_value_noneall" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_opti_headloss" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_opti_hyd" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_opti_qual" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_opti_unb" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_opti_unbal" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_opti_units" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_param_energy" ADD PRIMARY KEY ("id");
