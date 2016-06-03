@@ -942,6 +942,13 @@
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
      <property name="calendarPopup">
       <bool>true</bool>
      </property>

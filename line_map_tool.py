@@ -26,7 +26,7 @@ Under the terms of GNU GPL 2.
 
 # -*- coding: utf-8 -*-
 from qgis.gui import * # @UnusedWildImport
-from qgis.core import (QgsFeatureRequest, QgsExpression, QGis, QgsPoint, QgsMapToPixel, QgsGeometry, QgsFeature, QgsEditFormConfig, QgsEditError)
+from qgis.core import (QgsFeatureRequest, QGis, QgsPoint, QgsMapToPixel, QgsGeometry, QgsFeature)
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 from PyQt4.Qt import * # @UnusedWildImport
@@ -44,8 +44,7 @@ class LineMapTool(QgsMapTool):
         self.srid = self.settings.value('status/srid')
         self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
         self.dao = controller.getDao()   
-        self.schema_name = self.dao.get_schema_name() 
-        self.view_name = "v_edit_arc"                    
+        self.schema_name = self.dao.get_schema_name()              
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 
@@ -62,7 +61,6 @@ class LineMapTool(QgsMapTool):
         self.vertexMarker.setIconSize(9)
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
-
 
         # Snapper
         self.snapper = QgsMapCanvasSnapper(self.canvas)
@@ -114,15 +112,13 @@ class LineMapTool(QgsMapTool):
         # Remove the last added point when the delete key is pressed
         if event.key() == Qt.Key_Backspace:
             self.rubberBand.removeLastPoint()
-
-        
+       
 
     def reset(self):
         self.start_point = self.end_point = None
         self.isEmittingPoint = False
         self.rubberBand.reset(QGis.Line)
                        
-        
     
     
     ''' QgsMapTools inherited event functions '''
@@ -279,15 +275,13 @@ class LineMapTool(QgsMapTool):
                 else:
                     point =  QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
                 
-                self.rubberBand.movePoint(point)    
-            
-          
+                self.rubberBand.movePoint(point)            
         
         
     def canvasReleaseEvent(self, event):
         
         # With right click the digitizing is finished
-        if event.button()  == 2:
+        if event.button() == 2:
       
             layer = self.canvas.currentLayer()
             x = event.pos().x()
@@ -305,12 +299,8 @@ class LineMapTool(QgsMapTool):
             # Add this last point
 #            self.appendPoint(QgsPoint(point))
             self.sendGeometry()
-  
-  
-  
             #self.rubberBand.hide()
  
-  
         
     def appendPoint(self, point):
         #don't add the point if it is identical to the last point we added
@@ -320,7 +310,6 @@ class LineMapTool(QgsMapTool):
         else:
             pass
           
-    
     
     def sendGeometry(self):
         layer = self.canvas.currentLayer() 
@@ -370,9 +359,8 @@ class LineMapTool(QgsMapTool):
         provider = layer.dataProvider()
         f = QgsFeature()
     
-        #if (geom.validateGeometry()):
         if (geom.isGeosValid()):
-          f.setGeometry(geom)
+            f.setGeometry(geom)
         else:
             reply = QMessageBox.question(self.iface.mainWindow(), 'Feature not valid',
                                          "The geometry of the feature you just added isn't valid. Do you want to use it anyway?",
@@ -445,13 +433,14 @@ class LineMapTool(QgsMapTool):
             print repr(exc_info()[0])
 
                 
-        
     def activate(self):
         self.canvas.setCursor(self.cursor)
+  
   
     def deactivate(self):
         try:
             self.rubberBand.reset(QGis.Line)
         except AttributeError:
             pass
+        
         
