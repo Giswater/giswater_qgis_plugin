@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1015,7 +1015,7 @@
      </property>
      <property name="date">
       <date>
-       <year>2000</year>
+       <year>2016</year>
        <month>1</month>
        <day>1</day>
       </date>
@@ -2527,11 +2527,7 @@ p, li { white-space: pre-wrap; }
     <string>cat_connec.matcat_id</string>
    </property>
   </widget>
-<<<<<<< HEAD
-  <widget class="QComboBox" name="conneccat_id_dummy">
-=======
   <widget class="QComboBox" name="connecat_id_dummy">
->>>>>>> 0ec364491b202d32e39b4df173acad2e550fb2e3
    <property name="geometry">
     <rect>
      <x>290</x>
@@ -2559,11 +2555,7 @@ p, li { white-space: pre-wrap; }
     <string>cat_connec.dnom</string>
    </property>
   </widget>
-<<<<<<< HEAD
-  <widget class="QComboBox" name="conneccat_id">
-=======
   <widget class="QComboBox" name="connecat_id">
->>>>>>> 0ec364491b202d32e39b4df173acad2e550fb2e3
    <property name="geometry">
     <rect>
      <x>290</x>
