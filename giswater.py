@@ -22,6 +22,8 @@ from line_map_tool import LineMapTool
 from point_map_tool import PointMapTool
 from controller import DaoController
 from map_tools.move_node import MoveNode
+from ui.change_node_type import ChangeNodeType
+import utils_giswater
 
 
 class Giswater(QObject):
@@ -123,7 +125,7 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20, 26):    
+                if int(index_action) in (17, 20, 26, 28):  
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 else:        
@@ -237,47 +239,10 @@ class Giswater(QObject):
         # Project initialization
         self.project_read()               
             
-        # Menu entries
-        '''
-        self.create_action(None, self.tr('New network'), None, self.menu_name, False)
-        self.create_action(None, self.tr('Copy network as'), None, self.menu_name, False)
-            
-        self.menu_network_configuration = QMenu(self.tr('Network configuration'))
-        action1 = self.create_action(None, self.tr('Snapping tolerance'), None, None, False)               
-        action2 = self.create_action(None, self.tr('Node tolerance'), None, None, False)         
-        self.menu_network_configuration.addAction(action1)
-        self.menu_network_configuration.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_network_configuration.menuAction())  
-           
-        self.menu_network_management = QMenu(self.tr('Network management'))
-        action1 = self.create_action('21', self.tr('Table wizard'), None, None, False)               
-        action2 = self.create_action('22', self.tr('Undo wizard'), None, None, False)         
-        self.menu_network_management.addAction(action1)
-        self.menu_network_management.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_network_management.menuAction())         
-           
-        self.menu_analysis = QMenu(self.tr('Analysis'))          
-        action2 = self.create_action('25', self.tr('Result selector'), None, None, False)               
-        action3 = self.create_action('27', self.tr('Flow trace node'), None, None, False)         
-        action4 = self.create_action('26', self.tr('Flow trace arc'), None, None, False)         
-        self.menu_analysis.addAction(action2)
-        self.menu_analysis.addAction(action3)
-        self.menu_analysis.addAction(action4)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_analysis.menuAction())    
-         
-        self.menu_go2epa = QMenu(self.tr('Go2Epa'))
-        action1 = self.create_action('23', self.tr('Giswater interface'), None, None, False)               
-        action2 = self.create_action('24', self.tr('Run simulation'), None, None, False)         
-        self.menu_go2epa.addAction(action1)
-        self.menu_go2epa.addAction(action2)
-        self.iface.addPluginToMenu(self.menu_name, self.menu_go2epa.menuAction())     
-        '''
 
     def unload(self):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         for action_index, action in self.actions.iteritems():
-            #self.iface.removePluginMenu(self.menu_name, self.menu_network_management.menuAction())
-            #self.iface.removePluginMenu(self.menu_name, action)
             self.iface.removeToolBarIcon(action)
         if self.toolbar_ud_enabled:    
             del self.toolbar_ud
@@ -524,6 +489,9 @@ class Giswater(QObject):
             sql+= "DROP TABLE IF EXISTS temp_mincut_arc CASCADE;"
             sql+= "DROP TABLE IF EXISTS temp_mincut_valve CASCADE;" 
             self.dao.execute_sql(sql)  
+        elif result[0] == 1:
+            self.showWarning(self.controller.tr("Parametrize error type 1"))   
+            return
         else:
             self.showWarning(self.controller.tr("Undefined error"))    
             return        
@@ -556,5 +524,93 @@ class Giswater(QObject):
         
         # Select features with these id's 
         layer.setSelectedFeatures(id_list)       
+        
+        
+        # ------------------------------------------
+    def mg_change_elem_type(self):
+        #check if at least one node is checkedd             
+        layer = self.iface.activeLayer()  
+        count = layer.selectedFeatureCount()     
+        if count == 0:
+            self.showInfo(self.controller.tr("You have to select at least one feature!"))
+            return 
+        elif count > 1:  
+            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))   
+                    
+        # Get selected features (nodes)           
+        features = layer.selectedFeatures()
+        feature = features[0]
+        node_id = feature.attribute('node_id') 
+        #get node_type from curent node
+        node_type=feature.attribute('epa_type')
+        
+        #create the dialog, fill node_type and define its signals
+        self.dlg=ChangeNodeType()
+        self.dlg.node_node_type.setText(node_type)
+        print "A"
+        self.dlg.node_type_type_new.currentIndexChanged.connect(self.get_value)          
+        self.dlg.btn_accept.pressed.connect(self.accept)
+
+        # Fill 1. combo boxes-new system node type
+        sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.setDialog(self.dlg)
+        utils_giswater.fillComboBox("node_type_type_new", rows) 
+        
+        #open the dialog
+        self.dlg.exec_()    
+        
+        #? get value on click from combo box
+        
+        
+    def get_value(self, index):
+        #''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
+           
+        z = utils_giswater.getWidgetText("node_type_type_new")
+        print "get_value: "+str(z)
+        return z
+        
+        
+    def accept(self):
+        
+
+        #update node_type in the database
+        print "it works"
+        
+        print "--------**------"
+        w = self.get_value("node_node_type_new")  
+        print w
+        print "--------------"        
+           
+           
+        # Disabled ComboBox
+        #if loop 
+        self.dlg.node_node_type_new.setEnabled(False)    
+        self.dlg.node_nodecat_id.setEnabled(False)     
+        
+        #Fill 2.combo boxes-custom node type
+        sql = "SELECT id FROM "+self.schema_name+".cat_node ORDER BY id"
+        #sgl="SELECT id FROM" +self.schema_name+".node_type WHERE type='HYDRANT'"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("node_node_type_new", rows)   
+        
+        
+        #self.node_node_type_new.configure(disabled=true)
+ 
+        #quality=self.node_type_type_new.GetValue()
+        #if quality == '-qmax':
+        #    self.node_node_type_new.Disable()
+        #else:
+        #    self.node_node_type_new.Disable()
+      
+       
+        #Fill 3. combo boxes-catalog id
+        sql = "SELECT DISTINCT(nodetype_id) FROM "+self.schema_name+".cat_node ORDER BY nodetype_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.setDialog(self.dlg)
+        utils_giswater.fillComboBox("node_nodecat_id", rows)           
+
+            
+        #-------------------------------------------------    
             
             
