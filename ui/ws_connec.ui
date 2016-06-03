@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>845</width>
-    <height>585</height>
+    <height>615</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>845</width>
-    <height>585</height>
+    <height>615</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="label_menu">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -38,13 +38,13 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
-   <widget class="QWidget" name="tab_5">
+   <widget class="QWidget" name="page_feature">
     <attribute name="title">
      <string>Feature</string>
     </attribute>
-    <widget class="QComboBox" name="connec_location_type">
+    <widget class="QComboBox" name="location_type">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -237,7 +237,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_adress_02">
+    <widget class="QLineEdit" name="adress_02">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -319,7 +319,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_adress_01">
+    <widget class="QLineEdit" name="adress_01">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -365,7 +365,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_depth">
+    <widget class="QLineEdit" name="depth">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -411,7 +411,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_category_type">
+    <widget class="QComboBox" name="category_type">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -517,7 +517,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_elevation">
+    <widget class="QLineEdit" name="elevation">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -527,7 +527,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_fluid_type">
+    <widget class="QComboBox" name="cfluid_type">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -573,7 +573,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_buildercat_id">
+    <widget class="QComboBox" name="buildercat_id">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -583,7 +583,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_soilcat_id">
+    <widget class="QComboBox" name="soilcat_id">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -593,7 +593,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_state">
+    <widget class="QComboBox" name="state">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -603,7 +603,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_dma_id">
+    <widget class="QComboBox" name="dma_id">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -721,7 +721,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_sector_id">
+    <widget class="QComboBox" name="sector_id">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -731,7 +731,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_adress_03">
+    <widget class="QLineEdit" name="adress_03">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -744,9 +744,9 @@
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="geometry">
       <rect>
-       <x>640</x>
+       <x>695</x>
        <y>500</y>
-       <width>156</width>
+       <width>101</width>
        <height>23</height>
       </rect>
      </property>
@@ -754,7 +754,7 @@
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
-    <widget class="QTextEdit" name="connec_comment">
+    <widget class="QTextEdit" name="comment">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -800,7 +800,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="connec_observ">
+    <widget class="QTextEdit" name="observ">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -810,7 +810,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="connec_link">
+    <widget class="QTextEdit" name="link">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -820,7 +820,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="connec_descript">
+    <widget class="QTextEdit" name="descript">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -902,7 +902,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="connec_annotation">
+    <widget class="QTextEdit" name="annotation">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -984,7 +984,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="connec_workcat_id">
+    <widget class="QComboBox" name="workcat_id">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -994,17 +994,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="connec_builtdate">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>220</y>
-       <width>161</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="connec_ownercat_id">
+    <widget class="QComboBox" name="ownercat_id">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -1014,8 +1004,28 @@
       </rect>
      </property>
     </widget>
+    <widget class="QDateEdit" name="builtdate">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>220</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
-   <widget class="QWidget" name="tab">
+   <widget class="QWidget" name="page_analysis">
     <attribute name="title">
      <string>Add. info</string>
     </attribute>
@@ -1023,7 +1033,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>160</y>
+       <y>70</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -1059,9 +1069,9 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>190</y>
+       <y>100</y>
        <width>771</width>
-       <height>251</height>
+       <height>341</height>
       </rect>
      </property>
      <property name="html">
@@ -1072,29 +1082,51 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;element.element_id, cat_element.type, cat_element.id, element.builtdate, element.state,  element.enddate,  element.annotation,  element.link&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="cat_descript_7">
+    <widget class="QLabel" name="label_connec_demand">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>20</y>
-       <width>771</width>
-       <height>20</height>
+       <y>30</y>
+       <width>90</width>
+       <height>22</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <italic>true</italic>
+       <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
      <property name="text">
-      <string>short description (from node catalog)</string>
+      <string>demand</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="n_nhydrometer">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>30</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
      </property>
     </widget>
     <widget class="QLabel" name="label_code">
      <property name="geometry">
       <rect>
        <x>540</x>
-       <y>60</y>
+       <y>30</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -1126,11 +1158,21 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_elevation_2">
+    <widget class="QLineEdit" name="code">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>30</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="demand">
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>60</y>
+       <y>30</y>
        <width>151</width>
        <height>20</height>
       </rect>
@@ -1140,7 +1182,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>60</y>
+       <y>30</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -1166,58 +1208,8 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="connec_depth_2">
-     <property name="geometry">
-      <rect>
-       <x>380</x>
-       <y>60</y>
-       <width>151</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_connec_demand">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>60</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>demand</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="connec_depth_3">
-     <property name="geometry">
-      <rect>
-       <x>640</x>
-       <y>60</y>
-       <width>151</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
    </widget>
-   <widget class="QWidget" name="tab_9">
+   <widget class="QWidget" name="page_document">
     <attribute name="title">
      <string>Document</string>
     </attribute>
@@ -1316,7 +1308,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="doc_date_2">
+    <widget class="QDateEdit" name="date_document_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1325,8 +1317,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QDateTimeEdit" name="doc_date">
+    <widget class="QDateEdit" name="date_document_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1335,8 +1337,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QComboBox" name="cat_doc_type">
+    <widget class="QComboBox" name="doc_type">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1475,7 +1487,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_10">
+   <widget class="QWidget" name="page_picture">
     <attribute name="title">
      <string>Picture</string>
     </attribute>
@@ -1515,7 +1527,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="picture_date">
+    <widget class="QDateEdit" name="date_picture_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1523,6 +1535,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_picture_user">
@@ -1640,7 +1662,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="picture_date_2">
+    <widget class="QDateEdit" name="date_picture_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1648,6 +1670,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_to_2">
@@ -1687,7 +1719,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_11">
+   <widget class="QWidget" name="page_event">
     <attribute name="title">
      <string>Event</string>
     </attribute>
@@ -1793,7 +1825,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="event_date">
+    <widget class="QDateEdit" name="date_event_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1801,6 +1833,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="line_9">
@@ -1816,7 +1858,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="event_date_2">
+    <widget class="QDateEdit" name="date_event_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -1824,6 +1866,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_event_user">
@@ -1945,7 +1997,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_7">
+   <widget class="QWidget" name="page_log">
     <attribute name="title">
      <string>Log</string>
     </attribute>
@@ -2021,7 +2073,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_22">
+    <widget class="QDateEdit" name="date_log_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2030,8 +2082,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_47">
+    <widget class="QComboBox" name="log_event_type">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -2077,7 +2139,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_23">
+    <widget class="QDateEdit" name="date_log_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -2086,8 +2148,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_48">
+    <widget class="QComboBox" name="log_user">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -2146,7 +2218,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_15">
+    <widget class="QTableWidget" name="tbl_log">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2157,11 +2229,11 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_12">
+   <widget class="QWidget" name="page_dae">
     <attribute name="title">
      <string>DAE</string>
     </attribute>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_30">
+    <widget class="QDateEdit" name="date_dae_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2170,8 +2242,18 @@ p, li { white-space: pre-wrap; }
        <height>22</height>
       </rect>
      </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_8">
+    <widget class="QTableWidget" name="tbl_dae">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2181,7 +2263,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QDateTimeEdit" name="dateTimeEdit_31">
+    <widget class="QDateEdit" name="date_dae_to">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -2189,6 +2271,16 @@ p, li { white-space: pre-wrap; }
        <width>121</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_84">
@@ -2276,7 +2368,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_56">
+    <widget class="QComboBox" name="cod_dae">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -2324,11 +2416,11 @@ p, li { white-space: pre-wrap; }
     </widget>
    </widget>
   </widget>
-  <widget class="QLineEdit" name="connec_rotation">
+  <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
-     <x>765</x>
-     <y>543</y>
+     <x>110</x>
+     <y>540</y>
      <width>65</width>
      <height>20</height>
     </rect>
@@ -2337,7 +2429,7 @@ p, li { white-space: pre-wrap; }
     <string>rotation</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="connec_verified">
+  <widget class="QCheckBox" name="verified">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -2350,22 +2442,33 @@ p, li { white-space: pre-wrap; }
     <string>Verified</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="connec_connecat_id">
+  <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>20</y>
-     <width>141</width>
-     <height>20</height>
+     <x>680</x>
+     <y>540</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>Cat connec</string>
-    </property>
-   </item>
+   <property name="text">
+    <string>Accept</string>
+   </property>
   </widget>
-  <widget class="QLineEdit" name="connec_connec_id">
+  <widget class="QPushButton" name="btn_close">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>540</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="connec_id">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -2378,10 +2481,38 @@ p, li { white-space: pre-wrap; }
     <string>connec_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_connec_matcat_id">
+  <widget class="QComboBox" name="cat_connectype_id">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>130</x>
+     <y>20</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_35">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>20</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>arc_id</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="matcat_id">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
      <y>20</y>
      <width>111</width>
      <height>20</height>
@@ -2393,32 +2524,23 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string>cat_connec_matcat_id</string>
+    <string>cat_connec.matcat_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_connec_type">
+  <widget class="QComboBox" name="connecat_id_dummy">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>290</x>
      <y>20</y>
-     <width>121</width>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>connec_type</string>
-   </property>
   </widget>
-  <widget class="QLineEdit" name="cat_connec_dnom">
+  <widget class="QLineEdit" name="dnom">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>710</x>
      <y>20</y>
      <width>111</width>
      <height>20</height>
@@ -2430,25 +2552,17 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string>cat_connec_dnom</string>
+    <string>cat_connec.dnom</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_connec_pnom">
+  <widget class="QComboBox" name="connecat_id">
    <property name="geometry">
     <rect>
-     <x>640</x>
-     <y>20</y>
-     <width>111</width>
+     <x>290</x>
+     <y>0</y>
+     <width>141</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>cat_connec_pnom</string>
    </property>
   </widget>
  </widget>

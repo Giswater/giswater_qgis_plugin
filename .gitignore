@@ -6,7 +6,8 @@
 *.qgs~
 *.bat
 *.db
-
+test
+data/
 
 #################
 ## Eclipse
