@@ -20,6 +20,8 @@ class MoveNode(QgsMapTool):
         self.controller = controller
         self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name()   
+        self.layer_name = "Arc"   
+        self.layer_arc = None
         
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -45,12 +47,10 @@ class MoveNode(QgsMapTool):
 
     def reset(self):
                 
-        # Selection
+        # Clear selected features 
         layer = self.canvas.currentLayer()
-
         if layer is not None:
-            layer.setSelectedFeatures([])
-            #self.vertexMarker.
+            layer.removeSelection()
 
         # Graphic elements
         self.rubberBand.reset()
@@ -97,6 +97,15 @@ class MoveNode(QgsMapTool):
     ''' QgsMapTool inherited event functions '''    
        
     def activate(self):
+        ''' Called when set as currently active map tool '''
+        
+        # Check if layer named <self.layer_name> is loaded
+        aux = QgsMapLayerRegistry.instance().mapLayersByName(self.layer_name)
+        if len(aux) > 0:
+            self.layer_arc = aux[0]
+        if self.layer_arc is None:
+            self.showWarning("Layer named '"+self.layer_name+"' not found")
+            return                
         
         # Change pointer
         cursor = QCursor()
@@ -108,27 +117,19 @@ class MoveNode(QgsMapTool):
         # And finally we set the mapTool's parent cursor
         self.parent().setCursor(cursor)
 
-        # Clear selection
-        #iface.mapCanvas().setSelectionColor( QColor("red") )
-#        layer = self.canvas.currentLayer()
-#        layer.select([])
-
         # Reset
         self.reset()
         
-        layerArc = QgsMapLayerRegistry.instance().mapLayersByName( "Arc" )[0]
-
-        if layerArc is not None:
-
-            # it defines the snapping options layerArc : the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
-            QgsProject.instance().setSnapSettingsForLayer(layerArc.id(), True, 2, 0, 2, True)
-        
+        # it defines the snapping options self.layer_arc: the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
+        QgsProject.instance().setSnapSettingsForLayer(self.layer_arc.id(), True, 2, 0, 2, True)
+    
         # Show help message when action is activated
         if self.show_help:
-            self.showInfo(self.controller.tr("Click a point on the map to move selected node"))
+            self.showInfo(self.controller.tr("Select the node and move to desired location"))
             
             
     def deactivate(self):
+        ''' Called when map tool is being deactivated '''
         try:
             self.rubberBand.reset(QGis.Line)
         except AttributeError:
@@ -169,7 +170,7 @@ class MoveNode(QgsMapTool):
                 self.rubberBand.movePoint(point)
 
             else:
-                point =  QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
                 self.rubberBand.movePoint(point)
 
         else:
@@ -179,7 +180,7 @@ class MoveNode(QgsMapTool):
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
             # That's the snapped point
-            if (result <> []) and (result[0].layer.name() == "Arc") and (result[0].snappedVertexNr == -1):
+            if (result <> []) and (result[0].layer.name() == self.layer_name) and (result[0].snappedVertexNr == -1):
             
                 point = QgsPoint(result[0].snappedVertex)
 
@@ -189,9 +190,8 @@ class MoveNode(QgsMapTool):
                 self.vertexMarker.show()
                 
                 # Select the arc
-                layerArc = QgsMapLayerRegistry.instance().mapLayersByName( "Arc" )[0]
-                layerArc.setSelectedFeatures([])
-                layerArc.select([result[0].snappedAtGeometry])
+                self.layer_arc.removeSelection()
+                self.layer_arc.select([result[0].snappedAtGeometry])
 
                 # Bring the rubberband to the cursor i.e. the clicked point
                 self.rubberBand.movePoint(point)
@@ -199,14 +199,15 @@ class MoveNode(QgsMapTool):
             else:
                 
                 # Bring the rubberband to the cursor i.e. the clicked point
-                point =  QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
                 self.rubberBand.movePoint(point)
 
 
     def canvasReleaseEvent(self, event):
+        ''' Mouse release event '''         
         
         # On left click, take action
-        if event.button()  ==  1:
+        if event.button() == 1:
             
             # Get the click
             x = event.pos().x()
@@ -241,22 +242,16 @@ class MoveNode(QgsMapTool):
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
                 # That's the snapped point
-                if (result <> []) and (result[0].layer.name() == "Arc"):
+                if (result <> []) and (result[0].layer.name() == self.layer_name):
             
                     point = QgsPoint(result[0].snappedVertex)
-
-                    # Get clicked point, current layer and number of selected features             
-                    count = layer.selectedFeatureCount()     
-                    if count > 1:  
-                        self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))   
                     
-                    # Get selected features (nodes)           
-                    features = layer.selectedFeatures()
-                    feature = features[0]
+                    # Get selected feature (at this moment it will have one and only one)           
+                    feature = layer.selectedFeatures()[0]
                     node_id = feature.attribute('node_id') 
         
-                    # Move selected node to the current point
-                    status = self.move_node(node_id, point)       
+                    # Move selected node to the released point
+                    self.move_node(node_id, point)       
             
                     # Rubberband reset
                     self.reset()                    
@@ -265,13 +260,9 @@ class MoveNode(QgsMapTool):
                     self.iface.mapCanvas().refresh()               
         
         # On left click, take action
-        if event.button()  ==  2:
+        if event.button() == 2:
             
             # Node layer
             self.reset()
-        
-        
-    def canvasPressEvent(self, event):
-        pass    
-            
+                   
         
