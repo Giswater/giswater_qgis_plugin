@@ -6,9 +6,8 @@ name=giswater
 qgisMinimumVersion=2.8
 description=giswater plugin description
 about=About...
-version=0.5
-author=Giswater
-email=info@giswater.org
+version=0.6
+author=David Erill, Vicente Medina, Xavi Torret
 
 # End of mandatory metadata
 
