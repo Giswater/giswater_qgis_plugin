@@ -30,13 +30,13 @@ from qgis.core import (QgsFeatureRequest, QGis, QgsPoint, QgsMapToPixel, QgsGeom
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 from PyQt4.Qt import * # @UnusedWildImport
-from sys import exc_info
 
 
 class LineMapTool(QgsMapTool):
 
     def __init__(self, iface, settings, action, index_action, controller):
-        # Class constructor
+        ''' Class constructor '''
+        
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
@@ -73,29 +73,11 @@ class LineMapTool(QgsMapTool):
         self.firstTimeOnSegment = True
         self.lastPointMustStay = False
         self.lastPoint = None
-    
-        # traceDigitize borrowed icon
-        self.cursor = QCursor(QPixmap(["16 16 3 1",
-                                  "      c None",
-                                  ".     c #7F0000",
-                                  "+     c #FF0000",
-                                  "                ",
-                                  "       +.+      ",
-                                  "      ++.++     ",
-                                  "     +.....+    ",
-                                  "    +.     .+   ",
-                                  "   +.   .   .+  ",
-                                  "  +.    .    .+ ",
-                                  " ++.    .    .++",
-                                  " ... ...+... ...",
-                                  " ++.    .    .++",
-                                  "  +.    .    .+ ",
-                                  "   +.   .   .+  ",
-                                  "   ++.     .+   ",
-                                  "    ++.....+    ",
-                                  "      ++.++     ",
-                                  "       +.+      "]))
-                                  
+        
+        # Change map tool cursor
+        self.cursor = QCursor()
+        self.cursor.setShape(Qt.CrossCursor)
+        self.parent().setCursor(self.cursor)                                             
  
  
     # We need to know, if ctrl-key is pressed
@@ -128,12 +110,6 @@ class LineMapTool(QgsMapTool):
         # On left click, we add a point
         if event.button()  ==  1:
             layer = self.canvas.currentLayer()
-          
-            #If it is the start of a new trace, set the rubberband up
-#            if self.started == False:
-#                self.isPolygon = False
-#                self.rubberBand = QgsRubberBand (self.canvas, layer.geometryType())
-#                self.rubberBand. setColor(QColor(255, 0, 0)) 
     
             # Declare, that are we going to work
             self.started = True
@@ -143,11 +119,11 @@ class LineMapTool(QgsMapTool):
                 y = event.pos().y()
                 selPoint = QPoint(x,y)
     
-                #Check something snapped
+                # Check something snapped
                 (retval,result) = self.snapper.snapToBackgroundLayers(selPoint)
               
                 # The point we want to have, is either from snapping result
-                if result  <> []:
+                if result <> []:
                     point = result[0].snappedVertex
     
                     # If we snapped something, it's either a vertex
@@ -160,7 +136,7 @@ class LineMapTool(QgsMapTool):
     
                 # Or its some point from out in the wild
                 else:
-                    point =  QgsMapToPixel.toMapCoordinates(self.canvas.    getCoordinateTransform (), x, y)
+                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
                     self.firstTimeOnSegment = True
     
                 # Bring the rubberband to the cursor i.e. the clicked point
@@ -171,9 +147,7 @@ class LineMapTool(QgsMapTool):
               
                 # Try to remember that this point was on purpose i.e. clicked by the user
                 self.lastPointMustStay = True
-                self.firstTimeOnSegment = True
-              
-        #self.rubberBand.show()        
+                self.firstTimeOnSegment = True    
                        
     
     def canvasMoveEvent(self, event):
@@ -202,9 +176,6 @@ class LineMapTool(QgsMapTool):
                         
             # Only if the ctrl key is pressed
             if self.mCtrl == True:
-#                layer = self.canvas.currentLayer()
-#                if layer <> None:
-#                    (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
                  
                 # So if we have found a snapping
                 if result <> []:
@@ -230,28 +201,18 @@ class LineMapTool(QgsMapTool):
                     
                         # if we are not on a new segment, we have to test, if this point is really needed
                         else:
-                            #but only if we have already enough points
-                            #TODO: check if this is correct for lines also (they only need two points, to be vaild)
+                            # but only if we have already enough points
                             if self.rubberBand.numberOfVertices() >=3:
                                 max = self.rubberBand.numberOfVertices()
                                 lastRbP = self.rubberBand.getPoint(0, max-2)
-                            
-                                #QgsMessageLog.logMessage(str(self.rubberBand.getPoint(0, max-1)), 'rubberBand', 0)
-                                nextToLastRbP = self.rubberBand.getPoint(0, max-3)
-                                #QgsMessageLog.logMessage(str(self.rubberBand.getPoint(0, max-2)), 'rubberBand', 0)
-                                #QgsMessageLog.logMessage(str(point), 'rubberBand', 0)
-                            
+                                nextToLastRbP = self.rubberBand.getPoint(0, max-3)                          
                                 if not self.pointOnLine(lastRbP, nextToLastRbP, QgsPoint(point)):
                                     self.appendPoint(point)
                                     self.lastPointMustStay = False
                                 else:
-                                    #TODO: 
                                     if not self.lastPointMustStay:
                                         self.rubberBand.removeLastPoint()
                                         self.rubberBand.movePoint(point)
-                                        #QgsMessageLog.logMessage('point removed', 'click', 0)
-                                    #else:
-                                        #QgsMessageLog.logMessage('sleep', 'rubberBand', 0)
                             else:
                                 self.appendPoint(point)
                                 self.lastPointMustStay = False
@@ -259,7 +220,7 @@ class LineMapTool(QgsMapTool):
           
                 else:
                     #if nothing specials happens, just update the rubberband to the cursor position
-                    point =  QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform (), x, y)
+                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform (), x, y)
                     self.rubberBand.movePoint(point)
           
             else:
@@ -273,7 +234,7 @@ class LineMapTool(QgsMapTool):
                     self.vertexMarker.show()
 
                 else:
-                    point =  QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
                 
                 self.rubberBand.movePoint(point)            
         
@@ -291,20 +252,18 @@ class LineMapTool(QgsMapTool):
                 selPoint = QPoint(x,y)
                 (retval,result) = self.snapper.snapToBackgroundLayers(selPoint)
         
-            if result  <> []:
+            if result <> []:
                 point = result[0].snappedVertex
             else:
-                point =  QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
         
-            # Add this last point
-#            self.appendPoint(QgsPoint(point))
             self.sendGeometry()
             #self.rubberBand.hide()
  
         
     def appendPoint(self, point):
-        #don't add the point if it is identical to the last point we added
-        if not (self.lastPoint ==  point) :      
+        # Don't add the point if it is identical to the last point we added
+        if not (self.lastPoint == point) :      
             self.rubberBand.addPoint(point)
             self.lastPoint = QgsPoint(point)
         else:
@@ -312,10 +271,9 @@ class LineMapTool(QgsMapTool):
           
     
     def sendGeometry(self):
+        
         layer = self.canvas.currentLayer() 
         coords = []
-    
-        #backward compatiblity for a bug in qgsRubberband, that was fixed in 1.7
         self.rubberBand.removeLastPoint()
         
         if QGis.QGIS_VERSION_INT >= 10700:
@@ -344,8 +302,7 @@ class LineMapTool(QgsMapTool):
                  
         # Add geometry to feature.
         g = QgsGeometry().fromPolyline(coords)
-        
-        #self.emit(SIGNAL("traceFound(PyQt_PyObject)"),g) 
+    
         self.rubberBand.reset(QGis.Line)
         self.started = False
         
@@ -354,7 +311,7 @@ class LineMapTool(QgsMapTool):
         
         
     def createFeature(self, geom):
-        #pydevd.settrace()
+
         layer = self.canvas.currentLayer() 
         provider = layer.dataProvider()
         f = QgsFeature()
@@ -370,22 +327,18 @@ class LineMapTool(QgsMapTool):
             else:
                 return False
       
-        ## Add attribute fields to feature.
+        # Add attribute fields to feature.
         fields = layer.pendingFields()
         
         try: #API-Break 1.8 vs. 2.0 handling
             attr = f.initAttributes(len(fields))
             for i in range(len(fields)):
-                f.setAttribute(i,  provider.defaultValue(i))
+                f.setAttribute(i, provider.defaultValue(i))
               
         except AttributeError: #<=1.8
             ## Add attributefields to feature.
             for i in fields:
-                f.addAttribute(i,  provider.defaultValue(i))
-                
-        #layer.beginEditCommand("Feature added")
-        
-        #f['arc_id'] = self.elem_type
+                f.addAttribute(i, provider.defaultValue(i))
         
         idx = layer.fieldNameIndex('epa_type')
         f[idx] = self.elem_type
@@ -396,13 +349,9 @@ class LineMapTool(QgsMapTool):
         
         # Control PostgreSQL exceptions
         boolOk = layer.commitChanges()
-        
-        #layer.endEditCommand()
 
         # Update canvas        
         self.canvas.refresh()
-        
-        #self.rubberBand.hide()
  
         # Capture edit exception
         if boolOk:
@@ -430,7 +379,7 @@ class LineMapTool(QgsMapTool):
             QMessageBox.information(None, "PostgreSQL error:", "Error adding PIPE: Typically this occurs if\n the first point is not located in a existing\n node or feature is out of the defined sectors.") 
 
             # Console error
-            print repr(exc_info()[0])
+            #print repr(exc_info()[0])
 
                 
     def activate(self):
