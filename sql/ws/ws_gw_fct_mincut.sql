@@ -67,7 +67,7 @@ BEGIN
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed
-                SELECT valve_id INTO exists_id FROM temp_mincut_valve WHERE valve_id = node_2_aux;
+                SELECT valve_id INTO exists_id FROM anl_mincut_valve WHERE valve_id = node_2_aux;
 
                 -- Compute proceed
                 IF NOT FOUND THEN
