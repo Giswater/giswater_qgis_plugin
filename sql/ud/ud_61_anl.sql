@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
--- FLOW EXIT
+-- FLOW TRACE
 -- ----------------------------
 
 
