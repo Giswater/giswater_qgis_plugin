@@ -526,9 +526,13 @@ class Giswater(QObject):
         layer.setSelectedFeatures(id_list)       
         
         
-        # ------------------------------------------
     def mg_change_elem_type(self):
-        #check if at least one node is checkedd             
+        '''User select one node. A form is opened showing current node_type.type 
+        Combo to select new node_type.type
+        Combo to select new node_type.id
+        Combo to select new cat_node.id'''
+        
+        # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
         count = layer.selectedFeatureCount()     
         if count == 0:
@@ -540,77 +544,88 @@ class Giswater(QObject):
         # Get selected features (nodes)           
         features = layer.selectedFeatures()
         feature = features[0]
-        node_id = feature.attribute('node_id') 
-        #get node_type from curent node
-        node_type=feature.attribute('epa_type')
-        
-        #create the dialog, fill node_type and define its signals
-        self.dlg=ChangeNodeType()
-        self.dlg.node_node_type.setText(node_type)
-        print "A"
-        self.dlg.node_type_type_new.currentIndexChanged.connect(self.get_value)          
-        self.dlg.btn_accept.pressed.connect(self.accept)
+        # Get node_id form current node
+        self.node_id = feature.attribute('node_id')
 
-        # Fill 1. combo boxes-new system node type
+        # Get node_type from current node
+        node_type = feature.attribute('node_type')
+        
+        # Create the dialog, fill node_type and define its signals
+        self.dlg = ChangeNodeType()
+        self.dlg.node_node_type.setText(node_type)
+        self.dlg.node_type_type_new.currentIndexChanged.connect(self.get_value)         
+        self.dlg.node_node_type_new.currentIndexChanged.connect(self.get_value_2)
+        self.dlg.node_nodecat_id.currentIndexChanged.connect(self.get_value_3)           
+        self.dlg.btn_accept.pressed.connect(self.accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+
+        # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.setDialog(self.dlg)
         utils_giswater.fillComboBox("node_type_type_new", rows) 
-        
-        #open the dialog
+    
+        # Open the dialog
         self.dlg.exec_()    
-        
-        #? get value on click from combo box
-        
-        
+     
+     
     def get_value(self, index):
-        #''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
-           
-        z = utils_giswater.getWidgetText("node_type_type_new")
-        print "get_value: "+str(z)
-        return z
+        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) ''' 
+        
+        # Get selected value from 1st combobox
+        self.value_combo1 = utils_giswater.getWidgetText("node_type_type_new")   
+        
+        # When value is selected, enabled 2nd combo box
+        if self.value_combo1 != 'null':
+            self.dlg.node_node_type_new.setEnabled(True)  
+            # Fill 2nd combo_box-custom node type
+            sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type WHERE type='"+self.value_combo1+"'"
+            rows = self.dao.get_rows(sql)
+            utils_giswater.fillComboBox("node_node_type_new", rows)
+       
+       
+    def get_value_2(self, index):    
+        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) ''' 
+
+        if index == -1:
+            return
+        
+        # Get selected value from 2nd combobox
+        self.value_combo2= utils_giswater.getWidgetText("node_node_type_new")         
+        
+        # When value is selected, enabled 3rd combo box
+        if self.value_combo2 != 'null':
+            # Get selected value from 2nd combobox
+            self.dlg.node_nodecat_id.setEnabled(True)
+            # Fill 3rd combo_box-catalog_id
+            sql = "SELECT DISTINCT(id)"
+            sql+= " FROM "+self.schema_name+".cat_node"
+            sql+= " WHERE nodetype_id='"+self.value_combo2+"'"
+            rows = self.dao.get_rows(sql)
+            utils_giswater.fillComboBox("node_nodecat_id", rows)     
+    
+    
+    def get_value_3(self, index):
+        self.value_combo3 = utils_giswater.getWidgetText("node_nodecat_id")      
         
         
     def accept(self):
-        
+        ''' Update current type of node and save changes in database  '''
 
-        #update node_type in the database
-        print "it works"
+        # Update node_type in the database
+        sql = "UPDATE "+self.schema_name+".node"
+        sql+= " SET node_type ='"+self.value_combo2+"'"
+        if self.value_combo3 != 'null':
+            sql+= ", nodecat_id='"+self.value_combo3+"'"
+        sql+= " WHERE node_id ='"+self.node_id+"'"
+        self.dao.execute_sql(sql)
         
-        print "--------**------"
-        w = self.get_value("node_node_type_new")  
-        print w
-        print "--------------"        
-           
-           
-        # Disabled ComboBox
-        #if loop 
-        self.dlg.node_node_type_new.setEnabled(False)    
-        self.dlg.node_nodecat_id.setEnabled(False)     
-        
-        #Fill 2.combo boxes-custom node type
-        sql = "SELECT id FROM "+self.schema_name+".cat_node ORDER BY id"
-        #sgl="SELECT id FROM" +self.schema_name+".node_type WHERE type='HYDRANT'"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("node_node_type_new", rows)   
-        
-        
-        #self.node_node_type_new.configure(disabled=true)
- 
-        #quality=self.node_type_type_new.GetValue()
-        #if quality == '-qmax':
-        #    self.node_node_type_new.Disable()
-        #else:
-        #    self.node_node_type_new.Disable()
-      
+        # Show message to the user
+        self.showInfo(self.controller.tr("Node type has been update!")) 
        
-        #Fill 3. combo boxes-catalog id
-        sql = "SELECT DISTINCT(nodetype_id) FROM "+self.schema_name+".cat_node ORDER BY nodetype_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.setDialog(self.dlg)
-        utils_giswater.fillComboBox("node_nodecat_id", rows)           
-
-            
-        #-------------------------------------------------    
+                  
+    def close_dialog(self): 
+        ''' Close dialog '''
+        self.dlg.close()       
             
             
