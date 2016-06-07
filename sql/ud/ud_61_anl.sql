@@ -10,23 +10,23 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 
 
-CREATE TABLE "SCHEMA_NAME"."anl_flowexit_node" (
+CREATE TABLE "SCHEMA_NAME"."anl_flow_exit_node" (
 node_id varchar (16) NOT NULL,
 the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_flowexit_node_pkey PRIMARY KEY (node_id)
+CONSTRAINT anl_flow_exit_node_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."anl_flowexit_arc" (
+CREATE TABLE "SCHEMA_NAME"."anl_flow_exit_arc" (
 arc_id varchar (16) NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
-CONSTRAINT anl_flowexit_arc_pkey PRIMARY KEY (arc_id)
+CONSTRAINT anl_flow_exit_arc_pkey PRIMARY KEY (arc_id)
 );
 
 
-ALTER TABLE "SCHEMA_NAME"."anl_flowexit_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."anl_flowexit_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."anl_flow_exit_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."anl_flow_exit_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-CREATE INDEX flowexit_node_index ON anl_flowexit_node USING GIST (the_geom);
-CREATE INDEX flowexit_arc_index ON anl_flowexit_arc USING GIST (the_geom);
+CREATE INDEX flow_exit_node_index ON anl_flow_exit_node USING GIST (the_geom);
+CREATE INDEX flow_exit_arc_index ON anl_flow_exit_arc USING GIST (the_geom);
