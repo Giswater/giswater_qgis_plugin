@@ -3,22 +3,6 @@ DECLARE
  
 BEGIN
 
-    -- Create the temporal table for computing nodes
-    DROP TABLE IF EXISTS "SCHEMA_NAME".temp_flow_trace_node CASCADE;
-    CREATE TABLE "SCHEMA_NAME".temp_flow_trace_node (
-        node_id character varying(16) NOT NULL,
-        -- Force indexed column (for performance)
-        CONSTRAINT temp_flow_trace_node_pkey PRIMARY KEY (node_id)
-    );
-
-    -- Create the temporal table for computing pipes
-    DROP TABLE IF EXISTS "SCHEMA_NAME".temp_flow_trace_arc CASCADE;
-    CREATE TABLE "SCHEMA_NAME".temp_flow_trace_arc (
-        arc_id character varying(16) NOT NULL,
-        -- Force indexed column (for performance)
-        CONSTRAINT temp_flow_trace_arc_pkey PRIMARY KEY (arc_id)
-    );
-
     -- Compute the tributary area using DFS
     PERFORM "SCHEMA_NAME".gw_fct_flow_trace_recursive(node_id_arg);
 
