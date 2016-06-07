@@ -28,5 +28,5 @@ ALTER TABLE "SCHEMA_NAME"."anl_flow_trace_node" ADD FOREIGN KEY ("node_id") REFE
 ALTER TABLE "SCHEMA_NAME"."anl_flow_trace_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-CREATE INDEX flow_trace_node_index ON anl_flow_trace_node USING GIST (the_geom);
-CREATE INDEX flow_trace_arc_index ON anl_flow_trace_arc USING GIST (the_geom);
+CREATE INDEX anl_flow_trace_node_index ON "SCHEMA_NAME".anl_flow_trace_node USING GIST (the_geom);
+CREATE INDEX anl_flow_trace_arc_index ON "SCHEMA_NAME".anl_flow_trace_arc USING GIST (the_geom);
