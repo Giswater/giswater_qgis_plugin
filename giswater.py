@@ -513,11 +513,6 @@ class Giswater(QObject):
             # Get 'arc' and 'node' list and select them 
             self.mg_flow_trace_select_features(self.layer_arc, 'arc')                         
             self.mg_flow_trace_select_features(self.layer_node, 'node')   
-            # Drop temporary tables 
-            sql = "DROP TABLE IF EXISTS temp_mincut_node CASCADE;"
-            sql+= "DROP TABLE IF EXISTS temp_mincut_arc CASCADE;"
-            sql+= "DROP TABLE IF EXISTS temp_mincut_valve CASCADE;" 
-            self.dao.execute_sql(sql)  
         elif result[0] == 1:
             self.showWarning(self.controller.tr("Parametrize error type 1"))   
             return
@@ -531,7 +526,7 @@ class Giswater(QObject):
    
     def mg_flow_trace_select_features(self, layer, elem_type):
         
-        sql = "SELECT * FROM "+self.schema_name+".temp_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"  
+        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"  
         rows = self.dao.get_rows(sql)
         self.dao.commit()
         
