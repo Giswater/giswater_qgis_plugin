@@ -127,7 +127,7 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20, 26, 28, 32):    
+                if int(index_action) in (17, 20, 26, 27, 28, 32):    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 else:        
@@ -468,18 +468,31 @@ class Giswater(QObject):
         self.iface.mapCanvas().refresh() 
     
         
-    def change_elem_type(self):
-        ''' TODO: 28. User select one node. A form is opened showing current node_type.type 
-        Combo to select new node_type.type
-        Combo to select catalog id
-        Trigger 'gw_trg_edit_node' has to be disabled temporarily '''
-        pass
-        
     def table_wizard(self):
         ''' TODO: 21. ''' 
         pass
         
+            
+    def mg_flow_exit(self):
+        ''' Button 27. Valve analytics ''' 
+                
+        # Execute SQL function
+        function_name = "gw_fct_valveanalytics"
+        sql = "SELECT "+self.schema_name+"."+function_name+"();"  
+        result = self.dao.get_row(sql) 
+        self.dao.commit()   
+
+        # Manage SQL execution result
+        if result is None:
+            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
+            return   
+        elif result[0] == 0:
+            self.showInfo(self.controller.tr("Process completed"), 50)    
+        else:
+            self.showWarning(self.controller.tr("Undefined error"))    
+            return              
         
+            
     def mg_flow_trace(self):
         ''' Button 26. User select one node or arc.
         SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
@@ -550,11 +563,13 @@ class Giswater(QObject):
         layer.setSelectedFeatures(id_list)       
         
         
-    def mg_change_elem_type(self):
-        '''User select one node. A form is opened showing current node_type.type 
+    def mg_change_elem_type(self):                
+        ''' Button 28: User select one node. A form is opened showing current node_type.type 
         Combo to select new node_type.type
         Combo to select new node_type.id
-        Combo to select new cat_node.id'''
+        Combo to select new cat_node.id
+        TODO: Trigger 'gw_trg_edit_node' has to be disabled temporarily 
+        '''
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
@@ -615,7 +630,7 @@ class Giswater(QObject):
             return
         
         # Get selected value from 2nd combobox
-        self.value_combo2= utils_giswater.getWidgetText("node_node_type_new")         
+        self.value_combo2 = utils_giswater.getWidgetText("node_node_type_new")         
         
         # When value is selected, enabled 3rd combo box
         if self.value_combo2 != 'null':
@@ -634,7 +649,7 @@ class Giswater(QObject):
         
         
     def accept(self):
-        ''' Update current type of node and save changes in database  '''
+        ''' Update current type of node and save changes in database '''
 
         # Update node_type in the database
         sql = "UPDATE "+self.schema_name+".node"
@@ -646,6 +661,9 @@ class Giswater(QObject):
         
         # Show message to the user
         self.showInfo(self.controller.tr("Node type has been update!")) 
+        
+        # Close dialog
+        self.close_dialog()
        
                   
     def close_dialog(self): 

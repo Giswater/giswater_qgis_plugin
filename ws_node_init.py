@@ -58,7 +58,7 @@ class NodeDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.node_type = utils_giswater.getWidgetText("node_type", False)        
         self.nodecat_id = utils_giswater.getWidgetText("nodecat_id", False)        
-        self.epa_type = utils_giswater.getWidgetText("epa_type", False)      
+        self.epa_type = utils_giswater.getWidgetText("epa_type", False)  
         
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
@@ -240,7 +240,8 @@ class NodeDialog(ParentDialog):
         ''' Define and execute query to populate combo 'node_type_dummy' '''
         # Get node_type.type from node_type.id
         sql = "SELECT type FROM "+self.schema_name+".node_type"
-        sql+= " WHERE id = '"+self.node_type+"'"
+        if self.node_type:
+            sql+= " WHERE id = '"+self.node_type+"'"
         row = self.dao.get_row(sql)
         if row: 
             node_type_type = row[0]
