@@ -103,7 +103,6 @@ DECLARE
 BEGIN
 
     EXECUTE 'DROP TRIGGER IF EXISTS audit_trigger_row ON ' || target_table;
-    EXECUTE 'DROP TRIGGER IF EXISTS audit_trigger_stm ON ' || target_table;
 
     IF audit_rows THEN
         IF array_length(ignored_cols,1) > 0 THEN
@@ -117,13 +116,6 @@ BEGIN
         EXECUTE _q_txt;
         stm_targets = 'TRUNCATE';
     END IF;
-
-    _q_txt = 'CREATE TRIGGER audit_trigger_stm AFTER ' || stm_targets || ' ON ' ||
-             target_table ||
-             ' FOR EACH STATEMENT EXECUTE PROCEDURE SCHEMA_NAME_audit.if_modified_func('||
-             quote_literal(audit_query_text) || ');';
-    RAISE NOTICE '%',_q_txt;
-    EXECUTE _q_txt;
 
 END;
 $BODY$
@@ -183,7 +175,6 @@ BEGIN
     FOR rec IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
         aux:= schema_name||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' ENABLE trigger audit_trigger_row';
-        EXECUTE 'ALTER TABLE '||aux||' ENABLE trigger audit_trigger_stm';
     END LOOP;
 END;
 $BODY$
@@ -199,7 +190,6 @@ BEGIN
     FOR rec IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
         aux:= schema_name||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' DISABLE trigger audit_trigger_row';
-        EXECUTE 'ALTER TABLE '||aux||' DISABLE trigger audit_trigger_stm';
     END LOOP;
 END;
 $BODY$
