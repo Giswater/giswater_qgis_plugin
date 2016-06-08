@@ -217,11 +217,3 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer_x_data (
 );
 
 
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer" ADD FOREIGN KEY ("cat_hydrometer_id") REFERENCES "SCHEMA_NAME"."ext_cat_hydrometer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer_x_value" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "SCHEMA_NAME"."ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "SCHEMA_NAME"."ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("cat_period_id") REFERENCES "SCHEMA_NAME"."ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-

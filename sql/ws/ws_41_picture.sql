@@ -33,16 +33,5 @@ CONSTRAINT picture_pkey PRIMARY KEY (id)
 );
 
 
-ALTER TABLE "SCHEMA_NAME"."picture" ADD FOREIGN KEY ("event_id") REFERENCES "SCHEMA_NAME"."event" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."picture" ADD FOREIGN KEY ("tagcat_id") REFERENCES "SCHEMA_NAME"."cat_tag" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+CREATE INDEX picture_index ON "SCHEMA_NAME"."picture" USING gist ("the_geom");
 
-
-----------------
--- SPATIAL INDEX
-----------------
-
-CREATE INDEX picture_index ON picture USING GIST (the_geom);
-
-/*
-CREATE trigger to control changes on the name of node_id, arc_id, connec_id, element_id...
-*/

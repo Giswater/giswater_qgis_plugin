@@ -4,6 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- ----------------------------
+-- Records of config system table
+-- ----------------------------
+
+INSERT INTO "SCHEMA_NAME"."config" VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false);
 
 -- ----------------------------
 -- Records of node type system table

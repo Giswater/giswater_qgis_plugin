@@ -16,3 +16,8 @@ INSERT INTO "SCHEMA_NAME"."inp_selector_sector" VALUES ('sector_01');
 -- ----------------------------
 INSERT INTO "SCHEMA_NAME"."rtc_selector_period" VALUES ('5');
 
+
+-- ----------------------------
+-- Default values of valve selection
+-- ----------------------------
+INSERT INTO "SCHEMA_NAME"."man_selector_valve" VALUES ('SHUTOFF');

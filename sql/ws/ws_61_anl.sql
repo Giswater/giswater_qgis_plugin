@@ -36,16 +36,13 @@ the_geom public.geometry (POINT, SRID_VALUE),
 CONSTRAINT anl_mincut_valve_pkey PRIMARY KEY (valve_id)
 );
 
-ALTER TABLE "SCHEMA_NAME"."anl_mincut_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."anl_mincut_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."anl_mincut_valve" ADD FOREIGN KEY ("valve_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
 
 
 CREATE INDEX mincut_polygon_index ON "SCHEMA_NAME"."anl_mincut_polygon" USING GIST (the_geom);
 CREATE INDEX mincut_node_index ON "SCHEMA_NAME"."anl_mincut_node" USING GIST (the_geom);
 CREATE INDEX mincut_arc_index ON "SCHEMA_NAME"."anl_mincut_arc" USING GIST (the_geom);
 CREATE INDEX mincut_valve_index ON "SCHEMA_NAME"."anl_mincut_valve" USING GIST (the_geom);
+
 
 
 
