@@ -42,14 +42,14 @@ class ParentDialog(object):
         
         # Set controller to handle settings and database connection
         # TODO: Try to make only one connection
-        self.controller = DaoController(self.settings, self.plugin_name)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
         status = self.controller.set_database_connection()      
         if not status:
             message = self.controller.getLastError()
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return 
              
-        self.schema_name = self.controller.getSchemaName()          
+        self.schema_name = self.controller.get_schema_name()          
         self.dao = self.controller.getDao()
             
             

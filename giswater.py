@@ -9,7 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.gui import (QgsMessageBar)
+from qgis.gui import QgsMessageBar
 from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
@@ -61,10 +61,10 @@ class Giswater(QObject):
         self.settings.setIniCodec(sys.getfilesystemencoding())    
         
         # Set controller to handle settings and database
-        self.controller = DaoController(self.settings, self.plugin_name)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
         self.controller.set_database_connection()     
         self.dao = self.controller.getDao()     
-        self.schema_name = self.controller.getSchemaName()      
+        self.schema_name = self.controller.get_schema_name()      
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -427,7 +427,7 @@ class Giswater(QObject):
         self.dao.commit()
                     
         # Refresh map canvas
-        self.iface.mapCanvas().refresh()    
+        self.iface.mapCanvas().refresh()             
         
         # Manage SQL execution result
         if result is None:
