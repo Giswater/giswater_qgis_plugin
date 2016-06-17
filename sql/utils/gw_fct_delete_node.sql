@@ -51,7 +51,7 @@ BEGIN
                 -- Final geometry
                 IF myRecord1.node_1 = node_id_arg THEN
                     IF myRecord2.node_1 = node_id_arg THEN
-                        pointArray1 := ARRAY(SELECT ST_DumpPoints(ST_Reverse(myRecord1.the_geom)));
+                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(ST_Reverse(myRecord1.the_geom))).geom);
                         pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom));
                     ELSE
                         pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom);
@@ -59,10 +59,10 @@ BEGIN
                     END IF;
                 ELSE
                     IF myRecord2.node_1 = node_id_arg THEN
-                        pointArray1 := ARRAY(SELECT ST_DumpPoints(myRecord1.the_geom));
+                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord1.the_geom)).geom);
                         pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom));
                     ELSE
-                        pointArray1 := ARRAY(SELECT ST_DumpPoints(myRecord2.the_geom));
+                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom);
                         pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(ST_Reverse(myRecord1.the_geom))).geom));
                     END IF;
                 END IF;
