@@ -196,7 +196,49 @@ $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
 
 
-
 -- Start to audit all the tables of the schema
-SELECT SCHEMA_NAME_audit.audit_schema('SCHEMA_NAME');
+--SELECT SCHEMA_NAME_audit.audit_schema('SCHEMA_NAME');
+
+
+
+-- Audit functions
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME_audit.audit_function(p_log_code_id int4) RETURNS "pg_catalog"."int2" AS $BODY$
+BEGIN
+    RETURN SCHEMA_NAME_audit.audit_function($1, null, null);
+END;
+$BODY$
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+  
+  
+CREATE OR REPLACE FUNCTION SCHEMA_NAME_audit.audit_function(p_log_code_id int4, p_debug_info text) RETURNS "pg_catalog"."int2" AS $BODY$
+BEGIN
+    RETURN SCHEMA_NAME_audit.audit_function($1, null, $2);
+END;
+$BODY$
+LANGUAGE 'plpgsql' VOLATILE COST 100;
+
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME_audit.audit_function(p_log_function_id int4, p_log_code_id int4) RETURNS "pg_catalog"."int2" AS $BODY$
+BEGIN
+    RETURN SCHEMA_NAME_audit.audit_function($1, $2, null); 
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE COST 100;
+  
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME_audit.audit_function(p_log_code_id int4, p_log_function_id int4, p_debug_info text) RETURNS "pg_catalog"."int2" AS $BODY$
+BEGIN
+    BEGIN 
+        INSERT INTO sample_ws_fv_audit.log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
+        VALUES (p_log_code_id, p_log_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
+        RETURN p_log_code_id;
+    EXCEPTION WHEN foreign_key_violation THEN
+        INSERT INTO sample_ws_fv_audit.log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
+        VALUES (999, p_log_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
+        RETURN 999;
+    END;
+END;
+$BODY$
+LANGUAGE 'plpgsql' VOLATILE COST 100;
 
