@@ -5,27 +5,26 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_delete_node(node_id_arg character varying) RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_delete_node(node_id_arg varchar) RETURNS int4 AS $BODY$
 DECLARE
-    epa_type_aux	varchar;
-    rec_aux		record;
-    intersect_loc	double precision;
-    exists_id	varchar;
-    message_id	integer;
-    controlValue	integer;
-    myRecord1	"SCHEMA_NAME".arc;
-    myRecord2	"SCHEMA_NAME".arc;
-    arc_geom	geometry;
-    arc_id_1	varchar;
-    arc_id_2	varchar;
-    pointArray1	geometry[];
-    pointArray2	geometry[];
-
+    epa_type_aux varchar;
+    rec_aux record;
+    intersect_loc double precision;
+    exists_id varchar;
+    message_id integer;
+    controlValue integer;
+    myRecord1 SCHEMA_NAME.arc;
+    myRecord2 SCHEMA_NAME.arc;
+    arc_geom geometry;
+    arc_id_1 varchar;
+    arc_id_2 varchar;
+    pointArray1 geometry[];
+    pointArray2 geometry[];
 
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = SCHEMA_NAME, public;
 
     -- Check if the node is exists
     SELECT node_id INTO exists_id FROM node WHERE node_id = node_id_arg;
@@ -101,27 +100,24 @@ BEGIN
 
                 END IF;
 
-            -- Pipes are different
+            -- Pipes has different types
             ELSE
-                RETURN 2;
+                RETURN SCHEMA_NAME_audit.audit_function(202);
             END IF;
          
         -- Node has not 2 arcs
         ELSE
-            RETURN 3;
+            RETURN SCHEMA_NAME_audit.audit_function(203);
         END IF;
 
-    -- The arc_id was not found
+    -- Node not found
     ELSE 
-        RAISE EXCEPTION 'Nonexistent node ID --> %', node_id_arg
-        USING HINT = 'Please check your node table';
-        RETURN 1;
+        RETURN SCHEMA_NAME_audit.audit_function(201);
     END IF;
 
-    RETURN 0;
+    RETURN SCHEMA_NAME_audit.audit_function(0);
 
 END;
 $BODY$
-  LANGUAGE 'plpgsql' VOLATILE COST 100
-;
+  LANGUAGE 'plpgsql' VOLATILE COST 100;
 

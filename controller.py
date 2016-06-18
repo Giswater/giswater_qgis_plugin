@@ -88,11 +88,10 @@ class DaoController():
         
         
     def get_row(self, sql):
+        ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         #self.logger.info(sql)
         status = False
-        
-        # Execute SQL and manage its result
         result = self.dao.get_row(sql)
         self.dao.commit()        
         if result is None:
