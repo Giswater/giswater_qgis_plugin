@@ -232,7 +232,11 @@ BEGIN
     BEGIN 
         INSERT INTO sample_ws_fv_audit.log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
         VALUES (p_log_code_id, p_log_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
-        RETURN p_log_code_id;
+        IF p_log_code_id >= 100 AND p_log_code_id < 200 THEN
+            RETURN null;
+        ELSE
+            RETURN p_log_code_id;
+        END IF;
     EXCEPTION WHEN foreign_key_violation THEN
         INSERT INTO sample_ws_fv_audit.log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
         VALUES (999, p_log_function_id, p_debug_info, current_query(), session_user, inet_client_addr());

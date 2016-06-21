@@ -132,3 +132,10 @@ REFERENCES SCHEMA_NAME_audit.log_code ("id") ON DELETE CASCADE ON UPDATE CASCADE
 ALTER TABLE SCHEMA_NAME_audit.log_detail ADD FOREIGN KEY ("log_function_id") 
 REFERENCES SCHEMA_NAME_audit.log_function ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+
+DROP VIEW IF EXISTS SCHEMA_NAME_audit.v_audit_functions;
+CREATE VIEW SCHEMA_NAME_audit.v_audit_functions AS 
+SELECT tstamp, log_code.id, log_code.message, log_code.log_level, log_code.show_user, user_name, addr, debug_info
+FROM SCHEMA_NAME_audit.log_detail INNER JOIN SCHEMA_NAME_audit.log_code ON log_detail.log_code_id = log_code.id
+ORDER BY log_detail.id DESC;
+
