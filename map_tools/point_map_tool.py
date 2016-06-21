@@ -16,6 +16,7 @@ class PointMapTool(QgsMapTool):
         self.srid = self.settings.value('status/srid')
         self.node_type = self.settings.value('insert_values/'+str(index_action)+'_node_type')
         self.epa_type = self.settings.value('insert_values/'+str(index_action)+'_epa_type')
+        self.controller = controller
         self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name()   
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')          
@@ -29,7 +30,7 @@ class PointMapTool(QgsMapTool):
             the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+self.srid+")";
             sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
             sql+= " VALUES ('"+self.node_type+"', '"+self.epa_type+"', "+the_geom+");";
-            status = self.dao.execute_sql(sql)   
+            status = self.controller.execute_sql(sql)  
             return status  
       
 
