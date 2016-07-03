@@ -23,8 +23,8 @@ DECLARE
 
 BEGIN
 
-    SET search_path = "SCHEMA_NAME", public;
-
+    SET search_path = TG_TABLE_SCHEMA, public;
+    
     -- Main loop
     FOREACH connec_id_aux IN ARRAY connec_array
     LOOP
