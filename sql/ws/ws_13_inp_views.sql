@@ -45,13 +45,6 @@ JOIN SCHEMA_NAME.inp_selector_sector ON (((node.sector_id)::text = (inp_selector
 JOIN SCHEMA_NAME.inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)));
 
 
-CREATE VIEW "SCHEMA_NAME"."v_inp_demand" AS 
-SELECT inp_demand.node_id, inp_demand.demand, inp_demand.pattern_id, inp_demand.deman_type, inp_selector_sector.sector_id FROM (((SCHEMA_NAME.inp_demand 
-JOIN SCHEMA_NAME.node ON (((inp_demand.node_id)::text = (node.node_id)::text))) 
-JOIN SCHEMA_NAME.inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text)))
-JOIN SCHEMA_NAME.inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)));
-
-
 CREATE VIEW "SCHEMA_NAME"."v_inp_source" AS 
 SELECT inp_source.node_id, inp_source.sourc_type, inp_source.quality, inp_source.pattern_id, inp_selector_sector.sector_id FROM (((SCHEMA_NAME.inp_source JOIN SCHEMA_NAME.node ON (((inp_source.node_id)::text = (node.node_id)::text))) 
 JOIN SCHEMA_NAME.inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text)))
@@ -81,20 +74,6 @@ JOIN SCHEMA_NAME.node ON (((inp_emitter.node_id)::text = (node.node_id)::text)))
 JOIN SCHEMA_NAME.inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text)))
 JOIN SCHEMA_NAME.inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text))); 
 
-
-CREATE VIEW "SCHEMA_NAME"."v_inp_junction" AS 
-SELECT inp_junction.node_id, (node.elevation-node."depth")::numeric(12,4), elevation, inp_junction.demand, inp_junction.pattern_id, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, inp_selector_sector.sector_id 
-FROM (((SCHEMA_NAME.inp_junction 
-JOIN SCHEMA_NAME.node ON ((inp_junction.node_id)::text = (node.node_id)::text))
-JOIN SCHEMA_NAME.inp_selector_sector ON ((node.sector_id)::text = (inp_selector_sector.sector_id)::text))
-JOIN SCHEMA_NAME.inp_selector_state ON ((node."state")::text = (inp_selector_state.id)::text))
-UNION
-SELECT inp_junction.node_id, (temp_node.elevation-temp_node."depth")::numeric(12,4), elevation, inp_junction.demand, inp_junction.pattern_id, (st_x(temp_node.the_geom))::numeric(16,3) AS xcoord, (st_y(temp_node.the_geom))::numeric(16,3) AS ycoord, inp_selector_sector.sector_id 
-FROM (((SCHEMA_NAME.inp_junction 
-JOIN SCHEMA_NAME.temp_node ON ((inp_junction.node_id)::text = (temp_node.node_id)::text))
-JOIN SCHEMA_NAME.inp_selector_sector ON ((temp_node.sector_id)::text = (inp_selector_sector.sector_id)::text))
-JOIN SCHEMA_NAME.inp_selector_state ON ((temp_node."state")::text = (inp_selector_state.id)::text))
-ORDER BY node_id;
 
 
 CREATE VIEW "SCHEMA_NAME"."v_inp_reservoir" AS 

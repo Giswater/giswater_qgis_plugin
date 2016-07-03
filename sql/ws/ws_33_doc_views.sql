@@ -11,7 +11,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_node AS
 SELECT
 doc_x_node.id,
 doc_x_node.node_id,
-doc.doccat_id,
+doc.doc_type,
 doc_x_node.doc_id,
 doc.path,
 doc.observ,
@@ -29,7 +29,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_arc AS
 SELECT 
 doc_x_arc.id,
 doc_x_arc.arc_id,
-doc.doccat_id,
+doc.doc_type,
 doc_x_arc.doc_id,
 doc.path,
 doc.observ,
@@ -46,7 +46,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_connec AS
 SELECT
 doc_x_connec.id,
 doc_x_connec.connec_id,
-doc.doccat_id,
+doc.doc_type,
 doc_x_connec.doc_id,
 doc.path,
 doc.observ,

@@ -19,3 +19,5 @@ SET client_min_messages = warning;
 
 CREATE SCHEMA "SCHEMA_NAME";
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+CREATE EXTENSION IF NOT EXISTS tablefunc;
