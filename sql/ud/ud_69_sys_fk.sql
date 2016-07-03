@@ -5,29 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+
 -- ----------------------------
--- FLOW TRACE
+-- Fk 61
 -- ----------------------------
-
-
-CREATE TABLE "SCHEMA_NAME"."anl_flow_trace_node" (
-node_id varchar (16) NOT NULL,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_flow_trace_node_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "SCHEMA_NAME"."anl_flow_trace_arc" (
-arc_id varchar (16) NOT NULL,
-the_geom public.geometry (LINESTRING, SRID_VALUE),
-CONSTRAINT anl_flow_trace_arc_pkey PRIMARY KEY (arc_id)
-);
-
 
 ALTER TABLE "SCHEMA_NAME"."anl_flow_trace_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."anl_flow_trace_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
-CREATE INDEX anl_flow_trace_node_index ON "SCHEMA_NAME".anl_flow_trace_node USING GIST (the_geom);
-CREATE INDEX anl_flow_trace_arc_index ON "SCHEMA_NAME".anl_flow_trace_arc USING GIST (the_geom);
-
+ALTER TABLE "SCHEMA_NAME"."anl_flow_exit_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."anl_flow_exit_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;

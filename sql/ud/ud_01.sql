@@ -4,20 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-
---
--- TOC entry 10 (class 2615 OID 151924)
--- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA "SCHEMA_NAME";
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
 
 
 -- -----------------------------
@@ -99,6 +85,15 @@ CREATE SEQUENCE "SCHEMA_NAME"."gully_seq"
     NO MAXVALUE
     CACHE 1;
 
+
+CREATE SEQUENCE "SCHEMA_NAME"."lgully_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+	
 CREATE SEQUENCE "SCHEMA_NAME"."element_seq"
     START WITH 1
     INCREMENT BY 1
@@ -182,9 +177,10 @@ CREATE TABLE "SCHEMA_NAME"."config" (
 "connec_proximity" double precision,
 "arc_toporepair" double precision,
 "nodeinsert_arcendpoint" boolean,
-"nodeinsert_nodetype_vdefault" varchar (30),
+"nodeinsert_catalog_vdefault" varchar (30),
 "orphannode_delete" boolean,
 "vnode_update_tolerance" double precision,
+"nodetype_change_enabled" boolean,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
@@ -399,18 +395,6 @@ CONSTRAINT man_type_street_pkey PRIMARY KEY (id)
 );
 
 
--- ----------------------------
--- Table: GIS environment
--- ----------------------------
-
-CREATE TABLE "SCHEMA_NAME"."streetaxis" (
-"id" varchar (16) NOT NULL,
-"type" varchar(18),
-"name" varchar(100),
-"text" text,
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
-CONSTRAINT streeaxis_pkey PRIMARY KEY (id)
-);
 
 -- ----------------------------
 -- Table: GIS features
@@ -447,13 +431,12 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "location_type" varchar(18)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
-"builtdate" timestamp (6) without time zone,
+"builtdate" date,
 "ownercat_id" varchar(30)  ,
 "adress_01" varchar(50)  ,
 "adress_02" varchar(50)  ,
 "adress_03" varchar(50)  ,
 "descript" varchar(254)  ,
-
 "est_top_elev" varchar(6),
 "est_ymax" varchar(6),
 "rotation" numeric (6,3),
@@ -489,13 +472,12 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "location_type" varchar(18)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
-"builtdate" timestamp (6) without time zone,
+"builtdate" date,
 "ownercat_id" varchar(30)  ,
 "adress_01" varchar(50)  ,
 "adress_02" varchar(50)  ,
 "adress_03" varchar(50)  ,
 "descript" varchar(254)  ,
-
 "est_y1" boolean,
 "est_y2" boolean,
 "rotation" numeric (6,3),
@@ -533,6 +515,9 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "ymax" numeric(12,4),
 "connecat_id" varchar(30)  ,
 "sector_id" varchar(30)  ,
+"code" varchar(30),
+"n_hydrometer" int4,
+"demand" numeric(12,8),
 "state" character varying(16),
 "annotation" character varying(254),
 "observ" character varying(254),
@@ -545,7 +530,7 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "location_type" varchar(18)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
-"builtdate" timestamp (6) without time zone,
+"builtdate" date,
 "ownercat_id" varchar(30)  ,
 "adress_01" varchar(50)  ,
 "adress_02" varchar(50)  ,
@@ -562,27 +547,27 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."vnode" (
-"vnode_id" varchar(16) DEFAULT nextval('"test_ws".vnode_seq'::regclass) NOT NULL,
+"vnode_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".vnode_seq'::regclass) NOT NULL,
 "arc_id" varchar(16),
 "userdefined_pos" bool,
 "vnode_type" varchar(30),
 "sector_id" varchar(30),
 "state" varchar(16),
 "annotation" varchar(254),
-"the_geom" "public"."geometry",
+"the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT "vnode_pkey" PRIMARY KEY ("vnode_id")
 );
+
 
 
 CREATE TABLE "SCHEMA_NAME"."link" (
 link_id varchar (16) DEFAULT nextval('"SCHEMA_NAME".link_seq'::regclass) NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
-connec_id varchar(16) ,
-vnode_id varchar(16) ,
+connec_id varchar(16)  ,
+vnode_id varchar(16)  ,
 custom_length numeric (12,3),
 CONSTRAINT link_pkey PRIMARY KEY (link_id)
 );
-
 
 
 CREATE TABLE "SCHEMA_NAME"."gully" (
@@ -609,17 +594,19 @@ CREATE TABLE "SCHEMA_NAME"."gully" (
 "location_type" varchar(18)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
-"builtdate" timestamp (6) without time zone,
+"builtdate" date,
 "ownercat_id" varchar(30)  ,
 "adress_01" varchar(50)  ,
 "adress_02" varchar(50)  ,
 "adress_03" varchar(50)  ,
 "descript" varchar(254)  ,
 "link" character varying(512),
-"verified" varchar(4)  ,
+"verified" varchar(4),
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"the_geom_pol" public.geometry (POLYGON, SRID_VALUE),
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
+
 
 
 
@@ -660,7 +647,6 @@ CREATE TABLE "SCHEMA_NAME"."man_conduit" (
 "add_info" varchar(255)  ,
 CONSTRAINT man_conduit_pkey PRIMARY KEY (arc_id)
 );
-
 
 
 
@@ -711,6 +697,7 @@ CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
 );
 
 
+
 -- ----------------------------------
 -- Table: value domain
 -- ----------------------------------
@@ -739,134 +726,19 @@ CREATE TABLE "SCHEMA_NAME"."value_yesno" (
 
 
 
-------
--- FK
-------
-
-ALTER TABLE "SCHEMA_NAME"."cat_arc" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arc_type") REFERENCES "SCHEMA_NAME"."arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."cat_node" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("node_type") REFERENCES "SCHEMA_NAME"."node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("nodecat_id") REFERENCES "SCHEMA_NAME"."cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("verified") REFERENCES "SCHEMA_NAME"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_1") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("node_2") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("verified") REFERENCES "SCHEMA_NAME"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."polygon" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."cat_element" ADD FOREIGN KEY ("elementtype_id") REFERENCES "SCHEMA_NAME"."element_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_element" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_element" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."cat_connec" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."cat_connec" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."connec_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("connecat_id") REFERENCES "SCHEMA_NAME"."cat_connec" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."dma" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."link" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."link" ADD FOREIGN KEY ("vnode_id") REFERENCES "SCHEMA_NAME"."vnode" ("vnode_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("gratecat_id") REFERENCES "SCHEMA_NAME"."cat_grate" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("arccat_id") REFERENCES "SCHEMA_NAME"."cat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("matcat_id") REFERENCES "SCHEMA_NAME"."cat_mat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("groove") REFERENCES "SCHEMA_NAME"."value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("siphon") REFERENCES "SCHEMA_NAME"."value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("dma_id") REFERENCES "SCHEMA_NAME"."dma" ("dma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("soilcat_id") REFERENCES "SCHEMA_NAME"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("soilcat_id") REFERENCES "SCHEMA_NAME"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("soilcat_id") REFERENCES "SCHEMA_NAME"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("soilcat_id") REFERENCES "SCHEMA_NAME"."cat_soil" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("category_type") REFERENCES "SCHEMA_NAME"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("category_type") REFERENCES "SCHEMA_NAME"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("category_type") REFERENCES "SCHEMA_NAME"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("category_type") REFERENCES "SCHEMA_NAME"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("fluid_type") REFERENCES "SCHEMA_NAME"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("fluid_type") REFERENCES "SCHEMA_NAME"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("fluid_type") REFERENCES "SCHEMA_NAME"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("fluid_type") REFERENCES "SCHEMA_NAME"."man_type_fluid" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("location_type") REFERENCES "SCHEMA_NAME"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("location_type") REFERENCES "SCHEMA_NAME"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("location_type") REFERENCES "SCHEMA_NAME"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("location_type") REFERENCES "SCHEMA_NAME"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("workcat_id") REFERENCES "SCHEMA_NAME"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("workcat_id") REFERENCES "SCHEMA_NAME"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("workcat_id") REFERENCES "SCHEMA_NAME"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("workcat_id") REFERENCES "SCHEMA_NAME"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("buildercat_id") REFERENCES "SCHEMA_NAME"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("buildercat_id") REFERENCES "SCHEMA_NAME"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("buildercat_id") REFERENCES "SCHEMA_NAME"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("buildercat_id") REFERENCES "SCHEMA_NAME"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."gully" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."man_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("streetaxis_id") REFERENCES "SCHEMA_NAME"."streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."vnode" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."man_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."man_storage" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."man_outfall" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."man_virtual" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."man_conduit" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("elementcat_id") REFERENCES "SCHEMA_NAME"."cat_element" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("state") REFERENCES "SCHEMA_NAME"."value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("location_type") REFERENCES "SCHEMA_NAME"."man_type_location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("workcat_id") REFERENCES "SCHEMA_NAME"."cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("buildercat_id") REFERENCES "SCHEMA_NAME"."cat_builder" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("ownercat_id") REFERENCES "SCHEMA_NAME"."cat_owner" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element" ADD FOREIGN KEY ("verified") REFERENCES "SCHEMA_NAME"."value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
-ALTER TABLE "SCHEMA_NAME"."element_x_node" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."element_x_connec" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "SCHEMA_NAME"."connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."element_x_gully" ADD FOREIGN KEY ("element_id") REFERENCES "SCHEMA_NAME"."element" ("element_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."element_x_gully" ADD FOREIGN KEY ("gully_id") REFERENCES "SCHEMA_NAME"."gully" ("gully_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-
-
-
 ----------------
 -- SPATIAL INDEX
 ----------------
 
-CREATE INDEX arc_index ON arc USING GIST (the_geom);
-CREATE INDEX node_index ON node USING GIST (the_geom);
-CREATE INDEX dma_index ON dma USING GIST (the_geom);
-CREATE INDEX sector_index ON sector USING GIST (the_geom);
-CREATE INDEX connec_index ON connec USING GIST (the_geom);
-CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
-CREATE INDEX link_index ON link USING GIST (the_geom);
-CREATE INDEX gully_index ON gully USING GIST (the_geom);
+
+CREATE INDEX arc_index ON "SCHEMA_NAME".arc USING GIST (the_geom);
+CREATE INDEX node_index ON "SCHEMA_NAME".node USING GIST (the_geom);
+CREATE INDEX dma_index ON "SCHEMA_NAME".dma USING GIST (the_geom);
+CREATE INDEX sector_index ON "SCHEMA_NAME".sector USING GIST (the_geom);
+CREATE INDEX connec_index ON "SCHEMA_NAME".connec USING GIST (the_geom);
+CREATE INDEX gully_index ON "SCHEMA_NAME".gully USING GIST (the_geom);
+CREATE INDEX vnode_index ON "SCHEMA_NAME".vnode USING GIST (the_geom);
+CREATE INDEX link_index ON "SCHEMA_NAME".link USING GIST (the_geom);
+
 
 

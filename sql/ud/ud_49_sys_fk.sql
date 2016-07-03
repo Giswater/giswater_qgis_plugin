@@ -5,5 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-INSERT INTO "SCHEMA_NAME"."config" VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,null,null,null);
+
+ALTER TABLE "SCHEMA_NAME"."picture" ADD FOREIGN KEY ("event_id") REFERENCES "SCHEMA_NAME"."event" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SCHEMA_NAME"."picture" ADD FOREIGN KEY ("tagcat_id") REFERENCES "SCHEMA_NAME"."cat_tag" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

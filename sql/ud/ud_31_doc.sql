@@ -5,9 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- ----------------------------
--- Structure for event
--- ----------------------------
 
 CREATE SEQUENCE "SCHEMA_NAME".doc_seq
   START WITH 1
@@ -43,6 +40,8 @@ CREATE SEQUENCE "SCHEMA_NAME".doc_x_gully_seq
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
+  
+  
 
 
 CREATE TABLE "SCHEMA_NAME"."doc_type" (
@@ -52,14 +51,6 @@ CONSTRAINT doc_type_pkey PRIMARY KEY (id)
 );
   
   
-CREATE TABLE "SCHEMA_NAME"."cat_doc" (
-"id" varchar(30)   NOT NULL,
-"type" varchar(30)  ,
-"descript" varchar(50)  ,
-"comment" varchar(512)  ,
-CONSTRAINT cat_doc_pkey PRIMARY KEY (id)
-);
-
 
 CREATE TABLE "SCHEMA_NAME"."cat_tag" (
 "id" varchar(16)   NOT NULL,
@@ -70,7 +61,7 @@ CONSTRAINT cat_tag_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."doc" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_seq'::regclass) NOT NULL,
-"doccat_id" varchar(30)  ,
+"doc_type" varchar(30)  ,
 "path" varchar(512)  ,
 "observ" varchar(512)  ,
 "tagcat_id" varchar(16)  ,
@@ -81,7 +72,7 @@ CONSTRAINT doc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."doc_x_node" (
-"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_node'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_node_seq'::regclass) NOT NULL,
 "doc_id" int8,
 "node_id" varchar(16)  ,
 CONSTRAINT doc_x_node_pkey PRIMARY KEY (id)
@@ -89,7 +80,7 @@ CONSTRAINT doc_x_node_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."doc_x_arc" (
-"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_arc'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_arc_seq'::regclass) NOT NULL,
 "doc_id" int8,
 "arc_id" varchar(16)  ,
 CONSTRAINT doc_x_arc_pkey PRIMARY KEY (id)
@@ -97,7 +88,7 @@ CONSTRAINT doc_x_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."doc_x_connec" (
-"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_connec'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_connec_seq'::regclass) NOT NULL,
 "doc_id" int8,
 "connec_id" varchar(16)  ,
 CONSTRAINT doc_x_connec_pkey PRIMARY KEY (id)
@@ -111,9 +102,9 @@ CONSTRAINT doc_x_gully_pkey PRIMARY KEY (id)
 );
 
 
-ALTER TABLE "SCHEMA_NAME"."cat_doc" ADD FOREIGN KEY ("id") REFERENCES "SCHEMA_NAME"."doc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "SCHEMA_NAME"."doc" ADD FOREIGN KEY ("doccat_id") REFERENCES "SCHEMA_NAME"."cat_doc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "SCHEMA_NAME"."doc" ADD FOREIGN KEY ("doc_type") REFERENCES "SCHEMA_NAME"."doc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SCHEMA_NAME"."doc" ADD FOREIGN KEY ("tagcat_id") REFERENCES "SCHEMA_NAME"."cat_tag" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "SCHEMA_NAME"."doc_x_node" ADD FOREIGN KEY ("doc_id") REFERENCES "SCHEMA_NAME"."doc" ("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -109,15 +109,6 @@ INSERT INTO SCHEMA_NAME.cat_work VALUES ('WORK NO DATA', NULL, NULL, NULL);
 
 
 -- ----------------------------
--- Records of cat_event
--- ----------------------------
-INSERT INTO SCHEMA_NAME.cat_event VALUES ('EV01-INS', 'INSPECTION', 'Inspection 2015', NULL);
-INSERT INTO SCHEMA_NAME.cat_event VALUES ('EV02-REP', 'REPAIR', 'Repair 2015', NULL);
-INSERT INTO SCHEMA_NAME.cat_event VALUES ('EV03-INS', 'INSPECTION', 'Inspection 2016', NULL);
-INSERT INTO SCHEMA_NAME.cat_event VALUES ('EV04-REC', 'RECONSTRUCT', 'Reconstruction 2015', NULL);
-
-
--- ----------------------------
 -- Records of cat_tag
 -- ----------------------------
 INSERT INTO SCHEMA_NAME.cat_tag VALUES ('NO TAG', null);
