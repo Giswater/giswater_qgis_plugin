@@ -2,7 +2,7 @@
 from qgis.gui import *       # @UnusedWildImport
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
-from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsMapLayerRegistry, QgsProject)
+from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject)
 
 
 class MoveNode(QgsMapTool):
@@ -15,12 +15,11 @@ class MoveNode(QgsMapTool):
         self.settings = settings        
         self.index_action = index_action
         self.srid = self.settings.value('status/srid')        
-        self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
+        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
         self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name()   
-        self.layer_name = "Arc"   
         self.layer_arc = None
         
         # Vertex marker
@@ -44,6 +43,11 @@ class MoveNode(QgsMapTool):
         self.rubberBand.setWidth(3)           
         self.reset()        
         
+        
+    def set_layer_arc(self, layer_arc):
+        ''' Set layer 'Arc' '''
+        self.layer_arc = layer_arc
+
 
     def reset(self):
                 
@@ -99,12 +103,9 @@ class MoveNode(QgsMapTool):
     def activate(self):
         ''' Called when set as currently active map tool '''
         
-        # Check if layer named <self.layer_name> is loaded
-        aux = QgsMapLayerRegistry.instance().mapLayersByName(self.layer_name)
-        if len(aux) > 0:
-            self.layer_arc = aux[0]
+        # Check if layer 'Arc' is loaded
         if self.layer_arc is None:
-            self.showWarning("Layer named '"+self.layer_name+"' not found")
+            self.showWarning("Layer 'Arc' not found")
             return                
         
         # Change pointer
@@ -180,7 +181,7 @@ class MoveNode(QgsMapTool):
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
             # That's the snapped point
-            if (result <> []) and (result[0].layer.name() == self.layer_name) and (result[0].snappedVertexNr == -1):
+            if (result <> []) and (result[0].layer.name() == self.layer_arc.name()) and (result[0].snappedVertexNr == -1):
             
                 point = QgsPoint(result[0].snappedVertex)
 
@@ -242,7 +243,7 @@ class MoveNode(QgsMapTool):
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
                 # That's the snapped point
-                if (result <> []) and (result[0].layer.name() == self.layer_name):
+                if (result <> []) and (result[0].layer.name() == self.layer_arc.name()):
             
                     point = QgsPoint(result[0].snappedVertex)
                     
