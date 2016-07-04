@@ -2,18 +2,13 @@
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 from qgis.utils import iface
+from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
+from qgis.gui import QgsAttributeTableModel, QgsMessageBar
+import os
 
 import utils_giswater
 from ws_parent_init import ParentDialog
 
-from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry
-from qgis.gui import QgsAttributeTableView, QgsAttributeTableModel
-
-from controller import DaoController
-from itertools import count
-
-import os
-import ctypes
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -24,13 +19,13 @@ def formOpen(dialog, layer, feature):
     feature_dialog = ConnecDialog(iface, dialog, layer, feature)
     init_config()
     
+    
 def init_config():
      
     feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)         
     connecat_id = utils_giswater.getWidgetText("connecat_id", False)
     
-    
-    # TODO: Define slots
+    # Define slots
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)        
 
@@ -80,19 +75,16 @@ class ConnecDialog(ParentDialog):
         self.fill_connec_event_node()
         
 
-
                     
-    ''' TODO: Slot functions '''  
+    ''' Slot functions '''  
     
     def set_tabs_visibility(self):
         ''' Hide some tabs '''     
         self.tab_main.removeTab(3) 
-        
-        
+          
     
     def fill_document_connec(self):
-        '''Fill tab document of arc
-        '''
+        '''Fill tab document of arc '''
         
         self.tbl_connec = self.dialog.findChild(QTableView, "tbl_connec") 
         
@@ -158,28 +150,24 @@ class ConnecDialog(ParentDialog):
         
         # Check if clicked value is from the column "PATH"
         position_column = self.tbl_connec.currentIndex().column()
-        if position_column == 4 :      
+        if position_column == 4:      
             # Get data from address in memory (pointer)
             self.path=self.tbl_connec.selectedIndexes()[0].data() 
             # Check if file exist
             if not os.path.exists(self.path):
-                message="File doesn't exist!"
+                message = "File doesn't exist!"
                 self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
-                print ("File doesn't exist!")
-                
-            else :
+            else:
                 # Open the document
                 os.startfile(self.path)     
-        else :
+        else:
             return
-            
-    def showWarning(self, text, duration = 3):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)   
+        
         
     def get_doc_user(self):
-        '''Get selected value from combobox doc_user
-        Filter the table related on selected value'''
-        print ("koji k")
+        ''' Get selected value from combobox doc_user
+        Filter the table related on selected value '''
+        
         # Get selected value from ComboBoxs
         self.doc_user_value = utils_giswater.getWidgetText("doc_user")
         self.doc_type_value = utils_giswater.getWidgetText("doc_type")
@@ -221,8 +209,8 @@ class ConnecDialog(ParentDialog):
         
         
     def get_doc_type(self):
-        '''Get selected value from combobox cat_doc_type
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox cat_doc_type
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBox cat_doc_type 
         self.doc_type_value = utils_giswater.getWidgetText("doc_type")
@@ -233,7 +221,6 @@ class ConnecDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'AND "doccat_id" = \'' +self.doc_type_value + '\'')
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_value !='null'):
@@ -260,9 +247,10 @@ class ConnecDialog(ParentDialog):
         self.model.loadLayer()
         self.tbl_connec.setModel(self.model)
     
+    
     def get_doc_tag(self):
-        '''Get selected value from combobox doc_tag 
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_tag 
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxes
         self.doc_type_value = utils_giswater.getWidgetText("doc_type")
@@ -273,7 +261,6 @@ class ConnecDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'AND "tagcat_id" = \'' +self.doc_tag_value + '\'')
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_value !='null'):
@@ -302,10 +289,10 @@ class ConnecDialog(ParentDialog):
         self.model.loadLayer()
         self.tbl_connec.setModel(self.model)
         
+        
     def get_date(self):
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
+        Filter the table related on selected value '''
         #self.tbl_document.setModel(self.model)
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from") 
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")     
@@ -315,9 +302,8 @@ class ConnecDialog(ParentDialog):
         
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "connec_id" ='+ self.connec_id_selected+'' )
-            print(expr.dump())
         else :
-            message="Valid interval!"
+            message = "Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
@@ -328,8 +314,7 @@ class ConnecDialog(ParentDialog):
         
         
     def fill_info_node(self): 
-        ''' Fill tab info of node
-        '''
+        ''' Fill tab info of node '''
         
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")  
         
@@ -355,8 +340,7 @@ class ConnecDialog(ParentDialog):
             
             
     def fill_connec_event_node(self):
-        '''Fill tab event->node of connec
-        '''
+        ''' Fill tab event->node of connec '''
         
         self.tbl_event_node = self.dialog.findChild(QTableView, "tbl_event_node") 
         
@@ -406,17 +390,14 @@ class ConnecDialog(ParentDialog):
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'' )
             request = QgsFeatureRequest(expr)
-    
-            print(expr.dump())
             self.model_connec.setRequest(request)
             self.model_connec.loadLayer()
             self.tbl_event_node.setModel(self.model_connec)
 
 
     def get_doc_user_3(self):
-        print ("get_doc_user_3")
-        '''Get selected value from combobox doc_user_2
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_user_2
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_3_value = utils_giswater.getWidgetText("doc_user_3")
@@ -444,7 +425,6 @@ class ConnecDialog(ParentDialog):
                 expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'AND "event_type" = \'' +self.event_type_3_value + '\'') 
             if ((self.event_id_3_value !='null')&(self.event_type_3_value != 'null')):
                 expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'AND "event_id" = \'' +self.event_id_3_value + '\' AND "event_type" = \'' +self.event_type_3_value + '\'')  
-            
             if((self.event_id_3_value =='null')&(self.event_type_3_value == 'null')):  
                 # Automatically fill the table, based on connec_id if all value of Comboboxes are 'null'
                 expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'' )
@@ -454,10 +434,10 @@ class ConnecDialog(ParentDialog):
         self.model_connec.loadLayer()
         self.tbl_event_node.setModel(self.model_connec)
     
+    
     def get_event_id_3(self):
-        print("get event id 3")
-        '''Get selected value from combobox event_id
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox event_id
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_3_value = utils_giswater.getWidgetText("doc_user_3")
@@ -468,7 +448,6 @@ class ConnecDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'AND "event_id" = \'' +self.event_id_3_value + '\'')
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_3_value !='null'):
@@ -495,10 +474,11 @@ class ConnecDialog(ParentDialog):
         self.model_connec.setRequest(request)
         self.model_connec.loadLayer()
         self.tbl_event_node.setModel(self.model_connec)
+    
         
     def get_event_type_3(self):
-        '''Get selected value from combobox event_type_3
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox event_type_3
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_3_value = utils_giswater.getWidgetText("doc_user_3")
@@ -509,7 +489,6 @@ class ConnecDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"connec_id" ='+ self.connec_id_selected+'AND "event_type" = \'' +self.event_type_3_value + '\'')
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_3_value !='null'):
@@ -539,10 +518,8 @@ class ConnecDialog(ParentDialog):
         
         
     def get_date_event_element_3(self):
-        print ("get_date_event_element")
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
+        Filter the table related on selected value '''
 
         self.date_document_from_3 = self.dialog.findChild(QDateEdit, "date_document_from_3") 
         self.date_document_to_3 = self.dialog.findChild(QDateEdit, "date_document_to_3")     
@@ -552,9 +529,8 @@ class ConnecDialog(ParentDialog):
         
         if (date_from < date_to):
             expr = QgsExpression('format_date("timestamp",\'yyyyMMdd\') > ' + self.date_document_from_3.date().toString('yyyyMMdd')+'AND format_date("timestamp",\'yyyyMMdd\') < ' + self.date_document_to_3.date().toString('yyyyMMdd')+ ' AND "connec_id" ='+ self.connec_id_selected+'' )
-            print(expr.dump())
         else :
-            message="Valid interval!"
+            message = "Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
@@ -562,13 +538,9 @@ class ConnecDialog(ParentDialog):
         self.model_connec.setRequest(request)
         self.model_connec.loadLayer()
         self.tbl_event_node.setModel(self.model_connec)  
-        
-        
-        
+      
         
     def fill_connec_event_element(self):
-        print("fill element")
-        print("fill element")
         
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         
@@ -587,7 +559,6 @@ class ConnecDialog(ParentDialog):
         self.date_document_to_2.dateChanged.connect(self.get_date_event_element)
         self.date_document_from_2 = self.dialog.findChild(QDateEdit, "date_document_from_2")
         self.date_document_from_2.dateChanged.connect(self.get_date_event_element)
-
         
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_event_x_element")
@@ -619,7 +590,6 @@ class ConnecDialog(ParentDialog):
             
             # Execute value from sql to self.connec_event_id
             self.connec_event_id = self.dao.get_row(sql)
-            print(self.connec_event_id)
             '''
             # Automatically fill the table, based on event_id
             expr = QgsExpression ('"event_id" ='+ self.connec_event_id+'' )
@@ -630,11 +600,21 @@ class ConnecDialog(ParentDialog):
             self.modelC.loadLayer()
             self.tbl_event_element.setModel(self.modelC)
             '''
+            
+    
     def get_doc_user_2(self):
-        print("")
+        pass
+        
+        
     def get_event_id(self):
-        print("")
+        pass
+        
+        
     def get_event_type(self):
-        print("")
+        pass
+        
+        
     def get_date_event_element(self):
-        print("")
+        pass
+        
+        
