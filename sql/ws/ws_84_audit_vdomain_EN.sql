@@ -25,7 +25,7 @@ INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('102', 'There are no nodes catalog 
 INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('103', 'There are no sectors defined in the model, define at least one', '1', 't', 'ws_trg');
 INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('104', 'Please take a look on your map and use the approach of the sectors!', '1', 't', 'ws_trg');
 INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('105', 'There are no dma defined in the model, define at least one', '1', 't', 'ws_trg');
-INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('106', ' Please take a look on your map and use the approach of the dma', '1', 't', 'ws_trg');
+INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('106', 'Please take a look on your map and use the approach of the dma', '1', 't', 'ws_trg');
 INSERT INTO "SCHEMA_NAME"."log_code" VALUES ('107', 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog', '1', 't', 'ws_trg');
 
 -- Water supply messages (log_code.id between 200 and 299)

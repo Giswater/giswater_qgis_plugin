@@ -14,10 +14,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = pg_catalog, public;
 CREATE EXTENSION IF NOT EXISTS hstore;
 
--- Create schema for auditing
---CREATE SCHEMA IF NOT EXISTS SCHEMA_NAME;
---REVOKE ALL ON SCHEMA SCHEMA_NAME FROM public;
---COMMENT ON SCHEMA SCHEMA_NAME IS 'Out-of-table audit/history logging tables and trigger functions';
 
 --
 -- Audited data. Lots of information is available, it's just a matter of how much
