@@ -34,7 +34,7 @@ from PyQt4.Qt import * # @UnusedWildImport
 
 class LineMapTool(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, controller):
+    def __init__(self, iface, settings, action, index_action, controller):  
         ''' Class constructor '''
         
         self.iface = iface
@@ -42,7 +42,7 @@ class LineMapTool(QgsMapTool):
         self.settings = settings
         self.index_action = index_action
         self.srid = self.settings.value('status/srid')
-        self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
+        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name()              
         QgsMapTool.__init__(self, self.canvas)

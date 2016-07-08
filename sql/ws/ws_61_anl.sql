@@ -37,12 +37,19 @@ CONSTRAINT anl_mincut_valve_pkey PRIMARY KEY (valve_id)
 );
 
 
+CREATE TABLE IF NOT EXISTS "SCHEMA_NAME"."anl_valveanaytics_connec" (
+connec_id character varying(16) NOT NULL,
+the_geom public.geometry (POINT, SRID_VALUE),
+CONSTRAINT anl_valveanaytics_connec_pkey PRIMARY KEY (connec_id)
+);
+
+
 
 CREATE INDEX mincut_polygon_index ON "SCHEMA_NAME"."anl_mincut_polygon" USING GIST (the_geom);
 CREATE INDEX mincut_node_index ON "SCHEMA_NAME"."anl_mincut_node" USING GIST (the_geom);
 CREATE INDEX mincut_arc_index ON "SCHEMA_NAME"."anl_mincut_arc" USING GIST (the_geom);
 CREATE INDEX mincut_valve_index ON "SCHEMA_NAME"."anl_mincut_valve" USING GIST (the_geom);
-
+CREATE INDEX valveanalytics_connec_index ON "SCHEMA_NAME"."anl_valveanaytics_connec" USING GIST (the_geom)
 
 
 

@@ -177,9 +177,11 @@ class Giswater(QObject):
         # Create plugin main menu
         self.menu_name = self.tr('menu_name')    
         
-        # Get table or view related with 'arc' and 'node'
+        # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
+        self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
+        self.table_version = self.settings.value('db/table_version', 'version')   
         
         # Get SRID
         self.srid = self.settings.value('status/srid')             
@@ -272,6 +274,19 @@ class Giswater(QObject):
             if key in self.actions:
                 action = self.actions[key]
                 action.setEnabled(False)         
+                               
+    
+    def get_layer_source(self, layer):
+        ''' Get table or view name of selected layer '''
+        
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()   
+        pos_ini = uri.find('table=')
+        pos_fi = uri.find('" ')  
+        if pos_ini <> -1 and pos_fi <> -1:
+            uri_table = uri[pos_ini+6:pos_fi+1]                             
+            
+        return uri_table
 
                                 
     def project_read(self): 
@@ -285,25 +300,28 @@ class Giswater(QObject):
         # Initialize variables
         self.layer_arc = None
         self.layer_node = None
-        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
-        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
+        self.layer_connec = None
+        self.layer_version = None
         
-        # Iterate over all layers to get 'arc' and 'node' layer '''      
+        # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            uri = cur_layer.dataProvider().dataSourceUri().lower()   
-            pos_ini = uri.find('table=')
-            pos_fi = uri.find('" ')  
-            uri_table = uri   
-            if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]                           
-                if uri_table == table_arc:  
+            uri_table = self.get_layer_source(cur_layer)            
+            if uri_table is not None:
+                if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
-                if uri_table == table_node:  
+                if self.table_node in uri_table:  
                     self.layer_node = cur_layer
-        
-        # Disable toolbar actions and manage current layer selected
-        self.disable_actions()       
+                if self.table_connec in uri_table:  
+                    self.layer_connec = cur_layer
+                if self.table_version in uri_table:  
+                    self.layer_version = cur_layer
+                            
+        # Manage current layer selected  
         self.current_layer_changed(self.iface.activeLayer())   
+        
+        # Set layer 'Arc' for map tool 'Move node'
+        map_tool = self.map_tools['mg_move_node']
+        map_tool.set_layer_arc(self.layer_arc)
         
         # Create SearchPlus object
         try:
@@ -317,30 +335,46 @@ class Giswater(QObject):
                 self.search_plus.dlg.setVisible(False)                     
         except:
             pass       
-                               
-                               
+                        
+                                
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
 
+        # Disable all actions (buttons)
         self.disable_actions()
         if layer is None:
             layer = self.iface.activeLayer() 
+            if layer is None:
+                return            
         self.current_layer = layer
-        try:
-            list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
-            if list_index_action:
-                if type(list_index_action) is list:
-                    for index_action in list_index_action:
+        
+        # Check is selected layer is 'arc', 'node' or 'connec'
+        setting_name = None
+        uri_table = self.get_layer_source(layer)            
+        if uri_table is not None:
+            if self.table_arc in uri_table:  
+                setting_name = 'buttons_arc'
+            elif self.table_node in uri_table:  
+                setting_name = 'buttons_node'
+            elif self.table_connec in uri_table:  
+                setting_name = 'buttons_connec'                
+        
+        if setting_name is not None:
+            try:
+                list_index_action = self.settings.value('layers/'+setting_name, None)
+                if list_index_action:
+                    if type(list_index_action) is list:
+                        for index_action in list_index_action:
+                            if index_action != '-1' and str(index_action) in self.actions:
+                                self.actions[index_action].setEnabled(True)
+                    elif type(list_index_action) is unicode:
+                        index_action = str(list_index_action)
                         if index_action != '-1' and str(index_action) in self.actions:
-                            self.actions[index_action].setEnabled(True)
-                elif type(list_index_action) is unicode:
-                    index_action = str(list_index_action)
-                    if index_action != '-1' and str(index_action) in self.actions:
-                        self.actions[index_action].setEnabled(True)                
-        except AttributeError, e:
-            print "current_layer_changed: "+str(e)
-        except KeyError, e:
-            print "current_layer_changed: "+str(e)
+                            self.actions[index_action].setEnabled(True)                
+            except AttributeError, e:
+                print "current_layer_changed: "+str(e)
+            except KeyError, e:
+                print "current_layer_changed: "+str(e)
                         
                 
     def ws_generic(self, function_name):   

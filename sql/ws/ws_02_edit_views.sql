@@ -119,6 +119,7 @@ connec.streetaxis_id,
 ext_streetaxis.name,
 connec.postnumber,
 connec.descript,
+vnode.arc_id,
 cat_connec.svg AS "cat_svg",
 connec.rotation,
 connec.link,
@@ -126,7 +127,9 @@ connec.verified,
 connec.the_geom
 FROM ("SCHEMA_NAME".connec 
 LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
-LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text)));
+LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
+JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
+JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id);
 
 
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS

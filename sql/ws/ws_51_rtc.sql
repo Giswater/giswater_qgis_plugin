@@ -38,6 +38,15 @@ CREATE SEQUENCE "SCHEMA_NAME"."rtc_scada_x_sector_seq"
 -- --------------------------
 
 
+CREATE TABLE "SCHEMA_NAME"."rtc_options" (
+"id" varchar(16),
+"rtc_status" varchar(3),
+"period_id" varchar(16),
+"coefficient" varchar(16),
+CONSTRAINT rtc_options_pkey PRIMARY KEY (id)
+);
+
+
 
 CREATE TABLE "SCHEMA_NAME".rtc_scada_node (
   scada_id character varying(16) NOT NULL,
@@ -78,29 +87,15 @@ CREATE TABLE "SCHEMA_NAME".rtc_hydrometer_x_connec (
 -- Value domain
 -- --------------------------
 
-CREATE TABLE "SCHEMA_NAME".rtc_value_coefficient (
+CREATE TABLE "SCHEMA_NAME".rtc_value_opti_coef (
   id character varying(16) NOT NULL,
-    CONSTRAINT rtc_value_coeffiecient PRIMARY KEY (id)
+    CONSTRAINT rtc_value_opti_coef_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE "SCHEMA_NAME".rtc_value_opti_status (
+  id character varying(16) NOT NULL,
+    CONSTRAINT rtc_value_opti_status_pkey PRIMARY KEY (id)
 );
 
 
--- ----------------------------
--- Table structure for SELECTORS
--- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."rtc_selector_period" (
-"id" varchar(16),
-CONSTRAINT rtc_selector_period_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE "SCHEMA_NAME"."rtc_selector_coefficient" (
-"id" varchar(16),
-CONSTRAINT rtc_selector_coeffiecient_pkey PRIMARY KEY (id)
-);
-
-
-----------------
--- SPATIAL INDEX
-----------------
-
-CREATE INDEX picture_index ON "SCHEMA_NAME".picture USING GIST (the_geom);
