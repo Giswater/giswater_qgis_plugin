@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS SCHEMA_NAME.log_detail (
     query text,
     user_name text,
     addr inet,
-    debug_info text COLLATE
+    debug_info text
 );
 COMMENT ON COLUMN SCHEMA_NAME.log_detail.id IS 'Unique identifier for each auditable event';
 COMMENT ON COLUMN SCHEMA_NAME.log_detail.tstamp IS 'Timestamp in which audited event occurred';;
