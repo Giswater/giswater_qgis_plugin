@@ -24,7 +24,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = TG_TABLE_SCHEMA, public;
+    SET search_path = SCHEMA_NAME, public;
 
     -- Check if the node is exists
     SELECT node_id INTO exists_id FROM node WHERE node_id = node_id_arg;

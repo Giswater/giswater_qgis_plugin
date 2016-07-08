@@ -9,7 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.gui import (QgsMessageBar)
+from qgis.gui import QgsMessageBar
 from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
@@ -61,10 +61,10 @@ class Giswater(QObject):
         self.settings.setIniCodec(sys.getfilesystemencoding())    
         
         # Set controller to handle settings and database
-        self.controller = DaoController(self.settings, self.plugin_name)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
         self.controller.set_database_connection()     
         self.dao = self.controller.getDao()     
-        self.schema_name = self.controller.getSchemaName()      
+        self.schema_name = self.controller.get_schema_name()      
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -389,7 +389,9 @@ class Giswater(QObject):
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
-            self.showWarning("AttributeError: "+str(e))     
+            self.showWarning("AttributeError: "+str(e))            
+        except KeyError as e:
+            self.showWarning("KeyError: "+str(e))    
             
             
     def ud_generic(self, function_name):   
@@ -403,8 +405,10 @@ class Giswater(QObject):
                 print function_name+" has been checked"       
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
-        except AttributeError:
-            print "ud_generic: AttributeError"                
+        except AttributeError as e:
+            self.showWarning("AttributeError: "+str(e))            
+        except KeyError as e:
+            self.showWarning("KeyError: "+str(e))             
             
             
     def mg_generic(self, function_name):   
@@ -428,11 +432,12 @@ class Giswater(QObject):
                                             
                                                    
     ''' Edit bar functions '''  
+            
     def ed_search_plus(self):   
         if self.search_plus is not None:
-            #self.iface.mainWindow().addDockWidget(Qt.TopDockWidgetArea, self.search_plus.dlg)
             self.search_plus.dlg.setVisible(True)            
              
+                            
                                   
     ''' Management bar functions '''                                
         
@@ -441,7 +446,7 @@ class Giswater(QObject):
         Execute SQL function 'gw_fct_delete_node' 
         Show warning (if any) '''
 
-        # Get selected features (from layer 'connec')          
+        # Get selected features (from layer 'node')          
         layer = self.iface.activeLayer()  
         count = layer.selectedFeatureCount()     
         if count == 0:
@@ -454,28 +459,13 @@ class Giswater(QObject):
         feature = features[0]
         node_id = feature.attribute('node_id')   
         
-        # Execute SQL function
+        # Execute SQL function and show result to the user
         function_name = "gw_fct_delete_node"
         sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"  
-        result = self.dao.get_row(sql) 
-        self.dao.commit()
+        self.controller.get_row(sql)
                     
         # Refresh map canvas
-        self.iface.mapCanvas().refresh()    
-        
-        # Manage SQL execution result
-        if result is None:
-            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
-        elif result[0] == 0:
-            self.showInfo(self.controller.tr("Node deleted successfully"))    
-        elif result[0] == 1:
-            self.showWarning(self.controller.tr("Nonexistent node id: ")+node_id)   
-        elif result[0] == 2:
-            self.showWarning(self.controller.tr("Pipes has different types"))   
-        elif result[0] == 3:
-            self.showWarning(self.controller.tr("Node has not 2 arcs"))   
-        else:
-            self.showWarning(self.controller.tr("Undefined error"))               
+        self.iface.mapCanvas().refresh()             
         
         
     def mg_connec_tool(self):

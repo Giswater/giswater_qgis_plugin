@@ -7,9 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_if_modified_func() RETURNS TRIGGER AS $BODY$
-
-SET search_path = "SCHEMA_NAME", public;
-
 DECLARE
     audit_row log_actions;
     include_values boolean;
@@ -19,6 +16,8 @@ DECLARE
     excluded_cols text[] = ARRAY[]::text[];
 
 BEGIN
+
+    SET search_path = "SCHEMA_NAME", public;
 
     IF TG_WHEN <> 'AFTER' THEN
         RAISE EXCEPTION 'gw_trg_if_modified_func() may only run as an AFTER trigger';
@@ -72,7 +71,7 @@ SECURITY DEFINER
 SET search_path = pg_catalog, public;
 
 
-COMMENT ON FUNCTION  SCHEMA_NAME.gw_trg_if_modified_func() IS $BODY$
+COMMENT ON FUNCTION SCHEMA_NAME.gw_trg_if_modified_func() IS $BODY$
 Track changes to a table at the statement and/or row level.
 
 Optional parameters to trigger in CREATE TRIGGER call:
@@ -122,7 +121,7 @@ BEGIN
         END IF;
         _q_txt = 'CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON ' || 
                  target_table || 
-                 ' FOR EACH ROW EXECUTE PROCEDURE  gw_trg_if_modified_func(' ||
+                 ' FOR EACH ROW EXECUTE PROCEDURE gw_trg_if_modified_func(' ||
                  quote_literal(audit_query_text) || _ignored_cols_snip || ');';
         RAISE NOTICE '%',_q_txt;
         EXECUTE _q_txt;
@@ -147,19 +146,16 @@ $BODY$;
 
 -- Pg doesn't allow variadic calls with 0 params, so provide a wrapper
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_table(target_table regclass, audit_rows boolean, audit_query_text boolean) RETURNS void AS $BODY$
-
-SET search_path = "SCHEMA_NAME", public;
-SELECT audit_table($1, $2, $3, ARRAY[]::text[]);
-
+    SET search_path = "SCHEMA_NAME", public;
+    SELECT audit_table($1, $2, $3, ARRAY[]::text[]);
 $BODY$ LANGUAGE SQL;
 
 
 -- And provide a convenience call wrapper for the simplest case
 -- of row-level logging with no excluded cols and query logging enabled.
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_table(target_table regclass) RETURNS void AS $BODY$
-
-SET search_path = "SCHEMA_NAME", public;
-SELECT  audit_table($1, BOOLEAN 't', BOOLEAN 't');
+    SET search_path = "SCHEMA_NAME", public;
+    SELECT  audit_table($1, BOOLEAN 't', BOOLEAN 't');
 $BODY$ LANGUAGE 'sql';
 
 COMMENT ON FUNCTION SCHEMA_NAME.audit_table(regclass) IS $BODY$
@@ -174,12 +170,11 @@ DECLARE
     registro  record;
 
 BEGIN
-		
-	SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     FOR registro IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
         table_name:= schema_name || '.' || quote_ident(registro.tablename);
-        PERFORM  audit_table(table_name, BOOLEAN 't', BOOLEAN 't');
+        PERFORM audit_table(table_name, BOOLEAN 't', BOOLEAN 't');
     END LOOP;
 END;
 $BODY$
@@ -192,7 +187,6 @@ DECLARE
     rec record;
 
 BEGIN
-
     SET search_path = "SCHEMA_NAME", public;
 
     FOR rec IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
@@ -210,9 +204,8 @@ DECLARE
     rec record;
 
 BEGIN
-
     SET search_path = "SCHEMA_NAME", public;
-
+    
     FOR rec IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
         aux:= schema_name||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' DISABLE trigger audit_trigger_row';
@@ -222,19 +215,13 @@ $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
 
 
--- Start to audit all the tables of the schema
---SELECT SCHEMA_NAME.audit_schema('SCHEMA_NAME');
-
-
 
 -- Audit functions
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_log_code_id int4) RETURNS "pg_catalog"."int2" AS $BODY$
 BEGIN
-
     SET search_path = "SCHEMA_NAME", public;
-	
-    RETURN  audit_function($1, null, null);
+    RETURN audit_function($1, null, null);
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
@@ -242,10 +229,8 @@ LANGUAGE 'plpgsql' VOLATILE COST 100;
   
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_log_code_id int4, p_debug_info text) RETURNS "pg_catalog"."int2" AS $BODY$
 BEGIN
-
     SET search_path = "SCHEMA_NAME", public;
-
-    RETURN  audit_function($1, null, $2);
+    RETURN audit_function($1, null, $2);
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
@@ -253,10 +238,8 @@ LANGUAGE 'plpgsql' VOLATILE COST 100;
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_log_function_id int4, p_log_code_id int4) RETURNS "pg_catalog"."int2" AS $BODY$
 BEGIN
-
     SET search_path = "SCHEMA_NAME", public;
-
-    RETURN  audit_function($1, $2, null); 
+    RETURN audit_function($1, $2, null); 
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE COST 100;
@@ -266,9 +249,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_function(p_log_code_id int4, p_log_
 BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
-
-    BEGIN 
-        INSERT INTO  log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
+    
+    BEGIN
+        INSERT INTO log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
         VALUES (p_log_code_id, p_log_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
         IF p_log_code_id >= 100 AND p_log_code_id < 200 THEN
             RETURN null;
@@ -276,10 +259,11 @@ BEGIN
             RETURN p_log_code_id;
         END IF;
     EXCEPTION WHEN foreign_key_violation THEN
-        INSERT INTO  log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
+        INSERT INTO log_detail (log_code_id, log_function_id, debug_info, query, user_name, addr) 
         VALUES (999, p_log_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
         RETURN 999;
     END;
+    
 END;
 $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
