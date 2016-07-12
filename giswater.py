@@ -315,8 +315,33 @@ class Giswater(QObject):
                     self.layer_connec = cur_layer
                 if self.table_version in uri_table:  
                     self.layer_version = cur_layer
-                            
-        # Manage current layer selected  
+                                       
+        # Set layer custom UI form and init function   
+        if self.layer_arc is not None:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
+            file_init = os.path.join(self.plugin_dir, 'ws_arc_init.py')       
+            self.layer_arc.editFormConfig().setUiForm(file_ui) 
+            self.layer_arc.editFormConfig().setInitCodeSource(1)
+            self.layer_arc.editFormConfig().setInitFilePath(file_init)           
+            self.layer_arc.editFormConfig().setInitFunction('formOpen') 
+                                    
+        if self.layer_node is not None:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_node.ui')
+            file_init = os.path.join(self.plugin_dir, 'ws_node_init.py')       
+            self.layer_node.editFormConfig().setUiForm(file_ui) 
+            self.layer_node.editFormConfig().setInitCodeSource(1)
+            self.layer_node.editFormConfig().setInitFilePath(file_init)           
+            self.layer_node.editFormConfig().setInitFunction('formOpen')                         
+                                    
+        if self.layer_connec is not None:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_connec.ui')
+            file_init = os.path.join(self.plugin_dir, 'ws_connec_init.py')       
+            self.layer_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')                         
+        
+        # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
         # Set layer 'Arc' for map tool 'Move node'
