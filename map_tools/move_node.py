@@ -19,7 +19,7 @@ class MoveNode(QgsMapTool):
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
         self.dao = controller.getDao()   
-        self.schema_name = self.dao.get_schema_name()   
+        self.schema_name = self.controller.get_schema_name()   
         self.layer_arc = None
         
         # Vertex marker

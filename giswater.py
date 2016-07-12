@@ -63,8 +63,7 @@ class Giswater(QObject):
         # Set controller to handle settings and database
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
         self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()     
-        self.schema_name = self.controller.get_schema_name()      
+        self.dao = self.controller.getDao()           
         
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
@@ -156,9 +155,9 @@ class Giswater(QObject):
             if int(index_action) == 13:
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
             elif int(index_action) == 16:
-                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller)         
+                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller, self.srid)         
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)   
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             else:
                 pass
             if map_tool:      
@@ -170,7 +169,6 @@ class Giswater(QObject):
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
         
-        parent = self.iface.mainWindow()
         if self.controller is None:
             return
         
@@ -181,18 +179,91 @@ class Giswater(QObject):
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
-        self.table_version = self.settings.value('db/table_version', 'version')   
+        self.table_version = self.settings.value('db/table_version', 'version')          
+                               
+        # Project initialization
+        self.project_read()               
+
+
+    def unload(self):
+        ''' Removes the plugin menu item and icon from QGIS GUI '''
         
+        try:
+            for action_index, action in self.actions.iteritems():
+                self.iface.removePluginMenu(self.menu_name, action)
+                self.iface.removeToolBarIcon(action)
+            if self.toolbar_ud_enabled:    
+                del self.toolbar_ud
+            if self.toolbar_ws_enabled:    
+                del self.toolbar_ws
+            if self.toolbar_mg_enabled:    
+                del self.toolbar_mg
+            if self.toolbar_ed_enabled:    
+                del self.toolbar_ed
+                if self.search_plus is not None:
+                    self.search_plus.unload()
+        except AttributeError, e:
+            print "unload_AttributeError: "+str(e)
+        except KeyError, e:
+            print "unload_KeyError: "+str(e)
+    
+    
+    ''' Slots '''
+            
+    def disable_actions(self):
+        ''' Utility to disable all actions '''
+        for i in range(1,30):
+            key = str(i).zfill(2)
+            if key in self.actions:
+                action = self.actions[key]
+                action.setEnabled(False)         
+                               
+    
+    def get_layer_source(self, layer):
+        ''' Get table or view name of selected layer '''
+         
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()   
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.find('.')  
+        pos_fi = uri.find('" ')  
+        if pos_ini <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini+6:pos_end_schema]                             
+            uri_table = uri[pos_ini+6:pos_fi+1]                             
+             
+        return uri_schema, uri_table
+    
+        
+    def search_project_type(self):
+        
+        # Unload
+        #self.unload()
+        
+        if self.layer_version is not None:  
+            features = self.layer_version.getFeatures()
+            for feature in features:
+                wsoftware = feature['wsoftware']
+                if wsoftware.lower() == 'epanet':
+                    self.project_type = 'ws'
+                    #del self.toolbar_ws                   
+                elif wsoftware.lower() == 'epaswmm':
+                    self.project_type = 'ud'
+                    #del self.toolbar_ws
+                            
+        #print self.project_type
                 
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
+        parent = self.iface.mainWindow()
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
         self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
         self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
+        #if self.toolbar_ud_enabled and self.project_type == 'ud':
         if self.toolbar_ud_enabled:
             self.toolbar_ud_name = self.tr('toolbar_ud_name')
             self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
             self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
+        #if self.toolbar_ws_enabled and self.project_type == 'ws':
         if self.toolbar_ws_enabled:
             self.toolbar_ws_name = self.tr('toolbar_ws_name')
             self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
@@ -207,6 +278,7 @@ class Giswater(QObject):
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
         # UD toolbar
+        #if self.toolbar_ud_enabled and self.project_type == 'ud':        
         if self.toolbar_ud_enabled:        
             self.ag_ud = QActionGroup(parent);
             self.add_action('01', self.toolbar_ud, self.ag_ud)   
@@ -216,6 +288,7 @@ class Giswater(QObject):
             self.add_action('03', self.toolbar_ud, self.ag_ud)   
                 
         # WS toolbar
+        #if self.toolbar_ws_enabled and self.project_type == 'ws':  
         if self.toolbar_ws_enabled:  
             self.ag_ws = QActionGroup(parent);
             self.add_action('10', self.toolbar_ws, self.ag_ws)
@@ -239,52 +312,7 @@ class Giswater(QObject):
         if self.toolbar_ed_enabled:      
             self.ag_ed = QActionGroup(parent);
             for i in range(30,36):
-                self.add_action(str(i), self.toolbar_ed, self.ag_ed)
-                
-        # Project initialization
-        self.project_read()               
-
-
-    def unload(self):
-        ''' Removes the plugin menu item and icon from QGIS GUI '''
-        for action_index, action in self.actions.iteritems():
-            self.iface.removePluginMenu(self.menu_name, action)
-            self.iface.removeToolBarIcon(action)
-        if self.toolbar_ud_enabled:    
-            del self.toolbar_ud
-        if self.toolbar_ws_enabled:    
-            del self.toolbar_ws
-        if self.toolbar_mg_enabled:    
-            del self.toolbar_mg
-        if self.toolbar_ed_enabled:    
-            del self.toolbar_ed
-            if self.search_plus is not None:
-                self.search_plus.unload()
-            
-    
-    
-    ''' Slots '''
-            
-    def disable_actions(self):
-        ''' Utility to disable all actions '''
-        for i in range(1,30):
-            key = str(i).zfill(2)
-            if key in self.actions:
-                action = self.actions[key]
-                action.setEnabled(False)         
-                               
-    
-    def get_layer_source(self, layer):
-        ''' Get table or view name of selected layer '''
-        
-        uri_table = None
-        uri = layer.dataProvider().dataSourceUri().lower()   
-        pos_ini = uri.find('table=')
-        pos_fi = uri.find('" ')  
-        if pos_ini <> -1 and pos_fi <> -1:
-            uri_table = uri[pos_ini+6:pos_fi+1]                             
-            
-        return uri_table
+                self.add_action(str(i), self.toolbar_ed, self.ag_ed)        
 
                                 
     def project_read(self): 
@@ -303,7 +331,7 @@ class Giswater(QObject):
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            uri_table = self.get_layer_source(cur_layer)            
+            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   
             if uri_table is not None:
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
@@ -312,15 +340,37 @@ class Giswater(QObject):
                 if self.table_connec in uri_table:  
                     self.layer_connec = cur_layer
                 if self.table_version in uri_table:  
-                    self.layer_version = cur_layer
-                                       
-        # Set SRID from table node
+                    self.layer_version = cur_layer     
+        
+        # Check if table 'version' exists
+        if self.layer_version is None:
+            print "Table version not found"
+            self.unload()
+            return
+                 
+        # Get schema name from table 'version'
+        # Check if really exists
+        (self.schema_name, uri_table) = self.get_layer_source(self.layer_version)  
         schema_name = self.schema_name.replace('"', '')
+        if self.schema_name is None or not self.dao.check_schema(schema_name):
+            print "Schema not found: "+self.schema_name
+            return
+        
+        # Set schema_name in controller and in config file
+        self.settings.setValue("db/schema_name", self.schema_name)    
+        self.controller.set_schema_name(self.schema_name)    
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)        
+        
+        # Set SRID from table node
         sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
         row = self.dao.get_row(sql)
         if row:
-            self.srid = row[0]          
+            self.srid = row[0]                 
         
+        # Search prohect type in table 'version'
+        self.search_project_type()
+                                         
         # Set layer custom UI form and init function   
         if self.layer_arc is not None:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
@@ -345,7 +395,7 @@ class Giswater(QObject):
             self.layer_connec.editFormConfig().setInitCodeSource(1)
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           
             self.layer_connec.editFormConfig().setInitFunction('formOpen')                         
-        
+                    
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
@@ -380,7 +430,7 @@ class Giswater(QObject):
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        uri_table = self.get_layer_source(layer)            
+        (uri_schema, uri_table) = self.get_layer_source(layer)  
         if uri_table is not None:
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'

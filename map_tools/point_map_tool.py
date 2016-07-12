@@ -17,7 +17,7 @@ class PointMapTool(QgsMapTool):
         self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.epa_type = self.settings.value('insert_values/'+str(index_action)+'_epa_type')
         self.dao = controller.getDao()   
-        self.schema_name = self.dao.get_schema_name()   
+        self.schema_name = controller.get_schema_name()   
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')          
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action) 

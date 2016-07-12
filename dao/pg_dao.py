@@ -30,13 +30,7 @@ class PgDao():
         self.dbname = dbname
         self.user = user
         self.password = password
-        self.conn_string = "host="+self.host+" port="+self.port+" dbname="+self.dbname+" user="+self.user+" password="+self.password
-
-    def set_schema_name(self, schema_name):
-        self.schema_name = schema_name
-        
-    def get_schema_name(self):
-        return self.schema_name        
+        self.conn_string = "host="+self.host+" port="+self.port+" dbname="+self.dbname+" user="+self.user+" password="+self.password       
         
     def get_rows(self, sql):
         self.cursor.execute(sql)

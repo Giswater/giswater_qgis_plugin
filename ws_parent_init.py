@@ -10,7 +10,6 @@ import utils_giswater
 from controller import DaoController
         
         
-     
 class ParentDialog(object):   
     
     def __init__(self, iface, dialog, layer, feature):
@@ -49,7 +48,7 @@ class ParentDialog(object):
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return 
              
-        self.schema_name = self.controller.get_schema_name()          
+        self.schema_name = self.settings.value("db/schema_name")           
         self.dao = self.controller.getDao()
             
             

@@ -43,7 +43,7 @@ class LineMapTool(QgsMapTool):
         self.index_action = index_action
         self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.dao = controller.getDao()   
-        self.schema_name = self.dao.get_schema_name()              
+        self.schema_name = controller.get_schema_name()              
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 

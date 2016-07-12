@@ -20,7 +20,10 @@ class DaoController():
         
     def get_schema_name(self):
         return self.schema_name
-           
+        
+    def set_schema_name(self, schema_name):
+        self.schema_name = schema_name
+    
     def tr(self, message):
         return QCoreApplication.translate(self.plugin_name, message)                
     
@@ -35,9 +38,9 @@ class DaoController():
         
         # Initialize variables
         self.dao = None 
-        self.last_error = None        
+        self.last_error = None      
         self.connection_name = self.settings.value('db/connection_name', self.plugin_name)
-        self.schema_name = self.settings.value('db/schema_name', 'ws')
+        self.schema_name = self.settings.value('db/schema_name')
         self.log_codes = {}
         
         # Look for connection data in QGIS configuration (if exists)    
@@ -59,11 +62,7 @@ class DaoController():
         # Connect to Database 
         self.dao = PgDao()     
         self.dao.set_params(host, port, db, user, pwd)
-        self.dao.set_schema_name(self.schema_name)
         status = self.dao.init_db()
-        
-        # Cache error message with log_code = -1 (uncatched error)
-        self.get_error_message(-1)
         
         # TODO: Get postgresql data folder
        
@@ -72,6 +71,10 @@ class DaoController():
     
     def get_error_message(self, log_code_id):    
         ''' Get error message from selected error code '''
+        
+        if self.schema_name is None:
+            return       
+
         sql = "SELECT message FROM "+self.schema_name+".log_code WHERE id = "+str(log_code_id)
         result = self.dao.get_row(sql)  
         if result:
@@ -117,6 +120,9 @@ class DaoController():
     def get_error_from_audit(self):
         ''' Get last error from audit tables '''
         
+        if self.schema_name is None:
+            return                  
+                
         sql = "SELECT log_code.id, log_code.message, log_code.log_level, log_code.show_user "
         sql+= " FROM "+self.schema_name+".log_detail"
         sql+= " INNER JOIN "+self.schema_name+".log_code ON log_detail.log_code_id = log_code.id"
