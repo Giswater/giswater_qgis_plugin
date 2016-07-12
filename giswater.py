@@ -69,6 +69,7 @@ class Giswater(QObject):
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
         self.search_plus = None
+        self.srid = None
         
         # {function_name, map_tool}
         self.map_tools = {}
@@ -179,8 +180,70 @@ class Giswater(QObject):
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
-        self.table_version = self.settings.value('db/table_version', 'version')          
-                               
+        self.table_version = self.settings.value('db/table_version', 'version')     
+        
+        # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
+        parent = self.iface.mainWindow()
+        self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
+        self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
+        self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
+        self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
+        if self.toolbar_ud_enabled:
+            self.toolbar_ud_name = self.tr('toolbar_ud_name')
+            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
+            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
+        if self.toolbar_ws_enabled:
+            self.toolbar_ws_name = self.tr('toolbar_ws_name')
+            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
+            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
+        if self.toolbar_mg_enabled:
+            self.toolbar_mg_name = self.tr('toolbar_mg_name')
+            self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
+            self.toolbar_mg.setObjectName(self.toolbar_mg_name)      
+        if self.toolbar_ed_enabled:
+            self.toolbar_ed_name = self.tr('toolbar_ed_name')
+            self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
+            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
+                
+        # UD toolbar   
+        if self.toolbar_ud_enabled:        
+            self.ag_ud = QActionGroup(parent);
+            self.add_action('01', self.toolbar_ud, self.ag_ud)   
+            self.add_action('02', self.toolbar_ud, self.ag_ud)   
+            self.add_action('04', self.toolbar_ud, self.ag_ud)   
+            self.add_action('05', self.toolbar_ud, self.ag_ud)   
+            self.add_action('03', self.toolbar_ud, self.ag_ud)   
+                
+        # WS toolbar 
+        if self.toolbar_ws_enabled:  
+            self.ag_ws = QActionGroup(parent);
+            self.add_action('10', self.toolbar_ws, self.ag_ws)
+            self.add_action('11', self.toolbar_ws, self.ag_ws)
+            self.add_action('12', self.toolbar_ws, self.ag_ws)
+            self.add_action('14', self.toolbar_ws, self.ag_ws)
+            self.add_action('15', self.toolbar_ws, self.ag_ws)
+            self.add_action('08', self.toolbar_ws, self.ag_ws)
+            self.add_action('29', self.toolbar_ws, self.ag_ws)
+            self.add_action('13', self.toolbar_ws, self.ag_ws)
+                
+        # MANAGEMENT toolbar 
+        if self.toolbar_mg_enabled:      
+            self.ag_mg = QActionGroup(parent);
+            self.add_action('16', self.toolbar_mg, self.ag_mg)
+            self.add_action('28', self.toolbar_mg, self.ag_mg)            
+            for i in range(17,28):
+                self.add_action(str(i), self.toolbar_mg, self.ag_mg)
+                    
+        # EDIT toolbar 
+        if self.toolbar_ed_enabled:      
+            self.ag_ed = QActionGroup(parent);
+            for i in range(30,36):
+                self.add_action(str(i), self.toolbar_ed, self.ag_ed)                   
+         
+        # Disable and hide all toolbars
+        self.disable_actions()
+        self.hide_toolbars() 
+                         
         # Project initialization
         self.project_read()               
 
@@ -216,7 +279,25 @@ class Giswater(QObject):
             key = str(i).zfill(2)
             if key in self.actions:
                 action = self.actions[key]
-                action.setEnabled(False)         
+                action.setEnabled(False)   
+                
+
+    def hide_toolbars(self):
+        ''' Hide all toolbars from QGIS GUI '''
+        
+        try:
+            if self.toolbar_ud_enabled:            
+                self.toolbar_ud.setVisible(False)
+            if self.toolbar_ws_enabled:                
+                self.toolbar_ws.setVisible(False)
+            if self.toolbar_mg_enabled:                
+                self.toolbar_mg.setVisible(False)
+            if self.toolbar_ed_enabled:                
+                self.toolbar_ed.setVisible(False)
+        except AttributeError, e:
+            print "unload_AttributeError: "+str(e)
+        except KeyError, e:
+            print "unload_KeyError: "+str(e)                      
                                
     
     def get_layer_source(self, layer):
@@ -235,89 +316,33 @@ class Giswater(QObject):
     
         
     def search_project_type(self):
+        ''' Search in table 'version' project type of current QGIS project '''
         
-        # Unload
-        #self.unload()
+        features = self.layer_version.getFeatures()
+        for feature in features:
+            wsoftware = feature['wsoftware']
+            if wsoftware.lower() == 'epanet':
+                self.project_type = 'ws'     
+                if self.toolbar_ws_enabled:                
+                    self.toolbar_ws.setVisible(True)                            
+            elif wsoftware.lower() == 'epaswmm':
+                self.project_type = 'ud'
+                if self.toolbar_ud_enabled:                
+                    self.toolbar_ud.setVisible(True)                
         
-        if self.layer_version is not None:  
-            features = self.layer_version.getFeatures()
-            for feature in features:
-                wsoftware = feature['wsoftware']
-                if wsoftware.lower() == 'epanet':
-                    self.project_type = 'ws'
-                    #del self.toolbar_ws                   
-                elif wsoftware.lower() == 'epaswmm':
-                    self.project_type = 'ud'
-                    #del self.toolbar_ws
-                            
-        #print self.project_type
-                
-        # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
-        parent = self.iface.mainWindow()
-        self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
-        self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
-        self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
-        self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
-        #if self.toolbar_ud_enabled and self.project_type == 'ud':
-        if self.toolbar_ud_enabled:
-            self.toolbar_ud_name = self.tr('toolbar_ud_name')
-            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
-            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
-        #if self.toolbar_ws_enabled and self.project_type == 'ws':
-        if self.toolbar_ws_enabled:
-            self.toolbar_ws_name = self.tr('toolbar_ws_name')
-            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
-            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
-        if self.toolbar_mg_enabled:
-            self.toolbar_mg_name = self.tr('toolbar_mg_name')
-            self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
-            self.toolbar_mg.setObjectName(self.toolbar_mg_name)      
-        if self.toolbar_ed_enabled:
-            self.toolbar_ed_name = self.tr('toolbar_ed_name')
-            self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
-            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
-                
-        # UD toolbar
-        #if self.toolbar_ud_enabled and self.project_type == 'ud':        
-        if self.toolbar_ud_enabled:        
-            self.ag_ud = QActionGroup(parent);
-            self.add_action('01', self.toolbar_ud, self.ag_ud)   
-            self.add_action('02', self.toolbar_ud, self.ag_ud)   
-            self.add_action('04', self.toolbar_ud, self.ag_ud)   
-            self.add_action('05', self.toolbar_ud, self.ag_ud)   
-            self.add_action('03', self.toolbar_ud, self.ag_ud)   
-                
-        # WS toolbar
-        #if self.toolbar_ws_enabled and self.project_type == 'ws':  
-        if self.toolbar_ws_enabled:  
-            self.ag_ws = QActionGroup(parent);
-            self.add_action('10', self.toolbar_ws, self.ag_ws)
-            self.add_action('11', self.toolbar_ws, self.ag_ws)
-            self.add_action('12', self.toolbar_ws, self.ag_ws)
-            self.add_action('14', self.toolbar_ws, self.ag_ws)
-            self.add_action('15', self.toolbar_ws, self.ag_ws)
-            self.add_action('08', self.toolbar_ws, self.ag_ws)
-            self.add_action('29', self.toolbar_ws, self.ag_ws)
-            self.add_action('13', self.toolbar_ws, self.ag_ws)
-                
-        # MANAGEMENT toolbar 
-        if self.toolbar_mg_enabled:      
-            self.ag_mg = QActionGroup(parent);
-            self.add_action('16', self.toolbar_mg, self.ag_mg)
-            self.add_action('28', self.toolbar_mg, self.ag_mg)            
-            for i in range(17,28):
-                self.add_action(str(i), self.toolbar_mg, self.ag_mg)
-                    
-        # EDIT toolbar 
-        if self.toolbar_ed_enabled:      
-            self.ag_ed = QActionGroup(parent);
-            for i in range(30,36):
-                self.add_action(str(i), self.toolbar_ed, self.ag_ed)        
+        # Set visible MANAGEMENT and EDIT toolbar  
+        if self.toolbar_mg_enabled:         
+            self.toolbar_mg.setVisible(True)
+        if self.toolbar_ed_enabled: 
+            self.toolbar_ed.setVisible(True)
 
                                 
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
         
+        # Hide all toolbars
+        self.hide_toolbars()
+                    
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
@@ -344,8 +369,6 @@ class Giswater(QObject):
         
         # Check if table 'version' exists
         if self.layer_version is None:
-            print "Table version not found"
-            self.unload()
             return
                  
         # Get schema name from table 'version'
@@ -359,6 +382,7 @@ class Giswater(QObject):
         # Set schema_name in controller and in config file
         self.settings.setValue("db/schema_name", self.schema_name)    
         self.controller.set_schema_name(self.schema_name)    
+        
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
@@ -366,9 +390,9 @@ class Giswater(QObject):
         sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
         row = self.dao.get_row(sql)
         if row:
-            self.srid = row[0]                 
+            self.srid = row[0]   
         
-        # Search prohect type in table 'version'
+        # Search project type in table 'version'
         self.search_project_type()
                                          
         # Set layer custom UI form and init function   
