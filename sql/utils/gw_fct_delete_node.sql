@@ -102,20 +102,20 @@ BEGIN
 
             -- Pipes has different types
             ELSE
-                RETURN SCHEMA_NAME_audit.audit_function(202);
+                RETURN audit_function(202);
             END IF;
          
         -- Node has not 2 arcs
         ELSE
-            RETURN SCHEMA_NAME_audit.audit_function(203);
+            RETURN audit_function(203);
         END IF;
 
     -- Node not found
     ELSE 
-        RETURN SCHEMA_NAME_audit.audit_function(201);
+        RETURN audit_function(201);
     END IF;
 
-    RETURN SCHEMA_NAME_audit.audit_function(0);
+    RETURN audit_function(0);
 
 END;
 $BODY$
