@@ -28,6 +28,8 @@ class PointMapTool(QgsMapTool):
         
         if self.srid is None:
             self.srid = self.settings.value('db/srid')  
+        if self.schema_name is None:
+            self.schema_name = self.settings.value('db/schema_name')  
             
         if self.elem_type is not None:        
             the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";

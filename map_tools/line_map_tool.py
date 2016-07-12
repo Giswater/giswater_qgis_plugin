@@ -34,16 +34,14 @@ from PyQt4.Qt import * # @UnusedWildImport
 
 class LineMapTool(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, controller):  
+    def __init__(self, iface, settings, action, index_action):  
         ''' Class constructor '''
         
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
-        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
-        self.dao = controller.getDao()   
-        self.schema_name = controller.get_schema_name()              
+        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')           
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 

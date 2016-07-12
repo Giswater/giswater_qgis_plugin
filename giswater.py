@@ -154,7 +154,7 @@ class Giswater(QObject):
             map_tool = None
             action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
             if int(index_action) == 13:
-                map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
+                map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 16:
                 map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller, self.srid)         
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
