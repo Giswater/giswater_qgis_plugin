@@ -41,7 +41,6 @@ class LineMapTool(QgsMapTool):
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
-        self.srid = self.settings.value('status/srid')
         self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.dao = controller.getDao()   
         self.schema_name = self.dao.get_schema_name()              

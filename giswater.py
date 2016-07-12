@@ -183,8 +183,6 @@ class Giswater(QObject):
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
         self.table_version = self.settings.value('db/table_version', 'version')   
         
-        # Get SRID
-        self.srid = self.settings.value('status/srid')             
                 
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
@@ -316,6 +314,13 @@ class Giswater(QObject):
                 if self.table_version in uri_table:  
                     self.layer_version = cur_layer
                                        
+        # Set SRID from table node
+        schema_name = self.schema_name.replace('"', '')
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
+        row = self.dao.get_row(sql)
+        if row:
+            self.srid = row[0]          
+        
         # Set layer custom UI form and init function   
         if self.layer_arc is not None:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')

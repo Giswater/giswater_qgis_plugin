@@ -7,14 +7,14 @@ from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject)
 
 class MoveNode(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, controller):
+    def __init__(self, iface, settings, action, index_action, controller, srid):
         ''' Class constructor '''        
         
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings        
         self.index_action = index_action
-        self.srid = self.settings.value('status/srid')        
+        self.srid = srid
         self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
@@ -64,7 +64,7 @@ class MoveNode(QgsMapTool):
         ''' Move selected node to the current point '''     
         
         # Update node geometry
-        the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+self.srid+")";
+        the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
         status = self.dao.execute_sql(sql) 

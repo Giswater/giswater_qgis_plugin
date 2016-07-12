@@ -7,13 +7,13 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 
 class PointMapTool(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, controller):
+    def __init__(self, iface, settings, action, index_action, controller, srid):
         ''' Class constructor '''    
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
-        self.srid = self.settings.value('status/srid')
+        self.srid = srid
         self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.epa_type = self.settings.value('insert_values/'+str(index_action)+'_epa_type')
         self.dao = controller.getDao()   
@@ -26,7 +26,7 @@ class PointMapTool(QgsMapTool):
     def insert_node(self, x, y):
         ''' Insert a new node in the selected coordinates '''
         if self.elem_type is not None:        
-            the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+self.srid+")";
+            the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";
             sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
             sql+= " VALUES ('"+self.elem_type+"', '"+self.epa_type+"', "+the_geom+")" 
             sql+= " RETURNING node_id;";
