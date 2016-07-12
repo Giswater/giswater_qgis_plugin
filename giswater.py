@@ -391,6 +391,7 @@ class Giswater(QObject):
         row = self.dao.get_row(sql)
         if row:
             self.srid = row[0]   
+            self.settings.setValue("db/srid", self.srid)                           
         
         # Search project type in table 'version'
         self.search_project_type()

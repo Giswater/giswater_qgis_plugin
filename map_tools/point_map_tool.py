@@ -25,6 +25,10 @@ class PointMapTool(QgsMapTool):
      
     def insert_node(self, x, y):
         ''' Insert a new node in the selected coordinates '''
+        
+        if self.srid is None:
+            self.srid = self.settings.value('db/srid')  
+            
         if self.elem_type is not None:        
             the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";
             sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"

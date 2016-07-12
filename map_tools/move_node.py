@@ -61,8 +61,11 @@ class MoveNode(QgsMapTool):
           
             
     def move_node(self, node_id, point):
-        ''' Move selected node to the current point '''     
-        
+        ''' Move selected node to the current point '''  
+           
+        if self.srid is None:
+            self.srid = self.settings.value('db/srid')   
+                   
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
