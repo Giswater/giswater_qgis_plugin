@@ -72,7 +72,7 @@ class DaoController():
     
     def get_error_message(self, log_code_id):    
         ''' Get error message from selected error code '''
-        sql = "SELECT message FROM "+self.schema_name+"_audit.log_code WHERE id = "+str(log_code_id)
+        sql = "SELECT message FROM "+self.schema_name+".log_code WHERE id = "+str(log_code_id)
         result = self.dao.get_row(sql)  
         if result:
             self.log_codes[log_code_id] = result[0]    
@@ -118,8 +118,8 @@ class DaoController():
         ''' Get last error from audit tables '''
         
         sql = "SELECT log_code.id, log_code.message, log_code.log_level, log_code.show_user "
-        sql+= " FROM "+self.schema_name+"_audit.log_detail"
-        sql+= " INNER JOIN "+self.schema_name+"_audit.log_code ON log_detail.log_code_id = log_code.id"
+        sql+= " FROM "+self.schema_name+".log_detail"
+        sql+= " INNER JOIN "+self.schema_name+".log_code ON log_detail.log_code_id = log_code.id"
         sql+= " ORDER BY log_detail.id DESC LIMIT 1"
         result = self.dao.get_row(sql)
         if result is None:
