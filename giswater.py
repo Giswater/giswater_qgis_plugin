@@ -18,13 +18,14 @@ import os.path
 import sys  
 from functools import partial
 
+import utils_giswater
 from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
 from controller import DaoController
 from map_tools.move_node import MoveNode
 from search.search_plus import SearchPlus
 from ui.change_node_type import ChangeNodeType
-import utils_giswater
+from actions.mg import Mg
 
 
 class Giswater(QObject):
@@ -70,6 +71,7 @@ class Giswater(QObject):
         self.actions = {}
         self.search_plus = None
         self.srid = None
+        self.mg = Mg(self.iface, self.settings, self.controller)
         
         # {function_name, map_tool}
         self.map_tools = {}
@@ -127,7 +129,12 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20, 26, 27, 28, 32):    
+                # Management toolbar actions
+                if int(index_action) in (17, 26, 27, 28, 32):    
+                    callback_function = getattr(self.mg, function_name)  
+                    action.triggered.connect(callback_function)
+                # Edit toolbar actions
+                elif int(index_action) == 32:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 else:        
@@ -544,153 +551,7 @@ class Giswater(QObject):
              
                             
                                   
-    ''' Management bar functions '''                                
-        
-    def mg_delete_node(self):
-        ''' Button 17. User select one node. 
-        Execute SQL function 'gw_fct_delete_node' 
-        Show warning (if any) '''
-
-        # Get selected features (from layer 'node')          
-        layer = self.iface.activeLayer()  
-        count = layer.selectedFeatureCount()     
-        if count == 0:
-            self.showInfo(self.controller.tr("You have to select at least one feature!"))
-            return 
-        elif count > 1:  
-            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))      
-        
-        features = layer.selectedFeatures()
-        feature = features[0]
-        node_id = feature.attribute('node_id')   
-        
-        # Execute SQL function and show result to the user
-        function_name = "gw_fct_delete_node"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"  
-        self.controller.get_row(sql)
-                    
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()             
-        
-        
-    def mg_connec_tool(self):
-        ''' Button 20. User select connections from layer 'connec' 
-        and executes function: 'gw_fct_connect_to_network' '''      
-
-        # Get selected features (from layer 'connec')
-        aux = "{"         
-        layer = self.iface.activeLayer()  
-        if layer.selectedFeatureCount() == 0:
-            self.showInfo(self.controller.tr("You have to select at least one feature!"))
-            return 
-        features = layer.selectedFeatures()
-        for feature in features:
-            connec_id = feature.attribute('connec_id') 
-            aux+= str(connec_id)+", "
-        connec_array = aux[:-2]+"}"
-        
-        # Execute function
-        sql = "SELECT "+self.schema_name+".gw_fct_connect_to_network('"+connec_array+"');"  
-        self.dao.execute_sql(sql) 
-        
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh() 
-    
-        
-    def table_wizard(self):
-        ''' TODO: 21. ''' 
-        pass
-        
-            
-    def mg_flow_exit(self):
-        ''' Button 27. Valve analytics ''' 
-                
-        # Execute SQL function
-        function_name = "gw_fct_valveanalytics"
-        sql = "SELECT "+self.schema_name+"."+function_name+"();"  
-        result = self.dao.get_row(sql) 
-        self.dao.commit()   
-
-        # Manage SQL execution result
-        if result is None:
-            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
-            return   
-        elif result[0] == 0:
-            self.showInfo(self.controller.tr("Process completed"), 50)    
-        else:
-            self.showWarning(self.controller.tr("Undefined error"))    
-            return              
-        
-            
-    def mg_flow_trace(self):
-        ''' Button 26. User select one node or arc.
-        SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
-        Returns and integer: error code
-        Get these id's and select them in its corresponding layers '''
-        
-        # Get selected features and layer type: 'arc' or 'node'   
-        elem_type = self.current_layer.name().lower()
-        count = self.current_layer.selectedFeatureCount()     
-        if count == 0:
-            self.showInfo(self.controller.tr("You have to select at least one feature!"))
-            return 
-        elif count > 1:  
-            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))      
-         
-        features = self.current_layer.selectedFeatures()
-        feature = features[0]
-        elem_id = feature.attribute(elem_type+'_id')   
-        
-        # Execute SQL function
-        function_name = "gw_fct_mincut"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"  
-        result = self.dao.get_row(sql) 
-        self.dao.commit()        
-        
-        # Manage SQL execution result
-        if result is None:
-            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
-            return   
-        elif result[0] == 0:
-            # Get 'arc' and 'node' list and select them 
-            self.mg_flow_trace_select_features(self.layer_arc, 'arc')                         
-            self.mg_flow_trace_select_features(self.layer_node, 'node')   
-        elif result[0] == 1:
-            self.showWarning(self.controller.tr("Parametrize error type 1"))   
-            return
-        else:
-            self.showWarning(self.controller.tr("Undefined error"))    
-            return        
-    
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()   
-   
-   
-    def mg_flow_trace_select_features(self, layer, elem_type):
-        
-        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"  
-        rows = self.dao.get_rows(sql)
-        self.dao.commit()
-        
-        # Build an expression to select them
-        aux = "\""+elem_type+"_id\" IN ("
-        for elem in rows:
-            aux+= elem[0]+", "
-        aux = aux[:-2]+")"
-        
-        # Get a featureIterator from this expression:
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            self.showWarning("Expression Error: "+str(expr.parserErrorString()))
-            return        
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-        
-        # Select features with these id's 
-        layer.setSelectedFeatures(id_list)       
-        
+    ''' Management bar functions '''                                        
         
     def mg_change_elem_type(self):                
         ''' Button 28: User select one node. A form is opened showing current node_type.type 

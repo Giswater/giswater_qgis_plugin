@@ -86,7 +86,7 @@ class DaoController():
     def show_message(self, text, message_level=1, duration=5):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.iface.messageBar().pushMessage("", text, message_level, duration)      
+        self.iface.messageBar().pushMessage("", self.tr(text), message_level, duration)      
                             
             
     def get_row(self, sql):
@@ -109,11 +109,12 @@ class DaoController():
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
-        if not result:            
+        if not result:         
             self.show_message(self.log_codes[-1], 2)   
             return False
         else:
             # Get last record from audit tables (searching for a possible error)
+            print "getting error from audit table"              
             return self.get_error_from_audit()    
     
     
