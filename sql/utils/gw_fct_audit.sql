@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_if_modified_func() RETURNS TRIGGER AS $BODY$
 DECLARE
-    audit_row log_actions;
+    audit_row "SCHEMA_NAME".log_actions;
     include_values boolean;
     log_diffs boolean;
     h_old hstore;
@@ -105,7 +105,6 @@ $BODY$;
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_table(target_table regclass, audit_rows boolean, audit_query_text boolean, ignored_cols text[]) RETURNS void AS $BODY$
 DECLARE
-    stm_targets text = 'INSERT OR UPDATE OR DELETE OR TRUNCATE';
     _q_txt text;
     _ignored_cols_snip text = '';
   
@@ -113,19 +112,16 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-    EXECUTE 'DROP TRIGGER IF EXISTS audit_trigger_row ON ' || target_table;
+    EXECUTE 'DROP TRIGGER IF EXISTS audit_trigger_row ON '||target_table;
 
     IF audit_rows THEN
         IF array_length(ignored_cols,1) > 0 THEN
-            _ignored_cols_snip = ', ' || quote_literal(ignored_cols);
+            _ignored_cols_snip = ', '||quote_literal(ignored_cols);
         END IF;
-        _q_txt = 'CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON ' || 
-                 target_table || 
-                 ' FOR EACH ROW EXECUTE PROCEDURE gw_trg_if_modified_func(' ||
-                 quote_literal(audit_query_text) || _ignored_cols_snip || ');';
-        RAISE NOTICE '%',_q_txt;
+        _q_txt = 'CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON '||target_table|| 
+                 ' FOR EACH ROW EXECUTE PROCEDURE gw_trg_if_modified_func('||
+                 quote_literal(audit_query_text)||_ignored_cols_snip||');';
         EXECUTE _q_txt;
-        stm_targets = 'TRUNCATE';
     END IF;
 
 END;
@@ -172,7 +168,10 @@ DECLARE
 BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
-    FOR registro IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
+    FOR registro IN 
+        SELECT * FROM pg_tables 
+        WHERE schemaname = schema_name 
+        AND tablename NOT LIKE 'log_%' LOOP
         table_name:= schema_name || '.' || quote_ident(registro.tablename);
         PERFORM audit_table(table_name, BOOLEAN 't', BOOLEAN 't');
     END LOOP;
@@ -189,7 +188,10 @@ DECLARE
 BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
-    FOR rec IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
+    FOR rec IN 
+        SELECT * FROM pg_tables 
+        WHERE schemaname = schema_name 
+        AND tablename NOT LIKE 'log_%' LOOP
         aux:= schema_name||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' ENABLE trigger audit_trigger_row';
     END LOOP;
@@ -206,7 +208,10 @@ DECLARE
 BEGIN
     SET search_path = "SCHEMA_NAME", public;
     
-    FOR rec IN SELECT * FROM pg_tables WHERE schemaname = schema_name LOOP
+    FOR rec IN 
+        SELECT * FROM pg_tables 
+        WHERE schemaname = schema_name 
+        AND tablename NOT LIKE 'log_%' LOOP
         aux:= schema_name||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' DISABLE trigger audit_trigger_row';
     END LOOP;
