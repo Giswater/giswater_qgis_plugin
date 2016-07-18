@@ -303,6 +303,7 @@ class Giswater(QObject):
     def get_layer_source(self, layer):
         ''' Get table or view name of selected layer '''
          
+        uri_schema = None
         uri_table = None
         uri = layer.dataProvider().dataSourceUri().lower()   
         pos_ini = uri.find('table=')
