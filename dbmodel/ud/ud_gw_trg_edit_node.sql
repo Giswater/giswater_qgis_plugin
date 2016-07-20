@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
    
 
-CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_node()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -34,15 +34,16 @@ BEGIN
 			RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
 		END IF;
         
-        -- Node Catalog ID
-        IF (NEW.nodecat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RAISE EXCEPTION 'There are no nodes catalog defined in the model, define at least one.';
-            END IF;
-            NEW.nodecat_id:= (SELECT id FROM cat_node LIMIT 1);
-            NEW.epa_type:= (SELECT epa_default FROM node_type LIMIT 1);
-        ELSE
-            NEW.epa_type:= (SELECT epa_default FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id = NEW.nodecat_id);        
+         -- Node type & EPA type
+        IF (NEW.node_type IS NULL) THEN
+                RAISE EXCEPTION 'Please, define node_type.';
+        ELSE   
+		NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;        
+        END IF;
+
+        -- Arc catalog ID
+        IF (NEW.arccat_id IS NULL) THEN
+                RAISE EXCEPTION 'Please, define node_catalog.';
         END IF;
 
         -- Sector ID
@@ -70,9 +71,8 @@ BEGIN
 
         
         -- FEATURE INSERT
-        NEW.elev=NEW.top_elev-NEW.ymax;
 
-        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.elev, NEW.sander, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.sander, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.est_top_elev, NEW.est_ymax, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom);
 
@@ -86,7 +86,7 @@ BEGIN
         EXECUTE v_sql;
 
         -- MANAGEMENT INSERT
-        man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+        man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id=NEW.node_type);
         v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         EXECUTE v_sql;
             
@@ -95,6 +95,11 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
 
 	IF (NEW.elev <> OLD.elev) THEN
 	RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
@@ -130,17 +135,18 @@ BEGIN
             EXECUTE v_sql;
 
         END IF;
-
+/*
         IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
+			
             IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
                 RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
             END IF;
         END IF;
-
+*/
         UPDATE node 
-        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, elev=NEW.elev, sander=NEW.sander, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
+        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
@@ -163,6 +169,6 @@ $BODY$
   COST 100;
 
 
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_node
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_node();
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_node
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_node();
       

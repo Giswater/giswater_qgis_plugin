@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION sample_ud.gw_trg_node_update() RETURNS trigger
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update() RETURNS trigger
 LANGUAGE plpgsql AS $$
 
 DECLARE 
@@ -98,6 +98,9 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_node_update AFTER UPDATE ON "sample_ud"."node" 
-FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom)) OR ((old.top_elev IS DISTINCT FROM new.top_elev)) OR ((old.ymax IS DISTINCT FROM new.ymax))) EXECUTE PROCEDURE "sample_ud"."gw_trg_node_update"();
+-- CREATE TRIGGER gw_trg_node_update AFTER UPDATE ON "SCHEMA_NAME"."node" 
+-- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom)) OR ((old.top_elev IS DISTINCT FROM new.top_elev)) OR ((old.ymax IS DISTINCT FROM new.ymax))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
+
+CREATE TRIGGER gw_trg_node_update AFTER UPDATE ON "SCHEMA_NAME"."node" 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
 

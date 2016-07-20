@@ -1,42 +1,9 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_junction ALTER elevation SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_junction ALTER depth SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_junction ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_junction ALTER verified SET DEFAULT 'TO REVIEW';
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_reservoir ALTER elevation SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_reservoir ALTER depth SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_reservoir ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_reservoir ALTER verified SET DEFAULT 'TO REVIEW';
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_tank ALTER elevation SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_tank ALTER depth SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_tank ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_tank ALTER verified SET DEFAULT 'TO REVIEW';
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_pump ALTER elevation SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_pump ALTER depth SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_pump ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_pump ALTER verified SET DEFAULT 'TO REVIEW';
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_valve ALTER elevation SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_valve ALTER depth SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_valve ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_valve ALTER verified SET DEFAULT 'TO REVIEW';
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_shortpipe ALTER elevation SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_shortpipe ALTER depth SET DEFAULT 0;
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_shortpipe ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_shortpipe ALTER verified SET DEFAULT 'TO REVIEW';
-
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_pipe ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW "SCHEMA_NAME".v_edit_inp_pipe ALTER verified SET DEFAULT 'TO REVIEW';
 
 
 
@@ -92,9 +59,7 @@ INSERT INTO "SCHEMA_NAME"."inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'AL
 INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 
 
--- ----------------------------
--- Default values of state selection
--- ----------------------------
-INSERT INTO "SCHEMA_NAME"."state_selection" VALUES ('ON_SERVICE');
+
+
 
 

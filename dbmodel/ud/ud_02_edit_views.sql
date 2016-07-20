@@ -1,22 +1,22 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 20 (Sao Caetano)
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
 -- ----------------------------
--- Views structure
+-- Editing views structure
 -- ----------------------------
 
-CREATE VIEW "sample_ud".v_edit_node AS
+CREATE VIEW "SCHEMA_NAME".v_edit_node AS
 SELECT node.node_id, 
 node.top_elev, 
 node.ymax,
-node.elev,
+node.top_elev-node.ymax as elev,
 node.sander,
+node.node_type,
 node.nodecat_id,
-cat_node.nodetype_id AS "cat_nodetype_id",
 cat_node.matcat_id AS "cat_matcat_id",
 node.epa_type,
 node.sector_id, 
@@ -44,16 +44,18 @@ node.rotation,
 node.link,
 node.verified,
 node.the_geom
-   FROM ("sample_ud".node
-   JOIN "sample_ud".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+   FROM ("SCHEMA_NAME".node
+   JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
    
-CREATE VIEW "sample_ud".v_edit_arc AS
+CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
 SELECT arc.arc_id, 
+arc.node_1,
+arc.node_2,
 arc.y1, 
 arc.y2,
+arc.arc_type,
 arc.arccat_id, 
-cat_arc.arctype_id AS "cat_arctype_id",
 cat_arc.matcat_id AS "cat_matcat_id",
 cat_arc.shape AS "cat_shape",
 cat_arc.geom1 AS "cat_geom1",
@@ -86,5 +88,149 @@ arc.rotation,
 arc.link,
 arc.verified,
 arc.the_geom
-FROM ("sample_ud".arc
-JOIN "sample_ud".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+FROM ("SCHEMA_NAME".arc
+JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
+
+
+
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_connec AS
+SELECT connec.connec_id, 
+connec.top_elev, 
+connec.ymax, 
+connec.connecat_id,
+cat_connec.type AS "cat_connectype_id",
+cat_connec.matcat_id AS "cat_matcat_id",
+connec.sector_id,
+connec.code,
+connec.n_hydrometer,
+connec.demand,
+connec."state", 
+connec.annotation, 
+connec.observ, 
+connec."comment",
+connec.dma_id,
+connec.soilcat_id,
+connec.category_type,
+connec.fluid_type,
+connec.location_type,
+connec.workcat_id,
+connec.buildercat_id,
+connec.builtdate,
+connec.ownercat_id,
+connec.adress_01,
+connec.adress_02,
+connec.adress_03,
+connec.streetaxis_id,
+ext_streetaxis.name,
+connec.postnumber,
+connec.descript,
+vnode.arc_id,
+cat_connec.svg AS "cat_svg",
+connec.rotation,
+connec.link,
+connec.verified,
+connec.the_geom
+FROM ("SCHEMA_NAME".connec 
+LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
+LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
+JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
+JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id);
+
+
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
+SELECT 
+link.link_id,
+link.connec_id,
+link.vnode_id,
+st_length2d(link.the_geom) as gis_length,
+link.custom_length,
+connec.connecat_id,
+link.the_geom
+FROM ("SCHEMA_NAME".link 
+LEFT JOIN "SCHEMA_NAME".connec ON (((connec.connec_id)::text = (link.connec_id)::text))
+);
+
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_gully AS
+SELECT gully.gully_id, 
+gully.top_elev, 
+gully.ymax, 
+gully.gratecat_id,
+cat_grate.type AS "cat_grate_type",
+cat_grate.matcat_id AS "cat_grate_matcat",
+gully.sandbox,
+gully.matcat_id,
+gully.units,
+gully.groove,
+gully.arccat_id,
+gully.siphon,
+gully.sector_id, 
+gully."state", 
+gully.annotation, 
+gully.observ, 
+gully."comment",
+gully.dma_id,
+gully.soilcat_id,
+gully.category_type,
+gully.fluid_type,
+gully.location_type,
+gully.workcat_id,
+gully.buildercat_id,
+gully.builtdate,
+gully.ownercat_id,
+gully.adress_01,
+gully.adress_02,
+gully.adress_03,
+gully.descript,
+cat_grate.svg AS "cat_svg",
+gully.rotation,
+gully.link,
+gully.verified,
+gully.the_geom
+FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
+WHERE gully.the_geom is not null;
+
+
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_pgully AS
+SELECT gully.gully_id, 
+gully.top_elev, 
+gully.ymax, 
+gully.gratecat_id,
+cat_grate.type AS "cat_grate_type",
+cat_grate.matcat_id AS "cat_grate_matcat",
+gully.sandbox,
+gully.matcat_id,
+gully.units,
+gully.groove,
+gully.arccat_id,
+gully.siphon,
+gully.sector_id, 
+gully."state", 
+gully.annotation, 
+gully.observ, 
+gully."comment",
+gully.dma_id,
+gully.soilcat_id,
+gully.category_type,
+gully.fluid_type,
+gully.location_type,
+gully.workcat_id,
+gully.buildercat_id,
+gully.builtdate,
+gully.ownercat_id,
+gully.adress_01,
+gully.adress_02,
+gully.adress_03,
+gully.descript,
+cat_grate.svg AS "cat_svg",
+gully.rotation,
+gully.link,
+gully.verified,
+gully.the_geom_pol AS "the_geom"
+FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
+WHERE gully.the_geom_pol is not null;
+
+

@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -9,9 +9,9 @@ This version of Giswater is provided by Giswater Association
 -- SUBCATCHMENT EXPORT
 ------------------------------------------------
 
--- Function: "sample_ud".gw_dump_subcatchments()
+-- Function: "SCHEMA_NAME".gw_fct_dump_subcatchments()
 
-CREATE OR REPLACE FUNCTION "sample_ud".gw_dump_subcatchments() RETURNS SETOF character varying LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_dump_subcatchments() RETURNS SETOF character varying LANGUAGE plpgsql AS $$
 DECLARE
 	subcatchment_polygon public.geometry;
 	row_id varchar(16);

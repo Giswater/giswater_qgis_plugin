@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
    
-CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     arc_table varchar;
     man_table varchar;
@@ -23,11 +23,13 @@ BEGIN
     epa_type:= TG_ARGV[1];
     
     IF TG_OP = 'INSERT' THEN
+    RAISE EXCEPTION 'Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC';
+	RETURN NEW;
  /*
 --	To disable the insert option
     RAISE EXCEPTION 'Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC';
 	  RETURN NULL;
-*/
+
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id := (SELECT nextval('arc_id_seq'));
@@ -62,8 +64,10 @@ BEGIN
                 RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
             END IF;
         END IF;
+		
+		-- FEATURE INSERT
 
-        INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, 'PIPE', NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", 
+        INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", 
             NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, 
             null, null,NEW.rotation, NEW.link,  NEW.est_y1, NEW.est_y2, NEW.verified, NEW.the_geom);
 
@@ -78,18 +82,33 @@ BEGIN
 		ELSIF (epa_type = 'OUTLET') THEN 
         	INSERT INTO  inp_outlet VALUES(NEW.arc_id,NEW.outlet_type,NEW."offset",NEW.curve_id,NEW.cd1,NEW.cd2,NEW.flap);
         END IF;
+
+        -- MAN INSERT      
+        man_table := (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id=NEW.arc_type);
+        v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
+        EXECUTE v_sql;
+
+
         RETURN NEW;
     
-
+*/
     ELSIF TG_OP = 'UPDATE' THEN
+
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
+
+
         UPDATE arc 
-        SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
+        SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
             "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 
              est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE arc_id = OLD.arc_id;
 
         IF (epa_type = 'CONDUIT') THEN 
-            UPDATE inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culver=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage WHERE arc_id=OLD.arc_id;
+            UPDATE inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage WHERE arc_id=OLD.arc_id;
         ELSIF (epa_type = 'PUMP') THEN 
         	UPDATE inp_pump SET arc_id=NEW.arc_id,curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff WHERE arc_id=OLD.arc_id;
 		ELSIF (epa_type = 'ORIFICE') THEN 
@@ -116,20 +135,20 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_edit_inp_arc_conduit INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_conduit
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_arc('inp_conduit', 'CONDUIT');   
+CREATE TRIGGER gw_trg_edit_inp_arc_conduit INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_conduit
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_conduit', 'CONDUIT');   
 
-CREATE TRIGGER gw_trg_edit_inp_arc_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_pump
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_arc('inp_pump', 'PUMP');   
+CREATE TRIGGER gw_trg_edit_inp_arc_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pump
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_pump', 'PUMP');   
 
-CREATE TRIGGER gw_trg_edit_inp_arc_orifice INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_orifice
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_arc('inp_orifice', 'ORIFICE');   
+CREATE TRIGGER gw_trg_edit_inp_arc_orifice INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_orifice
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_orifice', 'ORIFICE');   
 
-CREATE TRIGGER gw_trg_edit_inp_arc_outlet INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_outlet
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_arc('inp_outlet', 'OUTLET');   
+CREATE TRIGGER gw_trg_edit_inp_arc_outlet INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_outlet
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_outlet', 'OUTLET');   
 
-CREATE TRIGGER gw_trg_edit_inp_arc_weir INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_weir
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_arc('inp_weir', 'WEIR');   
+CREATE TRIGGER gw_trg_edit_inp_arc_weir INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_weir
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_weir', 'WEIR');   
  
 
 

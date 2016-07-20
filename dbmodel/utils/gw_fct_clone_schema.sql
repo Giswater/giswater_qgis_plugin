@@ -15,7 +15,7 @@ DECLARE
     column_ text;
     msg text;
 
-    BEGIN
+BEGIN
 
     -- Create destination schema
     EXECUTE 'CREATE SCHEMA ' || dest_schema ;
@@ -53,9 +53,9 @@ DECLARE
     -- Loop again trough tables in order to set Foreign Keys
     FOR rec_table IN
         SELECT table_name FROM information_schema.TABLES WHERE table_schema = source_schema AND table_type = 'BASE TABLE' ORDER BY table_name
-    LOOP	  
+    LOOP
       
-        tablename := dest_schema || '.' || rec_table;	  
+        tablename := dest_schema || '.' || rec_table;
         FOR rec_fk IN
             SELECT tc.constraint_name, tc.constraint_schema, tc.table_name, kcu.column_name,
             ccu.table_name AS parent_table, ccu.column_name AS parent_column,

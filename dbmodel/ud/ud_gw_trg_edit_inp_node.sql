@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater
+This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -11,7 +11,7 @@ This version of Giswater is provided by Giswater Association
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION sample_ud.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     node_table varchar;
     man_table varchar;
@@ -28,11 +28,13 @@ BEGIN
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
+    RAISE EXCEPTION 'Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC';
+	RETURN NEW;
 /*
 --	To disable the insert option
     RAISE EXCEPTION 'Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC';
 	  RETURN NULL;
-*/
+
 
         -- Node ID
         IF (NEW.node_id IS NULL) THEN
@@ -75,12 +77,10 @@ BEGIN
         END IF;
             
         -- FEATURE INSERT
-		NEW.elev=NEW.top_elev-NEW.ymax;
-				
-        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.elev, NEW.nodecat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, 
+        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.sander, NEW.node_type, NEW.nodecat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, 
 								null, null, null, null, null ,null, null,
                                 null, null, null, null, null,
-                                NEW.rotation, NEW.link, NEW.est_top_elev, NEW.est_ymax, NEW.verified, NEW.the_geom);
+                                NEW.est_top_elev, NEW.est_ymax, NEW.rotation, NEW.link,  NEW.verified, NEW.the_geom);
 
         -- EPA INSERT
         IF node_table = 'inp_junction' THEN        
@@ -94,7 +94,7 @@ BEGIN
         END IF;
 
         -- MANAGEMENT INSERT
-        man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+        man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id=NEW.node_type);
         IF man_table IS NOT NULL THEN        
             v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
             EXECUTE v_sql;
@@ -102,10 +102,17 @@ BEGIN
         RETURN NEW;
 
 		RETURN NULL;
-
+*/
 
     ELSIF TG_OP = 'UPDATE' THEN
 
+        -- UPDATE position 
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+        END IF;
+
+/*
         IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
@@ -113,10 +120,10 @@ BEGIN
                 RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
             END IF;
         END IF;
-
+*/
         UPDATE node 
-        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, elev=NEW.elev, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", rotation=NEW.rotation, link=NEW.link, est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, verified=NEW.verified, the_geom=NEW.the_geom 
+        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
+            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
         IF node_table = 'inp_junction' THEN
@@ -142,17 +149,17 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_junction 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
+CREATE TRIGGER gw_trg_edit_inp_node_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_junction 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_junction', 'JUNCTION');
  
-CREATE TRIGGER gw_trg_edit_inp_node_divider INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_divider
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_divider', 'DIVIDER');
+CREATE TRIGGER gw_trg_edit_inp_node_divider INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_divider
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_divider', 'DIVIDER');
 
-CREATE TRIGGER gw_trg_edit_inp_node_outfall INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_outfall
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_outfall', 'OUTFALL');
+CREATE TRIGGER gw_trg_edit_inp_node_outfall INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_outfall
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_outfall', 'OUTFALL');
 
-CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON "sample_ud".v_edit_inp_storage 
-FOR EACH ROW EXECUTE PROCEDURE "sample_ud".gw_trg_edit_inp_node('inp_storage', 'STORAGE');
+CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_storage 
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_storage', 'STORAGE');
 
 
   
