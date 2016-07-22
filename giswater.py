@@ -17,6 +17,7 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 import os.path
 import sys  
 from functools import partial
+import subprocess
 
 from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
@@ -89,11 +90,11 @@ class Giswater(QObject):
             return self.controller.tr(message)
         
         
-    def showInfo(self, text, duration = 5):
+    def showInfo(self, text, duration=5):
         self.iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)            
         
         
-    def showWarning(self, text, duration = 5):
+    def showWarning(self, text, duration=5):
         self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)            
         
         
@@ -127,7 +128,7 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20, 26, 27, 28, 32):    
+                if int(index_action) in (17, 20, 26, 27, 28) or int(index_action) >= 30:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 else:        
@@ -237,12 +238,17 @@ class Giswater(QObject):
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
             self.ag_ed = QActionGroup(parent);
-            for i in range(30,36):
+            for i in range(30,37):
                 self.add_action(str(i), self.toolbar_ed, self.ag_ed)                   
          
         # Disable and hide all toolbars
         self.disable_actions()
         self.hide_toolbars() 
+        
+        # Get files to execute giswater jar
+        self.java_exe = self.settings.value('files/java_exe')          
+        self.giswater_jar = self.settings.value('files/giswater_jar')          
+        self.gsw_file = self.settings.value('files/gsw_file')          
                          
         # Project initialization
         self.project_read()               
@@ -273,13 +279,22 @@ class Giswater(QObject):
     
     ''' Slots '''
             
-    def disable_actions(self):
+    def disable_actions(self, start=1, stop=37):
         ''' Utility to disable all actions '''
-        for i in range(1,30):
+        for i in range(start, stop):
             key = str(i).zfill(2)
             if key in self.actions:
                 action = self.actions[key]
                 action.setEnabled(False)   
+                
+
+    def enable_actions(self, start=1, stop=37):
+        ''' Utility to enable all actions '''
+        for i in range(start, stop):
+            key = str(i).zfill(2)
+            if key in self.actions:
+                action = self.actions[key]
+                action.setEnabled(True)                   
                 
 
     def hide_toolbars(self):
@@ -440,14 +455,21 @@ class Giswater(QObject):
             if not status:
                 self.search_plus.dlg.setVisible(False)                     
         except:
-            pass       
-                        
+            pass   
+        
+        # Enable ED toolbar
+        self.enable_actions(30, 37)
+            
                                 
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
 
         # Disable all actions (buttons)
         self.disable_actions()
+        
+        # Enable ED toolbar
+        self.enable_actions(30, 37)
+        
         if layer is None:
             layer = self.iface.activeLayer() 
             if layer is None:
@@ -541,9 +563,39 @@ class Giswater(QObject):
             
     def ed_search_plus(self):   
         if self.search_plus is not None:
-            self.search_plus.dlg.setVisible(True)            
-             
-                            
+            self.search_plus.dlg.setVisible(True)    
+            
+                    
+    def ed_giswater_jar(self):   
+        ''' Open giswater.jar with selected .gsw file '''
+        
+        # Check if java.exe file exists
+        if not os.path.exists(self.java_exe):
+            self.showWarning(self.controller.tr("Java Runtime executable file not found at: "+self.java_exe), 10)
+            return  
+        
+        # Check if giswater.jar file exists
+        if not os.path.exists(self.giswater_jar):
+            self.showWarning(self.controller.tr("Giswater executable file not found at: "+self.giswater_jar), 10)
+            return  
+                  
+        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
+        if not os.path.exists(self.gsw_file):
+            self.showInfo(self.controller.tr("GSW file not found at: "+self.gsw_file), 10)
+            self.gsw_file = ""    
+        
+        # Execute process
+        aux = '"'+self.giswater_jar+'"'
+        if self.gsw_file != "":
+            aux+= ' "'+self.gsw_file+'"'
+            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, self.gsw_file])
+        else:
+            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, "> out.log"])
+        
+        # Show information message    
+        self.showInfo(self.controller.tr("Executing... "+aux))
+                              
+                              
                                   
     ''' Management bar functions '''                                
         
