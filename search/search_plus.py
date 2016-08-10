@@ -25,9 +25,7 @@ class SearchPlus(QObject):
             self.translator = QTranslator()
             self.translator.load(locale_path)
             if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)      
-        else:
-            print "Locale file not found at: "+locale_path            
+                QCoreApplication.installTranslator(self.translator)                
         
         # load local settings of the plugin
         self.app_name = "searchplus"        
