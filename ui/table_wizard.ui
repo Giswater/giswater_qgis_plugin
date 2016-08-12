@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>150</height>
+    <width>408</width>
+    <height>159</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,9 +32,9 @@
   <widget class="QPushButton" name="btn_select_file">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>340</x>
      <y>30</y>
-     <width>71</width>
+     <width>51</width>
      <height>21</height>
     </rect>
    </property>
@@ -47,7 +47,7 @@
     <rect>
      <x>70</x>
      <y>20</y>
-     <width>251</width>
+     <width>261</width>
      <height>36</height>
     </rect>
    </property>
@@ -68,7 +68,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="btn_import_csv">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>240</x>
      <y>110</y>
      <width>91</width>
      <height>23</height>
@@ -104,7 +104,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QComboBox" name="cbo_delimiter">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>280</x>
      <y>70</y>
      <width>51</width>
      <height>22</height>
@@ -124,7 +124,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_csv_3">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>220</x>
      <y>70</y>
      <width>51</width>
      <height>21</height>
@@ -132,6 +132,19 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Delimiter:</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chk_header">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>110</y>
+     <width>161</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>First record has field names</string>
    </property>
   </widget>
  </widget>

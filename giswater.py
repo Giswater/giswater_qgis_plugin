@@ -693,10 +693,10 @@ class Giswater(QObject):
     
         
     def mg_table_wizard(self):
-        ''' TODO: Button 21. WS/UD table wizard ''' 
+        ''' Button 21. WS/UD table wizard ''' 
         
         if self.project_type == 'ws':
-            table_list = ['inp_controls', 'inp_curve', 'inp_demand', 'inp_pattern', 'inp_rules', 'cat_node', 'cat_arc', 'a_csv']
+            table_list = ['inp_controls', 'inp_curve', 'inp_demand', 'inp_pattern', 'inp_rules', 'cat_node', 'cat_arc']
         elif self.project_type == 'ud':   
             table_list = {'inp_controls', 'inp_curve', 'inp_transects', 'inp_timeseries', 'inp_dwf', 'inp_hydrograph', 'inp_inflows', 'inp_lid_control', 'cat_node', 'cat_arc'}
         else:
@@ -741,9 +741,10 @@ class Giswater(QObject):
         
     def import_csv(self):
 
-        # Get selected table and delimiter
+        # Get selected table, delimiter, and header
         table_name = utils_giswater.getWidgetText(self.dlg.cbo_table)  
-        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimitier)  
+        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)  
+        header_status = self.dlg.chk_header.checkState()             
         
         # Get CSV file. Check if file exists
         self.file_path = self.dlg.txt_file_path.toPlainText()
@@ -751,16 +752,13 @@ class Giswater(QObject):
             msg = "Selected file not found: "+self.file_path
             self.showWarning(msg)
             return False      
-                   
-        # TODO: Check if data from CSV is compatible wit selected table (has same columns)
-        
-        # TODO: Delete previous content?
-#         sql = "DELETE FROM "+self.schema_name+"."+table_name
-#         self.dao.execute_sql(sql, False)
               
         # Open CSV file for read and copy into database
         rf = open(self.file_path)
-        sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV HEADER DELIMITER AS '"+delimiter+"'"
+        sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
+        if (header_status == Qt.Checked):
+            sql+= " HEADER"
+        sql+= " DELIMITER AS '"+delimiter+"'"
         status = self.dao.copy_expert(sql, rf)
         if status:
             self.dao.rollback()
