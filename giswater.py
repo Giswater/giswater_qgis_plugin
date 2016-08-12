@@ -25,6 +25,7 @@ from controller import DaoController
 from map_tools.move_node import MoveNode
 from search.search_plus import SearchPlus
 from ui.change_node_type import ChangeNodeType
+from ui.table_wizard import TableWizard
 import utils_giswater
 
 
@@ -124,13 +125,13 @@ class Giswater(QObject):
             self.actions[index_action] = action
         else:
             self.actions[text] = action
-            
+                                     
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
                 # Define buttons to execute custom or generic function
                 # Custom function
-                if int(index_action) in (17, 20, 24, 26, 27, 28) or int(index_action) >= 30:    
+                if int(index_action) in (17, 20, 21, 24, 26, 27, 28) or int(index_action) >= 30:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 # Generic function
@@ -333,6 +334,7 @@ class Giswater(QObject):
     def search_project_type(self):
         ''' Search in table 'version' project type of current QGIS project '''
         
+        self.project_type = None
         features = self.layer_version.getFeatures()
         for feature in features:
             wsoftware = feature['wsoftware']
@@ -456,9 +458,7 @@ class Giswater(QObject):
         except:
             pass   
         
-        # Enable ED toolbar
-        self.enable_actions(True, 30, 37)
-        self.enable_action(True, 24)    
+        self.custom_enable_actions()
             
                                 
     def current_layer_changed(self, layer):
@@ -467,9 +467,7 @@ class Giswater(QObject):
         # Disable all actions (buttons)
         self.enable_actions(False)
         
-        # Enable ED toolbar
-        self.enable_actions(True, 30, 37)
-        self.enable_action(True, 24)        
+        self.custom_enable_actions()     
         
         if layer is None:
             layer = self.iface.activeLayer() 
@@ -505,7 +503,17 @@ class Giswater(QObject):
             except KeyError, e:
                 print "current_layer_changed: "+str(e)
                         
+    
+    def custom_enable_actions(self):
+        
+        # MG toolbar
+        self.enable_action(True, 21)   
+        
+        # Enable ED toolbar
+        self.enable_actions(True, 30, 37)
+        self.enable_action(True, 24)   
                 
+                    
     def ws_generic(self, function_name):   
         ''' Water supply generic callback function '''
         try:
@@ -599,6 +607,7 @@ class Giswater(QObject):
                               
                                   
     ''' Management bar functions '''   
+        
     def mg_go2epa_express(self):
         ''' Button 24. Open giswater in silent mode
         Executes all options of File Manager: 
@@ -683,9 +692,83 @@ class Giswater(QObject):
         self.iface.mapCanvas().refresh() 
     
         
-    def table_wizard(self):
-        ''' TODO: 21. ''' 
-        pass
+    def mg_table_wizard(self):
+        ''' Button 21. WS/UD table wizard ''' 
+        
+        if self.project_type == 'ws':
+            table_list = ['inp_controls', 'inp_curve', 'inp_demand', 'inp_pattern', 'inp_rules', 'cat_node', 'cat_arc']
+        elif self.project_type == 'ud':   
+            table_list = {'inp_controls', 'inp_curve', 'inp_transects', 'inp_timeseries', 'inp_dwf', 'inp_hydrograph', 'inp_inflows', 'inp_lid_control', 'cat_node', 'cat_arc'}
+        else:
+            return
+        
+        # Get CSV file path from settings file          
+        self.file_path = self.settings.value('files/csv_file')
+        if self.file_path is None:             
+            self.file_path = self.plugin_dir+"/csv/test.csv"        
+        
+        # Open dialog to select CSV file and table to import contents to
+        self.dlg = TableWizard()
+        self.dlg.txt_file_path.setText(self.file_path)   
+        #utils_giswater.fillComboBox(self.dlg.cbo_table, table_list) 
+        table_list.sort()  
+        for row in table_list:
+            self.dlg.cbo_table.addItem(row)                
+ 
+        # Set signals
+        self.dlg.btn_select_file.clicked.connect(self.select_file)
+        self.dlg.btn_import_csv.clicked.connect(self.import_csv)
+
+        self.dlg.exec_()            
+
+        
+    def select_file(self):
+
+        # Set default value if necessary
+        if self.file_path == '': 
+            self.file_path = self.plugin_dir
+            
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_path)
+        os.chdir(folder_path)
+        msg = "Select CSV file"
+        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.csv')
+        self.dlg.txt_file_path.setText(self.file_path)     
+
+        # Save CSV file path into settings
+        self.settings.setValue('files/csv_file', self.file_path)       
+        
+        
+    def import_csv(self):
+
+        # Get selected table, delimiter, and header
+        table_name = utils_giswater.getWidgetText(self.dlg.cbo_table)  
+        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)  
+        header_status = self.dlg.chk_header.checkState()             
+        
+        # Get CSV file. Check if file exists
+        self.file_path = self.dlg.txt_file_path.toPlainText()
+        if not os.path.exists(self.file_path):
+            msg = "Selected file not found: "+self.file_path
+            self.showWarning(msg)
+            return False      
+              
+        # Open CSV file for read and copy into database
+        rf = open(self.file_path)
+        sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
+        if (header_status == Qt.Checked):
+            sql+= " HEADER"
+        sql+= " DELIMITER AS '"+delimiter+"'"
+        status = self.dao.copy_expert(sql, rf)
+        if status:
+            self.dao.rollback()
+            msg = "Cannot import CSV into table "+table_name+". Reason:\n"+str(status).decode('utf-8')
+            QMessageBox.warning(None, "Import CSV", self.controller.tr(msg))
+            return False
+        else:
+            self.dao.commit()
+            msg = "Selected CSV has been imported successfully"
+            self.showInfo(self.controller.tr(msg))
         
             
     def mg_flow_exit(self):
