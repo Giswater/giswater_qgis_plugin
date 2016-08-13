@@ -2,21 +2,14 @@
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 from qgis.utils import iface
+from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
+from qgis.gui import QgsAttributeTableModel, QgsMessageBar
+
+import os
 
 import utils_giswater
 from ws_parent_init import ParentDialog
 
-from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry
-from qgis.gui import QgsAttributeTableView, QgsAttributeTableModel
-
-from controller import DaoController
-from itertools import count
-
-import os
-import ctypes
-
-import psycopg2
-import psycopg2.extras
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a node is identified in the map '''
@@ -112,19 +105,14 @@ class NodeDialog(ParentDialog):
         
         # Fill the log/node tab
         self.fill_log_node()
-        
-        
-        
-        
-        
-        
+             
     
     def set_tabs_visibility(self):
-        ''' Hide some tabs '''
+        ''' TODO: Hide some tabs '''
         
         self.tab_main.removeTab(7)      
-        #self.tab_main.removeTab(4)      
         self.tab_main.removeTab(2) 
+        
         # Hide some tabs depending 'epa_type'
         man_visible = False
         index_tab = 0      
@@ -276,6 +264,7 @@ class NodeDialog(ParentDialog):
     
     def fill_node_type_id(self):
         ''' Define and execute query to populate combo 'node_type_dummy' '''
+        
         # Get node_type.type from node_type.id
         sql = "SELECT type FROM "+self.schema_name+".node_type"
         if self.node_type:
@@ -295,6 +284,7 @@ class NodeDialog(ParentDialog):
         
     def change_node_type_id(self, index):
         ''' Define and execute query to populate combo 'cat_nodetype_id' '''
+        
         node_type_id = utils_giswater.getWidgetText("node_type_dummy", False)    
         if node_type_id:        
             utils_giswater.setWidgetText("node_type", node_type_id)    
@@ -318,29 +308,28 @@ class NodeDialog(ParentDialog):
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)     
         
+        
     def delete_row_doc(self):
+        
         # Warning
         msgBox = QMessageBox()
         msgBox.setText("Are you sure you want unlink element?")
-        #msgBox.setInformativeText("Do you want to save your changes?")
         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         ret = msgBox.exec_()
         if ret == QMessageBox.Ok:
-            # OK was clicked
             self.upload_db_doc()
         elif ret == QMessageBox.Discard:
-        # Cancel save was clicked
+            # Cancel save was clicked
             return 
         
-    def upload_db_doc(self):
-        print("delete_row")
-        position_row = self.doc_path.currentIndex().row()
-        print(position_row)
         
+    def upload_db_doc(self):
+        
+        position_row = self.doc_path.currentIndex().row()      
         
         # Get data from address in memory (pointer)
         # Get Id of selected row
-        self.id=self.doc_path.selectedIndexes()[0].data()
+        self.id = self.doc_path.selectedIndexes()[0].data()
         print(self.id)  
         
         # Data base element_x_node
@@ -368,9 +357,7 @@ class NodeDialog(ParentDialog):
       
         
     def fill_doc_path(self):
-      
         ''' Fill the table control to show documents''' 
-        
          
         self.doc_path = self.dialog.findChild(QTableView, "doc_path")     
         
@@ -440,21 +427,18 @@ class NodeDialog(ParentDialog):
         
         # Check if clicked value is from the column "PATH"
         position_column = self.doc_path.currentIndex().column()
-        if position_column == 4 :      
+        if position_column == 4:      
             # Get data from address in memory (pointer)
-            self.path=self.doc_path.selectedIndexes()[0].data()
+            self.path = self.doc_path.selectedIndexes()[0].data()
             print(self.path)  
             # Check if file exist
             if not os.path.exists(self.path):
                 message="File doesn't exist!"
-                self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
-                print ("File doesn't exist!")
-                
-            else :
+                self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)                
+            else:
                 # Open the document
                 os.startfile(self.path)     
-        else :
-            return
+
             
     def showWarning(self, text, duration = 3):
         self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)    
@@ -504,7 +488,6 @@ class NodeDialog(ParentDialog):
         '''Get selected value from combobox doc_type
         Filter the table related on selected value'''
         
-        
         # Get selected value from ComboBox cat_doc_type 
         self.doc_type_value = utils_giswater.getWidgetText("doc_type")
         self.doc_user_value = utils_giswater.getWidgetText("doc_user")
@@ -514,7 +497,7 @@ class NodeDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "doc_type" = \'' +self.doc_type_value + '\'')
-        print(expr.dump())
+        #print(expr.dump())
        
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_value !='null'):
@@ -555,7 +538,7 @@ class NodeDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "tagcat_id" = \'' +self.doc_tag_value + '\'')
-        print(expr.dump())
+        #print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_value !='null'):
@@ -590,12 +573,13 @@ class NodeDialog(ParentDialog):
         ''' Get date_from and date_to from ComboBoxes
         Filter the table related on selected value
         '''
+        
         #self.tbl_document.setModel(self.model)
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from") 
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")     
         
-        date_from=self.date_document_from.date() 
-        date_to=self.date_document_to.date() 
+        date_from = self.date_document_from.date() 
+        date_to = self.date_document_to.date() 
         
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "node_id" ='+ self.node_id_selected+'' )
@@ -612,218 +596,50 @@ class NodeDialog(ParentDialog):
         
              
     def fill_info_node(self): 
-        ''' Fill info tab of node
-        '''
+        ''' Fill info tab of node '''
         
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")  
         
         # Set signal for bottom delete_row_info
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(self.delete_row_info) 
 
-        # Get arc_id from selected node
+        # Get selected node
         self.node_id_selected = utils_giswater.getWidgetText("node_id")  
-        print(self.node_id_selected)
-        # Get layers
+        # Get layer with selected ame
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_element_x_node")
         # The result is a list, lets pick the first
         if layerList: 
+            
             layer_B = layerList[0]
-
             self.cacheB = QgsVectorLayerCache(layer_B, 10000)
             self.modelB = QgsAttributeTableModel(self.cacheB)
                  
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-            
             self.modelB.setRequest(request)
             self.modelB.loadLayer()
             self.tbl_info.setModel(self.modelB)
-            
-            
-    
-        
-    
-        
-           
-    
-    def get_doc_user_2(self):
-        print("get user2") 
-        '''Get selected value from combobox doc_user_2
-        Filter the table related on selected value'''
-        
-        # Get selected value from ComboBoxs
-        self.doc_user_2_value = utils_giswater.getWidgetText("doc_user_2")
-        self.event_id_value = utils_giswater.getWidgetText("event_id")
-        self.event_type_value = utils_giswater.getWidgetText("event_type")
-        # Get id
-        self.arc_id_selected = utils_giswater.getWidgetText("node_id")
-        
-        # Filter and set table 
-        expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\'')
-        
-        # Filter and set table depending on selected values from others comboboxes
-        if (self.event_id_value != 'null' ):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_id" = \'' +self.event_id_value + '\'') 
-        if (self.event_type_value != 'null'):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_type" = \'' +self.event_type_value + '\'') 
-        if ((self.event_id_value !='null')&(self.event_id_value != 'null')):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_id" = \'' +self.event_id_value + '\' AND "event_type" = \'' +self.event_type_value + '\'')  
-        
-        # If combobox doc_user_2 is returned to 'null'
-        if (self.doc_user_2_value == 'null'): 
-            if (self.event_id_value != 'null' ):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_id" = \'' +self.event_id_value + '\'') 
-            if (self.event_type_value != 'null'):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_type" = \'' +self.event_type_value + '\'') 
-            if ((self.event_id_value !='null')&(self.event_type_value != 'null')):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_id" = \'' +self.event_id_value + '\' AND "event_type" = \'' +self.event_type_value + '\'')  
-            
-            if((self.event_id_value =='null')&(self.event_type_value == 'null')):  
-                # Automatically fill the table, based on node_id if all value of Comboboxes are 'null'
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
-              
-        request = QgsFeatureRequest(expr)
-        self.modelC.setRequest(request)
-        self.modelC.loadLayer()
-        self.tbl_event_element.setModel(self.modelC)
-            
-        
-    def get_event_id(self):
-        print("get event id")
-        '''Get selected value from combobox event_id
-        Filter the table related on selected value'''
-        
-        # Get selected value from ComboBox cat_doc_type 
-        self.doc_user_2_value = utils_giswater.getWidgetText("doc_user_2")
-        self.event_id_value = utils_giswater.getWidgetText("event_id")
-        self.event_type_value = utils_giswater.getWidgetText("event_type")
-        # Get id
-        self.node_id_selected = utils_giswater.getWidgetText("node_id")
-      
-        # Filter and set table 
-        expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_id" = \'' +self.event_id_value + '\'')
-        print(expr.dump())
-        
-        # Filter and set table depending on selected values from others comboboxes
-        if (self.doc_user_2_value !='null'):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_id" = \'' +self.event_id_value + '\'') 
-        if (self.event_type_value != 'null'):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_id" = \'' +self.event_id_value + '\' AND "event_type" = \'' +self.event_type_value + '\'') 
-        if ((self.doc_user_2_value !='null')&(self.event_type_value != 'null')):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_id" = \'' +self.event_id_value + '\' AND "event_type" = \'' +self.event_type_value + '\'')  
-        
-        # If combobox event_id is returned to 'null'
-        if (self.event_id_value == 'null'): 
-            if (self.doc_user_2_value !='null'):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_value_2 + '\'') 
-            if (self.event_type_value != 'null'):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_type" = \'' +self.event_type_value + '\'') 
-            if ((self.doc_user_2_value !='null')&(self.event_type_value != 'null')):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_type" = \'' +self.event_type_value + '\'')  
-            
-            if((self.doc_user_2_value =='null')&(self.event_type_value == 'null')):  
-                # Automatically fill the table, based on node_id if all value of Comboboxes are 'null'
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
-           
-        request = QgsFeatureRequest(expr)
-        self.modelC.setRequest(request)
-        self.modelC.loadLayer()
-        self.tbl_event_element.setModel(self.modelC)
-        
-    def get_event_type(self):
-        print("get event type")  
-        '''Get selected value from combobox event_type
-        Filter the table related on selected value'''
-        
-        # Get selected value from ComboBoxs
-        self.doc_user_2_value = utils_giswater.getWidgetText("doc_user_2")
-        self.event_id_value = utils_giswater.getWidgetText("event_id")
-        self.event_type_value = utils_giswater.getWidgetText("event_type")
-        # Get id
-        self.node_id_selected = utils_giswater.getWidgetText("node_id")
-      
-        # Filter and set table 
-        expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_type" = \'' +self.event_type_value + '\'')
-        print(expr.dump())
-        
-        # Filter and set table depending on selected values from others comboboxes
-        if (self.doc_user_2_value !='null'):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_type" = \'' +self.event_type_value + '\'') 
-        if (self.event_id_value != 'null'):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_id" = \'' +self.event_id_value + '\' AND "event_type" = \'' +self.event_type_value + '\'') 
-        if ((self.doc_user_2_value !='null')&(self.event_id_value != 'null')):
-            expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_id" = \'' +self.event_id_value + '\' AND "event_type" = \'' +self.event_type_value + '\'')  
-        
-        # If combobox event_type is returned to 'null'
-        if (self.event_type_value == 'null'): 
-            if (self.doc_user_2_value !='null'):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\'') 
-            if (self.event_id_value != 'null'):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_id" = \'' +self.event_id_value + '\'') 
-            if ((self.doc_user_2_value !='null')&(self.event_id_value != 'null')):
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.doc_user_2_value + '\' AND "event_id" = \'' +self.event_id_value + '\'')  
-            
-            if((self.doc_user_2_value =='null')&(self.event_id_value == 'null')):  
-                # Automatically fill the table, based on node_id if all value of Comboboxes are 'null'
-                expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' ) 
-               
-        request = QgsFeatureRequest(expr)
-        print(expr.dump())
-        self.modelC.setRequest(request)
-        self.modelC.loadLayer()
-        self.tbl_event_element.setModel(self.modelC)
-      
-            
-    def get_date_event_element(self):
-        ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
-        #self.tbl_document.setModel(self.model)
-        self.date_document_from_2 = self.dialog.findChild(QDateEdit, "date_document_from_2") 
-        self.date_document_to_2 = self.dialog.findChild(QDateEdit, "date_document_to_2")     
-        
-        date_from=self.date_document_from_2.date() 
-        date_to=self.date_document_to_2.date() 
-        
-        if (date_from < date_to):
-            expr = QgsExpression('format_date("timestamp",\'yyyyMMdd\') > ' + self.date_document_from_2.date().toString('yyyyMMdd')+'AND format_date("timestamp",\'yyyyMMdd\') < ' + self.date_document_to_2.date().toString('yyyyMMdd')+ ' AND "node_id" ='+ self.node_id_selected+'' )
-            print(expr.dump())
-        else :
-            message="Valid interval!"
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
-            return
-      
-        request = QgsFeatureRequest(expr)
-        self.modelC.setRequest(request)
-        self.modelC.loadLayer()
-        self.tbl_event_element.setModel(self.modelC)
-        
+       
         
     def delete_row_info(self):
-        # Warning
+        ''' Ask question to the user '''
+        
         msgBox = QMessageBox()
         msgBox.setText("Are you sure you want unlink element?")
-        #msgBox.setInformativeText("Do you want to save your changes?")
         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         ret = msgBox.exec_()
         if ret == QMessageBox.Ok:
-            # OK was clicked
             self.upload_db_el()
         elif ret == QMessageBox.Discard:
-        # Cancel save was clicked
             return 
         
+        
     def upload_db_el(self):
-        print("delete_row")
-        position_row = self.tbl_info.currentIndex().row()
-        print(position_row)
-        
-        
+       
         # Get data from address in memory (pointer)
         # Get Id of selected row
-        self.id=self.tbl_info.selectedIndexes()[0].data()
-        print(self.id)  
+        self.id = self.tbl_info.selectedIndexes()[0].data()
         
         # Data base element_x_node
         # Delete row 
@@ -843,17 +659,13 @@ class NodeDialog(ParentDialog):
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-            
             self.modelB.setRequest(request)
             self.modelB.loadLayer()
             self.tbl_info.setModel(self.modelB)
-            
-        
-        
+
             
     def fill_node_event_node(self):
-        ''' Fill tab event -> node of node
-        '''
+        ''' Fill tab event -> node of node '''
   
         self.tbl_event_node = self.dialog.findChild(QTableView, "tbl_event_node") 
         
@@ -907,10 +719,10 @@ class NodeDialog(ParentDialog):
             self.model_node.loadLayer()
             self.tbl_event_node.setModel(self.model_node)
         
+        
     def get_doc_user_3(self):
-        print ("get_doc_user_3")
-        '''Get selected value from combobox doc_user_3
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_user_3
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_3_value = utils_giswater.getWidgetText("doc_user_3")
@@ -947,6 +759,7 @@ class NodeDialog(ParentDialog):
         self.model_node.setRequest(request)
         self.model_node.loadLayer()
         self.tbl_event_node.setModel(self.model_node)
+    
     
     def get_event_id_3(self):
         '''Get selected value from combobox event_id
@@ -1034,20 +847,17 @@ class NodeDialog(ParentDialog):
         
     def get_date_event_element_3(self):
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
-        #self.tbl_document.setModel(self.model)
+        Filter the table related on selected value '''
+
         self.date_document_from_3 = self.dialog.findChild(QDateEdit, "date_document_from_3") 
         self.date_document_to_3 = self.dialog.findChild(QDateEdit, "date_document_to_3")     
-        
-        date_from=self.date_document_from_3.date() 
-        date_to=self.date_document_to_3.date() 
+        date_from = self.date_document_from_3.date() 
+        date_to = self.date_document_to_3.date() 
         
         if (date_from < date_to):
             expr = QgsExpression('format_date("timestamp",\'yyyyMMdd\') > ' + self.date_document_from_3.date().toString('yyyyMMdd')+'AND format_date("timestamp",\'yyyyMMdd\') < ' + self.date_document_to_3.date().toString('yyyyMMdd')+ ' AND "node_id" ='+ self.node_id_selected+'' )
-            print(expr.dump())
-        else :
-            message="Valid interval!"
+        else:
+            message = "Date interval not valid!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
@@ -1057,43 +867,30 @@ class NodeDialog(ParentDialog):
         self.tbl_event_node.setModel(self.model_node)
         
         
-        
-        
-        
-        
-        
     def fill_node_event_element(self):
-      
-        ''' Fill tab event -> element of connec
-        '''
+        ''' Fill tab event -> element of connec '''
   
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         
         # Set signals
-        
         self.doc_user_2 = self.dialog.findChild(QComboBox, "doc_user_2") 
         self.doc_user_2.activated.connect(self.get_doc_user_2)
-        
         self.event_id = self.dialog.findChild(QComboBox, "event_id") 
         self.event_id.activated.connect(self.get_event_id)
-        
         self.event_type = self.dialog.findChild(QComboBox, "event_type") 
         self.event_type.activated.connect(self.get_event_type)
-        
         
         # Define signal ->on dateChanged fill tbl_document
         self.date_document_to_2 = self.dialog.findChild(QDateEdit, "date_document_to_2")
         self.date_document_to_2.dateChanged.connect(self.get_date_event_element_2)
         self.date_document_from_2 = self.dialog.findChild(QDateEdit, "date_document_from_2")
         self.date_document_from_2.dateChanged.connect(self.get_date_event_element_2)
-
-        
         
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_event_x_element_x_node")
         if layerList: 
+            
             layer_element = layerList[0]
-
             self.cache_element = QgsVectorLayerCache(layer_element, 10000)
             self.model_element = QgsAttributeTableModel(self.cache_element)
             
@@ -1135,7 +932,6 @@ class NodeDialog(ParentDialog):
             
             
     def get_doc_user_2(self):
-        print("get event id event/element")
         
         # Get selected value from ComboBoxs
         self.log_element_user_value = utils_giswater.getWidgetText("doc_user_2")
@@ -1149,8 +945,6 @@ class NodeDialog(ParentDialog):
         # Filter and set table 
         # filter by event_id from v_ui_event_x_element
         expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "user" = \'' +self.log_element_user_value + '\'')
-        print ("value filter:")
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.log_element_event_value !='null'):
@@ -1180,8 +974,8 @@ class NodeDialog(ParentDialog):
         self.model_element.loadLayer()
         self.tbl_event_element.setModel(self.model_element)        
             
+            
     def get_event_id (self):
-        print("get event id event/element")
         
         # Get selected value from ComboBoxs
         self.log_element_user_value = utils_giswater.getWidgetText("doc_user_2")
@@ -1228,7 +1022,6 @@ class NodeDialog(ParentDialog):
         
      
     def get_event_type (self):
-        print("get event id event/element")
         
         # Get selected value from ComboBoxs
         self.log_element_user_value = utils_giswater.getWidgetText("doc_user_2")
@@ -1242,8 +1035,6 @@ class NodeDialog(ParentDialog):
         # Filter and set table 
         # filter by event_id from v_ui_event_x_element
         expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'AND "event_type" = \'' +self.log_element_event_type_value + '\'')
-        print ("value filter:")
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         # Combobox event_type is selected
@@ -1277,20 +1068,17 @@ class NodeDialog(ParentDialog):
      
     def get_date_event_element_2(self):
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
-        #self.tbl_document.setModel(self.model)
+        Filter the table related on selected value '''
+        
         self.date_document_from_2 = self.dialog.findChild(QDateEdit, "date_document_from_2") 
         self.date_document_to_2 = self.dialog.findChild(QDateEdit, "date_document_to_2")     
-        
-        date_from=self.date_document_from_2.date() 
-        date_to=self.date_document_to_2.date() 
+        date_from = self.date_document_from_2.date() 
+        date_to = self.date_document_to_2.date() 
         
         if (date_from < date_to):
             expr = QgsExpression('format_date("timestamp",\'yyyyMMdd\') > ' + self.date_document_from_2.date().toString('yyyyMMdd')+'AND format_date("timestamp",\'yyyyMMdd\') < ' + self.date_document_to_2.date().toString('yyyyMMdd')+ ' AND "node_id" ='+ self.node_id_selected+'' )
-            print(expr.dump())
-        else :
-            message="Valid interval!"
+        else:
+            message = "Date interval not valid!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
@@ -1302,58 +1090,42 @@ class NodeDialog(ParentDialog):
         
     def fill_scada_tab(self):
         '''Fill scada tab of node
-        Filter and fill table related with node_id
-        '''
-        
-        print("fh")
-        
+        Filter and fill table related with node_id '''
+
         self.tbl_rtc = self.dialog.findChild(QTableView, "tbl_rtc") 
-        
-        
         # Define signal ->on dateChanged fill tbl_document
 
-        
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_scada_x_node")
         if layerList: 
+            
             layer_scada = layerList[0]
-
             self.cache_scada = QgsVectorLayerCache(layer_scada, 10000)
             self.model_scada = QgsAttributeTableModel(self.cache_scada)
-            
-            
+
             # Get node_id from selected node
             self.node_id_selected = utils_giswater.getWidgetText("node_id") 
             
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-    
-            print(expr.dump())
             self.model_scada.setRequest(request)
             self.model_scada.loadLayer()
             self.tbl_rtc.setModel(self.model_scada)
-            
-            
+                  
             
     def fill_log_node(self):
         '''Fill log/node tab of node
-        Filter and fill table related with node_id
-        '''
-        
-        print("fh")
-        
-        self.tbl_log_connec = self.dialog.findChild(QTableView, "tbl_log_connec") 
-        
-        
-        # Define signal ->on dateChanged fill tbl_document
+        Filter and fill table related with node_id '''
 
+        self.tbl_log_connec = self.dialog.findChild(QTableView, "tbl_log_connec") 
+        # Define signal ->on dateChanged fill tbl_document
         
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_audit_node")
         if layerList: 
+            
             layer_log = layerList[0]
-
             self.cache_log = QgsVectorLayerCache(layer_log, 10000)
             self.model_log = QgsAttributeTableModel(self.cache_log)
             
@@ -1379,30 +1151,23 @@ class NodeDialog(ParentDialog):
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-    
-            print(expr.dump())
             self.model_log.setRequest(request)
             self.model_log.loadLayer()
             self.tbl_log_connec.setModel(self.model_log)
             
+            
     def fill_log_element(self):
         '''Fill log/element tab of node
-        Filter and fill table related with node_id
-        '''
-        
-        print("fh")
+        Filter and fill table related with node_id '''
         
         self.tbl_log_element = self.dialog.findChild(QTableView, "tbl_log_element") 
-        
-        
-        # Define signal ->on dateChanged fill tbl_document
 
-        
+        # Define signal ->on dateChanged fill tbl_document
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_audit_element")
         if layerList: 
+            
             layer_elem = layerList[0]
-
             self.cache_elem = QgsVectorLayerCache(layer_elem, 10000)
             self.model_elem = QgsAttributeTableModel(self.cache_elem)
             
@@ -1428,9 +1193,8 @@ class NodeDialog(ParentDialog):
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-    
-            print(expr.dump())
             self.model_elem.setRequest(request)
             self.model_elem.loadLayer()
             self.tbl_log_element.setModel(self.model_elem)
+            
         
