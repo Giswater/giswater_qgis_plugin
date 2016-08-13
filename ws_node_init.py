@@ -325,12 +325,9 @@ class NodeDialog(ParentDialog):
         
     def upload_db_doc(self):
         
-        position_row = self.doc_path.currentIndex().row()      
-        
         # Get data from address in memory (pointer)
         # Get Id of selected row
         self.id = self.doc_path.selectedIndexes()[0].data()
-        print(self.id)  
         
         # Data base element_x_node
         # Delete row 
@@ -342,15 +339,14 @@ class NodeDialog(ParentDialog):
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_doc_x_node")
         # The result is a list, lets pick the first
         if layerList: 
+            
             layer_B = layerList[0]
-
             self.cacheB = QgsVectorLayerCache(layer_B, 10000)
             self.modelB = QgsAttributeTableModel(self.cacheB)
                  
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-            
             self.modelB.setRequest(request)
             self.modelB.loadLayer()
             self.doc_path.setModel(self.modelB)
@@ -380,17 +376,16 @@ class NodeDialog(ParentDialog):
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         self.date_document_from.dateChanged.connect(self.get_date)
 
-        # Signal(double click on cell),function(geth_path):select individual cell("path") in QTableView and open the folder
-        self.doc_path.doubleClicked.connect(self.geth_path)
+        # Signal(double click on cell),function(get_path):select individual cell("path") in QTableView and open the folder
+        self.doc_path.doubleClicked.connect(self.get_path)
         
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_doc_x_node")
-
         
         # The result is a list, lets pick the first
         if layerList: 
+            
             layer_a = layerList[0]
-
             self.cache = QgsVectorLayerCache(layer_a, 10000)
             self.model = QgsAttributeTableModel(self.cache)
             
@@ -415,25 +410,24 @@ class NodeDialog(ParentDialog):
             # Automatically fill the table, based on node_id 
             expr = QgsExpression ('"node_id" ='+ self.node_id_selected+'' )
             request = QgsFeatureRequest(expr)
-            
             self.model.setRequest(request)
             self.model.loadLayer()
             self.doc_path.setModel(self.model)
         
    
-    def geth_path(self):
+    def get_path(self):
         ''' Get value from selected cell ("PATH")
-        Open the document''' 
+        Open the document ''' 
         
         # Check if clicked value is from the column "PATH"
         position_column = self.doc_path.currentIndex().column()
         if position_column == 4:      
             # Get data from address in memory (pointer)
             self.path = self.doc_path.selectedIndexes()[0].data()
-            print(self.path)  
+            #print(self.path)  
             # Check if file exist
             if not os.path.exists(self.path):
-                message="File doesn't exist!"
+                message = "File not found!"
                 self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)                
             else:
                 # Open the document
@@ -445,8 +439,8 @@ class NodeDialog(ParentDialog):
     
     
     def get_doc_user(self):
-        '''Get selected value from combobox doc_user
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_user
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_value = utils_giswater.getWidgetText("doc_user")
@@ -485,8 +479,8 @@ class NodeDialog(ParentDialog):
         
         
     def get_doc_type(self):
-        '''Get selected value from combobox doc_type
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_type
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBox cat_doc_type 
         self.doc_type_value = utils_giswater.getWidgetText("doc_type")
@@ -526,8 +520,8 @@ class NodeDialog(ParentDialog):
         
     
     def get_doc_tag(self):
-        '''Get selected value from combobox doc_tag 
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_tag 
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxes
         self.doc_type_value = utils_giswater.getWidgetText("doc_type")
@@ -571,21 +565,14 @@ class NodeDialog(ParentDialog):
               
     def get_date(self):
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
-        
-        #self.tbl_document.setModel(self.model)
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from") 
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")     
+        Filter the table related on selected value '''
         
         date_from = self.date_document_from.date() 
         date_to = self.date_document_to.date() 
-        
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "node_id" ='+ self.node_id_selected+'' )
-            print(expr.dump())
-        else :
-            message="Valid interval!"
+        else:
+            message = "Date interval not valid"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
@@ -688,8 +675,8 @@ class NodeDialog(ParentDialog):
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_event_x_node")
         if layerList: 
+            
             layer_node = layerList[0]
-
             self.cache_node = QgsVectorLayerCache(layer_node, 10000)
             self.model_node = QgsAttributeTableModel(self.cache_node)
             
