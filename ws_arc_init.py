@@ -2,18 +2,14 @@
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 from qgis.utils import iface
-from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry
-from qgis.gui import QgsAttributeTableView, QgsAttributeTableModel
+from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
+from qgis.gui import QgsAttributeTableModel, QgsMessageBar
 
+import os
 
 import utils_giswater
 from ws_parent_init import ParentDialog
 
-from controller import DaoController
-from itertools import count
-
-import os
-import ctypes
 
 def formOpen(dialog, layer, feature):
     ''' Function called when an arc is identified in the map '''
@@ -22,7 +18,6 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ArcDialog(iface, dialog, layer, feature)
-   
     init_config()
 
     
@@ -91,7 +86,6 @@ class ArcDialog(ParentDialog):
         ''' Hide some tabs '''
             
         self.tab_main.removeTab(7)      
-        #self.tab_main.removeTab(4)      
         self.tab_main.removeTab(2)      
         self.tab_main.removeTab(1)      
             
@@ -135,6 +129,7 @@ class ArcDialog(ParentDialog):
     
     def fill_arc_type(self):
         ''' Define and execute query to populate combo 'cat_arctype_id' '''
+        
         cat_arctype_id = utils_giswater.getWidgetText("cat_arctype_id", False)     
         sql = "SELECT id, man_table, epa_table FROM "+self.schema_name+".arc_type"
         sql+= " WHERE epa_default = '"+self.epa_type+"' ORDER BY id"
@@ -145,6 +140,7 @@ class ArcDialog(ParentDialog):
             
     def change_arc_type(self):
         ''' Define and execute query to populate combo 'arccat_id_dummy' '''
+        
         cat_arctype_id = utils_giswater.getWidgetText("cat_arctype_id", True)    
         sql = "SELECT id FROM "+self.schema_name+".cat_arc"
         sql+= " WHERE arctype_id = "+cat_arctype_id+" ORDER BY id"   
@@ -187,16 +183,16 @@ class ArcDialog(ParentDialog):
         self.date_document_to.dateChanged.connect(self.get_date)
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         self.date_document_from.dateChanged.connect(self.get_date)
-        # Signal(double click on cell),function(geth_path):select individual cell("path") in QTableView and open the folder
-        self.tbl_document.doubleClicked.connect(self.geth_path)
+        # Signal(double click on cell),function(get_path):select individual cell("path") in QTableView and open the folder
+        self.tbl_document.doubleClicked.connect(self.get_path)
         
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_doc_x_arc")
         
         # The result is a list, lets pick the first
         if layerList: 
+            
             layer_a = layerList[0]
-
             self.cache = QgsVectorLayerCache(layer_a, 10000)
             self.model = QgsAttributeTableModel(self.cache)
 
@@ -227,26 +223,23 @@ class ArcDialog(ParentDialog):
             self.tbl_document.setModel(self.model)
         
    
-    def geth_path(self):
+    def get_path(self):
         ''' Get value from selected cell "PATH"
-        Open the document''' 
+        Open the document ''' 
         
         # Check if clicked value is from the column "PATH"
         position_column = self.tbl_document.currentIndex().column()
         if position_column == 4 :      
             # Get data from address in memory (pointer)
-            self.path=self.tbl_document.selectedIndexes()[0].data()
-            print(self.path)  
+            self.path = self.tbl_document.selectedIndexes()[0].data()
+            #print(self.path)  
             # Check if file exist
             if not os.path.exists(self.path):
-                message="File doesn't exist!"
+                message = "File not found!"
                 self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
-                
             else :
                 # Open the document
                 os.startfile(self.path)     
-        else :
-            return
      
             
     def showWarning(self, text, duration = 3):
@@ -254,8 +247,8 @@ class ArcDialog(ParentDialog):
     
     
     def get_doc_user(self):
-        '''Get selected value from combobox doc_user
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_user
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_value = utils_giswater.getWidgetText("doc_user")
@@ -299,8 +292,8 @@ class ArcDialog(ParentDialog):
         
         
     def get_cat_doc_type(self):
-        '''Get selected value from combobox cat_doc_type
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox cat_doc_type
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBox cat_doc_type 
         self.cat_doc_type_value = utils_giswater.getWidgetText("cat_doc_type")
@@ -345,8 +338,8 @@ class ArcDialog(ParentDialog):
         
     
     def get_doc_tag(self):
-        '''Get selected value from combobox doc_tag 
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_tag 
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxes
         self.cat_doc_type_value = utils_giswater.getWidgetText("cat_doc_type")
@@ -393,22 +386,14 @@ class ArcDialog(ParentDialog):
               
     def get_date(self):
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
-        #self.tbl_document.setModel(self.model)
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from") 
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")     
+        Filter the table related on selected value '''
         
-        date_from=self.date_document_from.date() 
-        date_to=self.date_document_to.date() 
-        print (date_from)
-        print (date_to)
-        
+        date_from = self.date_document_from.date() 
+        date_to = self.date_document_to.date() 
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
-
-        else :
-            message="Valid interval!"
+        else:
+            message = "Date interval not valid!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
@@ -420,18 +405,15 @@ class ArcDialog(ParentDialog):
         
     def fill_arc_event_pipe(self):
         ''' Fill arc event tab
-        Define filters'''
+        Define filters '''
         
-
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         
         # Set signals
         self.doc_user_2 = self.dialog.findChild(QComboBox, "doc_user_2") 
         self.doc_user_2.activated.connect(self.get_doc_user_2)
-       
         self.event_id = self.dialog.findChild(QComboBox, "event_id") 
         self.event_id.activated.connect(self.get_event_id)
-        
         self.event_type = self.dialog.findChild(QComboBox, "event_type") 
         self.event_type.activated.connect(self.get_event_type)
         
@@ -444,8 +426,8 @@ class ArcDialog(ParentDialog):
         # Get layers
         layerList = QgsMapLayerRegistry.instance().mapLayersByName("v_ui_event_x_arc")
         if layerList: 
+            
             layer_C = layerList[0]
-
             self.cacheC = QgsVectorLayerCache(layer_C, 10000)
             self.modelC = QgsAttributeTableModel(self.cacheC)
             
@@ -474,11 +456,11 @@ class ArcDialog(ParentDialog):
             self.modelC.setRequest(request)
             self.modelC.loadLayer()
             self.tbl_event_element.setModel(self.modelC)
-            
+        
+   
     def get_doc_user_2(self):
-        print("get user2") 
-        '''Get selected value from combobox doc_user_2
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox doc_user_2
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_2_value = utils_giswater.getWidgetText("doc_user_2")
@@ -514,16 +496,14 @@ class ArcDialog(ParentDialog):
                 expr = QgsExpression ('"arc_id" ='+ self.arc_id_selected+'' )
             
         request = QgsFeatureRequest(expr)
-        print(expr.dump())
         self.modelC.setRequest(request)
         self.modelC.loadLayer()
         self.tbl_event_element.setModel(self.modelC)
             
         
     def get_event_id(self):
-        print("get event id")
-        '''Get selected value from combobox event_id
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox event_id
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBox cat_doc_type 
         self.doc_user_2_value = utils_giswater.getWidgetText("doc_user_2")
@@ -534,7 +514,6 @@ class ArcDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"arc_id" ='+ self.arc_id_selected+'AND "event_id" = \'' +self.event_id_value + '\'')
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         # If ComboBox user and ComboBox event_type are selected
@@ -565,10 +544,10 @@ class ArcDialog(ParentDialog):
         self.modelC.loadLayer()
         self.tbl_event_element.setModel(self.modelC)
         
+        
     def get_event_type(self):
-        print("get event type")  
-        '''Get selected value from combobox event_type
-        Filter the table related on selected value'''
+        ''' Get selected value from combobox event_type
+        Filter the table related on selected value '''
         
         # Get selected value from ComboBoxs
         self.doc_user_2_value = utils_giswater.getWidgetText("doc_user_2")
@@ -579,7 +558,6 @@ class ArcDialog(ParentDialog):
       
         # Filter and set table 
         expr = QgsExpression ('"arc_id" ='+ self.arc_id_selected+'AND "event_type" = \'' +self.event_type_value + '\'')
-        print(expr.dump())
         
         # Filter and set table depending on selected values from others comboboxes
         if (self.doc_user_2_value !='null'):
@@ -603,33 +581,27 @@ class ArcDialog(ParentDialog):
                 expr = QgsExpression ('"arc_id" ='+ self.arc_id_selected+'' ) 
                
         request = QgsFeatureRequest(expr)
-        print(expr.dump())
         self.modelC.setRequest(request)
         self.modelC.loadLayer()
         self.tbl_event_element.setModel(self.modelC)
            
+           
     def get_date_event_element(self):
         ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
-   
-        self.date_document_from_2 = self.dialog.findChild(QDateEdit, "date_document_from_2") 
-        self.date_document_to_2 = self.dialog.findChild(QDateEdit, "date_document_to_2")     
-        
-        date_from=self.date_document_from_2.date() 
-        date_to=self.date_document_to_2.date() 
-        
+        Filter the table related on selected value '''
+
+        date_from = self.date_document_from_2.date() 
+        date_to = self.date_document_to_2.date() 
         if (date_from < date_to):
             expr = QgsExpression('format_date("timestamp",\'yyyyMMdd\') > ' + self.date_document_from_2.date().toString('yyyyMMdd')+'AND format_date("timestamp",\'yyyyMMdd\') < ' + self.date_document_to_2.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
-        else :
-            message="Valid interval!"
+        else:
+            message = "Date interval not valid!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
       
         request = QgsFeatureRequest(expr)
         self.modelC.setRequest(request)
         self.modelC.loadLayer()
-        self.tbl_event_element.setModel(self.modelC)
-        
+        self.tbl_event_element.setModel(self.modelC)        
         
     
