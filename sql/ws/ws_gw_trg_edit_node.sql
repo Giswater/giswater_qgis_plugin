@@ -13,14 +13,13 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;
 
-
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
+
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-
+    
         -- Node ID
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id:= (SELECT nextval('node_id_seq'));
@@ -29,7 +28,7 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                RAISE EXCEPTION '[%]: There are no nodes types defined in the model, define at least one.', TG_NAME;
+                RETURN audit_function(101);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
         END IF;
@@ -37,29 +36,29 @@ BEGIN
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RAISE EXCEPTION '[%]: There are no nodes catalog defined in the model, define at least one.', TG_NAME;
+                RETURN audit_function(102);  
             END IF;      
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION '[%]: There are no sectors defined in the model, define at least one.', TG_NAME;
+                RETURN audit_function(103);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the sectors!', TG_NAME;
+                RETURN audit_function(104);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION '[%]: There are no dma defined in the model, define at least one.', TG_NAME;
+                RETURN audit_function(105);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the dma!', TG_NAME;
+                RETURN audit_function(106);  
             END IF;            
         END IF;
         
@@ -87,6 +86,8 @@ BEGIN
             v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
             EXECUTE v_sql;
         END IF;
+
+        PERFORM audit_function(1); 
         RETURN NEW;
 
 
@@ -136,7 +137,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
-                RAISE EXCEPTION '[%]: Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog', TG_NAME;
+                RETURN audit_function(107);  
             END IF;
         END IF;
 
@@ -147,13 +148,15 @@ BEGIN
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id = OLD.node_id;
-                
+            
+        PERFORM audit_function(2); 
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
 
         DELETE FROM node WHERE node_id = OLD.node_id;
+            PERFORM audit_function(3); 
         RETURN NULL;
    
     END IF;

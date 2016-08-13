@@ -88,9 +88,5 @@ $$;
 CREATE TRIGGER gw_trg_arc_searchnodes_insert BEFORE INSERT ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
 
--- CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
--- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom)) OR ((old.y1 IS DISTINCT FROM new.y1)) OR ((old.y2 IS DISTINCT FROM new.y2)))  EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
 
-CREATE TRIGGER gw_trg_arc_searchnodes_update BEFORE UPDATE ON "SCHEMA_NAME"."arc" 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
 

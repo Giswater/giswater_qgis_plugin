@@ -70,7 +70,7 @@ ALTER VIEW "SCHEMA_NAME".v_edit_inp_weir ALTER verified SET DEFAULT 'TO REVIEW';
 -- ----------------------------
 INSERT INTO "SCHEMA_NAME"."cat_hydrology" VALUES ('HC_DEFAULT', 'CURVE_NUMBER', 'Default value of infiltration');
 ALTER TABLE "SCHEMA_NAME".subcatchment ALTER COLUMN hydrology_id SET DEFAULT 'HC_DEFAULT';
-INSERT INTO "SCHEMA_NAME"."inp_selector_hydrology" VALUES ('HC_DEFAULT');
+
 
 
 -- ----------------------------
@@ -99,9 +99,4 @@ INSERT INTO "SCHEMA_NAME"."inp_options" VALUES ('CMS', 'DYNWAVE', 'DEPTH', 'H-W'
 INSERT INTO "SCHEMA_NAME"."inp_report" VALUES ('YES', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'ALL');
 
 
-
--- ----------------------------
--- Default values of state selection
--- ----------------------------
-INSERT INTO "SCHEMA_NAME"."inp_selector_state" VALUES ('ON_SERVICE');
 

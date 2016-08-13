@@ -2,25 +2,24 @@
 from qgis.gui import *       # @UnusedWildImport
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
-from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsMapLayerRegistry, QgsProject)
+from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject)
 
 
 class MoveNode(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, controller):
+    def __init__(self, iface, settings, action, index_action, controller, srid):
         ''' Class constructor '''        
         
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings        
         self.index_action = index_action
-        self.srid = self.settings.value('status/srid')        
-        self.elem_type = self.settings.value('actions/'+str(index_action)+'_elem_type')
+        self.srid = srid
+        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
         self.dao = controller.getDao()   
-        self.schema_name = self.dao.get_schema_name()   
-        self.layer_name = "Arc"   
+        self.schema_name = self.controller.get_schema_name()   
         self.layer_arc = None
         
         # Vertex marker
@@ -44,6 +43,11 @@ class MoveNode(QgsMapTool):
         self.rubberBand.setWidth(3)           
         self.reset()        
         
+        
+    def set_layer_arc(self, layer_arc):
+        ''' Set layer 'Arc' '''
+        self.layer_arc = layer_arc
+
 
     def reset(self):
                 
@@ -57,10 +61,15 @@ class MoveNode(QgsMapTool):
           
             
     def move_node(self, node_id, point):
-        ''' Move selected node to the current point '''     
-        
+        ''' Move selected node to the current point '''  
+           
+        if self.srid is None:
+            self.srid = self.settings.value('db/srid')  
+        if self.schema_name is None:
+            self.schema_name = self.settings.value('db/schema_name')               
+                   
         # Update node geometry
-        the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+self.srid+")";
+        the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
         status = self.dao.execute_sql(sql) 
@@ -99,12 +108,9 @@ class MoveNode(QgsMapTool):
     def activate(self):
         ''' Called when set as currently active map tool '''
         
-        # Check if layer named <self.layer_name> is loaded
-        aux = QgsMapLayerRegistry.instance().mapLayersByName(self.layer_name)
-        if len(aux) > 0:
-            self.layer_arc = aux[0]
+        # Check if layer 'Arc' is loaded
         if self.layer_arc is None:
-            self.showWarning("Layer named '"+self.layer_name+"' not found")
+            self.showWarning("Layer 'Arc' not found")
             return                
         
         # Change pointer
@@ -180,7 +186,7 @@ class MoveNode(QgsMapTool):
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
             # That's the snapped point
-            if (result <> []) and (result[0].layer.name() == self.layer_name) and (result[0].snappedVertexNr == -1):
+            if (result <> []) and (result[0].layer.name() == self.layer_arc.name()) and (result[0].snappedVertexNr == -1):
             
                 point = QgsPoint(result[0].snappedVertex)
 
@@ -242,7 +248,7 @@ class MoveNode(QgsMapTool):
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
                 # That's the snapped point
-                if (result <> []) and (result[0].layer.name() == self.layer_name):
+                if (result <> []) and (result[0].layer.name() == self.layer_arc.name()):
             
                     point = QgsPoint(result[0].snappedVertex)
                     

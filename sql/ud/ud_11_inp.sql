@@ -91,6 +91,14 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_lid_control_seq"
   NO MAXVALUE
   CACHE 1;
 
+
+CREATE SEQUENCE "SCHEMA_NAME"."inp_node_x_sector_seq"
+  START WITH 1
+  INCREMENT BY 1
+  NO MINVALUE
+  NO MAXVALUE
+  CACHE 1;
+
   
 CREATE SEQUENCE "SCHEMA_NAME"."inp_mapdim_seq"
   START WITH 1
@@ -776,6 +784,15 @@ CREATE TABLE "SCHEMA_NAME"."inp_mapunits" (
 "type_units" varchar(18)  ,
 "map_type" varchar(18)  
 );
+
+
+CREATE TABLE "SCHEMA_NAME"."inp_node_x_sector" (
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_node_x_sector_seq'::regclass) NOT NULL,
+"node_id" varchar(16),
+"sector_id" varchar(16),
+"epa_type" varchar(16)
+);
+
 
 
 CREATE TABLE "SCHEMA_NAME"."inp_options" (
@@ -1858,6 +1875,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_landuses" ADD PRIMARY KEY ("landus_id");
 ALTER TABLE "SCHEMA_NAME"."inp_lid_control" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_lidusage_subc_x_lidco" ADD PRIMARY KEY ("subc_id", "lidco_id");
 ALTER TABLE "SCHEMA_NAME"."inp_loadings_pol_x_subc" ADD PRIMARY KEY ("poll_id", "subc_id");
+ALTER TABLE "SCHEMA_NAME"."inp_node_x_sector" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_options" ADD PRIMARY KEY ("flow_units");
 ALTER TABLE "SCHEMA_NAME"."inp_orifice" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "SCHEMA_NAME"."inp_outfall" ADD PRIMARY KEY ("node_id");
@@ -1948,137 +1966,10 @@ ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD PRIMARY KEY ("subc_id");
 
 
 
--- ----------------------------
--- Foreign Key system structure
--- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("epa_type") REFERENCES "SCHEMA_NAME"."inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
--- ----------------------------
--- Foreign Key structure 
--- ----------------------------
-
-ALTER TABLE "SCHEMA_NAME"."inp_conduit" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD FOREIGN KEY ("curve_id") REFERENCES "SCHEMA_NAME"."inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_divider" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_dwf" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_dwf_pol_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_inflows" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_junction" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_orifice" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_orifice" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("allow_ponding") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("normal_flow_limited") REFERENCES "SCHEMA_NAME"."inp_value_options_nfl" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("inertial_damping") REFERENCES "SCHEMA_NAME"."inp_value_options_id" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("skip_steady_state") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_quality") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_routing") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_groundwater") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_snowmelt") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("ignore_rainfall") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("force_main_equation") REFERENCES "SCHEMA_NAME"."inp_value_options_fme" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("link_offsets") REFERENCES "SCHEMA_NAME"."inp_value_options_lo" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("flow_routing") REFERENCES "SCHEMA_NAME"."inp_value_options_fr" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD FOREIGN KEY ("flow_units") REFERENCES "SCHEMA_NAME"."inp_value_options_fu" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_outfall" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_outlet" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_outlet" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_pump" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_pump" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_rdii" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_report" ADD FOREIGN KEY ("controls") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_report" ADD FOREIGN KEY ("input") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_report" ADD FOREIGN KEY ("continuity") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_report" ADD FOREIGN KEY ("flowstats") REFERENCES "SCHEMA_NAME"."inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_storage" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_timeseries" ADD FOREIGN KEY ("timser_id") REFERENCES "SCHEMA_NAME"."inp_timser_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_treatment_node_x_pol" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."inp_weir" ADD FOREIGN KEY ("arc_id") REFERENCES "SCHEMA_NAME"."arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."inp_weir" ADD FOREIGN KEY ("node_id") REFERENCES "SCHEMA_NAME"."node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_arcflow_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_condsurcharge_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_continuity_errors" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_critical_elements" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_flowclass_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_flowrouting_cont" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_groundwater_cont" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_high_conterrors" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_high_flowinest_ind" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_instability_index" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_lidperformance_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_nodedepth_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_nodeflooding_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_nodeinflow_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_nodesurcharge_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_outfallflow_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_outfallload_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_pumping_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_qualrouting_cont" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_rainfall_dep" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_routing_timestep" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_runoff_qual" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_runoff_quant" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_storagevol_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_subcatchwashoff_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_subcathrunoff_sum" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."rpt_timestep_critelem" ADD FOREIGN KEY ("result_id") REFERENCES "SCHEMA_NAME"."rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD FOREIGN KEY ("sector_id") REFERENCES "SCHEMA_NAME"."sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD FOREIGN KEY ("hydrology_id") REFERENCES "SCHEMA_NAME"."cat_hydrology" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-
-
 ----------------
 -- SPATIAL INDEX
 ----------------
 
-CREATE INDEX raingage_index ON raingage USING GIST (the_geom);
-CREATE INDEX subcathment_index ON subcatchment USING GIST (the_geom);
+CREATE INDEX raingage_index ON "SCHEMA_NAME".raingage USING GIST (the_geom);
+CREATE INDEX subcathment_index ON "SCHEMA_NAME".subcatchment USING GIST (the_geom);
 

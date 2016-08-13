@@ -101,7 +101,10 @@ connec.ymax,
 connec.connecat_id,
 cat_connec.type AS "cat_connectype_id",
 cat_connec.matcat_id AS "cat_matcat_id",
-connec.sector_id, 
+connec.sector_id,
+connec.code,
+connec.n_hydrometer,
+connec.demand,
 connec."state", 
 connec.annotation, 
 connec.observ, 
@@ -119,9 +122,10 @@ connec.adress_01,
 connec.adress_02,
 connec.adress_03,
 connec.streetaxis_id,
-streetaxis.name AS streetaxis_name,
+ext_streetaxis.name,
 connec.postnumber,
 connec.descript,
+vnode.arc_id,
 cat_connec.svg AS "cat_svg",
 connec.rotation,
 connec.link,
@@ -129,7 +133,9 @@ connec.verified,
 connec.the_geom
 FROM ("SCHEMA_NAME".connec 
 LEFT JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
-LEFT JOIN "SCHEMA_NAME".streetaxis ON (((connec.streetaxis_id)::text = (streetaxis.id)::text)));
+LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
+JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
+JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id);
 
 
 
@@ -183,4 +189,48 @@ gully.rotation,
 gully.link,
 gully.verified,
 gully.the_geom
-FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)));
+FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
+WHERE gully.the_geom is not null;
+
+
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_pgully AS
+SELECT gully.gully_id, 
+gully.top_elev, 
+gully.ymax, 
+gully.gratecat_id,
+cat_grate.type AS "cat_grate_type",
+cat_grate.matcat_id AS "cat_grate_matcat",
+gully.sandbox,
+gully.matcat_id,
+gully.units,
+gully.groove,
+gully.arccat_id,
+gully.siphon,
+gully.sector_id, 
+gully."state", 
+gully.annotation, 
+gully.observ, 
+gully."comment",
+gully.dma_id,
+gully.soilcat_id,
+gully.category_type,
+gully.fluid_type,
+gully.location_type,
+gully.workcat_id,
+gully.buildercat_id,
+gully.builtdate,
+gully.ownercat_id,
+gully.adress_01,
+gully.adress_02,
+gully.adress_03,
+gully.descript,
+cat_grate.svg AS "cat_svg",
+gully.rotation,
+gully.link,
+gully.verified,
+gully.the_geom_pol AS "the_geom"
+FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
+WHERE gully.the_geom_pol is not null;
+
+

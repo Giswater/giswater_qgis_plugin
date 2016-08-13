@@ -6,10 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 
 -- ----------------------------
--- Records of rtc_value_coefficient
+-- Records of value coefficient table
 -- ----------------------------
-INSERT INTO "SCHEMA_NAME"."rtc_value_coefficient" VALUES ('MAX');
-INSERT INTO "SCHEMA_NAME"."rtc_value_coefficient" VALUES ('AVG');
-INSERT INTO "SCHEMA_NAME"."rtc_value_coefficient" VALUES ('MIN');
+
+INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('MIN');
+INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('AVG');
+INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('MAX');
 
 
+INSERT INTO "SCHEMA_NAME"."rtc_value_opti_status" VALUES ('ON');
+INSERT INTO "SCHEMA_NAME"."rtc_value_opti_status" VALUES ('OFF');

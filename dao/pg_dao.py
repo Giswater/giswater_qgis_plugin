@@ -8,11 +8,11 @@ class PgDao():
 
     def __init__(self):
         #self.logger = logging.getLogger('dbsync') 
-        pass
-
-    def get_host(self):
-        return self.host
+        self.last_error = None
     
+    def get_last_error(self):
+        return self.last_error    
+        
     def init_db(self):
         try:
             self.conn = psycopg2.connect(self.conn_string)
@@ -30,13 +30,7 @@ class PgDao():
         self.dbname = dbname
         self.user = user
         self.password = password
-        self.conn_string = "host="+self.host+" port="+self.port+" dbname="+self.dbname+" user="+self.user+" password="+self.password
-
-    def set_schema_name(self, schema_name):
-        self.schema_name = schema_name
-        
-    def get_schema_name(self):
-        return self.schema_name        
+        self.conn_string = "host="+self.host+" port="+self.port+" dbname="+self.dbname+" user="+self.user+" password="+self.password       
         
     def get_rows(self, sql):
         self.cursor.execute(sql)
@@ -73,12 +67,14 @@ class PgDao():
             return total
 
     def execute_sql(self, sql, autocommit=True):
+        self.last_error = None         
         status = True
         try:
             self.cursor.execute(sql) 
             self.commit()
         except Exception as e:
-            print "execute_sql: {0}".format(e)      
+            print "execute_sql: {0}".format(e)   
+            self.last_error = e               
             status = False
             self.rollback() 
         finally:
@@ -93,7 +89,15 @@ class PgDao():
     def rollback(self):
         self.conn.rollback()
         
-    def checkTable(self, schemaName, tableName):
+    def check_schema(self, schemaName):
+        exists = True
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = '"+schemaName+"'"    
+        self.cursor.execute(sql)         
+        if self.cursor.rowcount == 0:      
+            exists = False
+        return exists         
+    
+    def check_table(self, schemaName, tableName):
         exists = True
         sql = "SELECT * FROM pg_tables WHERE schemaname = '"+schemaName+"' AND tablename = '"+tableName+"'"    
         self.cursor.execute(sql)         
@@ -107,6 +111,12 @@ class PgDao():
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
-        return exists        
-            
+        return exists                    
 
+    def copy_expert(self, sql, csv_file):
+        try:
+            self.cursor.copy_expert(sql, csv_file)
+            return None
+        except Exception as e:
+            return e        
+        

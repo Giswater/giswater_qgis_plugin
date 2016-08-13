@@ -29,8 +29,6 @@ CREATE TABLE "SCHEMA_NAME"."ext_streetaxis" (
 CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 );
 
-ALTER TABLE "SCHEMA_NAME"."ext_streetaxis" ADD FOREIGN KEY ("type") REFERENCES "SCHEMA_NAME"."ext_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
 
 
 -- Urban_structure
@@ -48,9 +46,6 @@ CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT ext_urban_propierties_pkey PRIMARY KEY (id)
 );
-
-ALTER TABLE "SCHEMA_NAME"."ext_urban_propierties" ADD FOREIGN KEY ("streetaxis") REFERENCES "SCHEMA_NAME"."ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
 
 
 
@@ -91,6 +86,17 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_x_data_seq"
     NO MAXVALUE
     CACHE 1;
 
+
+
+CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_dma_period_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+
 CREATE TABLE "SCHEMA_NAME".ext_cat_scada(
 id character varying(16) NOT NULL,
 data_type character varying(30),
@@ -122,7 +128,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_value (
   scada_id character varying(16),
   value float, 
   status varchar (3),
-  date timestamp (6) without time zone,
+  timestamp timestamp (6) without time zone,
   interval_seconds int4,  -- seconds
   CONSTRAINT ext_rtc_scada_x_value_pkey PRIMARY KEY (id)
 );
@@ -142,13 +148,18 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_data (
 
 
 
+CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_dma_period (
+  id int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_scada_dma_period_seq'::regclass) NOT NULL,
+  dma_id character varying(16),
+  m3_min float, 
+  m3_max float,
+  m3_avg float,
+  m3_total_period float,  
+  cat_period_id varchar (16),
 
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_scada" ADD FOREIGN KEY ("cat_scada_id") REFERENCES "SCHEMA_NAME"."ext_cat_scada" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  CONSTRAINT ext_rtc_scada_dma_period_pkey PRIMARY KEY (id)
+);
 
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_scada_x_value" ADD FOREIGN KEY ("scada_id") REFERENCES "SCHEMA_NAME"."ext_rtc_scada" ("scada_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_scada_x_data" ADD FOREIGN KEY ("scada_id") REFERENCES "SCHEMA_NAME"."ext_rtc_scada" ("scada_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_scada_x_data" ADD FOREIGN KEY ("cat_period_id") REFERENCES "SCHEMA_NAME"."ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 
@@ -199,7 +210,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer_x_value (
   hydrometer_id character varying(16),
   value float, 
   status varchar (3),
-  date timestamp (6) without time zone,
+  timestamp timestamp (6) without time zone,
   interval_seconds int4,
   CONSTRAINT ext_rtc_hydrometer_x_value_pkey PRIMARY KEY (id)
 );
@@ -215,13 +226,5 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer_x_data (
   cat_period_id varchar (16),
   CONSTRAINT ext_rtc_hydrometer_x_data_pkey PRIMARY KEY (id)
 );
-
-
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer" ADD FOREIGN KEY ("cat_hydrometer_id") REFERENCES "SCHEMA_NAME"."ext_cat_hydrometer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer_x_value" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "SCHEMA_NAME"."ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "SCHEMA_NAME"."ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("cat_period_id") REFERENCES "SCHEMA_NAME"."ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
