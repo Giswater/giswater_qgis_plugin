@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1201,6 +1201,19 @@
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="delete_row_info">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>70</y>
+       <width>96</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DELETE_ROW</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="page_document">
     <attribute name="title">
@@ -1479,6 +1492,19 @@
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="delete_row_doc">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>120</y>
+       <width>96</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DELETE_ROW</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="page_event">
     <attribute name="title">
@@ -1494,7 +1520,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_event_feature">
       <attribute name="title">
@@ -1844,7 +1870,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QDateEdit" name="date_document_to_2">
+      <widget class="QDateEdit" name="date_document_from_2">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1900,7 +1926,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QDateEdit" name="date_document_from_2">
+      <widget class="QDateEdit" name="date_document_to_2">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -2652,16 +2678,6 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tbl_dae">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>120</y>
-       <width>761</width>
-       <height>311</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QDateEdit" name="date_dae_to">
      <property name="geometry">
       <rect>
@@ -2765,6 +2781,16 @@
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_dae">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>120</y>
+       <width>761</width>
+       <height>311</height>
+      </rect>
      </property>
     </widget>
    </widget>
