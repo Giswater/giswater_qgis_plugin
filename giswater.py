@@ -19,14 +19,15 @@ import sys
 from functools import partial
 import subprocess
 
+import utils_giswater
+from controller import DaoController
 from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
-from controller import DaoController
 from map_tools.move_node import MoveNode
 from search.search_plus import SearchPlus
 from ui.change_node_type import ChangeNodeType
 from ui.table_wizard import TableWizard
-import utils_giswater
+from ui.config import Config
 
 
 class Giswater(QObject):
@@ -238,6 +239,7 @@ class Giswater(QObject):
             self.add_action('28', self.toolbar_mg, self.ag_mg)            
             for i in range(17,28):
                 self.add_action(str(i), self.toolbar_mg, self.ag_mg)
+            self.add_action('99', self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
@@ -964,8 +966,107 @@ class Giswater(QObject):
         self.close_dialog()
        
                   
-    def close_dialog(self): 
+    def close_dialog(self, dlg=None): 
         ''' Close dialog '''
-        self.dlg.close()       
+        if dlg is None:
+            dlg = self.dlg.close()   
+        dlg.close()    
             
             
+    def mg_config(self):                
+        ''' Button 99 - Open a dialog showing data from table "config" 
+        User can changge its values '''
+        
+        # Get data from database "config"
+        # Get entire row from database 
+        sql = "SELECT * FROM "+self.schema_name+".config"
+        row = self.dao.get_row(sql)
+        if not row:
+            return
+        
+        # Create the dialog and signals
+        self.dlg_config = Config()
+        utils_giswater.setDialog(self.dlg_config)
+        self.dlg_config.btn_accept.pressed.connect(self.mg_config_accept)
+        self.dlg_config.btn_cancel.pressed.connect(self.close_dialog)
+        
+        # Set values from widgets of type QSoubleSpinBox
+        utils_giswater.setWidgetText("node_proximity", row["node_proximity"])
+        utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
+        utils_giswater.setWidgetText("node2arc", row["node2arc"])
+        utils_giswater.setWidgetText("connec_proximity", row["connec_proximity"])
+        utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
+        utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
+        utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
+
+        # Set values from widgets of type QCheckbox  
+        self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
+        self.dlg_config.arcendpoint.setChecked(bool(row["nodeinsert_arcendpoint"]))
+        self.dlg_config.nodetypechanged.setChecked(bool(row["nodetype_change_enabled"]))
+        self.dlg_config.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
+        self.dlg_config.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
+        self.dlg_config.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
+       
+        # Set values from widgets of type QComboBox
+        sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
+        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+
+        # Open the dialog
+        self.dlg_config.exec_()    
+    
+  
+    def mg_config_get_new_values(self):
+        ''' Get new values from all the widgets '''
+        
+        # Get new values from widgets of type QSoubleSpinBox
+        self.new_value_prox = utils_giswater.getWidgetText("node_proximity").replace(",", ".")
+        self.new_value_arc = utils_giswater.getWidgetText("arc_searchnodes").replace(",", ".")
+        self.new_value_node = utils_giswater.getWidgetText("node2arc").replace(",", ".")
+        self.new_value_con = utils_giswater.getWidgetText("connec_proximity").replace(",", ".")
+        self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
+        self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
+        self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
+        
+        # Get new values from widgets of type QComboBox
+        self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
+        
+        # Get new values from widgets of type  QCheckBox
+        self.new_value_orpha = self.dlg_config.orphannode.isChecked()
+        self.new_value_nodetypechanged = self.dlg_config.nodetypechanged.isChecked()
+        self.new_value_arcendpoint = self.dlg_config.arcendpoint.isChecked()
+        self.new_value_samenode_init_end_control = self.dlg_config.samenode_init_end_control.isChecked()
+        self.new_value_node_proximity_control = self.dlg_config.node_proximity_control.isChecked()
+        self.new_value_connec_proximity_control = self.dlg_config.connec_proximity_control.isChecked()
+
+    
+    def mg_config_accept(self):
+        ''' Update current values to the table '''
+        
+        # Get new values from all the widgets
+        self.mg_config_get_new_values()
+
+        # Set these values to table "config"
+        sql = "UPDATE "+self.schema_name+".config" 
+        sql+= " SET node_proximity = "+self.new_value_prox
+        sql+= ", arc_searchnodes = "+self.new_value_arc
+        sql+= ", node2arc = "+self.new_value_node
+        sql+= ", connec_proximity = "+self.new_value_con
+        sql+= ", arc_toporepair = "+self.new_value_arc_top
+        sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
+        sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
+        sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
+        sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
+        sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
+        sql+= ", nodeinsert_arcendpoint = '"+str(self.new_value_arcendpoint)+"'"
+        sql+= ", samenode_init_end_control = '"+str(self.new_value_samenode_init_end_control)+"'"
+        sql+= ", node_proximity_control = '"+str(self.new_value_node_proximity_control)+"'"
+        sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
+        self.dao.execute_sql(sql)
+
+        # Show message to user
+        self.showInfo(self.controller.tr("Values has been updated"))
+        self.close_dialog(self.dlg_config) 
+        
+                    
