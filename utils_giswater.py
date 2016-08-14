@@ -1,10 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox
 from PyQt4.QtCore import *   # @UnusedWildImport
 from qgis.gui import QgsMessageBar
-#    
-# Utility funcions    
-#
+
+
+''' Module with utility functions to interact with dialog and its widgets '''
+
 def tr(context, message):
     return QCoreApplication.translate(context, message)
 
@@ -72,7 +73,7 @@ def getStringValue2(widget):
 def getText(widget):
     
     if type(widget) is str:
-        widget = _dialog.findChild(QLineEdit, widget)          
+        widget = _dialog.findChild(QWidget, widget)          
     if widget:
         if widget.text():
             elem_text = widget.text()
@@ -89,12 +90,17 @@ def setText(widget, text):
         widget = _dialog.findChild(QWidget, widget)      
     if not widget:
         return    
+    
     value = unicode(text)
-    if value == 'None':    
-        widget.setText("")         
-    else:
-        widget.setText(value)     
-
+    if type(widget) is QLineEdit: 
+        if value == 'None':    
+            value = ""        
+        widget.setText(value)       
+    elif type(widget) is QDoubleSpinBox: 
+        if value == 'None':    
+            value = 0        
+        widget.setValue(float(value))     
+          
 
 def getWidgetText(widget, add_quote=False):
     
@@ -123,7 +129,7 @@ def setWidgetText(widget, text):
     if type(widget) is QLineEdit:
         setText(widget, text)
     elif type(widget) is QDoubleSpinBox:
-        widget.setValue(text)           
+        setText(widget, text)           
     elif type(widget) is QComboBox:
         setSelectedItem(widget, text)
 
@@ -138,8 +144,6 @@ def getSelectedItem(widget):
             widget_text = widget.currentText()       
     return widget_text    
 
-       
-    
 
 def setSelectedItem(widget, text):
 
@@ -183,3 +187,4 @@ def showWarning(text, duration = None):
         _iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, MSG_DURATION)  
     else:
         _iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)   
+        
