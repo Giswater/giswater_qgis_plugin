@@ -19,14 +19,15 @@ import sys
 from functools import partial
 import subprocess
 
+import utils_giswater
+from controller import DaoController
 from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
-from controller import DaoController
 from map_tools.move_node import MoveNode
 from search.search_plus import SearchPlus
 from ui.change_node_type import ChangeNodeType
 from ui.table_wizard import TableWizard
-import utils_giswater
+from ui.config import Config
 
 
 class Giswater(QObject):
@@ -238,6 +239,7 @@ class Giswater(QObject):
             self.add_action('28', self.toolbar_mg, self.ag_mg)            
             for i in range(17,28):
                 self.add_action(str(i), self.toolbar_mg, self.ag_mg)
+            self.add_action('99', self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
@@ -969,3 +971,94 @@ class Giswater(QObject):
         self.dlg.close()       
             
             
+    def mg_config(self):                
+        ''' Button 99 - Open a dialog showing data from table "config" 
+        User can changge its values '''
+        
+        # Get data from database "config"
+        # Get entire row from database 
+        sql = "SELECT * FROM "+self.schema_name+".config"
+        self.row = self.dao.get_row(sql)
+        
+        # Create the dialog and signals
+        self.dlg = Config()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_accept.pressed.connect(self.ok_button)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.id.textChanged.connect(self.get_new_value)
+        self.dlg.node_proximity.valueChanged.connect(self.get_new_value)
+        self.dlg.arc_searchnodes.valueChanged.connect(self.get_new_value) 
+        self.dlg.node2arc.valueChanged.connect(self.get_new_value)
+        self.dlg.connec_proximity.valueChanged.connect(self.get_new_value)
+        self.dlg.arc_toporepair.valueChanged.connect(self.get_new_value)
+        self.dlg.vnode_update_tolerance.valueChanged.connect(self.get_new_value) 
+        self.dlg.nodeinsert_catalog_vdefault.currentIndexChanged.connect(self.get_new_value) 
+        self.dlg.orphannode.stateChanged.connect(self.get_new_value)
+        
+        # Set values of current data 
+        utils_giswater.setWidgetText("id", self.row["id"])
+        self.dlg.node_proximity.setValue(self.row["node_proximity"])
+        self.dlg.arc_searchnodes.setValue(self.row["arc_searchnodes"])
+        self.dlg.node2arc.setValue(self.row["node2arc"])
+        self.dlg.connec_proximity.setValue(self.row["connec_proximity"])
+        self.dlg.arc_toporepair.setValue(self.row["arc_toporepair"])
+        self.dlg.vnode_update_tolerance.setValue(self.row["vnode_update_tolerance"])
+
+        # Set current value to Checkbox  
+        self.dlg.orphannode.setChecked(bool(self.row["orphannode_delete"]))
+        self.dlg.arcendpoint.setChecked(bool(self.row["nodeinsert_arcendpoint"]))
+        self.dlg.nodetypechanged.setChecked(bool(self.row["nodetype_change_enabled"]))
+       
+        # Fill ComboBox
+        sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
+
+        # Open the dialog
+        self.dlg.exec_()    
+    
+  
+    def get_new_value(self, index):
+        ''' Get new value '''
+        
+        self.new_value_id = utils_giswater.getWidgetText("id")
+        self.new_value_prox = utils_giswater.getWidgetText("node_proximity")
+        self.new_value_arc = utils_giswater.getWidgetText("arc_searchnodes")
+        self.new_value_node = utils_giswater.getWidgetText("node2arc")
+        self.new_value_con = utils_giswater.getWidgetText("connec_proximity")
+        self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair")
+        self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance")
+        
+        # Get new value form combobox
+        self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
+        
+        # Get new value from CheckBox
+        self.new_value_orpha = self.dlg.orphannode.isChecked()
+        self.new_value_nodetypechanged = self.dlg.nodetypechanged.isChecked()
+        self.new_value_arcendpoint = self.dlg.arcendpoint.isChecked()
+
+    
+    def ok_button(self):
+        ''' Update curren value to the database
+        On pressed button OK execute new value to database "config" '''
+        
+        # restore int value from row to new variable like str
+        # Set new value to database "config"
+        sql = "UPDATE "+self.schema_name+".config" 
+        sql+= " SET id = '"+self.new_value_id+"',"
+        sql+= " node_proximity = '"+self.new_value_prox+"',"
+        sql+= " arc_searchnodes = '"+self.new_value_arc+"',"
+        sql+= " node2arc = '"+self.new_value_node+"',"
+        sql+= " connec_proximity = '"+self.new_value_con+"',"
+        sql+= " arc_toporepair = '"+self.new_value_arc_top+"',"
+        sql+= " nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"',"
+        sql+= " orphannode_delete = '"+str(self.new_value_orpha)+"',"
+        sql+= " nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"',"
+        sql+= " nodeinsert_arcendpoint = '"+str(self.new_value_arcendpoint)+"'"
+        self.dao.execute_sql(sql)
+    
+        # Show message to user
+        self.showInfo(self.controller.tr("Values has been updated"))
+        self.close_dialog() 
+        
+                    
