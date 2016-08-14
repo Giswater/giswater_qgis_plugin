@@ -575,6 +575,7 @@ class Giswater(QObject):
     ''' Edit bar functions '''  
             
     def ed_search_plus(self):   
+        ''' Button 32. Open dialog to select street and portal number ''' 
         if self.search_plus is not None:
             self.search_plus.dlg.setVisible(True)    
             
@@ -1076,12 +1077,12 @@ class Giswater(QObject):
     ''' Edit bar functions '''
   
     def ed_add_element(self):
-        ''' jj '''
+        ''' Button 33. Add element '''
           
         # Create the dialog and signals
         self.dlg = Add_element()
         utils_giswater.setDialog(self.dlg)
-        self.dlg.pushButton.pressed.connect(self.aceptar_button_element)
+        self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
         # Check if at least one node is checked          
@@ -1094,71 +1095,46 @@ class Giswater(QObject):
         elif count > 1:  
             self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!")) 
         
-
         # Fill  comboBox elementcat_id
         sql = "SELECT DISTINCT(elementcat_id) FROM "+self.schema_name+".element ORDER BY elementcat_id"
         rows = self.dao.get_rows(sql)
-        
         utils_giswater.fillComboBox("elementcat_id", rows) 
         
         # Fill  comboBox state
         sql = "SELECT DISTINCT(state) FROM "+self.schema_name+".element ORDER BY state"
         rows = self.dao.get_rows(sql)
-       
         utils_giswater.fillComboBox("state", rows)
         
         # Fill comboBox location_type 
         sql = "SELECT DISTINCT(location_type) FROM "+self.schema_name+".element ORDER BY location_type"
         rows = self.dao.get_rows(sql)
-       
         utils_giswater.fillComboBox("location_type", rows)
         
         # Fill comboBox workcat_id 
         sql = "SELECT DISTINCT(workcat_id) FROM "+self.schema_name+".element ORDER BY workcat_id"
         rows = self.dao.get_rows(sql)
-       
         utils_giswater.fillComboBox("workcat_id", rows)
         
         # Fill comboBox buildercat_id
         sql = "SELECT DISTINCT(buildercat_id) FROM "+self.schema_name+".element ORDER BY buildercat_id"
         rows = self.dao.get_rows(sql)
-       
         utils_giswater.fillComboBox("buildercat_id", rows)
         
         # Fill comboBox ownercat_id 
         sql = "SELECT DISTINCT(ownercat_id) FROM "+self.schema_name+".element ORDER BY ownercat_id"
         rows = self.dao.get_rows(sql)
-        
         utils_giswater.fillComboBox("ownercat_id", rows)
         
         # Fill comboBox verified
         sql = "SELECT DISTINCT(verified) FROM "+self.schema_name+".element ORDER BY verified"
         rows = self.dao.get_rows(sql)
-        
         utils_giswater.fillComboBox("verified", rows)
-        
-        
-        
         
         # Open the dialog
         self.dlg.exec_()    
         
         
-    def aceptar_button_element(self):
-        '''
-        '''
-        '''
-        layer = self.iface.activeLayer()
-        
-        # Get selected features (nodes)           
-        features = layer.selectedFeatures()
-    
-        feature = features[0]
-        # Get node_id form current node
-        
-        self.arc_id = feature.attribute('arc_id')
-        self.node_id = feature.attribute('node_id')
-        '''
+    def ed_add_element_accept(self):
            
         # Get values from comboboxes-elementcat_id
         self.elementcat_id = utils_giswater.getWidgetText("elementcat_id")  
@@ -1168,8 +1144,6 @@ class Giswater(QObject):
                
         # Get element_id entered by user
         self.element_id = utils_giswater.getWidgetText("element_id")
-        
-        
         self.annotation = utils_giswater.getWidgetText("annotation")
         self.observ = utils_giswater.getWidgetText("observ")
         self.comment = utils_giswater.getWidgetText("comment")
@@ -1183,36 +1157,21 @@ class Giswater(QObject):
         self.link = utils_giswater.getWidgetText("link")
         self.verified = utils_giswater.getWidgetText("verified")
      
-        '''
-        
-        # Execute new values (from Comboboxes-elementcat_id and element id) to database-element
-        # code from SQL editor: UPDATE test_ws.config SET node_proximity='0.1'
-        
-        sql = "UPDATE "+self.schema_name+".element"
-        sql+= " SET state='"+self.state+"', element_id='"+self.element_id+"'"
-        sql+= " WHERE elementcat_id='"+self.elementcat_id+"'"
-        print("for element")
-        print (sql)
-        self.dao.execute_sql(sql)
-        '''
         # Execute data to database Elements 
-        sql = "INSERT INTO "+self.schema_name+".element (element_id,elementcat_id,state,location_type,workcat_id,buildercat_id,ownercat_id,rotation,comment,annotation,observ,link,verified) "
-        sql+= " VALUES ('"+self.element_id+"','"+self.elementcat_id+"','"+self.state+"','"+self.location_type+"','"+self.workcat_id+"','"+self.buildercat_id+"','"+self.ownercat_id+"','"+self.rotation+"','"+self.comment+"','"+self.annotation+"','"+self.observ+"','"+self.link+"','"+self.verified+"')"
-        print("for data base element")
-        print (sql)
+        sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
+        sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified) "
+        sql+= " VALUES ('"+self.element_id+"', '"+self.elementcat_id+"', '"+self.state+"', '"+self.location_type+"', '"
+        sql+= self.workcat_id+"', '"+self.buildercat_id+"', '"+self.ownercat_id+"', '"+self.rotation+"', '"+self.comment+"', '"
+        sql+= self.annotation+"','"+self.observ+"','"+self.link+"','"+self.verified+"')"
         self.dao.execute_sql(sql) 
         
-        #*************GET ALL SELECTED FEATURES*************
-
-        layer = self.iface.activeLayer()
+        # Get layers
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
             return
          
-        # Initialize variables   
-        status = True                    
+        # Initialize variables                    
         self.layer_arc = None
-
         table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
         table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
         table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
@@ -1225,16 +1184,16 @@ class Giswater(QObject):
             uri_table = uri 
 
             if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]                           
+                uri_table = uri[pos_ini+6:pos_fi+1]    
+                
+                # Table 'arc'                       
                 if table_arc == uri_table:  
                     self.layer_arc = cur_layer
                     self.count_arc = self.layer_arc.selectedFeatureCount()  
-                    print ("number of arcs")
-                    print(self.count_arc)
                     # Get all selected features-arcs
                     features_arcs = self.layer_arc.selectedFeatures()
-                    
-                    while (i<self.count_arc):
+                    i = 0
+                    while (i < self.count_arc):
                      
                         feature = features_arcs[i]
                         # Get arc_id from current arc
@@ -1254,92 +1213,69 @@ class Giswater(QObject):
                         sql+= " VALUES ('"+self.arc_id+"','"+self.element_id+"')"
                         '''
                         i=i+1
-                          
+                      
+                # Table 'node'   
                 if table_node == uri_table:  
                     self.layer_node = cur_layer
                     self.count_node = self.layer_node.selectedFeatureCount()  
-                    print(self.count_node)
-                    print ("number of node")
-                    print(self.count_node)
                     # Get all selected features-arcs
                     features_nodes = self.layer_node.selectedFeatures()
-                    i=0
-                    while (i<self.count_node):
-                    #for i in range(0,count_node):    
+                    i = 0
+                    while (i < self.count_node):
                           
+                        # Get node_id from current node
                         feature_node = features_nodes[i]
-                        # Get arc_id from current arc
                         self.node_id = feature_node.attribute('node_id')
-                        print(self.node_id)
-                                               
-                        
+
                         # Execute id(automaticaly),element_id and node_id to element_x_node
-                        sql = "INSERT INTO "+self.schema_name+".element_x_node (node_id,element_id) "
-                        sql+= " VALUES ('"+self.node_id+"','"+self.element_id+"')"
+                        sql = "INSERT INTO "+self.schema_name+".element_x_node (node_id, element_id) "
+                        sql+= " VALUES ('"+self.node_id+"', '"+self.element_id+"')"
                         self.dao.execute_sql(sql)   
-                        
-                        i=i+1
-                        
+                        i+=1
+                 
+                # Table 'connec'       
                 if table_connec == uri_table:  
                     self.layer_connec = cur_layer
-                    print ("radi")
                     self.count_connec = self.layer_connec.selectedFeatureCount()  
-                    print ("number of connec")                   
-                    print(self.count_connec)
                     # Get all selected features-arcs
                     features_connecs = self.layer_connec.selectedFeatures()
-                    i=0
-                    while (i<self.count_connec):
-                    #for i in range(0,count_node):    
-                          
+                    i = 0
+                    while (i < self.count_connec):
+
+                        # Get connec_id from current connec
                         feature_connec = features_connecs[i]
-                        # Get arc_id from current arc
                         self.connec_id = feature_connec.attribute('connec_id')
-                        print(self.connec_id)
-                                                
-                        
+
                         # Execute id(automaticaly),element_id and node_id to element_x_node
-                        sql = "INSERT INTO "+self.schema_name+".element_x_connec (connec_id,element_id) "
-                        sql+= " VALUES ('"+self.connec_id+"','"+self.element_id+"')"
+                        sql = "INSERT INTO "+self.schema_name+".element_x_connec (connec_id, element_id) "
+                        sql+= " VALUES ('"+self.connec_id+"', '"+self.element_id+"')"
                         self.dao.execute_sql(sql)   
-                        
-                        i=i+1
-        
-        
-        #*************************************************  
-        
+                        i+=1
+                
         # Show message to user
         self.showInfo(self.controller.tr("Values has been updated"))
         self.close_dialog()
     
     
-        
-    
     def ed_add_file(self):
-        '''
-        '''
-    
+        ''' Button 34. Add file '''
                         
         # Create the dialog and signals
         self.dlg = Add_file()
         utils_giswater.setDialog(self.dlg)
-        self.dlg.ok_button.pressed.connect(self.aceptar_button_doc)
+        self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
-        count = layer.selectedFeatureCount()   
-             
-        print("*******************")
-        print(count)  
-        
+        count = layer.selectedFeatureCount()           
         if count == 0:
             self.showInfo(self.controller.tr("You have to select at least one feature!"))
             return 
         elif count > 1:  
             self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!")) 
         
-        # Fill  comboBox elementcat_id
+        # Fill comboBox elementcat_id
         sql = "SELECT DISTINCT(doc_type) FROM "+self.schema_name+".doc ORDER BY doc_type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows) 
@@ -1349,49 +1285,37 @@ class Giswater(QObject):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("tagcat_id", rows) 
         
-        
         # Adding auto-completion to a QLineEdit
-       
         self.edit = self.dlg.findChild(QLineEdit,"doc_id")
         self.completer = QCompleter()
         self.edit.setCompleter(self.completer)
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc "
         row = self.dao.get_rows(sql)
-        print(row)
-        
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
-            
-        print(row) 
-        #x=["naaa","maaa","baaa","vaaa","caaa","ntr","ngf","mtyjt","mio"]
         
         model.setStringList(row)
-        print("model prints")
-        print(model)
         self.completer.setModel(model)
         
-        
         # Set signal to reach sellected value from QCompleter
-        self.completer.activated.connect(self.onAutoComplete)
+        self.completer.activated.connect(self.ed_add_file_autocomplete)
         
         # Open the dialog
         self.dlg.exec_()
         
-    
         
-    def onAutoComplete(self):    
-        print("Qcompleter")
-        # Qcompleter event- get selected vaalue
+    def ed_add_file_autocomplete(self):    
+
+        # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
         self.doc_id = utils_giswater.getWidgetText("doc_id") 
-        print("vrijednost od linije")
-        print(self.doc_id)
         
         
-    def aceptar_button_doc(self):   
-         # Get values from comboboxes
+    def ed_add_file_accept(self):   
+        
+        # Get values from comboboxes
         self.doc_id = utils_giswater.getWidgetText("doc_id") 
         self.doc_type = utils_giswater.getWidgetText("doc_type")   
         self.tagcat_id = utils_giswater.getWidgetText("tagcat_id")  
@@ -1399,23 +1323,17 @@ class Giswater(QObject):
         self.link = utils_giswater.getWidgetText("link")
         
         # Execute data to database DOC 
-        sql = "INSERT INTO "+self.schema_name+".doc (id,doc_type,path,observ,tagcat_id) "
-        sql+= " VALUES ('"+self.doc_id+"','"+self.doc_type+"','"+self.link+"','"+self.observ+"','"+self.tagcat_id+"')"
-        print("for data base doc")
-        print (sql)
+        sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
+        sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
         self.dao.execute_sql(sql)
         
-        #*************GET ALL SELECTED FEATURES*************
-
-        layer = self.iface.activeLayer()
+        # Get layers
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
             return
          
-        # Initialize variables   
-        status = True                    
+        # Initialize variables                    
         self.layer_arc = None
-
         table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
         table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
         table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
@@ -1428,162 +1346,76 @@ class Giswater(QObject):
             uri_table = uri 
 
             if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]                           
+                uri_table = uri[pos_ini+6:pos_fi+1]   
+                
+                # Table 'arc                        
                 if table_arc == uri_table:  
                     self.layer_arc = cur_layer
                     self.count_arc = self.layer_arc.selectedFeatureCount()  
-                    print ("number of arcs")
-                    print(self.count_arc)
                     # Get all selected features-arcs
                     features_arcs = self.layer_arc.selectedFeatures()
                     i=0
                     while (i<self.count_arc):
                      
-                        feature = features_arcs[i]
                         # Get arc_id from current arc
+                        feature = features_arcs[i]
                         self.arc_id = feature.attribute('arc_id')
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
-                        print(self.arc_id)
                                               
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
-     
-                        sql = "INSERT INTO "+self.schema_name+".doc_x_arc (arc_id,doc_id) "
-                        sql+= " VALUES ('"+self.arc_id+"','"+self.doc_id+"')"
-                        print(sql)
-                        i=i+1
+                        sql = "INSERT INTO "+self.schema_name+".doc_x_arc (arc_id, doc_id) "
+                        sql+= " VALUES ('"+self.arc_id+"', '"+self.doc_id+"')"
+                        i+=1
                         self.dao.execute_sql(sql) 
              
             if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]                           
+                uri_table = uri[pos_ini+6:pos_fi+1] 
+                
+                # Table 'node'                          
                 if table_node == uri_table:  
                     self.layer_node = cur_layer
                     self.count_node = self.layer_node.selectedFeatureCount()  
-                    print ("number of node")
-                    print(self.count_node)
                     # Get all selected features-arcs
                     features_nodes = self.layer_node.selectedFeatures()
-                    i=0
+                    i = 0
                     while (i<self.count_node):
-                     
-                        feature = features_nodes[i]
+
                         # Get arc_id from current arc
+                        feature = features_nodes[i]
                         self.node_id = feature.attribute('node_id')
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
-                        print(self.node_id)
                                               
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
-     
                         sql = "INSERT INTO "+self.schema_name+".doc_x_node (node_id,doc_id) "
                         sql+= " VALUES ('"+self.node_id+"','"+self.doc_id+"')"
-                        print(sql)
-                        i=i+1
+                        i+=1
                         self.dao.execute_sql(sql) 
                         
             if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]                           
+                uri_table = uri[pos_ini+6:pos_fi+1]
+                
+                # Table 'connec'                              
                 if table_connec == uri_table:  
                     self.layer_connec = cur_layer
                     self.count_connec = self.layer_connec.selectedFeatureCount()  
-                    print ("number of connec")
-                    print(self.count_connec)
                     # Get all selected features-arcs
                     features_connecs = self.layer_connec.selectedFeatures()
-                    i=0
+                    i = 0
                     while (i<self.count_connec):
                      
-                        feature = features_connecs[i]
                         # Get arc_id from current arc
+                        feature = features_connecs[i]
                         self.connec_id = feature.attribute('connec_id')
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
-                        print(self.connec_id)
-                                              
-                        # Execute id(automaticaly),element_id and arc_id to element_x_arc
-                        
-                        sql = "INSERT INTO "+self.schema_name+".doc_x_connec (connec_id,doc_id) "
-                        sql+= " VALUES ('"+self.connec_id+"','"+self.doc_id+"')"
-                        print(sql)
-                    
-                        self.dao.execute_sql(sql)  
-                        
-                        i=i+1
-        #*************************************************  
-          
 
-       
+                        # Execute id(automaticaly),element_id and arc_id to element_x_arc
+                        sql = "INSERT INTO "+self.schema_name+".doc_x_connec (connec_id, doc_id) "
+                        sql+= " VALUES ('"+self.connec_id+"', '"+self.doc_id+"')"
+                        self.dao.execute_sql(sql)  
+                        i+=1
         
         # Show message to user
         self.showInfo(self.controller.tr("Values has been updated"))
-        self.close_dialog()
+        self.close_dialog()            
         
-        
-        
-        
-        
-        
-def activate(self):
-
-    # Set selection color to red
-    iface.mapCanvas().setSelectionColor( QColor("red") )
-    # Get the active layer (must be a vector layer)
-    self.layer = iface.activeLayer()
-    # Check vector
-    if not self.layer or layer.type() != QgsMapLayer.VectorLayer:
-        QMessageBox.warning(None, "No!", "Select a vector layer")
-
-        return
-
-def canvasPressEvent(self, event):
-
-    # Left click
-    if event.button() == 1:
-        # Get point
-        x = event.pos().x()
-        y = event.pos().y()
-        self.pointClick = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-
-
-def canvasReleaseEvent(self, event):
-    # Left click
-
-    if event.button() == 1:
-        # Get point
-        x = event.pos().x()
-        y = event.pos().y()
-
-    self.pointRelease = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-
-    # Points distance
-    distance = math.sqrt(self.pointClick.sqrDist(self.pointRelease))
-
-    # Select by box or by snap
-
-    if distance > 0.5 :
-        searchRadius = 0
-    else :
-        searchRadius = 0.5
-
-    # Get boundaries
-
-    maxX = max(self.pointClick.x(), self.pointRelease.x())
-    minX = min(self.pointClick.x(), self.pointRelease.x())
-    maxY = max(self.pointClick.y(), self.pointRelease.y())
-    minY = min(self.pointClick.y(), self.pointRelease.y())
-
-    # Set bounding box
-
-   
-
-    rect = QgsRectangle()
-    rect.setXMinimum(minX - searchRadius/2);
-    rect.setXMaximum(maxX + searchRadius/2);
-    rect.setYMinimum(minY - searchRadius/2);
-    rect.setYMaximum(maxY + searchRadius/2);
-
-    # Convert from map units to layer units
-
-    rect = self.iface.mapCanvas().mapRenderer().mapToLayerCoordinates(self.layer, rect)
-
-    # Select by box
-
-    self.layer.select([], rect)
-                            
+                    

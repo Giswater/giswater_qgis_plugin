@@ -562,7 +562,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
      <x>375</x>
