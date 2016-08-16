@@ -135,11 +135,3 @@ VALUES (810, 'gw_trg_edit_node','trigger function', 'ud', null, null);
 INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
 VALUES (820, 'gw_trg_node_update','trigger function', 'ud', null, null);
 
-
-
-
-
-
-
-
-
