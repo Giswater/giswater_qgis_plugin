@@ -143,9 +143,3 @@ INSERT INTO cat_grate VALUES ('REIXA5', NULL, NULL, 47.5000, 100.0000, 4825.0000
 -- ----------------------------
 INSERT INTO cat_tag VALUES ('NO TAG', null);
 
-
-
-
-
-
-
