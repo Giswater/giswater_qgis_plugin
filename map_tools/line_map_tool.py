@@ -41,7 +41,7 @@ class LineMapTool(QgsMapTool):
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
-        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')           
+        self.elem_type_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type_type')           
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
 
@@ -255,7 +255,6 @@ class LineMapTool(QgsMapTool):
                 point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
         
             self.sendGeometry()
-            #self.rubberBand.hide()
  
         
     def appendPoint(self, point):
@@ -317,7 +316,7 @@ class LineMapTool(QgsMapTool):
             f.setGeometry(geom)
         else:
             reply = QMessageBox.question(self.iface.mainWindow(), 'Feature not valid',
-                                         "The geometry of the feature you just added isn't valid. Do you want to use it anyway?",
+                "The geometry of the feature you just added isn't valid. Do you want to use it anyway?",
             QMessageBox.Yes, QMessageBox.No)
             if reply == QMessageBox.Yes:
                 f.setGeometry(geom)
@@ -333,12 +332,12 @@ class LineMapTool(QgsMapTool):
                 f.setAttribute(i, provider.defaultValue(i))
               
         except AttributeError: #<=1.8
-            ## Add attributefields to feature.
+            # Add attributefields to feature.
             for i in fields:
                 f.addAttribute(i, provider.defaultValue(i))
         
         idx = layer.fieldNameIndex('epa_type')
-        f[idx] = self.elem_type
+        f[idx] = self.elem_type_type
         
         # Upload changes
         layer.startEditing()
