@@ -6,7 +6,8 @@ from PyQt4.QtGui import QFileDialog, QMessageBox
 import os
 import subprocess
 
-import utils_giswater
+#from utils_giswater import *      
+from ..utils_giswater import *
 from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport
 from ..ui.config import Config                      # @UnresolvedImport
 from ..ui.table_wizard import TableWizard           # @UnresolvedImport
@@ -137,8 +138,8 @@ class Mg():
     def mg_table_wizard_import_csv(self):
 
         # Get selected table, delimiter, and header
-        table_name = utils_giswater.getWidgetText(self.dlg.cbo_table)  
-        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)  
+        table_name = getWidgetText(self.dlg.cbo_table)  
+        delimiter = getWidgetText(self.dlg.cbo_delimiter)  
         header_status = self.dlg.chk_header.checkState()             
         
         # Get CSV file. Check if file exists
@@ -316,8 +317,8 @@ class Mg():
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
-        utils_giswater.setDialog(self.dlg)
-        utils_giswater.fillComboBox("node_type_type_new", rows) 
+        setDialog(self.dlg)
+        fillComboBox("node_type_type_new", rows) 
     
         # Open the dialog
         self.dlg.exec_()    
@@ -327,7 +328,7 @@ class Mg():
         ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) ''' 
         
         # Get selected value from 1st combobox
-        self.value_combo1 = utils_giswater.getWidgetText("node_type_type_new")   
+        self.value_combo1 = getWidgetText("node_type_type_new")   
         
         # When value is selected, enabled 2nd combo box
         if self.value_combo1 != 'null':
@@ -335,7 +336,7 @@ class Mg():
             # Fill 2nd combo_box-custom node type
             sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type WHERE type='"+self.value_combo1+"'"
             rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox("node_node_type_new", rows)
+            fillComboBox("node_node_type_new", rows)
        
        
     def mg_change_elem_type_get_value_2(self, index):    
@@ -345,7 +346,7 @@ class Mg():
             return
         
         # Get selected value from 2nd combobox
-        self.value_combo2 = utils_giswater.getWidgetText("node_node_type_new")         
+        self.value_combo2 = getWidgetText("node_node_type_new")         
         
         # When value is selected, enabled 3rd combo box
         if self.value_combo2 != 'null':
@@ -356,11 +357,11 @@ class Mg():
             sql+= " FROM "+self.schema_name+".cat_node"
             sql+= " WHERE nodetype_id='"+self.value_combo2+"'"
             rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox("node_nodecat_id", rows)     
+            fillComboBox("node_nodecat_id", rows)     
     
     
     def mg_change_elem_type_get_value_3(self, index):
-        self.value_combo3 = utils_giswater.getWidgetText("node_nodecat_id")      
+        self.value_combo3 = getWidgetText("node_nodecat_id")      
         
         
     def mg_change_elem_type_accept(self):
@@ -394,18 +395,18 @@ class Mg():
         
         # Create the dialog and signals
         self.dlg_config = Config()
-        utils_giswater.setDialog(self.dlg_config)
+        setDialog(self.dlg_config)
         self.dlg_config.btn_accept.pressed.connect(self.mg_config_accept)
         self.dlg_config.btn_cancel.pressed.connect(self.close_dialog)
         
         # Set values from widgets of type QSoubleSpinBox
-        utils_giswater.setWidgetText("node_proximity", row["node_proximity"])
-        utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
-        utils_giswater.setWidgetText("node2arc", row["node2arc"])
-        utils_giswater.setWidgetText("connec_proximity", row["connec_proximity"])
-        utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
-        utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
-        utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
+        setWidgetText("node_proximity", row["node_proximity"])
+        setWidgetText("arc_searchnodes", row["arc_searchnodes"])
+        setWidgetText("node2arc", row["node2arc"])
+        setWidgetText("connec_proximity", row["connec_proximity"])
+        setWidgetText("arc_toporepair", row["arc_toporepair"])
+        setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
+        setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
@@ -418,8 +419,8 @@ class Mg():
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+        fillComboBox("nodeinsert_catalog_vdefault", rows) 
+        setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
 
         # Open the dialog
         self.dlg_config.exec_()    
@@ -429,16 +430,16 @@ class Mg():
         ''' Get new values from all the widgets '''
         
         # Get new values from widgets of type QSoubleSpinBox
-        self.new_value_prox = utils_giswater.getWidgetText("node_proximity").replace(",", ".")
-        self.new_value_arc = utils_giswater.getWidgetText("arc_searchnodes").replace(",", ".")
-        self.new_value_node = utils_giswater.getWidgetText("node2arc").replace(",", ".")
-        self.new_value_con = utils_giswater.getWidgetText("connec_proximity").replace(",", ".")
-        self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
-        self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
-        self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
+        self.new_value_prox = getWidgetText("node_proximity").replace(",", ".")
+        self.new_value_arc = getWidgetText("arc_searchnodes").replace(",", ".")
+        self.new_value_node = getWidgetText("node2arc").replace(",", ".")
+        self.new_value_con = getWidgetText("connec_proximity").replace(",", ".")
+        self.new_value_arc_top = getWidgetText("arc_toporepair").replace(",", ".")
+        self.new_value_arc_tolerance = getWidgetText("vnode_update_tolerance").replace(",", ".")
+        self.new_value_node_duplicated_tolerance = getWidgetText("node_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
-        self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
+        self.new_value_combobox = getWidgetText("nodeinsert_catalog_vdefault")
         
         # Get new values from widgets of type  QCheckBox
         self.new_value_orpha = self.dlg_config.orphannode.isChecked()

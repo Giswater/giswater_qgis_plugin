@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.gui import (QgsMessageBar)
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
-from qgis.utils import iface
+from qgis.gui import QgsMessageBar
+from PyQt4.QtCore import QSettings
+from PyQt4.QtGui import QLabel
+
 import os.path
 import sys  
 
