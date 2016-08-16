@@ -30,7 +30,7 @@ class PointMapTool(QgsMapTool):
         if self.schema_name is None:
             self.schema_name = self.settings.value('db/schema_name')  
             
-        if self.elem_type is not None:   
+        if self.elem_type_type is not None:   
             # Get elem_type_id and epa_default from selected elem_type_type (get only first record)
             sql = "SELECT node_type.id, node_type.epa_default"
             sql+= " FROM "+self.schema_name+".node_type"

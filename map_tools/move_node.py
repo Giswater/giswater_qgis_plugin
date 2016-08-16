@@ -15,7 +15,6 @@ class MoveNode(QgsMapTool):
         self.settings = settings        
         self.index_action = index_action
         self.srid = srid
-        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
         self.dao = controller.getDao()   
