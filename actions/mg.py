@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
-from qgis.gui import *       # @UnusedWildImport
 from qgis.core import QgsExpression, QgsFeatureRequest
-from PyQt4.QtCore import *   # @UnusedWildImport
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QFileDialog, QMessageBox
 
 import os
 import subprocess
 
 import utils_giswater
-from controller import DaoController
-from ..ui.change_node_type import ChangeNodeType
-from ..ui.config import Config
-from ..ui.table_wizard import TableWizard
+from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport
+from ..ui.config import Config                      # @UnresolvedImport
+from ..ui.table_wizard import TableWizard           # @UnresolvedImport
 
 
 class Mg():

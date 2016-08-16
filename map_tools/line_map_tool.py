@@ -25,11 +25,10 @@ Under the terms of GNU GPL 2.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.gui import * # @UnusedWildImport
-from qgis.core import (QgsFeatureRequest, QGis, QgsPoint, QgsMapToPixel, QgsGeometry, QgsFeature)
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
-from PyQt4.Qt import * # @UnusedWildImport
+from qgis.core import QgsFeatureRequest, QGis, QgsPoint, QgsMapToPixel, QgsGeometry, QgsFeature
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QColor, QCursor, QMessageBox    
 
 
 class LineMapTool(QgsMapTool):

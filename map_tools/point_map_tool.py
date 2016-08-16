@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.gui import * # @UnusedWildImport
-from qgis.core import (QgsFeatureRequest, QgsExpression)
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
+from qgis.core import QgsFeatureRequest, QgsExpression
+from qgis.gui import QgsMapTool
 
 
 class PointMapTool(QgsMapTool):

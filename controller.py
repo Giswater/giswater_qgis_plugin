@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
+from PyQt4.QtCore import QCoreApplication, QSettings   # @UnusedWildImport
 
 from dao.pg_dao import PgDao
 

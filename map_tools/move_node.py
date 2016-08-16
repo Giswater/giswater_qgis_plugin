@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.gui import *       # @UnusedWildImport
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
 from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject)
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QColor, QCursor
 
 
 class MoveNode(QgsMapTool):
