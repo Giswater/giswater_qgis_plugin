@@ -37,6 +37,12 @@ BEGIN
 		SELECT * INTO nodeRecord1 FROM node WHERE node.node_id = arcrec.node_1;
 		SELECT * INTO nodeRecord2 FROM node WHERE node.node_id = arcrec.node_2;
 
+        -- UPDATE geom / dma
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+        END IF;
+
 
 --		Control de lineas de longitud 0
 		IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
@@ -97,9 +103,6 @@ END;
 $$;
 
 
-
--- CREATE TRIGGER gw_trg_node_update AFTER UPDATE ON "SCHEMA_NAME"."node" 
--- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom)) OR ((old.top_elev IS DISTINCT FROM new.top_elev)) OR ((old.ymax IS DISTINCT FROM new.ymax))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
 
 CREATE TRIGGER gw_trg_node_update AFTER UPDATE ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();

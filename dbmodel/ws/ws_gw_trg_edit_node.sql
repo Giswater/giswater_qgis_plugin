@@ -28,37 +28,42 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                RETURN audit_function(101);  
+                RETURN audit_function(105,380);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
         END IF;
 
+         -- Epa type
+        IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
+		END IF;
+
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RETURN audit_function(102);  
+                RETURN audit_function(110,380);  
             END IF;      
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(103);  
+                RETURN audit_function(115,380);  
             END IF;
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(104);          
+                RETURN audit_function(120,380);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(105);  
+                RETURN audit_function(125,380);  
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(106);  
+                RETURN audit_function(130,380);  
             END IF;            
         END IF;
         
@@ -87,11 +92,17 @@ BEGIN
             EXECUTE v_sql;
         END IF;
 
-     --   PERFORM audit_function(1); 
+        PERFORM audit_function(1,380); 
         RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+    -- UPDATE dma/sector
+    IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+        NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+        NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+    END IF;
 
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
@@ -137,7 +148,7 @@ BEGIN
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
-                RETURN audit_function(107);  
+                RETURN audit_function(135,380);  
             END IF;
         END IF;
 
@@ -149,14 +160,14 @@ BEGIN
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id = OLD.node_id;
             
-      --  PERFORM audit_function(2); 
+        PERFORM audit_function(2,380); 
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
 
         DELETE FROM node WHERE node_id = OLD.node_id;
-      --      PERFORM audit_function(3); 
+        PERFORM audit_function(3,380); 
         RETURN NULL;
    
     END IF;

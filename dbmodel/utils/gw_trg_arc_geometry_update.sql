@@ -18,8 +18,8 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
-    -- Get snapping_tolerance from config table
-    SELECT arc_searchnodes INTO rec FROM config;    
+    -- Get data from config table
+    SELECT * INTO rec FROM config;    
 
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
 	    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -27,12 +27,16 @@ BEGIN
     SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
+    -- UPDATE dma/sector
+    NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(ST_centroid(NEW.the_geom), sector.the_geom,0.001) LIMIT 1);          
+    NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+
     -- Control of length line
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
     
         -- Control of same node initial and final
-        IF (nodeRecord1.node_id = nodeRecord2.node_id) THEN
-            RAISE EXCEPTION '[%]: One or more features has the same Node as Node1 and Node2. Please check your project and repair it!', TG_NAME;
+        IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
+            RETURN audit_function (180,120);
         ELSE
             -- Update coordinates
             NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
@@ -58,7 +62,7 @@ BEGIN
         END IF;
         
     ELSE
-        RAISE EXCEPTION '[%]: Arc was not inserted', TG_NAME;
+        RETURN audit_function (182,120);
         RETURN NULL;
     END IF;
 

@@ -24,28 +24,28 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-            RAISE EXCEPTION '[%]:Connec catalog is not defined. Please, define one.', TG_NAME;
+                RETURN audit_function(150,350); 
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION '[%]:There are no sectors defined in the model, define at least one.', TG_NAME;
+                RETURN audit_function(115,350); 
             END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the sectors!!!', TG_NAME;
+                RETURN audit_function(120,350); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION '[%]:There are no dma defined in the model, define at least one.', TG_NAME;
+                RETURN audit_function(125,350); 
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION '[%]:Please take a look on your map and use the approach of the dma!!!', TG_NAME;
+                RETURN audit_function(130,350); 
             END IF;
         END IF;
         
@@ -54,15 +54,16 @@ BEGIN
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom);
               
-        RETURN NEW;
+    PERFORM audit_function(1,350);     
+	RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE position 
+       -- UPDATE dma/sector
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
         END IF;
 
         UPDATE connec 
@@ -72,13 +73,16 @@ BEGIN
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE connec_id = OLD.connec_id;
-                
+      
+        PERFORM audit_function(2,350);     
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
 
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
+
+		PERFORM audit_function(3,350);     
         RETURN NULL;
    
     END IF;

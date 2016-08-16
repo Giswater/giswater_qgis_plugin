@@ -14,32 +14,32 @@ BEGIN
     
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-
-         RAISE EXCEPTION '[%]:En esta capa no puedes insertar valvulas', TG_NAME;
+        RAISE EXCEPTION '[%]:En esta capa no puedes insertar valvulas', TG_NAME;
+        RETURN audit_function(165,390); 
         RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
-
 
         -- UPDATE position 
         IF  (NEW.the_geom IS DISTINCT FROM OLD.the_geom) OR 
 			(NEW.node_id IS DISTINCT FROM OLD.node_id) OR 
 			(NEW.nodetype_id IS DISTINCT FROM OLD.nodetype_id) OR
 			(NEW.type IS DISTINCT FROM OLD.type) THEN   
-         RAISE EXCEPTION '[%]:Los campos de caracaterísticas no son editables. Prueba solo con open, accesibility & broken', TG_NAME;          
+         RAISE EXCEPTION '[%]:Los campos de caracaterísticas no son editables. Prueba solo con open, accesibility & broken', TG_NAME;  
+        RETURN audit_function(170,390);         
 		END IF;
 
         UPDATE man_valve 
         SET opened=NEW.opened, acessibility=NEW.acessibility, "broken"=NEW."broken"
         WHERE node_id = OLD.node_id;
-                
+
+        PERFORM audit_function(2,390);  
         RETURN NEW;;
-    
+   
 
     ELSIF TG_OP = 'DELETE' THEN
-
-        RAISE EXCEPTION '[%]:En esta capa no puedes borrar valvulas', TG_NAME;
+        RETURN audit_function(175,390); 
         RETURN NEW;
    
     END IF;

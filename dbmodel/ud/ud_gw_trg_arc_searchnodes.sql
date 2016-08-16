@@ -23,8 +23,8 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
-    -- Get snapping_tolerance from config table
-    SELECT arc_searchnodes INTO rec FROM config;    
+    -- Get data from config table
+    SELECT * INTO rec FROM config;    
 
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
 	    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -35,25 +35,24 @@ BEGIN
 
 	SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
 
+    -- Control of start/end node
+    IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 	
---	Control de lineas de longitud 0
-	IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
-	
---  Control of same node initial and final
-    IF (nodeRecord1.node_id = nodeRecord2.node_id) THEN
-	RAISE EXCEPTION 'One or more features has the same Node as Node1 and Node2. Please check your project and repair it!';
-	ELSE
+--		Control de lineas de longitud 0
+		IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
+			RETURN audit_function (180,750);
+		ELSE
 
---  Update coordinates
-    NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
-    NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
+--  	Update coordinates
+		NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+		NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
 		
 		IF (optionsRecord.link_offsets = 'DEPTH') THEN
 			z1 := (nodeRecord1.top_elev - NEW.y1);
 			z2 := (nodeRecord2.top_elev - NEW.y2);
-		ELSE
-			z1 := NEW.y1;
-			z2 := NEW.y2;	
+			ELSE
+				z1 := NEW.y1;
+				z2 := NEW.y2;	
 		END IF;
 
 		IF ((z1 > z2) AND NEW.inverted_slope is false) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
@@ -76,6 +75,7 @@ BEGIN
         RETURN NEW;
 	END IF;
 	ELSE
+	RETURN audit_function (182,750);
     RETURN NULL;
     END IF;
 END; 

@@ -23,81 +23,16 @@ BEGIN
     epa_type:= TG_ARGV[1];
     
     IF TG_OP = 'INSERT' THEN
-    RAISE EXCEPTION 'Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC';
+        RETURN audit_function(155,790); 
 	RETURN NEW;
- /*
---	To disable the insert option
-    RAISE EXCEPTION 'Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC';
-	  RETURN NULL;
+ 
 
-        -- Arc ID
-        IF (NEW.arc_id IS NULL) THEN
-            NEW.arc_id := (SELECT nextval('arc_id_seq'));
-        END IF;
-
-        -- Arc catalog ID
-        IF (NEW.arccat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-                RAISE EXCEPTION 'There are no arcs catalog defined in the model, define at least one.';
-            END IF;	
-            NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
-        END IF;
-
-        -- Sector ID
-        IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
-            END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
-            IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
-            END IF;
-        END IF;
-
-        -- Dma ID
-        IF (NEW.dma_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
-            END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
-            IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
-            END IF;
-        END IF;
-		
-		-- FEATURE INSERT
-
-        INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, epa_type::text, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", 
-            NEW."comment", NEW.custom_length, null, null, null, null, null, null, null, null, null, null, null, 
-            null, null,NEW.rotation, NEW.link,  NEW.est_y1, NEW.est_y2, NEW.verified, NEW.the_geom);
-
-        IF (epa_type = 'CONDUIT') THEN 
-            INSERT INTO  inp_conduit VALUES(NEW.arc_id,NEW.barrels,NEW.culvert,NEW.kentry,NEW.kexit,NEW.kavg,NEW.flap,NEW.q0,NEW.qmax, NEW.seepage);
-        ELSIF (epa_type = 'PUMP') THEN 
-        	INSERT INTO  inp_pump VALUES(NEW.arc_id,NEW.curve_id,NEW.status,NEW.startup,NEW.shutoff);
-		ELSIF (epa_type = 'ORIFICE') THEN 
-			INSERT INTO  inp_orifice VALUES(NEW.arc_id,NEW.ori_type,NEW.offset,NEW.cd,NEW.orate,NEW.flap,NEW.shape,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4);
-		ELSIF (epa_type = 'WEIR') THEN 
-			INSERT INTO  inp_weir VALUES(NEW.arc_id,NEW.weir_type,NEW."offset",NEW.cd,NEW.ec,NEW.cd2,NEW.flap,NEW.geom1,NEW.geom2,NEW.geom3,NEW.geom4, NEW.surcharge);
-		ELSIF (epa_type = 'OUTLET') THEN 
-        	INSERT INTO  inp_outlet VALUES(NEW.arc_id,NEW.outlet_type,NEW."offset",NEW.curve_id,NEW.cd1,NEW.cd2,NEW.flap);
-        END IF;
-
-        -- MAN INSERT      
-        man_table := (SELECT arc_type.man_table FROM arc_type WHERE arc_type.id=NEW.arc_type);
-        v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
-        EXECUTE v_sql;
-
-
-        RETURN NEW;
-    
-*/
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE position 
+        -- UPDATE dma/sector
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
         END IF;
 
 
@@ -118,15 +53,18 @@ BEGIN
 		ELSIF (epa_type = 'OUTLET') THEN 
         	UPDATE inp_outlet SET arc_id=NEW.arc_id, outlet_type=NEW.outlet_type, "offset"=NEW."offset", curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap WHERE arc_id=OLD.arc_id;
 		END IF;
+
+        PERFORM audit_function (2,790);
         RETURN NEW;
 
 
 
 
     ELSIF TG_OP = 'DELETE' THEN
-        DELETE FROM arc WHERE arc_id = OLD.arc_id;
-        EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '|| quote_literal(OLD.arc_id);
-        RETURN NULL;
+    --  DELETE FROM arc WHERE arc_id = OLD.arc_id;
+    --  EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '|| quote_literal(OLD.arc_id);
+        RETURN audit_function(157,790); 
+        RETURN NEW;
     
     END IF;
     

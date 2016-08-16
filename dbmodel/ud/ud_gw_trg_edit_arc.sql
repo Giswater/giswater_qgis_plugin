@@ -18,44 +18,51 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     IF TG_OP = 'INSERT' THEN
-    
-        -- Arc ID
+      
+		-- Arc ID
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
         END IF;
 
-         -- Arc type & EPA type
+         -- Arc type
         IF (NEW.arc_type IS NULL) THEN
-                RAISE EXCEPTION 'Please, define arc_type.';
-        ELSE   
-		NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;        
-        END IF;        
+            IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
+                RETURN audit_function(140,760);  
+            END IF;
+            NEW.arc_type:= (SELECT id FROM arc_type LIMIT 1);     
+        END IF;
 
-
+         -- Epa type
+        IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
+		END IF;
+        
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
-                RAISE EXCEPTION 'Please, define arc_catalog.';
+            IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+                RETURN audit_function(145,760); 
+            END IF; 
         END IF;
-		
+        
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+                RETURN audit_function(130,760); 
             END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
+                RETURN audit_function(130,760); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+                RETURN audit_function(130,760); 
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
+                RETURN audit_function(130,760); 
             END IF;
         END IF;
     
@@ -83,14 +90,15 @@ BEGIN
         v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
         EXECUTE v_sql;
         
+		PERFORM audit_function (1,760);
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE position 
+        -- UPDATE dma/sector
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
         END IF;    
 
         IF (NEW.epa_type <> OLD.epa_type) THEN    
@@ -132,11 +140,14 @@ BEGIN
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE arc_id=OLD.arc_id;
+
+		PERFORM audit_function (2,760);
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN
-     
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
+
+		PERFORM audit_function (3,760);
         RETURN NULL;
      
      END IF;

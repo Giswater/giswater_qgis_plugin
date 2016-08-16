@@ -132,15 +132,6 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_x_gully_seq"
 -- Table system structure 
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."version" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
-"giswater" varchar(16)  ,
-"wsoftware" varchar(16)  ,
-"postgres" varchar(512)  ,
-"postgis" varchar(512)  ,
-"date" timestamp(6) DEFAULT now(),
-CONSTRAINT version_pkey PRIMARY KEY (id)
-);
  
 CREATE TABLE "SCHEMA_NAME"."arc_type" (
 "id" varchar(18)   NOT NULL,
@@ -167,22 +158,6 @@ CREATE TABLE "SCHEMA_NAME"."element_type" (
 "id" varchar(18)   NOT NULL,
 "event_table" varchar(18)   NOT NULL,
 CONSTRAINT element_type_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "SCHEMA_NAME"."config" (
-"id" varchar(18)   NOT NULL,
-"node_proximity" double precision,
-"arc_searchnodes" double precision,
-"node2arc" double precision,
-"connec_proximity" double precision,
-"arc_toporepair" double precision,
-"nodeinsert_arcendpoint" boolean,
-"nodeinsert_catalog_vdefault" varchar (30),
-"orphannode_delete" boolean,
-"vnode_update_tolerance" double precision,
-"nodetype_change_enabled" boolean,
-CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
 
@@ -475,7 +450,7 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "est_ymax" numeric(12,3),
 "rotation" numeric (6,3),
 "link" character varying(512),
-"verified" varchar(16) ,
+"verified" varchar(20) ,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
@@ -516,7 +491,7 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "est_y2" numeric(12,3),
 "rotation" numeric (6,3),
 "link" character varying(512),
-"verified" varchar(16),
+"verified" varchar(20),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
@@ -573,7 +548,7 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "postnumber" varchar (16)  ,
 "descript" varchar(254)  ,
 "link" character varying(512),
-"verified" varchar(16)  , 
+"verified" varchar(20)  , 
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
@@ -636,7 +611,7 @@ CREATE TABLE "SCHEMA_NAME"."gully" (
 "adress_03" varchar(50)  ,
 "descript" varchar(254)  ,
 "link" character varying(512),
-"verified" varchar(4),
+"verified" varchar(20),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "the_geom_pol" public.geometry (POLYGON, SRID_VALUE),
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
@@ -704,7 +679,7 @@ CREATE TABLE "SCHEMA_NAME"."element" (
 "enddate" timestamp (6) without time zone,
 "rotation" numeric (6,3),
 "link" character varying(512),
-"verified" varchar(16)   NOT NULL,
+"verified" varchar(20)   NOT NULL,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 

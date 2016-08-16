@@ -17,15 +17,15 @@ BEGIN
     arc_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
-    RAISE EXCEPTION '[%]:Insert features is forbidden. To insert new features use the GIS FEATURES layers agrupation of TOC', TG_NAME;
+        RETURN audit_function(155,360); 
     RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE position 
+        -- UPDATE dma/sector
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
         END IF;
 
 
@@ -38,12 +38,15 @@ BEGIN
         IF arc_table = 'inp_pipe' THEN   
             UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
         END IF;
+
+        PERFORM audit_function(2,360); 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        DELETE FROM arc WHERE arc_id = OLD.arc_id;
-        EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '|| quote_literal(OLD.arc_id);
-        RETURN NULL;
+     --   DELETE FROM arc WHERE arc_id = OLD.arc_id;
+     --   EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '|| quote_literal(OLD.arc_id);
+        RETURN audit_function(157,360); 
+        RETURN NEW;
     
     END IF;
     
@@ -52,7 +55,7 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_edit_inp_node_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pipe 
+CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_pipe 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_arc('inp_pipe');   
 
    

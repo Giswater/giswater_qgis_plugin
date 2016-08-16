@@ -16,6 +16,12 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
+    -- UPDATE dma/sector
+    NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+    NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+
+
+
     -- Select links with start-end on the updated connec
     querystring := 'SELECT * FROM link WHERE link.connec_id = ' || quote_literal(NEW.connec_id); 
 

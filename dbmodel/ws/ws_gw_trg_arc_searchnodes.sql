@@ -14,9 +14,11 @@ DECLARE
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+    SET LC_MESSAGES TO 'es_ES.UTF-8';
     
-    -- Get snapping_tolerance from config table
-    SELECT arc_searchnodes INTO rec FROM config;    
+    -- Get data from config table
+    SELECT * INTO rec FROM config;    
 
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -24,13 +26,12 @@ BEGIN
     SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
-    -- Control of length line
+    -- Control of start/end node
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
 
         -- Control of same node initial and final
-        IF (nodeRecord1.node_id = nodeRecord2.node_id) THEN
-        
-            RAISE EXCEPTION '[%]: One or more features has the same Node as Node1 and Node2. Please check your project and repair it!', TG_NAME;
+        IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
+            RETURN audit_function (180,330);
 
         ELSE
         
@@ -45,7 +46,7 @@ BEGIN
         END IF;
 
     -- Check auto insert end nodes
-    ELSEIF (nodeRecord1.node_id IS NOT NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
+    ELSIF (nodeRecord1.node_id IS NOT NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
 
         INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
             VALUES (
@@ -69,7 +70,7 @@ BEGIN
 
     -- Error, no existing nodes
     ELSE
-        RAISE EXCEPTION '[%]: Arc was not inserted', TG_NAME;
+        RETURN audit_function (182,330);
         RETURN NULL;
     END IF;
 

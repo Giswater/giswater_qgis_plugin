@@ -28,46 +28,53 @@ BEGIN
         IF (NEW.node_id IS NULL) THEN
             NEW.node_id:= (SELECT nextval('node_id_seq'));
         END IF;
-        
-        -- elev
+
+		-- elev
         IF (NEW.elev IS NOT NULL) THEN   	
-			RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
+                RETURN audit_function(200,810);  
 		END IF;
-        
-         -- Node type & EPA type
+
+        -- Node type
         IF (NEW.node_type IS NULL) THEN
-                RAISE EXCEPTION 'Please, define node_type.';
-        ELSE   
-		NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;        
+            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+                RETURN audit_function(105,810);  
+            END IF;
+            NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
         END IF;
 
-        -- Node catalog ID
+         -- Epa type
+        IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
+		END IF;
+
+        -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
-                RAISE EXCEPTION 'Please, define node_catalog.';
+            IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+                RETURN audit_function(110,810);  
+            END IF;      
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RAISE EXCEPTION 'There are no sectors defined in the model, define at least one.';
+                RETURN audit_function(115,810);  
             END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the sectors!!!';
-            END IF;
+                RETURN audit_function(120,810);          
+            END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RAISE EXCEPTION 'There are no dma defined in the model, define at least one.';
+                RETURN audit_function(125,810);  
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RAISE EXCEPTION 'Please take a look on your map and use the approach of the dma!!!';
-            END IF;
+                RETURN audit_function(130,810);  
+            END IF;            
         END IF;
-
 
         
         -- FEATURE INSERT
@@ -90,19 +97,20 @@ BEGIN
         v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         EXECUTE v_sql;
             
+        PERFORM audit_function (1,810);
         RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE position 
+        -- UPDATE dma/sector
         IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE (NEW.the_geom @ sector.the_geom) LIMIT 1);           
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE (NEW.the_geom @ dma.the_geom) LIMIT 1);         
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
         END IF;
 
 	IF (NEW.elev <> OLD.elev) THEN
-	RAISE EXCEPTION 'Please, review your data: elev is not an updatable field.';
+                RETURN audit_function(200,810);  
 	END IF;
 
         NEW.elev=NEW.top_elev-NEW.ymax;
@@ -135,16 +143,8 @@ BEGIN
             EXECUTE v_sql;
 
         END IF;
-/*
-        IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
-            old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
-            new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
-			
-            IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
-                RAISE EXCEPTION 'Change node catalog is forbidden. The new node catalog is not included on the same type (node_type.type) of the old node catalog';
-            END IF;
-        END IF;
-*/
+
+
         UPDATE node 
         SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
@@ -153,12 +153,14 @@ BEGIN
             est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id = OLD.node_id;
                 
+		PERFORM audit_function (2,810);
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
-
         DELETE FROM node WHERE node_id = OLD.node_id;
+
+		PERFORM audit_function (3,810);
         RETURN NULL;
    
     END IF;

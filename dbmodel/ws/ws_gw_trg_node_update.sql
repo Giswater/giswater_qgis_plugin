@@ -19,6 +19,11 @@ BEGIN
     -- Select arcs with start-end on the updated node
     querystring := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 
+    -- UPDATE dma/sector
+    NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+    NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+
+
     FOR arcrec IN EXECUTE querystring
     LOOP
 
@@ -45,9 +50,6 @@ BEGIN
 END; 
 $$;
 
-
--- CREATE TRIGGER gw_trg_node_update_geom AFTER UPDATE ON "SCHEMA_NAME"."node" 
--- FOR EACH ROW WHEN (((old.the_geom IS DISTINCT FROM new.the_geom))) EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update_geom"();
 
 CREATE TRIGGER gw_trg_node_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_node_update"();
