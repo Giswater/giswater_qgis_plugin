@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>6</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1228,6 +1228,19 @@
        <width>771</width>
        <height>251</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="delete_row_info">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>100</y>
+       <width>96</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink element</string>
      </property>
     </widget>
    </widget>
@@ -7278,6 +7291,19 @@
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="delete_row_doc">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>130</y>
+       <width>96</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink document</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="page_event">
     <attribute name="title">
@@ -8556,7 +8582,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="tbl_rtc">
+    <widget class="QTableView" name="tbl_rtc">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -8564,13 +8590,6 @@
        <width>761</width>
        <height>281</height>
       </rect>
-     </property>
-     <property name="html">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;id, rtc_scada_value(value, status,date)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -8749,6 +8768,52 @@ p, li { white-space: pre-wrap; }
      <x>80</x>
      <y>0</y>
      <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_pressure_zone">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>540</y>
+     <width>90</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Pressure zone:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="presszonecat_id">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>540</y>
+     <width>91</width>
      <height>20</height>
     </rect>
    </property>

@@ -75,7 +75,9 @@ class DaoController():
         if self.schema_name is None:
             return       
 
-        sql = "SELECT message FROM "+self.schema_name+".log_code WHERE id = "+str(log_code_id)
+        sql = "SELECT error_message"
+        sql+= " FROM "+self.schema_name+".audit_cat_error"
+        sql+= " WHERE id = "+str(log_code_id)
         result = self.dao.get_row(sql)  
         if result:
             self.log_codes[log_code_id] = result[0]    
@@ -86,7 +88,19 @@ class DaoController():
     def show_message(self, text, message_level=1, duration=5):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.iface.messageBar().pushMessage("", self.tr(text), message_level, duration)      
+        self.iface.messageBar().pushMessage("", self.tr(text), message_level, duration)  
+        
+            
+    def show_info(self, text, duration=5):
+        ''' Show message to the user.
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        self.show_message(text, 0, duration)
+        
+        
+    def show_warning(self, text, duration=5):
+        ''' Show message to the user.
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        self.show_message(text, 1, duration)
                             
             
     def get_row(self, sql):
@@ -113,8 +127,7 @@ class DaoController():
             self.show_message(self.log_codes[-1], 2)   
             return False
         else:
-            # Get last record from audit tables (searching for a possible error)
-            print "getting error from audit table"              
+            # If we have found an error, then get last record from audit tables            
             return self.get_error_from_audit()    
     
     
@@ -123,11 +136,11 @@ class DaoController():
         
         if self.schema_name is None:
             return                  
-                
-        sql = "SELECT log_code.id, log_code.message, log_code.log_level, log_code.show_user "
-        sql+= " FROM "+self.schema_name+".log_detail"
-        sql+= " INNER JOIN "+self.schema_name+".log_code ON log_detail.log_code_id = log_code.id"
-        sql+= " ORDER BY log_detail.id DESC LIMIT 1"
+        
+        sql = "SELECT audit_cat_error.id, error_message, log_level, show_user "
+        sql+= " FROM "+self.schema_name+".audit_function_actions"
+        sql+= " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
+        sql+= " ORDER BY audit_function_actions.id DESC LIMIT 1"
         result = self.dao.get_row(sql)
         if result is None:
             self.show_message(self.log_codes[-1], 2)

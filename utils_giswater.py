@@ -1,12 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox
 from PyQt4.QtCore import *   # @UnusedWildImport
 from qgis.gui import QgsMessageBar
 
 
-#    
-# Utility funcions    
-#
+''' Module with utility functions to interact with dialog and its widgets '''
+
 def tr(context, message):
     return QCoreApplication.translate(context, message)
 
@@ -74,7 +73,7 @@ def getStringValue2(widget):
 def getText(widget):
     
     if type(widget) is str:
-        widget = _dialog.findChild(QLineEdit, widget)          
+        widget = _dialog.findChild(QWidget, widget)          
     if widget:
         if widget.text():
             elem_text = widget.text()
@@ -91,12 +90,17 @@ def setText(widget, text):
         widget = _dialog.findChild(QWidget, widget)      
     if not widget:
         return    
+    
     value = unicode(text)
-    if value == 'None':    
-        widget.setText("")         
-    else:
-        widget.setText(value)     
-
+    if type(widget) is QLineEdit: 
+        if value == 'None':    
+            value = ""        
+        widget.setText(value)       
+    elif type(widget) is QDoubleSpinBox: 
+        if value == 'None':    
+            value = 0        
+        widget.setValue(float(value))     
+          
 
 def getWidgetText(widget, add_quote=False):
     
@@ -107,6 +111,8 @@ def getWidgetText(widget, add_quote=False):
     text = None
     if type(widget) is QLineEdit:
         text = getText(widget)
+    elif type(widget) is QDoubleSpinBox:
+        text = getText(widget)        
     elif type(widget) is QComboBox:
         text = getSelectedItem(widget)
     if add_quote and text <> "null":
@@ -122,6 +128,8 @@ def setWidgetText(widget, text):
         return
     if type(widget) is QLineEdit:
         setText(widget, text)
+    elif type(widget) is QDoubleSpinBox:
+        setText(widget, text)           
     elif type(widget) is QComboBox:
         setSelectedItem(widget, text)
 
@@ -172,11 +180,11 @@ def showInfo(text, duration = None):
         _iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, MSG_DURATION)  
     else:
         _iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)              
-    
+  
     
 def showWarning(text, duration = None):
     if duration is None:
         _iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, MSG_DURATION)  
     else:
         _iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)   
-
+        
