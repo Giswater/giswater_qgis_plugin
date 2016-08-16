@@ -972,7 +972,7 @@ class Giswater(QObject):
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
         if dlg is None:
-            dlg = self.dlg.close()   
+            dlg = self.dlg   
         dlg.close()    
             
             
