@@ -87,7 +87,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;
 
-        PERFORM audit_function(1); 
+     --   PERFORM audit_function(1); 
         RETURN NEW;
 
 
@@ -149,14 +149,14 @@ BEGIN
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id = OLD.node_id;
             
-        PERFORM audit_function(2); 
+      --  PERFORM audit_function(2); 
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
 
         DELETE FROM node WHERE node_id = OLD.node_id;
-            PERFORM audit_function(3); 
+      --      PERFORM audit_function(3); 
         RETURN NULL;
    
     END IF;

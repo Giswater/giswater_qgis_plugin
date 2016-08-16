@@ -490,6 +490,18 @@ CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "SCHEMA_NAME"."inp_giswater_config" (
+"id" varchar(16) NOT NULL,
+"giswater_file_path" text,
+"giswater_software_path" text,
+"inp_file_path" text,
+"rpt_file_path" text,
+"rpt_result_id" text,
+CONSTRAINT inp_giswater_conf PRIMARY KEY (id)
+);
+
+
+
 
 CREATE TABLE "SCHEMA_NAME"."inp_adjustments" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".inp_adjustments_seq'::regclass) NOT NULL,
@@ -1379,9 +1391,6 @@ CREATE TABLE "SCHEMA_NAME"."inp_value_yesno" (
 
 
 
-
-
-
 -- ----------------------------
 -- Table structure RPT
 -- --------------------------
@@ -1824,6 +1833,12 @@ CREATE TABLE "SCHEMA_NAME"."rpt_selector_result" (
 ;
 
 
+CREATE TABLE "SCHEMA_NAME"."rpt_selector_compare" (
+"result_id" varchar(16)   NOT NULL
+)WITH (OIDS=FALSE)
+;
+
+
 CREATE TABLE "SCHEMA_NAME"."inp_selector_sector" (
 "sector_id" varchar(30)   NOT NULL
 )WITH (OIDS=FALSE)
@@ -1933,6 +1948,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_weir" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "SCHEMA_NAME"."inp_windspeed" ADD PRIMARY KEY ("wind_type");
 ALTER TABLE "SCHEMA_NAME"."raingage" ADD PRIMARY KEY ("rg_id");
 ALTER TABLE "SCHEMA_NAME"."rpt_selector_result" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "SCHEMA_NAME"."rpt_selector_compare" ADD PRIMARY KEY ("result_id");
 ALTER TABLE "SCHEMA_NAME"."rpt_arcflow_sum" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."rpt_condsurcharge_sum" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."rpt_continuity_errors" ADD PRIMARY KEY ("id");

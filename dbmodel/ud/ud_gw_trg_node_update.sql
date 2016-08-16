@@ -56,7 +56,7 @@ BEGIN
 					z2 = (nodeRecord2.top_elev - arcrec.y2);
 
 --					Update direction if necessary
-					IF ((z2 > z1) AND arcrec.direction = 'D') OR ((z2 < z1) AND arcrec.direction = 'I') THEN
+					IF ((z2 > z1) AND arcrec.inverted_slope is false) OR ((z2 < z1) AND arcrec.inverted_slope is true) THEN
 						EXECUTE 'UPDATE arc SET node_1 = ' || quote_literal(nodeRecord2.node_id) || ', node_2 = ' || quote_literal(NEW.node_id) || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
 						EXECUTE 'UPDATE arc SET y1 = ' || arcrec.y2 || ', y2 = ' || arcrec.y1 || ' WHERE arc_id = ' || quote_literal(arcrec."arc_id"); 
 						EXECUTE 'UPDATE arc SET the_geom = ST_reverse($1) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom;

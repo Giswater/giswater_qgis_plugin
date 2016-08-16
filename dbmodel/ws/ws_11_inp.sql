@@ -229,6 +229,18 @@ CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "SCHEMA_NAME"."inp_giswater_config" (
+"id" varchar(16) NOT NULL,
+"giswater_file_path" text,
+"giswater_software_path" text,
+"inp_file_path" text,
+"rpt_file_path" text,
+"rpt_result_id" text,
+CONSTRAINT inp_giswater_config_pkey PRIMARY KEY (id)
+);
+
+
+
 CREATE TABLE "SCHEMA_NAME"."inp_backdrop" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_backdrop_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
@@ -245,7 +257,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_curve" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_id_seq'::regclass) NOT NULL,
 "curve_id" varchar(16)   NOT NULL,
 "x_value" numeric(12,4),
-"y_value" numeric(12,4)
+"y_value" numeric(12,4),
+CONSTRAINT inp_curve_pkey PRIMARY KEY (id)
 );
 
 
@@ -809,6 +822,10 @@ CREATE TABLE "SCHEMA_NAME"."rpt_selector_result" (
 )WITH (OIDS=FALSE)
 ;
 
+CREATE TABLE "SCHEMA_NAME"."rpt_selector_compare" (
+"result_id" varchar(16)   NOT NULL
+)WITH (OIDS=FALSE)
+;
 
 CREATE TABLE "SCHEMA_NAME"."inp_selector_sector" (
 "sector_id" varchar(30)   NOT NULL
@@ -830,7 +847,6 @@ CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
 
 ALTER TABLE "SCHEMA_NAME"."inp_backdrop" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_controls" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD PRIMARY KEY ("id");	
 ALTER TABLE "SCHEMA_NAME"."inp_curve_id" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_demand" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_emitter" ADD PRIMARY KEY ("node_id");
@@ -872,6 +888,7 @@ ALTER TABLE "SCHEMA_NAME"."inp_value_yesno" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_value_yesnofull" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."inp_valve" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "SCHEMA_NAME"."rpt_selector_result" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "SCHEMA_NAME"."rpt_selector_compare" ADD PRIMARY KEY ("result_id");
 ALTER TABLE "SCHEMA_NAME"."rpt_cat_result" ADD PRIMARY KEY ("result_id");
 ALTER TABLE "SCHEMA_NAME"."rpt_arc" ADD PRIMARY KEY ("id");
 ALTER TABLE "SCHEMA_NAME"."rpt_energy_usage" ADD PRIMARY KEY ("id");

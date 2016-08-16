@@ -1,0 +1,584 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
+
+---------------------------------------------------------------
+-- SPECIFIC SQL (UD)
+---------------------------------------------------------------
+
+
+
+CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc1" AS 
+SELECT
+	cat_arc.id,
+	cat_arc.geom1,
+	cat_arc.z1,
+	cat_arc.z2,
+	cat_arc.width,
+	cat_arc.area,
+	cat_arc.bulk,
+	cat_arc.estimated_depth,
+	cat_arc.cost_unit,
+	v_price_compost.price AS cost
+FROM ("SCHEMA_NAME".cat_arc
+JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."cost")::text = (v_price_compost.id)::text)));
+
+
+CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc2" AS 
+SELECT
+	cat_arc.id,
+	v_price_compost.price AS m2bottom_cost
+FROM ("SCHEMA_NAME".cat_arc
+JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."m2bottom_cost")::text = (v_price_compost.id)::text)));
+
+
+CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc3" AS 
+SELECT
+	cat_arc.id,
+	v_price_compost.price AS m3protec_cost
+FROM ("SCHEMA_NAME".cat_arc
+JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."m3protec_cost")::text = (v_price_compost.id)::text)));
+
+
+CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc" AS 
+SELECT
+	v_price_x_catarc1.id,
+	v_price_x_catarc1.geom1,
+	v_price_x_catarc1.z1,
+	v_price_x_catarc1.z2,
+	v_price_x_catarc1.width,
+	v_price_x_catarc1.area,
+	v_price_x_catarc1.bulk,
+	v_price_x_catarc1.estimated_depth,
+	v_price_x_catarc1.cost_unit,
+	v_price_x_catarc1.cost,
+	v_price_x_catarc2.m2bottom_cost,
+	v_price_x_catarc3.m3protec_cost
+FROM ("SCHEMA_NAME".v_price_x_catarc1
+JOIN "SCHEMA_NAME".v_price_x_catarc2 ON ((("SCHEMA_NAME".v_price_x_catarc2.id)::text = ("SCHEMA_NAME".v_price_x_catarc1.id)::text))
+JOIN "SCHEMA_NAME".v_price_x_catarc3 ON ((("SCHEMA_NAME".v_price_x_catarc3.id)::text = ("SCHEMA_NAME".v_price_x_catarc1.id)::text))
+);
+
+
+CREATE VIEW "SCHEMA_NAME"."v_price_x_catpavement" AS 
+SELECT
+	cat_pavement.id AS pavcat_id,
+	cat_pavement.thickness,
+	v_price_compost.price AS m2pav_cost
+FROM ("SCHEMA_NAME".cat_pavement
+JOIN "SCHEMA_NAME".v_price_compost ON (((cat_pavement."m2_cost")::text = (v_price_compost.id)::text)));
+
+
+CREATE VIEW "SCHEMA_NAME"."v_price_x_catnode" AS 
+SELECT
+	cat_node.id,
+	cat_node.estimated_y,
+	cat_node.cost_unit,
+	v_price_compost.price AS cost
+FROM ("SCHEMA_NAME".cat_node
+JOIN "SCHEMA_NAME".v_price_compost ON (((cat_node."cost")::text = (v_price_compost.id)::text)));
+
+
+
+
+
+-- ----------------------------
+-- View structure for v_plan_ml_arc
+-- ----------------------------
+
+CREATE VIEW "SCHEMA_NAME"."v_plan_ml_arc" AS 
+SELECT 
+arc.arc_id,
+v_arc_x_node.y1,
+v_arc_x_node.y2,
+(CASE WHEN (v_arc_x_node.y1*v_arc_x_node.y2 =0::numeric) THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc_x_node.y1+v_arc_x_node.y2)/2)::numeric(12,2) END) AS mean_y,
+arc.arccat_id,
+v_price_x_catarc.geom1,
+v_price_x_catarc.z1,
+v_price_x_catarc.z2,
+v_price_x_catarc.area,
+v_price_x_catarc.width,
+v_price_x_catarc.bulk,
+v_price_x_catarc.cost_unit,
+(v_price_x_catarc.cost)::numeric(12,2) AS arc_cost,
+(v_price_x_catarc.m2bottom_cost)::numeric(12,2) AS m2bottom_cost,
+(v_price_x_catarc.m3protec_cost)::numeric(12,2) AS m3protec_cost,
+v_price_x_catsoil.id AS soilcat_id,
+v_price_x_catsoil.y_param,
+v_price_x_catsoil.b,
+v_price_x_catsoil.trenchlining,
+(v_price_x_catsoil.m3exc_cost)::numeric(12,2) AS m3exc_cost,
+(v_price_x_catsoil.m3fill_cost)::numeric(12,2) AS m3fill_cost,
+(v_price_x_catsoil.m3excess_cost)::numeric(12,2)AS m3excess_cost,
+(v_price_x_catsoil.m2trenchl_cost)::numeric(12,2) AS m2trenchl_cost,
+sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
+sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
+arc.state,
+arc.the_geom
+
+FROM "SCHEMA_NAME".v_arc arc
+	JOIN SCHEMA_NAME.v_arc_x_node ON ((((arc.arc_id)::text = (v_arc_x_node.arc_id)::text)))
+	JOIN SCHEMA_NAME.v_price_x_catarc ON ((((arc.arccat_id)::text = (v_price_x_catarc.id)::text)))
+	JOIN SCHEMA_NAME.v_price_x_catsoil ON ((((arc.soilcat_id)::text = (v_price_x_catsoil.id)::text)))
+	JOIN SCHEMA_NAME.plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id)::text = (arc.arc_id)::text)))
+	JOIN SCHEMA_NAME.v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id)::text = (plan_arc_x_pavement.pavcat_id)::text)))
+	GROUP BY arc.arc_id, v_arc_x_node.y1, v_arc_x_node.y2, mean_y,arc.arccat_id, v_price_x_catarc.geom1,v_price_x_catarc.z1,v_price_x_catarc.z2,v_price_x_catarc.area,v_price_x_catarc.width,v_price_x_catarc.bulk, cost_unit, arc_cost, m2bottom_cost, m3protec_cost, v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom;
+	
+
+-- ----------------------------
+-- View structure for v_plan_mlcost_arc
+-- ----------------------------
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME"."v_plan_mlcost_arc" AS 
+
+SELECT
+v_plan_ml_arc.arc_id,
+v_plan_ml_arc.arccat_id,
+v_plan_ml_arc.cost_unit,
+v_plan_ml_arc.arc_cost,
+v_plan_ml_arc.m2bottom_cost,
+v_plan_ml_arc.soilcat_id,
+v_plan_ml_arc.m3exc_cost,
+v_plan_ml_arc.m3fill_cost,
+v_plan_ml_arc.m3excess_cost,
+v_plan_ml_arc.m3protec_cost,
+v_plan_ml_arc.m2trenchl_cost,
+v_plan_ml_arc.m2pav_cost,
+
+(2*((v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)::numeric(12,3)							AS m2mlpavement,
+
+((2*v_plan_ml_arc.b)+(v_plan_ml_arc.width))::numeric(12,3)  																												AS m2mlbase,
+
+(v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)::numeric(12,3)																		AS calculed_y,
+
+((v_plan_ml_arc.trenchlining)*2*(v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness))::numeric(12,3)										AS m2mltrenchl,
+
+((v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)																																								
+*((2*((v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+									
+v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)::numeric(12,3)																													AS m3mlexc,
+
+((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
+*(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
++(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)
+- v_plan_ml_arc.area)::numeric(12,3)																																		AS m3mlprotec,
+
+(((v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)																																								
+*((2*((v_plan_ml_arc.mean_y+v_plan_ml_arc.z1+v_plan_ml_arc.bulk-v_plan_ml_arc.thickness)/v_plan_ml_arc.y_param)+(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+								
+v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)
+-((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
+*(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)		
++(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2)))::numeric(12,3)																	AS m3mlfill,
+
+((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)																	
+*(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
++(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2))::numeric(12,3)																		AS m3mlexcess
+
+FROM "SCHEMA_NAME".v_plan_ml_arc;
+
+
+-- ----------------------------
+-- View structure for v_plan_cost_arc
+-- ----------------------------
+
+CREATE VIEW "SCHEMA_NAME"."v_plan_cost_arc" AS 
+SELECT
+v_plan_ml_arc.arc_id,
+v_plan_ml_arc.arccat_id,
+v_plan_ml_arc.soilcat_id,
+v_plan_ml_arc.y1,
+v_plan_ml_arc.y2,
+v_plan_ml_arc.mean_y,
+v_plan_ml_arc.z1,
+v_plan_ml_arc.z2,
+v_plan_ml_arc.thickness,
+v_plan_ml_arc.width,
+v_plan_ml_arc.b,
+v_plan_ml_arc.bulk,
+v_plan_ml_arc.geom1,
+v_plan_ml_arc.area,
+v_plan_ml_arc.y_param,
+
+v_plan_mlcost_arc.calculed_y,
+v_plan_mlcost_arc.m3mlexc,
+v_plan_mlcost_arc.m2mltrenchl,
+v_plan_mlcost_arc.m2mlbase AS m2mlbottom,
+v_plan_mlcost_arc.m2mlpavement AS m2mlpav,
+v_plan_mlcost_arc.m3mlprotec,
+v_plan_mlcost_arc.m3mlfill,
+v_plan_mlcost_arc.m3mlexcess,
+
+v_plan_mlcost_arc.m3exc_cost,
+v_plan_mlcost_arc.m2trenchl_cost,
+v_plan_mlcost_arc.m2bottom_cost,
+v_plan_mlcost_arc.m2pav_cost,
+v_plan_mlcost_arc.m3protec_cost,
+v_plan_mlcost_arc.m3fill_cost,
+v_plan_mlcost_arc.m3excess_cost,
+v_plan_ml_arc.cost_unit,
+
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost) END)::numeric(12,3) 	AS pav_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost) END)::numeric(12,3) 		AS exc_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost) END)::numeric(12,3)	AS trenchl_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost)END)::numeric(12,3) 		AS base_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost) END)::numeric(12,3) 	AS protec_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost) END)::numeric(12,3) 		AS fill_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost) END)::numeric(12,3) 	AS excess_cost,
+(v_plan_mlcost_arc.arc_cost)::numeric(12,3)									AS arc_cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN v_plan_ml_arc.arc_cost ELSE
+(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
++ v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
++ v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
++ v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost
++ v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
++ v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
++ v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
++ v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost
+
+FROM "SCHEMA_NAME".v_plan_ml_arc
+	JOIN SCHEMA_NAME.v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
+	JOIN SCHEMA_NAME.plan_selector_economic ON (((v_plan_ml_arc."state")::text = (plan_selector_economic.id)::text));
+
+
+
+-- ----------------------------
+-- View structure for v_plan_arc
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_plan_arc" AS 
+SELECT
+v_plan_ml_arc.arc_id,
+v_plan_ml_arc.arccat_id,
+v_plan_ml_arc.cost_unit,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN v_plan_ml_arc.arc_cost ELSE
+(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
++ v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
++ v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
++ v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost
++ v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
++ v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
++ v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
++ v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE (st_length2d(v_plan_ml_arc.the_geom)) END)::numeric(12,2)							AS length,
+(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN v_plan_ml_arc.arc_cost ELSE((st_length2d(v_plan_ml_arc.the_geom))::numeric(12,2)*
+(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
++ v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
++ v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
++ v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost
++ v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
++ v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
++ v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
++ v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
+v_plan_ml_arc."state",
+v_plan_ml_arc.the_geom
+
+FROM "SCHEMA_NAME".v_plan_ml_arc
+	JOIN SCHEMA_NAME.v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
+	JOIN SCHEMA_NAME.plan_selector_economic ON (((v_plan_ml_arc."state")::text = (plan_selector_economic.id)::text));
+
+
+
+-- ----------------------------
+-- View structure for v_plan_node
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_plan_node" AS 
+SELECT
+
+node.node_id,
+node.node_type,
+node.ymax,
+v_price_x_catnode.cost_unit,
+(CASE WHEN (v_price_x_catnode.cost_unit='ut'::text) THEN NULL ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)END)) END)::numeric(12,2) AS calculated_depth,
+v_price_x_catnode.cost,
+(CASE WHEN (v_price_x_catnode.cost_unit='ut'::text) THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
+node."state",
+node.the_geom
+
+FROM (SCHEMA_NAME.v_node node
+JOIN SCHEMA_NAME.v_price_x_catnode ON ((((node.node_type)::text = (v_price_x_catnode.id)::text))))
+JOIN SCHEMA_NAME.plan_selector_economic ON (((node."state")::text = (plan_selector_economic.id)::text));
+
+
+
+-- ----------------------------
+-- View structure for v_plan_arc_x_psector
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_plan_arc_x_psector" AS 
+SELECT
+
+arc.arc_id,
+arc.arccat_id,
+v_plan_arc.cost_unit,
+(v_plan_arc.cost)::numeric (14,2) AS cost,
+v_plan_arc.length,
+v_plan_arc.budget,
+plan_arc_x_psector.psector_id,
+arc."state",
+plan_arc_x_psector.atlas_id,
+arc.the_geom
+
+FROM (((SCHEMA_NAME.arc 
+JOIN SCHEMA_NAME.cat_arc ON ((((arc.arccat_id)::text = (cat_arc.id)::text))))
+JOIN SCHEMA_NAME.plan_arc_x_psector ON ((((plan_arc_x_psector.arc_id)::text = (arc.arc_id)::text))))
+JOIN SCHEMA_NAME.v_plan_arc ON ((((arc.arc_id)::text = (v_plan_arc.arc_id)::text))))
+ORDER BY arccat_id;
+
+
+-- ----------------------------
+-- View structure for v_plan_node_x_psector
+-- ----------------------------
+CREATE VIEW "SCHEMA_NAME"."v_plan_node_x_psector" AS 
+SELECT
+
+node.node_id,
+node.node_type,
+plan_node_x_psector.descript,
+(v_price_x_catnode.cost)::numeric(12,2) AS budget,
+plan_node_x_psector.psector_id,
+node."state",
+plan_node_x_psector.atlas_id,
+node.the_geom
+
+FROM ((SCHEMA_NAME.node 
+JOIN SCHEMA_NAME.v_price_x_catnode ON ((((node.node_type)::text = (v_price_x_catnode.id)::text))))
+JOIN SCHEMA_NAME.plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text))))
+ORDER BY node_type;
+
+
+-- ----------------------------
+-- View structure for v_plan_psector_arc
+-- ----------------------------
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_psector_arc" CASCADE;
+
+CREATE VIEW "SCHEMA_NAME"."v_plan_psector_arc" AS 
+SELECT 
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+sum(v_plan_arc.budget::numeric(14,2)) AS pem,
+plan_psector.gexpenses,
+(((100+plan_psector.gexpenses)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pec,
+plan_psector.vat,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pec_vat,
+plan_psector.other,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pca,
+plan_psector.the_geom
+
+FROM (((((SCHEMA_NAME.plan_psector
+JOIN SCHEMA_NAME.plan_arc_x_psector ON (plan_arc_x_psector.psector_id)::text = (plan_psector.psector_id)::text))
+JOIN SCHEMA_NAME.v_plan_arc ON ((v_plan_arc.arc_id)::text) = ((plan_arc_x_psector.arc_id)::text))
+JOIN SCHEMA_NAME.arc ON ((arc.arc_id)::text) = ((plan_arc_x_psector.arc_id)::text)))
+
+GROUP BY
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.the_geom,
+plan_psector.gexpenses,
+plan_psector.vat,
+plan_psector.other;
+
+
+
+-- ----------------------------
+-- View structure for v_plan_psector_node
+-- ----------------------------
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_psector_node" CASCADE;
+CREATE VIEW "SCHEMA_NAME"."v_plan_psector_node" AS 
+SELECT 
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+sum(v_plan_node.budget::numeric(14,2)) AS pem,
+plan_psector.gexpenses,
+(((100+plan_psector.gexpenses)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pec,
+plan_psector.vat,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pec_vat,
+plan_psector.other,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pca,
+plan_psector.the_geom
+
+FROM (((((SCHEMA_NAME.plan_psector
+JOIN SCHEMA_NAME.plan_node_x_psector ON (plan_node_x_psector.psector_id)::text = (plan_psector.psector_id)::text))
+JOIN SCHEMA_NAME.v_plan_node ON ((v_plan_node.node_id)::text) = ((plan_node_x_psector.node_id)::text))
+JOIN SCHEMA_NAME.node ON ((node.node_id)::text) = ((plan_node_x_psector.node_id)::text)))
+
+GROUP BY
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.the_geom,
+plan_psector.gexpenses,
+plan_psector.vat,
+plan_psector.other;
+
+
+
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_other_x_psector";
+
+CREATE VIEW "SCHEMA_NAME"."v_plan_other_x_psector" AS 
+SELECT
+plan_other_x_psector.id,
+plan_other_x_psector.psector_id,
+v_price_compost.id AS price_id,
+v_price_compost.descript,
+v_price_compost.price,
+plan_other_x_psector.measurement,
+(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget
+
+FROM (SCHEMA_NAME.plan_other_x_psector 
+JOIN SCHEMA_NAME.v_price_compost ON ((((v_price_compost.id)::text = (plan_other_x_psector.price_id)::text))))
+ORDER BY psector_id;
+
+
+DROP VIEW IF EXISTS  "SCHEMA_NAME"."v_plan_psector_other";
+
+CREATE VIEW "SCHEMA_NAME"."v_plan_psector_other" AS 
+SELECT 
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+sum(v_plan_other_x_psector.budget::numeric(14,2)) AS pem,
+plan_psector.gexpenses,
+(((100+plan_psector.gexpenses)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pec,
+plan_psector.vat,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pec_vat,
+plan_psector.other,
+(((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pca,
+plan_psector.the_geom
+
+FROM (((SCHEMA_NAME.plan_psector
+JOIN SCHEMA_NAME.v_plan_other_x_psector  ON (v_plan_other_x_psector.psector_id)::text = (plan_psector.psector_id)::text)))
+
+GROUP BY
+plan_psector.psector_id,
+plan_psector.descript,
+plan_psector.priority,
+plan_psector.text1, 
+plan_psector.text2,
+plan_psector.observ,
+plan_psector.rotation,
+plan_psector.scale,
+plan_psector.sector_id,
+plan_psector.the_geom,
+plan_psector.gexpenses,
+plan_psector.vat,
+plan_psector.other;
+
+
+ CREATE OR REPLACE VIEW SCHEMA_NAME.v_plan_psector AS 
+ SELECT wtotal.psector_id,
+	sum(wtotal.pem::numeric(12,2)) AS pem,
+    sum(wtotal.pec::numeric(12,2)) AS pec,
+	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
+    sum(wtotal.pca::numeric(12,2)) AS pca,
+    wtotal.the_geom
+   FROM (         SELECT v_plan_psector_arc.psector_id,
+					v_plan_psector_arc.pem,
+                    v_plan_psector_arc.pec,
+					v_plan_psector_arc.pec_vat,
+                    v_plan_psector_arc.pca,
+                    v_plan_psector_arc.the_geom
+                   FROM SCHEMA_NAME.v_plan_psector_arc
+        UNION
+                 SELECT v_plan_psector_node.psector_id,
+					v_plan_psector_node.pem,
+                    v_plan_psector_node.pec,
+					v_plan_psector_node.pec_vat,
+                    v_plan_psector_node.pca,
+                    v_plan_psector_node.the_geom
+                   FROM SCHEMA_NAME.v_plan_psector_node
+		UNION
+                 SELECT v_plan_psector_other.psector_id,
+					v_plan_psector_other.pem,
+                    v_plan_psector_other.pec,
+					v_plan_psector_other.pec_vat,
+                    v_plan_psector_other.pca,
+                    v_plan_psector_other.the_geom
+                   FROM SCHEMA_NAME.v_plan_psector_other) wtotal	  
+				   
+				GROUP BY wtotal.psector_id, wtotal.the_geom;
+
+
+				
+				
+ CREATE OR REPLACE VIEW "SCHEMA_NAME".v_plan_psector_filtered AS 
+ SELECT wtotal.psector_id,
+	sum(wtotal.pem::numeric(12,2)) AS pem,
+    sum(wtotal.pec::numeric(12,2)) AS pec,
+	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
+    sum(wtotal.pca::numeric(12,2)) AS pca,
+    wtotal.the_geom
+   FROM (         SELECT v_plan_psector_arc.psector_id,
+					v_plan_psector_arc.pem,
+                    v_plan_psector_arc.pec,
+					v_plan_psector_arc.pec_vat,
+                    v_plan_psector_arc.pca,
+                    v_plan_psector_arc.the_geom
+                   FROM "SCHEMA_NAME".v_plan_psector_arc
+				   JOIN "SCHEMA_NAME".plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_arc.psector_id)::text
+        UNION
+                 SELECT v_plan_psector_node.psector_id,
+					v_plan_psector_node.pem,
+                    v_plan_psector_node.pec,
+					v_plan_psector_node.pec_vat,
+                    v_plan_psector_node.pca,
+                    v_plan_psector_node.the_geom
+                   FROM "SCHEMA_NAME".v_plan_psector_node
+				   JOIN "SCHEMA_NAME".plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_node.psector_id)::text
+		UNION
+                 SELECT v_plan_psector_other.psector_id,
+					v_plan_psector_other.pem,
+                    v_plan_psector_other.pec,
+					v_plan_psector_other.pec_vat,
+                    v_plan_psector_other.pca,
+                    v_plan_psector_other.the_geom
+                   FROM "SCHEMA_NAME".v_plan_psector_other
+                   JOIN "SCHEMA_NAME".plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_other.psector_id)::text) wtotal
+				   
+				   
+				GROUP BY wtotal.psector_id, wtotal.the_geom;
+  
+
+
+

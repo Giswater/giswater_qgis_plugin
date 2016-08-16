@@ -26,6 +26,13 @@ INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('NOT DEFINED');
 
 
 -- ----------------------------
+-- Records of inp_giswater_config
+-- ----------------------------
+ 
+INSERT INTO "SCHEMA_NAME"."inp_giswater_config" VALUES ('01',null,null,null,null,null);
+
+
+-- ----------------------------
 -- Records of inp_typevalue_energy
 -- ----------------------------
  

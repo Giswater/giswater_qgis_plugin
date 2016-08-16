@@ -56,7 +56,7 @@ BEGIN
 			z2 := NEW.y2;	
 		END IF;
 
-		IF ((z1 > z2) AND NEW.direction = 'D') OR ((z1 < z2) AND NEW.direction = 'I') THEN
+		IF ((z1 > z2) AND NEW.inverted_slope is false) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
 
 			NEW.node_1 := nodeRecord1.node_id; 
 			NEW.node_2 := nodeRecord2.node_id;
@@ -85,7 +85,7 @@ $$;
 
 
 
-CREATE TRIGGER gw_trg_arc_searchnodes_insert BEFORE INSERT ON "SCHEMA_NAME"."arc" 
+CREATE TRIGGER gw_trg_arc_searchnodes BEFORE INSERT OR UPDATE ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
 
 

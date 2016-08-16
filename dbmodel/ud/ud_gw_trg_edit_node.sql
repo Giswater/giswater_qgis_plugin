@@ -41,8 +41,8 @@ BEGIN
 		NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;        
         END IF;
 
-        -- Arc catalog ID
-        IF (NEW.arccat_id IS NULL) THEN
+        -- Node catalog ID
+        IF (NEW.nodecat_id IS NULL) THEN
                 RAISE EXCEPTION 'Please, define node_catalog.';
         END IF;
 

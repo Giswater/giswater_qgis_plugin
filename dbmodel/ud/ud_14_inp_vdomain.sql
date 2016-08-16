@@ -30,6 +30,14 @@ INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('OUTFALL');
 INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('DIVIDER');
 INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('STORAGE');
 INSERT INTO "SCHEMA_NAME"."inp_node_type" VALUES ('NOT DEFINED');
+
+
+-- ----------------------------
+-- Records of inp_giswater_config
+-- ----------------------------
+ 
+INSERT INTO "SCHEMA_NAME"."inp_giswater_config" VALUES ('01',null,null,null,null,null);
+
  
 
 -- ----------------------------
@@ -407,6 +415,3 @@ INSERT INTO "SCHEMA_NAME"."inp_value_weirs" VALUES ('V-NOTCH', 'TRIANGULAR');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesno" VALUES ('NO');
 INSERT INTO "SCHEMA_NAME"."inp_value_yesno" VALUES ('YES');
  
-
- 
-

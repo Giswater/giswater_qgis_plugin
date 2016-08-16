@@ -50,20 +50,20 @@ CONSTRAINT cat_tag_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."doc" (
-"id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_seq'::regclass) NOT NULL,
-"doc_type" varchar(30)  ,
-"path" varchar(512)  ,
-"observ" varchar(512)  ,
-"tagcat_id" varchar(16)  ,
+"id" varchar(30) DEFAULT nextval('"SCHEMA_NAME".doc_seq'::regclass) NOT NULL,
+"doc_type" varchar(30),
+"path" varchar(512),
+"observ" varchar(512),
+"tagcat_id" varchar(16),
 "date" timestamp(6) DEFAULT now(),
-"user" varchar(16)  ,
+"user" varchar(16) DEFAULT user,
 CONSTRAINT doc_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."doc_x_node" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_node_seq'::regclass) NOT NULL,
-"doc_id" int8,
+"doc_id" varchar(30),
 "node_id" varchar(16)  ,
 CONSTRAINT doc_x_node_pkey PRIMARY KEY (id)
 );
@@ -71,7 +71,7 @@ CONSTRAINT doc_x_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."doc_x_arc" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_arc_seq'::regclass) NOT NULL,
-"doc_id" int8,
+"doc_id" varchar(30),
 "arc_id" varchar(16)  ,
 CONSTRAINT doc_x_arc_pkey PRIMARY KEY (id)
 );
@@ -79,7 +79,7 @@ CONSTRAINT doc_x_arc_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."doc_x_connec" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".doc_x_connec_seq'::regclass) NOT NULL,
-"doc_id" int8,
+"doc_id" varchar(30),
 "connec_id" varchar(16)  ,
 CONSTRAINT doc_x_connec_pkey PRIMARY KEY (id)
 );
