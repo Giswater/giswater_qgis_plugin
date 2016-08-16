@@ -9,29 +9,29 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Records of event event_type table
 -- ----------------------------
-INSERT INTO event_type VALUES ('INSPECTION', '');
-INSERT INTO event_type VALUES ('REPAIR', '');
-INSERT INTO event_type VALUES ('RECONSTRUCT', '');
-INSERT INTO event_type VALUES ('OTHER', '');
+INSERT INTO event_type VALUES ('INSPECCIO', '');
+INSERT INTO event_type VALUES ('REPARACIO', '');
+INSERT INTO event_type VALUES ('RECONSTRUIR', '');
+INSERT INTO event_type VALUES ('ALTRES', '');
 
 
 -- ----------------------------
 -- Records of event event_parameter table
 -- ----------------------------
-INSERT INTO event_parameter VALUES ('insp_node_p1','INSPECTION','NODE', 'TEXT', 'Inspection node parameter 1');
-INSERT INTO event_parameter VALUES ('insp_arc_p1','INSPECTION','ARC', 'TEXT', 'Inspection arc parameter 1');
-INSERT INTO event_parameter VALUES ('insp_element_p1','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 1');
-INSERT INTO event_parameter VALUES ('insp_node_p2','INSPECTION','NODE', 'TEXT', 'Inspection node parameter 2');
-INSERT INTO event_parameter VALUES ('insp_arc_p2','INSPECTION','ARC', 'TEXT', 'Inspection arc parameter 2');
-INSERT INTO event_parameter VALUES ('insp_element_p2','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 2');
-INSERT INTO event_parameter VALUES ('insp_node_p3','INSPECTION','NODE', 'TEXT', 'Inspection node parameter 3');
-INSERT INTO event_parameter VALUES ('insp_arc_p3','INSPECTION','ARC', 'TEXT', 'Inspection arc parameter 3');
-INSERT INTO event_parameter VALUES ('insp_element_p3','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 3');
-INSERT INTO event_parameter VALUES ('insp_connec_p1','INSPECTION','CONNEC', 'TEXT', 'Inspection connec parameter 1');
-INSERT INTO event_parameter VALUES ('insp_connec_p2','INSPECTION','CONNEC', 'TEXT', 'Inspection connec parameter 2');
+INSERT INTO event_parameter VALUES ('insp_node_p1','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 1');
+INSERT INTO event_parameter VALUES ('insp_arc_p1','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 1');
+INSERT INTO event_parameter VALUES ('insp_element_p1','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 1');
+INSERT INTO event_parameter VALUES ('insp_node_p2','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 2');
+INSERT INTO event_parameter VALUES ('insp_arc_p2','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 2');
+INSERT INTO event_parameter VALUES ('insp_element_p2','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 2');
+INSERT INTO event_parameter VALUES ('insp_node_p3','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 3');
+INSERT INTO event_parameter VALUES ('insp_arc_p3','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 3');
+INSERT INTO event_parameter VALUES ('insp_element_p3','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 3');
+INSERT INTO event_parameter VALUES ('insp_connec_p1','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio de l''escomesa parametre 1');
+INSERT INTO event_parameter VALUES ('insp_connec_p2','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio de l''escomesa parametre 2');
 
 -- ----------------------------
 -- Records of event event_position table
 -- ----------------------------
-INSERT INTO event_position VALUES ('bottom', 'NODE', 'description');
-INSERT INTO event_position VALUES ('top', 'NODE', 'description');
+INSERT INTO event_position VALUES ('inferior', 'NODE', 'descripcio');
+INSERT INTO event_position VALUES ('superior', 'NODE', 'descripcio');

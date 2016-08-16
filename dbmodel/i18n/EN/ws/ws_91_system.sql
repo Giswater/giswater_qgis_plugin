@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------

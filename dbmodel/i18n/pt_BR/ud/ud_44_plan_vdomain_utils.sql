@@ -5,24 +5,22 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
 -- ----------------------------
 -- Records of price_value_unit
 -- ----------------------------
-INSERT INTO price_value_unit VALUES ('m3');
-INSERT INTO price_value_unit VALUES ('m2');
-INSERT INTO price_value_unit VALUES ('ml');
-INSERT INTO price_value_unit VALUES ('pa');
-INSERT INTO price_value_unit VALUES ('ut');
+INSERT INTO "price_value_unit" VALUES ('m3');
+INSERT INTO "price_value_unit" VALUES ('m2');
+INSERT INTO "price_value_unit" VALUES ('ml');
+INSERT INTO "price_value_unit" VALUES ('pa');
+INSERT INTO "price_value_unit" VALUES ('ut');
+
 
 
 -- ----------------------------
 -- Records of plan_value_ps_priority
 -- ----------------------------
-INSERT INTO plan_value_ps_priority VALUES ('PRIORITAT_ALTA');
-INSERT INTO plan_value_ps_priority VALUES ('PRIORITAT_NORMAL');
-INSERT INTO plan_value_ps_priority VALUES ('PRIORITAT_BAIXA');
-
+INSERT INTO "plan_value_ps_priority" VALUES ('PRIORITAT_ALTA');
+INSERT INTO "plan_value_ps_priority" VALUES ('PRIORITAT_NORMAL');
+INSERT INTO "plan_value_ps_priority" VALUES ('PRIORITAT_BAIXA');
 
 
