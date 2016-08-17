@@ -113,6 +113,7 @@ class NodeDialog(ParentDialog):
         self.tab_main.removeTab(7)      
         self.tab_main.removeTab(2) 
         
+   
         # Hide some tabs depending 'epa_type'
         man_visible = False
         index_tab = 0      
@@ -1183,5 +1184,7 @@ class NodeDialog(ParentDialog):
             self.model_elem.setRequest(request)
             self.model_elem.loadLayer()
             self.tbl_log_element.setModel(self.model_elem)
+            
+   
             
         

@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>845</width>
-    <height>615</height>
+    <height>585</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>845</width>
-    <height>615</height>
+    <height>585</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>845</width>
-    <height>615</height>
+    <height>585</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -38,13 +38,13 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
      <string>Feature</string>
     </attribute>
-    <widget class="QComboBox" name="location_type">
+    <widget class="QComboBox" name="comboBox_14">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -204,7 +204,7 @@
     <widget class="QLabel" name="label_soilcat_id">
      <property name="geometry">
       <rect>
-       <x>414</x>
+       <x>415</x>
        <y>10</y>
        <width>90</width>
        <height>22</height>
@@ -237,7 +237,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="adress_02">
+    <widget class="QLineEdit" name="lineEdit_32">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -319,7 +319,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="adress_01">
+    <widget class="QLineEdit" name="lineEdit_33">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -365,7 +365,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="ymax">
+    <widget class="QLineEdit" name="lineEdit_3">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -375,7 +375,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_addres_01">
+    <widget class="QLabel" name="label_address_01">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -411,7 +411,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="category_type">
+    <widget class="QComboBox" name="comboBox_18">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -517,7 +517,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="top_elev">
+    <widget class="QLineEdit" name="lineEdit_2">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -527,7 +527,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="fluid_type">
+    <widget class="QComboBox" name="comboBox_15">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -573,7 +573,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="buildercat_id">
+    <widget class="QComboBox" name="comboBox_17">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -583,7 +583,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="soilcat_id">
+    <widget class="QComboBox" name="comboBox_20">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -593,7 +593,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="state">
+    <widget class="QComboBox" name="comboBox_3">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -603,7 +603,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="dma_id">
+    <widget class="QComboBox" name="comboBox_13">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -649,7 +649,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_builtdate">
+    <widget class="QLabel" name="label_13">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -721,7 +721,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="sector_id">
+    <widget class="QComboBox" name="comboBox_2">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -731,7 +731,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="adress_03">
+    <widget class="QLineEdit" name="lineEdit_29">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -754,7 +754,7 @@
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
-    <widget class="QTextEdit" name="comment">
+    <widget class="QTextEdit" name="textEdit_3">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -800,7 +800,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="observ">
+    <widget class="QTextEdit" name="textEdit_2">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -810,7 +810,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="link">
+    <widget class="QTextEdit" name="textEdit_5">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -820,7 +820,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="descript">
+    <widget class="QTextEdit" name="textEdit_4">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -902,7 +902,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="annotation">
+    <widget class="QTextEdit" name="textEdit">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -984,7 +984,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="workcat_id">
+    <widget class="QComboBox" name="comboBox_4">
      <property name="geometry">
       <rect>
        <x>120</x>
@@ -1007,7 +1007,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="ownercat_id">
+    <widget class="QComboBox" name="comboBox_16">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -1018,16 +1018,33 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_6">
+   <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>Document</string>
+     <string>Add info</string>
     </attribute>
-    <widget class="QLabel" name="label_doc_to">
+    <widget class="QTextEdit" name="element">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>35</y>
-       <width>31</width>
+       <x>20</x>
+       <y>90</y>
+       <width>771</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;element.element_id, cat_element.type, cat_element.id, element.builtdate, element.state,  element.enddate,  element.annotation,  element.link&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_elements">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>90</width>
        <height>22</height>
       </rect>
      </property>
@@ -1040,10 +1057,10 @@
       <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>to</string>
+      <string>Elements:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -1052,13 +1069,61 @@
       <bool>false</bool>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <property name="margin">
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_doc_tag">
+   </widget>
+   <widget class="QWidget" name="tab_7">
+    <attribute name="title">
+     <string>Document</string>
+    </attribute>
+    <widget class="QDateEdit" name="date_document_to">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tableWidget_12">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="Line" name="line_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>105</y>
+       <width>761</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_tag">
      <property name="geometry">
       <rect>
        <x>500</x>
@@ -1094,105 +1159,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="Line" name="line_6">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>105</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_doc_user">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>70</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>User</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="date_document_from">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="doc_event">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="date_document_to">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2017</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QComboBox" name="doc_tag">
      <property name="geometry">
       <rect>
@@ -1201,62 +1167,6 @@
        <width>111</width>
        <height>20</height>
       </rect>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_12">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="doc_user">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_doc_type">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>70</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>Type</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_document">
@@ -1295,127 +1205,7 @@
       <number>3</number>
      </property>
     </widget>
-   </widget>
-   <widget class="QWidget" name="tab_10">
-    <attribute name="title">
-     <string>Event</string>
-    </attribute>
-    <widget class="QTableWidget" name="tableWidget_19">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="event_eventcat_id">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_event_user">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>70</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>User</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_event">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>125</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Event:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="Line" name="line_13">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>105</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="event_user">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_event_event">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1451,6 +1241,447 @@
       <number>3</number>
      </property>
     </widget>
+    <widget class="QLabel" name="label_to">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>35</y>
+       <width>31</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>to</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_user">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>User</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="doc_user">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="doc_event">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="date_document_from">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_9">
+    <attribute name="title">
+     <string>Picture</string>
+    </attribute>
+    <widget class="QDateEdit" name="date_picture_from">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="Line" name="line_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>105</y>
+       <width>761</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="picture_user">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_picture">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>125</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Picture:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="picture_tag">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_user_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>User</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="date_picture_to">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_to_2">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>35</y>
+       <width>31</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>to</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tableWidget_13">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_tag_2">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>70</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>Tag</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_10">
+    <attribute name="title">
+     <string>Event</string>
+    </attribute>
+    <widget class="QComboBox" name="event_eventcat_id">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_event_3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>125</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Event:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_user_3">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>User</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tableWidget_14">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
     <widget class="QDateEdit" name="date_event_to">
      <property name="geometry">
       <rect>
@@ -1471,7 +1702,66 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_event_event_type">
+    <widget class="Line" name="line_8">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>105</y>
+       <width>761</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="event_user">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_event_2">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>70</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>Event</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_event_type">
      <property name="geometry">
       <rect>
        <x>500</x>
@@ -1507,16 +1797,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="cat_event_eventtype_id">
-     <property name="geometry">
-      <rect>
-       <x>600</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QDateEdit" name="date_event_from">
      <property name="geometry">
       <rect>
@@ -1533,11 +1813,28 @@
        <day>1</day>
       </date>
      </property>
+     <property name="time">
+      <time>
+       <hour>0</hour>
+       <minute>0</minute>
+       <second>0</second>
+      </time>
+     </property>
      <property name="calendarPopup">
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_event_to">
+    <widget class="QComboBox" name="cat_event_eventtype_id">
+     <property name="geometry">
+      <rect>
+       <x>600</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_to_3">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1574,28 +1871,44 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_9">
+   <widget class="QWidget" name="tab_11">
     <attribute name="title">
      <string>Log</string>
     </attribute>
-    <widget class="QComboBox" name="log_event_type">
+    <widget class="QLabel" name="label_to_4">
      <property name="geometry">
       <rect>
-       <x>360</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
+       <x>150</x>
+       <y>35</y>
+       <width>31</width>
+       <height>22</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QTableWidget" name="tbl_log">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>to</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_log">
@@ -1634,7 +1947,80 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_log_user">
+    <widget class="QDateEdit" name="date_log_from">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tbl_log">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="Line" name="line_9">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>105</y>
+       <width>761</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="date_log_to">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="log_user">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_user_4">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1670,30 +2056,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="Line" name="line_14">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>105</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="log_user">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_log_event_type">
+    <widget class="QLabel" name="label_event_type_2">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1729,7 +2092,127 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="date_log_from">
+    <widget class="QComboBox" name="log_event">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_12">
+    <attribute name="title">
+     <string>IPTU</string>
+    </attribute>
+    <widget class="QComboBox" name="iptu">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_iptu_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>125</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>IPTU:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="Line" name="line_13">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>105</y>
+       <width>761</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tbl_iptu">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_iptu">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>IPTU</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QDateEdit" name="date_iptu_from">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1749,27 +2232,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QDateEdit" name="date_log_to">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2017</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_log_to">
+    <widget class="QLabel" name="label_to_5">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1805,19 +2268,49 @@
       <number>3</number>
      </property>
     </widget>
+    <widget class="QDateEdit" name="date_iptu_to">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>35</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2017</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
+     </property>
+     <property name="calendarPopup">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
-  <widget class="QLineEdit" name="rotation">
+  <widget class="QLineEdit" name="lineEdit_8">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>765</x>
      <y>540</y>
      <width>65</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>rotation</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_21">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>20</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_4">
@@ -1830,7 +2323,25 @@
     </rect>
    </property>
    <property name="text">
-    <string>gully_id</string>
+    <string>connec_id</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_34">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>20</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <italic>true</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>cat_connec.matcat_id</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_38">
@@ -1849,33 +2360,15 @@
     </font>
    </property>
    <property name="text">
-    <string>cat_grate.type</string>
+    <string>cat_connec.type</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_35">
+  <widget class="QLineEdit" name="lineEdit_44">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>640</x>
      <y>20</y>
-     <width>131</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <italic>false</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>cat_grate.matcat_id</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_34">
-   <property name="geometry">
-    <rect>
-     <x>540</x>
-     <y>20</y>
-     <width>131</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -1885,55 +2378,15 @@
     </font>
    </property>
    <property name="text">
-    <string>units</string>
+    <string>cat_connec.dnom</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="verified">
+  <widget class="QLineEdit" name="lineEdit_35">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>540</y>
-     <width>151</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_22">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
+     <x>400</x>
      <y>20</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>arccat_id</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="comboBox_23">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>20</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>gratecat_id</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLineEdit" name="sandbox">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>540</y>
-     <width>131</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -1943,60 +2396,23 @@
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>arc_id</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>10</x>
      <y>540</y>
-     <width>70</width>
-     <height>17</height>
+     <width>101</width>
+     <height>20</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Groove</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="checkBox_2">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>540</y>
-     <width>70</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Siphon</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_close">
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>570</y>
-     <width>71</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Close</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>570</y>
-     <width>71</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Accept</string>
-   </property>
+   <item>
+    <property name="text">
+     <string>Verified</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>
