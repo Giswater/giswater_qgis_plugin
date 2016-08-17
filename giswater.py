@@ -30,6 +30,7 @@ from ui.table_wizard import TableWizard
 from ui.config import Config
 from ui.add_element import Add_element
 from ui.add_file import Add_file
+from ui.topology_tools import TopologyTools
 
 
 class Giswater(QObject):
@@ -57,8 +58,7 @@ class Giswater(QObject):
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+            QCoreApplication.installTranslator(self.translator)
          
         # Load local settings of the plugin
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
@@ -134,7 +134,7 @@ class Giswater(QObject):
                 action.setCheckable(is_checkable) 
                 # Define buttons to execute custom or generic function
                 # Custom function
-                if int(index_action) in (17, 20, 21, 24, 26, 27, 28) or int(index_action) >= 30:    
+                if int(index_action) in (17, 19, 20, 21, 24, 26, 27, 28) or int(index_action) >= 30:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 # Generic function
@@ -511,11 +511,12 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         
         # MG toolbar
+        self.enable_action(True, 19)   
         self.enable_action(True, 21)   
+        self.enable_action(True, 24)   
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 37)
-        self.enable_action(True, 24)   
                 
                     
     def ws_generic(self, function_name):   
@@ -612,6 +613,45 @@ class Giswater(QObject):
                               
                                   
     ''' Management bar functions '''   
+        
+    def mg_arc_topo_repair(self):
+        ''' Button 19. Topology repair '''
+
+        # Open dialog to check wich topology functions we want to execute
+        self.dlg = TopologyTools()     
+        if self.project_type == 'ws':
+            self.dlg.check_node_sink.setEnabled(False)     
+ 
+        # Set signals
+        self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+
+        self.dlg.exec_()   
+    
+    
+    def mg_arc_topo_repair_accept(self):
+        ''' Button 19. Executes functions that are selected '''
+        
+        if self.dlg.check_node_orphan.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_node_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_connec_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_arc_same_startend.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_node_sink.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
+            self.controller.execute_sql(sql) 
+            
         
     def mg_go2epa_express(self):
         ''' Button 24. Open giswater in silent mode
@@ -971,11 +1011,14 @@ class Giswater(QObject):
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
-        if dlg is None:
-            dlg = self.dlg   
-        dlg.close()    
-            
-            
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            dlg.close()
+        except AttributeError as e:
+            print "AttributeError: "+str(e)   
+
+             
     def mg_config(self):                
         ''' Button 99 - Open a dialog showing data from table "config" 
         User can changge its values '''
