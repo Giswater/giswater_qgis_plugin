@@ -1295,7 +1295,7 @@ class Giswater(QObject):
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
-        
+        print(row)
         model.setStringList(row)
         self.completer.setModel(model)
         
@@ -1308,9 +1308,31 @@ class Giswater(QObject):
         
     def ed_add_file_autocomplete(self):    
 
+        # Action on click when value is selected ( ComboBox - Qcompleter )
         # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
         self.doc_id = utils_giswater.getWidgetText("doc_id") 
+        print(self.doc_id)
+        #sql = "SELECT * FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        #row = self.dao.get_row(sql)
+        #print(row[4])
+        
+        sql = "SELECT doc_type FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_doc_type = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("doc_type", self.row_doc_type[0]) 
+        
+        sql = "SELECT tagcat_id FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_tagcat = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("tagcat_id", self.row_tagcat[0]) 
+        
+        sql = "SELECT observ FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_observ = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("observ", self.row_observ[0]) 
+        
+        sql = "SELECT path FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_path = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("link", self.row_path[0]) 
+       
         
         
     def ed_add_file_accept(self):   
@@ -1322,10 +1344,25 @@ class Giswater(QObject):
         self.observ = utils_giswater.getWidgetText("observ")
         self.link = utils_giswater.getWidgetText("link")
         
+        self.doc_id = utils_giswater.getWidgetText("doc_id")
+        sql="IF EXIST (SELECT id FROM "+self.schema_name+".doc WHERE id= '"+self.doc_id+"') BEGIN"
+        print(sql) 
+        
+        exist = cursor.fetchone()
+if exist is None:
+  #not exists
+else:
+  #exists
+        
         # Execute data to database DOC 
         sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
         sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
         self.dao.execute_sql(sql)
+        
+        # Update data base
+        sql = "UPDATE "+self.schema_name+".doc SET doc_type = '"+self.row_doc_type[0]+"', tagcat_id= '"+self.row_tagcat[0]+"',observ = '"+self.row_observ[0]+"', path = '"+self.row_path[0]+"'"
+        sql+= " WHERE id = '"+self.doc_id+"'"   
+        
         
         # Get layers
         layers = self.iface.legendInterface().layers()
