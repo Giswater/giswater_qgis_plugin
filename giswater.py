@@ -17,7 +17,6 @@ from PyQt4.QtGui import *    # @UnusedWildImport
 import os.path
 import sys  
 from functools import partial
-import subprocess
 
 import utils_giswater
 from controller import DaoController
@@ -261,8 +260,11 @@ class Giswater(QObject):
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')          
+        self.gsw_file = self.settings.value('files/gsw_file')   
                          
+        # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
+        self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
+                                 
         # Project initialization
         self.project_read()               
 
@@ -271,7 +273,7 @@ class Giswater(QObject):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         
         try:
-            for action_index, action in self.actions.iteritems():
+            for action_index, action in self.actions.iteritems():   #@UnusedVariable
                 self.iface.removePluginMenu(self.menu_name, action)
                 self.iface.removeToolBarIcon(action)
             if self.toolbar_ud_enabled:    
@@ -385,7 +387,7 @@ class Giswater(QObject):
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   
+            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   #@UnusedVariable
             if uri_table is not None:
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
@@ -426,7 +428,7 @@ class Giswater(QObject):
         self.search_project_type()
                                          
         # Set layer custom UI form and init function   
-        if self.layer_arc is not None:       
+        if self.layer_arc is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_arc_init.py')       
             self.layer_arc.editFormConfig().setUiForm(file_ui) 
@@ -434,7 +436,7 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
                                     
-        if self.layer_node is not None:       
+        if self.layer_node is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_node.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_node_init.py')       
             self.layer_node.editFormConfig().setUiForm(file_ui) 
@@ -442,7 +444,7 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')                         
                                     
-        if self.layer_connec is not None:       
+        if self.layer_connec is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_connec.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_connec_init.py')       
             self.layer_connec.editFormConfig().setUiForm(file_ui) 
@@ -489,7 +491,7 @@ class Giswater(QObject):
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        (uri_schema, uri_table) = self.get_layer_source(layer)  
+        (uri_schema, uri_table) = self.get_layer_source(layer)  #@UnusedVariable  
         if uri_table is not None:
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'
