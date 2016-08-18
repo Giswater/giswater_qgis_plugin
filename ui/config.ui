@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
-    <height>313</height>
+    <width>637</width>
+    <height>295</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QDoubleSpinBox" name="node_proximity">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>20</y>
-     <width>71</width>
+     <x>490</x>
+     <y>30</y>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
@@ -32,8 +32,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>260</y>
+     <x>440</x>
+     <y>250</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -46,7 +46,7 @@
    <property name="geometry">
     <rect>
      <x>540</x>
-     <y>260</y>
+     <y>250</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -58,9 +58,9 @@
   <widget class="QLabel" name="label_node_proximity">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>230</width>
+     <x>300</x>
+     <y>30</y>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -88,9 +88,9 @@
   <widget class="QLabel" name="label_arc_searchnodes">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>50</y>
-     <width>230</width>
+     <x>300</x>
+     <y>150</y>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -118,9 +118,9 @@
   <widget class="QLabel" name="label_node2arc">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>80</y>
-     <width>230</width>
+     <x>300</x>
+     <y>180</y>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -148,9 +148,9 @@
   <widget class="QLabel" name="label_connec_proximity">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>110</y>
-     <width>230</width>
+     <x>300</x>
+     <y>60</y>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -175,41 +175,11 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_arc_toporepair">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>140</y>
-     <width>230</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Box</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <property name="text">
-    <string>arc_toporepair</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_nodeinsert_arcendpoint">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>80</y>
+     <x>20</x>
+     <y>210</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -238,8 +208,8 @@
   <widget class="QLabel" name="label_nodeinsert_catalog_vdefault">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>260</y>
+     <x>300</x>
+     <y>210</y>
      <width>180</width>
      <height>22</height>
     </rect>
@@ -268,8 +238,8 @@
   <widget class="QLabel" name="label_orphannode_delete">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>20</y>
+     <x>20</x>
+     <y>90</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -298,9 +268,9 @@
   <widget class="QLabel" name="label_vnode_update_tolerance">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>170</y>
-     <width>230</width>
+     <x>300</x>
+     <y>90</y>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -328,8 +298,8 @@
   <widget class="QLabel" name="label_nodetype_change_enabled">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>50</y>
+     <x>20</x>
+     <y>120</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -358,9 +328,9 @@
   <widget class="QDoubleSpinBox" name="arc_searchnodes">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>50</y>
-     <width>71</width>
+     <x>490</x>
+     <y>150</y>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
@@ -374,25 +344,9 @@
   <widget class="QDoubleSpinBox" name="node2arc">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>80</y>
-     <width>71</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="decimals">
-    <number>3</number>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="arc_toporepair">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>140</y>
-     <width>71</width>
+     <x>490</x>
+     <y>180</y>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
@@ -406,9 +360,9 @@
   <widget class="QDoubleSpinBox" name="connec_proximity">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>110</y>
-     <width>71</width>
+     <x>490</x>
+     <y>60</y>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
@@ -422,9 +376,9 @@
   <widget class="QDoubleSpinBox" name="vnode_update_tolerance">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>170</y>
-     <width>71</width>
+     <x>490</x>
+     <y>90</y>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
@@ -438,8 +392,8 @@
   <widget class="QComboBox" name="nodeinsert_catalog_vdefault">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>260</y>
+     <x>490</x>
+     <y>210</y>
      <width>121</width>
      <height>22</height>
     </rect>
@@ -448,8 +402,8 @@
   <widget class="QCheckBox" name="orphannode">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>20</y>
+     <x>260</x>
+     <y>90</y>
      <width>20</width>
      <height>21</height>
     </rect>
@@ -461,8 +415,8 @@
   <widget class="QCheckBox" name="arcendpoint">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>80</y>
+     <x>260</x>
+     <y>210</y>
      <width>20</width>
      <height>21</height>
     </rect>
@@ -474,8 +428,8 @@
   <widget class="QCheckBox" name="nodetypechanged">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>50</y>
+     <x>260</x>
+     <y>120</y>
      <width>20</width>
      <height>21</height>
     </rect>
@@ -487,8 +441,8 @@
   <widget class="QCheckBox" name="samenode_init_end_control">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>110</y>
+     <x>260</x>
+     <y>180</y>
      <width>20</width>
      <height>21</height>
     </rect>
@@ -500,8 +454,8 @@
   <widget class="QLabel" name="label_samenode_init_end_control">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>110</y>
+     <x>20</x>
+     <y>180</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -530,8 +484,8 @@
   <widget class="QLabel" name="label_connec_proximity_control">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>170</y>
+     <x>20</x>
+     <y>60</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -560,8 +514,8 @@
   <widget class="QCheckBox" name="node_proximity_control">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>140</y>
+     <x>260</x>
+     <y>30</y>
      <width>20</width>
      <height>21</height>
     </rect>
@@ -573,8 +527,8 @@
   <widget class="QCheckBox" name="connec_proximity_control">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>170</y>
+     <x>260</x>
+     <y>60</y>
      <width>20</width>
      <height>21</height>
     </rect>
@@ -586,8 +540,8 @@
   <widget class="QLabel" name="label_node_proximity_control">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>140</y>
+     <x>20</x>
+     <y>30</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -616,9 +570,9 @@
   <widget class="QDoubleSpinBox" name="node_duplicated_tolerance">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>200</y>
-     <width>71</width>
+     <x>490</x>
+     <y>120</y>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
@@ -632,9 +586,9 @@
   <widget class="QLabel" name="label_node_duplicated_tolerance">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>200</y>
-     <width>230</width>
+     <x>300</x>
+     <y>120</y>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -662,8 +616,8 @@
   <widget class="QLabel" name="label_audit_function_control">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>200</y>
+     <x>20</x>
+     <y>150</y>
      <width>230</width>
      <height>22</height>
     </rect>
@@ -692,60 +646,14 @@
   <widget class="QCheckBox" name="audit_function_control">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>200</y>
+     <x>260</x>
+     <y>150</y>
      <width>20</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
     <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_connec_duplicated_tolerance">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>230</y>
-     <width>230</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Box</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <property name="text">
-    <string>connec_duplicated_tolerance</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>230</y>
-     <width>71</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="decimals">
-    <number>3</number>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
    </property>
   </widget>
  </widget>

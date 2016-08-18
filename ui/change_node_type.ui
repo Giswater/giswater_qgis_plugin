@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>390</width>
-    <height>219</height>
+    <height>212</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Change node type</string>
   </property>
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
@@ -187,7 +187,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_new_node_type_2">
+  <widget class="QLabel" name="label_custom_node_type">
    <property name="geometry">
     <rect>
      <x>30</x>
