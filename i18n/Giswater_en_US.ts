@@ -182,7 +182,7 @@
     </message>  
     <message>
         <source>label_depth</source>
-        <translation>Depth</translation>
+        <translation>Depth test</translation>
     </message>   
     <message>
         <source>label_sector_id</source>
@@ -267,6 +267,10 @@
     <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
+    </message>  
+    <message>
+        <source>delete_row_info</source>
+        <translation>Unlink element</translation>
     </message>  
     <message>
         <source>label_man_tank_vmax</source>
@@ -708,6 +712,10 @@
         <source>label_document</source>
         <translation>Document:</translation>
     </message>  
+	<message>
+        <source>delete_row_doc</source>
+        <translation>Unlink document</translation>
+    </message> 
      <message>
         <source>label_event_node_to</source>
         <translation>to</translation>
@@ -862,8 +870,8 @@
         <translation>Soil</translation>
     </message>  
     <message>
-        <source>label_arc_function_type</source>
-        <translation>Function</translation>
+        <source>label_arc_category_type</source>
+        <translation>Category</translation>
     </message>
     <message>
         <source>label_arc_fluid_type</source>
@@ -1101,6 +1109,10 @@
 	 <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
+    </message>  	
+	 <message>
+        <source>delete_row_info</source>
+        <translation>Unlink element</translation>
     </message>  	
     <message>
         <source>label_doc_to</source>
@@ -1918,6 +1930,10 @@
     <message>
         <source>label_document</source>
         <translation>Document:</translation>
+    </message>
+	<message>
+        <source>delete_row_doc</source>
+        <translation>Unlink document</translation>
     </message>
     <message>
         <source>label_event_junction_to</source>
@@ -2857,6 +2873,7 @@
     
 </context>
 
+
 <context>
 
     <name>change_node_type</name>
@@ -2877,9 +2894,10 @@
         <source>label_catalog_id</source>
         <translation>Catalog</translation>
     </message>
-	
+
 </context>
-	
+
+
 <context>
 
     <name>config</name>
@@ -2892,60 +2910,61 @@
         <source>label_arc_searchnodes</source>
         <translation>Arc search nodes</translation>
     </message>
-	<message>
+    <message>
         <source>label_node2arc</source>
         <translation>Node2arc</translation>
     </message>
-	<message>
+    <message>
         <source>label_connec_proximity</source>
         <translation>Connec proximity</translation>
     </message>
-	<message>
+    <message>
         <source>label_arc_toporepair</source>
         <translation>Arc topology repair</translation>
     </message>
-	<message>
+    <message>
         <source>label_vnode_update_tolerance</source>
         <translation>Vnode update tolerance</translation>
     </message>
-	<message>
+    <message>
         <source>label_node_duplicated_tolerance</source>
         <translation>Duplicated node tolerance</translation>
     </message>
-	<message>
+    <message>
         <source>label_nodeinsert_catalog_vdefault</source>
         <translation>Node insert catalog default value</translation>
     </message>
-	<message>
+    <message>
         <source>label_orphannode_delete</source>
         <translation>Delete orphan node</translation>
     </message>
-	<message>
+    <message>
         <source>label_nodetype_change_enabled</source>
         <translation>Enable node type change</translation>
     </message>
-	<message>
+    <message>
         <source>label_nodeinsert_arcendpoint</source>
         <translation>Insert node in arc endpoint</translation>
     </message>
-	<message>
+    <message>
         <source>label_samenode_init_end_control</source>
         <translation>Control arc with same initial and end node</translation>
     </message>
-	<message>
+    <message>
         <source>label_node_proximity_control</source>
         <translation>Node proximity control</translation>
     </message>
-	<message>
+    <message>
         <source>label_connec_proximity_control</source>
         <translation>Connec proximity control</translation>
     </message>
-	<message>
+    <message>
         <source>label_audit_function_control</source>
         <translation>Audit function control</translation>
     </message>
-	
+
 </context>
+
 
 <context>
 
@@ -2959,48 +2978,49 @@
         <source>label_owner</source>
         <translation>Owner</translation>
     </message>
-	<message>
+    <message>
         <source>label_state</source>
         <translation>State</translation>
     </message>
-	<message>
+    <message>
         <source>label_workcat_id</source>
         <translation>Work</translation>
     </message>
-	<message>
+    <message>
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>
-	<message>
+    <message>
         <source>label_builtdate</source>
         <translation>Builtdate</translation>
     </message>
-	<message>
+    <message>
         <source>label_end_date</source>
         <translation>End date</translation>
     </message>
-	<message>
+    <message>
         <source>label_annotation</source>
         <translation>Annotation</translation>
     </message>
-	<message>
+    <message>
         <source>label_observ</source>
         <translation>Observation</translation>
     </message>
-	<message>
+    <message>
         <source>label_comment</source>
         <translation>Comment</translation>
     </message>
-	<message>
+    <message>
         <source>label_link</source>
         <translation>Link</translation>
     </message>	
-	<message>
+    <message>
         <source>label_rotation</source>
         <translation>Rotation</translation>
     </message>
 
 </context>
+
 
 <context>
 
@@ -3009,17 +3029,18 @@
     <message>
         <source>label_tag</source>
         <translation>Tag</translation>
-    </message>	
-	<message>
+    </message>
+    <message>
         <source>label_observ</source>
         <translation>Observation</translation>
-    </message>	
-	<message>
+    </message>
+    <message>
         <source>label_link</source>
         <translation>Link</translation>
     </message>
-	
-</context>	
+
+</context>
+
 
 <context>
 
@@ -3028,15 +3049,61 @@
     <message>
         <source>label_csv</source>
         <translation>CSV file:</translation>
-    </message>	
-	<message>
+    </message>
+    <message>
         <source>label_table</source>
         <translation>Table:</translation>
-    </message>	
-	<message>
+    </message>
+    <message>
         <source>label_delimeter</source>
         <translation>Delimiter</translation>
     </message>
-	
-</context>	
-	</TS>
+
+</context>
+
+
+<context>
+
+    <name>topology_tools</name>
+
+    <message>
+        <source>check_node_orphan</source>
+        <translation>     Orphan node identifier check</translation>
+    </message>
+     <message>
+        <source>check_node_duplicated</source>
+        <translation>     Duplicated node identifier</translation>
+    </message>
+    <message>
+        <source>check_connec_duplicated</source>
+        <translation>     Duplicated connec identifier</translation>
+    </message>
+     <message>
+        <source>check_arc_same_startend</source>
+        <translation>     Arc with the same start-end identifier</translation>
+    </message>
+    <message>
+        <source>check_node_sink</source>
+        <translation>     Sink node identifier (only for ud projects)</translation>
+    </message>
+
+</context>
+
+
+<context>
+
+    <name>result_compare_selector</name>
+    
+    <message>
+        <source>label_result_name_to_show</source>
+        <translation>Result name (to show)</translation>
+    </message>
+    <message>
+        <source>label_result_name_to_compare</source>
+        <translation>Result name (to compare)</translation>
+    </message>
+
+</context>
+
+</TS>
+

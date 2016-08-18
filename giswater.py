@@ -632,6 +632,9 @@ class Giswater(QObject):
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'topology_tools')                
 
         self.dlg.exec_()   
     
@@ -770,6 +773,9 @@ class Giswater(QObject):
         # Set signals
         self.dlg.btn_select_file.clicked.connect(self.select_file)
         self.dlg.btn_import_csv.clicked.connect(self.import_csv)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'table_wizard')            
 
         self.dlg.exec_()            
 
@@ -953,6 +959,9 @@ class Giswater(QObject):
         rows = self.dao.get_rows(sql)
         utils_giswater.setDialog(self.dlg)
         utils_giswater.fillComboBox("node_type_type_new", rows) 
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'change_node_type')            
     
         # Open the dialog
         self.dlg.exec_()    
@@ -1138,6 +1147,9 @@ class Giswater(QObject):
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'element')            
+        
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
         count = layer.selectedFeatureCount()   
@@ -1318,6 +1330,9 @@ class Giswater(QObject):
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'file')               
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  

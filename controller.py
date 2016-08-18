@@ -24,8 +24,10 @@ class DaoController():
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
     
-    def tr(self, message):
-        return QCoreApplication.translate(self.plugin_name, message)                
+    def tr(self, message, context=None):
+        if context is None:
+            context = self.plugin_name
+        return QCoreApplication.translate(context, message)                            
     
     def set_settings(self, settings):
         self.settings = settings      
@@ -146,4 +148,28 @@ class DaoController():
         
         return True
         
+        
+    def translate_form(self, dialog, context_name):
+        ''' Translate widgets of the form to current language '''
+        
+        # Get objects of type: QLabel
+        widget_list = dialog.findChildren(QLabel)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
+            
+        # Get objects of type: QCheckBox
+        widget_list = dialog.findChildren(QCheckBox)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
+            
+            
+    def translate_widget(self, context_name, widget):
+        ''' Translate widget text '''
+        
+        if widget:
+            widget_name = widget.objectName()
+            text = self.tr(widget_name, context_name)
+            if text != widget_name:
+                widget.setText(text)    
+                        
     
