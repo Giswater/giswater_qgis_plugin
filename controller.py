@@ -108,7 +108,7 @@ class DaoController():
         return True  
     
             
-    def execute_sql(self, sql):
+    def execute_sql(self, sql, search_audit=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
@@ -116,8 +116,9 @@ class DaoController():
             self.show_message(self.log_codes[-1], 2)   
             return False
         else:
-            # Get last record from audit tables (searching for a possible error)
-            return self.get_error_from_audit()    
+            if search_audit:
+                # Get last record from audit tables (searching for a possible error)
+                return self.get_error_from_audit()    
     
     
     def get_error_from_audit(self):

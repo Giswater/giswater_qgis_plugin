@@ -1059,6 +1059,7 @@ class Giswater(QObject):
         self.dlg_config.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
         self.dlg_config.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
         self.dlg_config.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
+        self.dlg_config.audit_function_control.setChecked(bool(row["audit_function_control"]))
        
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
@@ -1092,6 +1093,7 @@ class Giswater(QObject):
         self.new_value_samenode_init_end_control = self.dlg_config.samenode_init_end_control.isChecked()
         self.new_value_node_proximity_control = self.dlg_config.node_proximity_control.isChecked()
         self.new_value_connec_proximity_control = self.dlg_config.connec_proximity_control.isChecked()
+        self.new_value_audit_function_control = self.dlg_config.audit_function_control.isChecked()
 
     
     def mg_config_accept(self):
@@ -1116,6 +1118,7 @@ class Giswater(QObject):
         sql+= ", samenode_init_end_control = '"+str(self.new_value_samenode_init_end_control)+"'"
         sql+= ", node_proximity_control = '"+str(self.new_value_node_proximity_control)+"'"
         sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
+        sql+= ", audit_function_control = '"+str(self.new_value_audit_function_control)+"'"        
         self.dao.execute_sql(sql)
 
         # Show message to user
