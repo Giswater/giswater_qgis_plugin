@@ -973,7 +973,7 @@ class Giswater(QObject):
         ''' Close dialog '''
         if dlg is None:
             dlg = self.dlg.close()   
-        self.dlg.close()    
+        dlg.close()    
             
             
     def mg_config(self):                
@@ -1254,13 +1254,12 @@ class Giswater(QObject):
                 
         # Show message to user
         self.showInfo(self.controller.tr("Values has been updated"))
-        #self.close_dialog()
+        self.close_dialog()
     
     
     def ed_add_file(self):
         ''' Button 34. Add file '''
-                    
-        print("button 34")
+                        
         # Create the dialog and signals
         self.dlg = Add_file()
         utils_giswater.setDialog(self.dlg)
@@ -1296,7 +1295,7 @@ class Giswater(QObject):
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
-        print(row)
+        
         model.setStringList(row)
         self.completer.setModel(model)
         
@@ -1309,31 +1308,9 @@ class Giswater(QObject):
         
     def ed_add_file_autocomplete(self):    
 
-        # Action on click when value is selected ( ComboBox - Qcompleter )
         # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
         self.doc_id = utils_giswater.getWidgetText("doc_id") 
-        print(self.doc_id)
-        #sql = "SELECT * FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        #row = self.dao.get_row(sql)
-        #print(row[4])
-        
-        sql = "SELECT doc_type FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_doc_type = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("doc_type", self.row_doc_type[0]) 
-        
-        sql = "SELECT tagcat_id FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_tagcat = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("tagcat_id", self.row_tagcat[0]) 
-        
-        sql = "SELECT observ FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_observ = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("observ", self.row_observ[0]) 
-        
-        sql = "SELECT path FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_path = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("link", self.row_path[0]) 
-       
         
         
     def ed_add_file_accept(self):   
@@ -1345,45 +1322,10 @@ class Giswater(QObject):
         self.observ = utils_giswater.getWidgetText("observ")
         self.link = utils_giswater.getWidgetText("link")
         
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc "
-
-        
-        #sql = "SELECT id FROM "+self.schema_name+".doc WHERE id= '"+self.doc_id+"'"
-        row = self.dao.get_rows(sql)
-
-      
-        # Convert to string
-        for i in range(0,len(row)):
-            aux = row[i]
-            row[i] = str(aux[0])
-        print(row)
-        
-        x = 0
-        for i in range(0,len(row)):
-            print(row[i])
-            if row[i] == self.doc_id:
-                print("exist")
-                x=1     
-           
-        
-        if x==1:
-            print("exist")
-            # Update data base
-            sql = "UPDATE "+self.schema_name+".doc SET doc_type = '"+self.doc_type+"', tagcat_id= '"+self.tagcat_id+"',observ = '"+self.observ+"', path = '"+self.link+"'"
-            sql+= " WHERE id = '"+self.doc_id+"'" 
-            print(sql)
-            print(self.doc_id)
-            print(self.doc_type)
-            self.dao.execute_sql(sql)
-        #elif row[0] != self.doc_idd:
-        else:
-            print(" doesnt exist")
-            # Execute data to database DOC 
-            sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
-            sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
-            self.dao.execute_sql(sql)
-        
-
+        # Execute data to database DOC 
+        sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
+        sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
+        self.dao.execute_sql(sql)
         
         # Get layers
         layers = self.iface.legendInterface().layers()
@@ -1392,8 +1334,6 @@ class Giswater(QObject):
          
         # Initialize variables                    
         self.layer_arc = None
-        self.layer_node = None
-        self.layer_connec = None
         table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
         table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
         table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
@@ -1401,27 +1341,20 @@ class Giswater(QObject):
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     
             uri = cur_layer.dataProvider().dataSourceUri().lower()   
-            print("curent layer--------**-*-*")
-            print(uri)
             pos_ini = uri.find('table=')
             pos_fi = uri.find('" ')  
             uri_table = uri 
-            print("test1")
+
             if pos_ini <> -1 and pos_fi <> -1:
                 uri_table = uri[pos_ini+6:pos_fi+1]   
-    
-                # Table 'arc   
-                table_arc="v_edit_arc" 
-                                  
+                
+                # Table 'arc                        
                 if table_arc == uri_table:  
                     self.layer_arc = cur_layer
-                    print("cur layer")
-                    print(cur_layer)
                     self.count_arc = self.layer_arc.selectedFeatureCount()  
                     # Get all selected features-arcs
                     features_arcs = self.layer_arc.selectedFeatures()
                     i=0
-                    print("table_arc")
                     while (i<self.count_arc):
                      
                         # Get arc_id from current arc
@@ -1429,7 +1362,7 @@ class Giswater(QObject):
                         self.arc_id = feature.attribute('arc_id')
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
                                               
-                        # Execute id(automaticaly),element_id and arc_id to doc_x_arc
+                        # Execute id(automaticaly),element_id and arc_id to element_x_arc
                         sql = "INSERT INTO "+self.schema_name+".doc_x_arc (arc_id, doc_id) "
                         sql+= " VALUES ('"+self.arc_id+"', '"+self.doc_id+"')"
                         i+=1
@@ -1437,11 +1370,9 @@ class Giswater(QObject):
              
             if pos_ini <> -1 and pos_fi <> -1:
                 uri_table = uri[pos_ini+6:pos_fi+1] 
-                table_node="v_edit_node" 
                 
                 # Table 'node'                          
-                if table_node == uri_table:          
-                    print("table_node")   
+                if table_node == uri_table:  
                     self.layer_node = cur_layer
                     self.count_node = self.layer_node.selectedFeatureCount()  
                     # Get all selected features-arcs
@@ -1449,13 +1380,11 @@ class Giswater(QObject):
                     i = 0
                     while (i<self.count_node):
 
-                        # Get node_id from current node
+                        # Get arc_id from current arc
                         feature = features_nodes[i]
                         self.node_id = feature.attribute('node_id')
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
-                        print("--------------")         
-                        print(self.node_id)
-                        print(self.doc_id)
+                                              
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
                         sql = "INSERT INTO "+self.schema_name+".doc_x_node (node_id,doc_id) "
                         sql+= " VALUES ('"+self.node_id+"','"+self.doc_id+"')"
@@ -1464,10 +1393,9 @@ class Giswater(QObject):
                         
             if pos_ini <> -1 and pos_fi <> -1:
                 uri_table = uri[pos_ini+6:pos_fi+1]
-                table_connec="v_edit_connec" 
+                
                 # Table 'connec'                              
                 if table_connec == uri_table:  
-                    print("table_connec")
                     self.layer_connec = cur_layer
                     self.count_connec = self.layer_connec.selectedFeatureCount()  
                     # Get all selected features-arcs
@@ -1488,7 +1416,6 @@ class Giswater(QObject):
         
         # Show message to user
         self.showInfo(self.controller.tr("Values has been updated"))
-        #self.close_dialog()            
+        self.close_dialog()            
         
-    def mg_result_selector(self):
-        print "aaa"     
+                    

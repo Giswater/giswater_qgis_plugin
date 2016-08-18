@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>427</width>
-    <height>151</height>
+    <width>410</width>
+    <height>168</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>250</x>
-     <y>110</y>
+     <x>240</x>
+     <y>120</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>110</y>
+     <x>320</x>
+     <y>120</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -42,7 +42,7 @@
   <widget class="QComboBox" name="rpt_selector_result_id">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>30</y>
      <width>211</width>
      <height>20</height>
@@ -55,7 +55,7 @@
   <widget class="QLabel" name="label_result_name_to_show">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>30</y>
      <width>141</width>
      <height>22</height>
@@ -85,7 +85,7 @@
   <widget class="QComboBox" name="rpt_selector_compare_id">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>70</y>
      <width>211</width>
      <height>20</height>
@@ -98,7 +98,7 @@
   <widget class="QLabel" name="label_result_name_to_compare">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>70</y>
      <width>141</width>
      <height>22</height>

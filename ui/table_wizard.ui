@@ -88,7 +88,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_table">
+  <widget class="QLabel" name="label_csv_2">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -121,7 +121,7 @@ p, li { white-space: pre-wrap; }
     </property>
    </item>
   </widget>
-  <widget class="QLabel" name="label_delimeter">
+  <widget class="QLabel" name="label_csv_3">
    <property name="geometry">
     <rect>
      <x>220</x>

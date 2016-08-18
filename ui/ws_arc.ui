@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -167,7 +167,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_arc_owner">
+    <widget class="QLabel" name="label_arc_ownercat_id">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -263,7 +263,7 @@
       <number>0</number>
      </property>
      <property name="text">
-      <string>category_type</string>
+      <string>function_type</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -598,7 +598,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="category_type">
+    <widget class="QComboBox" name="function_type">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -1038,9 +1038,9 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>50</y>
-       <width>761</width>
-       <height>381</height>
+       <y>150</y>
+       <width>771</width>
+       <height>251</height>
       </rect>
      </property>
      <property name="html">
@@ -1055,7 +1055,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>20</y>
+       <y>120</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -1086,6 +1086,42 @@ p, li { white-space: pre-wrap; }
      <property name="margin">
       <number>3</number>
      </property>
+    </widget>
+    <widget class="QTabWidget" name="label_management">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>771</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_13">
+      <attribute name="title">
+       <string>Pipe</string>
+      </attribute>
+      <widget class="QLineEdit" name="cat_arc_descript">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>741</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>short description (from arc catalog)</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="page_analysis">
@@ -1712,7 +1748,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>Document</string>
     </attribute>
-    <widget class="QLabel" name="label_doc_type">
+    <widget class="QLabel" name="label_cat_doc_type">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1893,7 +1929,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_doc_to">
+    <widget class="QLabel" name="label_to">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1978,10 +2014,10 @@ p, li { white-space: pre-wrap; }
     <widget class="QTableView" name="tbl_document">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>271</height>
+       <x>10</x>
+       <y>160</y>
+       <width>801</width>
+       <height>291</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -2012,7 +2048,7 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>Pipe</string>
       </attribute>
-      <widget class="QLabel" name="label_event_event">
+      <widget class="QLabel" name="label_event_eventcat_id">
        <property name="geometry">
         <rect>
          <x>270</x>
@@ -2137,7 +2173,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_event_type">
+      <widget class="QLabel" name="label_cat_event_eventtype_id">
        <property name="geometry">
         <rect>
          <x>508</x>
@@ -2239,7 +2275,7 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLabel" name="label_event_to">
+      <widget class="QLabel" name="label_to_3">
        <property name="geometry">
         <rect>
          <x>160</x>
@@ -2292,7 +2328,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>Log</string>
     </attribute>
-    <widget class="QLabel" name="label_log_event_type">
+    <widget class="QLabel" name="label_147">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -2407,7 +2443,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_log_user">
+    <widget class="QLabel" name="label_149">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2443,7 +2479,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_log_to">
+    <widget class="QLabel" name="label_101">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2547,7 +2583,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>rotation</string>
    </property>
   </widget>
   <widget class="QComboBox" name="arccat_id">
@@ -2584,9 +2620,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="gis_length">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>120</x>
      <y>540</y>
-     <width>101</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -2596,7 +2632,7 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>GIS length</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="custom_length">
@@ -2614,15 +2650,15 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>NULL</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_arc_custom_length">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>480</x>
      <y>540</y>
-     <width>81</width>
+     <width>151</width>
      <height>22</height>
     </rect>
    </property>
@@ -2639,7 +2675,7 @@ p, li { white-space: pre-wrap; }
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>custom length:</string>
+    <string>Insert value of real length -&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -2711,10 +2747,15 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>10</x>
      <y>540</y>
-     <width>151</width>
+     <width>101</width>
      <height>20</height>
     </rect>
    </property>
+   <item>
+    <property name="text">
+     <string>Verified</string>
+    </property>
+   </item>
   </widget>
   <widget class="QComboBox" name="cat_arctype_id">
    <property name="geometry">
@@ -2765,7 +2806,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QLabel" name="label_pressure_zone">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>240</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -2801,7 +2842,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="presszonecat_id">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>330</x>
      <y>540</y>
      <width>91</width>
      <height>20</height>

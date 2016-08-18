@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>object</class>
+ <widget class="QDialog" name="object">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>570</width>
-    <height>480</height>
+    <height>490</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Element</string>
+   <string>Dialog</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -31,8 +31,8 @@
   <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>400</y>
+     <x>455</x>
+     <y>425</y>
      <width>76</width>
      <height>20</height>
     </rect>
@@ -46,7 +46,7 @@
     <rect>
      <x>25</x>
      <y>20</y>
-     <width>271</width>
+     <width>266</width>
      <height>20</height>
     </rect>
    </property>
@@ -58,7 +58,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>400</y>
+     <y>425</y>
      <width>101</width>
      <height>20</height>
     </rect>
@@ -88,7 +88,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>209</y>
+     <y>234</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -124,7 +124,7 @@
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>210</y>
+     <y>235</y>
      <width>126</width>
      <height>20</height>
     </rect>
@@ -140,7 +140,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>170</y>
+     <y>195</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -176,7 +176,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>249</y>
+     <y>274</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -211,8 +211,8 @@
   <widget class="QComboBox" name="state">
    <property name="geometry">
     <rect>
-     <x>135</x>
-     <y>134</y>
+     <x>131</x>
+     <y>159</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -221,8 +221,8 @@
   <widget class="QComboBox" name="workcat_id">
    <property name="geometry">
     <rect>
-     <x>134</x>
-     <y>170</y>
+     <x>130</x>
+     <y>195</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -232,7 +232,7 @@
    <property name="geometry">
     <rect>
      <x>410</x>
-     <y>170</y>
+     <y>195</y>
      <width>126</width>
      <height>20</height>
     </rect>
@@ -247,8 +247,8 @@
   <widget class="QComboBox" name="ownercat_id">
    <property name="geometry">
     <rect>
-     <x>135</x>
-     <y>94</y>
+     <x>131</x>
+     <y>119</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -258,7 +258,7 @@
    <property name="geometry">
     <rect>
      <x>26</x>
-     <y>94</y>
+     <y>119</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -294,7 +294,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>355</y>
+     <y>380</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -330,7 +330,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>134</y>
+     <y>159</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -366,7 +366,7 @@
    <property name="geometry">
     <rect>
      <x>26</x>
-     <y>54</y>
+     <y>79</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -402,7 +402,7 @@
    <property name="geometry">
     <rect>
      <x>24</x>
-     <y>170</y>
+     <y>195</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -437,8 +437,8 @@
   <widget class="QComboBox" name="buildercat_id">
    <property name="geometry">
     <rect>
-     <x>135</x>
-     <y>209</y>
+     <x>131</x>
+     <y>234</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -447,18 +447,18 @@
   <widget class="QComboBox" name="location_type">
    <property name="geometry">
     <rect>
-     <x>135</x>
-     <y>54</y>
+     <x>131</x>
+     <y>79</y>
      <width>160</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_end_date">
+  <widget class="QLabel" name="label_builtdate_2">
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>210</y>
+     <y>235</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -494,7 +494,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>319</y>
+     <y>344</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -530,7 +530,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>285</y>
+     <y>310</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -566,7 +566,7 @@
    <property name="geometry">
     <rect>
      <x>375</x>
-     <y>430</y>
+     <y>455</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -579,7 +579,7 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>430</y>
+     <y>455</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -592,7 +592,7 @@
    <property name="geometry">
     <rect>
      <x>135</x>
-     <y>245</y>
+     <y>270</y>
      <width>401</width>
      <height>26</height>
     </rect>
@@ -602,7 +602,7 @@
    <property name="geometry">
     <rect>
      <x>135</x>
-     <y>280</y>
+     <y>305</y>
      <width>401</width>
      <height>26</height>
     </rect>
@@ -612,7 +612,7 @@
    <property name="geometry">
     <rect>
      <x>135</x>
-     <y>315</y>
+     <y>340</y>
      <width>401</width>
      <height>26</height>
     </rect>
@@ -622,17 +622,17 @@
    <property name="geometry">
     <rect>
      <x>135</x>
-     <y>355</y>
+     <y>380</y>
      <width>401</width>
      <height>26</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_rotation">
+  <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>395</x>
-     <y>405</y>
+     <y>430</y>
      <width>46</width>
      <height>13</height>
     </rect>

@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>File</string>
+   <string>Dialog</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>

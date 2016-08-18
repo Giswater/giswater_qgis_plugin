@@ -28,7 +28,67 @@
         <translation>Giswater - Urban drainage</translation>
     </message>    
     
-
+    <message>
+        <source>New network</source>
+        <translation>Add network</translation>
+    </message>           
+    <message>
+        <source>Copy network as</source>
+        <translation>Copy network as</translation>
+    </message>           
+    <message>
+        <source>Network configuration</source>
+        <translation>Network configuration</translation>
+    </message>           
+    <message>
+        <source>Snapping tolerance</source>
+        <translation>Snapping tolerance</translation>
+    </message>           
+    <message>
+        <source>Node tolerance</source>
+        <translation>Node tolerance</translation>
+    </message>           
+    <message>
+        <source>Network management</source>
+        <translation>Network management</translation>
+    </message>           
+    <message>
+        <source>Table wizard</source>
+        <translation>Table wizard</translation>
+    </message>           
+    <message>
+        <source>Undo wizard</source>
+        <translation>Undo wizard</translation>
+    </message>  
+    <message>
+        <source>Analysis</source>
+        <translation>Analysis</translation>
+    </message>        
+    <message>
+        <source>Result selector</source>
+        <translation>Result selector</translation>
+    </message>           
+    <message>
+        <source>Flow trace node</source>
+        <translation>Flow trace node</translation>
+    </message>           
+    <message>
+        <source>Flow trace arc</source>
+        <translation>Flow trace arc</translation>
+    </message>  
+    <message>
+        <source>Go2Epa</source>
+        <translation>Go2Epa</translation>
+    </message>                 
+    <message>
+        <source>Giswater interface</source>
+        <translation>Giswater interface</translation>
+    </message>           
+    <message>
+        <source>Run simulation</source>
+        <translation>Run simulation</translation>
+    </message>    
+    
     <message>
         <source>01_text</source>
         <translation>Insert junction</translation>
@@ -50,9 +110,22 @@
         <translation>Insert conduit</translation>
     </message>      
     <message>
+        <source>06_text</source>
+        <translation>Insert pump</translation>
+    </message>      
+    <message>
+        <source>07_text</source>
+        <translation>Insert orifice</translation>
+    </message>      
+    <message>
         <source>08_text</source>
         <translation>Insert filter</translation>
-    </message>        
+    </message>      
+    <message>
+        <source>09_text</source>
+        <translation>Insert outlet</translation>
+    </message>    
+    
     <message>
         <source>10_text</source>
         <translation>Insert junction</translation>
@@ -77,6 +150,7 @@
         <source>15_text</source>
         <translation>Insert valve</translation>
     </message>   
+    
     <message>
         <source>16_text</source>
         <translation>Move node</translation>
@@ -99,7 +173,7 @@
     </message>      
     <message>
         <source>21_text</source>
-        <translation>Import CSV</translation>
+        <translation>Table wizard</translation>
     </message>      
     <message>
         <source>22_text</source>
@@ -119,11 +193,11 @@
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Network analytics I</translation>
+        <translation>Flow trace</translation>
     </message>      
     <message>
         <source>27_text</source>
-        <translation>Network analytics II</translation>
+        <translation>Flow exit</translation>
     </message> 
     <message>
         <source>28_text</source>
@@ -133,9 +207,14 @@
         <source>29_text</source>
         <translation>Insert measure instrument</translation>
     </message>       
+
+    <message>
+        <source>30_text</source>
+        <translation>Select for plan</translation>
+    </message>  
     <message>
         <source>31_text</source>
-        <translation>Refresh data</translation>
+        <translation>Refresh (plan)</translation>
     </message> 
     <message>
         <source>32_text</source>
@@ -152,23 +231,15 @@
     <message>
         <source>35_text</source>
         <translation>Event</translation>
-    </message>
-	<message>
-        <source>36_text</source>
-        <translation>Giswater</translation>
-    </message>    
-	<message>
-        <source>37_text</source>
-        <translation>Help</translation>
-    </message>    	
-	<message>
-        <source>99_text</source>
-        <translation>Project configuration</translation>
-    </message>    
-  
+    </message>     
+
+    
+    <message>
+        <source>delete_node</source>
+        <translation>You are going to delete this node. Its related arcs will also we deleted.\n Are you sure?</translation>
+    </message>        
+    
 </context>
-
-
 
 
 
@@ -177,7 +248,7 @@
     <name>ws_node</name>
     
     <message>
-        <source>label_elevation</source>
+        <source>label_top_elev</source>
         <translation>Elevation</translation>
     </message>  
     <message>
@@ -233,7 +304,7 @@
         <translation>Soil</translation>
     </message>  
     <message>
-        <source>label_category_type</source>
+        <source>label_function_type</source>
         <translation>Category</translation>
     </message>  
     <message>
@@ -245,7 +316,7 @@
         <translation>Location</translation>
     </message>  
     <message>
-        <source>label_owner</source>
+        <source>label_ownercat_id</source>
         <translation>Owner</translation>
     </message>  
     <message>
@@ -260,17 +331,9 @@
         <source>label_adress_03</source>
         <translation>Address 03</translation>
     </message>  
-	<message>
-        <source>label_pressure_zone</source>
-        <translation>Pressure zone</translation>
-    </message> 	
     <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
-    </message>  
-    <message>
-        <source>delete_row_info</source>
-        <translation>Unlink element</translation>
     </message>  
     <message>
         <source>label_man_tank_vmax</source>
@@ -693,7 +756,7 @@
         <translation>Maximum:</translation>
     </message>  
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>  
     <message>
@@ -701,7 +764,7 @@
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_doc_type</source>
+        <source>label_cat_doc_type</source>
         <translation>Type</translation>
     </message>  
     <message>
@@ -712,96 +775,184 @@
         <source>label_document</source>
         <translation>Document:</translation>
     </message>  
-	<message>
-        <source>delete_row_doc</source>
-        <translation>Unlink document</translation>
-    </message> 
-     <message>
-        <source>label_event_node_to</source>
+    <message>
+        <source>label_to_2</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_event_node_user</source>
+        <source>label_picture_user</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_event_node_event</source>
+        <source>label_picture_tagcat_id</source>
+        <translation>Tag</translation>
+    </message>  
+    <message>
+        <source>label_results</source>
+        <translation>Picture:</translation>
+    </message>  
+    <message>
+        <source>label_to_3</source>
+        <translation>to</translation>
+    </message>  
+    <message>
+        <source>label_event_user</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_event_eventcat_id</source>
         <translation>Event</translation>
     </message>  
     <message>
-        <source>label_event_node_event_type</source>
+        <source>label_cat_event_eventtype_id</source>
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_node_event</source>
+        <source>label_result</source>
         <translation>Event:</translation>
     </message>  
     <message>
-        <source>label_event_element_to</source>
+        <source>label_to_5</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_event_element_user</source>
+        <source>label_event_user_3</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_event_element_event</source>
+        <source>label_event_eventcat_id_3</source>
         <translation>Event</translation>
     </message>  
     <message>
-        <source>label_event_element_event_type</source>
+        <source>label_cat_event_eventtype_id_3</source>
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_event_element_event_type</source>
+        <source>label_result_3</source>
         <translation>Event:</translation>
     </message>  
     <message>
-        <source>label_log_node_to</source>
+        <source>label_to_4</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_log_node_user</source>
+        <source>label_event_user_2</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_log_node_event</source>
+        <source>label_event_eventcat_id_2</source>
         <translation>Event</translation>
     </message>  
     <message>
-        <source>label_log_node_event_type</source>
+        <source>label_cat_event_eventtype_id_2</source>
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_node_log</source>
-        <translation>Log:</translation>
+        <source>label_result_2</source>
+        <translation>Event:</translation>
     </message>  
     <message>
-        <source>label_log_element_to</source>
+        <source>label_to_9</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_log_element_user</source>
+        <source>label_event_user_6</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_log_element_event</source>
+        <source>label_event_eventcat_id_6</source>
         <translation>Event</translation>
     </message>  
     <message>
-        <source>label_log_element_event_type</source>
+        <source>label_cat_event_eventtype_id_6</source>
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_element_log</source>
-        <translation>Log:</translation>
-    </message>
+        <source>label_result_7</source>
+        <translation>Event:</translation>
+    </message>  	
     <message>
-        <source>label_scada_to</source>
+        <source>label_to_6</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_scada</source>
+        <source>label_event_user_4</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_event_eventcat_id_4</source>
+        <translation>Event</translation>
+    </message>  
+    <message>
+        <source>label_cat_event_eventtype_id_4</source>
+        <translation>Type</translation>
+    </message>  
+    <message>
+        <source>label_result_4</source>
+        <translation>Event:</translation>
+    </message>  
+    <message>
+        <source>label_to_10</source>
+        <translation>to</translation>
+    </message>  
+    <message>
+        <source>label_event_user_7</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_event_eventcat_id_7</source>
+        <translation>Event</translation>
+    </message>  
+    <message>
+        <source>label_cat_event_eventtype_id_7</source>
+        <translation>Type</translation>
+    </message>  
+    <message>
+        <source>label_result_8</source>
+        <translation>Event:</translation>
+    </message>  
+    <message>
+        <source>label_to_7</source>
+        <translation>to</translation>
+    </message>  
+    <message>
+        <source>label_event_user_5</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_event_eventcat_id_5</source>
+        <translation>Event</translation>
+    </message>  
+    <message>
+        <source>label_cat_event_eventtype_id_5</source>
+        <translation>Type</translation>
+    </message>  
+    <message>
+        <source>label_result_5</source>
+        <translation>Event:</translation>
+    </message>  
+    <message>
+        <source>label_74</source>
+        <translation>to</translation>
+    </message>  
+    <message>
+        <source>label_149</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_147</source>
+        <translation>Type</translation>
+    </message>  
+    <message>
+        <source>label_148</source>
+        <translation>Log:</translation>
+    </message>  
+    <message>
+        <source>label_to_8</source>
+        <translation>to</translation>
+    </message>  
+    <message>
+        <source>label_result_6</source>
         <translation>RTC:</translation>
     </message> 
     
@@ -870,8 +1021,8 @@
         <translation>Soil</translation>
     </message>  
     <message>
-        <source>label_arc_category_type</source>
-        <translation>Category</translation>
+        <source>label_arc_function_type</source>
+        <translation>Function</translation>
     </message>
     <message>
         <source>label_arc_fluid_type</source>
@@ -882,7 +1033,7 @@
         <translation>Location</translation>
     </message>  
     <message>
-        <source>label_arc_owner</source>
+        <source>label_arc_ownercat_id</source>
         <translation>Owner</translation>
     </message>  
     <message>
@@ -899,12 +1050,8 @@
     </message>  
     <message>
         <source>label_arc_custom_length</source>
-        <translation>Custom length</translation>
+        <translation>Insert value of real length only to modify geometry length -></translation>
     </message>  
-	 <message>
-        <source>label_pressure_zone</source>
-        <translation>Pressure zone</translation>
-    </message> 
     <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
@@ -946,7 +1093,7 @@
         <translation>Maximum:</translation>
     </message>  
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>  
     <message>
@@ -954,7 +1101,7 @@
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_doc_type</source>
+        <source>label_cat_doc_type</source>
         <translation>Type</translation>
     </message>  
     <message>
@@ -966,41 +1113,65 @@
         <translation>Document:</translation>
     </message>  
     <message>
-        <source>label_event_to</source>
+        <source>label_to_2</source>
         <translation>to</translation>
-    </message>   
+    </message>  
+    <message>
+        <source>label_picture_user</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_picture_tagcat_id</source>
+        <translation>Tag</translation>
+    </message>  
+    <message>
+        <source>label_results</source>
+        <translation>Picture:</translation>
+    </message>  
+    <message>
+        <source>label_to_3</source>
+        <translation>to</translation>
+    </message>  
     <message>
         <source>label_event_user</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_event_event</source>
+        <source>label_event_eventcat_id</source>
         <translation>Event</translation>
     </message>  
     <message>
-        <source>label_event_type</source>
+        <source>label_cat_event_eventtype_id</source>
         <translation>Type</translation>
     </message>  
     <message>
         <source>label_event</source>
         <translation>Event:</translation>
     </message> 
-	<message>
-        <source>label_log_to</source>
+    <message>
+        <source>label_101</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_log_user</source>
+        <source>label_149</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_log_event_type</source>
+        <source>label_147</source>
         <translation>Type</translation>
     </message>  
     <message>
         <source>label_log</source>
         <translation>Log:</translation>
     </message>  
+    <message>
+        <source>label_102</source>
+        <translation>Type</translation>
+    </message>  
+    <message>
+        <source>label_rtc</source>
+        <translation>RTC:</translation>
+    </message>
     
 </context>  
 
@@ -1079,7 +1250,7 @@
         <translation>Location</translation>
     </message>  
     <message>
-        <source>label_connec_owner</source>
+        <source>label_connec_ownercat_id</source>
         <translation>Owner</translation>
     </message>  
     <message>
@@ -1094,28 +1265,8 @@
         <source>label_connec_adress_03</source>
         <translation>Address 03</translation>
     </message>  
-	 <message>
-        <source>label_demand</source>
-        <translation>Demand</translation>
-    </message>  
-	 <message>
-        <source>label_n_hydrometer</source>
-        <translation>Hydrometers</translation>
-    </message>  
-	 <message>
-        <source>label_code</source>
-        <translation>Code</translation>
-    </message>  
-	 <message>
-        <source>label_elements</source>
-        <translation>Elements:</translation>
-    </message>  	
-	 <message>
-        <source>delete_row_info</source>
-        <translation>Unlink element</translation>
-    </message>  	
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>  
     <message>
@@ -1123,7 +1274,7 @@
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_doc_type</source>
+        <source>label_doc_eventcat_id</source>
         <translation>Type</translation>
     </message>  
     <message>
@@ -1131,89 +1282,73 @@
         <translation>Tag</translation>
     </message>  
     <message>
-        <source>label_document</source>
+        <source>label_documents</source>
         <translation>Document:</translation>
     </message>  
     <message>
-        <source>label_event_connec_to</source>
+        <source>label_to_2</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_event_connec_user</source>
+        <source>label_picture_user</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_event_connec_event</source>
+        <source>label_picture_tagcat_id</source>
+        <translation>Tag</translation>
+    </message>  
+    <message>
+        <source>label_results</source>
+        <translation>Picture:</translation>
+    </message>  
+    <message>
+        <source>label_to_3</source>
+        <translation>to</translation>
+    </message>  
+    <message>
+        <source>label_event_user</source>
+        <translation>User</translation>
+    </message>  
+    <message>
+        <source>label_event_eventcat_id</source>
         <translation>Event</translation>
     </message>  
     <message>
-        <source>label_event_connec_event_type</source>
+        <source>label_cat_event_eventtype_id</source>
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_connec_event</source>
+        <source>label_83</source>
         <translation>Event:</translation>
-    </message> 
+    </message>  
     <message>
-        <source>label_element_to</source>
+        <source>label_74</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_event_element_user</source>
+        <source>label_150</source>
         <translation>User</translation>
     </message>  
     <message>
-        <source>label_event_element_event</source>
-        <translation>Event</translation>
-    </message>  
-    <message>
-        <source>label_event_element_event_type</source>
+        <source>label_149</source>
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_element_event</source>
-        <translation>Event:</translation>
-    </message> 
-    <message>
-        <source>label_log_connec_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_log_connec_user</source>
-        <translation>User</translation>
-    </message>  
-    <message>
-        <source>label_log_connec_event_type</source>
-        <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_connec_log</source>
+        <source>label_148</source>
         <translation>Log:</translation>
     </message>  
-	<message>
-        <source>label_log_element_to</source>
+    <message>
+        <source>label_85</source>
         <translation>to</translation>
     </message>  
     <message>
-        <source>label_log_element_user</source>
-        <translation>User</translation>
+        <source>label_86</source>
+        <translation>Cod. DAE</translation>
     </message>  
     <message>
-        <source>label_log_element_event_type</source>
-        <translation>Type</translation>
+        <source>label_84</source>
+        <translation>IPTU:</translation>
     </message>  
-    <message>
-        <source>label_element_log</source>
-        <translation>Log:</translation>
-    </message> 
-    <message>
-        <source>label_hydrometer_to</source>
-        <translation>to</translation>
-    </message>  
-    <message>
-        <source>label_hydrometer</source>
-        <translation>Hydrometer:</translation>
-    </message>   
     
 </context> 
 
@@ -1222,23 +1357,15 @@
 <context>
 
     <name>ud_node</name>
-	
+    
     <message>
         <source>label_top_elev</source>
-        <translation>Top elevation</translation>
+        <translation>Elevation</translation>
     </message>  
     <message>
         <source>label_ymax</source>
         <translation>Ymax</translation>
-    </message>
-    <message>
-        <source>label_elev</source>
-        <translation>Elevation</translation>
-    </message>
-   <message>
-        <source>label_sander</source>
-        <translation>Sander</translation>
-    </message>   	
+    </message>  
     <message>
         <source>label_sector_id</source>
         <translation>Sector</translation>
@@ -1269,7 +1396,7 @@
     </message>  
     <message>
         <source>label_observ</source>
-        <translation>Observation</translation>
+        <translation>Observ</translation>
     </message>  
     <message>
         <source>label_comment</source>
@@ -1286,11 +1413,11 @@
     <message>
         <source>label_soilcat_id</source>
         <translation>Soil</translation>
-    </message> 
-	<message>
-        <source>label_category_type</source>
-        <translation>Category</translation>
-    </message> 	 
+    </message>  
+    <message>
+        <source>label_function_type</source>
+        <translation>Function</translation>
+    </message>  
     <message>
         <source>label_fluid_type</source>
         <translation>Fluid</translation>
@@ -1912,99 +2039,111 @@
         <translation>Mfull dept</translation>
     </message>
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>   
     <message>
-        <source>label_doc_user</source>
+        <source>label_user</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_doc_type</source>
-        <translation>Type</translation>
+        <source>label_event</source>
+        <translation>Event</translation>
     </message>   
     <message>
-        <source>label_doc_tag</source>
+        <source>label_tag</source>
         <translation>Tag</translation>
     </message>   
     <message>
         <source>label_document</source>
         <translation>Document:</translation>
     </message>
-	<message>
-        <source>delete_row_doc</source>
-        <translation>Unlink document</translation>
-    </message>
     <message>
-        <source>label_event_junction_to</source>
+        <source>label_to_2</source>
         <translation>to</translation>
-    </message>
+    </message>   
     <message>
-        <source>label_event_juction_user</source>
+        <source>label_user_2</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_event_juction_event</source>
+        <source>label_tag_2</source>
+        <translation>Tag</translation>
+    </message>   
+    <message>
+        <source>label_picture</source>
+        <translation>Picture:</translation>
+    </message>   
+    <message>
+        <source>label_to_3</source>
+        <translation>to</translation>
+    </message>
+    <message>
+        <source>label_event_user</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <source>label_event_eventcat_id</source>
         <translation>Event</translation>
     </message>   
     <message>
-        <source>label_event_juction_event_type</source>
+        <source>label_cat_event_eventtype_id</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>label_junction_event</source>
+        <source>label_result</source>
         <translation>Event:</translation>
     </message>   
     <message>
-        <source>label_event_storage_to</source>
+        <source>label_to_4</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_event_storage_user</source>
+        <source>label_event_user_2</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_event_storage_event</source>
+        <source>label_event_eventcat_id_2</source>
         <translation>Event</translation>
     </message>   
     <message>
-        <source>label_event_storage_event_type</source>
+        <source>label_cat_event_eventtype_id_2</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>label_storage_event</source>
+        <source>label_result_2</source>
         <translation>Event:</translation>
     </message>   
     <message>
-        <source>label_event_outfall_to</source>
+        <source>label_to_6</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_event_outfall_user</source>
+        <source>label_event_user_4</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_event_outfall_event</source>
+        <source>label_event_eventcat_id_4</source>
         <translation>Event</translation>
     </message>   
     <message>
-        <source>label_event_outfall_event_type</source>
+        <source>label_cat_event_eventtype_id_4</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>label_outfall_event</source>
+        <source>label_result_4</source>
         <translation>Event:</translation>
     </message>   
     <message>
-        <source>label_log_to</source>
+        <source>label_to_5</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_log_user</source>
+        <source>label_user_3</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_log_event_type</source>
+        <source>label_event_type</source>
         <translation>Type</translation>
     </message>   
     <message>
@@ -2012,8 +2151,8 @@
         <translation>Log:</translation>
     </message>
     <message>
-        <source>label_scada_to</source>
-        <translation>to</translation>
+        <source>label_to_7</source>
+        <translation>Type</translation>
     </message>   
     <message>
         <source>label_scada</source>
@@ -2035,7 +2174,7 @@
     <message>
         <source>label_node_2</source>
         <translation>Node 2</translation>
-    </message>	
+    </message>
     <message>
         <source>label_y1</source>
         <translation>Y1</translation>
@@ -2043,38 +2182,6 @@
     <message>
         <source>label_y2</source>
         <translation>Y2</translation>
-    </message>
-	<message>
-        <source>label_elev1</source>
-        <translation>Elev 1</translation>
-    </message>
-	  <message>
-        <source>label_elev2</source>
-        <translation>Elev 2</translation>
-    </message>
-	  <message>
-        <source>label_z1</source>
-        <translation>Z1</translation>
-    </message>
-	  <message>
-        <source>label_z2</source>
-        <translation>Z2</translation>
-    </message>
-	  <message>
-        <source>label_r1</source>
-        <translation>R1</translation>
-    </message>
-	  <message>
-        <source>label_r2</source>
-        <translation>R2</translation>
-    </message>
-	  <message>
-        <source>label_y1_estimated</source>
-        <translation>Y1 esimated</translation>
-    </message>
-	  <message>
-        <source>label_y2_estimated</source>
-        <translation>Y2 estimated</translation>
     </message>
     <message>
         <source>label_sector_id</source>
@@ -2087,20 +2194,12 @@
     <message>
         <source>label_state</source>
         <translation>State</translation>
-    </message> 
-   <message>
-        <source>label_soilcat_id</source>
-        <translation>Soil</translation>
-    </message>  	
-	<message>
-        <source>label_category_type</source>
-        <translation>Category</translation>
-    </message>
+    </message>   
     <message>
         <source>label_workcat_id</source>
         <translation>Work</translation>
     </message>
-	<message>
+    <message>
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>   
@@ -2110,7 +2209,7 @@
     </message>
     <message>
         <source>label_observ</source>
-        <translation>Observation</translation>
+        <translation>Observ</translation>
     </message>   
     <message>
         <source>label_comment</source>
@@ -2127,7 +2226,15 @@
     <message>
         <source>label_builtdate</source>
         <translation>Builtdate</translation>
+    </message> 
+    <message>
+        <source>label_soilcat_id</source>
+        <translation>Soil</translation>
     </message>
+    <message>
+        <source>label_category_type</source>
+        <translation>Category</translation>
+    </message>   
     <message>
         <source>label_fluid_type</source>
         <translation>Fluid</translation>
@@ -2152,13 +2259,9 @@
         <source>label_address_03</source>
         <translation>Address 03</translation>
     </message>
-	<message>
-        <source>label_slope</source>
-        <translation>Slope</translation>
-    </message>
     <message>
-        <source>label_custom_length</source>
-        <translation>Custom length</translation>
+        <source>label_text_information</source>
+        <translation>Insert value of real length only to modify geometry length -></translation>
     </message>
     <message>
         <source>label_elements</source>
@@ -2481,19 +2584,19 @@
         <translation>Mfull dept</translation>
     </message>
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_doc_user</source>
+        <source>label_user</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_doc_type</source>
-        <translation>Type</translation>
+        <source>label_event</source>
+        <translation>Event</translation>
     </message>
     <message>
-        <source>label_doc_tag</source>
+        <source>label_tag</source>
         <translation>Tag</translation>
     </message>
     <message>
@@ -2501,35 +2604,51 @@
         <translation>Document:</translation>
     </message>
     <message>
-        <source>label_event_to</source>
+        <source>label_to_2</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_event_user</source>
+        <source>label_user_2</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_event_event</source>
+        <source>label_tag_2</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <source>label_picture</source>
+        <translation>Picture:</translation>
+    </message>
+    <message>
+        <source>label_to_7</source>
+        <translation>to</translation>
+    </message>
+    <message>
+        <source>label_event_user_5</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <source>label_event_eventcat_id_5</source>
         <translation>Event</translation>
     </message>
     <message>
-        <source>label_event_event_type</source>
+        <source>label_cat_event_eventtype_id_5</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>label_event</source>
+        <source>label_result_5</source>
         <translation>Event:</translation>
     </message>
     <message>
-        <source>label_log_to</source>
+        <source>label_to_3</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_log_user</source>
+        <source>label_user_3</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_log_event_type</source>
+        <source>label_event_type</source>
         <translation>Type</translation>
     </message>
     <message>
@@ -2537,7 +2656,7 @@
         <translation>Log:</translation>
     </message>
     <message>
-        <source>label_scada_to</source>
+        <source>label_to_4</source>
         <translation>to</translation>
     </message>
     <message>
@@ -2545,15 +2664,15 @@
         <translation>Scada:</translation>
     </message>
     <message>
-        <source>label_iptu_to</source>
+        <source>label_to_5</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_iptu_iptu</source>
+        <source>label_iptu</source>
         <translation>IPTU</translation>
     </message>
     <message>
-        <source>label_iptu</source>
+        <source>label_iptu_2</source>
         <translation>IPTU:</translation>
     </message>
     
@@ -2567,7 +2686,7 @@
     
     <message>
         <source>label_top_elev</source>
-        <translation>Top elevation</translation>
+        <translation>Elevation</translation>
     </message>
     <message>
         <source>label_ymax</source>
@@ -2593,17 +2712,13 @@
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>
-	<message>
-        <source>label_builtdate</source>
-        <translation>Builtdate</translation>
-    </message>
     <message>
         <source>label_annotation</source>
         <translation>Annotation</translation>
     </message>
     <message>
         <source>label_observ</source>
-        <translation>Observation</translation>
+        <translation>Observ</translation>
     </message>
     <message>
         <source>label_comment</source>
@@ -2649,24 +2764,20 @@
         <source>label_address_03</source>
         <translation>Address 03</translation>
     </message>
-	<message>
-        <source>label_elements</source>
-        <translation>Elements:</translation>
-    </message>
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_doc_user</source>
+        <source>label_user</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_doc_vent</source>
+        <source>label_event</source>
         <translation>Event</translation>
     </message>
     <message>
-        <source>label_doc_tag</source>
+        <source>label_tag</source>
         <translation>Tag</translation>
     </message>
     <message>
@@ -2674,35 +2785,51 @@
         <translation>Document:</translation>
     </message>
     <message>
-        <source>label_event_to</source>
+        <source>label_to_2</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_event_user</source>
+        <source>label_user_2</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_event_event</source>
+        <source>label_tag_2</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <source>label_picture</source>
+        <translation>Picture:</translation>
+    </message>
+    <message>
+        <source>label_to_3</source>
+        <translation>to</translation>
+    </message>
+    <message>
+        <source>label_user_3</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <source>label_event_2</source>
         <translation>Event</translation>
     </message>
     <message>
-        <source>label_event_event_type</source>
+        <source>label_event_type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>label_event</source>
+        <source>label_event_3</source>
         <translation>Event:</translation>
     </message>
     <message>
-        <source>label_log_to</source>
+        <source>label_to_4</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_log_user</source>
+        <source>label_user_4</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_log_event_type</source>
+        <source>label_event_type_2</source>
         <translation>Type</translation>
     </message>
     <message>
@@ -2710,15 +2837,15 @@
         <translation>Log:</translation>
     </message>
     <message>
-        <source>label_iptu_to</source>
+        <source>label_to_5</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_iptu_iptu</source>
+        <source>label_iptu</source>
         <translation>IPTU</translation>
     </message>
     <message>
-        <source>label_iptu</source>
+        <source>label_iptu_2</source>
         <translation>IPTU:</translation>
     </message>
     
@@ -2732,7 +2859,7 @@
     
     <message>
         <source>label_top_elev</source>
-        <translation>Top Elevation</translation>
+        <translation>Elevation</translation>
     </message>
     <message>
         <source>label_ymax</source>
@@ -2768,7 +2895,7 @@
     </message>
     <message>
         <source>label_observ</source>
-        <translation>Observation</translation>
+        <translation>Observ</translation>
     </message>
     <message>
         <source>label_comment</source>
@@ -2815,19 +2942,19 @@
         <translation>Address 03</translation>
     </message>
     <message>
-        <source>label_doc_to</source>
+        <source>label_to</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_doc_user</source>
+        <source>label_user</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_doc_type</source>
-        <translation>Type</translation>
+        <source>label_event</source>
+        <translation>Event</translation>
     </message>
     <message>
-        <source>label_doc_tag</source>
+        <source>label_tag</source>
         <translation>Tag</translation>
     </message>
     <message>
@@ -2835,35 +2962,51 @@
         <translation>Document:</translation>
     </message>
     <message>
-        <source>label_event_to</source>
+        <source>label_to_2</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_event_user</source>
+        <source>label_user_2</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_event_event</source>
+        <source>label_tag_2</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <source>label_picture</source>
+        <translation>Picture:</translation>
+    </message>
+    <message>
+        <source>label_to_3</source>
+        <translation>to</translation>
+    </message>
+    <message>
+        <source>label_user_3</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <source>label_event_2</source>
         <translation>Event</translation>
     </message>
     <message>
-        <source>label_event_event_type</source>
+        <source>label_event_type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <source>label_event</source>
+        <source>label_event_3</source>
         <translation>Event:</translation>
     </message>
     <message>
-        <source>label_log_to</source>
+        <source>label_to_4</source>
         <translation>to</translation>
     </message>
     <message>
-        <source>label_log_user</source>
+        <source>label_user_4</source>
         <translation>User</translation>
     </message>
     <message>
-        <source>label_log_event_type</source>
+        <source>label_event_type_2</source>
         <translation>Type</translation>
     </message>
     <message>
@@ -2873,227 +3016,5 @@
     
 </context>
 
-<context>
 
-    <name>change_node_type</name>
-    
-    <message>
-        <source>label_node_type</source>
-        <translation>Current system node type</translation>
-    </message>
-    <message>
-        <source>label_new_node_type</source>
-        <translation>New system node type</translation>
-    </message>
-    <message>
-        <source>label_custom_node_type</source>
-        <translation>Custom node type</translation>
-    </message>
-    <message>
-        <source>label_catalog_id</source>
-        <translation>Catalog</translation>
-    </message>
-	
-</context>
-	
-<context>
-
-    <name>config</name>
-    
-    <message>
-        <source>label_node_proximity</source>
-        <translation>Node proximity</translation>
-    </message>
-    <message>
-        <source>label_arc_searchnodes</source>
-        <translation>Arc search nodes</translation>
-    </message>
-	<message>
-        <source>label_node2arc</source>
-        <translation>Node2arc</translation>
-    </message>
-	<message>
-        <source>label_connec_proximity</source>
-        <translation>Connec proximity</translation>
-    </message>
-	<message>
-        <source>label_arc_toporepair</source>
-        <translation>Arc topology repair</translation>
-    </message>
-	<message>
-        <source>label_vnode_update_tolerance</source>
-        <translation>Vnode update tolerance</translation>
-    </message>
-	<message>
-        <source>label_node_duplicated_tolerance</source>
-        <translation>Duplicated node tolerance</translation>
-    </message>
-	<message>
-        <source>label_nodeinsert_catalog_vdefault</source>
-        <translation>Node insert catalog default value</translation>
-    </message>
-	<message>
-        <source>label_orphannode_delete</source>
-        <translation>Delete orphan node</translation>
-    </message>
-	<message>
-        <source>label_nodetype_change_enabled</source>
-        <translation>Enable node type change</translation>
-    </message>
-	<message>
-        <source>label_nodeinsert_arcendpoint</source>
-        <translation>Insert node in arc endpoint</translation>
-    </message>
-	<message>
-        <source>label_samenode_init_end_control</source>
-        <translation>Control arc with same initial and end node</translation>
-    </message>
-	<message>
-        <source>label_node_proximity_control</source>
-        <translation>Node proximity control</translation>
-    </message>
-	<message>
-        <source>label_connec_proximity_control</source>
-        <translation>Connec proximity control</translation>
-    </message>
-	<message>
-        <source>label_audit_function_control</source>
-        <translation>Audit function control</translation>
-    </message>
-	
-</context>
-
-<context>
-
-    <name>element</name>
-    
-    <message>
-        <source>label_location_type</source>
-        <translation>Location</translation>
-    </message>
-    <message>
-        <source>label_owner</source>
-        <translation>Owner</translation>
-    </message>
-	<message>
-        <source>label_state</source>
-        <translation>State</translation>
-    </message>
-	<message>
-        <source>label_workcat_id</source>
-        <translation>Work</translation>
-    </message>
-	<message>
-        <source>label_buildercat_id</source>
-        <translation>Builder</translation>
-    </message>
-	<message>
-        <source>label_builtdate</source>
-        <translation>Builtdate</translation>
-    </message>
-	<message>
-        <source>label_end_date</source>
-        <translation>End date</translation>
-    </message>
-	<message>
-        <source>label_annotation</source>
-        <translation>Annotation</translation>
-    </message>
-	<message>
-        <source>label_observ</source>
-        <translation>Observation</translation>
-    </message>
-	<message>
-        <source>label_comment</source>
-        <translation>Comment</translation>
-    </message>
-	<message>
-        <source>label_link</source>
-        <translation>Link</translation>
-    </message>	
-	<message>
-        <source>label_rotation</source>
-        <translation>Rotation</translation>
-    </message>
-
-</context>
-
-<context>
-
-    <name>file</name>
-    
-    <message>
-        <source>label_tag</source>
-        <translation>Tag</translation>
-    </message>	
-	<message>
-        <source>label_observ</source>
-        <translation>Observation</translation>
-    </message>	
-	<message>
-        <source>label_link</source>
-        <translation>Link</translation>
-    </message>
-	
-</context>	
-
-<context>
-
-    <name>table_wizard</name>
-    
-    <message>
-        <source>label_csv</source>
-        <translation>CSV file:</translation>
-    </message>	
-	<message>
-        <source>label_table</source>
-        <translation>Table:</translation>
-    </message>	
-	<message>
-        <source>label_delimeter</source>
-        <translation>Delimiter</translation>
-    </message>
-	
-</context>
-
-<context>
-
-    <name>topology_tools</name>
-    
-    <message>
-        <source>label_node_orphan</source>
-        <translation>Orphan node identifier</translation>
-    </message>
-	 <message>
-        <source>label_node_duplicated</source>
-        <translation>Duplicated node identifier</translation>
-    </message>
-	<message>
-        <source>label_connec_duplicated</source>
-        <translation>Duplicated connec identifier</translation>
-    </message>
-	 <message>
-        <source>label_arc_start_end</source>
-        <translation>Arc with the same start-end identifier</translation>
-    </message>
-	<message>
-        <source>label_node_dink</source>
-        <translation>Sink node identifier (only for ud projects)</translation>
-    </message>
-
-</context>
-	
-<context>
-
-    <name>result_compare_selector</name>
-	<message>
-        <source>label_result_name_to_show</source>
-        <translation>Result name (to show)</translation>
-    </message>	
-	<message>
-        <source>label_result_name_to_compare</source>
-        <translation>Result name (to compare)</translation>
-    </message>	
-</context>
-
-	</TS>
+</TS>
