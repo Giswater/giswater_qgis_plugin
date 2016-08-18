@@ -2931,6 +2931,10 @@
         <translation>Duplicated node tolerance</translation>
     </message>
     <message>
+        <source>label_connec_duplicated_tolerance</source>
+        <translation>Duplicated connec tolerance</translation>
+    </message>    
+    <message>
         <source>label_nodeinsert_catalog_vdefault</source>
         <translation>Node insert catalog default value</translation>
     </message>

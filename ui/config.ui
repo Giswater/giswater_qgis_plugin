@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
-    <height>288</height>
+    <width>631</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,8 +32,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>250</y>
+     <x>450</x>
+     <y>260</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -46,7 +46,7 @@
    <property name="geometry">
     <rect>
      <x>540</x>
-     <y>250</y>
+     <y>260</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -239,7 +239,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>230</y>
+     <y>260</y>
      <width>180</width>
      <height>22</height>
     </rect>
@@ -439,7 +439,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>230</y>
+     <y>260</y>
      <width>121</width>
      <height>22</height>
     </rect>
@@ -700,6 +700,52 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_connec_duplicated_tolerance">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>230</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="text">
+    <string>connec_duplicated_tolerance</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="connec_duplicated_tolerance">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>230</y>
+     <width>71</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>3</number>
+   </property>
+   <property name="singleStep">
+    <double>0.010000000000000</double>
    </property>
   </widget>
  </widget>

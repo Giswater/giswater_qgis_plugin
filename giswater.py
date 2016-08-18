@@ -1064,6 +1064,7 @@ class Giswater(QObject):
         utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
         utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
         utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
+        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
@@ -1078,7 +1079,10 @@ class Giswater(QObject):
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])    
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg_config, 'config')               
 
         # Open the dialog
         self.dlg_config.exec_()    
@@ -1095,6 +1099,7 @@ class Giswater(QObject):
         self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
         self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
         self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
+        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
         self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
@@ -1124,6 +1129,7 @@ class Giswater(QObject):
         sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
+        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
         sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
         sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
         sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
