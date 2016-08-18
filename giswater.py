@@ -25,7 +25,6 @@ from map_tools.move_node import MoveNode
 from search.search_plus import SearchPlus
 
 
-
 class Giswater(QObject):
    
     def __init__(self, iface):
@@ -58,26 +57,32 @@ class Giswater(QObject):
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())    
         
-        # Set controller to handle settings and database
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()           
-        
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
+        self.map_tools = {}
         self.search_plus = None
         self.srid = None
+        
+        # Set controller to handle settings and database connection
+        self.dao = None
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        connection_status = self.controller.set_database_connection()
+        if not connection_status:
+            msg = self.controller.last_error  
+            self.controller.show_message(msg, 1, 100) 
+            return 
+        else:
+            self.dao = self.controller.getDao()           
+        
+        # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         
-        # {function_name, map_tool}
-        self.map_tools = {}
-        
         # Define signals
         self.set_signals()
+        
                
-
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
@@ -120,13 +125,13 @@ class Giswater(QObject):
             try:
                 action.setCheckable(is_checkable) 
                 # Management toolbar actions
-                if int(index_action) in (17, 20, 21, 24, 26, 27, 28, 99):    
+                if int(index_action) in (17, 19, 20, 21, 24, 25, 26, 27, 28, 99):    
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
                 elif int(index_action) in (32, 33, 34, 36):    
                     callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)
+                    action.triggered.connect(callback_function)                    
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -168,7 +173,7 @@ class Giswater(QObject):
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
         
-        if self.controller is None:
+        if self.dao is None:
             return
         
         # Create plugin main menu
@@ -246,8 +251,11 @@ class Giswater(QObject):
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')          
+        self.gsw_file = self.settings.value('files/gsw_file')   
                          
+        # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
+        self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
+                                 
         # Project initialization
         self.project_read()               
 
@@ -256,7 +264,7 @@ class Giswater(QObject):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         
         try:
-            for action_index, action in self.actions.iteritems():
+            for action_index, action in self.actions.iteritems():   #@UnusedVariable
                 self.iface.removePluginMenu(self.menu_name, action)
                 self.iface.removeToolBarIcon(action)
             if self.toolbar_ud_enabled:    
@@ -351,6 +359,9 @@ class Giswater(QObject):
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
         
+        if self.dao is None:
+            return
+                
         # Hide all toolbars
         self.hide_toolbars()
                     
@@ -367,7 +378,7 @@ class Giswater(QObject):
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   
+            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   #@UnusedVariable
             if uri_table is not None:
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
@@ -408,7 +419,7 @@ class Giswater(QObject):
         self.search_project_type()
                                          
         # Set layer custom UI form and init function   
-        if self.layer_arc is not None:       
+        if self.layer_arc is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_arc_init.py')       
             self.layer_arc.editFormConfig().setUiForm(file_ui) 
@@ -416,7 +427,7 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
                                     
-        if self.layer_node is not None:       
+        if self.layer_node is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_node.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_node_init.py')       
             self.layer_node.editFormConfig().setUiForm(file_ui) 
@@ -424,7 +435,7 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')                         
                                     
-        if self.layer_connec is not None:       
+        if self.layer_connec is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_connec.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_connec_init.py')       
             self.layer_connec.editFormConfig().setUiForm(file_ui) 
@@ -472,7 +483,7 @@ class Giswater(QObject):
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        (uri_schema, uri_table) = self.get_layer_source(layer)  
+        (uri_schema, uri_table) = self.get_layer_source(layer)  #@UnusedVariable  
         if uri_table is not None:
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'
@@ -502,11 +513,13 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         
         # MG toolbar
+        self.enable_action(True, 19)   
         self.enable_action(True, 21)   
+        self.enable_action(True, 24)   
+        self.enable_action(True, 25)         
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 37)
-        self.enable_action(True, 24)   
                 
                     
     def ws_generic(self, function_name):   
@@ -560,4 +573,4 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))              
-                    
+            

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel
 
-import os.path
+import os
+import sys
 import subprocess
-
-#from utils_giswater import *                
-from ..utils_giswater import *              # @UnresolvedImport 
+  
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+import utils_giswater      
+         
 from ..ui.add_element import Add_element    # @UnresolvedImport
 from ..ui.add_file import Add_file          # @UnresolvedImport
 
@@ -35,11 +38,13 @@ class Ed():
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
-        if dlg is None:
-            dlg = self.dlg   
-        dlg.close()    
-                
-                
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            dlg.close()
+        except AttributeError as e:
+            print "AttributeError: "+str(e)    
+                  
             
     def ed_search_plus(self):   
         ''' Button 32. Open dialog to select street and portal number ''' 
@@ -52,9 +57,12 @@ class Ed():
           
         # Create the dialog and signals
         self.dlg = Add_element()
-        setDialog(self.dlg)
+        utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+          
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'element')                    
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
@@ -69,37 +77,37 @@ class Ed():
         # Fill  comboBox elementcat_id
         sql = "SELECT DISTINCT(elementcat_id) FROM "+self.schema_name+".element ORDER BY elementcat_id"
         rows = self.dao.get_rows(sql)
-        fillComboBox("elementcat_id", rows) 
+        utils_giswater.fillComboBox("elementcat_id", rows) 
         
         # Fill  comboBox state
         sql = "SELECT DISTINCT(state) FROM "+self.schema_name+".element ORDER BY state"
         rows = self.dao.get_rows(sql)
-        fillComboBox("state", rows)
+        utils_giswater.fillComboBox("state", rows)
         
         # Fill comboBox location_type 
         sql = "SELECT DISTINCT(location_type) FROM "+self.schema_name+".element ORDER BY location_type"
         rows = self.dao.get_rows(sql)
-        fillComboBox("location_type", rows)
+        utils_giswater.fillComboBox("location_type", rows)
         
         # Fill comboBox workcat_id 
         sql = "SELECT DISTINCT(workcat_id) FROM "+self.schema_name+".element ORDER BY workcat_id"
         rows = self.dao.get_rows(sql)
-        fillComboBox("workcat_id", rows)
+        utils_giswater.fillComboBox("workcat_id", rows)
         
         # Fill comboBox buildercat_id
         sql = "SELECT DISTINCT(buildercat_id) FROM "+self.schema_name+".element ORDER BY buildercat_id"
         rows = self.dao.get_rows(sql)
-        fillComboBox("buildercat_id", rows)
+        utils_giswater.fillComboBox("buildercat_id", rows)
         
         # Fill comboBox ownercat_id 
         sql = "SELECT DISTINCT(ownercat_id) FROM "+self.schema_name+".element ORDER BY ownercat_id"
         rows = self.dao.get_rows(sql)
-        fillComboBox("ownercat_id", rows)
+        utils_giswater.fillComboBox("ownercat_id", rows)
         
         # Fill comboBox verified
         sql = "SELECT DISTINCT(verified) FROM "+self.schema_name+".element ORDER BY verified"
         rows = self.dao.get_rows(sql)
-        fillComboBox("verified", rows)
+        utils_giswater.fillComboBox("verified", rows)
         
         # Open the dialog
         self.dlg.exec_()    
@@ -108,25 +116,25 @@ class Ed():
     def ed_add_element_accept(self):
            
         # Get values from comboboxes-elementcat_id
-        self.elementcat_id = getWidgetText("elementcat_id")  
+        self.elementcat_id = utils_giswater.getWidgetText("elementcat_id")  
         
         # Get state from combobox
-        self.state = getWidgetText("state")   
+        self.state = utils_giswater.getWidgetText("state")   
                
         # Get element_id entered by user
-        self.element_id = getWidgetText("element_id")
-        self.annotation = getWidgetText("annotation")
-        self.observ = getWidgetText("observ")
-        self.comment = getWidgetText("comment")
-        self.location_type = getWidgetText("location_type")
-        self.workcat_id = getWidgetText("workcat_id")
-        self.buildercat_id = getWidgetText("buildercat_id")
-        #self.builtdate = utils_giswater.getWidgetText("builtdate")
-        self.ownercat_id = getWidgetText("ownercat_id")
-        #self.enddate = utils_giswater.getWidgetText("enddate")
-        self.rotation = getWidgetText("rotation")
-        self.link = getWidgetText("link")
-        self.verified = getWidgetText("verified")
+        self.element_id = utils_giswater.getWidgetText("element_id")
+        self.annotation = utils_giswater.getWidgetText("annotation")
+        self.observ = utils_giswater.getWidgetText("observ")
+        self.comment = utils_giswater.getWidgetText("comment")
+        self.location_type = utils_giswater.getWidgetText("location_type")
+        self.workcat_id = utils_giswater.getWidgetText("workcat_id")
+        self.buildercat_id = utils_giswater.getWidgetText("buildercat_id")
+        #self.builtdate = utils_giswater.utils_giswater.getWidgetText("builtdate")
+        self.ownercat_id = utils_giswater.getWidgetText("ownercat_id")
+        #self.enddate = utils_giswater.utils_giswater.getWidgetText("enddate")
+        self.rotation = utils_giswater.getWidgetText("rotation")
+        self.link = utils_giswater.getWidgetText("link")
+        self.verified = utils_giswater.getWidgetText("verified")
      
         # Execute data to database Elements 
         sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
@@ -233,9 +241,12 @@ class Ed():
                         
         # Create the dialog and signals
         self.dlg = Add_file()
-        setDialog(self.dlg)
+        utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'file')              
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
@@ -249,12 +260,12 @@ class Ed():
         # Fill comboBox elementcat_id
         sql = "SELECT DISTINCT(doc_type) FROM "+self.schema_name+".doc ORDER BY doc_type"
         rows = self.dao.get_rows(sql)
-        fillComboBox("doc_type", rows) 
+        utils_giswater.fillComboBox("doc_type", rows) 
         
         # Fill comboBox tagcat_id
         sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".doc ORDER BY tagcat_id"
         rows = self.dao.get_rows(sql)
-        fillComboBox("tagcat_id", rows) 
+        utils_giswater.fillComboBox("tagcat_id", rows) 
         
         # Adding auto-completion to a QLineEdit
         self.edit = self.dlg.findChild(QLineEdit,"doc_id")
@@ -279,19 +290,36 @@ class Ed():
         
     def ed_add_file_autocomplete(self):    
 
+        # Action on click when value is selected ( ComboBox - Qcompleter )
         # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
-        self.doc_id = getWidgetText("doc_id") 
+        self.doc_id = utils_giswater.getWidgetText("doc_id") 
+        
+        sql = "SELECT doc_type FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_doc_type = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("doc_type", self.row_doc_type[0]) 
+        
+        sql = "SELECT tagcat_id FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_tagcat = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("tagcat_id", self.row_tagcat[0]) 
+        
+        sql = "SELECT observ FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_observ = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("observ", self.row_observ[0]) 
+        
+        sql = "SELECT path FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_path = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("link", self.row_path[0]) 
         
         
     def ed_add_file_accept(self):   
         
         # Get values from comboboxes
-        self.doc_id = getWidgetText("doc_id") 
-        self.doc_type = getWidgetText("doc_type")   
-        self.tagcat_id = getWidgetText("tagcat_id")  
-        self.observ = getWidgetText("observ")
-        self.link = getWidgetText("link")
+        self.doc_id = utils_giswater.getWidgetText("doc_id") 
+        self.doc_type = utils_giswater.getWidgetText("doc_type")   
+        self.tagcat_id = utils_giswater.getWidgetText("tagcat_id")  
+        self.observ = utils_giswater.getWidgetText("observ")
+        self.link = utils_giswater.getWidgetText("link")
         
         # Execute data to database DOC 
         sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
@@ -331,7 +359,7 @@ class Ed():
                         # Get arc_id from current arc
                         feature = features_arcs[i]
                         self.arc_id = feature.attribute('arc_id')
-                        self.doc_id = getWidgetText("doc_id")
+                        self.doc_id = utils_giswater.getWidgetText("doc_id")
                                               
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
                         sql = "INSERT INTO "+self.schema_name+".doc_x_arc (arc_id, doc_id) "
@@ -354,7 +382,7 @@ class Ed():
                         # Get arc_id from current arc
                         feature = features_nodes[i]
                         self.node_id = feature.attribute('node_id')
-                        self.doc_id = getWidgetText("doc_id")
+                        self.doc_id = utils_giswater.getWidgetText("doc_id")
                                               
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
                         sql = "INSERT INTO "+self.schema_name+".doc_x_node (node_id,doc_id) "
@@ -377,7 +405,7 @@ class Ed():
                         # Get arc_id from current arc
                         feature = features_connecs[i]
                         self.connec_id = feature.attribute('connec_id')
-                        self.doc_id = getWidgetText("doc_id")
+                        self.doc_id = utils_giswater.getWidgetText("doc_id")
 
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
                         sql = "INSERT INTO "+self.schema_name+".doc_x_connec (connec_id, doc_id) "

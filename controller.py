@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings   # @UnusedWildImport
+from PyQt4.QtGui import QLabel, QCheckBox
+
+import subprocess
 
 from dao.pg_dao import PgDao
 
@@ -23,8 +26,10 @@ class DaoController():
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
     
-    def tr(self, message):
-        return QCoreApplication.translate(self.plugin_name, message)                
+    def tr(self, message, context=None):
+        if context is None:
+            context = self.plugin_name
+        return QCoreApplication.translate(context, message)                            
     
     def set_settings(self, settings):
         self.settings = settings      
@@ -55,7 +60,8 @@ class DaoController():
             user = qgis_settings.value(root+"username", '')
             pwd = qgis_settings.value(root+"password", '') 
         else:
-            self.last_error = self.tr('Database connection name not found. Please check configuration file')
+            msg = "Database connection name '"+self.connection_name+"' not set in QGIS. Please define it or check parameter 'configuration_name' in file 'giswater.config'"
+            self.last_error = self.tr(msg)
             return False
     
         # Connect to Database 
@@ -118,7 +124,7 @@ class DaoController():
         return True  
     
             
-    def execute_sql(self, sql):
+    def execute_sql(self, sql, search_audit=False):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
@@ -126,8 +132,9 @@ class DaoController():
             self.show_message(self.log_codes[-1], 2)   
             return False
         else:
-            # If we have found an error, then get last record from audit tables            
-            return self.get_error_from_audit()    
+            if search_audit:
+                # Get last record from audit tables (searching for a possible error)
+                return self.get_error_from_audit()    
     
     
     def get_error_from_audit(self):
@@ -154,5 +161,38 @@ class DaoController():
                 pass
         
         return True
+        
+        
+    def translate_form(self, dialog, context_name):
+        ''' Translate widgets of the form to current language '''
+        
+        # Get objects of type: QLabel
+        widget_list = dialog.findChildren(QLabel)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
+            
+        # Get objects of type: QCheckBox
+        widget_list = dialog.findChildren(QCheckBox)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
+            
+            
+    def translate_widget(self, context_name, widget):
+        ''' Translate widget text '''
+        
+        if widget:
+            widget_name = widget.objectName()
+            text = self.tr(widget_name, context_name)
+            if text != widget_name:
+                widget.setText(text)    
+                
+                        
+    def start_program(self, program):     
+           
+        SW_MINIMIZE = 6
+        info = subprocess.STARTUPINFO()
+        info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+        info.wShowWindow = SW_MINIMIZE   
+        subprocess.Popen(program, startupinfo=info)                            
         
     

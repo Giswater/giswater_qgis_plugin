@@ -4,13 +4,18 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QFileDialog, QMessageBox
 
 import os
+import sys
 import subprocess
 
-#from utils_giswater import *      
-from ..utils_giswater import *
-from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport
-from ..ui.config import Config                      # @UnresolvedImport
-from ..ui.table_wizard import TableWizard           # @UnresolvedImport
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+import utils_giswater    
+
+from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
+from ..ui.config import Config                                  # @UnresolvedImport
+from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
+from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
+from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 
 
 class Mg():
@@ -31,9 +36,12 @@ class Mg():
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
-        if dlg is None:
-            dlg = self.dlg   
-        dlg.close()    
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            dlg.close()
+        except AttributeError as e:
+            print "AttributeError: "+str(e)   
                 
 
     def mg_delete_node(self):
@@ -62,7 +70,49 @@ class Mg():
         # Refresh map canvas
         self.iface.mapCanvas().refresh()   
                 
-           
+         
+    def mg_arc_topo_repair(self):
+        ''' Button 19. Topology repair '''
+
+        # Open dialog to check wich topology functions we want to execute
+        self.dlg = TopologyTools()     
+        if self.project_type == 'ws':
+            self.dlg.check_node_sink.setEnabled(False)     
+ 
+        # Set signals
+        self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'topology_tools')                
+
+        self.dlg.exec_()   
+    
+    
+    def mg_arc_topo_repair_accept(self):
+        ''' Button 19. Executes functions that are selected '''
+        
+        if self.dlg.check_node_orphan.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_node_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_connec_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_arc_same_startend.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_node_sink.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
+            self.controller.execute_sql(sql) 
+            
+                       
     def mg_connec_tool(self):
         ''' Button 20. User select connections from layer 'connec' 
         and executes function: 'gw_fct_connect_to_network' '''      
@@ -115,6 +165,9 @@ class Mg():
         self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
         self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
 
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'table_wizard')  
+        
         self.dlg.exec_()            
 
         
@@ -138,8 +191,8 @@ class Mg():
     def mg_table_wizard_import_csv(self):
 
         # Get selected table, delimiter, and header
-        table_name = getWidgetText(self.dlg.cbo_table)  
-        delimiter = getWidgetText(self.dlg.cbo_delimiter)  
+        table_name = utils_giswater.getWidgetText(self.dlg.cbo_table)  
+        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)  
         header_status = self.dlg.chk_header.checkState()             
         
         # Get CSV file. Check if file exists
@@ -175,12 +228,12 @@ class Mg():
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
-            self.showWarning(self.controller.tr("Java Runtime executable file not found at: "+self.java_exe), 10)
+            self.controller.show_warning("Java Runtime executable file not found at: "+self.java_exe, 10)
             return  
         
         # Check if giswater.jar file exists
         if not os.path.exists(self.giswater_jar):
-            self.showWarning(self.controller.tr("Giswater executable file not found at: "+self.giswater_jar), 10)
+            self.controller.show_warning("Giswater executable file not found at: "+self.giswater_jar, 10)
             return  
 
         # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
@@ -199,6 +252,58 @@ class Mg():
         # Show information message    
         self.controller.show_info("Executing... "+aux)    
                 
+                
+    def mg_result_selector(self):
+        ''' Button 25. Result selector '''
+        
+        # Create the dialog and signals
+        self.dlg = ResultCompareSelector()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_accept.pressed.connect(self.mg_result_selector_accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)     
+        
+        # Set values from widgets of type QComboBox
+        sql = "SELECT DISTINCT(result_id) FROM "+self.schema_name+".rpt_cat_result ORDER BY result_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("rpt_selector_result_id", rows) 
+        utils_giswater.fillComboBox("rpt_selector_compare_id", rows)     
+        
+        # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
+        sql = "SELECT result_id FROM "+self.schema_name+".rpt_selector_result"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("rpt_selector_result_id", row["result_id"])             
+        sql = "SELECT result_id FROM "+self.schema_name+".rpt_selector_compare"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("rpt_selector_compare_id", row["result_id"])             
+        
+        # Open the dialog
+        self.dlg.exec_()            
+                   
+        
+    def mg_result_selector_accept(self):
+        ''' Update current values to the table '''
+           
+        # Get new values from widgets of type QComboBox
+        rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
+        rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
+
+        # Delete previous values
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
+        sql= "DELETE FROM "+self.schema_name+".rpt_selector_result" 
+        self.dao.execute_sql(sql)
+        sql= "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
+        self.dao.execute_sql(sql)
+        sql= "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        self.dao.execute_sql(sql)
+        sql= "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
+        self.dao.execute_sql(sql)
+
+        # Show message to user
+        self.controller.show_info("Values has been updated")
+        self.close_dialog(self.dlg) 
+                      
         
     def mg_flow_trace(self):
         ''' Button 26. User select one node or arc.
@@ -270,7 +375,7 @@ class Mg():
 
         # Manage SQL execution result
         if result is None:
-            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
+            self.controller.show_warning("Uncatched error. Open PotgreSQL log file to get more details")   
             return   
         elif result[0] == 0:
             self.controller.show_info("Process completed", 50)    
@@ -317,9 +422,12 @@ class Mg():
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
-        setDialog(self.dlg)
-        fillComboBox("node_type_type_new", rows) 
-    
+        utils_giswater.setDialog(self.dlg)
+        utils_giswater.fillComboBox("node_type_type_new", rows) 
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'change_node_type') 
+            
         # Open the dialog
         self.dlg.exec_()    
      
@@ -328,7 +436,7 @@ class Mg():
         ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) ''' 
         
         # Get selected value from 1st combobox
-        self.value_combo1 = getWidgetText("node_type_type_new")   
+        self.value_combo1 = utils_giswater.getWidgetText("node_type_type_new")   
         
         # When value is selected, enabled 2nd combo box
         if self.value_combo1 != 'null':
@@ -336,7 +444,7 @@ class Mg():
             # Fill 2nd combo_box-custom node type
             sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type WHERE type='"+self.value_combo1+"'"
             rows = self.dao.get_rows(sql)
-            fillComboBox("node_node_type_new", rows)
+            utils_giswater.fillComboBox("node_node_type_new", rows)
        
        
     def mg_change_elem_type_get_value_2(self, index):    
@@ -346,7 +454,7 @@ class Mg():
             return
         
         # Get selected value from 2nd combobox
-        self.value_combo2 = getWidgetText("node_node_type_new")         
+        self.value_combo2 = utils_giswater.getWidgetText("node_node_type_new")         
         
         # When value is selected, enabled 3rd combo box
         if self.value_combo2 != 'null':
@@ -357,11 +465,11 @@ class Mg():
             sql+= " FROM "+self.schema_name+".cat_node"
             sql+= " WHERE nodetype_id='"+self.value_combo2+"'"
             rows = self.dao.get_rows(sql)
-            fillComboBox("node_nodecat_id", rows)     
+            utils_giswater.fillComboBox("node_nodecat_id", rows)     
     
     
     def mg_change_elem_type_get_value_3(self, index):
-        self.value_combo3 = getWidgetText("node_nodecat_id")      
+        self.value_combo3 = utils_giswater.getWidgetText("node_nodecat_id")      
         
         
     def mg_change_elem_type_accept(self):
@@ -395,18 +503,19 @@ class Mg():
         
         # Create the dialog and signals
         self.dlg_config = Config()
-        setDialog(self.dlg_config)
+        utils_giswater.setDialog(self.dlg_config)
         self.dlg_config.btn_accept.pressed.connect(self.mg_config_accept)
         self.dlg_config.btn_cancel.pressed.connect(self.close_dialog)
         
         # Set values from widgets of type QSoubleSpinBox
-        setWidgetText("node_proximity", row["node_proximity"])
-        setWidgetText("arc_searchnodes", row["arc_searchnodes"])
-        setWidgetText("node2arc", row["node2arc"])
-        setWidgetText("connec_proximity", row["connec_proximity"])
-        setWidgetText("arc_toporepair", row["arc_toporepair"])
-        setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
-        setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
+        utils_giswater.setWidgetText("node_proximity", row["node_proximity"])
+        utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
+        utils_giswater.setWidgetText("node2arc", row["node2arc"])
+        utils_giswater.setWidgetText("connec_proximity", row["connec_proximity"])
+        utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
+        utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
+        utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
+        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
@@ -415,12 +524,16 @@ class Mg():
         self.dlg_config.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
         self.dlg_config.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
         self.dlg_config.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
-       
+        self.dlg_config.audit_function_control.setChecked(bool(row["audit_function_control"]))
+  
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
-        fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
+        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg_config, 'config')               
 
         # Open the dialog
         self.dlg_config.exec_()    
@@ -430,16 +543,17 @@ class Mg():
         ''' Get new values from all the widgets '''
         
         # Get new values from widgets of type QSoubleSpinBox
-        self.new_value_prox = getWidgetText("node_proximity").replace(",", ".")
-        self.new_value_arc = getWidgetText("arc_searchnodes").replace(",", ".")
-        self.new_value_node = getWidgetText("node2arc").replace(",", ".")
-        self.new_value_con = getWidgetText("connec_proximity").replace(",", ".")
-        self.new_value_arc_top = getWidgetText("arc_toporepair").replace(",", ".")
-        self.new_value_arc_tolerance = getWidgetText("vnode_update_tolerance").replace(",", ".")
-        self.new_value_node_duplicated_tolerance = getWidgetText("node_duplicated_tolerance").replace(",", ".")
+        self.new_value_prox = utils_giswater.getWidgetText("node_proximity").replace(",", ".")
+        self.new_value_arc = utils_giswater.getWidgetText("arc_searchnodes").replace(",", ".")
+        self.new_value_node = utils_giswater.getWidgetText("node2arc").replace(",", ".")
+        self.new_value_con = utils_giswater.getWidgetText("connec_proximity").replace(",", ".")
+        self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
+        self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
+        self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
+        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
-        self.new_value_combobox = getWidgetText("nodeinsert_catalog_vdefault")
+        self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
         
         # Get new values from widgets of type  QCheckBox
         self.new_value_orpha = self.dlg_config.orphannode.isChecked()
@@ -448,6 +562,7 @@ class Mg():
         self.new_value_samenode_init_end_control = self.dlg_config.samenode_init_end_control.isChecked()
         self.new_value_node_proximity_control = self.dlg_config.node_proximity_control.isChecked()
         self.new_value_connec_proximity_control = self.dlg_config.connec_proximity_control.isChecked()
+        self.new_value_audit_function_control = self.dlg_config.audit_function_control.isChecked()
 
     
     def mg_config_accept(self):
@@ -465,6 +580,7 @@ class Mg():
         sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
+        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
         sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
         sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
         sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
@@ -472,6 +588,7 @@ class Mg():
         sql+= ", samenode_init_end_control = '"+str(self.new_value_samenode_init_end_control)+"'"
         sql+= ", node_proximity_control = '"+str(self.new_value_node_proximity_control)+"'"
         sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
+        sql+= ", audit_function_control = '"+str(self.new_value_audit_function_control)+"'"        
         self.dao.execute_sql(sql)
 
         # Show message to user
