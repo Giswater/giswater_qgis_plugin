@@ -56,7 +56,8 @@ class DaoController():
             user = qgis_settings.value(root+"username", '')
             pwd = qgis_settings.value(root+"password", '') 
         else:
-            self.last_error = self.tr('Database connection name not found. Please check configuration file')
+            msg = "Database connection name '"+self.connection_name+"' not set in QGIS. Please define it or check parameter 'configuration_name' in file 'giswater.config'"
+            self.last_error = self.tr(msg)
             return False
     
         # Connect to Database 

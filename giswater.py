@@ -65,24 +65,28 @@ class Giswater(QObject):
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())    
         
-        # Set controller to handle settings and database
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()           
-        
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
+        self.map_tools = {}
         self.search_plus = None
         self.srid = None
         
-        # {function_name, map_tool}
-        self.map_tools = {}
+        # Set controller to handle settings and database connection
+        self.dao = None
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        connection_status = self.controller.set_database_connection()
+        if not connection_status:
+            msg = self.controller.last_error  
+            self.controller.show_message(msg, 1, 100) 
+            return 
+        else:
+            self.dao = self.controller.getDao()           
         
         # Define signals
         self.set_signals()
+        
                
-
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
@@ -178,7 +182,7 @@ class Giswater(QObject):
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
         
-        if self.controller is None:
+        if self.dao is None:
             return
         
         # Create plugin main menu
@@ -361,6 +365,9 @@ class Giswater(QObject):
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
         
+        if self.dao is None:
+            return
+                
         # Hide all toolbars
         self.hide_toolbars()
                     
@@ -1355,10 +1362,6 @@ class Giswater(QObject):
         # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
         self.doc_id = utils_giswater.getWidgetText("doc_id") 
-        print(self.doc_id)
-        #sql = "SELECT * FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        #row = self.dao.get_row(sql)
-        #print(row[4])
         
         sql = "SELECT doc_type FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
         self.row_doc_type = self.dao.get_row(sql)
@@ -1377,7 +1380,6 @@ class Giswater(QObject):
         utils_giswater.setWidgetText("link", self.row_path[0]) 
        
         
-        
     def ed_add_file_accept(self):   
         
         # Get values from comboboxes
@@ -1388,14 +1390,7 @@ class Giswater(QObject):
         self.link = utils_giswater.getWidgetText("link")
         
         self.doc_id = utils_giswater.getWidgetText("doc_id")
-        sql="IF EXIST (SELECT id FROM "+self.schema_name+".doc WHERE id= '"+self.doc_id+"') BEGIN"
-        print(sql) 
-        
-        exist = cursor.fetchone()
-if exist is None:
-  #not exists
-else:
-  #exists
+        sql = "IF EXIST (SELECT id FROM "+self.schema_name+".doc WHERE id= '"+self.doc_id+"') BEGIN"
         
         # Execute data to database DOC 
         sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
@@ -1405,7 +1400,6 @@ else:
         # Update data base
         sql = "UPDATE "+self.schema_name+".doc SET doc_type = '"+self.row_doc_type[0]+"', tagcat_id= '"+self.row_tagcat[0]+"',observ = '"+self.row_observ[0]+"', path = '"+self.row_path[0]+"'"
         sql+= " WHERE id = '"+self.doc_id+"'"   
-        
         
         # Get layers
         layers = self.iface.legendInterface().layers()
