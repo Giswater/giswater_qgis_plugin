@@ -112,6 +112,8 @@ class NodeDialog(ParentDialog):
         
         self.tab_main.removeTab(7)      
         self.tab_main.removeTab(2) 
+        self.tab_main.removeTab(4) 
+        self.tab_main.removeTab(3) 		
         
         # Hide some tabs depending 'epa_type'
         man_visible = False

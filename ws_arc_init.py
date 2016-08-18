@@ -86,9 +86,9 @@ class ArcDialog(ParentDialog):
         ''' Hide some tabs '''
             
         self.tab_main.removeTab(7)      
-        self.tab_main.removeTab(2)      
-        self.tab_main.removeTab(1)      
-            
+        self.tab_main.removeTab(2)           
+        self.tab_main.removeTab(3) 
+        self.tab_main.removeTab(3)
    
     def load_tab_analysis(self):
         ''' Load data from tab 'Analysis' '''
