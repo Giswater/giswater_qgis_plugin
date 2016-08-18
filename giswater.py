@@ -31,6 +31,7 @@ from ui.config import Config
 from ui.add_element import Add_element
 from ui.add_file import Add_file
 from ui.result_compare_selector import ResultCompareSelector
+from ui.topology_tools import TopologyTools
 
 
 class Giswater(QObject):
@@ -58,32 +59,35 @@ class Giswater(QObject):
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+            QCoreApplication.installTranslator(self.translator)
          
         # Load local settings of the plugin
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())    
         
-        # Set controller to handle settings and database
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()           
-        
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
+        self.map_tools = {}
         self.search_plus = None
         self.srid = None
         
-        # {function_name, map_tool}
-        self.map_tools = {}
+        # Set controller to handle settings and database connection
+        self.dao = None
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        connection_status = self.controller.set_database_connection()
+        if not connection_status:
+            msg = self.controller.last_error  
+            self.controller.show_message(msg, 1, 100) 
+            return 
+        else:
+            self.dao = self.controller.getDao()           
         
         # Define signals
         self.set_signals()
+        
                
-
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
@@ -135,7 +139,7 @@ class Giswater(QObject):
                 action.setCheckable(is_checkable) 
                 # Define buttons to execute custom or generic function
                 # Custom function
-                if int(index_action) in (17, 20, 21, 24, 25, 26, 27, 28) or int(index_action) >= 30:    
+                if int(index_action) in (17, 19, 20, 21, 24, 25, 26, 27, 28) or int(index_action) >= 30:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 # Generic function
@@ -179,7 +183,7 @@ class Giswater(QObject):
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
         
-        if self.controller is None:
+        if self.dao is None:
             return
         
         # Create plugin main menu
@@ -362,6 +366,9 @@ class Giswater(QObject):
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
         
+        if self.dao is None:
+            return
+                
         # Hide all toolbars
         self.hide_toolbars()
                     
@@ -512,12 +519,13 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         
         # MG toolbar
+        self.enable_action(True, 19)   
         self.enable_action(True, 21)   
+        self.enable_action(True, 24)   
+        self.enable_action(True, 25)         
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 37)
-        self.enable_action(True, 24)   
-        self.enable_action(True, 25)   
                 
                     
     def ws_generic(self, function_name):   
@@ -600,20 +608,64 @@ class Giswater(QObject):
             self.showInfo(self.controller.tr("GSW file not found at: "+self.gsw_file), 10)
             self.gsw_file = ""    
         
-        # Execute process
+        # Start program     
         aux = '"'+self.giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"])
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"]
         else:
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"])
+            program = [self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"]
+            
+        self.controller.start_program(program)
         
         # Show information message    
         self.showInfo(self.controller.tr("Executing... "+aux))
-                              
+                                        
                               
                                   
     ''' Management bar functions '''   
+        
+    def mg_arc_topo_repair(self):
+        ''' Button 19. Topology repair '''
+
+        # Open dialog to check wich topology functions we want to execute
+        self.dlg = TopologyTools()     
+        if self.project_type == 'ws':
+            self.dlg.check_node_sink.setEnabled(False)     
+ 
+        # Set signals
+        self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
+        self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'topology_tools')                
+
+        self.dlg.exec_()   
+    
+    
+    def mg_arc_topo_repair_accept(self):
+        ''' Button 19. Executes functions that are selected '''
+        
+        if self.dlg.check_node_orphan.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_node_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_connec_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_arc_same_startend.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"  
+            self.controller.execute_sql(sql) 
+            
+        if self.dlg.check_node_sink.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
+            self.controller.execute_sql(sql) 
+            
         
     def mg_go2epa_express(self):
         ''' Button 24. Open giswater in silent mode
@@ -635,14 +687,16 @@ class Giswater(QObject):
         if not os.path.exists(self.gsw_file):
             self.showInfo(self.controller.tr("GSW file not found at: "+self.gsw_file), 10)
             self.gsw_file = ""    
-        
-        # Execute process
+            
+        # Start program     
         aux = '"'+self.giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"])
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
         else:
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"])
+            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
+            
+        self.controller.start_program(program)            
         
         # Show information message    
         self.showInfo(self.controller.tr("Executing... "+aux))        
@@ -725,6 +779,9 @@ class Giswater(QObject):
         # Set signals
         self.dlg.btn_select_file.clicked.connect(self.select_file)
         self.dlg.btn_import_csv.clicked.connect(self.import_csv)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'table_wizard')            
 
         self.dlg.exec_()            
 
@@ -908,6 +965,9 @@ class Giswater(QObject):
         rows = self.dao.get_rows(sql)
         utils_giswater.setDialog(self.dlg)
         utils_giswater.fillComboBox("node_type_type_new", rows) 
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'change_node_type')            
     
         # Open the dialog
         self.dlg.exec_()    
@@ -973,11 +1033,14 @@ class Giswater(QObject):
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
-        if dlg is None:
-            dlg = self.dlg.close()   
-        dlg.close()    
-            
-            
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            dlg.close()
+        except AttributeError as e:
+            print "AttributeError: "+str(e)   
+
+             
     def mg_config(self):                
         ''' Button 99 - Open a dialog showing data from table "config" 
         User can changge its values '''
@@ -1003,6 +1066,7 @@ class Giswater(QObject):
         utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
         utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
         utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
+        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
@@ -1011,12 +1075,16 @@ class Giswater(QObject):
         self.dlg_config.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
         self.dlg_config.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
         self.dlg_config.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
+        self.dlg_config.audit_function_control.setChecked(bool(row["audit_function_control"]))
        
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])    
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg_config, 'config')               
 
         # Open the dialog
         self.dlg_config.exec_()    
@@ -1033,6 +1101,7 @@ class Giswater(QObject):
         self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
         self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
         self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
+        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
         self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
@@ -1044,6 +1113,7 @@ class Giswater(QObject):
         self.new_value_samenode_init_end_control = self.dlg_config.samenode_init_end_control.isChecked()
         self.new_value_node_proximity_control = self.dlg_config.node_proximity_control.isChecked()
         self.new_value_connec_proximity_control = self.dlg_config.connec_proximity_control.isChecked()
+        self.new_value_audit_function_control = self.dlg_config.audit_function_control.isChecked()
 
     
     def mg_config_accept(self):
@@ -1061,6 +1131,7 @@ class Giswater(QObject):
         sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
+        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
         sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
         sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
         sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
@@ -1068,6 +1139,7 @@ class Giswater(QObject):
         sql+= ", samenode_init_end_control = '"+str(self.new_value_samenode_init_end_control)+"'"
         sql+= ", node_proximity_control = '"+str(self.new_value_node_proximity_control)+"'"
         sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
+        sql+= ", audit_function_control = '"+str(self.new_value_audit_function_control)+"'"        
         self.dao.execute_sql(sql)
 
         # Show message to user
@@ -1138,6 +1210,9 @@ class Giswater(QObject):
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'element')            
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
@@ -1320,6 +1395,9 @@ class Giswater(QObject):
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
+        # Manage i18n of the form
+        self.controller.translate_form(self.dlg, 'file')               
+        
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
         count = layer.selectedFeatureCount()           
@@ -1349,7 +1427,6 @@ class Giswater(QObject):
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
-        
         model.setStringList(row)
         self.completer.setModel(model)
         
@@ -1362,10 +1439,27 @@ class Giswater(QObject):
         
     def ed_add_file_autocomplete(self):    
 
+        # Action on click when value is selected ( ComboBox - Qcompleter )
         # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
         self.doc_id = utils_giswater.getWidgetText("doc_id") 
         
+        sql = "SELECT doc_type FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_doc_type = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("doc_type", self.row_doc_type[0]) 
+        
+        sql = "SELECT tagcat_id FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_tagcat = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("tagcat_id", self.row_tagcat[0]) 
+        
+        sql = "SELECT observ FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_observ = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("observ", self.row_observ[0]) 
+        
+        sql = "SELECT path FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
+        self.row_path = self.dao.get_row(sql)
+        utils_giswater.setWidgetText("link", self.row_path[0]) 
+       
         
     def ed_add_file_accept(self):   
         
@@ -1376,10 +1470,17 @@ class Giswater(QObject):
         self.observ = utils_giswater.getWidgetText("observ")
         self.link = utils_giswater.getWidgetText("link")
         
+        self.doc_id = utils_giswater.getWidgetText("doc_id")
+        sql = "IF EXIST (SELECT id FROM "+self.schema_name+".doc WHERE id= '"+self.doc_id+"') BEGIN"
+        
         # Execute data to database DOC 
         sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
         sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
         self.dao.execute_sql(sql)
+        
+        # Update data base
+        sql = "UPDATE "+self.schema_name+".doc SET doc_type = '"+self.row_doc_type[0]+"', tagcat_id= '"+self.row_tagcat[0]+"',observ = '"+self.row_observ[0]+"', path = '"+self.row_path[0]+"'"
+        sql+= " WHERE id = '"+self.doc_id+"'"   
         
         # Get layers
         layers = self.iface.legendInterface().layers()

@@ -14,8 +14,7 @@ class PointMapTool(QgsMapTool):
         self.settings = settings
         self.index_action = index_action
         self.srid = srid
-        self.elem_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type')
-        self.epa_type = self.settings.value('insert_values/'+str(index_action)+'_epa_type')
+        self.elem_type_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type_type')
         self.dao = controller.getDao()   
         self.schema_name = controller.get_schema_name()   
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')          
@@ -31,17 +30,29 @@ class PointMapTool(QgsMapTool):
         if self.schema_name is None:
             self.schema_name = self.settings.value('db/schema_name')  
             
-        if self.elem_type is not None:        
-            the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";
-            sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
-            sql+= " VALUES ('"+self.elem_type+"', '"+self.epa_type+"', "+the_geom+")" 
-            sql+= " RETURNING node_id;";
-            row = self.dao.get_row(sql)
-            self.dao.commit()
-            last_id = -1
+        if self.elem_type_type is not None:   
+            # Get elem_type_id and epa_default from selected elem_type_type (get only first record)
+            sql = "SELECT node_type.id, node_type.epa_default"
+            sql+= " FROM "+self.schema_name+".node_type"
+            sql+= " INNER JOIN "+self.schema_name+".cat_node ON cat_node.nodetype_id = node_type.id"
+            sql+= " WHERE node_type.type = '"+self.elem_type_type+"'"
+            sql+= " ORDER BY node_type.id ASC"
+            sql+= " LIMIT 1"
+            row = self.dao.get_row(sql)  
             if row:
-                last_id = row[0]
-            return last_id 
+                elem_type_id = row[0]
+                epa_default = row[1]
+                # Insert element with selected coordinates
+                the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";
+                sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
+                sql+= " VALUES ('"+elem_type_id+"', '"+epa_default+"', "+the_geom+")" 
+                sql+= " RETURNING node_id;";
+                row = self.dao.get_row(sql)
+                self.dao.commit()
+                last_id = -1
+                if row:
+                    last_id = row[0]
+                return last_id 
     
     
     ''' QgsMapTools inherited event functions '''
