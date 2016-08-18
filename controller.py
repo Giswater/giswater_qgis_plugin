@@ -2,6 +2,8 @@
 from PyQt4.QtCore import *   # @UnusedWildImport
 from PyQt4.QtGui import *    # @UnusedWildImport
 
+import subprocess
+
 from dao.pg_dao import PgDao
 
 
@@ -171,5 +173,14 @@ class DaoController():
             text = self.tr(widget_name, context_name)
             if text != widget_name:
                 widget.setText(text)    
+                
                         
+    def start_program(self, program):     
+           
+        SW_MINIMIZE = 6
+        info = subprocess.STARTUPINFO()
+        info.dwFlags = subprocess.STARTF_USESHOWWINDOW
+        info.wShowWindow = SW_MINIMIZE   
+        subprocess.Popen(program, startupinfo=info)                            
+        
     

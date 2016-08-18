@@ -606,17 +606,19 @@ class Giswater(QObject):
             self.showInfo(self.controller.tr("GSW file not found at: "+self.gsw_file), 10)
             self.gsw_file = ""    
         
-        # Execute process
+        # Start program     
         aux = '"'+self.giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"])
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"]
         else:
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"])
+            program = [self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"]
+            
+        self.controller.start_program(program)
         
         # Show information message    
         self.showInfo(self.controller.tr("Executing... "+aux))
-                              
+                                        
                               
                                   
     ''' Management bar functions '''   
@@ -683,14 +685,16 @@ class Giswater(QObject):
         if not os.path.exists(self.gsw_file):
             self.showInfo(self.controller.tr("GSW file not found at: "+self.gsw_file), 10)
             self.gsw_file = ""    
-        
-        # Execute process
+            
+        # Start program     
         aux = '"'+self.giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"])
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
         else:
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"])
+            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
+            
+        self.controller.start_program(program)            
         
         # Show information message    
         self.showInfo(self.controller.tr("Executing... "+aux))        
