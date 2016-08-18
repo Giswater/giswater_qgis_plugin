@@ -30,6 +30,7 @@ from ui.table_wizard import TableWizard
 from ui.config import Config
 from ui.add_element import Add_element
 from ui.add_file import Add_file
+from ui.result_compare_selector import ResultCompareSelector
 from ui.topology_tools import TopologyTools
 
 
@@ -138,7 +139,7 @@ class Giswater(QObject):
                 action.setCheckable(is_checkable) 
                 # Define buttons to execute custom or generic function
                 # Custom function
-                if int(index_action) in (17, 19, 20, 21, 24, 26, 27, 28) or int(index_action) >= 30:    
+                if int(index_action) in (17, 19, 20, 21, 24, 25, 26, 27, 28) or int(index_action) >= 30:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 # Generic function
@@ -521,6 +522,7 @@ class Giswater(QObject):
         self.enable_action(True, 19)   
         self.enable_action(True, 21)   
         self.enable_action(True, 24)   
+        self.enable_action(True, 25)         
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 37)
@@ -1145,6 +1147,58 @@ class Giswater(QObject):
         self.close_dialog(self.dlg_config) 
         
         
+    def mg_result_selector(self):
+        ''' Button 25. Result selector '''
+        
+        # Create the dialog and signals
+        self.dlg = ResultCompareSelector()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_accept.pressed.connect(self.mg_result_selector_accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)     
+        
+        # Set values from widgets of type QComboBox
+        sql = "SELECT DISTINCT(result_id) FROM "+self.schema_name+".rpt_cat_result ORDER BY result_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("rpt_selector_result_id", rows) 
+        utils_giswater.fillComboBox("rpt_selector_compare_id", rows)     
+        
+        # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
+        sql = "SELECT result_id FROM "+self.schema_name+".rpt_selector_result"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("rpt_selector_result_id", row["result_id"])             
+        sql = "SELECT result_id FROM "+self.schema_name+".rpt_selector_compare"
+        row = self.dao.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText("rpt_selector_compare_id", row["result_id"])             
+        
+        # Open the dialog
+        self.dlg.exec_()            
+                   
+        
+    def mg_result_selector_accept(self):
+        ''' Update current values to the table '''
+           
+        # Get new values from widgets of type QComboBox
+        rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
+        rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
+
+        # Delete previous values
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
+        sql= "DELETE FROM "+self.schema_name+".rpt_selector_result" 
+        self.dao.execute_sql(sql)
+        sql= "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
+        self.dao.execute_sql(sql)
+        sql= "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        self.dao.execute_sql(sql)
+        sql= "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
+        self.dao.execute_sql(sql)
+
+        # Show message to user
+        self.showInfo(self.controller.tr("Values has been updated"))
+        self.close_dialog(self.dlg) 
+                
+        
         
     ''' Edit bar functions '''
   
@@ -1373,7 +1427,6 @@ class Giswater(QObject):
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
-        print(row)
         model.setStringList(row)
         self.completer.setModel(model)
         
