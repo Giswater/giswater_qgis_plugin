@@ -241,13 +241,15 @@ class Mg():
             self.controller.show_info("GSW file not found at: "+self.gsw_file, 10)
             self.gsw_file = ""    
         
-        # Execute process
+        # Start program     
         aux = '"'+self.giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"])
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
         else:
-            subprocess.Popen([self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"])
+            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
+            
+        self.controller.start_program(program)   
         
         # Show information message    
         self.controller.show_info("Executing... "+aux)    
@@ -512,10 +514,10 @@ class Mg():
         utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
         utils_giswater.setWidgetText("node2arc", row["node2arc"])
         utils_giswater.setWidgetText("connec_proximity", row["connec_proximity"])
-        utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
+        #utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
         utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
         utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
-        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
+        #utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
@@ -547,10 +549,10 @@ class Mg():
         self.new_value_arc = utils_giswater.getWidgetText("arc_searchnodes").replace(",", ".")
         self.new_value_node = utils_giswater.getWidgetText("node2arc").replace(",", ".")
         self.new_value_con = utils_giswater.getWidgetText("connec_proximity").replace(",", ".")
-        self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
+        #self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
         self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
         self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
-        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
+        #self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
         self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
@@ -577,10 +579,10 @@ class Mg():
         sql+= ", arc_searchnodes = "+self.new_value_arc
         sql+= ", node2arc = "+self.new_value_node
         sql+= ", connec_proximity = "+self.new_value_con
-        sql+= ", arc_toporepair = "+self.new_value_arc_top
+        #sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
-        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
+        #sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
         sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
         sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
         sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"

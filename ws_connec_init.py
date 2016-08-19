@@ -22,7 +22,7 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)         
+    feature_dialog.dialog.findChild(QComboBox, "connecat_id_dummy").setVisible(False)         
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)        
  
@@ -34,6 +34,7 @@ class ConnecDialog(ParentDialog):
         ''' Constructor class '''
         super(ConnecDialog, self).__init__(iface, dialog, layer, feature)      
         self.init_config_connec()
+        self.feature = feature
     
                  
     def init_config_connec(self):
@@ -52,7 +53,9 @@ class ConnecDialog(ParentDialog):
         self.date_document_from_3 = self.dialog.findChild(QDateEdit, "date_document_from_3")
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
         self.date_document_to_2 = self.dialog.findChild(QDateEdit, "date_document_to_2")
-        self.date_document_to_3 = self.dialog.findChild(QDateEdit, "date_document_to_3")                                                
+        self.date_document_to_3 = self.dialog.findChild(QDateEdit, "date_document_to_3")
+       
+                            
             
         # Manage tab visibility
         self.set_tabs_visibility()                
@@ -92,8 +95,9 @@ class ConnecDialog(ParentDialog):
     ''' Slot functions '''  
     
     def set_tabs_visibility(self):
-        ''' Hide some tabs '''     
-        pass
+        ''' Hide some tabs '''   
+        self.tab_main.removeTab(3)    
+        self.tab_main.removeTab(3)  
     
         
     def delete_row_doc(self):

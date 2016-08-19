@@ -91,7 +91,7 @@
     </message>      
     <message>
         <source>19_text</source>
-        <translation>Arc topo repair</translation>
+        <translation>Topology toolbox</translation>
     </message>      
     <message>
         <source>20_text</source>
@@ -2920,7 +2920,7 @@
     </message>
     <message>
         <source>label_arc_toporepair</source>
-        <translation>Arc topology repair</translation>
+        <translation>Topology toolbox</translation>
     </message>
     <message>
         <source>label_vnode_update_tolerance</source>

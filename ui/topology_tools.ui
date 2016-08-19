@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>262</height>
+    <width>343</width>
+    <height>232</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>220</y>
-     <width>75</width>
+     <x>180</x>
+     <y>200</y>
+     <width>70</width>
      <height>23</height>
     </rect>
    </property>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>220</y>
+     <x>260</x>
+     <y>200</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -39,71 +39,162 @@
     <string>Cancel</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_node_dink">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>160</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Node sink identifier (only for ud projects)</string>
+   </property>
+  </widget>
   <widget class="QCheckBox" name="check_node_duplicated">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>60</y>
-     <width>231</width>
+     <y>70</y>
+     <width>21</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>     Node duplicated identifier</string>
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_orphan_identif">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>40</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Node orphan identifier</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_node_duplicated">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>70</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Node duplicated identifier</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_connec_duplicated">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>100</y>
+     <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Connec duplicated  identifier</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_arc_start_end">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>130</y>
+     <width>181</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Arc with same start-end indetifier</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="check_connec_duplicated">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>90</y>
-     <width>221</width>
+     <y>100</y>
+     <width>21</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>     Connec duplicated  identifier</string>
+    <string/>
    </property>
   </widget>
   <widget class="QCheckBox" name="check_arc_same_startend">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>120</y>
-     <width>241</width>
+     <y>130</y>
+     <width>21</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>     Arc with same start-end indetifier</string>
+    <string/>
    </property>
   </widget>
   <widget class="QCheckBox" name="check_node_sink">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>170</y>
-     <width>241</width>
+     <y>160</y>
+     <width>21</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>     Node sink identifier (only for ud projects)</string>
+    <string/>
    </property>
   </widget>
   <widget class="QCheckBox" name="check_node_orphan">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>30</y>
-     <width>251</width>
+     <y>40</y>
+     <width>21</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>     Node orphan identifier</string>
+    <string/>
    </property>
   </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>321</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Topology tools</string>
+   </property>
+  </widget>
+  <zorder>groupBox</zorder>
+  <zorder>btn_accept</zorder>
+  <zorder>btn_cancel</zorder>
+  <zorder>label_node_dink</zorder>
+  <zorder>check_node_duplicated</zorder>
+  <zorder>label_orphan_identif</zorder>
+  <zorder>label_node_duplicated</zorder>
+  <zorder>label_connec_duplicated</zorder>
+  <zorder>label_arc_start_end</zorder>
+  <zorder>check_connec_duplicated</zorder>
+  <zorder>check_arc_same_startend</zorder>
+  <zorder>check_node_sink</zorder>
+  <zorder>check_node_orphan</zorder>
  </widget>
  <resources/>
  <connections/>

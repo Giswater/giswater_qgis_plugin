@@ -336,24 +336,28 @@ class Giswater(QObject):
     def search_project_type(self):
         ''' Search in table 'version' project type of current QGIS project '''
         
-        self.mg.project_type = None
-        features = self.layer_version.getFeatures()
-        for feature in features:
-            wsoftware = feature['wsoftware']
-            if wsoftware.lower() == 'epanet':
-                self.mg.project_type = 'ws'     
-                if self.toolbar_ws_enabled:                
-                    self.toolbar_ws.setVisible(True)                            
-            elif wsoftware.lower() == 'epaswmm':
-                self.mg.project_type = 'ud'
-                if self.toolbar_ud_enabled:                
-                    self.toolbar_ud.setVisible(True)                
-        
-        # Set visible MANAGEMENT and EDIT toolbar  
-        if self.toolbar_mg_enabled:         
-            self.toolbar_mg.setVisible(True)
-        if self.toolbar_ed_enabled: 
-            self.toolbar_ed.setVisible(True)
+        try:
+            self.mg.project_type = None
+            features = self.layer_version.getFeatures()
+            for feature in features:
+                wsoftware = feature['wsoftware']
+                if wsoftware.lower() == 'epanet':
+                    self.mg.project_type = 'ws'     
+                    if self.toolbar_ws_enabled:                
+                        self.toolbar_ws.setVisible(True)                            
+                elif wsoftware.lower() == 'epaswmm':
+                    self.mg.project_type = 'ud'
+                    if self.toolbar_ud_enabled:                
+                        self.toolbar_ud.setVisible(True)                
+            
+            # Set visible MANAGEMENT and EDIT toolbar  
+            if self.toolbar_mg_enabled:         
+                self.toolbar_mg.setVisible(True)
+            if self.toolbar_ed_enabled: 
+                self.toolbar_ed.setVisible(True)
+            self.ed.search_plus = self.search_plus                   
+        except:
+            pass                  
 
                                 
     def project_read(self): 
@@ -573,4 +577,4 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))              
-            
+
