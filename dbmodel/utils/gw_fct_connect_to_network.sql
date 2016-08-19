@@ -9,11 +9,11 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array varchar[]) RETURNS void AS $BODY$
 DECLARE
     connec_id_aux  varchar;
-    arc_geom       geometry;
+    arc_geom       public.geometry;
     candidate_line integer;
-    connect_geom   geometry;
-    link           geometry;
-    vnode          geometry;
+    connect_geom   public.geometry;
+    link           public.geometry;
+    vnode          public.geometry;
     vnode_id       integer;
     vnode_id_aux   varchar;
     arc_id_aux     varchar;

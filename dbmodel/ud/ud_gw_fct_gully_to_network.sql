@@ -9,11 +9,11 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_gully_to_network(gully_array varchar[]) RETURNS void AS $BODY$
 DECLARE
     gully_id_aux  varchar;
-    arc_geom       geometry;
+    arc_geom       public.geometry;
     candidate_line integer;
-    gully_geom   geometry;
-    link           geometry;
-    vnode          geometry;
+    gully_geom   public.geometry;
+    link           public.geometry;
+    vnode          public.geometry;
     vnode_id       integer;
     vnode_id_aux   varchar;
     arc_id_aux     varchar;
