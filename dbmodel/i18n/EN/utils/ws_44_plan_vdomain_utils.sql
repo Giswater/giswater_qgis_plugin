@@ -12,9 +12,11 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 INSERT INTO price_value_unit VALUES ('m3');
 INSERT INTO price_value_unit VALUES ('m2');
-INSERT INTO price_value_unit VALUES ('ml');
+INSERT INTO price_value_unit VALUES ('m');
 INSERT INTO price_value_unit VALUES ('pa');
-INSERT INTO price_value_unit VALUES ('ut');
+INSERT INTO price_value_unit VALUES ('u');
+INSERT INTO price_value_unit VALUES ('kg');
+INSERT INTO price_value_unit VALUES ('t');
 
 
 -- ----------------------------

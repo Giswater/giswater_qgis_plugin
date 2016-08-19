@@ -37,7 +37,7 @@ INSERT INTO node_type VALUES ('THROTTLE VALVE','VALVE', 'VALVE', 'man_valve', 'i
 INSERT INTO node_type VALUES ('GEN-PURP.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
 INSERT INTO node_type VALUES ('PUMP STATION','PUMP', 'PUMP', 'man_pump', 'inp_pump', 'event_x_node');
 INSERT INTO node_type VALUES ('FILTER','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe','event_x_node');
-INSERT INTO node_type VALUES ('FLOW METER','MEASURE INSTRUMENT', 'PIPE', 'man_meter', 'inp_pipe', 'event_x_node');
+INSERT INTO node_type VALUES ('FLOW METER','MEASURE INSTRUMENT', 'SHORTPIPE', 'man_meter', 'inp_pipe', 'event_x_node');
 
 
 -- ----------------------------
