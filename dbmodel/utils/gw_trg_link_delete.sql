@@ -22,7 +22,7 @@ BEGIN
 END;
 $$;
 
-
+DROP TRIGGER IF EXISTS gw_trg_link_delete ON "SCHEMA_NAME"."link";
 CREATE TRIGGER gw_trg_link_delete AFTER DELETE ON "SCHEMA_NAME"."link" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_link_delete"();
 

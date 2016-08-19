@@ -13,6 +13,7 @@ BEGIN
 	PERFORM "SCHEMA_NAME".gw_fct_flow_exit_recursive(node_id_arg);
 
 	RETURN 0;
+	RETURN SCHEMA_NAME.audit_function(0,720);
 		
 END;
 $BODY$
@@ -51,7 +52,6 @@ BEGIN
 		END LOOP;
 	
 	END IF;
-
 	RETURN;
 		
 END;

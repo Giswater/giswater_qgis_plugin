@@ -315,7 +315,6 @@ CREATE TABLE "SCHEMA_NAME"."cat_soil" (
 "picture" varchar(512)  ,
 "y_param" numeric(5,2),
 "b" numeric(5,2),
-"estimated_y" numeric(5,2),
 "trenchlining" numeric(3,2),
 "m3exc_cost" varchar (16),
 "m3fill_cost" varchar (16),
@@ -395,14 +394,6 @@ CREATE TABLE "SCHEMA_NAME"."connec_type" (
 "observ" varchar(50)  ,
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
-
-
-CREATE TABLE "SCHEMA_NAME"."man_type_street" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
-CONSTRAINT man_type_street_pkey PRIMARY KEY (id)
-);
-
 
 
 -- ----------------------------

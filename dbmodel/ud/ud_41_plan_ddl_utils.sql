@@ -105,6 +105,7 @@ CREATE TABLE "SCHEMA_NAME"."plan_psector" (
 "rotation" numeric (8,4),
 "scale" numeric (8,2),
 "sector_id" varchar(30) COLLATE "default",
+"atlas_id" varchar(16) COLLATE "default",
 "gexpenses" numeric (4,2),
 "vat" numeric (4,2),
 "other" numeric (4,2),

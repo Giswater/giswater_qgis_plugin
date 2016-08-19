@@ -37,6 +37,8 @@ BEGIN
     END LOOP;
 
     RETURN (SELECT COUNT(*) FROM anl_node_sink);
+	
+	RETURN SCHEMA_NAME.audit_function(0,50);
 
   
 		

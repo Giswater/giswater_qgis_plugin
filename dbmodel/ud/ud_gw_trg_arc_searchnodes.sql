@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() 
+RETURNS trigger  LANGUAGE plpgsql    AS
+$$
 DECLARE 
 	nodeRecord1 Record; 
 	nodeRecord2 Record;
@@ -84,7 +84,7 @@ $$;
 
 
 
-
+DROP TRIGGER IF EXISTS gw_trg_arc_searchnodes ON "SCHEMA_NAME"."arc";
 CREATE TRIGGER gw_trg_arc_searchnodes BEFORE INSERT OR UPDATE ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
 

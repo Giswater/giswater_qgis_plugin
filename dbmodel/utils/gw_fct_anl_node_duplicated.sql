@@ -33,7 +33,10 @@ BEGIN
      FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.node_duplicated_tolerance)) 
      WHERE t1.node_id != t2.node_id  
      ORDER BY t1.node_id;
-        
+	 
+PERFORM audit_function(0,30);
+RETURN ;           
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

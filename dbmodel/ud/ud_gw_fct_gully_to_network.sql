@@ -77,7 +77,8 @@ BEGIN
         END IF;
 
     END LOOP;
-
+	
+	PERFORM SCHEMA_NAME.audit_function(0,740);
     RETURN;
 
 END;

@@ -1,20 +1,20 @@
-/*
-This file is part of Giswater 2.0
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+-- Function: SCHEMA_NAME.gw_fct_mincut(character varying, character varying)
+
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying);
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(IN element_id_arg character varying, IN type_element_arg character varying) RETURNS "pg_catalog"."int4" AS $BODY$
+SET SEARCH_PATH="SCHEMA_NAME", plublic;
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS $BODY$
 DECLARE
     node_1_aux		text;
     node_2_aux		text;
     controlValue	integer;
     exists_id		text;
-    polygon_aux		geometry;
-    polygon_aux2	geometry;
-    arc_aux             geometry;
-    node_aux            geometry;    
+    polygon_aux		public.geometry;
+    polygon_aux2	public.geometry;
+    arc_aux             public.geometry;
+    node_aux            public.geometry;    
     srid_schema		text;
 
 BEGIN
@@ -35,7 +35,7 @@ BEGIN
         SELECT COUNT(*) INTO controlValue FROM arc WHERE arc_id = element_id_arg;
         IF controlValue = 1 THEN
 
-            -- Select geometry
+            -- Select public.geometry
             SELECT the_geom INTO arc_aux FROM arc WHERE arc_id = element_id_arg;
 
             -- Insert arc id
@@ -45,10 +45,10 @@ BEGIN
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM arc WHERE arc_id = element_id_arg;
 
             -- Check extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_valve WHERE node_id = node_1_aux AND (acessibility = FALSE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_valve WHERE node_id = node_1_aux AND (acessibility = FALSE) AND (broken  = FALSE);
             IF controlValue = 1 THEN
 
-                -- Select geometry
+                -- Select public.geometry
                 SELECT the_geom INTO node_aux FROM node WHERE node_id = node_1_aux;
 
                 -- Insert valve id
@@ -63,7 +63,7 @@ BEGIN
 
 
             -- Check other extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_valve WHERE node_id = node_2_aux AND (acessibility = FALSE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_valve WHERE node_id = node_2_aux AND (acessibility = FALSE) AND (broken  = FALSE);
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed
@@ -72,7 +72,7 @@ BEGIN
                 -- Compute proceed
                 IF NOT FOUND THEN
 
-                    -- Select geometry
+                    -- Select public.geometry
                     SELECT the_geom INTO node_aux FROM node WHERE node_id = node_2_aux;
 
                     -- Insert valve id
@@ -131,99 +131,6 @@ BEGIN
 
     RETURN 0;
 
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-
-
-  
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut_recursive(node_id_arg character varying) RETURNS void AS $BODY$
-DECLARE
-    exists_id      character varying;
-    rec_table      record;
-    controlValue   integer;
-    node_aux       geometry;
-    arc_aux        geometry;
-
-BEGIN
-
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
-
-    -- Get node geometry
-    SELECT the_geom INTO node_aux FROM node WHERE node_id = node_id_arg;
-
-    -- Check node being a valve
-    SELECT node_id INTO exists_id FROM v_valve WHERE node_id = node_id_arg AND (acessibility = FALSE) AND (broken  = FALSE);
-    IF FOUND THEN
-
-        -- Check if the node is already computed
-        SELECT valve_id INTO exists_id FROM anl_mincut_valve WHERE valve_id = node_id_arg;
-
-        -- Compute proceed
-        IF NOT FOUND THEN
-
-            -- Insert valve id
-            INSERT INTO anl_mincut_valve VALUES(node_id_arg, node_aux);
-
-        END IF;
-
-    ELSE
-
-        -- Check if the node is already computed
-        SELECT node_id INTO exists_id FROM anl_mincut_node WHERE node_id = node_id_arg;
-
-        -- Compute proceed
-        IF NOT FOUND THEN
-
-            -- Update value
-            INSERT INTO anl_mincut_node VALUES(node_id_arg, node_aux);
-        
-            -- Loop for all the upstream nodes
-            FOR rec_table IN SELECT arc_id, node_1 FROM arc WHERE node_2 = node_id_arg
-            LOOP
-
-                -- Insert into tables
-                SELECT arc_id INTO exists_id FROM anl_mincut_arc WHERE arc_id = rec_table.arc_id;
-
-                -- Compute proceed
-                IF NOT FOUND THEN
-                    SELECT the_geom INTO arc_aux FROM arc WHERE arc_id = rec_table.arc_id;
-                    INSERT INTO anl_mincut_arc VALUES(rec_table.arc_id, arc_aux);
-                END IF;
-
-                -- Call recursive function weighting with the pipe capacity
-                PERFORM gw_fct_mincut_recursive(rec_table.node_1);
-                
-            END LOOP;
-
-            -- Loop for all the downstream nodes
-            FOR rec_table IN SELECT arc_id, node_2 FROM arc WHERE node_1 = node_id_arg
-            LOOP
-
-                -- Insert into tables
-                SELECT arc_id INTO exists_id FROM anl_mincut_arc WHERE arc_id = rec_table.arc_id;
-
-                -- Compute proceed
-                IF NOT FOUND THEN
-                    SELECT the_geom INTO arc_aux FROM arc WHERE arc_id = rec_table.arc_id;
-                    INSERT INTO anl_mincut_arc VALUES(rec_table.arc_id, arc_aux);
-                END IF;
-
-                -- Call recursive function weighting with the pipe capacity
-                PERFORM gw_fct_mincut_recursive(rec_table.node_2);
-
-            END LOOP;
-
-        END IF;
-    END IF;
-
-    RETURN;
-
-        
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -28,8 +28,8 @@ DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_table CASCADE;
 CREATE TABLE SCHEMA_NAME.db_cat_table (
     id int4 PRIMARY KEY,
     name text NOT NULL,
+	project_type text,
     context text,
-    class text,
 	db_cat_clientlayer_id int4,
 	description text
 );
@@ -41,8 +41,8 @@ DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_view CASCADE;
 CREATE TABLE SCHEMA_NAME.db_cat_view (
     id int4 PRIMARY KEY,
     name text NOT NULL,
+    project_type text,
     context text,
-    class text,
 	db_cat_clientlayer_id int4,
 	description text
 );
@@ -54,6 +54,7 @@ CREATE TABLE SCHEMA_NAME.db_cat_columns (
     id int4 PRIMARY KEY,
 	db_cat_table_id int4 NOT NULL,
     column_name text NOT NULL,
+	column_type text,
 	description text
 );
 

@@ -45,6 +45,6 @@ END;
 $$;
 
 
-
+DROP TRIGGER IF EXISTS gw_trg_connec_update ON "SCHEMA_NAME"."connec";
 CREATE TRIGGER gw_trg_connec_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME"."connec" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_connec_update"();

@@ -58,7 +58,10 @@ BEGIN
 			EXECUTE msg;
 		END IF;
 
-	END LOOP;	
+	END LOOP;
+	
+	PERFORM SCHEMA_NAME.audit_function(0,100);
+	RETURN ;
 
 END;
 $BODY$

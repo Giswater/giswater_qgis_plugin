@@ -71,7 +71,7 @@ $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100;
 
 
-
+DROP TRIGGER IF EXISTS gw_trg_arc_geometry_update ON "SCHEMA_NAME"."arc";
 CREATE TRIGGER gw_trg_arc_geometry_update BEFORE UPDATE OF the_geom ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_geometry_update"();
 

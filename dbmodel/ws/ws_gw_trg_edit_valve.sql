@@ -35,7 +35,7 @@ BEGIN
         WHERE node_id = OLD.node_id;
 
         PERFORM audit_function(2,390);  
-        RETURN NEW;;
+        RETURN NEW;
    
 
     ELSIF TG_OP = 'DELETE' THEN
@@ -47,7 +47,5 @@ BEGIN
 END;
 $$;
 
-
-
-CREATE TRIGGER gw_trg_edit_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_valve
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_valve();
+DROP TRIGGER IF EXISTS gw_trg_edit_valve ON "SCHEMA_NAME".v_edit_valve;
+CREATE TRIGGER gw_trg_edit_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_valve();

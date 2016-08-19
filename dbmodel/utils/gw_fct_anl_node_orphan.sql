@@ -27,6 +27,8 @@ BEGIN
 		LOOP
 			INSERT INTO anl_node_orphan VALUES (rec_node.node_id, rec_node.node_type, rec_node.the_geom);
 		END LOOP;
+	
+	PERFORM audit_function(0,40);
     RETURN;
         
 END;

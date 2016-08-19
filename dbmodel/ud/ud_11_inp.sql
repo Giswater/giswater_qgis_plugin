@@ -616,7 +616,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_divider" (
 CREATE TABLE "SCHEMA_NAME"."inp_dwf" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_dwf_seq'::regclass) NOT NULL,
 "node_id" varchar(50)  ,
-"value" numeric(12,5),
+"value" numeric(12,7),
 "pat1" varchar(16)  ,
 "pat2" varchar(16)  ,
 "pat3" varchar(16)  ,

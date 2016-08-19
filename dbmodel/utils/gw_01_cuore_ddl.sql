@@ -28,18 +28,26 @@ CREATE TABLE "SCHEMA_NAME"."config" (
 "node2arc" double precision,
 "connec_proximity" double precision,
 "arc_toporepair" double precision,
-"nodeinsert_arcendpoint" boolean,
+"nodeinsert_arcendpoint" boolean NOT NULL,
 "nodeinsert_catalog_vdefault" varchar (30),
-"orphannode_delete" boolean,
+"orphannode_delete" boolean NOT NULL,
 "vnode_update_tolerance" double precision,
-"nodetype_change_enabled" boolean,
-"samenode_init_end_control" boolean,
-"node_proximity_control" boolean,
-"connec_proximity_control" boolean,
+"nodetype_change_enabled" boolean NOT NULL,
+"samenode_init_end_control" boolean NOT NULL,
+"node_proximity_control" boolean NOT NULL,
+"connec_proximity_control" boolean NOT NULL,
 "node_duplicated_tolerance" float,
-"audit_function_control" boolean,
+"connec_duplicated_tolerance" float,
+"audit_function_control" boolean NOT NULL,
+"arc_searchnodes_control" boolean NOT NULL,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
+
+CREATE TABLE "SCHEMA_NAME"."config_csv_import" (
+"table_name" varchar(50) NOT NULL,
+"gis_client_layer_name" varchar(50),
+CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name")
+);
 
 

@@ -9,4 +9,4 @@ This version of Giswater is provided by Giswater Association
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false, true, true, true, 0.001, false);
+INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false, true, true, true, 0.001, 0.001, false, true);

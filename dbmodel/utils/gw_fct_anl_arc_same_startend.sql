@@ -24,6 +24,9 @@ BEGIN
 	st_length2d(arc.the_geom)::float,
 	the_geom
 	FROM arc WHERE node_1::text=node_2::text;
+	
+PERFORM audit_function(0,10);
+RETURN;
 		
 END;
 $BODY$

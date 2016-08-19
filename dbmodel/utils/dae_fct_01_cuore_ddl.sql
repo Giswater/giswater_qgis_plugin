@@ -6,23 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-
---
--- TOC entry 10 (class 2615 OID 151924)
--- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA "SCHEMA_NAME";
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
-CREATE EXTENSION IF NOT EXISTS tablefunc;
-
-
 
 
 
@@ -78,5 +62,8 @@ CREATE TABLE SCHEMA_NAME.db_cat_clientlayer (
 ALTER TABLE SCHEMA_NAME.db_cat_table ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE SCHEMA_NAME.db_cat_view ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE SCHEMA_NAME.db_cat_columns ADD FOREIGN KEY ("db_cat_table_id") REFERENCES SCHEMA_NAME.db_cat_table ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
 
 

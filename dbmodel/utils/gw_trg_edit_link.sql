@@ -41,7 +41,7 @@ END;
 $$;
 
 
-
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON "SCHEMA_NAME".v_edit_link;
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_link
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_link();
 

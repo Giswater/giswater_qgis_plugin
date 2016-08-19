@@ -38,6 +38,6 @@ END;
 $$;
 
 
-CREATE TRIGGER gw_trg_arc_delete AFTER DELETE ON "SCHEMA_NAME"."arc" 
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_delete"();
+DROP TRIGGER IF EXISTS gw_trg_arc_delete on "SCHEMA_NAME"."arc";
+CREATE TRIGGER gw_trg_arc_delete AFTER DELETE ON "SCHEMA_NAME"."arc" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_delete"();
 

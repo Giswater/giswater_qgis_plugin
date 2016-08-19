@@ -92,7 +92,9 @@ BEGIN
     LOOP
         EXECUTE 'CREATE VIEW ' || dest_schema || '.' || rec_view.table_name || ' AS ' || rec_view.definition;
     END LOOP;
- 
+	
+	PERFORM SCHEMA_NAME.audit_function(0,60);
+	RETURN ;
 END;
 $$;   
   

@@ -32,7 +32,9 @@ BEGIN
      FROM connec AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.connec_duplicated_tolerance)) 
      WHERE t1.connec_id != t2.connec_id  
      ORDER BY t1.connec_id;
-        
+    
+PERFORM audit_function(0,20);
+RETURN ;    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

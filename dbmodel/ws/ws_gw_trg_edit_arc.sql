@@ -69,7 +69,7 @@ BEGIN
         -- MAN INSERT      
         man_table := (SELECT arc_type.man_table FROM arc_type JOIN cat_arc ON (((arc_type.id)::text = (cat_arc.arctype_id)::text)) WHERE cat_arc.id=NEW.arccat_id);
         IF man_table IS NOT NULL THEN
-            v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||NEW.arc_id||')';    
+            v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
             EXECUTE v_sql;
         END IF;
      
@@ -125,8 +125,7 @@ $BODY$
   LANGUAGE 'plpgsql' VOLATILE COST 100
 ;
 
-
-
+DROP TRIGGER IF EXISTS gw_trg_edit_arc ON "SCHEMA_NAME".v_edit_arc;
 CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_arc
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_arc();
 

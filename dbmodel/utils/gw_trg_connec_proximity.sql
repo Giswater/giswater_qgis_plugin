@@ -41,10 +41,11 @@ END;
 $$;
 
 
-
+DROP TRIGGER IF EXISTS gw_trg_connec_proximity_insert ON "SCHEMA_NAME"."connec";
 CREATE TRIGGER gw_trg_connec_proximity_insert BEFORE INSERT ON "SCHEMA_NAME"."connec" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_connec_proximity"();
 
+DROP TRIGGER IF EXISTS gw_trg_connec_proximity_update ON "SCHEMA_NAME"."connec";
 CREATE TRIGGER gw_trg_connec_proximity_update AFTER UPDATE ON "SCHEMA_NAME"."connec" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_connec_proximity"();
 

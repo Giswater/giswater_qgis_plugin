@@ -115,7 +115,7 @@ BEGIN
         RETURN SCHEMA_NAME.audit_function(201);
     END IF;
 
-    RETURN SCHEMA_NAME.audit_function(0);
+    RETURN SCHEMA_NAME.audit_function(0,80);
 
 END;
 $BODY$
