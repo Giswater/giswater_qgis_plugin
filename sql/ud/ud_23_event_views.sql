@@ -5,159 +5,108 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- ----------------------------
--- Views to node
--- ----------------------------
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_junction AS 
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_node AS 
 SELECT
-event_x_junction.id,
-event_x_junction.event_id,
-event_x_junction.node_id,
-event_x_junction.value_struc,
-event_x_junction.value_sediment,
-event_x_junction.observ,
-max(event_x_junction.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_junction
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_junction.event_id::text
-JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_junction.node_id::text
-GROUP BY
-event_x_junction.id,
-event_x_junction.event_id,
-event_x_junction.node_id,
-event_x_junction.value_struc,
-event_x_junction.value_sediment,
-event_x_junction.observ,
-node.the_geom;
+event_x_node.id,
+event.event_type,
+event_x_node.event_id,
+event_x_node.node_id,
+node.node_type,
+event_x_node.parameter_id,
+event_x_node.value,
+event_x_node.position_id,
+event_x_node.text,
+event.timestamp,
+event.user
+FROM SCHEMA_NAME.event_x_node
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_node.event_id::text
+JOIN SCHEMA_NAME.node ON SCHEMA_NAME.node.node_id::text = event_x_node.node_id::text
+ORDER BY node_id;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_storage AS
+
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_arc AS 
 SELECT
-event_x_storage.id,
-event_x_storage.event_id,
-event_x_storage.node_id,
-event_x_storage.value_struc,
-event_x_storage.value_sediment,
-event_x_storage.observ,
-max(event_x_storage.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_storage
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_storage.event_id::text
-JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_storage.node_id::text
-GROUP BY
-event_x_storage.id,
-event_x_storage.event_id,
-event_x_storage.node_id,
-event_x_storage.value_struc,
-event_x_storage.value_sediment,
-event_x_storage.observ,
-node.the_geom;
+event_x_arc.id,
+event.event_type,
+event_x_arc.event_id,
+event_x_arc.arc_id,
+arc.arccat_id,
+event_x_arc.parameter_id,
+event_x_arc.value,
+event_x_arc.position_id,
+event_x_arc.text,
+event.startdate,
+event.enddate,
+event.timestamp,
+event.user
+FROM SCHEMA_NAME.event_x_arc
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_arc.event_id::text
+JOIN SCHEMA_NAME.arc ON SCHEMA_NAME.arc.arc_id::text = event_x_arc.arc_id::text
+ORDER BY arc_id;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_outfall AS
+
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element AS 
 SELECT
-event_x_outfall.id,
-event_x_outfall.event_id,
-event_x_outfall.node_id,
-event_x_outfall.value_struc,
-event_x_outfall.value_sediment,
-event_x_outfall.observ,
-max(event_x_outfall.date) AS date,
-node.the_geom
-FROM SCHEMA_NAME.event_x_outfall
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_outfall.event_id::text
-JOIN SCHEMA_NAME.node ON node.node_id::text = event_x_outfall.node_id::text
-GROUP BY
-event_x_outfall.id,
-event_x_outfall.event_id,
-event_x_outfall.node_id,
-event_x_outfall.value_struc,
-event_x_outfall.value_sediment,
-event_x_outfall.observ,
-node.the_geom;
+event_x_element.id,
+node.node_id,
+event.event_type,
+event_x_element.event_id,
+event_x_element.element_id,
+element.elementcat_id,
+event_x_element.parameter_id,
+event_x_element.value,
+event_x_element.position_id,
+event_x_element.text,
+event.timestamp,
+event.user
+FROM SCHEMA_NAME.event_x_element
+JOIN SCHEMA_NAME.event ON event.id::text = event_x_element.event_id::text
+JOIN SCHEMA_NAME.element ON SCHEMA_NAME.element.element_id::text = event_x_element.element_id::text
+JOIN SCHEMA_NAME.element_x_node ON SCHEMA_NAME.element_x_node.element_id::text = event_x_element.element_id::text
+JOIN SCHEMA_NAME.node ON SCHEMA_NAME.node.node_id::text = element_x_node.node_id::text
+ORDER BY element_id;
 
 
 
-
--- ----------------------------
--- Views to arc
--- ----------------------------
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_conduit AS
-SELECT 
-event_x_conduit.id,
-event_x_conduit.event_id,
-event_x_conduit.arc_id,
-event_x_conduit.value_struc,
-event_x_conduit.value_sediment,
-event_x_conduit.observ,
-max(event_x_conduit.date) AS date,
-arc.the_geom
-FROM SCHEMA_NAME.event_x_conduit
-JOIN SCHEMA_NAME.event ON event.id::text = event_x_conduit.event_id::text
-JOIN SCHEMA_NAME.arc ON arc.arc_id::text = event_x_conduit.arc_id::text
-GROUP BY
-event_x_conduit.id,
-event_x_conduit.event_id,
-event_x_conduit.arc_id,
-event_x_conduit.value_struc,
-event_x_conduit.value_sediment,
-event_x_conduit.observ,
-arc.the_geom;
-
-
-
--- ----------------------------
--- Views to connec
--- ----------------------------
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_connec AS
-SELECT 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_connec AS 
+SELECT
 event_x_connec.id,
+event.event_type,
 event_x_connec.event_id,
 event_x_connec.connec_id,
-event_x_connec.value_struc,
-event_x_connec.value_sediment,
-event_x_connec.observ,
-max(event_x_connec.date) AS date,
-connec.the_geom
+connec.connecat_id,
+event_x_connec.parameter_id,
+event_x_connec.value,
+event_x_connec.position_id,
+event_x_connec.text,
+event.timestamp,
+event.user
 FROM SCHEMA_NAME.event_x_connec
 JOIN SCHEMA_NAME.event ON event.id::text = event_x_connec.event_id::text
-JOIN SCHEMA_NAME.connec ON connec.connec_id::text = event_x_connec.connec_id::text
-GROUP BY
-event_x_connec.id,
-event_x_connec.event_id,
-event_x_connec.connec_id,
-event_x_connec.value_struc,
-event_x_connec.value_sediment,
-event_x_connec.observ,
-connec.the_geom;
+JOIN SCHEMA_NAME.connec ON SCHEMA_NAME.connec.connec_id::text = event_x_connec.connec_id::text
+ORDER BY connec_id;
 
 
--- ----------------------------
--- Views to connec
--- ----------------------------
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_event_x_gully AS
-SELECT 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_gully AS 
+SELECT
 event_x_gully.id,
+event.event_type,
 event_x_gully.event_id,
 event_x_gully.gully_id,
-event_x_gully.value_struc,
-event_x_gully.value_sediment,
-event_x_gully.observ,
-max(event_x_gully.date) AS date,
-gully.the_geom
+gully.gratecat_id,
+event_x_gully.parameter_id,
+event_x_gully.value,
+event_x_gully.position_id,
+event_x_gully.text,
+event.timestamp,
+event.user
 FROM SCHEMA_NAME.event_x_gully
 JOIN SCHEMA_NAME.event ON event.id::text = event_x_gully.event_id::text
-JOIN SCHEMA_NAME.gully ON gully.gully_id::text = event_x_gully.gully_id::text
-GROUP BY
-event_x_gully.id,
-event_x_gully.event_id,
-event_x_gully.gully_id,
-event_x_gully.value_struc,
-event_x_gully.value_sediment,
-event_x_gully.observ,
-gully.the_geom;
-
+JOIN SCHEMA_NAME.gully ON SCHEMA_NAME.gully.gully_id::text = event_x_gully.gully_id::text
+ORDER BY gully_id;

@@ -50,6 +50,9 @@ BEGIN
                 RAISE EXCEPTION '[%]: Please take a look on your map and use the approach of the dma!', TG_NAME;
             END IF;
         END IF;
+        
+        -- Set EPA type
+        NEW.epa_type = 'PIPE';        
     
         -- FEATURE INSERT
         INSERT INTO arc VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length, 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from qgis.gui import (QgsMessageBar)
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
-from qgis.utils import iface
+from qgis.gui import QgsMessageBar
+from PyQt4.QtCore import QSettings
+from PyQt4.QtGui import QLabel
+
 import os.path
 import sys  
 
@@ -10,7 +10,6 @@ import utils_giswater
 from controller import DaoController
         
         
-     
 class ParentDialog(object):   
     
     def __init__(self, iface, dialog, layer, feature):
@@ -42,14 +41,14 @@ class ParentDialog(object):
         
         # Set controller to handle settings and database connection
         # TODO: Try to make only one connection
-        self.controller = DaoController(self.settings, self.plugin_name)
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
         status = self.controller.set_database_connection()      
         if not status:
             message = self.controller.getLastError()
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return 
              
-        self.schema_name = self.controller.getSchemaName()          
+        self.schema_name = self.settings.value("db/schema_name")           
         self.dao = self.controller.getDao()
             
             

@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>830</width>
     <height>612</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>845</width>
+    <width>830</width>
     <height>585</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>845</width>
+    <width>830</width>
     <height>615</height>
    </size>
   </property>
@@ -33,7 +33,7 @@
     <rect>
      <x>10</x>
      <y>50</y>
-     <width>821</width>
+     <width>811</width>
      <height>481</height>
     </rect>
    </property>
@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -167,7 +167,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_arc_ownercat_id">
+    <widget class="QLabel" name="label_arc_owner">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -263,7 +263,7 @@
       <number>0</number>
      </property>
      <property name="text">
-      <string>function_type</string>
+      <string>category_type</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -283,7 +283,7 @@
       <rect>
        <x>520</x>
        <y>190</y>
-       <width>281</width>
+       <width>271</width>
        <height>20</height>
       </rect>
      </property>
@@ -365,7 +365,7 @@
       <rect>
        <x>520</x>
        <y>160</y>
-       <width>281</width>
+       <width>271</width>
        <height>20</height>
       </rect>
      </property>
@@ -421,7 +421,7 @@
       <rect>
        <x>120</x>
        <y>300</y>
-       <width>681</width>
+       <width>671</width>
        <height>31</height>
       </rect>
      </property>
@@ -477,7 +477,7 @@
       <rect>
        <x>120</x>
        <y>260</y>
-       <width>681</width>
+       <width>671</width>
        <height>31</height>
       </rect>
      </property>
@@ -598,7 +598,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="function_type">
+    <widget class="QComboBox" name="category_type">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -915,7 +915,7 @@
       <rect>
        <x>520</x>
        <y>220</y>
-       <width>281</width>
+       <width>271</width>
        <height>20</height>
       </rect>
      </property>
@@ -941,6 +941,13 @@
        <width>161</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="date">
+      <date>
+       <year>2016</year>
+       <month>1</month>
+       <day>1</day>
+      </date>
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
@@ -987,7 +994,7 @@
       <rect>
        <x>120</x>
        <y>340</y>
-       <width>681</width>
+       <width>671</width>
        <height>31</height>
       </rect>
      </property>
@@ -997,7 +1004,7 @@
       <rect>
        <x>120</x>
        <y>380</y>
-       <width>681</width>
+       <width>671</width>
        <height>31</height>
       </rect>
      </property>
@@ -1007,7 +1014,7 @@
       <rect>
        <x>120</x>
        <y>420</y>
-       <width>681</width>
+       <width>671</width>
        <height>31</height>
       </rect>
      </property>
@@ -1031,9 +1038,9 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>150</y>
-       <width>771</width>
-       <height>251</height>
+       <y>50</y>
+       <width>761</width>
+       <height>381</height>
       </rect>
      </property>
      <property name="html">
@@ -1048,7 +1055,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>120</y>
+       <y>20</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -1079,42 +1086,6 @@ p, li { white-space: pre-wrap; }
      <property name="margin">
       <number>3</number>
      </property>
-    </widget>
-    <widget class="QTabWidget" name="label_management">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>771</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab_13">
-      <attribute name="title">
-       <string>Pipe</string>
-      </attribute>
-      <widget class="QLineEdit" name="cat_arc_descript">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>741</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="text">
-        <string>short description (from arc catalog)</string>
-       </property>
-      </widget>
-     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="page_analysis">
@@ -1741,7 +1712,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>Document</string>
     </attribute>
-    <widget class="QLabel" name="label_cat_doc_type">
+    <widget class="QLabel" name="label_doc_type">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -1922,17 +1893,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QTableWidget" name="doc_doccat_id">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_to">
+    <widget class="QLabel" name="label_doc_to">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2014,236 +1975,20 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-   </widget>
-   <widget class="QWidget" name="page_picture">
-    <attribute name="title">
-     <string>Picture</string>
-    </attribute>
-    <widget class="QDateEdit" name="date_picture_from">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="date_picture_to">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2017</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="picture_user">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_picture_user">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>70</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>User</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="picture_tagcat_id">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>70</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_picture_tagcat_id">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>70</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>Tag</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="picture_path">
+    <widget class="QTableView" name="tbl_document">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>150</y>
        <width>761</width>
-       <height>281</height>
+       <height>271</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QLabel" name="label_to_2">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>35</y>
-       <width>31</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>to</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_results">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>125</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Picture:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="Line" name="line_12">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>105</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </widget>
@@ -2267,7 +2012,7 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>Pipe</string>
       </attribute>
-      <widget class="QLabel" name="label_event_eventcat_id">
+      <widget class="QLabel" name="label_event_event">
        <property name="geometry">
         <rect>
          <x>270</x>
@@ -2339,7 +2084,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_user">
+      <widget class="QComboBox" name="doc_user_2">
        <property name="geometry">
         <rect>
          <x>133</x>
@@ -2349,7 +2094,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateEdit" name="date_event_from">
+      <widget class="QDateEdit" name="date_document_from_2">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -2382,7 +2127,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QComboBox" name="event_eventcat_id">
+      <widget class="QComboBox" name="event_id">
        <property name="geometry">
         <rect>
          <x>373</x>
@@ -2392,7 +2137,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_cat_event_eventtype_id">
+      <widget class="QLabel" name="label_event_type">
        <property name="geometry">
         <rect>
          <x>508</x>
@@ -2464,17 +2209,7 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QTableWidget" name="event_x_pipe_state_observ">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>705</width>
-         <height>231</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="cat_event_eventtype_id">
+      <widget class="QComboBox" name="event_type">
        <property name="geometry">
         <rect>
          <x>610</x>
@@ -2484,7 +2219,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QDateEdit" name="date_event_to">
+      <widget class="QDateEdit" name="date_document_to_2">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -2504,7 +2239,7 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLabel" name="label_to_3">
+      <widget class="QLabel" name="label_event_to">
        <property name="geometry">
         <rect>
          <x>160</x>
@@ -2540,6 +2275,16 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
+      <widget class="QTableView" name="tbl_event_element">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>130</y>
+         <width>701</width>
+         <height>231</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>
@@ -2547,7 +2292,7 @@ p, li { white-space: pre-wrap; }
     <attribute name="title">
      <string>Log</string>
     </attribute>
-    <widget class="QLabel" name="label_147">
+    <widget class="QLabel" name="label_log_event_type">
      <property name="geometry">
       <rect>
        <x>260</x>
@@ -2662,7 +2407,7 @@ p, li { white-space: pre-wrap; }
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="label_149">
+    <widget class="QLabel" name="label_log_user">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -2698,7 +2443,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_101">
+    <widget class="QLabel" name="label_log_to">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2764,161 +2509,14 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tbl_log">
+    <widget class="QTableView" name="tbl_log">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>150</y>
        <width>761</width>
-       <height>281</height>
+       <height>271</height>
       </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="page_rtc">
-    <attribute name="title">
-     <string>RTC</string>
-    </attribute>
-    <widget class="Line" name="line_13">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>105</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_102">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>35</y>
-       <width>31</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>to</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="date_rtc_from">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="date_rtc_to">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2017</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_rtc">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>125</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>RTC:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="tbl_rtc">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
-     </property>
-     <property name="html">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;arc_id, rtc_scada_value(value, status,date)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -2942,14 +2540,14 @@ p, li { white-space: pre-wrap; }
   <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>750</x>
      <y>540</y>
      <width>71</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>rotation</string>
+    <string/>
    </property>
   </widget>
   <widget class="QComboBox" name="arccat_id">
@@ -2968,7 +2566,7 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>759</x>
+     <x>750</x>
      <y>20</y>
      <width>71</width>
      <height>20</height>
@@ -2983,12 +2581,12 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="v_edit_arc_gis_length">
+  <widget class="QLineEdit" name="gis_length">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>180</x>
      <y>540</y>
-     <width>111</width>
+     <width>101</width>
      <height>20</height>
     </rect>
    </property>
@@ -2998,13 +2596,13 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string>GIS length</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="custom_length">
    <property name="geometry">
     <rect>
-     <x>640</x>
+     <x>630</x>
      <y>540</y>
      <width>111</width>
      <height>20</height>
@@ -3016,15 +2614,15 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string>NULL</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label_arc_custom_length">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>550</x>
      <y>540</y>
-     <width>301</width>
+     <width>81</width>
      <height>22</height>
     </rect>
    </property>
@@ -3041,7 +2639,7 @@ p, li { white-space: pre-wrap; }
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>Insert value of real length only to modify geometry length -&gt;</string>
+    <string>custom length:</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -3062,7 +2660,7 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>670</x>
      <y>20</y>
      <width>71</width>
      <height>20</height>
@@ -3083,7 +2681,7 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>560</x>
+     <x>550</x>
      <y>20</y>
      <width>111</width>
      <height>20</height>
@@ -3103,7 +2701,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>430</x>
      <y>20</y>
-     <width>121</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -3113,15 +2711,10 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>10</x>
      <y>540</y>
-     <width>101</width>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>Verified</string>
-    </property>
-   </item>
   </widget>
   <widget class="QComboBox" name="cat_arctype_id">
    <property name="geometry">
@@ -3146,7 +2739,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>670</x>
      <y>570</y>
      <width>71</width>
      <height>31</height>
@@ -3159,7 +2752,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>750</x>
      <y>570</y>
      <width>71</width>
      <height>31</height>
@@ -3167,6 +2760,52 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Close</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_pressure_zone">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>540</y>
+     <width>90</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Pressure zone:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="presszonecat_id">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>540</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

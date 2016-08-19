@@ -63,4 +63,3 @@ INSERT INTO "SCHEMA_NAME"."inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:0
 
 
 
-

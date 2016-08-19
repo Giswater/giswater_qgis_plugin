@@ -9,18 +9,18 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.gui import (QgsMessageBar)
-from qgis.core import QgsExpression, QgsFeatureRequest
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
+from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
+from PyQt4.QtGui import QAction, QActionGroup, QIcon   
 
 import os.path
 import sys  
 from functools import partial
 
-from line_map_tool import LineMapTool
-from point_map_tool import PointMapTool
+from actions.ed import Ed
+from actions.mg import Mg
 from controller import DaoController
+from map_tools.line_map_tool import LineMapTool
+from map_tools.point_map_tool import PointMapTool
 from map_tools.move_node import MoveNode
 from search.search_plus import SearchPlus
 
@@ -50,32 +50,39 @@ class Giswater(QObject):
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+            QCoreApplication.installTranslator(self.translator)
          
         # Load local settings of the plugin
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())    
         
-        # Set controller to handle settings and database
-        self.controller = DaoController(self.settings, self.plugin_name)
-        self.controller.set_database_connection()     
-        self.dao = self.controller.getDao()     
-        self.schema_name = self.controller.getSchemaName()      
-        
         # Declare instance attributes
         self.icon_folder = self.plugin_dir+'/icons/'        
         self.actions = {}
-        self.search_plus = None
-        
-        # {function_name, map_tool}
         self.map_tools = {}
+        self.search_plus = None
+        self.srid = None
+        
+        # Set controller to handle settings and database connection
+        self.dao = None
+        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        connection_status = self.controller.set_database_connection()
+        if not connection_status:
+            msg = self.controller.last_error  
+            self.controller.show_message(msg, 1, 100) 
+            return 
+        else:
+            self.dao = self.controller.getDao()           
+        
+        # Set actions classes
+        self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
+        
                
-
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
@@ -84,15 +91,7 @@ class Giswater(QObject):
                    
     def tr(self, message):
         if self.controller:
-            return self.controller.tr(message)
-        
-        
-    def showInfo(self, text, duration = 5):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)            
-        
-        
-    def showWarning(self, text, duration = 5):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)            
+            return self.controller.tr(message)      
         
         
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
@@ -121,13 +120,19 @@ class Giswater(QObject):
             self.actions[index_action] = action
         else:
             self.actions[text] = action
-            
+                                     
         if function_name is not None:
             try:
                 action.setCheckable(is_checkable) 
-                if int(index_action) in (17, 20, 26, 32):    
-                    callback_function = getattr(self, function_name)  
+                # Management toolbar actions
+                if int(index_action) in (17, 19, 20, 21, 24, 25, 26, 27, 28, 99):    
+                    callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
+                # Edit toolbar actions
+                elif int(index_action) in (32, 33, 34, 36):    
+                    callback_function = getattr(self.ed, function_name)  
+                    action.triggered.connect(callback_function)                    
+                # Generic function
                 else:        
                     water_soft = function_name[:2] 
                     callback_function = getattr(self, water_soft+'_generic')  
@@ -152,11 +157,11 @@ class Giswater(QObject):
             map_tool = None
             action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
             if int(index_action) == 13:
-                map_tool = LineMapTool(self.iface, self.settings, action, index_action, self.controller)
+                map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 16:
-                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller)         
+                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller, self.srid)         
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)   
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             else:
                 pass
             if map_tool:      
@@ -168,21 +173,20 @@ class Giswater(QObject):
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
         
-        parent = self.iface.mainWindow()
-        if self.controller is None:
+        if self.dao is None:
             return
         
         # Create plugin main menu
         self.menu_name = self.tr('menu_name')    
         
-        # Get table or view related with 'arc' and 'node'
+        # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
+        self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
+        self.table_version = self.settings.value('db/table_version', 'version')     
         
-        # Get SRID
-        self.srid = self.settings.value('status/srid')             
-                
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
+        parent = self.iface.mainWindow()
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
         self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
@@ -204,7 +208,7 @@ class Giswater(QObject):
             self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
-        # UD toolbar
+        # UD toolbar   
         if self.toolbar_ud_enabled:        
             self.ag_ud = QActionGroup(parent);
             self.add_action('01', self.toolbar_ud, self.ag_ud)   
@@ -213,7 +217,7 @@ class Giswater(QObject):
             self.add_action('05', self.toolbar_ud, self.ag_ud)   
             self.add_action('03', self.toolbar_ud, self.ag_ud)   
                 
-        # WS toolbar
+        # WS toolbar 
         if self.toolbar_ws_enabled:  
             self.ag_ws = QActionGroup(parent);
             self.add_action('10', self.toolbar_ws, self.ag_ws)
@@ -232,49 +236,139 @@ class Giswater(QObject):
             self.add_action('28', self.toolbar_mg, self.ag_mg)            
             for i in range(17,28):
                 self.add_action(str(i), self.toolbar_mg, self.ag_mg)
+            self.add_action('99', self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
             self.ag_ed = QActionGroup(parent);
-            for i in range(30,36):
-                self.add_action(str(i), self.toolbar_ed, self.ag_ed)
-                
+            for i in range(30,37):
+                self.add_action(str(i), self.toolbar_ed, self.ag_ed)                   
+         
+        # Disable and hide all toolbars
+        self.enable_actions(False)
+        self.hide_toolbars() 
+        
+        # Get files to execute giswater jar
+        self.java_exe = self.settings.value('files/java_exe')          
+        self.giswater_jar = self.settings.value('files/giswater_jar')          
+        self.gsw_file = self.settings.value('files/gsw_file')   
+                         
+        # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
+        self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
+                                 
         # Project initialization
         self.project_read()               
 
 
     def unload(self):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
-        for action_index, action in self.actions.iteritems():
-            self.iface.removePluginMenu(self.menu_name, action)
-            self.iface.removeToolBarIcon(action)
-        if self.toolbar_ud_enabled:    
-            del self.toolbar_ud
-        if self.toolbar_ws_enabled:    
-            del self.toolbar_ws
-        if self.toolbar_mg_enabled:    
-            del self.toolbar_mg
-        if self.toolbar_ed_enabled:    
-            del self.toolbar_ed
-            if self.search_plus is not None:
-                self.search_plus.unload()
-            
+        
+        try:
+            for action_index, action in self.actions.iteritems():   #@UnusedVariable
+                self.iface.removePluginMenu(self.menu_name, action)
+                self.iface.removeToolBarIcon(action)
+            if self.toolbar_ud_enabled:    
+                del self.toolbar_ud
+            if self.toolbar_ws_enabled:    
+                del self.toolbar_ws
+            if self.toolbar_mg_enabled:    
+                del self.toolbar_mg
+            if self.toolbar_ed_enabled:    
+                del self.toolbar_ed
+                if self.search_plus is not None:
+                    self.search_plus.unload()
+        except AttributeError, e:
+            print "unload_AttributeError: "+str(e)
+        except KeyError, e:
+            print "unload_KeyError: "+str(e)
     
     
-    ''' Slots '''
+    ''' Slots '''             
+
+    def enable_actions(self, enable=True, start=1, stop=37):
+        ''' Utility to enable all actions '''
+        for i in range(start, stop):
+            self.enable_action(enable, i)              
+
+
+    def enable_action(self, enable=True, index=1):
+        ''' Enable selected action '''
+        key = str(index).zfill(2)
+        if key in self.actions:
+            action = self.actions[key]
+            action.setEnabled(enable)                   
+
+
+    def hide_toolbars(self):
+        ''' Hide all toolbars from QGIS GUI '''
+        
+        try:
+            if self.toolbar_ud_enabled:            
+                self.toolbar_ud.setVisible(False)
+            if self.toolbar_ws_enabled:                
+                self.toolbar_ws.setVisible(False)
+            if self.toolbar_mg_enabled:                
+                self.toolbar_mg.setVisible(False)
+            if self.toolbar_ed_enabled:                
+                self.toolbar_ed.setVisible(False)
+        except AttributeError, e:
+            print "unload_AttributeError: "+str(e)
+        except KeyError, e:
+            print "unload_KeyError: "+str(e)                      
+                               
+    
+    def get_layer_source(self, layer):
+        ''' Get table or view name of selected layer '''
+         
+        uri_schema = None
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()   
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.rfind('.')  
+        pos_fi = uri.find('" ')  
+        if pos_ini <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini+6:pos_end_schema]                             
+            uri_table = uri[pos_ini+6:pos_fi+1]                             
+             
+        return uri_schema, uri_table
+    
+        
+    def search_project_type(self):
+        ''' Search in table 'version' project type of current QGIS project '''
+        
+        try:
+            self.mg.project_type = None
+            features = self.layer_version.getFeatures()
+            for feature in features:
+                wsoftware = feature['wsoftware']
+                if wsoftware.lower() == 'epanet':
+                    self.mg.project_type = 'ws'     
+                    if self.toolbar_ws_enabled:                
+                        self.toolbar_ws.setVisible(True)                            
+                elif wsoftware.lower() == 'epaswmm':
+                    self.mg.project_type = 'ud'
+                    if self.toolbar_ud_enabled:                
+                        self.toolbar_ud.setVisible(True)                
             
-    def disable_actions(self):
-        ''' Utility to disable all actions '''
-        for i in range(1,30):
-            key = str(i).zfill(2)
-            if key in self.actions:
-                action = self.actions[key]
-                action.setEnabled(False)         
+            # Set visible MANAGEMENT and EDIT toolbar  
+            if self.toolbar_mg_enabled:         
+                self.toolbar_mg.setVisible(True)
+            if self.toolbar_ed_enabled: 
+                self.toolbar_ed.setVisible(True)
+            self.ed.search_plus = self.search_plus                   
+        except:
+            pass                  
 
                                 
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
         
+        if self.dao is None:
+            return
+                
+        # Hide all toolbars
+        self.hide_toolbars()
+                    
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
@@ -283,25 +377,82 @@ class Giswater(QObject):
         # Initialize variables
         self.layer_arc = None
         self.layer_node = None
-        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
-        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
+        self.layer_connec = None
+        self.layer_version = None
         
-        # Iterate over all layers to get 'arc' and 'node' layer '''      
+        # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            uri = cur_layer.dataProvider().dataSourceUri().lower()   
-            pos_ini = uri.find('table=')
-            pos_fi = uri.find('" ')  
-            uri_table = uri   
-            if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]                           
-                if uri_table == table_arc:  
+            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   #@UnusedVariable
+            if uri_table is not None:
+                if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
-                if uri_table == table_node:  
+                if self.table_node in uri_table:  
                     self.layer_node = cur_layer
+                if self.table_connec in uri_table:  
+                    self.layer_connec = cur_layer
+                if self.table_version in uri_table:  
+                    self.layer_version = cur_layer     
         
-        # Disable toolbar actions and manage current layer selected
-        self.disable_actions()       
+        # Check if table 'version' exists
+        if self.layer_version is None:
+            return
+                 
+        # Get schema name from table 'version'
+        # Check if really exists
+        (self.schema_name, uri_table) = self.get_layer_source(self.layer_version)  
+        schema_name = self.schema_name.replace('"', '')
+        if self.schema_name is None or not self.dao.check_schema(schema_name):
+            print "Schema not found: "+self.schema_name
+            return
+        
+        # Set schema_name in controller and in config file
+        self.settings.setValue("db/schema_name", self.schema_name)    
+        self.controller.set_schema_name(self.schema_name)    
+        
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)        
+        
+        # Set SRID from table node
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
+        row = self.dao.get_row(sql)
+        if row:
+            self.srid = row[0]   
+            self.settings.setValue("db/srid", self.srid)                           
+        
+        # Search project type in table 'version'
+        self.search_project_type()
+                                         
+        # Set layer custom UI form and init function   
+        if self.layer_arc is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
+            file_init = os.path.join(self.plugin_dir, 'ws_arc_init.py')       
+            self.layer_arc.editFormConfig().setUiForm(file_ui) 
+            self.layer_arc.editFormConfig().setInitCodeSource(1)
+            self.layer_arc.editFormConfig().setInitFilePath(file_init)           
+            self.layer_arc.editFormConfig().setInitFunction('formOpen') 
+                                    
+        if self.layer_node is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_node.ui')
+            file_init = os.path.join(self.plugin_dir, 'ws_node_init.py')       
+            self.layer_node.editFormConfig().setUiForm(file_ui) 
+            self.layer_node.editFormConfig().setInitCodeSource(1)
+            self.layer_node.editFormConfig().setInitFilePath(file_init)           
+            self.layer_node.editFormConfig().setInitFunction('formOpen')                         
+                                    
+        if self.layer_connec is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_connec.ui')
+            file_init = os.path.join(self.plugin_dir, 'ws_connec_init.py')       
+            self.layer_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')                         
+                    
+        # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
+        
+        # Set layer 'Arc' for map tool 'Move node'
+        map_tool = self.map_tools['mg_move_node']
+        map_tool.set_layer_arc(self.layer_arc)
         
         # Create SearchPlus object
         try:
@@ -312,35 +463,69 @@ class Giswater(QObject):
             self.actions['32'].setEnabled(status) 
             self.actions['32'].setCheckable(False) 
             if not status:
-                self.search_plus.dlg.setVisible(False)                     
+                self.search_plus.dlg.setVisible(False)  
+            self.ed.search_plus = self.search_plus                   
         except:
-            pass       
-                               
-                               
+            pass   
+        
+        self.custom_enable_actions()
+            
+                                
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
 
-        self.disable_actions()
+        # Disable all actions (buttons)
+        self.enable_actions(False)
+        
+        self.custom_enable_actions()     
+        
         if layer is None:
             layer = self.iface.activeLayer() 
+            if layer is None:
+                return            
         self.current_layer = layer
-        try:
-            list_index_action = self.settings.value('layers/'+self.current_layer.name(), None)
-            if list_index_action:
-                if type(list_index_action) is list:
-                    for index_action in list_index_action:
+        
+        # Check is selected layer is 'arc', 'node' or 'connec'
+        setting_name = None
+        (uri_schema, uri_table) = self.get_layer_source(layer)  #@UnusedVariable  
+        if uri_table is not None:
+            if self.table_arc in uri_table:  
+                setting_name = 'buttons_arc'
+            elif self.table_node in uri_table:  
+                setting_name = 'buttons_node'
+            elif self.table_connec in uri_table:  
+                setting_name = 'buttons_connec'                
+        
+        if setting_name is not None:
+            try:
+                list_index_action = self.settings.value('layers/'+setting_name, None)
+                if list_index_action:
+                    if type(list_index_action) is list:
+                        for index_action in list_index_action:
+                            if index_action != '-1' and str(index_action) in self.actions:
+                                self.actions[index_action].setEnabled(True)
+                    elif type(list_index_action) is unicode:
+                        index_action = str(list_index_action)
                         if index_action != '-1' and str(index_action) in self.actions:
-                            self.actions[index_action].setEnabled(True)
-                elif type(list_index_action) is unicode:
-                    index_action = str(list_index_action)
-                    if index_action != '-1' and str(index_action) in self.actions:
-                        self.actions[index_action].setEnabled(True)                
-        except AttributeError, e:
-            print "current_layer_changed: "+str(e)
-        except KeyError, e:
-            print "current_layer_changed: "+str(e)
+                            self.actions[index_action].setEnabled(True)                
+            except AttributeError, e:
+                print "current_layer_changed: "+str(e)
+            except KeyError, e:
+                print "current_layer_changed: "+str(e)
                         
+    
+    def custom_enable_actions(self):
+        
+        # MG toolbar
+        self.enable_action(True, 19)   
+        self.enable_action(True, 21)   
+        self.enable_action(True, 24)   
+        self.enable_action(True, 25)         
+        
+        # Enable ED toolbar
+        self.enable_actions(True, 30, 37)
                 
+                    
     def ws_generic(self, function_name):   
         ''' Water supply generic callback function '''
         try:
@@ -353,7 +538,9 @@ class Giswater(QObject):
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
-            self.showWarning("AttributeError: "+str(e))     
+            self.controller.show_warning("AttributeError: "+str(e))            
+        except KeyError as e:
+            self.controller.show_warning("KeyError: "+str(e))    
             
             
     def ud_generic(self, function_name):   
@@ -367,8 +554,10 @@ class Giswater(QObject):
                 print function_name+" has been checked"       
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
-        except AttributeError:
-            print "ud_generic: AttributeError"                
+        except AttributeError as e:
+            self.controller.show_warning("AttributeError: "+str(e))            
+        except KeyError as e:
+            self.controller.show_warning("KeyError: "+str(e))             
             
             
     def mg_generic(self, function_name):   
@@ -385,168 +574,7 @@ class Giswater(QObject):
                     self.iface.mapCanvas().unsetMapTool(map_tool)
                     print function_name+" has been unchecked (mg_generic)"  
         except AttributeError as e:
-            self.showWarning("AttributeError: "+str(e))            
+            self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
-            self.showWarning("KeyError: "+str(e))   
-            
-                                            
-                                                   
-    ''' Edit bar functions '''  
-    def ed_search_plus(self):   
-        if self.search_plus is not None:
-            #self.iface.mainWindow().addDockWidget(Qt.TopDockWidgetArea, self.search_plus.dlg)
-            self.search_plus.dlg.setVisible(True)            
-             
-                                  
-    ''' Management bar functions '''                                
-        
-    def mg_delete_node(self):
-        ''' Button 17. User select one node. 
-        Execute SQL function 'gw_fct_delete_node' 
-        Show warning (if any) '''
+            self.controller.show_warning("KeyError: "+str(e))              
 
-        # Get selected features (from layer 'connec')          
-        layer = self.iface.activeLayer()  
-        count = layer.selectedFeatureCount()     
-        if count == 0:
-            self.showInfo(self.controller.tr("You have to select at least one feature!"))
-            return 
-        elif count > 1:  
-            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))      
-        
-        features = layer.selectedFeatures()
-        feature = features[0]
-        node_id = feature.attribute('node_id')   
-        
-        # Execute SQL function
-        function_name = "gw_fct_delete_node"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"  
-        result = self.dao.get_row(sql) 
-        self.dao.commit()
-                    
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()    
-        
-        # Manage SQL execution result
-        if result is None:
-            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
-        elif result[0] == 0:
-            self.showInfo(self.controller.tr("Node deleted successfully"))    
-        elif result[0] == 1:
-            self.showWarning(self.controller.tr("Nonexistent node id: ")+node_id)   
-        elif result[0] == 2:
-            self.showWarning(self.controller.tr("Pipes has different types"))   
-        elif result[0] == 3:
-            self.showWarning(self.controller.tr("Node has not 2 arcs"))   
-        else:
-            self.showWarning(self.controller.tr("Undefined error"))               
-        
-        
-    def mg_connec_tool(self):
-        ''' Button 20. User select connections from layer 'connec' 
-        and executes function: 'gw_fct_connect_to_network' '''      
-
-        # Get selected features (from layer 'connec')
-        aux = "{"         
-        layer = self.iface.activeLayer()  
-        if layer.selectedFeatureCount() == 0:
-            self.showInfo(self.controller.tr("You have to select at least one feature!"))
-            return 
-        features = layer.selectedFeatures()
-        for feature in features:
-            connec_id = feature.attribute('connec_id') 
-            aux+= str(connec_id)+", "
-        connec_array = aux[:-2]+"}"
-        
-        # Execute function
-        sql = "SELECT "+self.schema_name+".gw_fct_connect_to_network('"+connec_array+"');"  
-        self.dao.execute_sql(sql) 
-        
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh() 
-    
-        
-    def change_elem_type(self):
-        ''' TODO: 28. User select one node. A form is opened showing current node_type.type 
-        Combo to select new node_type.type
-        Combo to select catalog id
-        Trigger 'gw_trg_edit_node' has to be disabled temporarily '''
-        pass
-        
-    def table_wizard(self):
-        ''' TODO: 21. ''' 
-        pass
-        
-        
-    def mg_flow_trace(self):
-        ''' Button 26. User select one node or arc.
-        SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
-        Returns and integer: error code
-        Get these id's and select them in its corresponding layers '''
-        
-        # Get selected features and layer type: 'arc' or 'node'   
-        elem_type = self.current_layer.name().lower()
-        count = self.current_layer.selectedFeatureCount()     
-        if count == 0:
-            self.showInfo(self.controller.tr("You have to select at least one feature!"))
-            return 
-        elif count > 1:  
-            self.showInfo(self.controller.tr("More than one feature selected. Only the first one will be processed!"))      
-         
-        features = self.current_layer.selectedFeatures()
-        feature = features[0]
-        elem_id = feature.attribute(elem_type+'_id')   
-        
-        # Execute SQL function
-        function_name = "gw_fct_mincut"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"  
-        result = self.dao.get_row(sql) 
-        self.dao.commit()        
-        
-        # Manage SQL execution result
-        if result is None:
-            self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
-            return   
-        elif result[0] == 0:
-            # Get 'arc' and 'node' list and select them 
-            self.mg_flow_trace_select_features(self.layer_arc, 'arc')                         
-            self.mg_flow_trace_select_features(self.layer_node, 'node')   
-            # Drop temporary tables 
-            sql = "DROP TABLE IF EXISTS temp_mincut_node CASCADE;"
-            sql+= "DROP TABLE IF EXISTS temp_mincut_arc CASCADE;"
-            sql+= "DROP TABLE IF EXISTS temp_mincut_valve CASCADE;" 
-            self.dao.execute_sql(sql)  
-        else:
-            self.showWarning(self.controller.tr("Undefined error"))    
-            return        
-    
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()   
-   
-   
-    def mg_flow_trace_select_features(self, layer, elem_type):
-        
-        sql = "SELECT * FROM "+self.schema_name+".temp_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"  
-        rows = self.dao.get_rows(sql)
-        self.dao.commit()
-        
-        # Build an expression to select them
-        aux = "\""+elem_type+"_id\" IN ("
-        for elem in rows:
-            aux+= elem[0]+", "
-        aux = aux[:-2]+")"
-        
-        # Get a featureIterator from this expression:
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            self.showWarning("Expression Error: "+str(expr.parserErrorString()))
-            return        
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-        
-        # Select features with these id's 
-        layer.setSelectedFeatures(id_list)       
-            
-            
