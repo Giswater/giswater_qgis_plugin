@@ -324,7 +324,7 @@ class Giswater(QObject):
         uri_table = None
         uri = layer.dataProvider().dataSourceUri().lower()   
         pos_ini = uri.find('table=')
-        pos_end_schema = uri.find('.')  
+        pos_end_schema = uri.rfind('.')  
         pos_fi = uri.find('" ')  
         if pos_ini <> -1 and pos_fi <> -1:
             uri_schema = uri[pos_ini+6:pos_end_schema]                             
