@@ -74,7 +74,7 @@ class Mg():
     def mg_arc_topo_repair(self):
         ''' Button 19. Topology repair '''
 
-        # Open dialog to check wich topology functions we want to execute
+        # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()     
         if self.project_type == 'ws':
             self.dlg.check_node_sink.setEnabled(False)     
@@ -83,9 +83,8 @@ class Mg():
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
         
-        # Manage i18n of the form
+        # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'topology_tools')                
-
         self.dlg.exec_()   
     
     
@@ -111,6 +110,14 @@ class Mg():
         if self.dlg.check_node_sink.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
             self.controller.execute_sql(sql) 
+         
+        # Show message and close the dialog   
+        msg = "Selected functions have been executed"
+        self.controller.show_info(msg)   
+        self.close_dialog()         
+            
+        # Refresh map canvas
+        self.iface.mapCanvas().refresh()             
             
                        
     def mg_connec_tool(self):
@@ -153,10 +160,9 @@ class Mg():
         if self.file_path is None:             
             self.file_path = self.plugin_dir+"/test.csv"        
         
-        # Open dialog to select CSV file and table to import contents to
+        # Create dialog to select CSV file and table to import contents to
         self.dlg = TableWizard()
         self.dlg.txt_file_path.setText(self.file_path)   
-        #utils_giswater.fillComboBox(self.dlg.cbo_table, table_list) 
         table_list.sort()  
         for row in table_list:
             self.dlg.cbo_table.addItem(row)                
@@ -165,9 +171,8 @@ class Mg():
         self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
         self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
 
-        # Manage i18n of the form
+        # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'table_wizard')  
-        
         self.dlg.exec_()            
 
         
@@ -427,10 +432,8 @@ class Mg():
         utils_giswater.setDialog(self.dlg)
         utils_giswater.fillComboBox("node_type_type_new", rows) 
         
-        # Manage i18n of the form
+        # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'change_node_type') 
-            
-        # Open the dialog
         self.dlg.exec_()    
      
      
@@ -534,10 +537,8 @@ class Mg():
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
         utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
         
-        # Manage i18n of the form
+        # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_config, 'config')               
-
-        # Open the dialog
         self.dlg_config.exec_()    
     
   
