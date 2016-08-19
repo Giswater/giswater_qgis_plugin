@@ -29,7 +29,6 @@ from ui.table_wizard import TableWizard
 from ui.config import Config
 from ui.add_element import Add_element
 from ui.add_file import Add_file
-from ui.result_compare_selector import ResultCompareSelector
 from ui.topology_tools import TopologyTools
 
 
@@ -138,7 +137,7 @@ class Giswater(QObject):
                 action.setCheckable(is_checkable) 
                 # Define buttons to execute custom or generic function
                 # Custom function
-                if int(index_action) in (17, 19, 20, 21, 24, 25, 26, 27, 28) or int(index_action) >= 30:    
+                if int(index_action) in (17, 19, 20, 21, 24, 26, 27, 28) or int(index_action) >= 30:    
                     callback_function = getattr(self, function_name)  
                     action.triggered.connect(callback_function)
                 # Generic function
@@ -260,11 +259,8 @@ class Giswater(QObject):
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')   
+        self.gsw_file = self.settings.value('files/gsw_file')          
                          
-        # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
-        self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
-                                 
         # Project initialization
         self.project_read()               
 
@@ -273,7 +269,7 @@ class Giswater(QObject):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         
         try:
-            for action_index, action in self.actions.iteritems():   #@UnusedVariable
+            for action_index, action in self.actions.iteritems():
                 self.iface.removePluginMenu(self.menu_name, action)
                 self.iface.removeToolBarIcon(action)
             if self.toolbar_ud_enabled:    
@@ -387,7 +383,7 @@ class Giswater(QObject):
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   #@UnusedVariable
+            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   
             if uri_table is not None:
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
@@ -428,7 +424,7 @@ class Giswater(QObject):
         self.search_project_type()
                                          
         # Set layer custom UI form and init function   
-        if self.layer_arc is not None and self.load_custom_forms:       
+        if self.layer_arc is not None:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_arc_init.py')       
             self.layer_arc.editFormConfig().setUiForm(file_ui) 
@@ -436,7 +432,7 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
                                     
-        if self.layer_node is not None and self.load_custom_forms:       
+        if self.layer_node is not None:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_node.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_node_init.py')       
             self.layer_node.editFormConfig().setUiForm(file_ui) 
@@ -444,7 +440,7 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')                         
                                     
-        if self.layer_connec is not None and self.load_custom_forms:       
+        if self.layer_connec is not None:       
             file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_connec.ui')
             file_init = os.path.join(self.plugin_dir, 'ws_connec_init.py')       
             self.layer_connec.editFormConfig().setUiForm(file_ui) 
@@ -491,7 +487,7 @@ class Giswater(QObject):
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        (uri_schema, uri_table) = self.get_layer_source(layer)  #@UnusedVariable  
+        (uri_schema, uri_table) = self.get_layer_source(layer)  
         if uri_table is not None:
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'
@@ -524,7 +520,6 @@ class Giswater(QObject):
         self.enable_action(True, 19)   
         self.enable_action(True, 21)   
         self.enable_action(True, 24)   
-        self.enable_action(True, 25)         
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 37)
@@ -1068,7 +1063,6 @@ class Giswater(QObject):
         utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
         utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
         utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
-        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
@@ -1083,10 +1077,7 @@ class Giswater(QObject):
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])    
-        
-        # Manage i18n of the form
-        self.controller.translate_form(self.dlg_config, 'config')               
+        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
 
         # Open the dialog
         self.dlg_config.exec_()    
@@ -1103,7 +1094,6 @@ class Giswater(QObject):
         self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
         self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
         self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
-        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
         self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
@@ -1137,7 +1127,6 @@ class Giswater(QObject):
         sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
-        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
         sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
         sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
         sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
@@ -1152,58 +1141,6 @@ class Giswater(QObject):
         self.showInfo(self.controller.tr("Values has been updated"))
         self.close_dialog(self.dlg_config) 
         
-        
-    def mg_result_selector(self):
-        ''' Button 25. Result selector '''
-        
-        # Create the dialog and signals
-        self.dlg = ResultCompareSelector()
-        utils_giswater.setDialog(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.mg_result_selector_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)     
-        
-        # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(result_id) FROM "+self.schema_name+".rpt_cat_result ORDER BY result_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("rpt_selector_result_id", rows) 
-        utils_giswater.fillComboBox("rpt_selector_compare_id", rows)     
-        
-        # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = "SELECT result_id FROM "+self.schema_name+".rpt_selector_result"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText("rpt_selector_result_id", row["result_id"])             
-        sql = "SELECT result_id FROM "+self.schema_name+".rpt_selector_compare"
-        row = self.dao.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText("rpt_selector_compare_id", row["result_id"])             
-        
-        # Open the dialog
-        self.dlg.exec_()            
-                   
-        
-    def mg_result_selector_accept(self):
-        ''' Update current values to the table '''
-           
-        # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
-        rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
-
-        # Delete previous values
-        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql= "DELETE FROM "+self.schema_name+".rpt_selector_result" 
-        self.dao.execute_sql(sql)
-        sql= "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
-        self.dao.execute_sql(sql)
-        sql= "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
-        self.dao.execute_sql(sql)
-        sql= "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
-        self.dao.execute_sql(sql)
-
-        # Show message to user
-        self.showInfo(self.controller.tr("Values has been updated"))
-        self.close_dialog(self.dlg) 
-                
         
         
     ''' Edit bar functions '''
@@ -1394,6 +1331,10 @@ class Giswater(QObject):
         table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
         table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
         table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
+        
+        table_arc ='"test_ws_0815"."v_edit_arc"'
+        table_node ='"test_ws_0815"."v_edit_node"'
+        table_connec ='"test_ws_0815"."v_edit_connec"'
    
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     
@@ -1418,10 +1359,10 @@ class Giswater(QObject):
                         # Get arc_id from current arc
                         self.arc_id = feature.attribute('arc_id')
                         
-                        ''' data base for arc element_x_arc doesn't exist 
+                        #data base for arc element_x_arc doesn't exist 
                         sql = "INSERT INTO "+self.schema_name+".element_x_arc (arc_id,element_id) "
                         sql+= " VALUES ('"+self.arc_id+"','"+self.element_id+"')"
-                        '''
+                        self.dao.execute_sql(sql)  
                         i=i+1
             if pos_ini <> -1 and pos_fi <> -1:
                 uri_table = uri[pos_ini+6:pos_fi+1]     
@@ -1443,6 +1384,7 @@ class Giswater(QObject):
                         sql+= " VALUES ('"+self.node_id+"', '"+self.element_id+"')"
                         self.dao.execute_sql(sql)   
                         i+=1
+                                   
                         
             if pos_ini <> -1 and pos_fi <> -1:
                 uri_table = uri[pos_ini+6:pos_fi+1]  
@@ -1579,19 +1521,23 @@ class Giswater(QObject):
         table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
         table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
         table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
-   
+        #print(table_arc)
+        table_arc ='"test_ws_0815"."v_edit_arc"'
+        table_node ='"test_ws_0815"."v_edit_node"'
+        table_connec ='"test_ws_0815"."v_edit_connec"'
+        
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     
             uri = cur_layer.dataProvider().dataSourceUri().lower()   
             pos_ini = uri.find('table=')
             pos_fi = uri.find('" ')  
             uri_table = uri 
-
+               
             if pos_ini <> -1 and pos_fi <> -1:
                 uri_table = uri[pos_ini+6:pos_fi+1]   
-                
-                # Table 'arc                        
-                if table_arc == uri_table:  
+               
+                if table_arc == uri_table: 
+                     
                     self.layer_arc = cur_layer
                     self.count_arc = self.layer_arc.selectedFeatureCount()  
                     # Get all selected features-arcs
@@ -1603,11 +1549,12 @@ class Giswater(QObject):
                         feature = features_arcs[i]
                         self.arc_id = feature.attribute('arc_id')
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
-                                              
+
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
                         sql = "INSERT INTO "+self.schema_name+".doc_x_arc (arc_id, doc_id) "
                         sql+= " VALUES ('"+self.arc_id+"', '"+self.doc_id+"')"
                         i+=1
+                    
                         self.dao.execute_sql(sql) 
              
             if pos_ini <> -1 and pos_fi <> -1:
@@ -1628,9 +1575,11 @@ class Giswater(QObject):
                         self.doc_id = utils_giswater.getWidgetText("doc_id")
                                               
                         # Execute id(automaticaly),element_id and arc_id to element_x_arc
+                        
                         sql = "INSERT INTO "+self.schema_name+".doc_x_node (node_id,doc_id) "
                         sql+= " VALUES ('"+self.node_id+"','"+self.doc_id+"')"
                         i+=1
+
                         self.dao.execute_sql(sql) 
                         
             if pos_ini <> -1 and pos_fi <> -1:
