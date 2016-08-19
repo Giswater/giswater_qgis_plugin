@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox
-from PyQt4.QtCore import *   # @UnusedWildImport
+from PyQt4.QtCore import QCoreApplication
 from qgis.gui import QgsMessageBar
 
 

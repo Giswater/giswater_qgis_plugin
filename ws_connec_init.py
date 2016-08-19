@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
-from qgis.utils import iface
 from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
 from qgis.gui import QgsAttributeTableModel, QgsMessageBar
+from qgis.utils import iface
+from PyQt4.QtGui import *    # @UnusedWildImport
 
 import os
 
