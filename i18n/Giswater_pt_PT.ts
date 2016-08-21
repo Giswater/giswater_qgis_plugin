@@ -187,12 +187,12 @@
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Análise de fluxo (link)</translation>
-    </message>      
+        <translation>Arc/Node minimum cut</translation>
+    </message>
     <message>
         <source>27_text</source>
-        <translation>Análise de fluxo (nó)</translation>
-    </message>    
+        <translation>Valves configuration analysis</translation>
+    </message>
    
 </context>
 

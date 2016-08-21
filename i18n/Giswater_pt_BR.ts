@@ -184,11 +184,11 @@
     <message>
         <source>26_text</source>
         <translation>Arc/Node minimum cut</translation>
-    </message>      
+    </message>
     <message>
         <source>27_text</source>
         <translation>Valves configuration analysis</translation>
-    </message>    
+    </message>
 </context>
 
 
