@@ -172,8 +172,9 @@ class Giswater(QObject):
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
-                pass
-            if map_tool:      
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+
+            if map_tool:
                 self.map_tools[function_name] = map_tool       
         
         return action         
