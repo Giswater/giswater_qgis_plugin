@@ -183,11 +183,11 @@
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Flow trace (from arc)</translation>
+        <translation>Arc/Node minimum cut</translation>
     </message>      
     <message>
         <source>27_text</source>
-        <translation>Flow trace (from node)</translation>
+        <translation>Valves configuration analysis</translation>
     </message>    
 </context>
 
