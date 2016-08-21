@@ -22,6 +22,7 @@ from controller import DaoController
 from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
 from map_tools.move_node import MoveNode
+from map_tools.mincut_map_tool import MincutMapTool
 from search.search_plus import SearchPlus
 
 
@@ -125,7 +126,7 @@ class Giswater(QObject):
             try:
                 action.setCheckable(is_checkable) 
                 # Management toolbar actions
-                if int(index_action) in (17, 19, 20, 21, 24, 25, 26, 27, 28, 99):    
+                if int(index_action) in (17, 19, 20, 21, 24, 25, 27, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -155,13 +156,21 @@ class Giswater(QObject):
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
         if function_name:
             map_tool = None
-            action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
             if int(index_action) == 13:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 16:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller, self.srid)         
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
+            elif int(index_action) == 26:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 27:
+                # 27 should be not checkeable
+                action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
                 pass
             if map_tool:      
@@ -453,6 +462,11 @@ class Giswater(QObject):
         # Set layer 'Arc' for map tool 'Move node'
         map_tool = self.map_tools['mg_move_node']
         map_tool.set_layer_arc(self.layer_arc)
+        map_tool = self.map_tools['mg_flow_trace']
+        map_tool.set_layer_arc(self.layer_arc)
+        map_tool.set_layer_node(self.layer_node)
+        map_tool.set_schema_name(self.schema_name)
+        map_tool.set_dao(self.dao)
         
         # Create SearchPlus object
         try:
@@ -520,7 +534,9 @@ class Giswater(QObject):
         self.enable_action(True, 19)   
         self.enable_action(True, 21)   
         self.enable_action(True, 24)   
-        self.enable_action(True, 25)         
+        self.enable_action(True, 25)
+        self.enable_action(True, 26)
+        self.enable_action(True, 27)
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 37)
@@ -567,12 +583,14 @@ class Giswater(QObject):
             sender = self.sender()  
             if function_name in self.map_tools:          
                 map_tool = self.map_tools[function_name]
-                if sender.isChecked():
+
+                if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
-                    print function_name+" has been checked (mg_generic)"       
+                    print function_name + " has been checked (mg_generic)"
                 else:
                     self.iface.mapCanvas().unsetMapTool(map_tool)
-                    print function_name+" has been unchecked (mg_generic)"  
+                    print function_name + " has been unchecked (mg_generic)"
+
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:

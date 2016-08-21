@@ -310,67 +310,8 @@ class Mg():
         # Show message to user
         self.controller.show_info("Values has been updated")
         self.close_dialog(self.dlg) 
-                      
-        
-    def mg_flow_trace(self):
-        ''' Button 26. User select one node or arc.
-        SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
-        Returns and integer: error code
-        Get these id's and select them in its corresponding layers '''
-        
-        # Get selected features and layer type: 'arc' or 'node'   
-        layer = self.iface.activeLayer()          
-        elem_type = layer.name().lower()
-        count = layer.selectedFeatureCount()     
-        if count == 0:
-            self.controller.show_warning("You have to select at least one feature!")
-            return 
-        elif count > 1:  
-            self.controller.show_warning("More than one feature selected. Only the first one will be processed!")   
-         
-        features = layer.selectedFeatures()
-        feature = features[0]
-        elem_id = feature.attribute(elem_type+'_id')   
-        
-        # Execute SQL function
-        function_name = "gw_fct_mincut"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"  
-        result = self.controller.execute_sql(sql) 
-        if result:
-            # Get 'arc' and 'node' list and select them 
-            self.mg_flow_trace_select_features(self.layer_arc, 'arc')                         
-            self.mg_flow_trace_select_features(self.layer_node, 'node')     
-            
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()                         
-                
-        
-    def mg_flow_trace_select_features(self, layer, elem_type):
-        
-        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"  
-        rows = self.dao.get_rows(sql)
-        self.dao.commit()
-        
-        # Build an expression to select them
-        aux = "\""+elem_type+"_id\" IN ("
-        for elem in rows:
-            aux+= elem[0]+", "
-        aux = aux[:-2]+")"
-        
-        # Get a featureIterator from this expression:
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            self.controller.show_message("Expression Error: "+str(expr.parserErrorString()))
-            return        
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-        
-        # Select features with these id's 
-        layer.setSelectedFeatures(id_list)   
-        
-        
+
+
     def mg_flow_exit(self):
         ''' Button 27. Valve analytics ''' 
                 
