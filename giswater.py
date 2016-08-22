@@ -23,6 +23,7 @@ from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
 from map_tools.move_node import MoveNode
 from map_tools.mincut_map_tool import MincutMapTool
+from map_tools.delete_node_map_tool import DeleteNodeMapTool
 from search.search_plus import SearchPlus
 
 
@@ -126,7 +127,7 @@ class Giswater(QObject):
             try:
                 action.setCheckable(is_checkable) 
                 # Management toolbar actions
-                if int(index_action) in (17, 19, 20, 21, 24, 25, 27, 28, 99):
+                if int(index_action) in (19, 20, 21, 24, 25, 27, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -165,6 +166,9 @@ class Giswater(QObject):
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
+            elif int(index_action) == 17:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 26:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
@@ -468,7 +472,10 @@ class Giswater(QObject):
         map_tool.set_layer_node(self.layer_node)
         map_tool.set_schema_name(self.schema_name)
         map_tool.set_dao(self.dao)
-        
+        map_tool = self.map_tools['mg_delete_node']
+        map_tool.set_schema_name(self.schema_name)
+        map_tool.set_controller(self.controller)
+
         # Create SearchPlus object
         try:
             if self.search_plus is None:
@@ -532,6 +539,7 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         
         # MG toolbar
+        self.enable_action(True, 17)
         self.enable_action(True, 19)   
         self.enable_action(True, 21)   
         self.enable_action(True, 24)   
