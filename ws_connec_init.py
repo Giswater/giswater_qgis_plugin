@@ -224,10 +224,6 @@ class ConnecDialog(ParentDialog):
             else :
                 # Open the document
                 os.startfile(self.path)     
-
-            
-    def showWarning(self, text, duration = 3):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)   
         
         
     def get_doc_user(self):

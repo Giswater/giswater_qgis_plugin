@@ -157,7 +157,6 @@ class ArcDialog(ParentDialog):
                 
     def change_epa_type(self, index):
         ''' Just select item to 'real' combo 'arccat_id' (that is hidden) '''
-        epa_type = utils_giswater.getWidgetText("epa_type", False)
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)        
 
@@ -239,10 +238,6 @@ class ArcDialog(ParentDialog):
             else :
                 # Open the document
                 os.startfile(self.path)     
-     
-            
-    def showWarning(self, text, duration = 3):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)    
     
     
     def get_doc_user(self):
