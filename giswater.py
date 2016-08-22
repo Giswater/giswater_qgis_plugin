@@ -21,7 +21,7 @@ from actions.mg import Mg
 from controller import DaoController
 from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
-from map_tools.move_node import MoveNode
+from map_tools.move_node_map_tool import MoveNodeMapTool
 from map_tools.mincut_map_tool import MincutMapTool
 from map_tools.delete_node_map_tool import DeleteNodeMapTool
 from search.search_plus import SearchPlus
@@ -162,7 +162,7 @@ class Giswater(QObject):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 16:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-                map_tool = MoveNode(self.iface, self.settings, action, index_action, self.controller, self.srid)         
+                map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
@@ -467,6 +467,7 @@ class Giswater(QObject):
         # Set layer 'Arc' for map tool 'Move node'
         map_tool = self.map_tools['mg_move_node']
         map_tool.set_layer_arc(self.layer_arc)
+        map_tool.set_layer_node(self.layer_node)
         map_tool = self.map_tools['mg_flow_trace']
         map_tool.set_layer_arc(self.layer_arc)
         map_tool.set_layer_node(self.layer_node)
@@ -539,6 +540,7 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         
         # MG toolbar
+        self.enable_action(True, 16)
         self.enable_action(True, 17)
         self.enable_action(True, 19)   
         self.enable_action(True, 21)   

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject)
+from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject, QgsMapLayerRegistry, QgsMapLayer)
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMessageBar
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
+from snapping_utils import SnappingConfigManager
 
-class MoveNode(QgsMapTool):
+
+class MoveNodeMapTool(QgsMapTool):
 
     def __init__(self, iface, settings, action, index_action, controller, srid):
         ''' Class constructor '''        
@@ -20,7 +22,8 @@ class MoveNode(QgsMapTool):
         self.dao = controller.getDao()   
         self.schema_name = self.controller.get_schema_name()   
         self.layer_arc = None
-        
+        self.layer_node = None
+
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
         self.vertexMarker.setColor(QColor(0, 255, 0))
@@ -29,6 +32,7 @@ class MoveNode(QgsMapTool):
         self.vertexMarker.setPenWidth(5)
 
         # Snapper
+        self.snapperManager = SnappingConfigManager(self.iface)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         # Call superclass constructor and set current action                
@@ -46,6 +50,11 @@ class MoveNode(QgsMapTool):
     def set_layer_arc(self, layer_arc):
         ''' Set layer 'Arc' '''
         self.layer_arc = layer_arc
+
+
+    def set_layer_node(self, layer_node):
+        ''' Set layer 'Node' '''
+        self.layer_node = layer_node
 
 
     def reset(self):
@@ -106,12 +115,22 @@ class MoveNode(QgsMapTool):
        
     def activate(self):
         ''' Called when set as currently active map tool '''
-        
-        # Check if layer 'Arc' is loaded
-        if self.layer_arc is None:
-            self.showWarning("Layer 'Arc' not found")
-            return                
-        
+
+        print('move_node_map_tool Activate')
+
+        # Check button
+        self.action().setChecked(True)
+
+        # Store user snapping configuration
+        self.snapperManager.storeSnappingOptions()
+
+        # Clear snapping
+        self.snapperManager.clearSnapping()
+
+        # Set snapping to node
+        self.snapperManager.snapToNode()
+        self.snapperManager.snapToArc()
+
         # Change pointer
         cursor = QCursor()
         cursor.setShape(Qt.CrossCursor)
@@ -124,17 +143,33 @@ class MoveNode(QgsMapTool):
 
         # Reset
         self.reset()
-        
-        # it defines the snapping options self.layer_arc: the id of your layer, True : to enable the layer snapping, 2 : options (0: on vertex, 1 on segment, 2: vertex+segment), 1: pixel (0: type of unit on map), 1000 : tolerance, true : avoidIntersection)
-        QgsProject.instance().setSnapSettingsForLayer(self.layer_arc.id(), True, 2, 0, 2, True)
-    
+
         # Show help message when action is activated
         if self.show_help:
             self.showInfo(self.controller.tr("Select the node and move to desired location"))
-            
-            
+
+        # Control current layer (due to QGIS bug in snapping system)
+        try:
+            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
+                self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Node")[0])
+        except:
+            self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Node")[0])
+
+
     def deactivate(self):
         ''' Called when map tool is being deactivated '''
+
+        print('move_node_map_tool Deactivate')
+
+        # Check button
+        self.action().setChecked(False)
+
+        # Restore previous snapping
+        self.snapperManager.recoverSnappingOptions()
+
+        # Recover cursor
+        self.canvas.setCursor(self.stdCursor)
+
         try:
             self.rubberBand.reset(QGis.Line)
         except AttributeError:
@@ -159,10 +194,11 @@ class MoveNode(QgsMapTool):
         if layer.selectedFeatureCount() == 0:
 
             # Snap to node
-            (retval,result) = self.snapper.snapToCurrentLayer(eventPoint, 0)
+            (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
             # That's the snapped point
-            if result <> []:
+            if result <> [] and (result[0].layer.name() == self.layer_node.name()):
+
                 point = QgsPoint(result[0].snappedVertex)
 
                 # Add marker    
@@ -226,10 +262,10 @@ class MoveNode(QgsMapTool):
             if layer.selectedFeatureCount() == 0:
 
                 # Snap to node
-                (retval,result) = self.snapper.snapToCurrentLayer(eventPoint, 0)
+                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
             
                 # That's the snapped point
-                if result <> []:
+                if result <> [] and (result[0].layer.name() == self.layer_node.name()):
             
                     point = QgsPoint(result[0].snappedVertex)
 
