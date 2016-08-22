@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_valveanalytics() RETURNS "pg_catalog"."int4" AS $BODY$
 DECLARE
-
     exists_id      text;
     polygon_aux    public.geometry;
     polygon_aux2   public.geometry;
@@ -84,8 +83,7 @@ BEGIN
     DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
 
-    RETURN 0;
-	RETURN SCHEMA_NAME.audit_function(0,320);
+    RETURN audit_function(0,320);
 
 END;
 $BODY$

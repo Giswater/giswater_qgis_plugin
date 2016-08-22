@@ -27,7 +27,7 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-        RETURN audit_function(160,370); 
+        PERFORM audit_function(160,370); 
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -38,12 +38,12 @@ BEGIN
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
         END IF;
 
-	
         IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
             IF (quote_literal(old_nodetype)::text <> quote_literal(new_nodetype)::text) THEN
-			RETURN audit_function(135,370); 
+                PERFORM audit_function(135,370); 
+                RETURN NULL;
             END IF;
         END IF;
 
@@ -72,13 +72,14 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
     --  DELETE FROM node WHERE node_id = OLD.node_id;
     --  EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||quote_literal(OLD.node_id);
-        RETURN audit_function(163,370); 
+        PERFORM audit_function(163,370); 
         RETURN NEW;
     
     END IF;
        
 END;
 $$;
+
 
 DROP TRIGGER IF EXISTS gw_trg_edit_inp_node_shortpipe ON "SCHEMA_NAME".v_edit_inp_shortpipe;
 CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_shortpipe 

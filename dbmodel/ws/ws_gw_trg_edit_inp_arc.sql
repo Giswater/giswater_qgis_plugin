@@ -17,8 +17,8 @@ BEGIN
     arc_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
-        RETURN audit_function(155,360); 
-    RETURN NEW;
+        PERFORM audit_function(155,360); 
+        RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 
@@ -45,7 +45,7 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
      --   DELETE FROM arc WHERE arc_id = OLD.arc_id;
      --   EXECUTE 'DELETE FROM '||arc_table||' WHERE arc_id = '|| quote_literal(OLD.arc_id);
-        RETURN audit_function(157,360); 
+        PERFORM audit_function(157,360); 
         RETURN NEW;
     
     END IF;

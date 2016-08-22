@@ -24,28 +24,33 @@ BEGIN
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-                RETURN audit_function(150,350); 
+            PERFORM audit_function(150,350); 
+            RETURN NULL;                   
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,350); 
+                PERFORM audit_function(115,350); 
+                RETURN NULL;                     
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,350); 
+                PERFORM audit_function(120,350); 
+                RETURN NULL;                     
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,350); 
+                PERFORM audit_function(125,350); 
+                RETURN NULL;                         
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,350); 
+                PERFORM audit_function(130,350); 
+                RETURN NULL;                     
             END IF;
         END IF;
         
@@ -54,8 +59,8 @@ BEGIN
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom);
               
-    PERFORM audit_function(1,350);     
-	RETURN NEW;
+        PERFORM audit_function(1,350);     
+        RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -82,7 +87,7 @@ BEGIN
 
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-		PERFORM audit_function(3,350);     
+        PERFORM audit_function(3,350);     
         RETURN NULL;
    
     END IF;
@@ -94,4 +99,5 @@ $$;
 DROP TRIGGER IF EXISTS gw_trg_edit_connec ON "SCHEMA_NAME".v_edit_connec;
 CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_connec
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_connec();
+
       

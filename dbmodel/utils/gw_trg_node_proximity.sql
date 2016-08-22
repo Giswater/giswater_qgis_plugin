@@ -21,7 +21,6 @@ BEGIN
         -- Existing nodes  
         numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(NEW.the_geom, rec.node_proximity));
 
-
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing nodes  
         DROP TABLE IF EXISTS table_holder;
@@ -32,7 +31,8 @@ BEGIN
 
     -- If there is an existing node closer than 'rec.node_tolerance' meters --> error
     IF (numNodes > 0) AND (rec.node_proximity_control IS TRUE) THEN
-        RETURN audit_function(190,170);
+        PERFORM audit_function(190,170);
+        RETURN NULL;
     END IF;
 
     RETURN NEW;

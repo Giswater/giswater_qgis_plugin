@@ -5,10 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-CREATE OR REPLACE FUNCTION gw_trg_arc_searchnodes()
-RETURNS trigger  LANGUAGE plpgsql    AS
-$$
+CREATE OR REPLACE FUNCTION gw_trg_arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     nodeRecord1 record; 
     nodeRecord2 record; 
@@ -73,14 +70,13 @@ BEGIN
 
     -- Error, no existing nodes
        
-	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
-        RETURN audit_function (182,330);
+    ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
+        PERFORM audit_function (182,330);
         RETURN NULL;
 
-	ELSE
+    ELSE
         INSERT INTO anl_arc_no_startend_node (arc_id, the_geom) VALUES (NEW.arc_id, NEW.the_geom);
         RETURN NEW;
-
 
     END IF;
 

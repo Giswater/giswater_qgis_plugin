@@ -36,7 +36,8 @@ BEGIN
     
         -- Control of same node initial and final
         IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-            RETURN audit_function (180,120);
+            PERFORM audit_function (180,120);
+            RETURN NULL;
         ELSE
             -- Update coordinates
             NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
@@ -62,7 +63,7 @@ BEGIN
         END IF;
         
     ELSE
-        RETURN audit_function (182,120);
+        PERFORM audit_function (182,120);
         RETURN NULL;
     END IF;
 

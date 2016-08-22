@@ -79,8 +79,8 @@ BEGIN
 
     END IF;
 
-    RETURN 0;
-	RETURN SCHEMA_NAME.audit_function(0,90);
+
+    RETURN audit_function(0,90);
         
 END;
 $BODY$
