@@ -48,10 +48,10 @@ INSERT INTO audit_cat_error VALUES ('200', 'Elev is not an updatable column', 'P
 
 
 -- Function messages (audit_cat_error.id between 501 and 998)
-INSERT INTO audit_cat_error VALUES ('505', 'Node not found', 'Please check table node', '1', 't', 'ws');
+INSERT INTO audit_cat_error VALUES ('505', 'Node not found','Please check table node', '1', 't', 'ws');
 INSERT INTO audit_cat_error VALUES ('510', 'Pipes has different types', 'It is no possible to delete node', '1', 't', 'ws');
 INSERT INTO audit_cat_error VALUES ('515', 'Node has not 2 arcs', 'It is no possible to delete node', '1', 't', 'ws');
-INSERT INTO audit_cat_error VALUES ('520', 'Arc not found', 'Please check table arc', '1', 't', 'ws_fct');
+INSERT INTO audit_cat_error VALUES ('520', 'Arc not found','Please check table arc', '1', 't', 'ws_fct');
 
 -- Undefined error (audit_cat_error.id = 999)
 INSERT INTO audit_cat_error VALUES ('999', 'Undefined error', 'Undefined', '1', 't', 'generic');

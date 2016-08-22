@@ -17,7 +17,6 @@ INSERT INTO price_value_unit VALUES ('pa');
 INSERT INTO price_value_unit VALUES ('u');
 INSERT INTO price_value_unit VALUES ('kg');
 INSERT INTO price_value_unit VALUES ('t');
-;
 
 
 -- ----------------------------
