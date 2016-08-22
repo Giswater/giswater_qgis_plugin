@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QSettings   # @UnusedWildImport
+from PyQt4.QtCore import QCoreApplication, QSettings   
 from PyQt4.QtGui import QLabel, QCheckBox
 
 import subprocess
@@ -13,15 +13,6 @@ class DaoController():
         self.settings = settings      
         self.plugin_name = plugin_name               
         self.iface = iface               
-        
-    def getDao(self):
-        return self.dao
-        
-    def get_last_error(self):
-        return self.last_error
-        
-    def get_schema_name(self):
-        return self.schema_name
         
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
@@ -154,7 +145,7 @@ class DaoController():
         else:        
             if result['log_level'] <= 2:
                 if result['show_user']:
-                    self.show_message(result['message'], result['log_level'])
+                    self.show_message(result['error_message'], result['log_level'])
                 return False    
             elif result['log_level'] == 3:
                 # Debug message
@@ -188,6 +179,7 @@ class DaoController():
                 
                         
     def start_program(self, program):     
+        ''' Start a minimized external program '''
            
         SW_MINIMIZE = 6
         info = subprocess.STARTUPINFO()

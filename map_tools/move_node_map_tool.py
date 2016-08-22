@@ -19,8 +19,8 @@ class MoveNodeMapTool(QgsMapTool):
         self.srid = srid
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
-        self.dao = controller.getDao()   
-        self.schema_name = self.controller.get_schema_name()   
+        self.dao = controller.dao   
+        self.schema_name = self.controller.schema_name   
         self.layer_arc = None
         self.layer_node = None
 

@@ -49,7 +49,7 @@ class ParentDialog(object):
             return 
              
         self.schema_name = self.settings.value("db/schema_name")           
-        self.dao = self.controller.getDao()
+        self.dao = self.controller.dao
             
             
     def translate_form(self, context_name):

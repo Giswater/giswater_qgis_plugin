@@ -25,8 +25,8 @@ class Mg():
         self.iface = iface
         self.settings = settings
         self.controller = controller
-        self.plugin_dir= plugin_dir       
-        self.dao = self.controller.getDao()             
+        self.plugin_dir = plugin_dir       
+        self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name    
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          

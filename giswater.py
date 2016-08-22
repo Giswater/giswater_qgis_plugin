@@ -75,7 +75,7 @@ class Giswater(QObject):
             self.controller.show_message(msg, 1, 100) 
             return 
         else:
-            self.dao = self.controller.getDao()           
+            self.dao = self.controller.dao          
         
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -538,6 +538,7 @@ class Giswater(QObject):
                         
     
     def custom_enable_actions(self):
+        ''' Enable selected actions '''
         
         # MG toolbar
         self.enable_action(True, 16)
@@ -555,6 +556,7 @@ class Giswater(QObject):
                     
     def ws_generic(self, function_name):   
         ''' Water supply generic callback function '''
+        
         try:
             # Get sender (selected action) and map tool associated 
             sender = self.sender()                            
@@ -572,6 +574,7 @@ class Giswater(QObject):
             
     def ud_generic(self, function_name):   
         ''' Urban drainage generic callback function '''
+        
         try:        
             # Get sender (selected action) and map tool associated 
             sender = self.sender()            
@@ -589,9 +592,8 @@ class Giswater(QObject):
             
     def mg_generic(self, function_name):   
         ''' Management generic callback function '''
+        
         try:        
-            # Get sender (selected action) and map tool associated 
-            sender = self.sender()  
             if function_name in self.map_tools:          
                 map_tool = self.map_tools[function_name]
 
