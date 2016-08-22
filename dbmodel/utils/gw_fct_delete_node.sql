@@ -50,7 +50,7 @@ BEGIN
                 -- Final geometry
                 IF myRecord1.node_1 = node_id_arg THEN
                     IF myRecord2.node_1 = node_id_arg THEN
-                        pointArray1 := ARRAY(SELECT ST_DumpPoints(ST_Reverse(myRecord1.the_geom)));
+                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(ST_Reverse(myRecord1.the_geom))).geom);
                         pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom));
                     ELSE
                         pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom);
@@ -58,10 +58,10 @@ BEGIN
                     END IF;
                 ELSE
                     IF myRecord2.node_1 = node_id_arg THEN
-                        pointArray1 := ARRAY(SELECT ST_DumpPoints(myRecord1.the_geom));
+                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord1.the_geom)).geom);
                         pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom));
                     ELSE
-                        pointArray1 := ARRAY(SELECT ST_DumpPoints(myRecord2.the_geom));
+                        pointArray1 := ARRAY(SELECT (ST_DumpPoints(myRecord2.the_geom)).geom);
                         pointArray2 := array_cat(pointArray1, ARRAY(SELECT (ST_DumpPoints(ST_Reverse(myRecord1.the_geom))).geom));
                     END IF;
                 END IF;
@@ -69,8 +69,8 @@ BEGIN
                 arc_geom := ST_MakeLine(pointArray2);
 
                 -- Cascade bug
-                DELETE FROM event_x_junction WHERE node_id = node_id_arg;
-                DELETE FROM event_x_pipe WHERE arc_id = myRecord1.arc_id OR arc_id = myRecord2.arc_id;
+                DELETE FROM event_x_node WHERE node_id = node_id_arg;
+                DELETE FROM event_x_arc WHERE arc_id = myRecord1.arc_id OR arc_id = myRecord2.arc_id;
 
                 -- Select longest
                 IF ST_Length(myRecord1.the_geom) > ST_Length(myRecord2.the_geom) THEN
