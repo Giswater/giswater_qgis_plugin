@@ -102,22 +102,22 @@ BEGIN
 
             -- Pipes has different types
             ELSE
-                RETURN SCHEMA_NAME.audit_function(202);
+                RETURN SCHEMA_NAME.audit_function(505,80);
             END IF;
          
         -- Node has not 2 arcs
         ELSE
-            RETURN SCHEMA_NAME.audit_function(203);
+            RETURN SCHEMA_NAME.audit_function(510,80);
         END IF;
 
     -- Node not found
     ELSE 
-        RETURN SCHEMA_NAME.audit_function(201);
+        RETURN SCHEMA_NAME.audit_function(515,80);
     END IF;
 
-    RETURN SCHEMA_NAME.audit_function(0,80);
+    RETURN SCHEMA_NAME.audit_function(520,80);
 
 END;
 $BODY$
-  LANGUAGE 'plpgsql' VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

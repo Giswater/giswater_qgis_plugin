@@ -534,10 +534,12 @@ CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 CREATE TABLE "SCHEMA_NAME"."man_valve" (
 "node_id" varchar(16)   NOT NULL,
 "type" varchar(30)  ,
-"opened" boolean DEFAULT false,
-"acessibility" boolean DEFAULT false,
-"broken" boolean DEFAULT false,
-"add_info" varchar(255)  ,
+"opened" boolean DEFAULT true,
+"acessibility" boolean DEFAULT true,
+"broken" boolean DEFAULT true,
+"add_info" varchar(255),
+"mincut_anl" boolean DEFAULT true,
+"hydraulic_anl" boolean DEFAULT true,
 CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 );
 

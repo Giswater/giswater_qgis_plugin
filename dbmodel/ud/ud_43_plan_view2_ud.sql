@@ -221,22 +221,22 @@ v_plan_mlcost_arc.m3fill_cost,
 v_plan_mlcost_arc.m3excess_cost,
 v_plan_ml_arc.cost_unit,
 
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost) END)::numeric(12,3) 	AS pav_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost) END)::numeric(12,3) 		AS exc_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost) END)::numeric(12,3)	AS trenchl_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost)END)::numeric(12,3) 		AS base_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost) END)::numeric(12,3) 	AS protec_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost) END)::numeric(12,3) 		AS fill_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost) END)::numeric(12,3) 	AS excess_cost,
 (v_plan_mlcost_arc.arc_cost)::numeric(12,3)									AS arc_cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN v_plan_ml_arc.arc_cost ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN v_plan_ml_arc.arc_cost ELSE
 (v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
 + v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
 + v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
@@ -260,7 +260,7 @@ SELECT
 v_plan_ml_arc.arc_id,
 v_plan_ml_arc.arccat_id,
 v_plan_ml_arc.cost_unit,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN v_plan_ml_arc.arc_cost ELSE
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN v_plan_ml_arc.arc_cost ELSE
 (v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
 + v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
 + v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
@@ -269,8 +269,8 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN NULL ELSE (st_length2d(v_plan_ml_arc.the_geom)) END)::numeric(12,2)							AS length,
-(CASE WHEN (v_plan_ml_arc.cost_unit='ut'::text) THEN v_plan_ml_arc.arc_cost ELSE((st_length2d(v_plan_ml_arc.the_geom))::numeric(12,2)*
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE (st_length2d(v_plan_ml_arc.the_geom)) END)::numeric(12,2)							AS length,
+(CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN v_plan_ml_arc.arc_cost ELSE((st_length2d(v_plan_ml_arc.the_geom))::numeric(12,2)*
 (v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
 + v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
 + v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
@@ -298,14 +298,14 @@ node.node_id,
 node.node_type,
 node.ymax,
 v_price_x_catnode.cost_unit,
-(CASE WHEN (v_price_x_catnode.cost_unit='ut'::text) THEN NULL ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)END)) END)::numeric(12,2) AS calculated_depth,
+(CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN NULL ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)END)) END)::numeric(12,2) AS calculated_depth,
 v_price_x_catnode.cost,
-(CASE WHEN (v_price_x_catnode.cost_unit='ut'::text) THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
+(CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
 node."state",
 node.the_geom
 
 FROM (SCHEMA_NAME.v_node node
-JOIN SCHEMA_NAME.v_price_x_catnode ON ((((node.node_type)::text = (v_price_x_catnode.id)::text))))
+JOIN SCHEMA_NAME.v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
 JOIN SCHEMA_NAME.plan_selector_economic ON (((node."state")::text = (plan_selector_economic.id)::text));
 
 
@@ -350,9 +350,9 @@ plan_node_x_psector.atlas_id,
 node.the_geom
 
 FROM ((SCHEMA_NAME.node 
-JOIN SCHEMA_NAME.v_price_x_catnode ON ((((node.node_type)::text = (v_price_x_catnode.id)::text))))
+JOIN SCHEMA_NAME.v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
 JOIN SCHEMA_NAME.plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text))))
-ORDER BY node_type;
+ORDER BY nodecat_id;
 
 
 -- ----------------------------

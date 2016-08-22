@@ -19,8 +19,8 @@ SELECT
   (CASE WHEN (price_compost.price IS  NOT NULL) THEN price_compost.price::numeric(14,2) 
   ELSE (sum(price_simple.price*price_compost_value.value))::numeric(14,2) END) AS price 
 FROM ("SCHEMA_NAME".price_compost
-JOIN "SCHEMA_NAME".price_compost_value ON (((price_compost.id)::text = (price_compost_value.compost_id)::text))
-JOIN "SCHEMA_NAME".price_simple ON (((price_simple.id)::text = (price_compost_value.simple_id)::text)))
+LEFT JOIN "SCHEMA_NAME".price_compost_value ON (((price_compost.id)::text = (price_compost_value.compost_id)::text))
+LEFT JOIN "SCHEMA_NAME".price_simple ON (((price_simple.id)::text = (price_compost_value.simple_id)::text)))
 GROUP BY price_compost.id, price_compost.unit, price_compost.descript;
 
 
@@ -79,9 +79,9 @@ SELECT
   v_price_x_catsoil3.m3excess_cost,
   v_price_x_catsoil4.m2trenchl_cost
 FROM ("SCHEMA_NAME".v_price_x_catsoil1
-JOIN "SCHEMA_NAME".v_price_x_catsoil2 ON ((("SCHEMA_NAME".v_price_x_catsoil2.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
-JOIN "SCHEMA_NAME".v_price_x_catsoil3 ON ((("SCHEMA_NAME".v_price_x_catsoil3.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
-JOIN "SCHEMA_NAME".v_price_x_catsoil4 ON ((("SCHEMA_NAME".v_price_x_catsoil4.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
+LEFT JOIN "SCHEMA_NAME".v_price_x_catsoil2 ON ((("SCHEMA_NAME".v_price_x_catsoil2.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
+LEFT JOIN "SCHEMA_NAME".v_price_x_catsoil3 ON ((("SCHEMA_NAME".v_price_x_catsoil3.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
+LEFT JOIN "SCHEMA_NAME".v_price_x_catsoil4 ON ((("SCHEMA_NAME".v_price_x_catsoil4.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
 );
 
 

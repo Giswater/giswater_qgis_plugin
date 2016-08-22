@@ -163,6 +163,8 @@ man_valve.type,
 man_valve.opened,
 man_valve.acessibility,
 man_valve.broken,
+man_valve.mincut_anl,
+man_valve.hydraulic_anl,
 node.the_geom
 FROM SCHEMA_NAME.node
 JOIN SCHEMA_NAME.cat_node ON node.nodecat_id::text=cat_node.id::text

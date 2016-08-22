@@ -25,13 +25,12 @@ BEGIN
         IF  (NEW.the_geom IS DISTINCT FROM OLD.the_geom) OR 
 			(NEW.node_id IS DISTINCT FROM OLD.node_id) OR 
 			(NEW.nodetype_id IS DISTINCT FROM OLD.nodetype_id) OR
-			(NEW.type IS DISTINCT FROM OLD.type) THEN   
-         RAISE EXCEPTION '[%]:Los campos de caracaterísticas no son editables. Prueba solo con open, accesibility & broken', TG_NAME;  
+			(NEW.type IS DISTINCT FROM OLD.type) THEN    
         RETURN audit_function(170,390);         
 		END IF;
 
         UPDATE man_valve 
-        SET opened=NEW.opened, acessibility=NEW.acessibility, "broken"=NEW."broken"
+        SET opened=NEW.opened, acessibility=NEW.acessibility, "broken"=NEW."broken", "mincut_anl"=NEW."mincut_anl", "hydraulic_anl"=NEW."hydraulic_anl"
         WHERE node_id = OLD.node_id;
 
         PERFORM audit_function(2,390);  
