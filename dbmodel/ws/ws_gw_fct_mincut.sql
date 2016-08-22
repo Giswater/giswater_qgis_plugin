@@ -1,9 +1,9 @@
--- Function: SCHEMA_NAME.gw_fct_mincut(character varying, character varying)
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying);
-
-
-SET SEARCH_PATH="SCHEMA_NAME", plublic;
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS $BODY$
 DECLARE
@@ -13,8 +13,8 @@ DECLARE
     exists_id		text;
     polygon_aux		public.geometry;
     polygon_aux2	public.geometry;
-    arc_aux             public.geometry;
-    node_aux            public.geometry;    
+    arc_aux         public.geometry;
+    node_aux        public.geometry;    
     srid_schema		text;
 
 BEGIN
@@ -26,7 +26,6 @@ BEGIN
     DELETE FROM "anl_mincut_arc";
     DELETE FROM "anl_mincut_valve";
     DELETE FROM "anl_mincut_polygon";
-
 
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
@@ -116,11 +115,11 @@ BEGIN
     -- Concave hull for not included lines
     polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM arc WHERE arc_id NOT IN (SELECT a.arc_id FROM anl_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 10, 'join=mitre mitre_limit=1.0'));
 
---RAISE EXCEPTION 'Polygon = %', polygon_aux2;
+    --RAISE EXCEPTION 'Polygon = %', polygon_aux2;
 
     -- Substract
     IF polygon_aux2 IS NOT NULL THEN
-	polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
+        polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
     ELSE
         polygon_aux := polygon_aux;
     END IF;

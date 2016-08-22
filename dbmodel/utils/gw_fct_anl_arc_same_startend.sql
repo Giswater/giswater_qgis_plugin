@@ -5,29 +5,24 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_same_startend()
-RETURNS void AS
-$BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_same_startend() RETURNS void AS $BODY$
 DECLARE
 
 BEGIN
 
---  Search path
     SET search_path = "SCHEMA_NAME", public;
 
---	Delete old values
-	DELETE FROM anl_arc_same_startend;
-		
+    -- Delete old values
+    DELETE FROM anl_arc_same_startend;
+        
     INSERT INTO anl_arc_same_startend
-	SELECT	
-	arc_id, 
-	st_length2d(arc.the_geom)::float,
-	the_geom
-	FROM arc WHERE node_1::text=node_2::text;
-	
-PERFORM audit_function(0,10);
-RETURN;
-		
+    SELECT arc_id, st_length2d(arc.the_geom)::float, the_geom
+    FROM arc 
+    WHERE node_1::text=node_2::text;
+
+    PERFORM audit_function(0,10);
+    RETURN;
+            
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

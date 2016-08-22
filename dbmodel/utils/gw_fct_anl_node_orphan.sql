@@ -5,13 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_orphan() 
-RETURNS void
-AS $$
-
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_orphan() RETURNS void AS $$
 DECLARE
-    rec_node      record;
+    rec_node record;
 
 BEGIN
 
@@ -21,14 +17,13 @@ BEGIN
     -- Reset values
     DELETE FROM anl_node_orphan;
 
-	
     -- Loop for all the arcs
     FOR rec_node IN SELECT DISTINCT * FROM node AS a WHERE (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id) = 0
-		LOOP
-			INSERT INTO anl_node_orphan VALUES (rec_node.node_id, rec_node.node_type, rec_node.the_geom);
-		END LOOP;
-	
-	PERFORM audit_function(0,40);
+    LOOP
+        INSERT INTO anl_node_orphan VALUES (rec_node.node_id, rec_node.node_type, rec_node.the_geom);
+    END LOOP;
+
+    PERFORM audit_function(0,40);
     RETURN;
         
 END;

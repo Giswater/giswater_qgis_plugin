@@ -11,7 +11,6 @@ DECLARE
     linkrec Record; 
     connecRecord Record; 
 
-
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -19,8 +18,6 @@ BEGIN
     -- UPDATE dma/sector
     NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
     NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-
-
 
     -- Select links with start-end on the updated connec
     querystring := 'SELECT * FROM link WHERE link.connec_id = ' || quote_literal(NEW.connec_id); 
@@ -31,10 +28,9 @@ BEGIN
         -- Initial and final connec of the link
         SELECT * INTO connecRecord FROM connec WHERE connec.connec_id = linkrec.connec_id;
         
-
         -- Control de lineas de longitud 0
         IF (connecRecord.connec_id IS NOT NULL)  THEN
-			EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
+            EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, 0, $2) WHERE link_id = ' || quote_literal(linkrec."link_id") USING linkrec.the_geom, NEW.the_geom; 
         END IF;
 
     END LOOP; 

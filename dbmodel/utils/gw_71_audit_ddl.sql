@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS SCHEMA_NAME.audit_cat_error CASCADE;
 CREATE TABLE SCHEMA_NAME.audit_cat_error (
     id integer PRIMARY KEY,
     error_message text,
-	hint_message text,
+    hint_message text,
     log_level int2 CHECK (log_level IN (0,1,2,3)) DEFAULT 1,
     show_user boolean DEFAULT 'True',
     context text DEFAULT 'generic'

@@ -20,7 +20,6 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-
     -- Create destination schema
     EXECUTE 'CREATE SCHEMA ' || dest_schema ;
      
@@ -92,9 +91,10 @@ BEGIN
     LOOP
         EXECUTE 'CREATE VIEW ' || dest_schema || '.' || rec_view.table_name || ' AS ' || rec_view.definition;
     END LOOP;
-	
-	PERFORM SCHEMA_NAME.audit_function(0,60);
-	RETURN ;
+
+    PERFORM audit_function(0,60);
+    RETURN;
+    
 END;
 $$;   
   

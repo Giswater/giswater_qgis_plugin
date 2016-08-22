@@ -5,10 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_sink() 
-RETURNS integer AS
-$BODY$
-
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_sink() RETURNS integer AS $BODY$
 DECLARE
     node_id_var    text;
     point_aux      public.geometry;
@@ -16,32 +13,28 @@ DECLARE
 
 BEGIN
 
---  Search path
+    -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-	
-	RAISE NOTICE 'Create table.';
-	
---	Create table for node results
-	DELETE FROM anl_node_sink;
-		
+    RAISE NOTICE 'Create table.';
+
+    -- Create table for node results
+    DELETE FROM anl_node_sink;
+        
     RAISE NOTICE 'Start computations.';
 
---  Compute the tributary area using DFS
+    --  Compute the tributary area using DFS
     FOR node_id_var, point_aux IN SELECT node_id, the_geom FROM node AS a WHERE ((SELECT COUNT(*) FROM arc AS b WHERE b.node_2 = a.node_id) > 0) AND ((SELECT COUNT(*) FROM arc AS b WHERE b.node_1 = a.node_id) = 0)
     LOOP
-
---      Insert in analytics table
+        -- Insert in analytics table
         INSERT INTO anl_node_sink VALUES(node_id_var, (SELECT COUNT(*) FROM arc WHERE node_1 = node_id_var OR node_2 = node_id_var), point_aux);
-
     END LOOP;
 
     RETURN (SELECT COUNT(*) FROM anl_node_sink);
-	
-	RETURN SCHEMA_NAME.audit_function(0,50);
 
-  
-		
+    RETURN audit_function(0,50);
+
+        
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -5,9 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_element()
-  RETURNS trigger AS
-$BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_element() RETURNS trigger AS $BODY$
 DECLARE 
     element_table varchar;
     v_sql varchar;
@@ -17,36 +15,35 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     element_table:= TG_ARGV[0];
 
-		IF TG_OP = 'INSERT' THEN
-		--	PERFORM audit_function(1); 
-			RETURN NEW;
-    
-		ELSIF TG_OP = 'UPDATE' THEN
-		--	PERFORM audit_function(2); 
-			RETURN NEW;
+    IF TG_OP = 'INSERT' THEN
+        --	PERFORM audit_function(1); 
+        RETURN NEW;
 
-		ELSIF TG_OP = 'DELETE' THEN
-			v_sql:= 'DELETE FROM '||element_table||' WHERE id = '||quote_literal(OLD.id)||';';
-			EXECUTE v_sql;
-		--	PERFORM audit_function(3); 
-			RETURN NULL;
-		
-		END IF;
+    ELSIF TG_OP = 'UPDATE' THEN
+        --	PERFORM audit_function(2); 
+        RETURN NEW;
+
+    ELSIF TG_OP = 'DELETE' THEN
+        v_sql:= 'DELETE FROM '||element_table||' WHERE id = '||quote_literal(OLD.id)||';';
+        EXECUTE v_sql;
+        --	PERFORM audit_function(3); 
+        RETURN NULL;
+    
+    END IF;
     
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
+  
 DROP TRIGGER IF EXISTS gw_trg_ui_element_x_node ON "SCHEMA_NAME".v_ui_element_x_node;
 CREATE TRIGGER gw_trg_ui_element_x_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_ui_element_x_node
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_element(element_x_node);
 
-
 DROP TRIGGER IF EXISTS gw_trg_ui_element_x_arc ON "SCHEMA_NAME".v_ui_element_x_arc;
 CREATE TRIGGER gw_trg_ui_element_x_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_ui_element_x_arc
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_ui_element(element_x_arc);
-
 
 DROP TRIGGER IF EXISTS gw_trg_ui_elememt_x_connec ON "SCHEMA_NAME".v_ui_element_x_connec;
 CREATE TRIGGER gw_trg_ui_elememt_x_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_ui_element_x_connec

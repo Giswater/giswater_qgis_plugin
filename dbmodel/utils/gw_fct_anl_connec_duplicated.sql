@@ -5,18 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_connec_duplicated() 
-RETURNS void
-AS $BODY$ 
-
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_connec_duplicated() RETURNS void AS $BODY$ 
 DECLARE
-    rec_connec    record;
-    rec		      record;
+    rec_connec record;
+    rec record;
 
 BEGIN
 
-    -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
     -- Get data from config table
@@ -25,16 +20,14 @@ BEGIN
     -- Create table for duplicated connecs
     DELETE FROM anl_connec_duplicated;
     INSERT INTO anl_connec_duplicated (connec_id, connec_conserv, the_geom)
-    SELECT DISTINCT 
-	 t1.connec_id, 
-	  t2.connec_id,
-      t1.the_geom
-     FROM connec AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.connec_duplicated_tolerance)) 
-     WHERE t1.connec_id != t2.connec_id  
-     ORDER BY t1.connec_id;
+    SELECT DISTINCT t1.connec_id, t2.connec_id, t1.the_geom
+    FROM connec AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.connec_duplicated_tolerance)) 
+    WHERE t1.connec_id != t2.connec_id  
+    ORDER BY t1.connec_id;
     
-PERFORM audit_function(0,20);
-RETURN ;    
+    PERFORM audit_function(0,20);
+    RETURN;  
+    
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

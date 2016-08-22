@@ -7,20 +7,19 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_link_delete() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
-
     
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Delete vnodes
-    
-            DELETE FROM vnode WHERE vnode_id = OLD.vnode_id;
+    DELETE FROM vnode WHERE vnode_id = OLD.vnode_id;
     
     RETURN OLD;
 
 END;
 $$;
+
 
 DROP TRIGGER IF EXISTS gw_trg_link_delete ON "SCHEMA_NAME"."link";
 CREATE TRIGGER gw_trg_link_delete AFTER DELETE ON "SCHEMA_NAME"."link" 

@@ -18,22 +18,21 @@ BEGIN
     SELECT * INTO rec FROM config;
 
     IF TG_OP = 'INSERT' THEN
-		-- Existing nodes  
-		numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(NEW.the_geom, rec.node_proximity));
+        -- Existing nodes  
+        numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(NEW.the_geom, rec.node_proximity));
 
 
     ELSIF TG_OP = 'UPDATE' THEN
-		-- Existing nodes  
-		DROP TABLE IF EXISTS table_holder;
-		CREATE TEMP TABLE table_holder AS SELECT * FROM node WHERE  ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity);
-		numNodes:= (SELECT COUNT(*) FROM table_holder WHERE table_holder.node_id != NEW.node_id);
+        -- Existing nodes  
+        DROP TABLE IF EXISTS table_holder;
+        CREATE TEMP TABLE table_holder AS SELECT * FROM node WHERE  ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity);
+        numNodes:= (SELECT COUNT(*) FROM table_holder WHERE table_holder.node_id != NEW.node_id);
 
-END IF;
+    END IF;
 
     -- If there is an existing node closer than 'rec.node_tolerance' meters --> error
     IF (numNodes > 0) AND (rec.node_proximity_control IS TRUE) THEN
-		RETURN audit_function(190,170);
-			
+        RETURN audit_function(190,170);
     END IF;
 
     RETURN NEW;
