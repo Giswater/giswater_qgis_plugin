@@ -44,33 +44,6 @@ class Mg():
             print "AttributeError: "+str(e)   
                 
 
-    def mg_delete_node(self):
-        ''' Button 17. User select one node. 
-        Execute SQL function 'gw_fct_delete_node' 
-        Show warning (if any) '''
-
-        # Get selected features (from layer 'node')          
-        layer = self.iface.activeLayer()  
-        count = layer.selectedFeatureCount()     
-        if count == 0:
-            self.controller.show_warning("You have to select at least one feature!")
-            return 
-        elif count > 1:  
-            self.controller.show_warning("More than one feature selected. Only the first one will be processed!")     
-        
-        features = layer.selectedFeatures()
-        feature = features[0]
-        node_id = feature.attribute('node_id')   
-        
-        # Execute SQL function and show result to the user
-        function_name = "gw_fct_delete_node"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"  
-        self.controller.get_row(sql)
-                    
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh()   
-                
-         
     def mg_arc_topo_repair(self):
         ''' Button 19. Topology repair '''
 
