@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject)
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMessageBar
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
