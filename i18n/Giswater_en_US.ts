@@ -79,11 +79,11 @@
     </message>   
     <message>
         <source>16_text</source>
-        <translation>Move node</translation>
+        <translation>Move unconnected node to split a pipe</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Delete node</translation>
+        <translation>Delete node in pipe midpoint</translation>
     </message>      
     <message>
         <source>18_text</source>
