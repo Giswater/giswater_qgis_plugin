@@ -111,18 +111,23 @@ class DaoController():
         self.show_message(text, 1, duration)
      
      
-    def ask_question(self, text):
+    def ask_question(self, text, title=None, inf_text=None):
         ''' Ask question to the user '''   
 
-        msgBox = QMessageBox()
-        msgBox.setText(self.tr(text))
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        ret = msgBox.exec_()
+        msg_box = QMessageBox()
+        msg_box.setText(self.tr(text))
+        if title is not None:
+            msg_box.setWindowTitle(title);        
+        if inf_text is not None:
+            msg_box.setInformativeText(inf_text);        
+        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg_box.setDefaultButton(QMessageBox.No)        
+        ret = msg_box.exec_()
         if ret == QMessageBox.Ok:
             return True
         elif ret == QMessageBox.Discard:
             return False      
-                            
+                                                    
             
     def get_row(self, sql):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
