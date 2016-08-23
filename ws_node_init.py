@@ -349,23 +349,7 @@ class NodeDialog(ParentDialog):
         widget.hideColumn(3)  
         widget.hideColumn(5)          
         
-   
-    def open_selected_document(self):
-        ''' Get value from selected cell ("PATH")
-        Open the document ''' 
-        
-        # Check if clicked value is from the column "PATH"
-        position_column = self.tbl_document.currentIndex().column()
-        if position_column == 4:      
-            # Get data from address in memory (pointer)
-            self.path = self.tbl_document.selectedIndexes()[0].data()
-            # Check if file exist
-            if not os.path.exists(self.path):
-                message = "File not found!"
-                self.controller.show_warning(message)                
-            else:
-                # Open the document
-                os.startfile(self.path)     
+  
     
             
     def set_filter_tbl_document(self):
@@ -385,7 +369,7 @@ class NodeDialog(ParentDialog):
         doc_tag_value = utils_giswater.getWidgetText("doc_tag")
         
         # Set filter
-        expr = "node_id = '"+self.id+"'"
+        expr = self.field_id+" = '"+self.id+"'"
         expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
         
         if doc_type_value != 'null': 
@@ -403,24 +387,7 @@ class NodeDialog(ParentDialog):
         self.tbl_document.model().select()
     
     
-    def set_model_to_table(self, widget, table_name, filter_): 
-        ''' Set a model with selected filter.
-        Attach that model to selected table '''
-        
-        # Set model
-        model = QSqlTableModel();
-        model.setTable(table_name)
-        model.setFilter(filter_)
-        model.select()    
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())      
-
-        # Attach model to table view
-        widget.setModel(model)  
-        
-             
+            
     def fill_tbl_info(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
         
@@ -432,36 +399,10 @@ class NodeDialog(ParentDialog):
         widget.hideColumn(6)           
 
         
-        
     def fill_tbl_scada(self, widget, table_name, filter_):
         ''' Fill scada tab of node
         Filter and fill table related with node_id '''        
         self.set_model_to_table(widget, table_name, filter_)    
        
-        
-    def delete_records(self, widget, table_name):
-        ''' Delete selected element '''
-        
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()    
-        if len(selected_list) == 0:
-            self.controller.show_warning("Any record selected")
-            return
-        
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = widget.model().record(row).value("id")
-            inf_text+= str(id_)+", "
-            list_id = list_id+"'"+str(id_)+"', "
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
-        if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name 
-            sql+= " WHERE id IN ("+list_id+")"
-            self.dao.execute_sql(sql)
-            widget.model().select()            
-        
+
     

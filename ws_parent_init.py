@@ -2,6 +2,7 @@
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QLabel
+from PyQt4.QtSql import QSqlTableModel
 
 import os.path
 import sys  
@@ -164,4 +165,69 @@ class ParentDialog(object):
         ''' Close form without saving '''
         self.layer.rollBack()   
         self.dialog.parent().setVisible(False)    
+        
+        
+    def set_model_to_table(self, widget, table_name, filter_): 
+        ''' Set a model with selected filter.
+        Attach that model to selected table '''
+        
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setFilter(filter_)
+        model.select()    
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())      
+
+        # Attach model to table view
+        widget.setModel(model)    
+        
+        
+    def delete_records(self, widget, table_name):
+        ''' Delete selected elements of the table '''
+        
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            self.controller.show_warning("Any record selected")
+            return
+        
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("id")
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            sql = "DELETE FROM "+self.schema_name+"."+table_name 
+            sql+= " WHERE id IN ("+list_id+")"
+            self.dao.execute_sql(sql)
+            widget.model().select()
+            
+            
+   
+    def open_selected_document(self):
+        ''' Get value from selected cell ("PATH")
+        Open the document ''' 
+        
+        # Check if clicked value is from the column "PATH"
+        position_column = self.tbl_document.currentIndex().column()
+        if position_column == 4:      
+            # Get data from address in memory (pointer)
+            self.path = self.tbl_document.selectedIndexes()[0].data()
+            # Check if file exist
+            if not os.path.exists(self.path):
+                message = "File not found!"
+                self.controller.show_warning(message)                
+            else:
+                # Open the document
+                os.startfile(self.path)   
+                                  
+                      
 
