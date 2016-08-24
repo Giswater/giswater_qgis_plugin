@@ -210,7 +210,6 @@ class ParentDialog(object):
             self.dao.execute_sql(sql)
             widget.model().select()
             
-            
    
     def open_selected_document(self):
         ''' Get value from selected cell ("PATH")
@@ -227,7 +226,5 @@ class ParentDialog(object):
                 self.controller.show_warning(message)                
             else:
                 # Open the document
-                os.startfile(self.path)   
-                                  
-                      
+                os.startfile(self.path)                      
 

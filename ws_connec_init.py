@@ -22,6 +22,7 @@ def init_config():
     
     # Manage visibility     
     feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)    
+    feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id").setVisible(False)    
     
     # Manage 'connecat_id'
     connecat_id = utils_giswater.getWidgetText("connecat_id")
@@ -30,8 +31,10 @@ def init_config():
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
     
     # Manage 'connec_type'
-    cat_connecatype_id = utils_giswater.getWidgetText("cat_connecatype_id")
-    utils_giswater.setSelectedItem("cat_connecatype_id", cat_connecatype_id)  
+    cat_connectype_id = utils_giswater.getWidgetText("cat_connectype_id")
+    utils_giswater.setSelectedItem("cat_connectype_id_dummy", cat_connectype_id)  
+    feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id_dummy").activated.connect(feature_dialog.change_connec_type_id)  
+    feature_dialog.change_connec_type_id(-1)      
     
     # Set  button signals      
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
@@ -53,9 +56,8 @@ class ConnecDialog(ParentDialog):
         self.field_id = "connec_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.cat_connectype_id = utils_giswater.getWidgetText("cat_connectype_id", False)        
-        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False)        
-        #self.epa_type = utils_giswater.getWidgetText("epa_type", False)        
+        self.connec_type = utils_giswater.getWidgetText("cat_connectype_id", False)        
+        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False)             
         
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
@@ -72,8 +74,8 @@ class ConnecDialog(ParentDialog):
         # Manage i18n
         self.translate_form('ws_connec')        
         
-        # Define and execute query to populate combo 'node_type_dummy'
-        #self.fill_connec_type_id()
+        # Define and execute query to populate combo 'cat_connectype_id_dummy' 
+        self.fill_connec_type_id()
         
         # Load data from related tables
         self.load_data()
@@ -89,11 +91,9 @@ class ConnecDialog(ParentDialog):
         table_document = "v_ui_doc_x_connec"
         self.fill_tbl_connec(self.tbl_connec, self.schema_name+"."+table_document, self.filter)
         
-        
         # Fill tab Hydrometer
         table_hydrometer = "v_ui_hydrometer_x_connec"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
-        
         
         # Set signals                  
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
@@ -106,203 +106,39 @@ class ConnecDialog(ParentDialog):
         # Remove tabs: Event, Log
         self.tab_main.removeTab(4)      
         self.tab_main.removeTab(3) 
-        
-        '''
-        # Get 'epa_type'
-        man_visible = False
-        index_tab = 0      
-        if self.epa_type == 'JUNCTION':
-            index_tab = 0
-            self.epa_table = 'inp_junction'
-        elif self.epa_type == 'RESERVOIR' or self.epa_type == 'HYDRANT':
-            index_tab = 1
-            self.epa_table = 'inp_reservoir'
-        elif self.epa_type == 'TANK':
-            index_tab = 2
-            self.epa_table = 'inp_tank'
-            man_visible = True           
-        elif self.epa_type == 'PUMP':
-            index_tab = 3
-            self.epa_table = 'inp_pump'
-        elif self.epa_type == 'VALVE':
-            index_tab = 4
-            self.epa_table = 'inp_valve'
-        elif self.epa_type == 'SHORTPIPE' or self.epa_type == 'FILTER':
-            index_tab = 5
-            self.epa_table = 'inp_shortpipe'
-        elif self.epa_type == 'MEASURE INSTRUMENT':
-            index_tab = 6
-        '''
-        man_visible = False
-        
-        # Tab 'Add. info': Manage visibility of these widgets 
-        utils_giswater.setWidgetVisible("label_demand", man_visible) 
-        utils_giswater.setWidgetVisible("label_n_hydrometer", man_visible) 
-        utils_giswater.setWidgetVisible("label_code", man_visible)   
-        utils_giswater.setWidgetVisible("demand", man_visible) 
-        utils_giswater.setWidgetVisible("n_hydrometer", man_visible) 
-        utils_giswater.setWidgetVisible("code", man_visible) 
-    
-   
-    def load_tab_add_info(self):
-        ''' Load data from tab 'Add. info' '''
-        print("load tab info")
-        '''
-        if self.epa_type == 'TANK':
-            sql = "SELECT vmax, area" 
-            sql+= " FROM "+self.schema_name+".man_tank"
-            sql+= " WHERE "+self.field_id+" = '"+self.id+"'"
-            row = self.dao.get_row(sql)           
-            if row:             
-                utils_giswater.setWidgetText("man_tank_vmax", str(row[0]))
-                utils_giswater.setWidgetText("man_tank_area", str(row[1]))
-        '''
-   
-    def load_tab_analysis(self):
-        ''' Load data from tab 'Analysis' '''
-        print("load tab analysis")
-        '''
-        if self.epa_type == 'JUNCTION':                           
-            # Load combo 'pattern_id'
-            combo = self.epa_table+"_pattern_id"
-            table_name = "inp_pattern"
-            sql = "SELECT pattern_id FROM "+self.schema_name+"."+table_name+" ORDER BY pattern_id"
-            rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox(combo, rows)
-            
-            self.fields_junction = ['demand', 'pattern_id']               
-            sql = "SELECT "
-            for i in range(len(self.fields_junction)):
-                sql+= self.fields_junction[i]+", "
-            sql = sql[:-2]
-            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE node_id = '"+self.id+"'"
-            row = self.dao.get_row(sql)
-            if row:
-                for i in range(len(self.fields_junction)):
-                    widget_name = self.epa_table+"_"+self.fields_junction[i]
-                    utils_giswater.setWidgetText(widget_name, str(row[i]))                
-                    
-        elif self.epa_type == 'TANK':
-            # Load combo 'curve_id'
-            combo = self.epa_table+"_curve_id"
-            table_name = "inp_curve_id"            
-            sql = "SELECT id FROM "+self.schema_name+".inp_curve_id ORDER BY id"
-            rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox(combo, rows)
-                        
-            self.fields_tank = ['initlevel', 'minlevel', 'maxlevel', 'diameter', 'minvol', 'curve_id']            
-            sql = "SELECT "
-            for i in range(len(self.fields_tank)):
-                sql+= self.fields_tank[i]+", "
-            sql = sql[:-2]
-            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE "+self.field_id+" = '"+self.id+"'"
-            row = self.dao.get_row(sql)      
-            if row:
-                for i in range(len(self.fields_tank)):
-                    widget_name = self.epa_table+"_"+self.fields_tank[i]
-                    utils_giswater.setWidgetText(widget_name, str(row[i]))
-        
-        '''    
-
-    def save_tab_add_info(self):
-        ''' Save tab from tab 'Add. info' '''   
-        print("save_tab_info")
-        '''  
-        if self.epa_type == 'TANK':
-            vmax = utils_giswater.getWidgetText("demand", False)
-            area = utils_giswater.getWidgetText("man_tank_area", False)
-            sql= " UPDATE "+self.schema_name+".man_tank SET" 
-            sql+= " vmax = "+str(vmax)+ ", area = "+str(area)
-            sql+= " WHERE node_id = '"+self.id+"';"
-            self.dao.execute_sql(sql)
-            total = self.dao.rowcount
-            # Perform an INSERT if any record has been updated
-            # TODO: If trigger was working correctly this wouldn't be necessary!
-            if total == 0:
-                sql = "INSERT INTO "+self.schema_name+".man_tank (node_id, vmax, area) VALUES"
-                sql+= " ('"+self.id+"', "+str(vmax)+ ", "+str(area)+");"     
-                self.dao.execute_sql(sql)
-        '''
-
-    def save_tab_analysis(self):
-        ''' Save tab from tab 'Analysis' '''        
-        print("save tab analysis")
-        
-        '''
-        #super(NodeDialog, self).save_tab_analysis()
-        if self.epa_type == 'JUNCTION':
-            values = []            
-            sql = "UPDATE "+self.schema_name+"."+self.epa_table+" SET "
-            for i in range(len(self.fields_junction)):
-                widget_name = self.epa_table+"_"+self.fields_junction[i]     
-                value = utils_giswater.getWidgetText(widget_name, True)     
-                values.append(value)
-                sql+= self.fields_junction[i]+" = "+str(values[i])+", "
-            sql = sql[:-2]      
-            sql+= " WHERE node_id = '"+self.id+"'"        
-            self.dao.execute_sql(sql)
-            
-        if self.epa_type == 'TANK':
-            values = []
-            sql = "UPDATE "+self.schema_name+"."+self.epa_table+" SET "
-            for i in range(len(self.fields_tank)):
-                widget_name = self.epa_table+"_"+self.fields_tank[i]              
-                value = utils_giswater.getWidgetText(widget_name, True)     
-                values.append(value)
-                sql+= self.fields_tank[i]+" = "+str(values[i])+", "
-            sql = sql[:-2]                
-            sql+= " WHERE node_id = '"+self.id+"'"        
-            self.dao.execute_sql(sql)
-        '''
-                            
+                
     
     def fill_connec_type_id(self):
-        '''Define and execute query to populate combo 'node_type_dummy' '''
+        ''' Define and execute query to populate combo 'cat_connectype_id_dummy' '''
         
-        
-        print("fill connenc type_id")
-        '''
-        # Get node_type.type from node_type.id
-        sql = "SELECT type FROM "+self.schema_name+".node_type"
-        if self.node_type:
-            sql+= " WHERE id = '"+self.node_type+"'"
-        row = self.dao.get_row(sql)
-        if row: 
-            node_type_type = row[0]
-            sql = "SELECT node_type.id"
-            sql+= " FROM "+self.schema_name+".node_type INNER JOIN "+self.schema_name+".cat_node ON node_type.id = cat_node.nodetype_id"
-            sql+= " WHERE type = '"+node_type_type+"' GROUP BY node_type.id ORDER BY node_type.id"
-            rows = self.dao.get_rows(sql)              
-            utils_giswater.fillComboBox("node_type_dummy", rows, False)
-            utils_giswater.setWidgetText("node_type_dummy", self.node_type)
-        '''
-    '''    
+        sql = "SELECT connec_type.id"
+        sql+= " FROM "+self.schema_name+".connec_type INNER JOIN "+self.schema_name+".cat_connec ON connec_type.id = cat_connec.type"
+        sql+= " GROUP BY connec_type.id ORDER BY connec_type.id"
+        rows = self.dao.get_rows(sql)           
+        utils_giswater.fillComboBox("cat_connectype_id_dummy", rows, False)
+        utils_giswater.setWidgetText("cat_connectype_id_dummy", self.connec_type)
+
+
     def change_connec_type_id(self, index):
-        # Define and execute query to populate combo 'cat_nodetype_id' 
+        ''' Define and execute query to populate combo 'cat_nodetype_id' '''
         
-        node_type_id = utils_giswater.getWidgetText("node_type_dummy", False)    
-        if node_type_id:        
-            utils_giswater.setWidgetText("node_type", node_type_id)    
-            sql = "SELECT id FROM "+self.schema_name+".cat_node"
-            sql+= " WHERE nodetype_id = '"+node_type_id+"' ORDER BY id"
-            rows = self.dao.get_rows(sql)    
-            utils_giswater.fillComboBox("nodecat_id_dummy", rows, False)    
+        connec_type_id = utils_giswater.getWidgetText("cat_connectype_id_dummy", False)    
+        if connec_type_id:       
+            utils_giswater.setWidgetText("cat_connectype_id", connec_type_id)    
+            sql = "SELECT id FROM "+self.schema_name+".cat_connec"
+            sql+= " WHERE type = '"+connec_type_id+"' ORDER BY id"
+            rows = self.dao.get_rows(sql)   
+            utils_giswater.fillComboBox("connecat_id_dummy", rows, False)    
             if index == -1:  
-                utils_giswater.setWidgetText("nodecat_id_dummy", self.nodecat_id)    
-            self.change_node_cat()
-    '''                      
+                utils_giswater.setWidgetText("connecat_id_dummy", self.connecat_id)    
+            self.change_connec_cat()
+                       
                        
     def change_connec_cat(self):
         ''' Just select item to 'real' combo 'connecat_id' (that is hidden) '''
         connecat_id_dummy = utils_giswater.getWidgetText("connecat_id_dummy")
         utils_giswater.setWidgetText("connecat_id", connecat_id_dummy)           
         
-           
-    def change_connec_type(self, index):
-        ''' Refresh form '''
-        self.save()
-        self.iface.openFeatureForm(self.layer, self.feature)        
-             
         
     def fill_tbl_connec(self, widget, table_name, filter_):
         ''' Fill the table control to show documents''' 
@@ -402,8 +238,7 @@ class ConnecDialog(ParentDialog):
         self.tbl_connec.model().setFilter(expr)
         self.tbl_connec.model().select()
     
-    
-            
+        
     def fill_tbl_info(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
         
@@ -427,7 +262,6 @@ class ConnecDialog(ParentDialog):
         
         #Fill scada tab of node
         #Filter and fill table related with node_id        
-        self.set_model_to_table(widget, table_name, filter_)    
-     
+        self.set_model_to_table(widget, table_name, filter_)       
 
         

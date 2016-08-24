@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2743,11 +2743,14 @@
    </property>
   </widget>
   <widget class="QLineEdit" name="connec_id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>101</width>
+     <width>71</width>
      <height>20</height>
     </rect>
    </property>
@@ -2758,14 +2761,17 @@
   <widget class="QComboBox" name="cat_connectype_id">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>20</y>
-     <width>141</width>
+     <x>100</x>
+     <y>0</y>
+     <width>161</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="arc_id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -2784,6 +2790,9 @@
    </property>
   </widget>
   <widget class="QLineEdit" name="cat_matcat_id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>570</x>
@@ -2804,14 +2813,17 @@
   <widget class="QComboBox" name="connecat_id_dummy">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>270</x>
      <y>20</y>
-     <width>141</width>
+     <width>161</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="cat_dnom">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>690</x>
@@ -2832,14 +2844,17 @@
   <widget class="QComboBox" name="connecat_id">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>270</x>
      <y>0</y>
-     <width>141</width>
+     <width>161</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="cat_pnom">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>760</x>
@@ -2909,6 +2924,16 @@
      <x>10</x>
      <y>540</y>
      <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cat_connectype_id_dummy">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>20</y>
+     <width>161</width>
      <height>20</height>
     </rect>
    </property>

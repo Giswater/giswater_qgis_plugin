@@ -343,9 +343,7 @@ class NodeDialog(ParentDialog):
         # Hide columns
         widget.hideColumn(1)  
         widget.hideColumn(3)  
-        widget.hideColumn(5)          
-        
-  
+        widget.hideColumn(5)            
     
             
     def set_filter_tbl_document(self):
@@ -380,8 +378,7 @@ class NodeDialog(ParentDialog):
   
         # Refresh model with selected filter
         self.tbl_document.model().setFilter(expr)
-        self.tbl_document.model().select()
-    
+        self.tbl_document.model().select()    
     
             
     def fill_tbl_info(self, widget, table_name, filter_): 
@@ -398,7 +395,6 @@ class NodeDialog(ParentDialog):
     def fill_tbl_scada(self, widget, table_name, filter_):
         ''' Fill scada tab of node
         Filter and fill table related with node_id '''        
-        self.set_model_to_table(widget, table_name, filter_)    
-       
+        self.set_model_to_table(widget, table_name, filter_)           
 
     
