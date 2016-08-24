@@ -75,18 +75,18 @@ class SnappingConfigManager():
 
     # Set snapping to Arc
     def snapToArc(self):
-        QgsProject.instance().setSnapSettingsForLayer((QgsMapLayerRegistry.instance().mapLayersByName("Arc")[0]).id(), True, 2, 2, 0.5, False)
+        QgsProject.instance().setSnapSettingsForLayer((QgsMapLayerRegistry.instance().mapLayersByName("Arc")[0]).id(), True, 2, 2, 1.0, False)
 
 
     # Set snapping to Node
     def snapToNode(self):
-        QgsProject.instance().setSnapSettingsForLayer((QgsMapLayerRegistry.instance().mapLayersByName("Node")[0]).id(), True, 0, 2, 0.5, False)
+        QgsProject.instance().setSnapSettingsForLayer((QgsMapLayerRegistry.instance().mapLayersByName("Node")[0]).id(), True, 0, 2, 1.0, False)
 
 
     # Set snapping to Connec
     def snapToConnec(self):
 
-        QgsProject.instance().setSnapSettingsForLayer((QgsMapLayerRegistry.instance().mapLayersByName("Connec")[0]).id(), True, 2, 2, 0.5, False)
+        QgsProject.instance().setSnapSettingsForLayer((QgsMapLayerRegistry.instance().mapLayersByName("Connec")[0]).id(), True, 2, 2, 1.0, False)
 
 
     # Function that restores the previous snapping
