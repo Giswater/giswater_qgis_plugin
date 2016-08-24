@@ -18,48 +18,28 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsMapLayer, QgsMapLayerRegistry
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QCursor
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsMapLayer
+from qgis.gui import QgsVertexMarker
+from PyQt4.QtCore import QPoint
+from PyQt4.QtGui import QColor
 
-from snapping_utils import SnappingConfigManager
+from parent_map_tool import ParentMapTool
 
 
-class DeleteNodeMapTool(QgsMapTool):
+class DeleteNodeMapTool(ParentMapTool):
 
     def __init__(self, iface, settings, action, index_action):  
         ''' Class constructor '''
 
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.settings = settings
-        self.show_help = bool(int(self.settings.value('status/show_help', 1)))
-        self.index_action = index_action
-        QgsMapTool.__init__(self, self.canvas)
-        self.setAction(action)
-
-        # Snapper
-        self.snapperManager = SnappingConfigManager(self.iface)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-        # Change map tool cursor
-        self.cursor = QCursor()
-        self.cursor.setShape(Qt.CrossCursor)
-
-        # Get default cursor
-        self.stdCursor = self.parent().cursor()
-
-        # And finally we set the mapTool's parent cursor
-        #self.parent().setCursor(self.cursor)
+        # Call ParentMapTool constructor
+        super(DeleteNodeMapTool, self).__init__(iface, settings, action, index_action)     
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
         self.vertexMarker.setColor(QColor(255, 25, 25))
         self.vertexMarker.setIconSize(12)
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE) # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)
-
+        self.vertexMarker.setPenWidth(5)   
 
 
     ''' QgsMapTools inherited event functions '''
@@ -84,7 +64,7 @@ class DeleteNodeMapTool(QgsMapTool):
             # Check Arc or Node
             for snapPoint in result:
 
-                if snapPoint.layer.name() == 'Node':
+                if snapPoint.layer.name() == self.layer_node.name():
 
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
@@ -111,45 +91,21 @@ class DeleteNodeMapTool(QgsMapTool):
             Show warning (if any) '''
 
             # Get selected features and layer type: 'node'
-            elem_type = self.current_layer.name().lower()
-
             feature = self.snappFeat
             node_id = feature.attribute('node_id')
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_delete_node"
             sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
-            self.controller.get_row(sql)
+            status = self.controller.execute_sql(sql)
+            if status:
+                self.controller.show_info("Node deleted successfully")
 
             # Refresh map canvas
             self.iface.mapCanvas().refresh()
 
 
-    def set_layer_arc(self, layer_arc):
-        ''' Set layer 'Arc' '''
-        self.layer_arc = layer_arc
-
-
-    def set_layer_node(self, layer_node):
-        ''' Set layer 'Node' '''
-        self.layer_node = layer_node
-
-
-    def set_schema_name(self, schema_name):
-        self.schema_name = schema_name
-
-
-    def set_dao(self, dao):
-        self.dao = dao
-
-
-    def set_controller(self, controller):
-        self.controller = controller
-
-
     def activate(self):
-
-        print('delete_node_map_tool Activate')
 
         # Check button
         self.action().setChecked(True)
@@ -170,18 +126,15 @@ class DeleteNodeMapTool(QgsMapTool):
         if self.show_help:
             self.controller.show_info("Select the node inside a pipe by clicking on it and it will be removed")
 
-
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Node")[0])
+                self.canvas.setCurrentLayer(self.layer_node)
         except:
-            self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Node")[0])
+            self.canvas.setCurrentLayer(self.layer_node)
 
 
     def deactivate(self):
-
-        print('delete_node_map_tool Deactivate')
 
         # Check button
         self.action().setChecked(False)
@@ -194,3 +147,5 @@ class DeleteNodeMapTool(QgsMapTool):
 
         # Removehighlight
         self.h = None
+        
+        

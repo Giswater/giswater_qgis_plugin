@@ -99,23 +99,23 @@ class DaoController():
         self.show_message(text, 1, duration)
                             
             
-    def get_row(self, sql):
+    def get_row(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
-        #self.logger.info(sql)
         result = self.dao.get_row(sql)
         self.dao.commit()        
         if result is None:
             self.show_message(self.log_codes[-1], 2)   
             return False
         elif result != 0:
-            # If we have found an error, then get last record from audit tables
-            return self.get_error_from_audit()
+            if search_audit:
+                # Get last record from audit tables (searching for a possible error)
+                return self.get_error_from_audit()
           
         return True  
     
             
-    def execute_sql(self, sql, search_audit=False):
+    def execute_sql(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
@@ -126,31 +126,35 @@ class DaoController():
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
                 return self.get_error_from_audit()    
+
+        return True
     
     
     def get_error_from_audit(self):
-        ''' Get last error from audit tables '''
+        ''' Get last error from audit tables that has not been showed to the user '''
         
         if self.schema_name is None:
             return                  
         
-        sql = "SELECT audit_cat_error.id, error_message, log_level, show_user "
+        sql = "SELECT audit_function_actions.id, error_message, log_level, show_user "
         sql+= " FROM "+self.schema_name+".audit_function_actions"
         sql+= " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
+        sql+= " WHERE audit_cat_error.id != 0 AND debug_info is null"
         sql+= " ORDER BY audit_function_actions.id DESC LIMIT 1"
         result = self.dao.get_row(sql)
-        if result is None:
-            self.show_message(self.log_codes[-1], 2)
-            return False    
-        else:        
+        if result is not None:
             if result['log_level'] <= 2:
+                sql = "UPDATE "+self.schema_name+".audit_function_actions"
+                sql+= " SET debug_info = 'showed'"
+                sql+= " WHERE id = "+str(result['id'])
+                self.dao.execute_sql(sql)
                 if result['show_user']:
                     self.show_message(result['error_message'], result['log_level'])
                 return False    
             elif result['log_level'] == 3:
                 # Debug message
                 pass
-        
+            
         return True
         
         

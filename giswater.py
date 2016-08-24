@@ -468,25 +468,29 @@ class Giswater(QObject):
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
-        # Set layer 'Arc' for map tool 'Move node'
+        # Set objects for map tools classes
         map_tool = self.map_tools['mg_move_node']
-        map_tool.set_layer_arc(self.layer_arc)
-        map_tool.set_layer_node(self.layer_node)
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
+        
+        map_tool = self.map_tools['mg_delete_node']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_schema_name(self.schema_name)
+        map_tool.set_controller(self.controller)
+        
         map_tool = self.map_tools['mg_flow_trace']
         map_tool.set_layer_arc(self.layer_arc)
         map_tool.set_layer_node(self.layer_node)
         map_tool.set_schema_name(self.schema_name)
-        map_tool.set_dao(self.dao)
-        map_tool = self.map_tools['mg_delete_node']
-        map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
+        map_tool.set_dao(self.dao)
+        
 #        map_tool = self.map_tools['mg_connec_tool']
 #        map_tool.set_schema_name(self.schema_name)
 #        map_tool.set_controller(self.controller)
 #        map_tool.set_layer_connec(self.layer_connec)
-        map_tool = self.map_tools['mg_flow_trace']
-        map_tool.set_controller(self.controller)
+
 
         # Create SearchPlus object
         try:
@@ -574,7 +578,7 @@ class Giswater(QObject):
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
                 self.iface.mapCanvas().setMapTool(map_tool)
-                print function_name+" has been checked (ws_generic)"       
+                #print function_name+" has been checked (ws_generic)"       
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
@@ -592,7 +596,7 @@ class Giswater(QObject):
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
                 self.iface.mapCanvas().setMapTool(map_tool)
-                print function_name+" has been checked"       
+                #print function_name+" has been checked"       
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
@@ -607,14 +611,11 @@ class Giswater(QObject):
         try:        
             if function_name in self.map_tools:          
                 map_tool = self.map_tools[function_name]
-
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
-                    print function_name + " has been checked (mg_generic)"
+                    #print function_name + " has been checked (mg_generic)"
                 else:
                     self.iface.mapCanvas().unsetMapTool(map_tool)
-                    print function_name + " has been unchecked (mg_generic)"
-
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:

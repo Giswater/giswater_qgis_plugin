@@ -18,30 +18,22 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsMapLayerRegistry, QgsMapLayer)
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
+from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsMapLayer
+from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
-from snapping_utils import SnappingConfigManager
+from parent_map_tool import ParentMapTool
 
 
-class MoveNodeMapTool(QgsMapTool):
+class MoveNodeMapTool(ParentMapTool):
 
     def __init__(self, iface, settings, action, index_action, controller, srid):
         ''' Class constructor '''        
         
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.settings = settings        
-        self.index_action = index_action
-        self.srid = srid
-        self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
-        self.controller = controller
-        self.dao = controller.dao   
-        self.schema_name = self.controller.schema_name   
-        self.layer_arc = None
-        self.layer_node = None
+        # Call ParentMapTool constructor     
+        super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
+        self.srid = srid  
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -49,14 +41,6 @@ class MoveNodeMapTool(QgsMapTool):
         self.vertexMarker.setIconSize(9)
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
-
-        # Snapper
-        self.snapperManager = SnappingConfigManager(self.iface)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-        # Call superclass constructor and set current action                
-        QgsMapTool.__init__(self, self.canvas)
-        self.setAction(action) 
    
         # Rubber band
         self.rubberBand = QgsRubberBand(self.canvas, QGis.Line)
@@ -64,20 +48,6 @@ class MoveNodeMapTool(QgsMapTool):
         self.rubberBand.setColor(mFillColor)
         self.rubberBand.setWidth(3)           
         self.reset()        
-        
-        
-    def set_layer_arc(self, layer_arc):
-        ''' Set layer 'Arc' '''
-        self.layer_arc = layer_arc
-
-
-    def set_layer_node(self, layer_node):
-        ''' Set layer 'Node' '''
-        self.layer_node = layer_node
-
-
-    def set_controller(self, controller):
-        self.controller = controller
 
 
     def reset(self):
@@ -103,21 +73,12 @@ class MoveNodeMapTool(QgsMapTool):
         the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
-        status = self.dao.execute_sql(sql) 
-        
+        status = self.controller.execute_sql(sql) 
         if status:
-            
-            # Execute function
-            sql = "SELECT "+self.schema_name+".gw_fct_node2arc('"+node_id+"')"
-            result = self.dao.get_row(sql) 
-            self.dao.commit()
-            if result is None:
-                self.controller.show_warning("Uncatched error. Open PotgreSQL log file to get more details")   
-            elif result[0] == 0:
-                self.controller.show_info("Node moved successfully")               
-            elif result[0] == 1:
-                self.controller.show_info("Node already related with 2 arcs")
-        
+            # Execute SQL function and show result to the user
+            function_name = "gw_fct_node2arc"
+            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
+            self.controller.execute_sql(sql)
         else:
             self.controller.show_warning("Move node: Error updating geometry")
             
@@ -130,8 +91,6 @@ class MoveNodeMapTool(QgsMapTool):
        
     def activate(self):
         ''' Called when set as currently active map tool '''
-
-        print('move_node_map_tool Activate')
 
         # Check button
         self.action().setChecked(True)
@@ -166,15 +125,13 @@ class MoveNodeMapTool(QgsMapTool):
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Node")[0])
+                self.canvas.setCurrentLayer(self.layer_node)
         except:
-            self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Node")[0])
+            self.canvas.setCurrentLayer(self.layer_node)
 
 
     def deactivate(self):
         ''' Called when map tool is being deactivated '''
-
-        print('move_node_map_tool Deactivate')
 
         # Check button
         self.action().setChecked(False)
