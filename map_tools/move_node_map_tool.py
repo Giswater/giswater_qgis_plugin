@@ -1,3 +1,22 @@
+"""
+/***************************************************************************
+        begin                : 2016-01-05
+        copyright            : (C) 2016 by BGEO SL
+        email                : vicente.medina@gits.ws
+        git sha              : $Format:%H$
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+"""
+
 # -*- coding: utf-8 -*-
 from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsMapLayerRegistry, QgsMapLayer)
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
@@ -55,6 +74,10 @@ class MoveNodeMapTool(QgsMapTool):
     def set_layer_node(self, layer_node):
         ''' Set layer 'Node' '''
         self.layer_node = layer_node
+
+
+    def set_controller(self, controller):
+        self.controller = controller
 
 
     def reset(self):

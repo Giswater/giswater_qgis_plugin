@@ -34,6 +34,7 @@ class DeleteNodeMapTool(QgsMapTool):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
+        self.show_help = bool(int(self.settings.value('status/show_help', 1)))
         self.index_action = index_action
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)

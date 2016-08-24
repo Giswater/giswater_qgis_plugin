@@ -24,6 +24,7 @@ from map_tools.point_map_tool import PointMapTool
 from map_tools.move_node_map_tool import MoveNodeMapTool
 from map_tools.mincut_map_tool import MincutMapTool
 from map_tools.delete_node_map_tool import DeleteNodeMapTool
+# from map_tools.connec_map_tool import ConnecMapTool
 from search.search_plus import SearchPlus
 
 
@@ -172,6 +173,9 @@ class Giswater(QObject):
             elif int(index_action) == 26:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
+#            elif int(index_action) == 20:
+#                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+#                map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 27:
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
@@ -468,6 +472,7 @@ class Giswater(QObject):
         map_tool = self.map_tools['mg_move_node']
         map_tool.set_layer_arc(self.layer_arc)
         map_tool.set_layer_node(self.layer_node)
+        map_tool.set_controller(self.controller)
         map_tool = self.map_tools['mg_flow_trace']
         map_tool.set_layer_arc(self.layer_arc)
         map_tool.set_layer_node(self.layer_node)
@@ -475,6 +480,12 @@ class Giswater(QObject):
         map_tool.set_dao(self.dao)
         map_tool = self.map_tools['mg_delete_node']
         map_tool.set_schema_name(self.schema_name)
+        map_tool.set_controller(self.controller)
+#        map_tool = self.map_tools['mg_connec_tool']
+#        map_tool.set_schema_name(self.schema_name)
+#        map_tool.set_controller(self.controller)
+#        map_tool.set_layer_connec(self.layer_connec)
+        map_tool = self.map_tools['mg_flow_trace']
         map_tool.set_controller(self.controller)
 
         # Create SearchPlus object

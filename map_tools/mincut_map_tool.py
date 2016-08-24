@@ -34,6 +34,7 @@ class MincutMapTool(QgsMapTool):
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
+        self.show_help = bool(int(self.settings.value('status/show_help', 1)))
         self.index_action = index_action
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
@@ -190,6 +191,10 @@ class MincutMapTool(QgsMapTool):
 
     def set_dao(self, dao):
         self.dao = dao
+
+
+    def set_controller(self, controller):
+        self.controller = controller
 
 
     def activate(self):
