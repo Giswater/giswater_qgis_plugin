@@ -3,7 +3,6 @@ from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QMessageBox
 
 import os
 import sys
-import subprocess
   
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -16,6 +15,7 @@ from ..ui.add_file import Add_file          # @UnresolvedImport
 class Ed():
    
     def __init__(self, iface, settings, controller, plugin_dir):
+        
         ''' Class to control Management toolbar actions '''    
         self.iface = iface
         self.settings = settings
@@ -37,6 +37,7 @@ class Ed():
     
                   
     def close_dialog(self, dlg=None): 
+        
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg

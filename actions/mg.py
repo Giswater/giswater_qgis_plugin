@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QFileDialog, QMessageBox
 
 import os
 import sys
-import subprocess
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -21,7 +19,8 @@ from ..ui.topology_tools import TopologyTools                   # @UnresolvedImp
 class Mg():
    
     def __init__(self, iface, settings, controller, plugin_dir):
-        ''' Class to control Management toolbar actions '''    
+        ''' Class to control Management toolbar actions '''  
+          
         self.iface = iface
         self.settings = settings
         self.controller = controller
@@ -36,6 +35,7 @@ class Mg():
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
+        
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
@@ -288,22 +288,13 @@ class Mg():
     def mg_flow_exit(self):
         ''' Button 27. Valve analytics ''' 
                 
-        # Execute SQL function
+        # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
-        result = self.dao.get_row(sql) 
-        self.dao.commit()   
+        result = self.controller.execute_sql(sql)      
+        if result:
+            self.controller.show_info("Valve analytics executed successfully", 30)
 
-        # Manage SQL execution result
-        if result is None:
-            self.controller.show_warning("Uncatched error. Open PotgreSQL log file to get more details")   
-            return   
-        elif result[0] == 0:
-            self.controller.show_info("Process completed", 50)    
-        else:
-            self.controller.show_warning("Undefined error")    
-            return       
-        
 
     def mg_change_elem_type(self):                
         ''' Button 28: User select one node. A form is opened showing current node_type.type 
@@ -421,10 +412,10 @@ class Mg():
             return
         
         # Create the dialog and signals
-        self.dlg_config = Config()
-        utils_giswater.setDialog(self.dlg_config)
-        self.dlg_config.btn_accept.pressed.connect(self.mg_config_accept)
-        self.dlg_config.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg = Config()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_accept.pressed.connect(self.mg_config_accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
         # Set values from widgets of type QSoubleSpinBox
         utils_giswater.setWidgetText("node_proximity", row["node_proximity"])
@@ -437,13 +428,13 @@ class Mg():
         #utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
-        self.dlg_config.orphannode.setChecked(bool(row["orphannode_delete"]))
-        self.dlg_config.arcendpoint.setChecked(bool(row["nodeinsert_arcendpoint"]))
-        self.dlg_config.nodetypechanged.setChecked(bool(row["nodetype_change_enabled"]))
-        self.dlg_config.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
-        self.dlg_config.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
-        self.dlg_config.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
-        self.dlg_config.audit_function_control.setChecked(bool(row["audit_function_control"]))
+        self.dlg.orphannode.setChecked(bool(row["orphannode_delete"]))
+        self.dlg.arcendpoint.setChecked(bool(row["nodeinsert_arcendpoint"]))
+        self.dlg.nodetypechanged.setChecked(bool(row["nodetype_change_enabled"]))
+        self.dlg.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
+        self.dlg.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
+        self.dlg.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
+        self.dlg.audit_function_control.setChecked(bool(row["audit_function_control"]))
   
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
@@ -452,8 +443,8 @@ class Mg():
         utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
         
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg_config, 'config')               
-        self.dlg_config.exec_()    
+        self.controller.translate_form(self.dlg, 'config')               
+        self.dlg.exec_()    
     
   
     def mg_config_get_new_values(self):
@@ -473,13 +464,13 @@ class Mg():
         self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
         
         # Get new values from widgets of type  QCheckBox
-        self.new_value_orpha = self.dlg_config.orphannode.isChecked()
-        self.new_value_nodetypechanged = self.dlg_config.nodetypechanged.isChecked()
-        self.new_value_arcendpoint = self.dlg_config.arcendpoint.isChecked()
-        self.new_value_samenode_init_end_control = self.dlg_config.samenode_init_end_control.isChecked()
-        self.new_value_node_proximity_control = self.dlg_config.node_proximity_control.isChecked()
-        self.new_value_connec_proximity_control = self.dlg_config.connec_proximity_control.isChecked()
-        self.new_value_audit_function_control = self.dlg_config.audit_function_control.isChecked()
+        self.new_value_orpha = self.dlg.orphannode.isChecked()
+        self.new_value_nodetypechanged = self.dlg.nodetypechanged.isChecked()
+        self.new_value_arcendpoint = self.dlg.arcendpoint.isChecked()
+        self.new_value_samenode_init_end_control = self.dlg.samenode_init_end_control.isChecked()
+        self.new_value_node_proximity_control = self.dlg.node_proximity_control.isChecked()
+        self.new_value_connec_proximity_control = self.dlg.connec_proximity_control.isChecked()
+        self.new_value_audit_function_control = self.dlg.audit_function_control.isChecked()
 
     
     def mg_config_accept(self):
@@ -510,6 +501,6 @@ class Mg():
 
         # Show message to user
         self.controller.show_info("Values has been updated")
-        self.close_dialog(self.dlg_config)       
+        self.close_dialog(self.dlg)       
                         
                 
