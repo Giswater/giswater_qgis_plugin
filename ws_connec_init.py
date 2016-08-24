@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
-from qgis.gui import QgsAttributeTableModel
 from qgis.utils import iface
-from PyQt4.QtGui import *    # @UnusedWildImport
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget
 
-import os
 from functools import partial
 
 import utils_giswater
@@ -86,7 +82,7 @@ class ConnecDialog(ParentDialog):
         self.layer.startEditing()
         
         # Fill the info table
-        table_element= "v_ui_element_x_connec"
+        table_element = "v_ui_element_x_connec"
         self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
         # Fill the tab Document

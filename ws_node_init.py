@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
-from qgis.gui import QgsAttributeTableModel
 from qgis.utils import iface
-from PyQt4.QtGui import *    # @UnusedWildImport
-from PyQt4.QtSql import QSqlTableModel
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget
 
-import os
 from functools import partial
 
 import utils_giswater
