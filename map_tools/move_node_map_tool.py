@@ -138,7 +138,7 @@ class MoveNodeMapTool(QgsMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            self.controller.show_info("Select the node and move to desired location")
+            self.controller.show_info("Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again")
 
         # Control current layer (due to QGIS bug in snapping system)
         try:

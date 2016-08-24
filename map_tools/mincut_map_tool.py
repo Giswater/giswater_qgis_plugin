@@ -212,6 +212,11 @@ class MincutMapTool(QgsMapTool):
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
+        # Show help message when action is activated
+        if self.show_help:
+            self.controller.show_info("Select a node or pipe and click on it, the valves minimum cut polygon is computed")
+
+
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:

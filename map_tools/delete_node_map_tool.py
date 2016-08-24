@@ -165,6 +165,11 @@ class DeleteNodeMapTool(QgsMapTool):
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
+        # Show help message when action is activated
+        if self.show_help:
+            self.controller.show_info("Select the node inside a pipe by clicking on it and it will be removed")
+
+
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
