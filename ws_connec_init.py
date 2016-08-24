@@ -94,12 +94,12 @@ class ConnecDialog(ParentDialog):
         table_hydrometer = "v_ui_hydrometer_x_connec"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
-        '''
+        
         # Set signals                  
-        self.dialog.findChild(QPushButton, "btn_element_delete").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))                   
-        ''' 
-    
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
+        self.dialog.findChild(QPushButton, "delete_row_doc").clicked.connect(partial(self.delete_records, self.tbl_connec, table_document))                   
+        
+       
     def set_tabs_visibility(self):
         ''' Hide some tabs '''
         
@@ -142,16 +142,7 @@ class ConnecDialog(ParentDialog):
         utils_giswater.setWidgetVisible("demand", man_visible) 
         utils_giswater.setWidgetVisible("n_hydrometer", man_visible) 
         utils_giswater.setWidgetVisible("code", man_visible) 
-        '''   
-        # Tab 'EPANET': Hide some tabs depending 'epa_type'                    
-        # Move 'visible' tab to last position and remove previous ones
-        self.tab_analysis.tabBar().moveTab(index_tab, 5);
-        for i in range(0, self.tab_analysis.count() - 1):    #@UnusedVariable
-            self.tab_analysis.removeTab(0)    
-        self.tab_event.tabBar().moveTab(index_tab, 6);
-        for i in range(0, self.tab_event.count() - 1):   #@UnusedVariable
-            self.tab_event.removeTab(0)      
-        '''   
+    
    
     def load_tab_add_info(self):
         ''' Load data from tab 'Add. info' '''
@@ -390,6 +381,26 @@ class ConnecDialog(ParentDialog):
         # Refresh model with selected filter
         self.tbl_connec.model().setFilter(expr)
         self.tbl_connec.model().select()
+        
+        
+    def set_filter_tbl_hydrometer(self):
+        ''' Get values selected by the user and sets a new filter for its table model '''
+        
+        # Get selected dates
+        date_from = self.date_dae_from.date().toString('yyyyMMdd') 
+        date_to = self.date_dae_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)                   
+            return
+        
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+  
+        # Refresh model with selected filter
+        self.tbl_connec.model().setFilter(expr)
+        self.tbl_connec.model().select()
     
     
             
@@ -405,6 +416,15 @@ class ConnecDialog(ParentDialog):
 
        
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
+        
+        # Get widgets
+        self.date_dae_to = self.dialog.findChild(QDateEdit, "date_dae_to")
+        self.date_dae_from = self.dialog.findChild(QDateEdit, "date_dae_from")
+        
+        # Set signals
+        self.date_dae_to.dateChanged.connect(self.set_filter_tbl_hydrometer)
+        self.date_dae_from.dateChanged.connect(self.set_filter_tbl_hydrometer)
+        
         #Fill scada tab of node
         #Filter and fill table related with node_id        
         self.set_model_to_table(widget, table_name, filter_)    
