@@ -228,3 +228,36 @@ class ParentDialog(object):
                 # Open the document
                 os.startfile(self.path)                      
 
+
+    def set_filter_table(self, widget):
+        ''' Get values selected by the user and sets a new filter for its table model '''
+        
+        # Get selected dates
+        date_from = self.date_document_from.date().toString('yyyyMMdd') 
+        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message)                   
+            return
+        
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        
+        # Get selected values in Comboboxes        
+        doc_type_value = utils_giswater.getWidgetText("doc_type")
+        if doc_type_value != 'null': 
+            expr+= " AND doc_type = '"+doc_type_value+"'"
+        doc_tag_value = utils_giswater.getWidgetText("doc_tag")
+        if doc_tag_value != 'null': 
+            expr+= " AND tagcat_id = '"+doc_tag_value+"'"
+        
+        # TODO: Bug because 'user' is a reserverd word
+#         doc_user_value = utils_giswater.getWidgetText("doc_user")
+#         if doc_user_value != 'null': 
+#             expr+= " AND user = '"+doc_user_value+"'"
+  
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()   
+        

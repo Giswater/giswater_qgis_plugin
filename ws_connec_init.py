@@ -151,11 +151,11 @@ class ConnecDialog(ParentDialog):
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
         
         # Set signals
-        doc_user.activated.connect(self.set_filter_tbl_connec)
-        doc_type.activated.connect(self.set_filter_tbl_connec)
-        doc_tag.activated.connect(self.set_filter_tbl_connec)
-        self.date_document_to.dateChanged.connect(self.set_filter_tbl_connec)
-        self.date_document_from.dateChanged.connect(self.set_filter_tbl_connec)
+        doc_user.activated.connect(partial(self.set_filter_table, self.tbl_connec))
+        doc_type.activated.connect(partial(self.set_filter_table, self.tbl_connec))
+        doc_tag.activated.connect(partial(self.set_filter_table, self.tbl_connec))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, self.tbl_connec))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_connec))
         self.tbl_connec.doubleClicked.connect(self.open_selected_document)
         
         # TODO: Get data from related tables!
@@ -182,41 +182,6 @@ class ConnecDialog(ParentDialog):
         widget.hideColumn(1)  
         widget.hideColumn(3)  
         widget.hideColumn(5)          
-        
-            
-    def set_filter_tbl_connec(self):
-        ''' Get values selected by the user and sets a new filter for its table model '''
-        
-        # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
-            return
-        
-        # Get selected value from ComboBoxs
-        doc_user_value = utils_giswater.getWidgetText("doc_user")
-        doc_type_value = utils_giswater.getWidgetText("doc_type")
-        doc_tag_value = utils_giswater.getWidgetText("doc_tag")
-        
-        # Set filter
-        expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
-        if doc_type_value != 'null': 
-            expr+= " AND doc_type = '"+doc_type_value+"'"
-        if doc_tag_value != 'null': 
-            expr+= " AND tagcat_id = '"+doc_tag_value+"'"
-        
-        # TODO: Bug because 'user' is a reserverd word
-#         if doc_user_value != 'null': 
-#             expr+= " AND user = '"+doc_user_value+"'"
-        #print expr
-  
-        # Refresh model with selected filter
-        self.tbl_connec.model().setFilter(expr)
-        self.tbl_connec.model().select()
         
         
     def set_filter_tbl_hydrometer(self):
