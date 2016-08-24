@@ -114,6 +114,17 @@ class DaoController():
           
         return True  
     
+    
+    def get_rows(self, sql, search_audit=True):
+        ''' Execute SQL. Check its result in log tables, and show it to the user '''
+        
+        rows = self.dao.get_rows(sql)      
+        if rows is None:
+            self.show_warning(str(self.dao.last_error))   
+            return False
+
+        return rows  
+    
             
     def execute_sql(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''

@@ -18,40 +18,25 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer, QgsMapLayerRegistry
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker
-from PyQt4.QtCore import Qt, QPoint   
-from PyQt4.QtGui import QColor, QCursor   
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer
+from qgis.gui import QgsVertexMarker
+from PyQt4.QtCore import QPoint   
+from PyQt4.QtGui import QColor   
 
-from snapping_utils import SnappingConfigManager
+from parent_map_tool import ParentMapTool
 
 
-class MincutMapTool(QgsMapTool):
+class MincutMapTool(ParentMapTool):
+    ''' Button 26. User select one node or arc.
+    SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
+    Returns and integer: error code
+    Get these id's and select them in its corresponding layers '''    
 
     def __init__(self, iface, settings, action, index_action):  
         ''' Class constructor '''
-
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.settings = settings
-        self.show_help = bool(int(self.settings.value('status/show_help', 1)))
-        self.index_action = index_action
-        QgsMapTool.__init__(self, self.canvas)
-        self.setAction(action)
-
-        # Snapper
-        self.snapperManager = SnappingConfigManager(self.iface)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-        # Change map tool cursor
-        self.cursor = QCursor()
-        self.cursor.setShape(Qt.CrossCursor)
-
-        # Get default cursor
-        self.stdCursor = self.parent().cursor()
-
-        # And finally we set the mapTool's parent cursor
-        #self.parent().setCursor(self.cursor)
+        
+        # Call ParentMapTool constructor     
+        super(MincutMapTool, self).__init__(iface, settings, action, index_action)  
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -84,8 +69,8 @@ class MincutMapTool(QgsMapTool):
             # Check Arc or Node
             for snapPoint in result:
 
-                if snapPoint.layer.name() == 'Node' or snapPoint.layer.name() == 'Arc':
-
+                if snapPoint.layer.name() == self.layer_node.name() or snapPoint.layer.name() == self.layer_arc.name():
+                    
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
 
@@ -95,11 +80,10 @@ class MincutMapTool(QgsMapTool):
 
                     # Data for function
                     self.current_layer = result[0].layer
-                    self.snappFeat = next(
-                        result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                    self.snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
 
                     # Change symbol
-                    if snapPoint.layer.name() == 'Node':
+                    if snapPoint.layer.name() == self.layer_node.name():
                         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)
                     else:
                         self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)
@@ -112,94 +96,59 @@ class MincutMapTool(QgsMapTool):
         # With right click the digitizing is finished
         if event.button() == 1 and self.current_layer is not None:
 
-            ''' Button 26. User select one node or arc.
-            SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
-            Returns and integer: error code
-            Get these id's and select them in its corresponding layers '''
-
-            # Get selected features and layer type: 'arc' or 'node'
-            elem_type = self.current_layer.name().lower()
+            # Get selected layer type: 'arc' or 'node'
+            if self.current_layer.name() == self.layer_arc.name():
+                elem_type = 'arc'
+            elif self.current_layer.name() == self.layer_node.name():
+                elem_type = 'node'
+            else:
+                print "not valid"
+                return
 
             feature = self.snappFeat
-            elem_id = feature.attribute(elem_type + '_id')
+            elem_id = feature.attribute(elem_type+'_id')
 
             # Execute SQL function
             function_name = "gw_fct_mincut"
-            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(
-                elem_id) + "', '" + elem_type + "');"
-            result = self.dao.get_row(sql)
-            self.dao.commit()
-
-            # Manage SQL execution result
-            if result is None:
-                self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))
-                return
-            elif result[0] == 0:
+            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"
+            result = self.controller.execute_sql(sql)
+            print sql
+            if result:
                 # Get 'arc' and 'node' list and select them
                 self.mg_flow_trace_select_features(self.layer_arc, 'arc')
                 self.mg_flow_trace_select_features(self.layer_node, 'node')
-            elif result[0] == 1:
-                self.showWarning(self.controller.tr("Parametrize error type 1"))
-                return
-            else:
-                self.showWarning(self.controller.tr("Undefined error"))
-                return
 
-                # Refresh map canvas
+            # Refresh map canvas
             self.iface.mapCanvas().refresh()
 
 
     def mg_flow_trace_select_features(self, layer, elem_type):
 
-        sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_" + elem_type + " ORDER BY " + elem_type + "_id"
-        rows = self.dao.get_rows(sql)
-        self.dao.commit()
-
-        # Build an expression to select them
-        aux = "\"" + elem_type + "_id\" IN ("
-        for elem in rows:
-            aux += elem[0] + ", "
-        aux = aux[:-2] + ")"
-
-        # Get a featureIterator from this expression:
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            self.showWarning("Expression Error: " + str(expr.parserErrorString()))
-            return
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-
-        # Select features with these id's
-        layer.setSelectedFeatures(id_list)
-
-
-    def set_layer_arc(self, layer_arc):
-        ''' Set layer 'Arc' '''
-        self.layer_arc = layer_arc
-
-
-    def set_layer_node(self, layer_node):
-        ''' Set layer 'Node' '''
-        self.layer_node = layer_node
-
-
-    def set_schema_name(self, schema_name):
-        self.schema_name = schema_name
-
-
-    def set_dao(self, dao):
-        self.dao = dao
-
-
-    def set_controller(self, controller):
-        self.controller = controller
+        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"
+        rows = self.controller.get_rows(sql)
+        if rows:
+    
+            # Build an expression to select them
+            aux = "\""+elem_type+"_id\" IN ("
+            for elem in rows:
+                aux += elem[0] + ", "
+            aux = aux[:-2] + ")"
+    
+            # Get a featureIterator from this expression:
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                self.controller.show_warning("Expression Error: " + str(expr.parserErrorString()))
+                return
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+    
+            # Build a list of feature id's from the previous result
+            id_list = [i.id() for i in it]
+    
+            # Select features with these id's
+            layer.setSelectedFeatures(id_list)
 
 
     def activate(self):
-
-        print('mincut_map_tool Activate')
 
         # Check button
         self.action().setChecked(True)
@@ -221,18 +170,15 @@ class MincutMapTool(QgsMapTool):
         if self.show_help:
             self.controller.show_info("Select a node or pipe and click on it, the valves minimum cut polygon is computed")
 
-
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Arc")[0])
+                self.canvas.setCurrentLayer(self.layer_arc)
         except:
-            self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Arc")[0])
+            self.canvas.setCurrentLayer(self.layer_arc)
 
 
     def deactivate(self):
-
-        print('mincut_map_tool Deactivate')
 
         # Check button
         self.action().setChecked(False)
@@ -243,5 +189,7 @@ class MincutMapTool(QgsMapTool):
         # Recover cursor
         self.canvas.setCursor(self.stdCursor)
 
-        # Removehighlight
+        # Remove highlight
         self.h = None
+        
+        

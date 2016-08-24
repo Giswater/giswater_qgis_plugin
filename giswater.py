@@ -480,11 +480,9 @@ class Giswater(QObject):
         map_tool.set_controller(self.controller)
         
         map_tool = self.map_tools['mg_flow_trace']
-        map_tool.set_layer_arc(self.layer_arc)
-        map_tool.set_layer_node(self.layer_node)
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
         map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
-        map_tool.set_dao(self.dao)
         
 #        map_tool = self.map_tools['mg_connec_tool']
 #        map_tool.set_schema_name(self.schema_name)
