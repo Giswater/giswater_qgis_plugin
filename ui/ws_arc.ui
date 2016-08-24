@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2713,7 +2713,7 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>20</y>
+     <y>0</y>
      <width>131</width>
      <height>20</height>
     </rect>
@@ -2797,6 +2797,16 @@
      <x>380</x>
      <y>540</y>
      <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cat_arctype_id_dummy">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>20</y>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>

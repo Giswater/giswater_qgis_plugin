@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayerCache, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
-from qgis.gui import QgsAttributeTableModel
 from qgis.utils import iface
 from PyQt4.QtGui import *    # @UnusedWildImport
-from PyQt4.QtSql import QSqlTableModel
-
-import os
-from functools import partial
 
 import utils_giswater
 from ws_parent_init import ParentDialog
@@ -25,7 +19,7 @@ def formOpen(dialog, layer, feature):
 def init_config():
     
     # Manage visibility 
-    #feature_dialog.dialog.findChild(QComboBox, "cat_arctype_id").setVisible(False)    
+    feature_dialog.dialog.findChild(QComboBox, "cat_arctype_id").setVisible(False)    
     feature_dialog.dialog.findChild(QComboBox, "arccat_id").setVisible(False)    
     
     # Manage 'arccat_id'
@@ -35,8 +29,10 @@ def init_config():
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
     
     # Manage 'cat_arctype_id'
-    node_type_id = utils_giswater.getWidgetText("cat_arctype_id")
-    utils_giswater.setSelectedItem("cat_arctype_id", node_type_id)    
+    arc_type_id = utils_giswater.getWidgetText("cat_arctype_id")
+    utils_giswater.setSelectedItem("cat_arctype_id_dummy", arc_type_id)    
+    feature_dialog.dialog.findChild(QComboBox, "cat_arctype_id_dummy").activated.connect(feature_dialog.change_arc_type_id)  
+    feature_dialog.change_arc_type_id(-1)      
       
     # Set 'epa_type' and button signals      
     feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)  
@@ -60,8 +56,8 @@ class ArcDialog(ParentDialog):
         self.field_id = "arc_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.node_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
-        self.nodecat_id = utils_giswater.getWidgetText("arccat_id", False)        
+        self.arc_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
+        self.arccat_id = utils_giswater.getWidgetText("arccat_id", False)        
         self.epa_type = utils_giswater.getWidgetText("epa_type", False)        
         
         # Get widget controls
@@ -78,6 +74,9 @@ class ArcDialog(ParentDialog):
         
         # Manage i18n
         self.translate_form('ws_arc')        
+        
+        # Define and execute query to populate combo 'cat_arctype_id_dummy'
+        self.fill_arc_type_id()        
       
         # Load data from related tables
         self.load_data()
@@ -101,135 +100,29 @@ class ArcDialog(ParentDialog):
         self.tab_main.removeTab(5)      
         self.tab_main.removeTab(4) 
         self.tab_main.removeTab(2) 
-        
-        '''
-        # Get 'epa_type'
-        man_visible = False
-        index_tab = 0      
-        if self.epa_type == 'JUNCTION':
-            index_tab = 0
-            self.epa_table = 'inp_junction'
-        elif self.epa_type == 'RESERVOIR' or self.epa_type == 'HYDRANT':
-            index_tab = 1
-            self.epa_table = 'inp_reservoir'
-        elif self.epa_type == 'TANK':
-            index_tab = 2
-            self.epa_table = 'inp_tank'
-            man_visible = True           
-        elif self.epa_type == 'PUMP':
-            index_tab = 3
-            self.epa_table = 'inp_pump'
-        elif self.epa_type == 'VALVE':
-            index_tab = 4
-            self.epa_table = 'inp_valve'
-        elif self.epa_type == 'SHORTPIPE' or self.epa_type == 'FILTER':
-            index_tab = 5
-            self.epa_table = 'inp_shortpipe'
-        elif self.epa_type == 'MEASURE INSTRUMENT':
-            index_tab = 6
-        ''' 
-   
-    def load_tab_analysis(self):
-        ''' Load data from tab 'Analysis' '''
-        
-        print("load_tab_analysis")
-        '''
-        if self.epa_type == 'JUNCTION':                           
-            # Load combo 'pattern_id'
-            combo = self.epa_table+"_pattern_id"
-            table_name = "inp_pattern"
-            sql = "SELECT pattern_id FROM "+self.schema_name+"."+table_name+" ORDER BY pattern_id"
-            rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox(combo, rows)
-            
-            self.fields_junction = ['demand', 'pattern_id']               
-            sql = "SELECT "
-            for i in range(len(self.fields_junction)):
-                sql+= self.fields_junction[i]+", "
-            sql = sql[:-2]
-            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE arc_id = '"+self.id+"'"
-            row = self.dao.get_row(sql)
-            if row:
-                for i in range(len(self.fields_junction)):
-                    widget_name = self.epa_table+"_"+self.fields_junction[i]
-                    utils_giswater.setWidgetText(widget_name, str(row[i]))                
-                    
-        elif self.epa_type == 'TANK':
-            # Load combo 'curve_id'
-            combo = self.epa_table+"_curve_id"
-            table_name = "inp_curve_id"            
-            sql = "SELECT id FROM "+self.schema_name+".inp_curve_id ORDER BY id"
-            rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox(combo, rows)
-                        
-            self.fields_tank = ['initlevel', 'minlevel', 'maxlevel', 'diameter', 'minvol', 'curve_id']            
-            sql = "SELECT "
-            for i in range(len(self.fields_tank)):
-                sql+= self.fields_tank[i]+", "
-            sql = sql[:-2]
-            sql+= " FROM "+self.schema_name+"."+self.epa_table+" WHERE "+self.field_id+" = '"+self.id+"'"
-            row = self.dao.get_row(sql)      
-            if row:
-                for i in range(len(self.fields_tank)):
-                    widget_name = self.epa_table+"_"+self.fields_tank[i]
-                    utils_giswater.setWidgetText(widget_name, str(row[i]))
-        '''    
-
-    def save_tab_analysis(self):
-        ''' Save tab from tab 'Analysis' '''        
-        print("save_tab_analysis")
-        '''
-        #super(NodeDialog, self).save_tab_analysis()
-        if self.epa_type == 'JUNCTION':
-            values = []            
-            sql = "UPDATE "+self.schema_name+"."+self.epa_table+" SET "
-            for i in range(len(self.fields_junction)):
-                widget_name = self.epa_table+"_"+self.fields_junction[i]     
-                value = utils_giswater.getWidgetText(widget_name, True)     
-                values.append(value)
-                sql+= self.fields_junction[i]+" = "+str(values[i])+", "
-            sql = sql[:-2]      
-            sql+= " WHERE node_id = '"+self.id+"'"        
-            self.dao.execute_sql(sql)
-            
-        if self.epa_type == 'TANK':
-            values = []
-            sql = "UPDATE "+self.schema_name+"."+self.epa_table+" SET "
-            for i in range(len(self.fields_tank)):
-                widget_name = self.epa_table+"_"+self.fields_tank[i]              
-                value = utils_giswater.getWidgetText(widget_name, True)     
-                values.append(value)
-                sql+= self.fields_tank[i]+" = "+str(values[i])+", "
-            sql = sql[:-2]                
-            sql+= " WHERE node_id = '"+self.id+"'"        
-            self.dao.execute_sql(sql)
-        '''              
+                
     
     def fill_arc_type_id(self):
         ''' Define and execute query to populate combo 'node_type_dummy' '''
         
-        print("fill_arc_type_id")
-        '''
         # Get node_type.type from node_type.id
-        sql = "SELECT type FROM "+self.schema_name+".node_type"
-        if self.node_type:
-            sql+= " WHERE id = '"+self.node_type+"'"
+        sql = "SELECT type FROM "+self.schema_name+".arc_type"
+        if self.arc_type:
+            sql+= " WHERE id = '"+self.arc_type+"'"
         row = self.dao.get_row(sql)
         if row: 
-            node_type_type = row[0]
-            sql = "SELECT node_type.id"
-            sql+= " FROM "+self.schema_name+".node_type INNER JOIN "+self.schema_name+".cat_node ON node_type.id = cat_node.nodetype_id"
-            sql+= " WHERE type = '"+node_type_type+"' GROUP BY node_type.id ORDER BY node_type.id"
-            rows = self.dao.get_rows(sql)              
-            utils_giswater.fillComboBox("node_type_dummy", rows, False)
-            utils_giswater.setWidgetText("node_type_dummy", self.node_type)
-        '''
+            arc_type_type = row[0]
+            sql = "SELECT arc_type.id"
+            sql+= " FROM "+self.schema_name+".arc_type INNER JOIN "+self.schema_name+".cat_arc ON arc_type.id = cat_arc.arctype_id"
+            sql+= " WHERE type = '"+arc_type_type+"' GROUP BY arc_type.id ORDER BY arc_type.id"
+            rows = self.dao.get_rows(sql)             
+            utils_giswater.fillComboBox("cat_arctype_id_dummy", rows, False)
+            utils_giswater.setWidgetText("cat_arctype_id_dummy", self.arc_type)
+        
         
     def change_arc_type_id(self, index):
         ''' Define and execute query to populate combo 'cat_arctype_id' '''
-        
-        print("change arc type id")
-        '''  
+
         arc_type_id = utils_giswater.getWidgetText("cat_arctype_id", False)    
         if arc_type_id:        
             utils_giswater.setWidgetText("cat_arctype_id", arc_type_id)    
@@ -238,9 +131,9 @@ class ArcDialog(ParentDialog):
             rows = self.dao.get_rows(sql)    
             utils_giswater.fillComboBox("arccat_id_dummy", rows, False)    
             if index == -1:  
-                utils_giswater.setWidgetText("arccat_id_dummy", self.nodecat_id)    
-            self.change_arc_cat()
-        '''                 
+                utils_giswater.setWidgetText("arccat_id_dummy", self.arccat_id)    
+            self.change_arc_cat()     
+                  
                        
     def change_arc_cat(self):
         ''' Just select item to 'real' combo 'arccat_id' (that is hidden) '''
@@ -332,7 +225,6 @@ class ArcDialog(ParentDialog):
         self.tbl_document.model().setFilter(expr)
         self.tbl_document.model().select()
     
-    
             
     def fill_tbl_info(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
@@ -342,8 +234,6 @@ class ArcDialog(ParentDialog):
         # Hide columns
         widget.hideColumn(1)  
         widget.hideColumn(5)  
-        widget.hideColumn(6)           
-
- 
+        widget.hideColumn(6)
 
     
