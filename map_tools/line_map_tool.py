@@ -116,7 +116,7 @@ class LineMapTool(QgsMapTool):
                 selPoint = QPoint(x,y)
     
                 # Check something snapped
-                (retval,result) = self.snapper.snapToBackgroundLayers(selPoint)
+                (retval,result) = self.snapper.snapToBackgroundLayers(selPoint) #@UnusedVariable
               
                 # The point we want to have, is either from snapping result
                 if result <> []:
@@ -157,7 +157,7 @@ class LineMapTool(QgsMapTool):
         eventPoint = QPoint(x,y)
 
         # Snapping        
-        (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
+        (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
 
         # That's the snapped point
         if result <> []:
@@ -246,7 +246,7 @@ class LineMapTool(QgsMapTool):
             
             if layer <> None and self.started == True: 
                 selPoint = QPoint(x,y)
-                (retval,result) = self.snapper.snapToBackgroundLayers(selPoint)
+                (retval,result) = self.snapper.snapToBackgroundLayers(selPoint) #@UnusedVariable
         
             if result <> []:
                 point = result[0].snappedVertex

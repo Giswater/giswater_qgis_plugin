@@ -18,10 +18,10 @@
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import *   # @UnusedWildImport
-from PyQt4.QtGui import *    # @UnusedWildImport
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer, QgsMapLayerRegistry
-from qgis.gui import QgsHighlight, QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsVertexMarker
+from PyQt4.QtCore import Qt, QPoint   
+from PyQt4.QtGui import QColor, QCursor   
 
 from snapping_utils import SnappingConfigManager
 
@@ -74,7 +74,7 @@ class MincutMapTool(QgsMapTool):
         eventPoint = QPoint(x,y)
 
         # Snapping        
-        (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
+        (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable   
         self.current_layer = None
 
         # That's the snapped point

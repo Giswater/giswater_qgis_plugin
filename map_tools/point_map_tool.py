@@ -13,8 +13,8 @@ class PointMapTool(QgsMapTool):
         self.index_action = index_action
         self.srid = srid
         self.elem_type_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type_type')
-        self.dao = controller.getDao()   
-        self.schema_name = controller.get_schema_name()   
+        self.dao = controller.dao  
+        self.schema_name = controller.schema_name  
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')          
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action) 

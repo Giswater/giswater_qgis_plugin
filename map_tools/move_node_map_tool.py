@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsProject, QgsMapLayerRegistry, QgsMapLayer)
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMessageBar
+from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsMapLayerRegistry, QgsMapLayer)
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
@@ -19,8 +19,8 @@ class MoveNodeMapTool(QgsMapTool):
         self.srid = srid
         self.show_help = bool(int(self.settings.value('status/show_help', 1)))  
         self.controller = controller
-        self.dao = controller.getDao()   
-        self.schema_name = self.controller.get_schema_name()   
+        self.dao = controller.dao   
+        self.schema_name = self.controller.schema_name   
         self.layer_arc = None
         self.layer_node = None
 
@@ -89,26 +89,18 @@ class MoveNodeMapTool(QgsMapTool):
             result = self.dao.get_row(sql) 
             self.dao.commit()
             if result is None:
-                self.showWarning(self.controller.tr("Uncatched error. Open PotgreSQL log file to get more details"))   
+                self.controller.show_warning("Uncatched error. Open PotgreSQL log file to get more details")   
             elif result[0] == 0:
-                self.showInfo(self.controller.tr("Node moved successfully"))                
+                self.controller.show_info("Node moved successfully")               
             elif result[0] == 1:
-                print self.controller.tr("Node already related with 2 arcs")
+                self.controller.show_info("Node already related with 2 arcs")
         
         else:
-            self.showWarning(self.controller.tr("Move node: Error updating geometry")) 
+            self.controller.show_warning("Move node: Error updating geometry")
             
         # Refresh map canvas
         self.canvas.currentLayer().triggerRepaint()  
 
-
-    def showInfo(self, text, duration = 3):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)    
-    
-
-    def showWarning(self, text, duration = 3):
-        self.iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)    
-                
                 
     
     ''' QgsMapTool inherited event functions '''    
@@ -146,7 +138,7 @@ class MoveNodeMapTool(QgsMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            self.showInfo(self.controller.tr("Select the node and move to desired location"))
+            self.controller.show_info("Select the node and move to desired location")
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
@@ -194,7 +186,7 @@ class MoveNodeMapTool(QgsMapTool):
         if layer.selectedFeatureCount() == 0:
 
             # Snap to node
-            (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
+            (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             
             # That's the snapped point
             if result <> [] and (result[0].layer.name() == self.layer_node.name()):
@@ -218,7 +210,7 @@ class MoveNodeMapTool(QgsMapTool):
                 
             # Snap to arc
             result = []
-            (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
+            (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             
             # That's the snapped point
             if (result <> []) and (result[0].layer.name() == self.layer_arc.name()) and (result[0].snappedVertexNr == -1):
@@ -262,7 +254,7 @@ class MoveNodeMapTool(QgsMapTool):
             if layer.selectedFeatureCount() == 0:
 
                 # Snap to node
-                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
+                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             
                 # That's the snapped point
                 if result <> [] and (result[0].layer.name() == self.layer_node.name()):
@@ -280,7 +272,7 @@ class MoveNodeMapTool(QgsMapTool):
             else:
                 
                 # Snap to arc
-                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)
+                (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             
                 # That's the snapped point
                 if (result <> []) and (result[0].layer.name() == self.layer_arc.name()):

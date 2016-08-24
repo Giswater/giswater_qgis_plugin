@@ -222,7 +222,7 @@ class NodeDialog(ParentDialog):
             sql+= " vmax = "+str(vmax)+ ", area = "+str(area)
             sql+= " WHERE node_id = '"+self.id+"';"
             self.dao.execute_sql(sql)
-            total = self.dao.get_rowcount()
+            total = self.dao.rowcount
             # Perform an INSERT if any record has been updated
             # TODO: If trigger was working correctly this wouldn't be necessary!
             if total == 0:

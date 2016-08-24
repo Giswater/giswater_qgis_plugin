@@ -9,9 +9,6 @@ class PgDao():
     def __init__(self):
         #self.logger = logging.getLogger('dbsync') 
         self.last_error = None
-    
-    def get_last_error(self):
-        return self.last_error    
         
     def init_db(self):
         try:
@@ -78,10 +75,7 @@ class PgDao():
             status = False
             self.rollback() 
         finally:
-            return status
-        
-    def get_rowcount(self):
-        return self.cursor.rowcount        
+            return status 
 
     def commit(self):
         self.conn.commit()
