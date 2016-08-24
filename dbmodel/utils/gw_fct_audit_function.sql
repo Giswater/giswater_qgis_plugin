@@ -75,6 +75,10 @@ BEGIN
         -- function return        
         ELSIF p_audit_cat_error_id >= 501 AND p_audit_cat_error_id < 998 THEN
             RETURN p_audit_cat_error_id;
+        
+        -- No errors
+        ELSE
+            RETURN 0;
         END IF;
 
         EXCEPTION WHEN foreign_key_violation THEN
