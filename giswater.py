@@ -68,15 +68,21 @@ class Giswater(QObject):
         self.srid = None
         
         # Set controller to handle settings and database connection
-        self.dao = None
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        
+        # Check if config file exists    
+        if not os.path.exists(setting_file):
+            msg = "Config file not found at: "+setting_file
+            self.controller.show_message(msg, 1, 100) 
+            return    
+        
+        # Check connection status   
         connection_status = self.controller.set_database_connection()
+        self.dao = self.controller.dao        
         if not connection_status:
             msg = self.controller.last_error  
             self.controller.show_message(msg, 1, 100) 
             return 
-        else:
-            self.dao = self.controller.dao          
         
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)

@@ -41,7 +41,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1278,7 +1278,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="delete_row_info">
+    <widget class="QPushButton" name="btn_element_delete">
      <property name="geometry">
       <rect>
        <x>680</x>
@@ -1306,7 +1306,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_analysis_junction">
       <attribute name="title">
@@ -7329,7 +7329,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTableView" name="doc_path">
+    <widget class="QTableView" name="tbl_document">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -7339,7 +7339,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="delete_row_doc">
+    <widget class="QPushButton" name="btn_doc_delete">
      <property name="geometry">
       <rect>
        <x>680</x>
@@ -7367,7 +7367,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_event_feature_2">
       <attribute name="title">
@@ -7941,7 +7941,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_event_feature_3">
       <attribute name="title">

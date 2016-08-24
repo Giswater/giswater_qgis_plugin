@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings   
-from PyQt4.QtGui import QLabel, QCheckBox
+from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox
+from PyQt4.QtSql import QSqlDatabase
 
 import subprocess
 
@@ -50,6 +51,17 @@ class DaoController():
             db = qgis_settings.value(root+"database", '')
             user = qgis_settings.value(root+"username", '')
             pwd = qgis_settings.value(root+"password", '') 
+            # We need to create this connections for Table Views
+            self.db = QSqlDatabase.addDatabase("QPSQL")
+            self.db.setHostName(host)
+            self.db.setPort(int(port))
+            self.db.setDatabaseName(db)
+            self.db.setUserName(user)
+            self.db.setPassword(pwd)
+            self.status = self.db.open()    
+            if not self.status:
+                msg = "Database connection error"
+                self.last_error = self.tr(msg)           
         else:
             msg = "Database connection name '"+self.connection_name+"' not set in QGIS. Please define it or check parameter 'configuration_name' in file 'giswater.config'"
             self.last_error = self.tr(msg)
@@ -97,7 +109,25 @@ class DaoController():
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
         self.show_message(text, 1, duration)
-                            
+     
+     
+    def ask_question(self, text, title=None, inf_text=None):
+        ''' Ask question to the user '''   
+
+        msg_box = QMessageBox()
+        msg_box.setText(self.tr(text))
+        if title is not None:
+            msg_box.setWindowTitle(title);        
+        if inf_text is not None:
+            msg_box.setInformativeText(inf_text);        
+        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg_box.setDefaultButton(QMessageBox.No)        
+        ret = msg_box.exec_()
+        if ret == QMessageBox.Ok:
+            return True
+        elif ret == QMessageBox.Discard:
+            return False      
+                                                    
             
     def get_row(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
