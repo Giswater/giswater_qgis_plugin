@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 -- TRIGGERS EDITING VIEWS FOR NODE
 -----------------------------
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     node_table varchar;
     man_table varchar;

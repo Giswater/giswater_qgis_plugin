@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_recursive(node_id_arg character varying) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut_recursive(node_id_arg character varying) RETURNS void AS $BODY$
 DECLARE
     exists_id      character varying;
     rec_table      record;

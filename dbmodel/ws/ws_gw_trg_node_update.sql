@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_update() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_update() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     querystring Varchar; 
     arcrec Record; 

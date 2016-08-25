@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS $BODY$
 DECLARE
     node_1_aux		text;
     node_2_aux		text;

@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-   
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_connec() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     v_sql varchar;

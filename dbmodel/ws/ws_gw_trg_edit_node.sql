@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_trg_edit_node"() RETURNS "pg_catalog"."trigger" AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node() RETURNS "pg_catalog"."trigger" AS $BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
