@@ -9,7 +9,6 @@ This version of Giswater is provided by Giswater Association
 -- VALVE ANALYTICS
 -- ----------------------------
 
-
 CREATE TABLE IF NOT EXISTS "SCHEMA_NAME"."anl_valveanaytics_connec" (
 connec_id character varying(16) NOT NULL,
 the_geom public.geometry (POINT, SRID_VALUE),

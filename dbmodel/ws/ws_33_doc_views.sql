@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_node AS 
 SELECT
 doc_x_node.id,
@@ -20,8 +19,6 @@ doc.date,
 doc.user
 FROM SCHEMA_NAME.doc_x_node
 JOIN SCHEMA_NAME.doc ON doc.id::text = doc_x_node.doc_id::text;
-
-
 
 
 
@@ -41,7 +38,6 @@ JOIN SCHEMA_NAME.doc ON doc.id::text = doc_x_arc.doc_id::text;
 
 
 
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_connec AS
 SELECT
 doc_x_connec.id,
@@ -55,3 +51,4 @@ doc.date,
 doc.user
 FROM SCHEMA_NAME.doc_x_connec
 JOIN SCHEMA_NAME.doc ON doc.id::text = doc_x_connec.doc_id::text;
+

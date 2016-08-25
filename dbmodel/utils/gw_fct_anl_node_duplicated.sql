@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_duplicated() RETURNS void AS $BODY$
 DECLARE
     rec_node record;

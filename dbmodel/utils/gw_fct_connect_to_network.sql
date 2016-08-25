@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array varchar[]) RETURNS void AS $BODY$
 DECLARE
     connec_id_aux  varchar;

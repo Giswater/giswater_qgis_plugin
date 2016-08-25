@@ -128,7 +128,7 @@ BEGIN
     DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
 
-    RETURN 0;
+    RETURN audit_function(0,310);
 
 END;
 $BODY$

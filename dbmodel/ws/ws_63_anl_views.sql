@@ -9,14 +9,12 @@ This version of Giswater is provided by Giswater Association
 -- MINCUT
 -- ----------------------------
 
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_anl_mincut_connec AS 
 SELECT
 connec.connec_id,
 --anl_mincut_node.node_id,
 connec.the_geom
 FROM SCHEMA_NAME.connec;
-
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_anl_mincut_hydrometer AS 

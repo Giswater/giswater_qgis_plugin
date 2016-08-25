@@ -21,7 +21,6 @@ CREATE TABLE SCHEMA_NAME.audit_cat_function (
     context text,
     input_params json, 
     return_type text
-
 );
 
 
@@ -51,8 +50,12 @@ CREATE TABLE IF NOT EXISTS SCHEMA_NAME.audit_function_actions (
     debug_info text
 );
 
-ALTER TABLE SCHEMA_NAME.audit_function_actions ADD FOREIGN KEY ("audit_cat_error_id") REFERENCES SCHEMA_NAME.audit_cat_error ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SCHEMA_NAME.audit_function_actions ADD FOREIGN KEY ("audit_cat_function_id") REFERENCES SCHEMA_NAME.audit_cat_function ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE SCHEMA_NAME.audit_function_actions ADD FOREIGN KEY ("audit_cat_error_id") 
+REFERENCES SCHEMA_NAME.audit_cat_error ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE SCHEMA_NAME.audit_function_actions ADD FOREIGN KEY ("audit_cat_function_id") 
+REFERENCES SCHEMA_NAME.audit_cat_function ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 DROP VIEW IF EXISTS SCHEMA_NAME.v_audit_functions;
 CREATE VIEW SCHEMA_NAME.v_audit_functions AS 

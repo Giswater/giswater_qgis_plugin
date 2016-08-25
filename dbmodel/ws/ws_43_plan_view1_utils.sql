@@ -9,8 +9,6 @@ This version of Giswater is provided by Giswater Association
 -- COMMON SQL (WS & UD)
 
 DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_compost" CASCADE; 
-
-
 CREATE VIEW "SCHEMA_NAME"."v_price_compost" AS 
 SELECT
   price_compost.id,
@@ -27,7 +25,6 @@ GROUP BY price_compost.id, price_compost.unit, price_compost.descript;
 
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil1" AS 
 SELECT
-
   cat_soil.id,
   cat_soil.y_param,
   cat_soil.b,
@@ -35,7 +32,6 @@ SELECT
   v_price_compost.price AS m3exc_cost
 FROM ("SCHEMA_NAME".cat_soil
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m3exc_cost")::text = (v_price_compost.id)::text)));
-
 
 
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil2" AS
@@ -46,15 +42,12 @@ FROM ("SCHEMA_NAME".cat_soil
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m3fill_cost")::text = (v_price_compost.id)::text)));
 
 
-
-
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil3" AS
 SELECT
   cat_soil.id,
   v_price_compost.price AS m3excess_cost
 FROM ("SCHEMA_NAME".cat_soil
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m3excess_cost")::text = (v_price_compost.id)::text)));
-
 
 
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil4" AS
@@ -64,8 +57,6 @@ SELECT
 FROM ("SCHEMA_NAME".cat_soil
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m2trenchl_cost")::text = (v_price_compost.id)::text)))
 WHERE (((cat_soil.m2trenchl_cost)::text = (v_price_compost.id)::text)  OR  (cat_soil.m2trenchl_cost)::text = null);
-
-
 
 
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil" AS
@@ -83,9 +74,5 @@ LEFT JOIN "SCHEMA_NAME".v_price_x_catsoil2 ON ((("SCHEMA_NAME".v_price_x_catsoil
 LEFT JOIN "SCHEMA_NAME".v_price_x_catsoil3 ON ((("SCHEMA_NAME".v_price_x_catsoil3.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
 LEFT JOIN "SCHEMA_NAME".v_price_x_catsoil4 ON ((("SCHEMA_NAME".v_price_x_catsoil4.id)::text = ("SCHEMA_NAME".v_price_x_catsoil1.id)::text))
 );
-
-
-
-
 
 

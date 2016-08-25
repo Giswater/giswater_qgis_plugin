@@ -6,7 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_node AS 
 SELECT
 event_x_node.id,
@@ -24,8 +23,6 @@ FROM SCHEMA_NAME.event_x_node
 JOIN SCHEMA_NAME.event ON event.id::text = event_x_node.event_id::text
 JOIN SCHEMA_NAME.node ON SCHEMA_NAME.node.node_id::text = event_x_node.node_id::text
 ORDER BY node_id;
-
-
 
 
 

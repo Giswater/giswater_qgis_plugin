@@ -5,7 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
@@ -23,9 +22,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE EXTENSION IF NOT EXISTS tablefunc;
 
 
-
-
-
 -- Catalog of table
 DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_table CASCADE; 
 CREATE TABLE SCHEMA_NAME.db_cat_table (
@@ -36,7 +32,6 @@ CREATE TABLE SCHEMA_NAME.db_cat_table (
 	db_cat_clientlayer_id int4,
 	description text
 );
-
 
 
 -- Catalog of views
@@ -60,7 +55,6 @@ CREATE TABLE SCHEMA_NAME.db_cat_columns (
 	column_type text,
 	description text
 );
-
 
 
 -- Catalog of client layer

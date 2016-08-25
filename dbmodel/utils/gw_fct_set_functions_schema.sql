@@ -5,8 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- DROP FUNCTION SCHEMA_NAME.set_functions_schema(text, text);
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.set_functions_schema(old_name text, new_name text) RETURNS void AS $BODY$
 DECLARE
     rec_view record;

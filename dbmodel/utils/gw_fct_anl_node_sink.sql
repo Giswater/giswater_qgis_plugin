@@ -29,11 +29,10 @@ BEGIN
         -- Insert in analytics table
         INSERT INTO anl_node_sink VALUES(node_id_var, (SELECT COUNT(*) FROM arc WHERE node_1 = node_id_var OR node_2 = node_id_var), point_aux);
     END LOOP;
+    
+    PERFORM audit_function(0,50);
 
     RETURN (SELECT COUNT(*) FROM anl_node_sink);
-
-    RETURN audit_function(0,50);
-
         
 END;
 $BODY$

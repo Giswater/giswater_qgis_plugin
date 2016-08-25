@@ -26,8 +26,7 @@ CREATE SEQUENCE "SCHEMA_NAME".event_x_node_seq
   NO MAXVALUE
   CACHE 1;
 
-  
-  
+    
 CREATE SEQUENCE "SCHEMA_NAME".event_x_arc_seq
   START WITH 1
   INCREMENT BY 1
@@ -102,7 +101,6 @@ CONSTRAINT event_pkey PRIMARY KEY (id)
 -- Table gis & elements features related
 -- ----------------------------
 
-
 CREATE TABLE "SCHEMA_NAME"."event_x_node" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_x_node_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
@@ -113,7 +111,6 @@ CREATE TABLE "SCHEMA_NAME"."event_x_node" (
 "text" text,
 CONSTRAINT event_x_node_pkey PRIMARY KEY (id)
 );
-
 
 
 CREATE TABLE "SCHEMA_NAME"."event_x_arc" (
@@ -128,7 +125,6 @@ CONSTRAINT event_x_arc_pkey PRIMARY KEY (id)
 );
 
 
-
 CREATE TABLE "SCHEMA_NAME"."event_x_connec" (
 "id" int8 DEFAULT nextval('"SCHEMA_NAME".event_x_connec_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
@@ -139,7 +135,6 @@ CREATE TABLE "SCHEMA_NAME"."event_x_connec" (
 "text" text,
 CONSTRAINT event_x_connec_pkey PRIMARY KEY (id)
 );
-
 
 
 CREATE TABLE "SCHEMA_NAME"."event_x_element" (

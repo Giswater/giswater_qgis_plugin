@@ -143,3 +143,4 @@ v_rtc_hydrometer_x_node_period.node_id,
 pattern_id,
 v_rtc_hydrometer_x_node_period.period_id,
 rtc_options.coefficient;
+

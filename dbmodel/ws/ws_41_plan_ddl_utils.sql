@@ -6,11 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
 ---------------------------------------------------------------
 -- COMMON SQL (WS & UD)
 ---------------------------------------------------------------
-
 
 
 -- ----------------------------
@@ -87,7 +85,6 @@ CREATE SEQUENCE "SCHEMA_NAME"."price_compost_value_seq"
   NO MINVALUE
   NO MAXVALUE
   CACHE 1;
-
   
 
 
@@ -133,7 +130,6 @@ CREATE TABLE "SCHEMA_NAME"."plan_node_x_psector" (
 );
 
 
-
 CREATE TABLE "SCHEMA_NAME"."plan_other_x_psector" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_other_x_psector_seq'::regclass) NOT NULL,
 "price_id" varchar(16) COLLATE "default",
@@ -145,15 +141,13 @@ CREATE TABLE "SCHEMA_NAME"."plan_other_x_psector" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".plan_arc_x_pavement
-(
+CREATE TABLE "SCHEMA_NAME".plan_arc_x_pavement (
   "id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_arc_x_pavement_seq'::regclass) NOT NULL,
-  arc_id character varying(16),
-  pavcat_id character varying(16),
-  percent numeric (3,2),
+  "arc_id" character varying(16),
+  "pavcat_id" character varying(16),
+  "percent" numeric (3,2),
   CONSTRAINT plan_arc_x_pavement_pkey PRIMARY KEY (id)
 );
-
 
 
 CREATE TABLE "SCHEMA_NAME"."plan_value_ps_priority" (
@@ -163,23 +157,20 @@ CREATE TABLE "SCHEMA_NAME"."plan_value_ps_priority" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."plan_selector_economic"  -- Used to show economic data
-(
-  id character varying(16) NOT NULL,
-  observ character varying(254),
+-- Used to show economic data
+CREATE TABLE "SCHEMA_NAME"."plan_selector_economic" (
+  "id" character varying(16) NOT NULL,
+  "observ" character varying(254),
   CONSTRAINT plan_selector_economic_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."plan_selector_psector" -- Used to show a defined range of psector features on map composer
-(
-  id character varying(16) NOT NULL,
-  observ character varying(254),
+-- Used to show a defined range of psector features on map composer
+CREATE TABLE "SCHEMA_NAME"."plan_selector_psector" (
+  "id" character varying(16) NOT NULL,
+  "observ" character varying(254),
   CONSTRAINT plan_selector_psector_pkey PRIMARY KEY (id)
 );
-
-
-
 
 
 
@@ -188,9 +179,7 @@ CREATE TABLE "SCHEMA_NAME"."plan_selector_psector" -- Used to show a defined ran
 ---------------------------------------------
 
 
-
-CREATE TABLE "SCHEMA_NAME".price_simple
-(
+CREATE TABLE "SCHEMA_NAME".price_simple (
   id character varying(16) NOT NULL,
   unit character varying(5),
   descript character varying(100),
@@ -201,10 +190,7 @@ CREATE TABLE "SCHEMA_NAME".price_simple
 );
 
 
-
-
-CREATE TABLE "SCHEMA_NAME".price_compost
-(
+CREATE TABLE "SCHEMA_NAME".price_compost (
   id character varying(16) NOT NULL,
   unit character varying(5),
   descript character varying(100),
@@ -214,10 +200,7 @@ CREATE TABLE "SCHEMA_NAME".price_compost
 );
 
 
-
-
-CREATE TABLE "SCHEMA_NAME".price_compost_value
-(
+CREATE TABLE "SCHEMA_NAME".price_compost_value (
   "id" int4 DEFAULT nextval('"SCHEMA_NAME".price_compost_value_seq'::regclass) NOT NULL,
   compost_id character varying(16),
   simple_id character varying(16),
@@ -226,8 +209,7 @@ CREATE TABLE "SCHEMA_NAME".price_compost_value
 );
 
 
-CREATE TABLE "SCHEMA_NAME".price_value_unit
-(
+CREATE TABLE "SCHEMA_NAME".price_value_unit (
   id character varying(16) NOT NULL,
   descript character varying(100),
   CONSTRAINT price_value_unit_pkey PRIMARY KEY (id)

@@ -13,6 +13,5 @@ INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('MIN');
 INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('AVG');
 INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('MAX');
 
-
 INSERT INTO "SCHEMA_NAME"."rtc_value_opti_status" VALUES ('ON');
 INSERT INTO "SCHEMA_NAME"."rtc_value_opti_status" VALUES ('OFF');
