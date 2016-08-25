@@ -24,7 +24,7 @@ from map_tools.point_map_tool import PointMapTool
 from map_tools.move_node_map_tool import MoveNodeMapTool
 from map_tools.mincut_map_tool import MincutMapTool
 from map_tools.delete_node_map_tool import DeleteNodeMapTool
-# from map_tools.connec_map_tool import ConnecMapTool
+from map_tools.connec_map_tool import ConnecMapTool
 from search.search_plus import SearchPlus
 
 
@@ -134,7 +134,7 @@ class Giswater(QObject):
             try:
                 action.setCheckable(is_checkable) 
                 # Management toolbar actions
-                if int(index_action) in (19, 20, 21, 24, 25, 27, 28, 99):
+                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -179,9 +179,9 @@ class Giswater(QObject):
             elif int(index_action) == 26:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
-#            elif int(index_action) == 20:
-#                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-#                map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 20:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 27:
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
@@ -490,10 +490,10 @@ class Giswater(QObject):
         map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
         
-#        map_tool = self.map_tools['mg_connec_tool']
-#        map_tool.set_schema_name(self.schema_name)
-#        map_tool.set_controller(self.controller)
-#        map_tool.set_layer_connec(self.layer_connec)
+        map_tool = self.map_tools['mg_connec_tool']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_schema_name(self.schema_name)
+        map_tool.set_controller(self.controller)
 
 
         # Create SearchPlus object
@@ -563,8 +563,9 @@ class Giswater(QObject):
         self.enable_action(True, 16)
         self.enable_action(True, 17)
         self.enable_action(True, 19)   
-        self.enable_action(True, 21)   
-        self.enable_action(True, 24)   
+        self.enable_action(True, 20)
+        self.enable_action(True, 21)
+        self.enable_action(True, 24)
         self.enable_action(True, 25)
         self.enable_action(True, 26)
         self.enable_action(True, 27)
