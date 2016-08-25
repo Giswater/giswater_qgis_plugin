@@ -18,20 +18,17 @@
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QRect
-from PyQt4.QtGui import QApplication
-from qgis.core import (QGis, QgsPoint, QgsMapToPixel, QgsMapLayerRegistry, QgsMapLayer, QgsVectorLayer,
-                       QgsFeatureRequest, QgsRectangle)
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool, QgsRubberBand, QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QCursor
+from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle
+from qgis.gui import QgsRubberBand, QgsVertexMarker
+from PyQt4.QtCore import QPoint, QRect, Qt
+from PyQt4.QtGui import QApplication, QColor
 
 from parent_map_tool import ParentMapTool
 
-from snapping_utils import SnappingConfigManager
-
 
 class ConnecMapTool(ParentMapTool):
+    ''' Button 20. User select connections from layer 'connec'
+    Execute SQL function: 'gw_fct_connect_to_network' '''    
 
     def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
@@ -40,9 +37,6 @@ class ConnecMapTool(ParentMapTool):
         super(ConnecMapTool, self).__init__(iface, settings, action, index_action)
 
         self.dragging = False
-
-        # And finally we set the mapTool's parent cursor
-        # self.parent().setCursor(self.cursor)
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -58,15 +52,14 @@ class ConnecMapTool(ParentMapTool):
         self.rubberBand.setWidth(3)
         mBorderColor = QColor(254, 58, 29)
         self.rubberBand.setBorderColor(mBorderColor)
-        # self.reset()
 
         # Select rectangle
         self.selectRect = QRect()
 
 
     def reset(self):
-
-        # Clear selected features
+        ''' Clear selected features '''
+        
         layer = self.layer_connec
         if layer is not None:
             layer.removeSelection()
@@ -75,11 +68,12 @@ class ConnecMapTool(ParentMapTool):
         self.rubberBand.reset()
 
 
+
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
-
-        # With right click the digitizing is finished
+        ''' With left click the digitizing is finished '''
+        
         if event.buttons() == Qt.LeftButton:
 
             if not self.dragging:
@@ -127,9 +121,9 @@ class ConnecMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-
-        # With right click the digitizing is finished
-        if event.button() == 1:
+        ''' With left click the digitizing is finished '''
+        
+        if event.button() == Qt.LeftButton:
 
             # Get the click
             x = event.pos().x()
@@ -147,8 +141,8 @@ class ConnecMapTool(ParentMapTool):
 
                 # That's the snapped point
                 if result <> [] and (result[0].layer.name() == self.layer_connec.name()):
-                    point = QgsPoint(result[0].snappedVertex)
-
+                    
+                    point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                     layer.removeSelection()
                     layer.select([result[0].snappedAtGeometry])
 
@@ -157,7 +151,6 @@ class ConnecMapTool(ParentMapTool):
 
                     # Hide highlight
                     self.vertexMarker.hide()
-
 
             else:
 
@@ -169,28 +162,20 @@ class ConnecMapTool(ParentMapTool):
                     self.selectRect.setBottom( self.selectRect.bottom() + 1 )
 
                 self.set_rubber_band()
-
-                selectGeom = self.rubberBand.asGeometry()
-
+                selectGeom = self.rubberBand.asGeometry()   #@UnusedVariable
                 self.select_multiple_features(self.selectRectMapCoord)
-
                 self.dragging = False
 
                 # Create link
                 self.link_connec()
 
-                #self.reset()
-
-        # On right click, take action
-        if event.button() == 2:
+        elif event.button() == Qt.RightButton:
 
             # Create link
             self.link_connec()
 
 
     def activate(self):
-
-        print('connec_map_tool Activate')
 
         # Check button
         self.action().setChecked(True)
@@ -212,20 +197,18 @@ class ConnecMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            self.controller.show_info(
-                "Right click to use current selection, select connec points by clicking or dragging (selection box)")
+            msg = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
+            self.controller.show_info(msg)
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Connec")[0])
+                self.canvas.setCurrentLayer(self.layer_connec)
         except:
-            self.canvas.setCurrentLayer(QgsMapLayerRegistry.instance().mapLayersByName("Connec")[0])
+            self.canvas.setCurrentLayer(self.layer_connec)
 
 
     def deactivate(self):
-
-        print('connec_map_tool Deactivate')
 
         # Check button
         self.action().setChecked(False)
@@ -243,9 +226,6 @@ class ConnecMapTool(ParentMapTool):
     def link_connec(self):
         ''' Link selected connec to the pipe '''
 
-        ''' Button 20. User select connections from layer 'connec'
-        and executes function: 'gw_fct_connect_to_network' '''
-
         # Get selected features (from layer 'connec')
         aux = "{"
         layer = self.layer_connec
@@ -260,12 +240,12 @@ class ConnecMapTool(ParentMapTool):
 
         # Execute function
         function_name = "gw_fct_connect_to_network"
-        sql = "SELECT " + self.schema_name + "." + function_name + "('" + connec_array + "');"
+        sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
         self.controller.execute_sql(sql)
 
         # Refresh map canvas
         self.rubberBand.reset()
-        self.iface.mapCanvas().refresh()  # Rubberband reset
+        self.iface.mapCanvas().refresh()
 
 
     def set_rubber_band(self):
@@ -303,20 +283,15 @@ class ConnecMapTool(ParentMapTool):
         elif modifiers == Qt.ShiftModifier:
             behaviour = QgsVectorLayer.RemoveFromSelection
 
-        # Layer
-        layer = self.layer_connec
-
-        if layer == None:
+        if self.layer_connec is None:
             return
 
         # Change cursor
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
         # Selection
-        layer.selectByRect(selectGeometry, behaviour)
+        self.layer_connec.selectByRect(selectGeometry, behaviour)
 
         # Old cursor
         QApplication.restoreOverrideCursor()
-
-
 
