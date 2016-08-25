@@ -13,10 +13,6 @@ DECLARE
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
-
         
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -58,8 +54,8 @@ BEGIN
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom);
               
-    PERFORM audit_function (1,770);
-	RETURN NEW;
+        PERFORM audit_function (1,770);
+        RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -78,14 +74,14 @@ BEGIN
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE connec_id = OLD.connec_id;
                 
-		PERFORM audit_function (2,770);
+        PERFORM audit_function (2,770);
         RETURN NEW;
-    
+
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-		PERFORM audit_function (3,770);
+        PERFORM audit_function (3,770);
         RETURN NULL;
    
     END IF;
