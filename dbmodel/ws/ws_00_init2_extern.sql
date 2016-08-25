@@ -82,7 +82,6 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_x_data_seq"
     CACHE 1;
 
 
-
 CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_dma_period_seq"
     START WITH 1
     INCREMENT BY 1
@@ -101,7 +100,7 @@ CREATE TABLE "SCHEMA_NAME".ext_cat_scada(
 "text3" character varying(100),
 "link" varchar(512),
 "url" varchar(512),
-"picture" varchar(512 ,
+"picture" varchar(512),
 "svg" varchar(50),
 CONSTRAINT ext_cat_scada_pkey PRIMARY KEY (id)
 );
@@ -119,7 +118,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_scada(
 
 CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_value (
   "id" int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_scada_x_value_seq'::regclass) NOT NULL,
-  "scada"_id character varying(16),
+  "scada_id" character varying(16),
   "value" float, 
   "status" varchar (3),
   "timestamp" timestamp (6) without time zone,
@@ -180,13 +179,12 @@ CREATE TABLE "SCHEMA_NAME".ext_cat_hydrometer(
 "text1" character varying(100),
 "text2" character varying(100),
 "text3" character varying(100),
-"link" varchar(512)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
-"svg" varchar(50)  ,
+"link" varchar(512),
+"url" varchar(512),
+"picture" varchar(512),
+"svg" varchar(50),
 CONSTRAINT ext_cat_hydrometer_pkey PRIMARY KEY (id)
 );
-
 
 
 CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer(

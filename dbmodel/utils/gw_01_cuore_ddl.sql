@@ -22,24 +22,24 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."config" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(18) NOT NULL,
 "node_proximity" double precision,
 "arc_searchnodes" double precision,
 "node2arc" double precision,
 "connec_proximity" double precision,
 "arc_toporepair" double precision,
-"nodeinsert_arcendpoint" boolean NOT NULL,
+"nodeinsert_arcendpoint" boolean,
 "nodeinsert_catalog_vdefault" varchar (30),
-"orphannode_delete" boolean NOT NULL,
+"orphannode_delete" boolean,
 "vnode_update_tolerance" double precision,
-"nodetype_change_enabled" boolean NOT NULL,
-"samenode_init_end_control" boolean NOT NULL,
-"node_proximity_control" boolean NOT NULL,
-"connec_proximity_control" boolean NOT NULL,
+"nodetype_change_enabled" boolean,
+"samenode_init_end_control" boolean,
+"node_proximity_control" boolean,
+"connec_proximity_control" boolean,
 "node_duplicated_tolerance" float,
 "connec_duplicated_tolerance" float,
-"audit_function_control" boolean NOT NULL,
-"arc_searchnodes_control" boolean NOT NULL,
+"audit_function_control" boolean,
+"arc_searchnodes_control" boolean,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 

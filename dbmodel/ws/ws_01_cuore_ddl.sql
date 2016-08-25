@@ -320,33 +320,31 @@ id varchar (18),
 
 
 CREATE TABLE "SCHEMA_NAME"."man_type_category" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_type_fluid" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_type_location" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."connec_type" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
-
-
 
 
 
@@ -355,14 +353,14 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "SCHEMA_NAME"."sector" (
-"sector_id" varchar(30)   NOT NULL,
-"descript" varchar(100)  ,
+"sector_id" varchar(30) NOT NULL,
+"descript" varchar(100),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 );
 
 CREATE TABLE "SCHEMA_NAME"."node" (
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
 "node_type" varchar(30),
@@ -376,9 +374,9 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "dma_id" varchar(30)  ,
 													-- to INP model
 "soilcat_id" varchar(16)  ,
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
@@ -396,7 +394,7 @@ CONSTRAINT node_pkey PRIMARY KEY (node_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."arc" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16) NOT NULL,
 "node_1" varchar(16)  ,
 "node_2" varchar(16)  ,
 "arccat_id" varchar(30) ,
@@ -410,9 +408,9 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "dma_id" varchar(30)  ,
 													-- to INP model
 "soilcat_id" varchar(16)  ,
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
@@ -430,7 +428,7 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."dma" (
-"dma_id" varchar(30)   NOT NULL,
+"dma_id" varchar(30) NOT NULL,
 "sector_id" varchar(30),
 "presszonecat_id" varchar(30),
 "descript" varchar(255),
@@ -438,7 +436,6 @@ CREATE TABLE "SCHEMA_NAME"."dma" (
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 );
-
 
 
 
@@ -458,9 +455,9 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "rotation" numeric (6,3),
 "dma_id" varchar(30),
 "soilcat_id" varchar(16),
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date ,
@@ -491,16 +488,14 @@ CONSTRAINT "vnode_pkey" PRIMARY KEY ("vnode_id")
 );
 
 
-
 CREATE TABLE "SCHEMA_NAME"."link" (
 link_id varchar (16) DEFAULT nextval('"SCHEMA_NAME".link_seq'::regclass) NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
-connec_id varchar(16)  ,
-vnode_id varchar(16)  ,
+connec_id varchar(16),
+vnode_id varchar(16),
 custom_length numeric (12,3),
 CONSTRAINT link_pkey PRIMARY KEY (link_id)
 );
-
 
 
 
@@ -509,8 +504,8 @@ CONSTRAINT link_pkey PRIMARY KEY (link_id)
 -- -----------------------------------
 
 CREATE TABLE "SCHEMA_NAME"."man_junction" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
 );
 
@@ -525,15 +520,15 @@ CONSTRAINT man_tank_pkey PRIMARY KEY (node_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."man_hydrant" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_valve" (
-"node_id" varchar(16)   NOT NULL,
-"type" varchar(30)  ,
+"node_id" varchar(16) NOT NULL,
+"type" varchar(30),
 "opened" boolean DEFAULT true,
 "acessibility" boolean DEFAULT true,
 "broken" boolean DEFAULT true,
@@ -545,30 +540,29 @@ CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."man_pump" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_pump_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_filter" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_filter_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_meter" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_meter_pkey PRIMARY KEY (node_id)
 );
 
 
-
 CREATE TABLE "SCHEMA_NAME"."man_pipe" (
-"arc_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"arc_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
 );
 
@@ -600,24 +594,24 @@ CONSTRAINT element_pkey PRIMARY KEY (element_id)
 
 CREATE TABLE "SCHEMA_NAME"."element_x_arc" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_arc_seq'::regclass) NOT NULL,
-"element_id" varchar(16)  ,
-"arc_id" varchar(16)  ,
+"element_id" varchar(16),
+"arc_id" varchar(16),
 CONSTRAINT element_x_arc_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."element_x_node" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_node_seq'::regclass) NOT NULL,
-"element_id" varchar(16)  ,
-"node_id" varchar(16)  ,
+"element_id" varchar(16),
+"node_id" varchar(16),
 CONSTRAINT element_x_node_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."element_x_connec" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_connec_seq'::regclass) NOT NULL,
-"element_id" varchar(16)  ,
-"connec_id" varchar(16)  ,
+"element_id" varchar(16),
+"connec_id" varchar(16),
 CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 );
 
@@ -627,21 +621,21 @@ CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 -- ----------------------------------
 
 CREATE TABLE "SCHEMA_NAME"."value_state" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
+"id" varchar(16) NOT NULL,
+"observ" varchar(254),
  CONSTRAINT value_state_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."value_verified" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
+"id" varchar(16) NOT NULL,
+"observ" varchar(254),
  CONSTRAINT value_verified_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE "SCHEMA_NAME"."value_yesno" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
+"id" varchar(16) NOT NULL,
+"observ" varchar(254),
  CONSTRAINT value_yesno_pkey PRIMARY KEY (id)
 );
 
@@ -652,7 +646,7 @@ CREATE TABLE "SCHEMA_NAME"."value_yesno" (
 
 
 CREATE TABLE "SCHEMA_NAME"."man_selector_valve" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(50) NOT NULL,
  CONSTRAINT man_selector_valve_pkey PRIMARY KEY (id)
 );
 

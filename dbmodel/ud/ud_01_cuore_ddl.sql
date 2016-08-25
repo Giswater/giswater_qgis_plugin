@@ -335,19 +335,19 @@ CONSTRAINT cat_builder_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."cat_work" (
-"id" varchar(30)   NOT NULL,
-"descript" varchar(512)  ,
-"link" varchar(512)  ,
-"picture" varchar(512)  ,
+"id" varchar(30) NOT NULL,
+"descript" varchar(512),
+"link" varchar(512),
+"picture" varchar(512),
 CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."cat_owner" (
-"id" varchar(30)   NOT NULL,
-"descript" varchar(512)  ,
-"link" varchar(512)  ,
-"picture" varchar(512)  ,
+"id" varchar(30) NOT NULL,
+"descript" varchar(512),
+"link" varchar(512),
+"picture" varchar(512),
 CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
 );
 
@@ -355,8 +355,8 @@ CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
 CREATE TABLE "SCHEMA_NAME"."cat_pavement" (
 id varchar (18),
 "descript" text,
-"link" varchar(512)  ,
-"picture" varchar(512)  ,
+"link" varchar(512),
+"picture" varchar(512),
 "thickness" numeric(12,2) DEFAULT 0.00,
 "m2_cost" varchar (16),
  CONSTRAINT cat_pavement_pkey PRIMARY KEY (id)
@@ -369,29 +369,29 @@ id varchar (18),
 -----------
 
 CREATE TABLE "SCHEMA_NAME"."man_type_category" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_type_fluid" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_type_location" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(50) NOT NULL,
+"observ" varchar(50),
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."connec_type" (
-"id" varchar(20)   NOT NULL,
-"observ" varchar(50)  ,
+"id" varchar(20) NOT NULL,
+"observ" varchar(50)
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
 
@@ -401,8 +401,8 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "SCHEMA_NAME"."sector" (
-"sector_id" varchar(30)   NOT NULL,
-"descript" varchar(100)  ,
+"sector_id" varchar(30) NOT NULL,
+"descript" varchar(100),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 )
@@ -411,7 +411,7 @@ WITH (OIDS=FALSE)
 
 
 CREATE TABLE "SCHEMA_NAME"."node" (
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16) NOT NULL,
 "top_elev" numeric(12,3),
 "ymax" numeric(12,3),
 "sander" numeric(12,3),
@@ -426,9 +426,9 @@ CREATE TABLE "SCHEMA_NAME"."node" (
 "dma_id" varchar(30)  ,
 														-- to INP model
 "soilcat_id" varchar(16)  ,
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
@@ -449,7 +449,7 @@ CONSTRAINT node_pkey PRIMARY KEY (node_id)
 
 
 CREATE TABLE "SCHEMA_NAME"."arc" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16) NOT NULL,
 "node_1" varchar(16)  ,
 "node_2" varchar(16)  ,
 "y1" numeric (12,3) ,
@@ -467,9 +467,9 @@ CREATE TABLE "SCHEMA_NAME"."arc" (
 "dma_id" varchar(30)  ,
 													-- to INP model
 "soilcat_id" varchar(16)  ,
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
@@ -525,9 +525,9 @@ CREATE TABLE "SCHEMA_NAME"."connec" (
 "rotation" numeric (6,3),
 "dma_id" varchar(30)  ,
 "soilcat_id" varchar(16)  ,
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
@@ -610,42 +610,41 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 
 
 
-
 -- ----------------------------
 -- Table: Add info feature 
 -- ----------------------------
 
 
 CREATE TABLE "SCHEMA_NAME"."man_junction" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_storage" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_storage_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_outfall" (
-"node_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_virtual" (
-"arc_id" varchar(16)   NOT NULL,
+"arc_id" varchar(16) NOT NULL,
 CONSTRAINT man_virtualarc_pkey PRIMARY KEY (arc_id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."man_conduit" (
-"arc_id" varchar(16)   NOT NULL,
-"add_info" varchar(255)  ,
+"arc_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
 CONSTRAINT man_conduit_pkey PRIMARY KEY (arc_id)
 );
 
@@ -685,8 +684,8 @@ CONSTRAINT element_x_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."element_x_arc" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_arc_seq'::regclass) NOT NULL,
-"element_id" varchar(16)  ,
-"arc_id" varchar(16)  ,
+"element_id" varchar(16),
+"arc_id" varchar(16),
 CONSTRAINT element_x_arc_pkey PRIMARY KEY (id)
 );
 
@@ -700,8 +699,8 @@ CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."element_x_gully" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_gully_seq'::regclass) NOT NULL,
-"element_id" varchar(16)  ,
-"gully_id" varchar(16)  ,
+"element_id" varchar(16),
+"gully_id" varchar(16),
 CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
 );
 
@@ -713,32 +712,30 @@ CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "SCHEMA_NAME"."value_state" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
+"id" varchar(16) NOT NULL,
+"observ" varchar(254),
  CONSTRAINT value_state_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."value_verified" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
+"id" varchar(16) NOT NULL,
+"observ" varchar(254),
  CONSTRAINT value_verified_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "SCHEMA_NAME"."value_yesno" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
+"id" varchar(16) NOT NULL,
+"observ" varchar(254),
  CONSTRAINT value_yesno_pkey PRIMARY KEY (id)
 );
-
 
 
 
 ----------------
 -- SPATIAL INDEX
 ----------------
-
 
 CREATE INDEX arc_index ON "SCHEMA_NAME".arc USING GIST (the_geom);
 CREATE INDEX node_index ON "SCHEMA_NAME".node USING GIST (the_geom);
@@ -748,6 +745,4 @@ CREATE INDEX connec_index ON "SCHEMA_NAME".connec USING GIST (the_geom);
 CREATE INDEX gully_index ON "SCHEMA_NAME".gully USING GIST (the_geom);
 CREATE INDEX vnode_index ON "SCHEMA_NAME".vnode USING GIST (the_geom);
 CREATE INDEX link_index ON "SCHEMA_NAME".link USING GIST (the_geom);
-
-
 

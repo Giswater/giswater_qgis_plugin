@@ -8,7 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
@@ -53,5 +52,4 @@ INSERT INTO element_type VALUES ('REGISTER', 'event_x_element');
 INSERT INTO element_type VALUES ('MANHOLE', 'event_x_element');
 INSERT INTO element_type VALUES ('COVER', 'event_x_element');
 INSERT INTO element_type VALUES ('STEP', 'event_x_element');
-
 
