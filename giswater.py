@@ -309,9 +309,9 @@ class Giswater(QObject):
     
     ''' Slots '''             
 
-    def enable_actions(self, enable=True, start=1, stop=37):
+    def enable_actions(self, enable=True, start=1, stop=36):
         ''' Utility to enable all actions '''
-        for i in range(start, stop):
+        for i in range(start, stop+1):
             self.enable_action(enable, i)              
 
 
@@ -419,6 +419,7 @@ class Giswater(QObject):
         
         # Check if table 'version' exists
         if self.layer_version is None:
+            self.controller.show_warning("Layer version not found")
             return
                  
         # Get schema name from table 'version'
@@ -426,7 +427,7 @@ class Giswater(QObject):
         (self.schema_name, uri_table) = self.get_layer_source(self.layer_version)  
         schema_name = self.schema_name.replace('"', '')
         if self.schema_name is None or not self.dao.check_schema(schema_name):
-            print "Schema not found: "+self.schema_name
+            self.controller.show_warning("Schema not found: "+self.schema_name)            
             return
         
         # Set schema_name in controller and in config file
@@ -477,24 +478,19 @@ class Giswater(QObject):
         # Set objects for map tools classes
         map_tool = self.map_tools['mg_move_node']
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
         
         map_tool = self.map_tools['mg_delete_node']
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
         
         map_tool = self.map_tools['mg_flow_trace']
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
         
         map_tool = self.map_tools['mg_connec_tool']
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_schema_name(self.schema_name)
         map_tool.set_controller(self.controller)
-
 
         # Create SearchPlus object
         try:
@@ -559,19 +555,14 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         ''' Enable selected actions '''
         
-        # MG toolbar
-        self.enable_action(True, 16)
-        self.enable_action(True, 17)
-        self.enable_action(True, 19)   
-        self.enable_action(True, 20)
-        self.enable_action(True, 21)
-        self.enable_action(True, 24)
-        self.enable_action(True, 25)
-        self.enable_action(True, 26)
-        self.enable_action(True, 27)
+        # Enable MG toolbar
+        self.enable_actions(True, 16, 27)        
+        self.enable_action(False, 18)        
+        self.enable_action(False, 22)        
+        self.enable_action(False, 23)        
         
         # Enable ED toolbar
-        self.enable_actions(True, 30, 37)
+        self.enable_actions(True, 30, 36)
                 
                     
     def ws_generic(self, function_name):   

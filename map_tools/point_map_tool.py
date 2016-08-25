@@ -6,7 +6,8 @@ from qgis.gui import QgsMapTool
 class PointMapTool(QgsMapTool):
 
     def __init__(self, iface, settings, action, index_action, controller, srid):
-        ''' Class constructor '''    
+        ''' Class constructor '''   
+         
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings

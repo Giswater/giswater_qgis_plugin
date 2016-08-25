@@ -17,7 +17,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject, QgsMapLayerRegistry
+from qgis.core import QgsProject
 from qgis.gui import QgsMapCanvasSnapper
 
 
@@ -100,7 +100,8 @@ class SnappingConfigManager():
         ''' Function that restores the previous snapping '''
 
         # We loop through all the layers in the project
-        QgsProject.instance().blockSignals(True)  # we don't want to refresh the snapping UI
+        # We don't want to refresh the snapping UI        
+        QgsProject.instance().blockSignals(True)  
 
         for snpOpts in snappingsOptions:
             QgsProject.instance().setSnapSettingsForLayer(snpOpts['layerid'], int(snpOpts['enabled']),
@@ -108,7 +109,8 @@ class SnappingConfigManager():
                                                           float(snpOpts['tolerance']), int(snpOpts['avoidInt']))
 
         QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snapSettingsChanged.emit()  # update the gui
+        # Update the gui        
+        QgsProject.instance().snapSettingsChanged.emit()  
 
 
     def recoverSnappingOptions(self):

@@ -20,13 +20,15 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsMapLayer
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint
+from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor
 
 from parent_map_tool import ParentMapTool
 
 
 class DeleteNodeMapTool(ParentMapTool):
+    ''' Button 17. User select one node.
+    Execute SQL function: 'gw_fct_delete_node' '''    
 
     def __init__(self, iface, settings, action, index_action):  
         ''' Class constructor '''
@@ -83,12 +85,8 @@ class DeleteNodeMapTool(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
         
-        # With right click the digitizing is finished
-        if event.button() == 1 and self.current_layer is not None:
-
-            ''' Button 17. User select one node.
-            Execute SQL function 'gw_fct_delete_node'
-            Show warning (if any) '''
+        # With left click the digitizing is finished
+        if event.button() == Qt.LeftButton and self.current_layer is not None:
 
             # Get selected features and layer type: 'node'
             feature = self.snappFeat
@@ -96,7 +94,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_delete_node"
-            sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
             status = self.controller.execute_sql(sql)
             if status:
                 self.controller.show_info("Node deleted successfully")

@@ -20,15 +20,16 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint   
-from PyQt4.QtGui import QColor   
+from PyQt4.QtCore import QPoint, Qt 
+from PyQt4.QtGui import QColor
 
 from parent_map_tool import ParentMapTool
 
 
 class MincutMapTool(ParentMapTool):
     ''' Button 26. User select one node or arc.
-    SQL function fills 3 temporary tables with id's: node_id, arc_id and valve_id
+    Execute SQL function: 'gw_fct_mincut'
+    This function fills 3 temporary tables with id's: node_id, arc_id and valve_id
     Returns and integer: error code
     Get these id's and select them in its corresponding layers '''    
 
@@ -92,9 +93,9 @@ class MincutMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
+        ''' With left click the digitizing is finished '''
         
-        # With right click the digitizing is finished
-        if event.button() == 1 and self.current_layer is not None:
+        if event.button() == Qt.LeftButton and self.current_layer is not None:
 
             # Get selected layer type: 'arc' or 'node'
             if self.current_layer.name() == self.layer_arc.name():
@@ -102,7 +103,7 @@ class MincutMapTool(ParentMapTool):
             elif self.current_layer.name() == self.layer_node.name():
                 elem_type = 'node'
             else:
-                print "not valid"
+                self.controller.show_warning("Current layer not valid")
                 return
 
             feature = self.snappFeat
