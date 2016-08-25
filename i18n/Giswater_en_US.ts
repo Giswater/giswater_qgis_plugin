@@ -164,7 +164,41 @@
 	<message>
         <source>99_text</source>
         <translation>Project configuration</translation>
-    </message>    
+    </message>   
+    
+	<message>
+        <source>Select the node and move to desired location</source>
+        <translation>(ENGLISH) Select the node and move to desired location</translation>
+    </message>  
+    <message>
+        <source>current_layer_changed:</source>
+        <translation>(ENGLISH) current_layer_changed:</translation>
+    </message>   
+    <message>
+        <source>has been checked (ws_generic)</source>
+        <translation>(ENGLISH) has been checked (ws_generic)</translation>
+    </message>  
+    <message>
+        <source>AttributeError:</source>
+        <translation>(ENGLISH) AttributeError:</translation>
+    </message>
+    <message>
+        <source>KeyError:</source>
+        <translation>(ENGLISH) KeyError:</translation>
+    </message> 
+    <message>
+        <source>has been checked</source>
+        <translation>(ENGLISH) has been checked</translation>
+    </message>
+    <message>
+        <source>has been checked (mg_generic)</source>
+        <translation>(ENGLISH) has been checked (mg_generic)</translation>
+    </message> 
+    <message>
+        <source>has been unchecked (mg_generic)</source>
+        <translation>(ENGLISH) has been unchecked (mg_generic)</translation>
+    </message>      
+    
   
 </context>
 
@@ -805,6 +839,11 @@
         <translation>RTC:</translation>
     </message> 
     
+    <message>
+        <source>Selected date interval is not valid</source>
+        <translation>(ENGLISH) Selected date interval is not valid</translation>
+    </message>
+    
 </context>    
 
 
@@ -1000,7 +1039,14 @@
     <message>
         <source>label_log</source>
         <translation>Log:</translation>
-    </message>  
+    </message> 
+    
+     <message>
+        <source>Selected date interval is not valid</source>
+        <translation>(ENGLISH) Selected date interval is not valid</translation>
+    </message>
+    
+     
     
 </context>  
 
@@ -1214,6 +1260,12 @@
         <source>label_hydrometer</source>
         <translation>Hydrometer:</translation>
     </message>   
+    
+    <message>
+        <source>Selected date interval is not valid</source>
+        <translation>(ENGLISH) Selected date interval is not valid</translation>
+    </message>
+    
     
 </context> 
 
@@ -2019,6 +2071,9 @@
         <source>label_scada</source>
         <translation>Scada:</translation>
     </message>
+
+    
+    
     
 </context>
 
@@ -2556,6 +2611,7 @@
         <source>label_iptu</source>
         <translation>IPTU:</translation>
     </message>
+
     
 </context>  
 
@@ -2894,6 +2950,21 @@
         <source>label_catalog_id</source>
         <translation>Catalog</translation>
     </message>
+    
+    <message>
+        <source>You have to select at least one feature!</source>
+        <translation>(ENGLISH) You have to select at least one feature!</translation>
+    </message>
+    <message>
+        <source>More than one feature selected. Only the first one will be processed!</source>
+        <translation>(ENGLISH) More than one feature selected. Only the first one will be processed!</translation>
+    </message>
+    <message>
+        <source>Node type has been update!</source>
+        <translation>(ENGLISH) Node type has been update!</translation>
+    </message>
+    
+    
 
 </context>
 
@@ -2966,6 +3037,11 @@
         <source>label_audit_function_control</source>
         <translation>Audit function control</translation>
     </message>
+    
+    <message>
+        <source>Values has been updated</source>
+        <translation>(ENGLISH) Values has been updated</translation>
+    </message>
 
 </context>
 
@@ -3022,6 +3098,20 @@
         <source>label_rotation</source>
         <translation>Rotation</translation>
     </message>
+    
+    <message>
+        <source>You have to select at least one feature!</source>
+        <translation>(ENGLISH) You have to select at least one feature!</translation>
+    </message>
+    <message>
+        <source>More than one feature selected. Only the first one will be processed!</source>
+        <translation>(ENGLISH) More than one feature selected. Only the first one will be processed!</translation>
+    </message>
+    <message>
+        <source>Are you sure you want change the data?</source>
+        <translation>(ENGLISH) Are you sure you want change the data?</translation>
+    </message>
+    
 
 </context>
 
@@ -3042,6 +3132,25 @@
         <source>label_link</source>
         <translation>Link</translation>
     </message>
+    
+    <message>
+        <source>You have to select at least one feature!</source>
+        <translation>(ENGLISH) You have to select at least one feature!</translation>
+    </message>
+    <message>
+        <source>More than one feature selected. Only the first one will be processed!</source>
+        <translation>(ENGLISH) More than one feature selected. Only the first one will be processed!</translation>
+    </message>
+    <message>
+        <source>Values has been updated</source>
+        <translation>(ENGLISH) Values has been updated</translation>
+    </message>
+    <message>
+        <source>Are you sure you want change the data?</source>
+        <translation>(ENGLISH) Are you sure you want change the data?</translation>
+    </message>
+    
+    
 
 </context>
 
@@ -3061,6 +3170,47 @@
     <message>
         <source>label_delimeter</source>
         <translation>Delimiter</translation>
+    </message>
+    
+    <message>
+        <source>Select CSV file</source>
+        <translation>(ENGLISH) Select CSV file</translation>
+    </message>
+    <message>
+        <source>Selected file not found:</source>
+        <translation>(ENGLISH) Selected file not found:</translation>
+    </message>
+    <message>
+        <source>Cannot import CSV into table</source>
+        <translation>(ENGLISH) Cannot import CSV into table</translation>
+    </message>
+    <message>
+        <source>. Reason:</source>
+        <translation>(ENGLISH). Reason:</translation>
+    </message>
+    <message>
+        <source>Import CSV</source>
+        <translation>(ENGLISH) Import CSV</translation>
+    </message>
+    <message>
+        <source>Selected CSV has been imported successfully</source>
+        <translation>(ENGLISH) Selected CSV has been imported successfully</translation>
+    </message>
+    <message>
+        <source>Java Runtime executable file not found at:</source>
+        <translation>(ENGLISH) Java Runtime executable file not found at:</translation>
+    </message>
+    <message>
+        <source>Giswater executable file not found at:</source>
+        <translation>(ENGLISH) Giswater executable file not found at:</translation>
+    </message>
+    <message>
+        <source>GSW file not found at:</source>
+        <translation>(ENGLISH) GSW file not found at:</translation>
+    </message>
+    <message>
+        <source>Executing...</source>
+        <translation>(ENGLISH) Executing...</translation>
     </message>
 
 </context>
@@ -3090,6 +3240,15 @@
         <source>check_node_sink</source>
         <translation>     Sink node identifier (only for ud projects)</translation>
     </message>
+    
+    <message>
+        <source>Selected functions have been executed</source>
+        <translation>(ENGLISH) Selected functions have been executed</translation>
+    </message>
+    <message>
+        <source>You have to select at least one feature!</source>
+        <translation>(ENGLISH) You have to select at least one feature!</translation>
+    </message>
 
 </context>
 
@@ -3107,6 +3266,81 @@
         <translation>Result name (to compare)</translation>
     </message>
 
+</context>
+
+
+<context>
+
+    <name>move_node</name>
+    
+    <message>
+        <source>Uncatched error. Open PotgreSQL log file to get more details</source>
+        <translation>(ENGLISH) Uncatched error. Open PotgreSQL log file to get more details</translation>
+    </message>
+    <message>
+        <source>Node moved successfully</source>
+        <translation>(ENGLISH) Node moved successfully</translation>
+    </message>
+    <message>
+        <source>Node already related with 2 arcs</source>
+        <translation>(ENGLISH) Node already related with 2 arcs</translation>
+    </message>
+    <message>
+        <source>Move node: Error updating geometry</source>
+        <translation>(ENGLISH) Move node: Error updating geometry</translation>
+    </message>
+    <message>
+        <source>Select the node and move to desired location</source>
+        <translation>(ENGLISH) Select the node and move to desired location</translation>
+    </message>
+
+</context>
+
+
+<context>
+
+    <name>mincut_map</name>
+    
+    <message>
+        <source>Uncatched error. Open PotgreSQL log file to get more details</source>
+        <translation>(ENGLISH) Uncatched error. Open PotgreSQL log file to get more details</translation>
+    </message>
+    <message>
+        <source>Parametrize error type 1</source>
+        <translation>(ENGLISH) Parametrize error type 1</translation>
+    </message>
+    <message>
+        <source>Undefined error</source>
+        <translation>(ENGLISH) Undefined error</translation>
+    </message>
+    <message>
+        <source>Expression Error:</source>
+        <translation>(ENGLISH) Expression Error:</translation>
+    </message>
+
+</context>
+
+
+<context>
+
+    <name>line_map</name>
+    
+    <message>
+        <source>Feature not valid</source>
+        <translation>(ENGLISH) Feature not valid</translation>
+    </message>
+    <message>
+        <source>The geometry of the feature you just added isn't valid. Do you want to use it anyway?</source>
+        <translation>(ENGLISH) The geometry of the feature you just added isn't valid. Do you want to use it anyway?</translation>
+    </message>
+    <message>
+        <source>"PostgreSQL error:"</source>
+        <translation>(ENGLISH) "PostgreSQL error:"</translation>
+    </message>
+    <message>
+        <source>Error adding PIPE: Typically this occurs if\n the first point is not located in a existing\n node or feature is out of the defined sectors.</source>
+        <translation>(ENGLISH) Error adding PIPE: Typically this occurs if\n the first point is not located in a existing\n node or feature is out of the defined sectors.</translation>
+    </message>
 
 </context>
 
