@@ -12,10 +12,11 @@ class PointMapTool(QgsMapTool):
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
         self.index_action = index_action
+        self.controller = controller
         self.srid = srid
         self.elem_type_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type_type')
-        self.dao = controller.dao  
         self.schema_name = controller.schema_name  
+        self.dao = controller.dao
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')          
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action) 
@@ -52,6 +53,8 @@ class PointMapTool(QgsMapTool):
                 if row:
                     last_id = row[0]
                 return last_id 
+            else:
+                self.controller.show_info("Any record found in table 'cat_node' related with selected 'node_type.type'")
     
     
     ''' QgsMapTools inherited event functions '''
@@ -69,7 +72,7 @@ class PointMapTool(QgsMapTool):
         # Insert new node into selected point. Open its feature form
         last_id = self.insert_node(int(self.point.x()), int(self.point.y()))  
         if last_id != -1:
-            filter_expr = "node_id = "+str(last_id)    
+            filter_expr = "node_id = '"+str(last_id)+"'"    
             expr = QgsExpression(filter_expr)
             f_request = QgsFeatureRequest(expr)
             f_iterator = layer.getFeatures(f_request)

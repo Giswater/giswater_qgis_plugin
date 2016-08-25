@@ -98,6 +98,10 @@ class PgDao():
             return status 
 
 
+    def get_rowcount(self):        
+        return self.cursor.rowcount      
+ 
+ 
     def commit(self):
         self.conn.commit()
         
