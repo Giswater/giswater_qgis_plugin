@@ -73,8 +73,6 @@ CREATE TABLE SCHEMA_NAME.db_cat_clientlayer (
 );
 
 
-ALTER TABLE SCHEMA_NAME.db_cat_table ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SCHEMA_NAME.db_cat_view ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SCHEMA_NAME.db_cat_columns ADD FOREIGN KEY ("db_cat_table_id") REFERENCES SCHEMA_NAME.db_cat_table ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 

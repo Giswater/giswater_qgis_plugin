@@ -29,8 +29,8 @@ CREATE TABLE SCHEMA_NAME.db_cat_table (
     name text NOT NULL,
     project_type text,
     context text,
-	db_cat_clientlayer_id int4,
-	description text
+    db_cat_clientlayer_id int4,
+    description text
 );
 
 
@@ -39,10 +39,10 @@ DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_view CASCADE;
 CREATE TABLE SCHEMA_NAME.db_cat_view (
     id int4 PRIMARY KEY,
     name text NOT NULL,
-	project_type text,
+    project_type text,
     context text,
-	db_cat_clientlayer_id int4,
-	description text
+    db_cat_clientlayer_id int4,
+    description text
 );
 
 
@@ -50,10 +50,10 @@ CREATE TABLE SCHEMA_NAME.db_cat_view (
 DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_columns CASCADE; 
 CREATE TABLE SCHEMA_NAME.db_cat_columns (
     id int4 PRIMARY KEY,
-	db_cat_table_id int4 NOT NULL,
+    db_cat_table_id int4 NOT NULL,
     column_name text NOT NULL,
-	column_type text,
-	description text
+    column_type text,
+    description text
 );
 
 
@@ -62,15 +62,9 @@ DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_clientlayer CASCADE;
 CREATE TABLE SCHEMA_NAME.db_cat_clientlayer (
     id int4 PRIMARY KEY,
     name text NOT NULL,
-	group_level_1 text,
-	group_level_2 text,
-	group_level_3 text,
-	description text
+    group_level_1 text,
+    group_level_2 text,
+    group_level_3 text,
+    description text
 );
-
-
-ALTER TABLE SCHEMA_NAME.db_cat_table ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SCHEMA_NAME.db_cat_view ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SCHEMA_NAME.db_cat_columns ADD FOREIGN KEY ("db_cat_table_id") REFERENCES SCHEMA_NAME.db_cat_table ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
 

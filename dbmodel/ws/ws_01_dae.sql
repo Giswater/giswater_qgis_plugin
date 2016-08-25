@@ -36,8 +36,8 @@ ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("adress_01") REFERENCES "SCH
 -- NO
 
 CREATE TABLE "SCHEMA_NAME"."ppoint" (
-"ppoint_id" varchar(30)   NOT NULL,
-"category_type" varchar(30)  ,
+"ppoint_id" varchar(30) NOT NULL,
+"category_type" varchar(50),
 "number" int4,
 "observ" character varying(512),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
@@ -45,8 +45,6 @@ CONSTRAINT prdistrict_pkey PRIMARY KEY (ppoint_id)
 );
 
 
-
-ALTER TABLE "SCHEMA_NAME"."ppoint" ADD FOREIGN KEY ("category_type") REFERENCES "SCHEMA_NAME"."man_type_category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- ALTER TABLE "SCHEMA_NAME"."node" ADD FOREIGN KEY ("adress_01") REFERENCES "SCHEMA_NAME"."ppoint" ("ppoint_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 -- ALTER TABLE "SCHEMA_NAME"."arc" ADD FOREIGN KEY ("adress_01") REFERENCES "SCHEMA_NAME"."ppoint" ("ppoint_id") ON DELETE RESTRICT ON UPDATE CASCADE;

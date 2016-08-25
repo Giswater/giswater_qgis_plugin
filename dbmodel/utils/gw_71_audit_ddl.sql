@@ -51,16 +51,9 @@ CREATE TABLE IF NOT EXISTS SCHEMA_NAME.audit_function_actions (
 );
 
 
-ALTER TABLE SCHEMA_NAME.audit_function_actions ADD FOREIGN KEY ("audit_cat_error_id") 
-REFERENCES SCHEMA_NAME.audit_cat_error ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SCHEMA_NAME.audit_function_actions ADD FOREIGN KEY ("audit_cat_function_id") 
-REFERENCES SCHEMA_NAME.audit_cat_function ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-
 DROP VIEW IF EXISTS SCHEMA_NAME.v_audit_functions;
 CREATE VIEW SCHEMA_NAME.v_audit_functions AS 
 SELECT tstamp, audit_cat_error.id, audit_cat_error.error_message, audit_cat_error.hint_message, audit_cat_error.log_level, audit_cat_error.show_user, user_name, addr, debug_info
 FROM SCHEMA_NAME.audit_function_actions INNER JOIN SCHEMA_NAME.audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id
 ORDER BY audit_function_actions.id DESC;
-
 
