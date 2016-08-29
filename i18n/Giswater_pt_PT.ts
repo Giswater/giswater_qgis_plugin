@@ -159,19 +159,19 @@
     </message>      
     <message>
         <source>19_text</source>
-        <translation>Edição link</translation>
+        <translation>Topology toolbox</translation>
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Assistente tabelas</translation>
+        <translation>Ferramenta conexões</translation>
     </message>      
     <message>
         <source>21_text</source>
-        <translation>Assistente desfazer</translation>
+        <translation>Import CSV</translation>
     </message>      
     <message>
         <source>22_text</source>
-        <translation>Seleção resultados</translation>
+        <translation>Assistente desfazer</translation>
     </message>      
     <message>
         <source>23_text</source>
@@ -183,7 +183,7 @@
     </message>      
     <message>
         <source>25_text</source>
-        <translation>Ferramenta conexões</translation>
+        <translation>Seleção resultados</translation>
     </message>      
     <message>
         <source>26_text</source>
@@ -193,7 +193,46 @@
         <source>27_text</source>
         <translation>Valves configuration analysis</translation>
     </message>
-   
+    <message>
+        <source>28_text</source>
+        <translation>Change node type</translation>
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Insert measure instrument</translation>
+    </message>
+    <message>
+        <source>31_text</source>
+        <translation>Refresh data</translation>
+    </message>
+    <message>
+        <source>32_text</source>
+        <translation>Search plus</translation>
+    </message>
+    <message>
+        <source>33_text</source>
+        <translation>Add element</translation>
+    </message>
+    <message>
+        <source>34_text</source>
+        <translation>Add file</translation>
+    </message>
+    <message>
+        <source>35_text</source>
+        <translation>Event</translation>
+    </message>
+	<message>
+        <source>36_text</source>
+        <translation>Giswater</translation>
+    </message>
+	<message>
+        <source>37_text</source>
+        <translation>Help</translation>
+    </message>
+	<message>
+        <source>99_text</source>
+        <translation>Project configuration</translation>
+    </message>
 </context>
 
 

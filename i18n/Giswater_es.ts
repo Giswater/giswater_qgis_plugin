@@ -146,42 +146,42 @@
         <source>16_text</source>
         <translation>Move unconnected node to split a pipe</translation>
     </message>
-    <message>
+ <message>
         <source>17_text</source>
         <translation>Delete node in pipe midpoint</translation>
-    </message>      
+    </message>
     <message>
         <source>18_text</source>
         <translation>Capture raster elevation</translation>
-    </message>      
+    </message>
     <message>
         <source>19_text</source>
-        <translation>Edit arc</translation>
-    </message>      
+        <translation>Topology toolbox</translation>
+    </message>
     <message>
         <source>20_text</source>
-        <translation>Table wizard</translation>
-    </message>      
+        <translation>Connec tool</translation>
+    </message>
     <message>
         <source>21_text</source>
-        <translation>Undo wizard</translation>
-    </message>      
+        <translation>Import CSV</translation>
+    </message>
     <message>
         <source>22_text</source>
-        <translation>Result selector</translation>
-    </message>      
+        <translation>Undo wizard</translation>
+    </message>
     <message>
         <source>23_text</source>
         <translation>Go2Epa</translation>
-    </message>      
+    </message>
     <message>
         <source>24_text</source>
         <translation>Go2Epa express</translation>
-    </message>      
+    </message>
     <message>
         <source>25_text</source>
-        <translation>Connect tool</translation>
-    </message>      
+        <translation>Result selector</translation>
+    </message>
     <message>
         <source>26_text</source>
         <translation>Arc/Node minimum cut</translation>
@@ -190,7 +190,46 @@
         <source>27_text</source>
         <translation>Valves configuration analysis</translation>
     </message>
-   
+    <message>
+        <source>28_text</source>
+        <translation>Change node type</translation>
+    </message>
+    <message>
+        <source>29_text</source>
+        <translation>Insert measure instrument</translation>
+    </message>
+    <message>
+        <source>31_text</source>
+        <translation>Refresh data</translation>
+    </message>
+    <message>
+        <source>32_text</source>
+        <translation>Search plus</translation>
+    </message>
+    <message>
+        <source>33_text</source>
+        <translation>Add element</translation>
+    </message>
+    <message>
+        <source>34_text</source>
+        <translation>Add file</translation>
+    </message>
+    <message>
+        <source>35_text</source>
+        <translation>Event</translation>
+    </message>
+	<message>
+        <source>36_text</source>
+        <translation>Giswater</translation>
+    </message>
+	<message>
+        <source>37_text</source>
+        <translation>Help</translation>
+    </message>
+	<message>
+        <source>99_text</source>
+        <translation>Project configuration</translation>
+    </message>
 </context>
 
 
