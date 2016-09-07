@@ -54,34 +54,30 @@ BEGIN
             VALUES (p_audit_cat_error_id, p_audit_cat_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
         END IF;
 
-        -- function and trigger function trace log
-        IF p_audit_cat_error_id >= 1 AND p_audit_cat_error_id < 99 THEN 
+        -- log_level of type 'INFO' or 'SUCCESS'
+        IF audit_cat_error_rec.log_level = 0 OR audit_cat_error_rec.log_level = 3 THEN 
             RETURN p_audit_cat_error_id;
 
-        -- trigger function return
-        ELSIF (p_audit_cat_error_id >= 100 AND p_audit_cat_error_id < 500) AND audit_cat_error_rec.log_level=0 THEN
-            SELECT 'WNG:'||id::text||' - '||error_message INTO message_rec FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id;   
-            SELECT * INTO function_rec FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE NOTICE '[%]:Procedure', function_rec.name USING HINT = message_rec;
+        -- log_level of type 'WARNING' (mostly applied to functions)
+        ELSIF audit_cat_error_rec.log_level = 1 THEN
+            SELECT 'WNG['||id||'] - '||error_message||'. '||CASE WHEN hint_message IS NULL THEN '' ELSE hint_message END INTO message_rec 
+            FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id;   
+            SELECT * INTO function_rec 
+            FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
+            RAISE WARNING 'Function [%]', function_rec.name USING HINT = message_rec;
             RETURN p_audit_cat_error_id;
         
-        -- trigger function return        
-        ELSIF (p_audit_cat_error_id >= 100 AND p_audit_cat_error_id < 500) AND audit_cat_error_rec.log_level=1 THEN
-            SELECT 'ERR:'||id::text||' - '||error_message||'. '||hint_message INTO message_rec FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id;   
-            SELECT * INTO function_rec FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
-            RAISE EXCEPTION '[%]:Procedure', function_rec.name USING HINT = message_rec;
-            RETURN p_audit_cat_error_id;
+        -- log_level of type 'ERROR' (mostly applied to trigger functions) 
+        ELSIF audit_cat_error_rec.log_level = 2 THEN
+            SELECT 'ERR['||id||'] - '||error_message||'. '||CASE WHEN hint_message IS NULL THEN '' ELSE hint_message END INTO message_rec 
+            FROM audit_cat_error WHERE audit_cat_error.id=p_audit_cat_error_id;   
+            SELECT * INTO function_rec 
+            FROM audit_cat_function WHERE audit_cat_function.id=p_audit_cat_function_id; 
+            RAISE EXCEPTION 'Function [%]', function_rec.name USING HINT = message_rec;
         
-        -- function return        
-        ELSIF p_audit_cat_error_id >= 501 AND p_audit_cat_error_id < 998 THEN
-            RETURN p_audit_cat_error_id;
-        
-        -- No errors
-        ELSE
-            RETURN 0;
         END IF;
 
-        EXCEPTION WHEN foreign_key_violation THEN
+    EXCEPTION WHEN foreign_key_violation THEN
         INSERT INTO audit_function_actions (audit_cat_error_id, audit_cat_function_id, debug_info, query, user_name, addr) 
         VALUES (999, p_audit_cat_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
         RETURN 999;
