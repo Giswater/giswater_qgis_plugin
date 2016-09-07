@@ -1,9 +1,12 @@
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_vnode_update() RETURNS trigger AS
-$BODY$
 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_vnode_update() RETURNS trigger AS $BODY$
 DECLARE
-
     connecPoint geometry;
     arcPoint geometry;
     linkrec record;
@@ -19,7 +22,7 @@ BEGIN
         -- Update link
         connecPoint := (SELECT the_geom FROM connec WHERE connec_id = linkrec.connec_id);
         UPDATE link 
-	    SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
+        SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
 
     END LOOP;
 
@@ -33,7 +36,6 @@ BEGIN
     RETURN NEW;
 
 END;
-
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

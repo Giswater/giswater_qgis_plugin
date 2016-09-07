@@ -5,9 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_searchnodes()
-  RETURNS trigger AS
-$BODY$DECLARE 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_searchnodes() RETURNS trigger AS $BODY$
+DECLARE 
     nodeRecord1 record; 
     nodeRecord2 record; 
     rec record;  
@@ -21,10 +20,9 @@ BEGIN
     
     -- Get data from config table
     SELECT * INTO rec FROM config;  
-
     
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
-	ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
     SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
@@ -39,36 +37,36 @@ BEGIN
         -- Control of same node initial and final
         IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
             RETURN audit_function (180,120);
+        
         ELSE
-		
             -- Update coordinates
             NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
             NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
             NEW.node_1:= nodeRecord1.node_id; 
             NEW.node_2:= nodeRecord2.node_id;
 
-	    -- 	Update vnode/link
+        -- Update vnode/link
 
-			IF TG_OP = 'UPDATE' THEN
+            IF TG_OP = 'UPDATE' THEN
 
-				-- Select arcs with start-end on the updated node
-				FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
-				LOOP
+                -- Select arcs with start-end on the updated node
+                FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
+                LOOP
 
-					-- Update vnode geometry
-					newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
-					UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+                    -- Update vnode geometry
+                    newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
+                    UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
 
-					-- Update link
-					connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
-					UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+                    -- Update link
+                    connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+                    UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
 
-				END LOOP; 
+                END LOOP; 
             END IF;
             RETURN NEW;
  
         END IF;
-		
+
     -- Check auto insert end nodes
     ELSIF (nodeRecord1.node_id IS NOT NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
 
@@ -93,14 +91,10 @@ BEGIN
         RETURN NEW;
 
     -- Error, no existing nodes
-		
-	ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
+    ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
         RETURN audit_function (182,330);
-        RETURN NULL;
-        
     ELSE
         RETURN audit_function (182,120);
-        RETURN NULL;
     END IF;
 
 END; 

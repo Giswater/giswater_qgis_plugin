@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_flow_trace(node_id_arg character varying) RETURNS int2 AS $BODY$
 DECLARE
  
@@ -12,8 +13,7 @@ BEGIN
     -- Compute the tributary area using DFS
     PERFORM "SCHEMA_NAME".gw_fct_flow_trace_recursive(node_id_arg);
 
-    RETURN 0;
-	RETURN SCHEMA_NAME.audit_function(0,730);
+    RETURN "SCHEMA_NAME".audit_function(0,730);
         
 END;
 $BODY$

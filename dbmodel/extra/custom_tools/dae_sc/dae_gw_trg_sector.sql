@@ -5,8 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".dae_gw_trg_sector() RETURNS trigger LANGUAGE plpgsql AS
-$BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".dae_gw_trg_sector() RETURNS trigger LANGUAGE plpgsql AS $BODY$
 DECLARE 
     v_sql varchar;
     geom_column varchar;
@@ -18,7 +17,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
     -- Dynamic SQL
-    v_sql := 'SELECT
+    v_sql:= 'SELECT
                  tc.table_name,
                  kcu.column_name
              FROM 
@@ -39,24 +38,14 @@ BEGIN
     LOOP
 
         -- Find the geometry column name
-        v_sql := 'SELECT f_geometry_column FROM geometry_columns WHERE f_table_schema=' || quote_literal(TG_TABLE_SCHEMA) || ' AND f_table_name=' || quote_literal(r.table_name); 
+        v_sql:= 'SELECT f_geometry_column FROM geometry_columns WHERE f_table_schema=' || quote_literal(TG_TABLE_SCHEMA) || ' AND f_table_name=' || quote_literal(r.table_name); 
         EXECUTE v_sql INTO geom_column;
 
-	-- Filter non geometric tables
-	IF geom_column IS NOT NULL AND (r.table_name != 'dma') THEN
+        -- Filter non geometric tables
+        IF geom_column IS NOT NULL AND (r.table_name != 'dma') THEN
 
-	    -- Check orphan
---            v_sql := 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM sector WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', sector.the_geom) LIMIT 1)=0';
-        
---	    EXECUTE v_sql INTO num_sectors;
-
---            IF num_sectors > 0 THEN
---                RAISE NOTICE 'num_sectors= %', num_sectors;        
---                -- RAISE EXCEPTION 'There are features in table % outside of the sector polygons', r.table_name;
---            END IF;
-
-            --Update sector id       
-            v_sql := 'UPDATE ' || quote_ident(r.table_name) || ' SET ' || quote_ident(r.column_name) || ' = (SELECT sector_id FROM sector WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', sector.the_geom) LIMIT 1)';
+            -- Update sector id       
+            v_sql:= 'UPDATE ' || quote_ident(r.table_name) || ' SET ' || quote_ident(r.column_name) || ' = (SELECT sector_id FROM sector WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', sector.the_geom) LIMIT 1)';
             EXECUTE v_sql;
 
         END IF;

@@ -5,12 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-
------------------------------
--- TRIGGERS EDITING VIEWS FOR NODE
------------------------------
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_node() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     node_table varchar;
@@ -29,7 +23,6 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
         RETURN audit_function(160,800); 
-        RETURN NEW;
 
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -61,10 +54,7 @@ BEGIN
 
 
     ELSIF TG_OP = 'DELETE' THEN
-   --   DELETE FROM node WHERE node_id = OLD.node_id;
-   --   EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||quote_literal(OLD.node_id);
         RETURN audit_function(163,800);
-        RETURN NULL;
     
     END IF;
        
@@ -87,7 +77,5 @@ FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_outfall',
 DROP TRIGGER IF EXISTS gw_trg_edit_inp_node_storage ON "SCHEMA_NAME".v_edit_inp_storage;
 CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_inp_storage 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_inp_node('inp_storage', 'STORAGE');
-
-
   
   

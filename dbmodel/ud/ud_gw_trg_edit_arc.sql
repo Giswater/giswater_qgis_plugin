@@ -5,8 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_arc() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     inp_table varchar;
@@ -19,7 +17,7 @@ BEGIN
     
     IF TG_OP = 'INSERT' THEN
       
-		-- Arc ID
+        -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
         END IF;
@@ -34,8 +32,8 @@ BEGIN
 
          -- Epa type
         IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
-		END IF;
+            NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
+        END IF;
         
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
@@ -75,11 +73,11 @@ BEGIN
             inp_table:= 'inp_conduit';
         ELSIF (NEW.epa_type = 'PUMP') THEN 
             inp_table:= 'inp_pump';
-		ELSIF (NEW.epa_type = 'ORIFICE') THEN 
-			inp_table:= 'inp_orifice';
-		ELSIF (NEW.epa_type = 'WEIR') THEN 
+        ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+            inp_table:= 'inp_orifice';
+        ELSIF (NEW.epa_type = 'WEIR') THEN 
             inp_table:= 'inp_weir';
-		ELSIF (NEW.epa_type = 'OUTLET') THEN 
+        ELSIF (NEW.epa_type = 'OUTLET') THEN 
             inp_table:= 'inp_outlet';
         END IF;
         v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
@@ -90,7 +88,7 @@ BEGIN
         v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
         EXECUTE v_sql;
         
-		PERFORM audit_function (1,760);
+        PERFORM audit_function (1,760);
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -104,30 +102,30 @@ BEGIN
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'CONDUIT') THEN 
-            inp_table:= 'inp_conduit';
-			ELSIF (OLD.epa_type = 'PUMP') THEN 
-            inp_table:= 'inp_pump';
-			ELSIF (OLD.epa_type = 'ORIFICE') THEN 
-			inp_table:= 'inp_orifice';
-			ELSIF (OLD.epa_type = 'WEIR') THEN 
-            inp_table:= 'inp_weir';
-			ELSIF (OLD.epa_type = 'OUTLET') THEN 
-            inp_table:= 'inp_outlet';
-			END IF;
+                inp_table:= 'inp_conduit';
+            ELSIF (OLD.epa_type = 'PUMP') THEN 
+                inp_table:= 'inp_pump';
+            ELSIF (OLD.epa_type = 'ORIFICE') THEN 
+                inp_table:= 'inp_orifice';
+            ELSIF (OLD.epa_type = 'WEIR') THEN 
+                inp_table:= 'inp_weir';
+            ELSIF (OLD.epa_type = 'OUTLET') THEN 
+                inp_table:= 'inp_outlet';
+            END IF;
             v_sql:= 'DELETE FROM '||inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
             EXECUTE v_sql;
 
-			IF (NEW.epa_type = 'CONDUIT') THEN 
-            inp_table:= 'inp_conduit';
-			ELSIF (NEW.epa_type = 'PUMP') THEN 
-			inp_table:= 'inp_pump';
-			ELSIF (NEW.epa_type = 'ORIFICE') THEN 
-			inp_table:= 'inp_orifice';
-			ELSIF (NEW.epa_type = 'WEIR') THEN 
-            inp_table:= 'inp_weir';
-			ELSIF (NEW.epa_type = 'OUTLET') THEN 
-            inp_table:= 'inp_outlet';
-			END IF;
+            IF (NEW.epa_type = 'CONDUIT') THEN 
+                inp_table:= 'inp_conduit';
+            ELSIF (NEW.epa_type = 'PUMP') THEN 
+                inp_table:= 'inp_pump';
+            ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+                inp_table:= 'inp_orifice';
+            ELSIF (NEW.epa_type = 'WEIR') THEN 
+                inp_table:= 'inp_weir';
+            ELSIF (NEW.epa_type = 'OUTLET') THEN 
+                inp_table:= 'inp_outlet';
+            END IF;
             v_sql:= 'INSERT INTO '||inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
             EXECUTE v_sql;
 
@@ -141,13 +139,13 @@ BEGIN
             rotation=NEW.rotation, link=NEW.link, est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE arc_id=OLD.arc_id;
 
-		PERFORM audit_function (2,760);
+        PERFORM audit_function (2,760);
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
 
-		PERFORM audit_function (3,760);
+        PERFORM audit_function (3,760);
         RETURN NULL;
      
      END IF;
