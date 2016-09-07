@@ -5,7 +5,9 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_trg_edit_arc"() RETURNS "pg_catalog"."trigger" AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_arc()
+  RETURNS trigger AS
+$BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
@@ -21,37 +23,39 @@ BEGIN
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
         END IF;
+
+        -- Arc type
+        IF (NEW.cat_arctype_id IS NULL) THEN
+            NEW.cat_arctype_id := (SELECT id FROM arc_type WHERE epa_default = 'PIPE');
+        END IF;
         
         -- Arc catalog ID
         IF (NEW.arccat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-                PERFORM audit_function(145,340); 
-                RETURN NULL;                
-            END IF; 
+                RETURN audit_function(145,340); 
+            END IF;
+            NEW.arccat_id := (SELECT id FROM cat_arc WHERE arctype_id = NEW.cat_arctype_id LIMIT 1);
         END IF;
         
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                PERFORM audit_function(130,340); 
-                RETURN NULL;                   
+                RETURN audit_function(130,340); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                PERFORM audit_function(130,340); 
-                RETURN NULL;                   
+                RETURN audit_function(130,340); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                PERFORM audit_function(130,340); 
+                RETURN audit_function(130,340); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                PERFORM audit_function(130,340); 
-                RETURN NULL;                   
+                RETURN audit_function(130,340); 
             END IF;
         END IF;
         
@@ -77,7 +81,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;
      
-        PERFORM audit_function(1,340); 
+		PERFORM audit_function(1,340); 
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -126,7 +130,8 @@ BEGIN
 
 END;
 $BODY$
-  LANGUAGE 'plpgsql' VOLATILE COST 100;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
   
 
 DROP TRIGGER IF EXISTS gw_trg_edit_arc ON "SCHEMA_NAME".v_edit_arc;
