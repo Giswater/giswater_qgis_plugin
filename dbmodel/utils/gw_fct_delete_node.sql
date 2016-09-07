@@ -80,11 +80,8 @@ BEGIN
                     myRecord1.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001));
                     myRecord1.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001));
 
-                    -- Delete previous node
-                    DELETE FROM node WHERE node_id = node_id_arg;
-
                     -- Insert new record
-                    INSERT INTO arc SELECT myRecord1.*;
+                    UPDATE arc SET node_1 = myRecord1.node_1, node_2 = myRecord1.node_2, the_geom = myRecord1.the_geom WHERE arc_id = myRecord1.arc_id;
                     
                 ELSE
                     -- Create a new arc
@@ -92,13 +89,13 @@ BEGIN
                     myRecord2.node_1 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_StartPoint(arc_geom), node.the_geom, 0.001));
                     myRecord2.node_2 := (SELECT node_id FROM node WHERE  ST_DWithin(ST_EndPoint(arc_geom), node.the_geom, 0.001));
 
-                    -- Delete previous node
-                    DELETE FROM node WHERE node_id = node_id_arg;
-
                     -- Insert new record
-                    INSERT INTO arc SELECT myRecord2.*;
+                    UPDATE arc SET node_1 = myRecord2.node_1, node_2 = myRecord2.node_2, the_geom = myRecord2.the_geom WHERE arc_id = myRecord2.arc_id;
 
                 END IF;
+
+                -- Delete previous node
+                DELETE FROM node WHERE node_id = node_id_arg;
 
             -- Pipes has different types
             ELSE
