@@ -28,48 +28,42 @@ BEGIN
         -- Node type
         IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                PERFORM audit_function(105,380); 
-                RETURN NULL;                     
+                RETURN audit_function(105,380);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
         END IF;
 
          -- Epa type
         IF (NEW.epa_type IS NULL) THEN
-            NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
-        END IF;
+			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
+		END IF;
 
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                PERFORM audit_function(110,380);
-                RETURN NULL;                     
+                RETURN audit_function(110,380);  
             END IF;      
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                PERFORM audit_function(115,380);
-                RETURN NULL;                     
+                RETURN audit_function(115,380);  
             END IF;
             NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                PERFORM audit_function(120,380);
-                RETURN NULL;                     
+                RETURN audit_function(120,380);          
             END IF;            
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                PERFORM audit_function(125,380);  
-                RETURN NULL;                     
+                RETURN audit_function(125,380);  
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                PERFORM audit_function(130,380); 
-                RETURN NULL;                     
+                RETURN audit_function(130,380);  
             END IF;            
         END IF;
         
@@ -92,7 +86,8 @@ BEGIN
         END IF;
 
         -- MANAGEMENT INSERT
-        man_table:= (SELECT node_type.man_table FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id);
+        man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
+
         IF man_table IS NOT NULL THEN
             v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
             EXECUTE v_sql;
@@ -180,7 +175,10 @@ BEGIN
     
 END;
 $BODY$
-  LANGUAGE 'plpgsql' VOLATILE COST 100;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION gw_saa.gw_trg_edit_node()
+  OWNER TO postgres;
 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node ON "SCHEMA_NAME".v_edit_node;
