@@ -6,17 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_hydrometer AS
-SELECT
-ext_rtc_hydrometer.hydrometer_id,
-ext_rtc_hydrometer.cat_hydrometer_id,
-ext_cat_hydrometer.hydrometer_type,
-ext_cat_hydrometer.text2,
-ext_cat_hydrometer.text3,
-ext_rtc_hydrometer.text
-FROM "SCHEMA_NAME".ext_rtc_hydrometer
-LEFT JOIN "SCHEMA_NAME".ext_cat_hydrometer ON ext_cat_hydrometer.id = ext_rtc_hydrometer.cat_hydrometer_id;
-
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer AS 
+ SELECT ext_rtc_hydrometer.hydrometer_id, 
+    v_ext_urban_propierties.id as urban_propierties_id,
+    ext_rtc_hydrometer.cat_hydrometer_id, 
+    ext_cat_hydrometer.hydrometer_type, 
+    ext_cat_hydrometer.text2, 
+    ext_cat_hydrometer.text3, 
+    ext_rtc_hydrometer.text
+   FROM SCHEMA_NAME.ext_rtc_hydrometer
+   LEFT JOIN SCHEMA_NAME.ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
+   JOIN SCHEMA_NAME.rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id
+   LEFT JOIN SCHEMA_NAME.v_ext_urban_propierties ON v_ext_urban_propierties.connec_id::text = rtc_hydrometer_x_connec.connec_id::text;
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_scada_x_node AS 
