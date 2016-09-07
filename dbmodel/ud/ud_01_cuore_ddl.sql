@@ -391,7 +391,7 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 
 CREATE TABLE "SCHEMA_NAME"."connec_type" (
 "id" varchar(20) NOT NULL,
-"observ" varchar(50)
+"observ" varchar(50),
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
 

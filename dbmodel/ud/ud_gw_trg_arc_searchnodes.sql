@@ -17,6 +17,10 @@ DECLARE
 	z1 double precision;
 	z2 double precision;
 	z_aux double precision;
+	vnoderec Record;
+	newPoint public.geometry;    
+    connecPoint public.geometry;
+	
 	
 BEGIN 
 
@@ -73,19 +77,24 @@ BEGIN
 				RETURN NEW;
 			END IF;
 
--- Select arcs with start-end on the updated node
-            FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
-            LOOP
+ -- 	Update vnode/link
 
-                -- Update vnode geometry
-                newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
-                UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+			IF TG_OP = 'UPDATE' THEN
 
-                -- Update link
-                connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
-                UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+				-- Select arcs with start-end on the updated node
+				FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
+				LOOP
 
-            END LOOP; 
+					-- Update vnode geometry
+					newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
+					UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+
+					-- Update link
+					connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+					UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+
+				END LOOP; 
+            END IF;
 			RETURN NEW;
 		END IF;
 
@@ -123,13 +132,12 @@ BEGIN
 		RETURN audit_function (182,750);
 		RETURN NULL;
     END IF;
-END; 
+END;  
 $$;
 
 
 DROP TRIGGER IF EXISTS gw_trg_arc_searchnodes ON "SCHEMA_NAME"."arc";
 CREATE TRIGGER gw_trg_arc_searchnodes BEFORE INSERT OR UPDATE OF the_geom ON "SCHEMA_NAME"."arc" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_searchnodes"();
-
 
 

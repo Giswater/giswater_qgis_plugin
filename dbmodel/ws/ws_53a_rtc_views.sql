@@ -4,13 +4,19 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer_x_connec AS
-SELECT 
-connec_id,
-count(hydrometer_id)::integer as n_hydrometer
 
-FROM SCHEMA_NAME.rtc_hydrometer_x_connec
-group by connec_id;
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_hydrometer AS
+SELECT
+ext_rtc_hydrometer.hydrometer_id,
+ext_rtc_hydrometer.cat_hydrometer_id,
+ext_cat_hydrometer.hydrometer_type,
+ext_cat_hydrometer.text2,
+ext_cat_hydrometer.text3,
+ext_rtc_hydrometer.text
+FROM "SCHEMA_NAME".ext_rtc_hydrometer
+LEFT JOIN "SCHEMA_NAME".ext_cat_hydrometer ON ext_cat_hydrometer.id = ext_rtc_hydrometer.cat_hydrometer_id
+);
 
 
 

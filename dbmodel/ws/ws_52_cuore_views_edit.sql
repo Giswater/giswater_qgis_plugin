@@ -5,10 +5,18 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_ext_urban_propierties AS
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer_x_connec AS
 SELECT 
-ext_urban_propierties.id as connec_id, 
+connec_id,
+count(hydrometer_id)::integer as n_hydrometer
+
+FROM SCHEMA_NAME.rtc_hydrometer_x_connec
+group by connec_id;
+
+
+
+CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_connec AS
+SELECT connec.connec_id, 
 connec.elevation, 
 connec.depth, 
 connec.connecat_id,
@@ -46,11 +54,10 @@ cat_connec.svg AS "cat_svg",
 connec.rotation,
 connec.link,
 connec.verified,
-ext_urban_propierties.the_geom
+connec.the_geom
 FROM ("SCHEMA_NAME".connec
-JOIN "SCHEMA_NAME".ext_urban_propierties ON (((connec.code)::text = (ext_urban_propierties.code)::text))
-JOIN "SCHEMA_NAME".v_rtc_hydrometer_x_connec ON (((connec.connec_id)::text = (v_rtc_hydrometer_x_connec.connec_id)::text))
 JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
+LEFT JOIN "SCHEMA_NAME".v_rtc_hydrometer_x_connec ON (((connec.connec_id)::text = (v_rtc_hydrometer_x_connec.connec_id)::text))
 LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
 LEFT JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
 LEFT JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id

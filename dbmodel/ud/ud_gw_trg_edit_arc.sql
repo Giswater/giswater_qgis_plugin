@@ -60,7 +60,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(130,760); 
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(130,760); 
             END IF;

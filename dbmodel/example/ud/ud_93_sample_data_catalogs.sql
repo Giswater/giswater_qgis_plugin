@@ -103,7 +103,7 @@ INSERT INTO cat_owner VALUES ('OWNER NO DATA', NULL, NULL, NULL);
 -- ----------------------------
 -- Records of cat_soil
 -- ----------------------------
-INSERT INTO cat_soil VALUES ('SOIL NO DATA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_soil VALUES ('SOIL NO DATA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 -- ----------------------------

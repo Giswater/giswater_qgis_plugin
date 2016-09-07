@@ -7,8 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_searchnodes()
   RETURNS trigger AS
-$BODY$
-DECLARE 
+$BODY$DECLARE 
     nodeRecord1 record; 
     nodeRecord2 record; 
     rec record;  
@@ -21,8 +20,9 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Get data from config table
-    SELECT * INTO rec FROM config;    
+    SELECT * INTO rec FROM config;  
 
+    
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
 	ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
@@ -47,19 +47,24 @@ BEGIN
             NEW.node_1:= nodeRecord1.node_id; 
             NEW.node_2:= nodeRecord2.node_id;
 
-            -- Select arcs with start-end on the updated node
-            FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
-            LOOP
+	    -- 	Update vnode/link
 
-                -- Update vnode geometry
-                newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
-                UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+			IF TG_OP = 'UPDATE' THEN
 
-                -- Update link
-                connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
-                UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+				-- Select arcs with start-end on the updated node
+				FOR vnoderec IN SELECT * FROM vnode WHERE ST_DWithin(OLD.the_geom, the_geom, 0.01)
+				LOOP
 
-            END LOOP; 
+					-- Update vnode geometry
+					newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
+					UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
+
+					-- Update link
+					connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+					UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+
+				END LOOP; 
+            END IF;
             RETURN NEW;
  
         END IF;

@@ -177,8 +177,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION gw_saa.gw_trg_edit_node()
-  OWNER TO postgres;
 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node ON "SCHEMA_NAME".v_edit_node;

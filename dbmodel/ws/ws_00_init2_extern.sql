@@ -184,7 +184,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data_seq"
 
 CREATE TABLE "SCHEMA_NAME".ext_cat_hydrometer(
 "id" character varying(16) NOT NULL,
-"text1" character varying(100),
+"hydrometer_type" character varying(100),
 "text2" character varying(100),
 "text3" character varying(100),
 "link" varchar(512),
