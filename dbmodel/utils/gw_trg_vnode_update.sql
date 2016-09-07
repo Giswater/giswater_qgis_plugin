@@ -35,6 +35,6 @@ $BODY$
 
   
 DROP TRIGGER IF EXISTS gw_trg_vnode_update ON "SCHEMA_NAME"."vnode";
-CREATE TRIGGER gw_trg_vnode_update AFTER UPDATE ON "SCHEMA_NAME"."vnode"
+CREATE TRIGGER gw_trg_vnode_update AFTER UPDATE OF the_geom ON "SCHEMA_NAME"."vnode"
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_vnode_update"();
 
