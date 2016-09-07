@@ -29,9 +29,12 @@ CREATE TABLE "SCHEMA_NAME"."ext_streetaxis" (
 CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 );
 
+-- Postnumber layer is not needed because connec acts as postnumber
+
 
 
 -- Urban_structure
+
 
 CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
 "id" varchar (16) NOT NULL,
@@ -41,9 +44,14 @@ CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
 "complement" varchar(16),
 "placement" varchar(16),
 "square" varchar(16),
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"observ" text,
+"text" text,
+"the_geom" public.geometry (POLYGON, SRID_VALUE),
 CONSTRAINT ext_urban_propierties_pkey PRIMARY KEY (id)
 );
+
+
+
 
 
 
@@ -52,11 +60,11 @@ CONSTRAINT ext_urban_propierties_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "SCHEMA_NAME".ext_cat_period (
-  "id" character varying(16) NOT NULL,
-  "starttime" timestamp (6) without time zone,
-  "endtime" timestamp (6) without time zone,
-  "period_seconds" integer,
-  "comment" character varying(100),
+  id character varying(16) NOT NULL,
+  starttime timestamp (6) without time zone,
+  endtime timestamp (6) without time zone,
+  period_seconds integer,
+  comment character varying(100),
   CONSTRAINT ext_cat_period_pkey PRIMARY KEY (id)
 );
 

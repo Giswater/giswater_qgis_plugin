@@ -4,6 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer_x_connec AS
+SELECT 
+connec_id,
+count(hydrometer_id)::integer as n_hydrometer
+
+FROM SCHEMA_NAME.rtc_hydrometer_x_connec
+group by connec_id;
+
 
 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_scada_x_node AS 

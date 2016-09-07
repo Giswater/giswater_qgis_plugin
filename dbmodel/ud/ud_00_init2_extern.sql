@@ -29,20 +29,24 @@ CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 );
 
 
+-- Postnumber layer is not needed because connec acts as postnumber
 
 
 -- Urban_structure
 
 
+
 CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
-"id" varchar (50) NOT NULL,
-"code" varchar(50),
+"id" varchar (16) NOT NULL,
+"code" varchar(30),
 "streetaxis" varchar(16),
 "postnumber" varchar(16),
 "complement" varchar(16),
 "placement" varchar(16),
 "square" varchar(16),
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"observ" text,
+"text" text,
+"the_geom" public.geometry (POLYGON, SRID_VALUE),
 CONSTRAINT ext_urban_propierties_pkey PRIMARY KEY (id)
 );
 
