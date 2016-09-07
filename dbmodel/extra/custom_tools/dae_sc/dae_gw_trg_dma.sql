@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".dae_gw_trg_dma() RETURNS trigger LANGUAGE plpgsql AS $BODY$
+
 DECLARE 
     v_sql varchar;
     geom_column varchar;
@@ -45,13 +46,13 @@ BEGIN
         IF geom_column IS NOT NULL THEN
 
             -- Check orphan
-            v_sql:= 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)=0';
-            EXECUTE v_sql INTO num_dmas;
+--            v_sql:= 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)=0';
+--            EXECUTE v_sql INTO num_dmas;
 
-            IF num_dmas > 0 THEN
-                RAISE NOTICE 'num_dmas= %', num_dmas;        
-                -- RAISE EXCEPTION 'There are features in table % outside of the dma polygons', r.table_name;
-            END IF;
+--            IF num_dmas > 0 THEN
+--                RAISE NOTICE 'num_dmas= %', num_dmas;        
+--                -- RAISE EXCEPTION 'There are features in table % outside of the dma polygons', r.table_name;
+--            END IF;
 
             -- Update dma id       
             v_sql:= 'UPDATE ' || quote_ident(r.table_name) || ' SET ' || quote_ident(r.column_name) || ' = (SELECT dma_id FROM dma WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', dma.the_geom) LIMIT 1)';
@@ -65,7 +66,6 @@ BEGIN
 
 END;
 $BODY$;
-
 
 CREATE TRIGGER dae_gw_trg_dma AFTER INSERT ON "SCHEMA_NAME"."dma"
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."dae_gw_trg_dma"();

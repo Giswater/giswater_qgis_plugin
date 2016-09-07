@@ -5,8 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".dae_gw_trg_sector()
-  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".dae_gw_trg_sector() RETURNS trigger LANGUAGE plpgsql AS
 $BODY$
 DECLARE 
     v_sql varchar;
@@ -47,14 +46,14 @@ BEGIN
 	IF geom_column IS NOT NULL AND (r.table_name != 'dma') THEN
 
 	    -- Check orphan
-            v_sql := 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM sector WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', sector.the_geom) LIMIT 1)=0';
+--            v_sql := 'SELECT COUNT(*) FROM ' || quote_ident(r.table_name) || ' WHERE (SELECT COUNT(*) FROM sector WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', sector.the_geom) LIMIT 1)=0';
         
-	    EXECUTE v_sql INTO num_sectors;
+--	    EXECUTE v_sql INTO num_sectors;
 
-            IF num_sectors > 0 THEN
-                RAISE NOTICE 'num_sectors= %', num_sectors;        
-                -- RAISE EXCEPTION 'There are features in table % outside of the sector polygons', r.table_name;
-            END IF;
+--            IF num_sectors > 0 THEN
+--                RAISE NOTICE 'num_sectors= %', num_sectors;        
+--                -- RAISE EXCEPTION 'There are features in table % outside of the sector polygons', r.table_name;
+--            END IF;
 
             --Update sector id       
             v_sql := 'UPDATE ' || quote_ident(r.table_name) || ' SET ' || quote_ident(r.column_name) || ' = (SELECT sector_id FROM sector WHERE ST_Intersects(' || quote_ident(r.table_name) || '.' || quote_ident(geom_column) || ', sector.the_geom) LIMIT 1)';
@@ -67,9 +66,7 @@ BEGIN
     RETURN NEW;
 
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$BODY$;
 
 
 CREATE TRIGGER dae_gw_trg_sector AFTER INSERT ON "SCHEMA_NAME"."sector"
