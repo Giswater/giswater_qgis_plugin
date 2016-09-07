@@ -91,8 +91,8 @@ v_arc_x_node2.z2,
 v_arc_x_node1.geom1,
 v_arc_x_node1.r1,
 v_arc_x_node2.r2,
-(CASE WHEN ((((((100)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_node2.elev2 + v_arc_x_node2.z2))))::double precision / (1+public.st_length(arc.the_geom)))>100)) THEN null::numeric(6,2)
-ELSE (((((100)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_node2.elev2 + v_arc_x_node2.z2))))::double precision / (1+public.st_length(arc.the_geom))))::numeric(6,2) END) AS slope,
+(CASE WHEN ((((((1)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_node2.elev2 + v_arc_x_node2.z2))))::double precision / (public.st_length(arc.the_geom)))>1)) THEN null::numeric(6,4)
+ELSE (((((1)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_node2.elev2 + v_arc_x_node2.z2))))::double precision / (public.st_length(arc.the_geom))))::numeric(6,4) END) AS slope,
 arc."state", 
 arc.sector_id, 
 arc.the_geom
