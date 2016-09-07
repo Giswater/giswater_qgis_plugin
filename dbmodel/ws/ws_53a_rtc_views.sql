@@ -15,8 +15,7 @@ ext_cat_hydrometer.text2,
 ext_cat_hydrometer.text3,
 ext_rtc_hydrometer.text
 FROM "SCHEMA_NAME".ext_rtc_hydrometer
-LEFT JOIN "SCHEMA_NAME".ext_cat_hydrometer ON ext_cat_hydrometer.id = ext_rtc_hydrometer.cat_hydrometer_id
-);
+LEFT JOIN "SCHEMA_NAME".ext_cat_hydrometer ON ext_cat_hydrometer.id = ext_rtc_hydrometer.cat_hydrometer_id;
 
 
 
