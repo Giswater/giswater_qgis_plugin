@@ -23,10 +23,7 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing nodes  
-        DROP TABLE IF EXISTS table_holder;
-        CREATE TEMP TABLE table_holder AS SELECT * FROM node WHERE  ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity);
-        numNodes:= (SELECT COUNT(*) FROM table_holder WHERE table_holder.node_id != NEW.node_id);
-
+       numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id);
     END IF;
 
     -- If there is an existing node closer than 'rec.node_tolerance' meters --> error

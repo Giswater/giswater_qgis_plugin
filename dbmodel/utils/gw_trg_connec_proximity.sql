@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_proximity() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
-    numNodes numeric;
+    numConnecs numeric;
     rec record;
 
 BEGIN
@@ -19,18 +19,15 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         -- Existing connecs  
-        numNodes:= (SELECT COUNT(*) FROM connec WHERE connec.the_geom && ST_Expand(NEW.the_geom, rec.connec_proximity));
+        numConnecs:= (SELECT COUNT(*) FROM connec WHERE connec.the_geom && ST_Expand(NEW.the_geom, rec.connec_proximity));
 
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing connecs  
-        DROP TABLE IF EXISTS table_holder;
-        CREATE TEMP TABLE table_holder AS SELECT * FROM connec WHERE  ST_DWithin(NEW.the_geom, connec.the_geom, rec.connec_proximity);
-        numNodes:= (SELECT COUNT(*) FROM table_holder WHERE table_holder.connec_id != NEW.connec_id);
-
+       numConnecs := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(NEW.the_geom, connec.the_geom, rec.connec_proximity) AND connec.connec_id != NEW.connec_id);
     END IF;
 
     -- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
-    IF (numNodes > 0) AND (rec.connec_proximity_control IS TRUE) THEN
+    IF (numConnecs > 0) AND (rec.connec_proximity_control IS TRUE) THEN
         PERFORM audit_function (185,130);
         RETURN NULL;
     END IF;
