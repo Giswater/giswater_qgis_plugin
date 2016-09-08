@@ -449,24 +449,24 @@ class Giswater(QObject):
                                          
         # Set layer custom UI form and init function   
         if self.layer_arc is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_arc.ui')
-            file_init = os.path.join(self.plugin_dir, 'ws_arc_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_arc_init.py')                     
             self.layer_arc.editFormConfig().setUiForm(file_ui) 
             self.layer_arc.editFormConfig().setInitCodeSource(1)
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
-                                    
+         
         if self.layer_node is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_node.ui')
-            file_init = os.path.join(self.plugin_dir, 'ws_node_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_node_init.py')       
             self.layer_node.editFormConfig().setUiForm(file_ui) 
             self.layer_node.editFormConfig().setInitCodeSource(1)
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')                         
                                     
         if self.layer_connec is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', 'ws_connec.ui')
-            file_init = os.path.join(self.plugin_dir, 'ws_connec_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_connec_init.py')       
             self.layer_connec.editFormConfig().setUiForm(file_ui) 
             self.layer_connec.editFormConfig().setInitCodeSource(1)
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           

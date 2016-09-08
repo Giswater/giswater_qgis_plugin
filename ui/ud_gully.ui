@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="tabWidget_2">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -1018,6 +1018,70 @@
      </property>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab_18">
+    <attribute name="title">
+     <string>Add. info</string>
+    </attribute>
+    <widget class="QLabel" name="label_elements_2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Elements:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_element">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>761</width>
+       <height>366</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_element_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>30</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink element</string>
+     </property>
+    </widget>
+   </widget>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
      <string>Document</string>
@@ -1163,7 +1227,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="doc_event">
+    <widget class="QComboBox" name="doc_type">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1200,16 +1264,6 @@
        <y>70</y>
        <width>111</width>
        <height>20</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_12">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
       </rect>
      </property>
     </widget>
@@ -1293,6 +1347,29 @@
      </property>
      <property name="margin">
       <number>3</number>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_document">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_doc_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>120</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink document</string>
      </property>
     </widget>
    </widget>
@@ -1820,7 +1897,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
+  <widget class="QLineEdit" name="gully_id">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -1833,7 +1910,7 @@
     <string>gully_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_38">
+  <widget class="QLineEdit" name="cat_grate_type">
    <property name="geometry">
     <rect>
      <x>270</x>
@@ -1852,7 +1929,7 @@
     <string>cat_grate.type</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_35">
+  <widget class="QLineEdit" name="cat_grate_matcat">
    <property name="geometry">
     <rect>
      <x>400</x>
@@ -1870,7 +1947,7 @@
     <string>cat_grate.matcat_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_34">
+  <widget class="QLineEdit" name="units">
    <property name="geometry">
     <rect>
      <x>540</x>
@@ -1898,7 +1975,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_22">
+  <widget class="QComboBox" name="arccat_id">
    <property name="geometry">
     <rect>
      <x>680</x>
@@ -1913,7 +1990,7 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="comboBox_23">
+  <widget class="QComboBox" name="gratecat_id">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -1946,7 +2023,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="groove">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -1959,7 +2036,7 @@
     <string>Groove</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_2">
+  <widget class="QCheckBox" name="siphon">
    <property name="geometry">
     <rect>
      <x>250</x>
