@@ -10,8 +10,6 @@ CREATE OR REPLACE VIEW "SCHEMA_NAME".v_ext_urban_propierties AS
 SELECT
     ext_urban_propierties.id,
     connec.connec_id, 
-    connec.elevation, 
-    connec.depth, 
     connec.connecat_id, 
     cat_connec.type AS cat_connectype_id, 
     cat_connec.matcat_id AS cat_matcat_id, 

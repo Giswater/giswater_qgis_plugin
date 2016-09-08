@@ -5,10 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node() RETURNS "pg_catalog"."trigger" AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node() RETURNS trigger AS 
+$BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
+	new_man_table varchar;
+	old_man_table varchar;
     v_sql varchar;
     old_nodetype varchar;
     new_nodetype varchar;
@@ -105,6 +108,7 @@ BEGIN
         NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
     END IF;
 
+    -- UPDATE EPA values
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'JUNCTION') THEN
@@ -142,10 +146,23 @@ BEGIN
                 v_sql:= 'INSERT INTO '||inp_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
                 EXECUTE v_sql;
             END IF;
-
         END IF;
 
-        IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) THEN  
+    -- UPDATE management values
+		IF (NEW.node_type <> OLD.node_type) THEN 
+			new_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
+			old_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
+			IF new_man_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||old_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
+				EXECUTE v_sql;
+				v_sql:= 'INSERT INTO '||new_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+				EXECUTE v_sql;
+				NEW.nodecat_id:= (SELECT id FROM cat_node WHERE nodetype_id=NEW.node_type LIMIT 1);
+			END IF;
+		END IF;
+
+	-- Node catalog restriction
+        IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) AND (NEW.node_type=OLD.node_type) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
@@ -153,6 +170,8 @@ BEGIN
             END IF;
         END IF;
 
+
+	-- UPDATE values
         UPDATE node 
         SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
@@ -177,7 +196,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
 
 DROP TRIGGER IF EXISTS gw_trg_edit_node ON "SCHEMA_NAME".v_edit_node;
 CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_node

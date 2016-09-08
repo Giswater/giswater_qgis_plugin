@@ -58,6 +58,7 @@ CREATE TABLE "SCHEMA_NAME"."config_search_plus" (
 "ppoint_field_number" varchar (30),
 "urban_propierties_layer" varchar (30),
 "urban_propierties_field_pzone" varchar (30),
+"urban_propierties_field_block" varchar (30),
 "urban_propierties_field_number" varchar (30),
 "street_layer" varchar (30),
 "street_field_code" varchar (30),

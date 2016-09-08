@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 
    
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node()
-  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_node() RETURNS trigger AS
 $BODY$
 DECLARE 
     inp_table varchar;
     man_table varchar;
+    new_man_table varchar;
+    old_man_table varchar;
     v_sql varchar;
     old_nodetype varchar;
     new_nodetype varchar;
@@ -144,6 +145,17 @@ BEGIN
 
         END IF;
 
+    -- UPDATE management values
+		IF (NEW.node_type <> OLD.node_type) THEN 
+			new_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
+			old_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
+			IF new_man_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||old_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
+				EXECUTE v_sql;
+				v_sql:= 'INSERT INTO '||new_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+				EXECUTE v_sql;
+			END IF;
+		END IF;
 
         UPDATE node 
         SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 

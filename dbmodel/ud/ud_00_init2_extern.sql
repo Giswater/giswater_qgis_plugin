@@ -46,7 +46,7 @@ CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
 "square" varchar(16),
 "observ" text,
 "text" text,
-"the_geom" public.geometry (POLYGON, SRID_VALUE),
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT ext_urban_propierties_pkey PRIMARY KEY (id)
 );
 
