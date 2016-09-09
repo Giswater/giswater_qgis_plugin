@@ -170,6 +170,9 @@ class Giswater(QObject):
             elif int(index_action) == 16:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)
+            elif int(index_action) in (1, 2, 4, 5, 3):
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             elif int(index_action) in (10, 11, 12, 14, 15, 8, 29):
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
