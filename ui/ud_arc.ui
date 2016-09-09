@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
-    <height>585</height>
+    <width>830</width>
+    <height>615</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>845</width>
-    <height>585</height>
+    <width>830</width>
+    <height>615</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>845</width>
-    <height>585</height>
+    <height>615</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
     <rect>
      <x>10</x>
      <y>50</y>
-     <width>820</width>
+     <width>801</width>
      <height>481</height>
     </rect>
    </property>
@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -7109,9 +7109,9 @@
   <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
-     <x>750</x>
+     <x>740</x>
      <y>540</y>
-     <width>65</width>
+     <width>71</width>
      <height>20</height>
     </rect>
    </property>
@@ -7140,7 +7140,7 @@
   <widget class="QLineEdit" name="custom_length">
    <property name="geometry">
     <rect>
-     <x>630</x>
+     <x>620</x>
      <y>540</y>
      <width>111</width>
      <height>20</height>
@@ -7158,7 +7158,7 @@
   <widget class="QLabel" name="label_text_information">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>530</x>
      <y>540</y>
      <width>81</width>
      <height>22</height>
@@ -7210,7 +7210,7 @@
   <widget class="QLineEdit" name="cat_matcat_id">
    <property name="geometry">
     <rect>
-     <x>570</x>
+     <x>550</x>
      <y>20</y>
      <width>91</width>
      <height>20</height>
@@ -7228,7 +7228,7 @@
   <widget class="QLineEdit" name="cat_geom1">
    <property name="geometry">
     <rect>
-     <x>790</x>
+     <x>770</x>
      <y>20</y>
      <width>41</width>
      <height>20</height>
@@ -7249,7 +7249,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>670</x>
+     <x>650</x>
      <y>20</y>
      <width>111</width>
      <height>20</height>
@@ -7269,7 +7269,7 @@
     <rect>
      <x>260</x>
      <y>20</y>
-     <width>171</width>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
@@ -7277,7 +7277,7 @@
   <widget class="QComboBox" name="epa_type">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>420</x>
      <y>20</y>
      <width>121</width>
      <height>20</height>
@@ -7366,6 +7366,32 @@
    </property>
    <property name="text">
     <string>Inverted slope</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_close">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>570</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_accept">
+   <property name="geometry">
+    <rect>
+     <x>660</x>
+     <y>570</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Accept</string>
    </property>
   </widget>
  </widget>
