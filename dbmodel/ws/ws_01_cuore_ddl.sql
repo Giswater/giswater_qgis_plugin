@@ -11,57 +11,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Sequences
 -- --------------------------
 
-CREATE SEQUENCE "SCHEMA_NAME"."version_seq"
+CREATE SEQUENCE "version_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."cat_node_seq"
+CREATE SEQUENCE "cat_node_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."cat_arc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE "SCHEMA_NAME"."node_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "SCHEMA_NAME"."arc_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "SCHEMA_NAME"."connec_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "SCHEMA_NAME"."vnode_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "SCHEMA_NAME"."link_seq"
+CREATE SEQUENCE "cat_arc_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -69,7 +33,35 @@ CREATE SEQUENCE "SCHEMA_NAME"."link_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."element_seq"
+CREATE SEQUENCE "node_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "arc_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "connec_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "vnode_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "link_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -77,7 +69,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."element_x_arc_seq"
+CREATE SEQUENCE "element_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -85,14 +77,22 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_x_arc_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."element_x_node_seq"
+CREATE SEQUENCE "element_x_arc_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."element_x_connec_seq"
+
+CREATE SEQUENCE "element_x_node_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "element_x_connec_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -107,7 +107,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."element_x_connec_seq"
 -- ----------------------------
 
  
-CREATE TABLE "SCHEMA_NAME"."arc_type" (
+CREATE TABLE "arc_type" (
 "id" varchar(18)   NOT NULL,
 "type" varchar(18)   NOT NULL,
 "epa_default" varchar(18)   NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE "SCHEMA_NAME"."arc_type" (
 CONSTRAINT arc_type_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."node_type" (
+CREATE TABLE "node_type" (
 "id" varchar(18)   NOT NULL,
 "type" varchar(18)   NOT NULL,
 "epa_default" varchar(18)   NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE "SCHEMA_NAME"."node_type" (
 CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."element_type" (
+CREATE TABLE "element_type" (
 "id" varchar(18)   NOT NULL,
 "event_table" varchar(18)   NOT NULL,
 CONSTRAINT element_type_pkey PRIMARY KEY (id)
@@ -140,7 +140,7 @@ CONSTRAINT element_type_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_mat_arc" (
+CREATE TABLE "cat_mat_arc" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
 "roughness" numeric(12,4),
@@ -150,7 +150,7 @@ CREATE TABLE "SCHEMA_NAME"."cat_mat_arc" (
 CONSTRAINT cat_mat_arc_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."cat_mat_node" (
+CREATE TABLE "cat_mat_node" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
 "roughness" numeric(12,4),
@@ -160,7 +160,7 @@ CREATE TABLE "SCHEMA_NAME"."cat_mat_node" (
 CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."cat_arc" (
+CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "arctype_id" varchar(16)  ,
 "matcat_id" varchar(30)  ,
@@ -187,7 +187,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_node" (
+CREATE TABLE "cat_node" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
 "nodetype_id" varchar(16)  ,
 "matcat_id" varchar(30)  ,
@@ -207,7 +207,7 @@ CONSTRAINT cat_node_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_mat_element" (
+CREATE TABLE "cat_mat_element" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
@@ -217,7 +217,7 @@ CONSTRAINT cat_mat_element_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_element" (
+CREATE TABLE "cat_element" (
 "id" varchar(30)   NOT NULL,
 "elementtype_id" varchar(30)  ,
 "matcat_id" varchar(30)  ,
@@ -231,7 +231,7 @@ CONSTRAINT cat_element_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_connec" (
+CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
 "type" varchar(16)  ,
 "matcat_id" varchar(16)  ,
@@ -247,7 +247,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_soil" (
+CREATE TABLE "cat_soil" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512),
 "link" varchar(512),
@@ -264,7 +264,7 @@ CONSTRAINT cat_soil_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_builder" (
+CREATE TABLE "cat_builder" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
@@ -274,7 +274,7 @@ CONSTRAINT cat_builder_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_work" (
+CREATE TABLE "cat_work" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
@@ -283,7 +283,7 @@ CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_owner" (
+CREATE TABLE "cat_owner" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
@@ -293,7 +293,7 @@ CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."cat_pavement" (
+CREATE TABLE "cat_pavement" (
 id varchar (18),
 "descript" text,
 "link" varchar(512)  ,
@@ -304,7 +304,7 @@ id varchar (18),
  );
  
  
- CREATE TABLE "SCHEMA_NAME"."cat_press_zone" (
+ CREATE TABLE "cat_press_zone" (
 id varchar (18),
 "descript" text,
 "link" varchar(512)  ,
@@ -319,28 +319,28 @@ id varchar (18),
 -----------
 
 
-CREATE TABLE "SCHEMA_NAME"."man_type_category" (
+CREATE TABLE "man_type_category" (
 "id" varchar(50) NOT NULL,
 "observ" varchar(50),
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_type_fluid" (
+CREATE TABLE "man_type_fluid" (
 "id" varchar(50) NOT NULL,
 "observ" varchar(50),
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_type_location" (
+CREATE TABLE "man_type_location" (
 "id" varchar(50) NOT NULL,
 "observ" varchar(50),
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."connec_type" (
+CREATE TABLE "connec_type" (
 "id" varchar(50) NOT NULL,
 "observ" varchar(50),
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
@@ -352,14 +352,14 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 -- Table: GIS features
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."sector" (
+CREATE TABLE "sector" (
 "sector_id" varchar(30) NOT NULL,
 "descript" varchar(100),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."node" (
+CREATE TABLE "node" (
 "node_id" varchar(16) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -393,7 +393,7 @@ CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."arc" (
+CREATE TABLE "arc" (
 "arc_id" varchar(16) NOT NULL,
 "node_1" varchar(16)  ,
 "node_2" varchar(16)  ,
@@ -427,7 +427,7 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."dma" (
+CREATE TABLE "dma" (
 "dma_id" varchar(30) NOT NULL,
 "sector_id" varchar(30),
 "presszonecat_id" varchar(30),
@@ -439,7 +439,7 @@ CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."connec" (
+CREATE TABLE "connec" (
 "connec_id" varchar (16) DEFAULT nextval('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -475,7 +475,7 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."vnode" (
+CREATE TABLE "vnode" (
 "vnode_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".vnode_seq'::regclass) NOT NULL,
 "arc_id" varchar(16),
 "userdefined_pos" bool,
@@ -488,7 +488,7 @@ CONSTRAINT "vnode_pkey" PRIMARY KEY ("vnode_id")
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."link" (
+CREATE TABLE "link" (
 link_id varchar (16) DEFAULT nextval('"SCHEMA_NAME".link_seq'::regclass) NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
 connec_id varchar(16),
@@ -503,14 +503,14 @@ CONSTRAINT link_pkey PRIMARY KEY (link_id)
 -- Table: Add info of GIS feature 
 -- -----------------------------------
 
-CREATE TABLE "SCHEMA_NAME"."man_junction" (
+CREATE TABLE "man_junction" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
 CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_tank" (
+CREATE TABLE "man_tank" (
 "node_id" varchar(16)   NOT NULL,
 "vmax" numeric (12,4),
 "area" numeric (12,4),
@@ -519,14 +519,14 @@ CONSTRAINT man_tank_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_hydrant" (
+CREATE TABLE "man_hydrant" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
 CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_valve" (
+CREATE TABLE "man_valve" (
 "node_id" varchar(16) NOT NULL,
 "type" varchar(30),
 "opened" boolean DEFAULT true,
@@ -539,28 +539,28 @@ CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_pump" (
+CREATE TABLE "man_pump" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
 CONSTRAINT man_pump_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_filter" (
+CREATE TABLE "man_filter" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
 CONSTRAINT man_filter_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_meter" (
+CREATE TABLE "man_meter" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
 CONSTRAINT man_meter_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."man_pipe" (
+CREATE TABLE "man_pipe" (
 "arc_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
 CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
@@ -572,7 +572,7 @@ CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
 -- Table: Element
 -- ----------------------------------
 
-CREATE TABLE "SCHEMA_NAME"."element" (
+CREATE TABLE "element" (
 "element_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_seq'::regclass) NOT NULL,
 "elementcat_id" varchar(30)  ,
 "state" character varying(16) NOT NULL,
@@ -592,7 +592,7 @@ CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."element_x_arc" (
+CREATE TABLE "element_x_arc" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_arc_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "arc_id" varchar(16),
@@ -600,7 +600,7 @@ CONSTRAINT element_x_arc_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."element_x_node" (
+CREATE TABLE "element_x_node" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_node_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "node_id" varchar(16),
@@ -608,7 +608,7 @@ CONSTRAINT element_x_node_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."element_x_connec" (
+CREATE TABLE "element_x_connec" (
 "id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_x_connec_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "connec_id" varchar(16),
@@ -620,14 +620,14 @@ CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 -- Table: value domain
 -- ----------------------------------
 
-CREATE TABLE "SCHEMA_NAME"."value_state" (
+CREATE TABLE "value_state" (
 "id" varchar(16) NOT NULL,
 "observ" varchar(254),
  CONSTRAINT value_state_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."value_verified" (
+CREATE TABLE "value_verified" (
 "id" varchar(16) NOT NULL,
 "observ" varchar(254),
  CONSTRAINT value_verified_pkey PRIMARY KEY (id)
@@ -645,7 +645,7 @@ CREATE TABLE "SCHEMA_NAME"."value_yesno" (
 -- ----------------------------------
 
 
-CREATE TABLE "SCHEMA_NAME"."man_selector_valve" (
+CREATE TABLE "man_selector_valve" (
 "id" varchar(50) NOT NULL,
  CONSTRAINT man_selector_valve_pkey PRIMARY KEY (id)
 );
@@ -656,11 +656,11 @@ CREATE TABLE "SCHEMA_NAME"."man_selector_valve" (
 -- SPATIAL INDEX
 ----------------
 
-CREATE INDEX arc_index ON "SCHEMA_NAME".arc USING GIST (the_geom);
-CREATE INDEX node_index ON "SCHEMA_NAME".node USING GIST (the_geom);
-CREATE INDEX dma_index ON "SCHEMA_NAME".dma USING GIST (the_geom);
-CREATE INDEX sector_index ON "SCHEMA_NAME".sector USING GIST (the_geom);
-CREATE INDEX connec_index ON "SCHEMA_NAME".connec USING GIST (the_geom);
-CREATE INDEX vnode_index ON "SCHEMA_NAME".vnode USING GIST (the_geom);
-CREATE INDEX link_index ON "SCHEMA_NAME".link USING GIST (the_geom);
+CREATE INDEX arc_index ON arc USING GIST (the_geom);
+CREATE INDEX node_index ON node USING GIST (the_geom);
+CREATE INDEX dma_index ON dma USING GIST (the_geom);
+CREATE INDEX sector_index ON sector USING GIST (the_geom);
+CREATE INDEX connec_index ON connec USING GIST (the_geom);
+CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
+CREATE INDEX link_index ON link USING GIST (the_geom);
 

@@ -31,11 +31,11 @@ ALTER TABLE "SCHEMA_NAME"."connec" ADD FOREIGN KEY ("adress_01") REFERENCES "SCH
 */
 
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- NO
 
-CREATE TABLE "SCHEMA_NAME"."ppoint" (
+CREATE TABLE "ppoint" (
 "ppoint_id" varchar(30) NOT NULL,
 "category_type" varchar(50),
 "number" int4,

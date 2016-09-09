@@ -4,34 +4,20 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- temporals
 -- ----------------------------
 
-CREATE SEQUENCE "SCHEMA_NAME"."temp_node_seq"
+CREATE SEQUENCE "temp_node_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."temp_arc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE "SCHEMA_NAME"."temp_arcnodearc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "SCHEMA_NAME"."temp_nodearcnode_seq"
+CREATE SEQUENCE "temp_arc_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -39,7 +25,22 @@ CREATE SEQUENCE "SCHEMA_NAME"."temp_nodearcnode_seq"
     CACHE 1;
 
 
-CREATE TABLE "SCHEMA_NAME"."temp_node" (
+CREATE SEQUENCE "temp_arcnodearc_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "temp_nodearcnode_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE TABLE "temp_node" (
 "node_id" varchar(16)   NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -58,7 +59,7 @@ CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."temp_arc" (
+CREATE TABLE "temp_arc" (
 "arc_id" varchar(16)   NOT NULL,
 "node_1" varchar(16)  ,
 "node_2" varchar(16)  ,
@@ -78,7 +79,7 @@ CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."temp_nodearcnode" (
+CREATE TABLE "temp_nodearcnode" (
 node_id varchar(16)  ,
 arc_id varchar(16)  ,
 node_2 varchar(16)  ,
@@ -86,7 +87,7 @@ CONSTRAINT temp_nodearcnode_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."temp_arcnodearc" (
+CREATE TABLE "temp_arcnodearc" (
 node_id varchar(16)  ,
 arc_1 varchar(16)  ,
 arc_2 varchar(16)  ,
@@ -99,112 +100,112 @@ CONSTRAINT temp_arcnodearc_pkey PRIMARY KEY (node_id)
 -- Sequence structure
 -- ----------------------------
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_backdrop_id_seq"
+CREATE SEQUENCE "inp_backdrop_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_controls_id_seq"
+CREATE SEQUENCE "inp_controls_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_curve_id_seq"
+CREATE SEQUENCE "inp_curve_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_demand_id_seq"
+CREATE SEQUENCE "inp_demand_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_labels_id_seq"
+CREATE SEQUENCE "inp_labels_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_pattern_id_seq"
+CREATE SEQUENCE "inp_pattern_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_rules_id_seq"
+CREATE SEQUENCE "inp_rules_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_sector_id_seq"
+CREATE SEQUENCE "inp_sector_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_vertice_id_seq"
+CREATE SEQUENCE "inp_vertice_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_arc_id_seq"
+CREATE SEQUENCE "rpt_arc_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_energy_usage_id_seq"
+CREATE SEQUENCE "rpt_energy_usage_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_hydraulic_status_id_seq"
+CREATE SEQUENCE "rpt_hydraulic_status_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_node_id_seq"
+CREATE SEQUENCE "rpt_node_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodearcnode_seq"
+CREATE SEQUENCE "rpt_nodearcnode_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_arcnodearc_seq"
+CREATE SEQUENCE "rpt_arcnodearc_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_cat_result_id_seq"
+CREATE SEQUENCE "rpt_cat_result_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -217,19 +218,19 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_cat_result_id_seq"
 -- Table structure INP
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."inp_arc_type" (
+CREATE TABLE "inp_arc_type" (
 "id" varchar(16)   NOT NULL,
 CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_node_type" (
+CREATE TABLE "inp_node_type" (
 "id" varchar(16)   NOT NULL,
 CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_giswater_config" (
+CREATE TABLE "inp_giswater_config" (
 "id" varchar(16) NOT NULL,
 "giswater_file_path" text,
 "giswater_software_path" text,
@@ -241,20 +242,20 @@ CONSTRAINT inp_giswater_config_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_backdrop" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_backdrop_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_backdrop" (
+"id" int4 DEFAULT nextval('"".inp_backdrop_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_controls" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_controls_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_controls" (
+"id" int4 DEFAULT nextval('"".inp_controls_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_curve" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_curve" (
+"id" int4 DEFAULT nextval('"".inp_curve_id_seq'::regclass) NOT NULL,
 "curve_id" varchar(16)   NOT NULL,
 "x_value" numeric(12,4),
 "y_value" numeric(12,4),
@@ -262,14 +263,14 @@ CONSTRAINT inp_curve_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_curve_id" (
+CREATE TABLE "inp_curve_id" (
 "id" varchar(16)   NOT NULL,
 "curve_type" varchar(20)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_demand" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_demand_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_demand" (
+"id" int4 DEFAULT nextval('"".inp_demand_id_seq'::regclass) NOT NULL,
 "node_id" varchar(16)   NOT NULL,
 "demand" numeric(12,6),
 "pattern_id" varchar(16)  ,
@@ -277,13 +278,13 @@ CREATE TABLE "SCHEMA_NAME"."inp_demand" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_emitter" (
+CREATE TABLE "inp_emitter" (
 "node_id" varchar(16)   NOT NULL,
 "coef" numeric
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_energy_el" (
+CREATE TABLE "inp_energy_el" (
 "id" int4 NOT NULL,
 "pump_id" varchar(16)  ,
 "parameter" varchar(20)  ,
@@ -292,7 +293,7 @@ CONSTRAINT inp_energy_el_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_energy_gl" (
+CREATE TABLE "inp_energy_gl" (
 "id" int4 NOT NULL,
 "energ_type" varchar(18)  ,
 "parameter" varchar(20)  ,
@@ -301,15 +302,15 @@ CONSTRAINT inp_energy_gl_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_junction" (
+CREATE TABLE "inp_junction" (
 "node_id" varchar(16)   NOT NULL,
 "demand" numeric(12,6),
 "pattern_id" varchar(16)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_label" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_labels_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_label" (
+"id" int4 DEFAULT nextval('"".inp_labels_id_seq'::regclass) NOT NULL,
 "xcoord" numeric(18,6),
 "ycoord" numeric(18,6),
 "label" varchar(50)  ,
@@ -317,14 +318,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_label" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_mixing" (
+CREATE TABLE "inp_mixing" (
 "node_id" varchar(16)   NOT NULL,
 "mix_type" varchar(18)  ,
 "value" numeric
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_options" (
+CREATE TABLE "inp_options" (
 "units" varchar(20)   NOT NULL,
 "headloss" varchar(20)  ,
 "hydraulics" varchar(12)  ,
@@ -348,8 +349,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_options" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_pattern" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_pattern_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_pattern" (
+"id" int4 DEFAULT nextval('"".inp_pattern_id_seq'::regclass) NOT NULL,
 "pattern_id" varchar(16)   NOT NULL,
 "factor_1" numeric(12,4),
 "factor_2" numeric(12,4),
@@ -378,14 +379,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_pattern" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_pipe" (
+CREATE TABLE "inp_pipe" (
 "arc_id" varchar(16)   NOT NULL,
 "minorloss" numeric(12,6),
 "status" varchar(12)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_shortpipe" (
+CREATE TABLE "inp_shortpipe" (
 "node_id" varchar(16)   NOT NULL,
 "minorloss" numeric(12,6),
 "to_arc" varchar(16)  ,
@@ -394,14 +395,14 @@ CONSTRAINT inp_shortpipe_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_project_id" (
+CREATE TABLE "inp_project_id" (
 "title" varchar(254)  ,
 "author" varchar(50)  ,
 "date" varchar(12)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_pump" (
+CREATE TABLE "inp_pump" (
 "node_id" varchar(16)   NOT NULL,
 "power" varchar  ,
 "curve_id" varchar  ,
@@ -411,13 +412,13 @@ CREATE TABLE "SCHEMA_NAME"."inp_pump" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_quality" (
+CREATE TABLE "inp_quality" (
 "node_id" varchar(16)   NOT NULL,
 "initqual" numeric
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_reactions_el" (
+CREATE TABLE "inp_reactions_el" (
 "id" int4 NOT NULL,
 "parameter" varchar(20)   NOT NULL,
 "arc_id" varchar(16)  ,
@@ -427,7 +428,7 @@ CONSTRAINT inp_reactions_el_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_reactions_gl" (
+CREATE TABLE "inp_reactions_gl" (
 "id" int4 NOT NULL,
 "react_type" varchar(30)   NOT NULL,
 "parameter" varchar(20)  ,
@@ -436,7 +437,7 @@ CONSTRAINT inp_reactions_gl_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_report" (
+CREATE TABLE "inp_report" (
 "pagesize" numeric NOT NULL,
 "file" varchar(254)  ,
 "status" varchar(4)  ,
@@ -460,20 +461,20 @@ CREATE TABLE "SCHEMA_NAME"."inp_report" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_reservoir" (
+CREATE TABLE "inp_reservoir" (
 "node_id" varchar(16)   NOT NULL,
 "head" numeric(12,4),
 "pattern_id" varchar(16)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_rules" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_rules_id_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_rules" (
+"id" int4 DEFAULT nextval('"".inp_rules_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_source" (
+CREATE TABLE "inp_source" (
 "node_id" varchar(16)   NOT NULL,
 "sourc_type" varchar(18)  ,
 "quality" numeric(12,6),
@@ -481,14 +482,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_source" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_tags" (
+CREATE TABLE "inp_tags" (
 "object" varchar(18)  ,
 "node_id" varchar(16)   NOT NULL,
 "tag" varchar(50)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_tank" (
+CREATE TABLE "inp_tank" (
 "node_id" varchar(16)   NOT NULL,
 "initlevel" numeric(12,4),
 "minlevel" numeric(12,4),
@@ -499,7 +500,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_tank" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_times" (
+CREATE TABLE "inp_times" (
 "duration" varchar(10)   NOT NULL,
 "hydraulic_timestep" varchar(10)  ,
 "quality_timestep" varchar(10)  ,
@@ -513,7 +514,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_times" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_valve" (
+CREATE TABLE "inp_valve" (
 "node_id" varchar(16)   NOT NULL,
 "valv_type" varchar(18)  ,
 "pressure" numeric(12,4),
@@ -527,127 +528,127 @@ CREATE TABLE "SCHEMA_NAME"."inp_valve" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_energy" (
+CREATE TABLE "inp_typevalue_energy" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_pump" (
+CREATE TABLE "inp_typevalue_pump" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_reactions_gl" (
+CREATE TABLE "inp_typevalue_reactions_gl" (
 "id" varchar(30)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_source" (
+CREATE TABLE "inp_typevalue_source" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_valve" (
+CREATE TABLE "inp_typevalue_valve" (
 "id" varchar(18)   NOT NULL,
 "descript" varchar(50)  ,
 "meter" varchar(18)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_ampm" (
+CREATE TABLE "inp_value_ampm" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_curve" (
+CREATE TABLE "inp_value_curve" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_mixing" (
+CREATE TABLE "inp_value_mixing" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_noneall" (
+CREATE TABLE "inp_value_noneall" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_opti_headloss" (
+CREATE TABLE "inp_value_opti_headloss" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_opti_hyd" (
+CREATE TABLE "inp_value_opti_hyd" (
 "id" varchar(20)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_opti_qual" (
+CREATE TABLE "inp_value_opti_qual" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_opti_unbal" (
+CREATE TABLE "inp_value_opti_unbal" (
 "id" varchar(20)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_opti_units" (
+CREATE TABLE "inp_value_opti_units" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_param_energy" (
+CREATE TABLE "inp_value_param_energy" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_reactions_el" (
+CREATE TABLE "inp_value_reactions_el" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_reactions_gl" (
+CREATE TABLE "inp_value_reactions_gl" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_status_pipe" (
+CREATE TABLE "inp_value_status_pipe" (
 "id" varchar(18)   NOT NULL,
 CONSTRAINT inp_value_status_pipe_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_status_pump" (
+CREATE TABLE "inp_value_status_pump" (
 "id" varchar(18)   NOT NULL,
 CONSTRAINT inp_value_status_pump_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_status_valve" (
+CREATE TABLE "inp_value_status_valve" (
 "id" varchar(18)   NOT NULL,
 CONSTRAINT inp_value_status_valve_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_times" (
+CREATE TABLE "inp_value_times" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_yesno" (
+CREATE TABLE "inp_value_yesno" (
 "id" varchar(3)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_yesnofull" (
+CREATE TABLE "inp_value_yesnofull" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_plan" (
+CREATE TABLE "inp_value_plan" (
 "id" varchar(16)   NOT NULL,
 "observ" varchar(254)  
 
@@ -658,8 +659,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_value_plan" (
 -- Table structure for rpt
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."rpt_arc" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arc_id_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_arc" (
+"id" int4 DEFAULT nextval('"".rpt_arc_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "arc_id" varchar(16)  ,
 "length" numeric,
@@ -676,8 +677,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_arc" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_nodearcnode" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodearcnode_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_nodearcnode" (
+"id" int4 DEFAULT nextval('"".rpt_nodearcnode_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "elevation_1" numeric,
@@ -710,8 +711,8 @@ CONSTRAINT rpt_nodearc_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_arcnodearc" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arcnodearc_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_arcnodearc" (
+"id" int4 DEFAULT nextval('"".rpt_arcnodearc_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "arc_1" varchar(16)  ,
@@ -749,8 +750,8 @@ CONSTRAINT rpt_arcnodearc_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_energy_usage" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_energy_usage_id_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_energy_usage" (
+"id" int4 DEFAULT nextval('"".rpt_energy_usage_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16),
 "usage_fact" numeric,
@@ -762,16 +763,16 @@ CREATE TABLE "SCHEMA_NAME"."rpt_energy_usage" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_hydraulic_status" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_hydraulic_status" (
+"id" int4 DEFAULT nextval('"".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "time" varchar(10)  ,
 "text" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_node" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_node_id_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_node" (
+"id" int4 DEFAULT nextval('"".rpt_node_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)   NOT NULL,
 "elevation" numeric,
@@ -784,8 +785,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_node" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_cat_result" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_cat_result_id_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_cat_result" (
+"id" int4 DEFAULT nextval('"".rpt_cat_result_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "n_junction" numeric,
 "n_reservoir" numeric,
@@ -817,23 +818,23 @@ CREATE TABLE "SCHEMA_NAME"."rpt_cat_result" (
 -- Table structure for SELECTORS
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."rpt_selector_result" (
+CREATE TABLE "rpt_selector_result" (
 "result_id" varchar(16)   NOT NULL
 )WITH (OIDS=FALSE)
 ;
 
-CREATE TABLE "SCHEMA_NAME"."rpt_selector_compare" (
+CREATE TABLE "rpt_selector_compare" (
 "result_id" varchar(16)   NOT NULL
 )WITH (OIDS=FALSE)
 ;
 
-CREATE TABLE "SCHEMA_NAME"."inp_selector_sector" (
+CREATE TABLE "inp_selector_sector" (
 "sector_id" varchar(30)   NOT NULL
 )WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_selector_state" (
+CREATE TABLE "inp_selector_state" (
 "id" varchar(16)   NOT NULL,
 "observ" varchar(254)  ,
 CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
@@ -845,56 +846,56 @@ CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
 -- Primary Key structure
 -- ----------------------------
 
-ALTER TABLE "SCHEMA_NAME"."inp_backdrop" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_controls" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_curve_id" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_demand" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_emitter" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_junction" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_label" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_mixing" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD PRIMARY KEY ("units");
-ALTER TABLE "SCHEMA_NAME"."inp_pattern" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_pipe" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_project_id" ADD PRIMARY KEY ("title");
-ALTER TABLE "SCHEMA_NAME"."inp_pump" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_quality" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_report" ADD PRIMARY KEY ("pagesize");
-ALTER TABLE "SCHEMA_NAME"."inp_reservoir" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_rules" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_source" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_tags" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_tank" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_times" ADD PRIMARY KEY ("duration");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_energy" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_pump" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_reactions_gl" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_source" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_valve" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_ampm" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_curve" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_mixing" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_noneall" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_opti_headloss" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_opti_hyd" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_opti_qual" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_opti_unbal" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_opti_units" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_param_energy" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_reactions_el" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_reactions_gl" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_times" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_yesno" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_yesnofull" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_valve" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_selector_result" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_selector_compare" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_cat_result" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_arc" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_energy_usage" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_hydraulic_status" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_node" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_selector_sector" ADD PRIMARY KEY ("sector_id");
+ALTER TABLE "inp_backdrop" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_controls" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_curve_id" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_demand" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_emitter" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_junction" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_label" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_mixing" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_options" ADD PRIMARY KEY ("units");
+ALTER TABLE "inp_pattern" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_pipe" ADD PRIMARY KEY ("arc_id");
+ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
+ALTER TABLE "inp_pump" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_quality" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_report" ADD PRIMARY KEY ("pagesize");
+ALTER TABLE "inp_reservoir" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_rules" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_source" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_tags" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_tank" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_times" ADD PRIMARY KEY ("duration");
+ALTER TABLE "inp_typevalue_energy" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_pump" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_reactions_gl" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_source" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_valve" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_ampm" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_curve" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_mixing" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_noneall" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_opti_headloss" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_opti_hyd" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_opti_qual" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_opti_unbal" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_opti_units" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_param_energy" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_reactions_el" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_reactions_gl" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_times" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_yesno" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_yesnofull" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_valve" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "rpt_selector_result" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_selector_compare" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_cat_result" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_arc" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_energy_usage" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_hydraulic_status" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_node" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
 
 
 
@@ -902,6 +903,6 @@ ALTER TABLE "SCHEMA_NAME"."inp_selector_sector" ADD PRIMARY KEY ("sector_id");
 -- SPATIAL INDEX
 ----------------
 
-CREATE INDEX temp_arc_index ON "SCHEMA_NAME".temp_arc USING GIST (the_geom);
-CREATE INDEX temp_node_index ON "SCHEMA_NAME".temp_node USING GIST (the_geom);
+CREATE INDEX temp_arc_index ON temp_arc USING GIST (the_geom);
+CREATE INDEX temp_node_index ON temp_node USING GIST (the_geom);
 

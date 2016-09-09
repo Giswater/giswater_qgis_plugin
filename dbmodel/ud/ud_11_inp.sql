@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
   
 -- ----------------------------
 -- Sequence structure
 -- ----------------------------
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_adjustments_seq"
+CREATE SEQUENCE "inp_adjustments_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -21,15 +21,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_adjustments_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."inp_aquifer_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-  
-CREATE SEQUENCE "SCHEMA_NAME"."inp_backdrop_seq"
+CREATE SEQUENCE "inp_aquifer_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -37,7 +29,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_backdrop_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_controls_seq"
+CREATE SEQUENCE "inp_backdrop_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -45,14 +37,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_controls_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_curve_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-CREATE SEQUENCE "SCHEMA_NAME"."inp_dwf_seq"
+CREATE SEQUENCE "inp_controls_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -60,7 +45,14 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_dwf_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_files_seq"
+CREATE SEQUENCE "inp_curve_seq"
+  START WITH 1
+  INCREMENT BY 1
+  NO MINVALUE
+  NO MAXVALUE
+  CACHE 1;
+
+CREATE SEQUENCE "inp_dwf_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -68,7 +60,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_files_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_hydrograph_seq"
+CREATE SEQUENCE "inp_files_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -76,7 +68,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_hydrograph_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_inflows_seq"
+CREATE SEQUENCE "inp_hydrograph_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -84,15 +76,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_inflows_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_lid_control_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-
-CREATE SEQUENCE "SCHEMA_NAME"."inp_node_x_sector_seq"
+CREATE SEQUENCE "inp_inflows_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -100,7 +84,15 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_node_x_sector_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_mapdim_seq"
+CREATE SEQUENCE "inp_lid_control_seq"
+  START WITH 1
+  INCREMENT BY 1
+  NO MINVALUE
+  NO MAXVALUE
+  CACHE 1;
+
+
+CREATE SEQUENCE "inp_node_x_sector_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -108,7 +100,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_mapdim_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_mapunits_seq"
+CREATE SEQUENCE "inp_mapdim_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -116,7 +108,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_mapunits_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_options_seq"
+CREATE SEQUENCE "inp_mapunits_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -124,7 +116,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_options_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_project_seq"
+CREATE SEQUENCE "inp_options_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -132,7 +124,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_project_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_report_seq"
+CREATE SEQUENCE "inp_project_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -140,7 +132,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_report_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_sector_seq"
+CREATE SEQUENCE "inp_report_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -148,7 +140,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_sector_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_timeseries_seq"
+CREATE SEQUENCE "inp_sector_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -156,7 +148,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_timeseries_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_transects_seq"
+CREATE SEQUENCE "inp_timeseries_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -164,7 +156,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_transects_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."inp_vertice_seq"
+CREATE SEQUENCE "inp_transects_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -172,7 +164,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."inp_vertice_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_arcflow_sum_seq"
+CREATE SEQUENCE "inp_vertice_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -180,14 +172,22 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_arcflow_sum_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_arcpolload_sum_seq"
+CREATE SEQUENCE "rpt_arcflow_sum_seq"
+  START WITH 1
+  INCREMENT BY 1
+  NO MINVALUE
+  NO MAXVALUE
+  CACHE 1;
+
+  
+CREATE SEQUENCE "rpt_arcpolload_sum_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_condsurcharge_sum_seq"
+CREATE SEQUENCE "rpt_condsurcharge_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -195,7 +195,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_condsurcharge_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_continuity_errors_seq"
+CREATE SEQUENCE "rpt_continuity_errors_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -203,7 +203,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_continuity_errors_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_critical_elements_seq"
+CREATE SEQUENCE "rpt_critical_elements_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -211,7 +211,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_critical_elements_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_flowclass_sum_seq"
+CREATE SEQUENCE "rpt_flowclass_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -219,7 +219,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_flowclass_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_flowrouting_cont_seq"
+CREATE SEQUENCE "rpt_flowrouting_cont_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -227,7 +227,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_flowrouting_cont_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_groundwater_cont_seq"
+CREATE SEQUENCE "rpt_groundwater_cont_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -235,7 +235,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_groundwater_cont_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_high_conterrors_seq"
+CREATE SEQUENCE "rpt_high_conterrors_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -243,7 +243,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_high_conterrors_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_high_flowinest_ind_seq"
+CREATE SEQUENCE "rpt_high_flowinest_ind_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -251,7 +251,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_high_flowinest_ind_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_instability_index_seq"
+CREATE SEQUENCE "rpt_instability_index_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -259,7 +259,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_instability_index_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_lidperformance_sum_seq"
+CREATE SEQUENCE "rpt_lidperformance_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -267,7 +267,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_lidperformance_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodedepth_sum_seq"
+CREATE SEQUENCE "rpt_nodedepth_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -275,7 +275,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodedepth_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodeflooding_sum_seq"
+CREATE SEQUENCE "rpt_nodeflooding_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -283,7 +283,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodeflooding_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodeinflow_sum_seq"
+CREATE SEQUENCE "rpt_nodeinflow_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -291,7 +291,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodeinflow_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodesurcharge_sum_seq"
+CREATE SEQUENCE "rpt_nodesurcharge_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -299,7 +299,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_nodesurcharge_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_outfallflow_sum_seq"
+CREATE SEQUENCE "rpt_outfallflow_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -307,7 +307,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_outfallflow_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_outfallload_sum_seq"
+CREATE SEQUENCE "rpt_outfallload_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -315,7 +315,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_outfallload_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_pumping_sum_seq"
+CREATE SEQUENCE "rpt_pumping_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -323,7 +323,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_pumping_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_qualrouting_cont_seq"
+CREATE SEQUENCE "rpt_qualrouting_cont_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -331,7 +331,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_qualrouting_cont_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_rainfall_dep_seq"
+CREATE SEQUENCE "rpt_rainfall_dep_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -339,7 +339,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_rainfall_dep_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_cat_result_seq"
+CREATE SEQUENCE "rpt_cat_result_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -347,7 +347,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_cat_result_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_routing_timestep_seq"
+CREATE SEQUENCE "rpt_routing_timestep_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -355,7 +355,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_routing_timestep_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_runoff_qual_seq"
+CREATE SEQUENCE "rpt_runoff_qual_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -363,7 +363,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_runoff_qual_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_runoff_quant_seq"
+CREATE SEQUENCE "rpt_runoff_quant_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -371,7 +371,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_runoff_quant_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_storagevol_sum_seq"
+CREATE SEQUENCE "rpt_storagevol_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -379,7 +379,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_storagevol_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_subcatchwashoff_sum_seq"
+CREATE SEQUENCE "rpt_subcatchwashoff_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -387,7 +387,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_subcatchwashoff_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_subcathrunoff_sum_seq"
+CREATE SEQUENCE "rpt_subcathrunoff_sum_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -395,7 +395,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_subcathrunoff_sum_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."rpt_timestep_critelem_seq"
+CREATE SEQUENCE "rpt_timestep_critelem_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -411,7 +411,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."rpt_timestep_critelem_seq"
 -- Table structure (with geom)
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."raingage" (
+CREATE TABLE "raingage" (
 "rg_id" varchar(16)   NOT NULL,
 "form_type" varchar(12)  ,
 "intvl" varchar(10)  ,
@@ -425,7 +425,7 @@ CREATE TABLE "SCHEMA_NAME"."raingage" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."subcatchment" (
+CREATE TABLE "subcatchment" (
 "subc_id" varchar(16)   NOT NULL,
 "node_id" varchar(50)  ,
 "rg_id" varchar(16)  ,
@@ -464,7 +464,7 @@ CREATE TABLE "SCHEMA_NAME"."subcatchment" (
 -- Table CATALOG
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."cat_hydrology" (
+CREATE TABLE "cat_hydrology" (
 "id" varchar(20)   NOT NULL,
 "infiltration" varchar(20)   NOT NULL,
 "descript" varchar(255)  ,
@@ -478,19 +478,19 @@ CONSTRAINT "cat_hydrology_pkey" PRIMARY KEY ("id")
 -- Table structure
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."inp_arc_type" (
+CREATE TABLE "inp_arc_type" (
 "id" varchar(16)   NOT NULL,
 CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_node_type" (
+CREATE TABLE "inp_node_type" (
 "id" varchar(16)   NOT NULL,
 CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_giswater_config" (
+CREATE TABLE "inp_giswater_config" (
 "id" varchar(16) NOT NULL,
 "giswater_file_path" text,
 "giswater_software_path" text,
@@ -503,8 +503,8 @@ CONSTRAINT inp_giswater_conf PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_adjustments" (
-"id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".inp_adjustments_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_adjustments" (
+"id" varchar(16) DEFAULT nextval('inp_adjustments_seq'::regclass) NOT NULL,
 "adj_type" varchar(16)   NOT NULL,
 "value_1" numeric(12,4),
 "value_2" numeric(12,4),
@@ -522,8 +522,8 @@ CONSTRAINT inp_adjustments_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_aquifer" (
-"aquif_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".inp_aquifer_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_aquifer" (
+"aquif_id" varchar(16) DEFAULT nextval('inp_aquifer_seq'::regclass) NOT NULL,
 "por" numeric(12,4),
 "wp" numeric(12,4),
 "fc" numeric(12,4),
@@ -541,13 +541,13 @@ CREATE TABLE "SCHEMA_NAME"."inp_aquifer" (
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_backdrop" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_backdrop_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_backdrop" (
+"id" int4 DEFAULT nextval('inp_backdrop_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_buildup_land_x_pol" (
+CREATE TABLE "inp_buildup_land_x_pol" (
 "landus_id" varchar(16)   NOT NULL,
 "poll_id" varchar(16)   NOT NULL,
 "funcb_type" varchar(18)  ,
@@ -558,7 +558,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_buildup_land_x_pol" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_conduit" (
+CREATE TABLE "inp_conduit" (
 "arc_id" varchar(50)   NOT NULL,
 "barrels" int2,
 "culvert" varchar(10)  ,
@@ -572,34 +572,34 @@ CREATE TABLE "SCHEMA_NAME"."inp_conduit" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_controls" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_controls_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_controls" (
+"id" int4 DEFAULT nextval('inp_controls_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_coverage_land_x_subc" (
+CREATE TABLE "inp_coverage_land_x_subc" (
 "subc_id" varchar(16)   NOT NULL,
 "landus_id" varchar(16)   NOT NULL,
 "percent" numeric(12,4)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_curve" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_curve" (
+"id" int4 DEFAULT nextval('inp_curve_seq'::regclass) NOT NULL,
 "curve_id" varchar(16)  ,
 "x_value" numeric(18,6),
 "y_value" numeric(18,6)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_curve_id" (
+CREATE TABLE "inp_curve_id" (
 "id" varchar(16)   NOT NULL,
 "curve_type" varchar(20)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_divider" (
+CREATE TABLE "inp_divider" (
 "node_id" varchar(50)   NOT NULL,
 "divider_type" varchar(18)  ,
 "arc_id" varchar(50)  ,
@@ -613,8 +613,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_divider" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_dwf" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_dwf_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_dwf" (
+"id" int4 DEFAULT nextval('inp_dwf_seq'::regclass) NOT NULL,
 "node_id" varchar(50)  ,
 "value" numeric(12,7),
 "pat1" varchar(16)  ,
@@ -624,7 +624,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_dwf" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_dwf_pol_x_node" (
+CREATE TABLE "inp_dwf_pol_x_node" (
 "poll_id" varchar(16)   NOT NULL,
 "node_id" varchar(50)   NOT NULL,
 "value" numeric(12,4),
@@ -635,7 +635,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_dwf_pol_x_node" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_evaporation" (
+CREATE TABLE "inp_evaporation" (
 "evap_type" varchar(16)   NOT NULL,
 "evap" numeric(12,4),
 "timser_id" varchar(16)  ,
@@ -668,15 +668,15 @@ CREATE TABLE "SCHEMA_NAME"."inp_evaporation" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_files" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_files_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_files" (
+"id" int4 DEFAULT nextval('inp_files_seq'::regclass) NOT NULL,
 "actio_type" varchar(18)  ,
 "file_type" varchar(18)  ,
 "fname" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_groundwater" (
+CREATE TABLE "inp_groundwater" (
 "subc_id" varchar(16)   NOT NULL,
 "aquif_id" varchar(16) NOT NULL,
 "node_id" varchar(50)  ,
@@ -693,14 +693,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_groundwater" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_hydrograph" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_hydrograph_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_hydrograph" (
+"id" int4 DEFAULT nextval('inp_hydrograph_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_inflows" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_inflows_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_inflows" (
+"id" int4 DEFAULT nextval('inp_inflows_seq'::regclass) NOT NULL,
 "node_id" varchar(50)  ,
 "timser_id" varchar(16)  ,
 "sfactor" numeric(12,4),
@@ -709,7 +709,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_inflows" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" (
+CREATE TABLE "inp_inflows_pol_x_node" (
 "poll_id" varchar(16)   NOT NULL,
 "node_id" varchar(50)   NOT NULL,
 "timser_id" varchar(16)  ,
@@ -721,7 +721,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_junction" (
+CREATE TABLE "inp_junction" (
 "node_id" varchar(50)   NOT NULL,
 "y0" numeric(12,4),
 "ysur" numeric(12,4),
@@ -729,7 +729,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_junction" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_label" (
+CREATE TABLE "inp_label" (
 "label" varchar(16)   NOT NULL,
 "xcoord" numeric(18,6),
 "ycoord" numeric(18,6),
@@ -741,7 +741,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_label" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_landuses" (
+CREATE TABLE "inp_landuses" (
 "landus_id" varchar(16)   NOT NULL,
 "sweepint" numeric(12,4),
 "availab" numeric(12,4),
@@ -749,8 +749,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_landuses" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_lid_control" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_lid_control_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_lid_control" (
+"id" int4 DEFAULT nextval('inp_lid_control_seq'::regclass) NOT NULL,
 "lidco_id" varchar(16)  ,
 "lidco_type" varchar(10)  ,
 "value_2" numeric(12,4),
@@ -763,7 +763,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_lid_control" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_lidusage_subc_x_lidco" (
+CREATE TABLE "inp_lidusage_subc_x_lidco" (
 "subc_id" varchar(16)   NOT NULL,
 "lidco_id" varchar(16)   NOT NULL,
 "number" int2,
@@ -776,14 +776,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_lidusage_subc_x_lidco" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_loadings_pol_x_subc" (
+CREATE TABLE "inp_loadings_pol_x_subc" (
 "poll_id" varchar(16)   NOT NULL,
 "subc_id" varchar(16)   NOT NULL,
 "ibuildup" numeric(12,4)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_mapdim" (
+CREATE TABLE "inp_mapdim" (
 "type_dim" varchar(18)  ,
 "x1" numeric(18,6),
 "y1" numeric(18,6),
@@ -792,14 +792,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_mapdim" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_mapunits" (
+CREATE TABLE "inp_mapunits" (
 "type_units" varchar(18)  ,
 "map_type" varchar(18)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_node_x_sector" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_node_x_sector_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_node_x_sector" (
+"id" int4 DEFAULT nextval('inp_node_x_sector_seq'::regclass) NOT NULL,
 "node_id" varchar(16),
 "sector_id" varchar(16),
 "epa_type" varchar(16)
@@ -807,7 +807,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_node_x_sector" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_options" (
+CREATE TABLE "inp_options" (
 "flow_units" varchar(20)   NOT NULL,
 "flow_routing" varchar(12)  ,
 "link_offsets" varchar(12)  ,
@@ -846,7 +846,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_options" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_orifice" (
+CREATE TABLE "inp_orifice" (
 "arc_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "ori_type" varchar(18)  ,
@@ -864,7 +864,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_orifice" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_outfall" (
+CREATE TABLE "inp_outfall" (
 "node_id" varchar(16)   NOT NULL,
 "outfall_type" varchar(16)  ,
 "stage" numeric(12,4),
@@ -874,7 +874,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_outfall" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_outlet" (
+CREATE TABLE "inp_outlet" (
 "arc_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "outlet_type" varchar(16)  ,
@@ -886,7 +886,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_outlet" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_pattern" (
+CREATE TABLE "inp_pattern" (
 "pattern_id" varchar(16)   NOT NULL,
 "pattern_type" varchar(16)  ,
 "factor_1" numeric(12,4),
@@ -916,7 +916,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_pattern" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_pollutant" (
+CREATE TABLE "inp_pollutant" (
 "poll_id" varchar(16)   NOT NULL,
 "units_type" varchar(18)  ,
 "crain" numeric(12,4),
@@ -930,14 +930,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_pollutant" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_project_id" (
+CREATE TABLE "inp_project_id" (
 "title" varchar(254)  ,
 "author" varchar(50)  ,
 "date" varchar(12)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_pump" (
+CREATE TABLE "inp_pump" (
 "arc_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "curve_id" varchar(16)  ,
@@ -949,7 +949,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_pump" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_rdii" (
+CREATE TABLE "inp_rdii" (
 "node_id" varchar(50)   NOT NULL,
 "hydro_id" varchar(16)  ,
 "sewerarea" numeric(16,6)
@@ -957,7 +957,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_rdii" (
 WITH (OIDS=FALSE);
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_report" (
+CREATE TABLE "inp_report" (
 "input" varchar(18)   NOT NULL,
 "continuity" varchar(20)  ,
 "flowstats" varchar(3)  ,
@@ -968,7 +968,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_report" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_snowmelt" (
+CREATE TABLE "inp_snowmelt" (
 "stemp" numeric(12,4) NOT NULL,
 "atiwt" numeric(12,4),
 "rnm" numeric(12,4),
@@ -998,7 +998,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_snowmelt" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_snowpack" (
+CREATE TABLE "inp_snowpack" (
 "snow_id" varchar(16)   NOT NULL,
 "cmin_1" numeric(12,4),
 "cmax_1" numeric(12,4),
@@ -1031,7 +1031,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_snowpack" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_storage" (
+CREATE TABLE "inp_storage" (
 "node_id" varchar(50)   NOT NULL,
 "storage_type" varchar(18)  ,
 "curve_id" varchar(16)  ,
@@ -1048,7 +1048,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_storage" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_temperature" (
+CREATE TABLE "inp_temperature" (
 "temp_type" varchar(16)   NOT NULL,
 "timser_id" varchar(16)  ,
 "fname" varchar(254)  ,
@@ -1056,8 +1056,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_temperature" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_timeseries" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_timeseries_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_timeseries" (
+"id" int4 DEFAULT nextval('inp_timeseries_seq'::regclass) NOT NULL,
 "timser_id" varchar(16)  ,
 "date" varchar(12)  ,
 "hour" varchar(10)  ,
@@ -1068,7 +1068,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_timeseries" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_timser_id" (
+CREATE TABLE "inp_timser_id" (
 "id" varchar(16)   NOT NULL,
 "timser_type" varchar(20)  ,
 "times_type" varchar(16)  
@@ -1076,14 +1076,14 @@ CREATE TABLE "SCHEMA_NAME"."inp_timser_id" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_transects" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_transects_seq'::regclass) NOT NULL,
+CREATE TABLE "inp_transects" (
+"id" int4 DEFAULT nextval('inp_transects_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_treatment_node_x_pol" (
+CREATE TABLE "inp_treatment_node_x_pol" (
 "node_id" varchar(50)   NOT NULL,
 "poll_id" varchar(16)   NOT NULL,
 "function" varchar(100)  
@@ -1092,7 +1092,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_treatment_node_x_pol" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_washoff_land_x_pol" (
+CREATE TABLE "inp_washoff_land_x_pol" (
 "landus_id" varchar(16)   NOT NULL,
 "poll_id" varchar(16)   NOT NULL,
 "funcw_type" varchar(18)  ,
@@ -1104,7 +1104,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_washoff_land_x_pol" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_weir" (
+CREATE TABLE "inp_weir" (
 "arc_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "weir_type" varchar(18)  ,
@@ -1123,7 +1123,7 @@ CREATE TABLE "SCHEMA_NAME"."inp_weir" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_windspeed" (
+CREATE TABLE "inp_windspeed" (
 "wind_type" varchar(16)   NOT NULL,
 "value_1" numeric(12,4),
 "value_2" numeric(12,4),
@@ -1148,198 +1148,198 @@ CREATE TABLE "SCHEMA_NAME"."inp_windspeed" (
 -- Table structure for inp_typevalue & value
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_divider" (
+CREATE TABLE "inp_typevalue_divider" (
 "id" varchar(16)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_evap" (
+CREATE TABLE "inp_typevalue_evap" (
 "id" varchar(18)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_orifice" (
+CREATE TABLE "inp_typevalue_orifice" (
 "id" varchar(16)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_outfall" (
+CREATE TABLE "inp_typevalue_outfall" (
 "id" varchar(16)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_outlet" (
+CREATE TABLE "inp_typevalue_outlet" (
 "id" varchar(16)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_pattern" (
+CREATE TABLE "inp_typevalue_pattern" (
 "id" varchar(18)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_raingage" (
+CREATE TABLE "inp_typevalue_raingage" (
 "id" varchar(18)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_storage" (
+CREATE TABLE "inp_typevalue_storage" (
 "id" varchar(16)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_temp" (
+CREATE TABLE "inp_typevalue_temp" (
 "id" varchar(18)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_timeseries" (
+CREATE TABLE "inp_typevalue_timeseries" (
 "id" varchar(18)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_typevalue_windsp" (
+CREATE TABLE "inp_typevalue_windsp" (
 "id" varchar(16)   NOT NULL,
 "descript" varchar(100)  
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_allnone" (
+CREATE TABLE "inp_value_allnone" (
 "id" varchar(18)   NOT NULL
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_buildup" (
+CREATE TABLE "inp_value_buildup" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_catarc" (
+CREATE TABLE "inp_value_catarc" (
 "id" varchar(18)   NOT NULL,
 CONSTRAINT inp_value_catarc_pkey PRIMARY KEY (id)
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_curve" (
+CREATE TABLE "inp_value_curve" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_files_actio" (
+CREATE TABLE "inp_value_files_actio" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_files_type" (
+CREATE TABLE "inp_value_files_type" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_inflows" (
-"id" varchar(18)   NOT NULL
-);
-
-
-
-
-CREATE TABLE "SCHEMA_NAME"."inp_value_lidcontrol" (
-"id" varchar(18)   NOT NULL
-);
-
-
-
-CREATE TABLE "SCHEMA_NAME"."inp_value_mapunits" (
+CREATE TABLE "inp_value_inflows" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_fme" (
+CREATE TABLE "inp_value_lidcontrol" (
+"id" varchar(18)   NOT NULL
+);
+
+
+
+CREATE TABLE "inp_value_mapunits" (
+"id" varchar(18)   NOT NULL
+);
+
+
+
+
+CREATE TABLE "inp_value_options_fme" (
 "id" varchar(16)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_fr" (
+CREATE TABLE "inp_value_options_fr" (
 "id" varchar(16)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_fu" (
+CREATE TABLE "inp_value_options_fu" (
 "id" varchar(16)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_id" (
+CREATE TABLE "inp_value_options_id" (
 "id" varchar(16)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_in" (
-"id" varchar(16)   NOT NULL
-);
-
-
-
-
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_lo" (
-"id" varchar(16)   NOT NULL
-);
-
-
-
-CREATE TABLE "SCHEMA_NAME"."inp_value_options_nfl" (
+CREATE TABLE "inp_value_options_in" (
 "id" varchar(16)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_orifice" (
+CREATE TABLE "inp_value_options_lo" (
+"id" varchar(16)   NOT NULL
+);
+
+
+
+CREATE TABLE "inp_value_options_nfl" (
+"id" varchar(16)   NOT NULL
+);
+
+
+
+
+CREATE TABLE "inp_value_orifice" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_pollutants" (
+CREATE TABLE "inp_value_pollutants" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_raingage" (
+CREATE TABLE "inp_value_raingage" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_routeto" (
+CREATE TABLE "inp_value_routeto" (
 "id" varchar(18)   NOT NULL,
 CONSTRAINT inp_value_routeto_pkey PRIMARY KEY (id)
 );
@@ -1347,14 +1347,14 @@ CONSTRAINT inp_value_routeto_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_status" (
+CREATE TABLE "inp_value_status" (
 "id" varchar(6)   NOT NULL,
 CONSTRAINT inp_value_status_pkey PRIMARY KEY (id)
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_timserid" (
+CREATE TABLE "inp_value_timserid" (
 "id" varchar(20)   NOT NULL,
 "descript" varchar(100)  
 );
@@ -1362,26 +1362,26 @@ CREATE TABLE "SCHEMA_NAME"."inp_value_timserid" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_treatment" (
+CREATE TABLE "inp_value_treatment" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_washoff" (
+CREATE TABLE "inp_value_washoff" (
 "id" varchar(18)   NOT NULL
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_weirs" (
+CREATE TABLE "inp_value_weirs" (
 "id" varchar(18)   NOT NULL,
 "shape" varchar(18)  
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_value_yesno" (
+CREATE TABLE "inp_value_yesno" (
 "id" varchar(3)   NOT NULL
 );
 
@@ -1395,8 +1395,8 @@ CREATE TABLE "SCHEMA_NAME"."inp_value_yesno" (
 -- Table structure RPT
 -- --------------------------
 
-CREATE TABLE "SCHEMA_NAME"."rpt_arcflow_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arcflow_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_arcflow_sum" (
+"id" int4 DEFAULT nextval('rpt_arcflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "arc_type" varchar(18)  ,
@@ -1418,8 +1418,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_arcflow_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_arcpolload_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arcpolload_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_arcpolload_sum" (
+"id" int4 DEFAULT nextval('rpt_arcpolload_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
@@ -1428,8 +1428,8 @@ CONSTRAINT "rpt_arcpolload_pkey" PRIMARY KEY ("id")
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_condsurcharge_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_condsurcharge_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_condsurcharge_sum" (
+"id" int4 DEFAULT nextval('rpt_condsurcharge_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "both_ends" numeric(12,4),
@@ -1441,16 +1441,16 @@ CREATE TABLE "SCHEMA_NAME"."rpt_condsurcharge_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_continuity_errors" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_continuity_errors_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_continuity_errors" (
+"id" int4 DEFAULT nextval('rpt_continuity_errors_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_critical_elements" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_critical_elements_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_critical_elements" (
+"id" int4 DEFAULT nextval('rpt_critical_elements_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1458,8 +1458,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_critical_elements" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_flowclass_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_flowclass_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_flowclass_sum" (
+"id" int4 DEFAULT nextval('rpt_flowclass_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "length" numeric(12,4),
@@ -1477,8 +1477,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_flowclass_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_flowrouting_cont" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_flowrouting_cont_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_flowrouting_cont" (
+"id" int4 DEFAULT nextval('rpt_flowrouting_cont_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "dryw_inf" numeric(12,4),
 "wetw_inf" numeric(12,4),
@@ -1498,8 +1498,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_flowrouting_cont" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_groundwater_cont" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_groundwater_cont_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_groundwater_cont" (
+"id" int4 DEFAULT nextval('rpt_groundwater_cont_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "init_stor" numeric(12,4),
 "infilt" numeric(12,4),
@@ -1514,25 +1514,16 @@ CREATE TABLE "SCHEMA_NAME"."rpt_groundwater_cont" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_high_conterrors" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_high_conterrors_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_high_conterrors" (
+"id" int4 DEFAULT nextval('rpt_high_conterrors_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_high_flowinest_ind" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_high_flowinest_ind_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
-"text" varchar(255)  
-);
-
-
-
-
-CREATE TABLE "SCHEMA_NAME"."rpt_instability_index" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_instability_index_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_high_flowinest_ind" (
+"id" int4 DEFAULT nextval('rpt_high_flowinest_ind_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1540,8 +1531,17 @@ CREATE TABLE "SCHEMA_NAME"."rpt_instability_index" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_lidperformance_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_lidperformance_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_instability_index" (
+"id" int4 DEFAULT nextval('rpt_instability_index_seq'::regclass) NOT NULL,
+"result_id" varchar(16)  ,
+"text" varchar(255)  
+);
+
+
+
+
+CREATE TABLE "rpt_lidperformance_sum" (
+"id" int4 DEFAULT nextval('rpt_lidperformance_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "subc_id" varchar(16)  ,
 "lidco_id" varchar(16)  ,
@@ -1559,8 +1559,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_lidperformance_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_nodedepth_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodedepth_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_nodedepth_sum" (
+"id" int4 DEFAULT nextval('rpt_nodedepth_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
@@ -1574,8 +1574,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_nodedepth_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_nodeflooding_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodeflooding_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_nodeflooding_sum" (
+"id" int4 DEFAULT nextval('rpt_nodeflooding_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "hour_flood" numeric(12,4),
@@ -1589,8 +1589,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_nodeflooding_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_nodeinflow_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodeinflow_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_nodeinflow_sum" (
+"id" int4 DEFAULT nextval('rpt_nodeinflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
@@ -1607,8 +1607,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_nodeinflow_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_nodesurcharge_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodesurcharge_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_nodesurcharge_sum" (
+"id" int4 DEFAULT nextval('rpt_nodesurcharge_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
@@ -1620,8 +1620,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_nodesurcharge_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_outfallflow_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_outfallflow_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_outfallflow_sum" (
+"id" int4 DEFAULT nextval('rpt_outfallflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "flow_freq" numeric(12,4),
@@ -1633,8 +1633,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_outfallflow_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_outfallload_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_outfallload_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_outfallload_sum" (
+"id" int4 DEFAULT nextval('rpt_outfallload_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 "node_id" varchar(50)  ,
@@ -1643,8 +1643,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_outfallload_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_pumping_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_pumping_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_pumping_sum" (
+"id" int4 DEFAULT nextval('rpt_pumping_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "percent" numeric(12,4),
@@ -1661,8 +1661,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_pumping_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_qualrouting_cont" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_qualrouting_cont_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_qualrouting_cont" (
+"id" int4 DEFAULT nextval('rpt_qualrouting_cont_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 "dryw_inf" numeric(12,4),
@@ -1681,8 +1681,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_qualrouting_cont" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_rainfall_dep" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_rainfall_dep_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_rainfall_dep" (
+"id" int4 DEFAULT nextval('rpt_rainfall_dep_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "sewer_rain" numeric(12,4),
 "rdiip_prod" numeric(12,4),
@@ -1692,8 +1692,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_rainfall_dep" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_cat_result" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_cat_result_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_cat_result" (
+"id" int4 DEFAULT nextval('rpt_cat_result_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "flow_units" varchar(3)  ,
 "rain_runof" varchar(3)  ,
@@ -1720,8 +1720,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_cat_result" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_routing_timestep" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_routing_timestep_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_routing_timestep" (
+"id" int4 DEFAULT nextval('rpt_routing_timestep_seq'::regclass) NOT NULL,
 "result_id" varchar(254)  ,
 "text" varchar(255)  
 );
@@ -1729,8 +1729,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_routing_timestep" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_runoff_qual" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_runoff_qual_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_runoff_qual" (
+"id" int4 DEFAULT nextval('rpt_runoff_qual_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 "init_buil" numeric(12,4),
@@ -1746,8 +1746,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_runoff_qual" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_runoff_quant" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_runoff_quant_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_runoff_quant" (
+"id" int4 DEFAULT nextval('rpt_runoff_quant_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "initsw_co" numeric(12,4),
 "total_prec" numeric(12,4),
@@ -1763,8 +1763,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_runoff_quant" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_storagevol_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_storagevol_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_storagevol_sum" (
+"id" int4 DEFAULT nextval('rpt_storagevol_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "aver_vol" numeric(12,4),
@@ -1780,8 +1780,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_storagevol_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_subcatchwashoff_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_subcatchwashoff_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_subcatchwashoff_sum" (
+"id" int4 DEFAULT nextval('rpt_subcatchwashoff_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "subc_id" varchar(16)   NOT NULL,
 "poll_id" varchar(16)   NOT NULL,
@@ -1791,8 +1791,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_subcatchwashoff_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_subcathrunoff_sum" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_subcathrunoff_sum_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_subcathrunoff_sum" (
+"id" int4 DEFAULT nextval('rpt_subcathrunoff_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "subc_id" varchar(16)  ,
 "tot_precip" numeric(12,4),
@@ -1813,8 +1813,8 @@ CREATE TABLE "SCHEMA_NAME"."rpt_subcathrunoff_sum" (
 
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_timestep_critelem" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_timestep_critelem_seq'::regclass) NOT NULL,
+CREATE TABLE "rpt_timestep_critelem" (
+"id" int4 DEFAULT nextval('rpt_timestep_critelem_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1827,26 +1827,26 @@ CREATE TABLE "SCHEMA_NAME"."rpt_timestep_critelem" (
 -- Table structure for SELECTORS
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME"."rpt_selector_result" (
+CREATE TABLE "rpt_selector_result" (
 "result_id" varchar(16)   NOT NULL
 )WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."rpt_selector_compare" (
+CREATE TABLE "rpt_selector_compare" (
 "result_id" varchar(16)   NOT NULL
 )WITH (OIDS=FALSE)
 ;
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_selector_sector" (
+CREATE TABLE "inp_selector_sector" (
 "sector_id" varchar(30)   NOT NULL
 )WITH (OIDS=FALSE)
 ;
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_selector_state" (
+CREATE TABLE "inp_selector_state" (
 "id" varchar(16)   NOT NULL,
 "observ" varchar(254)  ,
 CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
@@ -1855,7 +1855,7 @@ CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."inp_selector_hydrology" (
+CREATE TABLE "inp_selector_hydrology" (
 "hydrology_id" varchar(20)   NOT NULL,
 CONSTRAINT "inp_selector_hydrology_pkey" PRIMARY KEY ("hydrology_id")
 )
@@ -1867,118 +1867,118 @@ WITH (OIDS=FALSE);
 -- ----------------------------
 -- Primary Key structure
 -- ----------------------------
-ALTER TABLE "SCHEMA_NAME"."inp_aquifer" ADD PRIMARY KEY ("aquif_id");
-ALTER TABLE "SCHEMA_NAME"."inp_backdrop" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_buildup_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
-ALTER TABLE "SCHEMA_NAME"."inp_conduit" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_controls" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_coverage_land_x_subc" ADD PRIMARY KEY ("subc_id", "landus_id");
-ALTER TABLE "SCHEMA_NAME"."inp_curve" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_curve_id" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_divider" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_dwf" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_dwf_pol_x_node" ADD PRIMARY KEY ("poll_id", "node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_evaporation" ADD PRIMARY KEY ("evap_type");
-ALTER TABLE "SCHEMA_NAME"."inp_files" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_groundwater" ADD PRIMARY KEY ("subc_id", "aquif_id");
-ALTER TABLE "SCHEMA_NAME"."inp_hydrograph" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_inflows" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_inflows_pol_x_node" ADD PRIMARY KEY ("poll_id", "node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_junction" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_label" ADD PRIMARY KEY ("label");
-ALTER TABLE "SCHEMA_NAME"."inp_landuses" ADD PRIMARY KEY ("landus_id");
-ALTER TABLE "SCHEMA_NAME"."inp_lid_control" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_lidusage_subc_x_lidco" ADD PRIMARY KEY ("subc_id", "lidco_id");
-ALTER TABLE "SCHEMA_NAME"."inp_loadings_pol_x_subc" ADD PRIMARY KEY ("poll_id", "subc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_node_x_sector" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_options" ADD PRIMARY KEY ("flow_units");
-ALTER TABLE "SCHEMA_NAME"."inp_orifice" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_outfall" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_outlet" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_pattern" ADD PRIMARY KEY ("pattern_id");
-ALTER TABLE "SCHEMA_NAME"."inp_pollutant" ADD PRIMARY KEY ("poll_id");
-ALTER TABLE "SCHEMA_NAME"."inp_project_id" ADD PRIMARY KEY ("title");
-ALTER TABLE "SCHEMA_NAME"."inp_pump" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_rdii" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_report" ADD PRIMARY KEY ("input");
-ALTER TABLE "SCHEMA_NAME"."inp_snowmelt" ADD PRIMARY KEY ("stemp");
-ALTER TABLE "SCHEMA_NAME"."inp_snowpack" ADD PRIMARY KEY ("snow_id");
-ALTER TABLE "SCHEMA_NAME"."inp_storage" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "SCHEMA_NAME"."inp_temperature" ADD PRIMARY KEY ("temp_type");
-ALTER TABLE "SCHEMA_NAME"."inp_timeseries" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_timser_id" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_transects" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_treatment_node_x_pol" ADD PRIMARY KEY ("node_id", "poll_id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_divider" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_evap" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_orifice" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_outfall" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_outlet" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_pattern" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_raingage" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_storage" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_temp" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_timeseries" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_typevalue_windsp" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_allnone" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_buildup" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_curve" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_files_actio" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_files_type" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_inflows" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_lidcontrol" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_mapunits" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_fme" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_fr" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_fu" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_id" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_in" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_lo" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_options_nfl" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_orifice" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_pollutants" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_raingage" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_timserid" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_treatment" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_washoff" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_weirs" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_value_yesno" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_washoff_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
-ALTER TABLE "SCHEMA_NAME"."inp_weir" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "SCHEMA_NAME"."inp_windspeed" ADD PRIMARY KEY ("wind_type");
-ALTER TABLE "SCHEMA_NAME"."raingage" ADD PRIMARY KEY ("rg_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_selector_result" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_selector_compare" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_arcflow_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_condsurcharge_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_continuity_errors" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_critical_elements" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_flowclass_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_flowrouting_cont" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_groundwater_cont" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_high_conterrors" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_high_flowinest_ind" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_instability_index" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_lidperformance_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_nodedepth_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_nodeflooding_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_nodeinflow_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_nodesurcharge_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_outfallflow_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_outfallload_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_pumping_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_qualrouting_cont" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_rainfall_dep" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_cat_result" ADD PRIMARY KEY ("result_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_routing_timestep" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_runoff_qual" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_runoff_quant" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_storagevol_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_subcatchwashoff_sum" ADD PRIMARY KEY ("result_id", "subc_id", "poll_id");
-ALTER TABLE "SCHEMA_NAME"."rpt_subcathrunoff_sum" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."rpt_timestep_critelem" ADD PRIMARY KEY ("id");
-ALTER TABLE "SCHEMA_NAME"."inp_selector_sector" ADD PRIMARY KEY ("sector_id");
-ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD PRIMARY KEY ("subc_id");
+ALTER TABLE "inp_aquifer" ADD PRIMARY KEY ("aquif_id");
+ALTER TABLE "inp_backdrop" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_buildup_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
+ALTER TABLE "inp_conduit" ADD PRIMARY KEY ("arc_id");
+ALTER TABLE "inp_controls" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_coverage_land_x_subc" ADD PRIMARY KEY ("subc_id", "landus_id");
+ALTER TABLE "inp_curve" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_curve_id" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_divider" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_dwf" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_dwf_pol_x_node" ADD PRIMARY KEY ("poll_id", "node_id");
+ALTER TABLE "inp_evaporation" ADD PRIMARY KEY ("evap_type");
+ALTER TABLE "inp_files" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_groundwater" ADD PRIMARY KEY ("subc_id", "aquif_id");
+ALTER TABLE "inp_hydrograph" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_inflows" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_inflows_pol_x_node" ADD PRIMARY KEY ("poll_id", "node_id");
+ALTER TABLE "inp_junction" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_label" ADD PRIMARY KEY ("label");
+ALTER TABLE "inp_landuses" ADD PRIMARY KEY ("landus_id");
+ALTER TABLE "inp_lid_control" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_lidusage_subc_x_lidco" ADD PRIMARY KEY ("subc_id", "lidco_id");
+ALTER TABLE "inp_loadings_pol_x_subc" ADD PRIMARY KEY ("poll_id", "subc_id");
+ALTER TABLE "inp_node_x_sector" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_options" ADD PRIMARY KEY ("flow_units");
+ALTER TABLE "inp_orifice" ADD PRIMARY KEY ("arc_id");
+ALTER TABLE "inp_outfall" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_outlet" ADD PRIMARY KEY ("arc_id");
+ALTER TABLE "inp_pattern" ADD PRIMARY KEY ("pattern_id");
+ALTER TABLE "inp_pollutant" ADD PRIMARY KEY ("poll_id");
+ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
+ALTER TABLE "inp_pump" ADD PRIMARY KEY ("arc_id");
+ALTER TABLE "inp_rdii" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_report" ADD PRIMARY KEY ("input");
+ALTER TABLE "inp_snowmelt" ADD PRIMARY KEY ("stemp");
+ALTER TABLE "inp_snowpack" ADD PRIMARY KEY ("snow_id");
+ALTER TABLE "inp_storage" ADD PRIMARY KEY ("node_id");
+ALTER TABLE "inp_temperature" ADD PRIMARY KEY ("temp_type");
+ALTER TABLE "inp_timeseries" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_timser_id" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_transects" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_treatment_node_x_pol" ADD PRIMARY KEY ("node_id", "poll_id");
+ALTER TABLE "inp_typevalue_divider" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_evap" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_orifice" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_outfall" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_outlet" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_pattern" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_raingage" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_storage" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_temp" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_timeseries" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_typevalue_windsp" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_allnone" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_buildup" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_curve" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_files_actio" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_files_type" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_inflows" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_lidcontrol" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_mapunits" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_fme" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_fr" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_fu" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_id" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_in" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_lo" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_options_nfl" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_orifice" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_pollutants" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_raingage" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_timserid" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_treatment" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_washoff" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_weirs" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_value_yesno" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_washoff_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
+ALTER TABLE "inp_weir" ADD PRIMARY KEY ("arc_id");
+ALTER TABLE "inp_windspeed" ADD PRIMARY KEY ("wind_type");
+ALTER TABLE "raingage" ADD PRIMARY KEY ("rg_id");
+ALTER TABLE "rpt_selector_result" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_selector_compare" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_arcflow_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_condsurcharge_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_continuity_errors" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_critical_elements" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_flowclass_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_flowrouting_cont" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_groundwater_cont" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_high_conterrors" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_high_flowinest_ind" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_instability_index" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_lidperformance_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_nodedepth_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_nodeflooding_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_nodeinflow_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_nodesurcharge_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_outfallflow_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_outfallload_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_pumping_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_qualrouting_cont" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_rainfall_dep" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_cat_result" ADD PRIMARY KEY ("result_id");
+ALTER TABLE "rpt_routing_timestep" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_runoff_qual" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_runoff_quant" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_storagevol_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_subcatchwashoff_sum" ADD PRIMARY KEY ("result_id", "subc_id", "poll_id");
+ALTER TABLE "rpt_subcathrunoff_sum" ADD PRIMARY KEY ("id");
+ALTER TABLE "rpt_timestep_critelem" ADD PRIMARY KEY ("id");
+ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
+ALTER TABLE "subcatchment" ADD PRIMARY KEY ("subc_id");
 
 
 
@@ -1986,6 +1986,6 @@ ALTER TABLE "SCHEMA_NAME"."subcatchment" ADD PRIMARY KEY ("subc_id");
 -- SPATIAL INDEX
 ----------------
 
-CREATE INDEX raingage_index ON "SCHEMA_NAME".raingage USING GIST (the_geom);
-CREATE INDEX subcathment_index ON "SCHEMA_NAME".subcatchment USING GIST (the_geom);
+CREATE INDEX raingage_index ON raingage USING GIST (the_geom);
+CREATE INDEX subcathment_index ON subcatchment USING GIST (the_geom);
 

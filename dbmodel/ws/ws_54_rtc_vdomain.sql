@@ -4,14 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- Records of value coefficient table
 -- ----------------------------
 
-INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('MIN');
-INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('AVG');
-INSERT INTO "SCHEMA_NAME"."rtc_value_opti_coef" VALUES ('MAX');
+INSERT INTO "rtc_value_opti_coef" VALUES ('MIN');
+INSERT INTO "rtc_value_opti_coef" VALUES ('AVG');
+INSERT INTO "rtc_value_opti_coef" VALUES ('MAX');
 
-INSERT INTO "SCHEMA_NAME"."rtc_value_opti_status" VALUES ('ON');
-INSERT INTO "SCHEMA_NAME"."rtc_value_opti_status" VALUES ('OFF');
+INSERT INTO "rtc_value_opti_status" VALUES ('ON');
+INSERT INTO "rtc_value_opti_status" VALUES ('OFF');

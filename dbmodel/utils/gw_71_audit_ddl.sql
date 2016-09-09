@@ -10,11 +10,11 @@ This version of Giswater is provided by Giswater Association
 -- This code is generic and not depend on application roles or structures. Is based on:
 --   http://wiki.postgresql.org/wiki/Audit_trigger_91plus
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- Catalog of functions
-DROP TABLE IF EXISTS SCHEMA_NAME.audit_cat_function CASCADE; 
-CREATE TABLE SCHEMA_NAME.audit_cat_function (
+DROP TABLE IF EXISTS audit_cat_function CASCADE; 
+CREATE TABLE audit_cat_function (
     id int4 PRIMARY KEY,
     name text NOT NULL,
     function_type text,
@@ -26,8 +26,8 @@ CREATE TABLE SCHEMA_NAME.audit_cat_function (
 
 
 -- Catalog of errors
-DROP TABLE IF EXISTS SCHEMA_NAME.audit_cat_error CASCADE;  
-CREATE TABLE SCHEMA_NAME.audit_cat_error (
+DROP TABLE IF EXISTS audit_cat_error CASCADE;  
+CREATE TABLE audit_cat_error (
     id integer PRIMARY KEY,
     error_message text,
     hint_message text,
@@ -38,8 +38,8 @@ CREATE TABLE SCHEMA_NAME.audit_cat_error (
 
 
 
-DROP TABLE IF EXISTS SCHEMA_NAME.audit_function_actions CASCADE; 
-CREATE TABLE IF NOT EXISTS SCHEMA_NAME.audit_function_actions (
+DROP TABLE IF EXISTS audit_function_actions CASCADE; 
+CREATE TABLE IF NOT EXISTS audit_function_actions (
     id bigserial PRIMARY KEY,
     tstamp TIMESTAMP NOT NULL DEFAULT date_trunc('second', current_timestamp), 
     audit_cat_error_id integer NOT NULL,
@@ -51,9 +51,9 @@ CREATE TABLE IF NOT EXISTS SCHEMA_NAME.audit_function_actions (
 );
 
 
-DROP VIEW IF EXISTS SCHEMA_NAME.v_audit_functions;
-CREATE VIEW SCHEMA_NAME.v_audit_functions AS 
+DROP VIEW IF EXISTS v_audit_functions;
+CREATE VIEW v_audit_functions AS 
 SELECT tstamp, audit_cat_error.id, audit_cat_error.error_message, audit_cat_error.hint_message, audit_cat_error.log_level, audit_cat_error.show_user, user_name, addr, debug_info
-FROM SCHEMA_NAME.audit_function_actions INNER JOIN SCHEMA_NAME.audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id
+FROM audit_function_actions INNER JOIN audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id
 ORDER BY audit_function_actions.id DESC;
 

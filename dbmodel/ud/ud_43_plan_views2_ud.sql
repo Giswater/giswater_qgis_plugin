@@ -5,15 +5,15 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 ---------------------------------------------------------------
 -- SPECIFIC SQL (UD)
 ---------------------------------------------------------------
 
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc1";
-CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc1" AS 
+DROP VIEW IF EXISTS "v_price_x_catarc1";
+CREATE VIEW "v_price_x_catarc1" AS 
 SELECT
 	cat_arc.id,
 	cat_arc.geom1,
@@ -25,28 +25,28 @@ SELECT
 	cat_arc.estimated_depth,
 	cat_arc.cost_unit,
 	v_price_compost.price AS cost
-FROM ("SCHEMA_NAME".cat_arc
-JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."cost")::text = (v_price_compost.id)::text)));
+FROM (cat_arc
+JOIN v_price_compost ON (((cat_arc."cost")::text = (v_price_compost.id)::text)));
 
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc2";
-CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc2" AS 
+DROP VIEW IF EXISTS "v_price_x_catarc2";
+CREATE VIEW "v_price_x_catarc2" AS 
 SELECT
 	cat_arc.id,
 	v_price_compost.price AS m2bottom_cost
-FROM ("SCHEMA_NAME".cat_arc
-JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."m2bottom_cost")::text = (v_price_compost.id)::text)));
+FROM (cat_arc
+JOIN v_price_compost ON (((cat_arc."m2bottom_cost")::text = (v_price_compost.id)::text)));
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc3";
-CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc3" AS 
+DROP VIEW IF EXISTS "v_price_x_catarc3";
+CREATE VIEW "v_price_x_catarc3" AS 
 SELECT
 	cat_arc.id,
 	v_price_compost.price AS m3protec_cost
-FROM ("SCHEMA_NAME".cat_arc
-JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."m3protec_cost")::text = (v_price_compost.id)::text)));
+FROM (cat_arc
+JOIN v_price_compost ON (((cat_arc."m3protec_cost")::text = (v_price_compost.id)::text)));
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc";
-CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc" AS 
+DROP VIEW IF EXISTS "v_price_x_catarc";
+CREATE VIEW "v_price_x_catarc" AS 
 SELECT
 	v_price_x_catarc1.id,
 	v_price_x_catarc1.geom1,
@@ -60,29 +60,29 @@ SELECT
 	v_price_x_catarc1.cost,
 	v_price_x_catarc2.m2bottom_cost,
 	v_price_x_catarc3.m3protec_cost
-FROM ("SCHEMA_NAME".v_price_x_catarc1
-JOIN "SCHEMA_NAME".v_price_x_catarc2 ON ((("SCHEMA_NAME".v_price_x_catarc2.id)::text = ("SCHEMA_NAME".v_price_x_catarc1.id)::text))
-JOIN "SCHEMA_NAME".v_price_x_catarc3 ON ((("SCHEMA_NAME".v_price_x_catarc3.id)::text = ("SCHEMA_NAME".v_price_x_catarc1.id)::text))
+FROM (v_price_x_catarc1
+JOIN v_price_x_catarc2 ON (((v_price_x_catarc2.id)::text = (v_price_x_catarc1.id)::text))
+JOIN v_price_x_catarc3 ON (((v_price_x_catarc3.id)::text = (v_price_x_catarc1.id)::text))
 );
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catpavement";
-CREATE VIEW "SCHEMA_NAME"."v_price_x_catpavement" AS 
+DROP VIEW IF EXISTS "v_price_x_catpavement";
+CREATE VIEW "v_price_x_catpavement" AS 
 SELECT
 	cat_pavement.id AS pavcat_id,
 	cat_pavement.thickness,
 	v_price_compost.price AS m2pav_cost
-FROM ("SCHEMA_NAME".cat_pavement
-JOIN "SCHEMA_NAME".v_price_compost ON (((cat_pavement."m2_cost")::text = (v_price_compost.id)::text)));
+FROM (cat_pavement
+JOIN v_price_compost ON (((cat_pavement."m2_cost")::text = (v_price_compost.id)::text)));
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catnode";
-CREATE VIEW "SCHEMA_NAME"."v_price_x_catnode" AS 
+DROP VIEW IF EXISTS "v_price_x_catnode";
+CREATE VIEW "v_price_x_catnode" AS 
 SELECT
 	cat_node.id,
 	cat_node.estimated_y,
 	cat_node.cost_unit,
 	v_price_compost.price AS cost
-FROM ("SCHEMA_NAME".cat_node
-JOIN "SCHEMA_NAME".v_price_compost ON (((cat_node."cost")::text = (v_price_compost.id)::text)));
+FROM (cat_node
+JOIN v_price_compost ON (((cat_node."cost")::text = (v_price_compost.id)::text)));
 
 
 
@@ -91,8 +91,8 @@ JOIN "SCHEMA_NAME".v_price_compost ON (((cat_node."cost")::text = (v_price_compo
 -- ----------------------------
 -- View structure for v_plan_ml_arc
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_ml_arc";
-CREATE VIEW "SCHEMA_NAME"."v_plan_ml_arc" AS 
+DROP VIEW IF EXISTS "v_plan_ml_arc";
+CREATE VIEW "v_plan_ml_arc" AS 
 SELECT 
 arc.arc_id,
 v_arc_x_node.y1,
@@ -122,7 +122,7 @@ sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent
 arc.state,
 arc.the_geom
 
-FROM "SCHEMA_NAME".v_arc arc
+FROM v_arc arc
 	JOIN SCHEMA_NAME.v_arc_x_node ON ((((arc.arc_id)::text = (v_arc_x_node.arc_id)::text)))
 	JOIN SCHEMA_NAME.v_price_x_catarc ON ((((arc.arccat_id)::text = (v_price_x_catarc.id)::text)))
 	JOIN SCHEMA_NAME.v_price_x_catsoil ON ((((arc.soilcat_id)::text = (v_price_x_catsoil.id)::text)))
@@ -134,8 +134,8 @@ FROM "SCHEMA_NAME".v_arc arc
 -- ----------------------------
 -- View structure for v_plan_mlcost_arc
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_mlcost_arc";
-CREATE OR REPLACE VIEW "SCHEMA_NAME"."v_plan_mlcost_arc" AS 
+DROP VIEW IF EXISTS "v_plan_mlcost_arc";
+CREATE OR REPLACE VIEW "v_plan_mlcost_arc" AS 
 
 SELECT
 v_plan_ml_arc.arc_id,
@@ -179,14 +179,14 @@ v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)
 *(((2*((v_plan_ml_arc.z1+v_plan_ml_arc.geom1+v_plan_ml_arc.bulk*2+v_plan_ml_arc.z2)/v_plan_ml_arc.y_param)
 +(v_plan_ml_arc.width)+v_plan_ml_arc.b*2)+(v_plan_ml_arc.b*2+(v_plan_ml_arc.width)))/2))::numeric(12,3)																		AS m3mlexcess
 
-FROM "SCHEMA_NAME".v_plan_ml_arc;
+FROM v_plan_ml_arc;
 
 
 -- ----------------------------
 -- View structure for v_plan_cost_arc
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_cost_arc";
-CREATE VIEW "SCHEMA_NAME"."v_plan_cost_arc" AS 
+DROP VIEW IF EXISTS "v_plan_cost_arc";
+CREATE VIEW "v_plan_cost_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
 v_plan_ml_arc.arccat_id,
@@ -247,7 +247,7 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost
 
-FROM "SCHEMA_NAME".v_plan_ml_arc
+FROM v_plan_ml_arc
 	JOIN SCHEMA_NAME.v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
 	JOIN SCHEMA_NAME.plan_selector_economic ON (((v_plan_ml_arc."state")::text = (plan_selector_economic.id)::text));
 
@@ -256,8 +256,8 @@ FROM "SCHEMA_NAME".v_plan_ml_arc
 -- ----------------------------
 -- View structure for v_plan_arc
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_arc";
-CREATE VIEW "SCHEMA_NAME"."v_plan_arc" AS 
+DROP VIEW IF EXISTS "v_plan_arc";
+CREATE VIEW "v_plan_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
 v_plan_ml_arc.arccat_id,
@@ -284,7 +284,7 @@ v_plan_ml_arc.cost_unit,
 v_plan_ml_arc."state",
 v_plan_ml_arc.the_geom
 
-FROM "SCHEMA_NAME".v_plan_ml_arc
+FROM v_plan_ml_arc
 	JOIN SCHEMA_NAME.v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
 	JOIN SCHEMA_NAME.plan_selector_economic ON (((v_plan_ml_arc."state")::text = (plan_selector_economic.id)::text));
 
@@ -293,8 +293,8 @@ FROM "SCHEMA_NAME".v_plan_ml_arc
 -- ----------------------------
 -- View structure for v_plan_node
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_node";
-CREATE VIEW "SCHEMA_NAME"."v_plan_node" AS 
+DROP VIEW IF EXISTS "v_plan_node";
+CREATE VIEW "v_plan_node" AS 
 SELECT
 
 node.node_id,
@@ -316,8 +316,8 @@ JOIN SCHEMA_NAME.plan_selector_economic ON (((node."state")::text = (plan_select
 -- ----------------------------
 -- View structure for v_plan_arc_x_psector
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_arc_x_psector";
-CREATE VIEW "SCHEMA_NAME"."v_plan_arc_x_psector" AS 
+DROP VIEW IF EXISTS "v_plan_arc_x_psector";
+CREATE VIEW "v_plan_arc_x_psector" AS 
 SELECT
 
 arc.arc_id,
@@ -341,8 +341,8 @@ ORDER BY arccat_id;
 -- ----------------------------
 -- View structure for v_plan_node_x_psector
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_node_x_psector";
-CREATE VIEW "SCHEMA_NAME"."v_plan_node_x_psector" AS 
+DROP VIEW IF EXISTS "v_plan_node_x_psector";
+CREATE VIEW "v_plan_node_x_psector" AS 
 SELECT
 
 node.node_id,
@@ -364,9 +364,9 @@ ORDER BY nodecat_id;
 -- View structure for v_plan_psector_arc
 -- ----------------------------
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_psector_arc" CASCADE;
+DROP VIEW IF EXISTS "v_plan_psector_arc" CASCADE;
 
-CREATE VIEW "SCHEMA_NAME"."v_plan_psector_arc" AS 
+CREATE VIEW "v_plan_psector_arc" AS 
 SELECT 
 plan_psector.psector_id,
 plan_psector.descript,
@@ -411,8 +411,8 @@ plan_psector.other;
 -- ----------------------------
 -- View structure for v_plan_psector_node
 -- ----------------------------
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_psector_node" CASCADE;
-CREATE VIEW "SCHEMA_NAME"."v_plan_psector_node" AS 
+DROP VIEW IF EXISTS "v_plan_psector_node" CASCADE;
+CREATE VIEW "v_plan_psector_node" AS 
 SELECT 
 plan_psector.psector_id,
 plan_psector.descript,
@@ -454,9 +454,9 @@ plan_psector.other;
 
 
 
-DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_other_x_psector";
+DROP VIEW IF EXISTS "v_plan_other_x_psector";
 
-CREATE VIEW "SCHEMA_NAME"."v_plan_other_x_psector" AS 
+CREATE VIEW "v_plan_other_x_psector" AS 
 SELECT
 plan_other_x_psector.id,
 plan_other_x_psector.psector_id,
@@ -471,9 +471,9 @@ JOIN SCHEMA_NAME.v_price_compost ON ((((v_price_compost.id)::text = (plan_other_
 ORDER BY psector_id;
 
 
-DROP VIEW IF EXISTS  "SCHEMA_NAME"."v_plan_psector_other";
+DROP VIEW IF EXISTS  "v_plan_psector_other";
 
-CREATE VIEW "SCHEMA_NAME"."v_plan_psector_other" AS 
+CREATE VIEW "v_plan_psector_other" AS 
 SELECT 
 plan_psector.psector_id,
 plan_psector.descript,
@@ -548,8 +548,8 @@ DROP VIEW IF EXISTS SCHEMA_NAME.v_plan_psector;
 
 
 				
-DROP VIEW IF EXISTS "SCHEMA_NAME".v_plan_psector_filtered;				
- CREATE OR REPLACE VIEW "SCHEMA_NAME".v_plan_psector_filtered AS 
+DROP VIEW IF EXISTS v_plan_psector_filtered;				
+ CREATE OR REPLACE VIEW v_plan_psector_filtered AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,
     sum(wtotal.pec::numeric(12,2)) AS pec,
@@ -562,8 +562,8 @@ DROP VIEW IF EXISTS "SCHEMA_NAME".v_plan_psector_filtered;
 					v_plan_psector_arc.pec_vat,
                     v_plan_psector_arc.pca,
                     v_plan_psector_arc.the_geom
-                   FROM "SCHEMA_NAME".v_plan_psector_arc
-				   JOIN "SCHEMA_NAME".plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_arc.psector_id)::text
+                   FROM v_plan_psector_arc
+				   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_arc.psector_id)::text
         UNION
                  SELECT v_plan_psector_node.psector_id,
 					v_plan_psector_node.pem,
@@ -571,8 +571,8 @@ DROP VIEW IF EXISTS "SCHEMA_NAME".v_plan_psector_filtered;
 					v_plan_psector_node.pec_vat,
                     v_plan_psector_node.pca,
                     v_plan_psector_node.the_geom
-                   FROM "SCHEMA_NAME".v_plan_psector_node
-				   JOIN "SCHEMA_NAME".plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_node.psector_id)::text
+                   FROM v_plan_psector_node
+				   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_node.psector_id)::text
 		UNION
                  SELECT v_plan_psector_other.psector_id,
 					v_plan_psector_other.pem,
@@ -580,8 +580,8 @@ DROP VIEW IF EXISTS "SCHEMA_NAME".v_plan_psector_filtered;
 					v_plan_psector_other.pec_vat,
                     v_plan_psector_other.pca,
                     v_plan_psector_other.the_geom
-                   FROM "SCHEMA_NAME".v_plan_psector_other
-                   JOIN "SCHEMA_NAME".plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_other.psector_id)::text) wtotal
+                   FROM v_plan_psector_other
+                   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_other.psector_id)::text) wtotal
 				   
 				   
 				GROUP BY wtotal.psector_id, wtotal.the_geom;

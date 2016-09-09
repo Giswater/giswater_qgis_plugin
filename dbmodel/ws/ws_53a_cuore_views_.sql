@@ -3,10 +3,10 @@ This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
-DROP VIEW IF EXISTS "SCHEMA_NAME".v_ext_urban_propierties;
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_ext_urban_propierties AS
+DROP VIEW IF EXISTS v_ext_urban_propierties;
+CREATE OR REPLACE VIEW v_ext_urban_propierties AS
 SELECT
     ext_urban_propierties.id,
     connec.connec_id, 
@@ -46,11 +46,11 @@ SELECT
     connec.link, 
     connec.verified, 
     ext_urban_propierties.the_geom
-   FROM SCHEMA_NAME.connec
-   JOIN SCHEMA_NAME.ext_urban_propierties ON connec.code::text = ext_urban_propierties.code::text
-   JOIN SCHEMA_NAME.v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
-   JOIN SCHEMA_NAME.cat_connec ON connec.connecat_id::text = cat_connec.id::text
-   LEFT JOIN SCHEMA_NAME.ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-   LEFT JOIN SCHEMA_NAME.link ON connec.connec_id::text = link.connec_id::text
-   LEFT JOIN SCHEMA_NAME.vnode ON vnode.vnode_id::text = link.vnode_id::text
-   LEFT JOIN SCHEMA_NAME.dma ON connec.dma_id::text = dma.dma_id::text;
+   FROM connec
+   JOIN ext_urban_propierties ON connec.code::text = ext_urban_propierties.code::text
+   JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
+   JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+   LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
+   LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+   LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
+   LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text;

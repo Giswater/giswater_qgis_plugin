@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- Base map
@@ -12,14 +12,14 @@ This version of Giswater is provided by Giswater Association
 
 -- Streeter
 
-CREATE TABLE "SCHEMA_NAME"."ext_type_street" (
+CREATE TABLE "ext_type_street" (
 "id" varchar(20)   NOT NULL,
 "observ" varchar(50)  ,
 CONSTRAINT ext_type_street_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."ext_streetaxis" (
+CREATE TABLE "ext_streetaxis" (
 "id" varchar (16) NOT NULL,
 "type" varchar(18),
 "name" varchar(100),
@@ -36,7 +36,7 @@ CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
+CREATE TABLE "ext_urban_propierties" (
 "id" varchar (16) NOT NULL,
 "code" varchar(30),
 "streetaxis" varchar(16),
