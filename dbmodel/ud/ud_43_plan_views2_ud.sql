@@ -12,7 +12,7 @@ This version of Giswater is provided by Giswater Association
 ---------------------------------------------------------------
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc1";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc1" AS 
 SELECT
 	cat_arc.id,
@@ -29,6 +29,7 @@ FROM ("SCHEMA_NAME".cat_arc
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."cost")::text = (v_price_compost.id)::text)));
 
 
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc2";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc2" AS 
 SELECT
 	cat_arc.id,
@@ -36,7 +37,7 @@ SELECT
 FROM ("SCHEMA_NAME".cat_arc
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."m2bottom_cost")::text = (v_price_compost.id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc3";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc3" AS 
 SELECT
 	cat_arc.id,
@@ -44,7 +45,7 @@ SELECT
 FROM ("SCHEMA_NAME".cat_arc
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_arc."m3protec_cost")::text = (v_price_compost.id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catarc";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catarc" AS 
 SELECT
 	v_price_x_catarc1.id,
@@ -64,7 +65,7 @@ JOIN "SCHEMA_NAME".v_price_x_catarc2 ON ((("SCHEMA_NAME".v_price_x_catarc2.id)::
 JOIN "SCHEMA_NAME".v_price_x_catarc3 ON ((("SCHEMA_NAME".v_price_x_catarc3.id)::text = ("SCHEMA_NAME".v_price_x_catarc1.id)::text))
 );
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catpavement";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catpavement" AS 
 SELECT
 	cat_pavement.id AS pavcat_id,
@@ -73,7 +74,7 @@ SELECT
 FROM ("SCHEMA_NAME".cat_pavement
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_pavement."m2_cost")::text = (v_price_compost.id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catnode";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catnode" AS 
 SELECT
 	cat_node.id,
@@ -90,7 +91,7 @@ JOIN "SCHEMA_NAME".v_price_compost ON (((cat_node."cost")::text = (v_price_compo
 -- ----------------------------
 -- View structure for v_plan_ml_arc
 -- ----------------------------
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_ml_arc";
 CREATE VIEW "SCHEMA_NAME"."v_plan_ml_arc" AS 
 SELECT 
 arc.arc_id,
@@ -133,7 +134,7 @@ FROM "SCHEMA_NAME".v_arc arc
 -- ----------------------------
 -- View structure for v_plan_mlcost_arc
 -- ----------------------------
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_mlcost_arc";
 CREATE OR REPLACE VIEW "SCHEMA_NAME"."v_plan_mlcost_arc" AS 
 
 SELECT
@@ -184,7 +185,7 @@ FROM "SCHEMA_NAME".v_plan_ml_arc;
 -- ----------------------------
 -- View structure for v_plan_cost_arc
 -- ----------------------------
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_cost_arc";
 CREATE VIEW "SCHEMA_NAME"."v_plan_cost_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
@@ -255,6 +256,7 @@ FROM "SCHEMA_NAME".v_plan_ml_arc
 -- ----------------------------
 -- View structure for v_plan_arc
 -- ----------------------------
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_arc";
 CREATE VIEW "SCHEMA_NAME"."v_plan_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
@@ -291,6 +293,7 @@ FROM "SCHEMA_NAME".v_plan_ml_arc
 -- ----------------------------
 -- View structure for v_plan_node
 -- ----------------------------
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_node";
 CREATE VIEW "SCHEMA_NAME"."v_plan_node" AS 
 SELECT
 
@@ -313,6 +316,7 @@ JOIN SCHEMA_NAME.plan_selector_economic ON (((node."state")::text = (plan_select
 -- ----------------------------
 -- View structure for v_plan_arc_x_psector
 -- ----------------------------
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_arc_x_psector";
 CREATE VIEW "SCHEMA_NAME"."v_plan_arc_x_psector" AS 
 SELECT
 
@@ -337,6 +341,7 @@ ORDER BY arccat_id;
 -- ----------------------------
 -- View structure for v_plan_node_x_psector
 -- ----------------------------
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_node_x_psector";
 CREATE VIEW "SCHEMA_NAME"."v_plan_node_x_psector" AS 
 SELECT
 
@@ -358,6 +363,7 @@ ORDER BY nodecat_id;
 -- ----------------------------
 -- View structure for v_plan_psector_arc
 -- ----------------------------
+
 DROP VIEW IF EXISTS "SCHEMA_NAME"."v_plan_psector_arc" CASCADE;
 
 CREATE VIEW "SCHEMA_NAME"."v_plan_psector_arc" AS 
@@ -506,6 +512,7 @@ plan_psector.vat,
 plan_psector.other;
 
 
+DROP VIEW IF EXISTS SCHEMA_NAME.v_plan_psector;
  CREATE OR REPLACE VIEW SCHEMA_NAME.v_plan_psector AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,
@@ -541,7 +548,7 @@ plan_psector.other;
 
 
 				
-				
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_plan_psector_filtered;				
  CREATE OR REPLACE VIEW "SCHEMA_NAME".v_plan_psector_filtered AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,

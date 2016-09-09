@@ -9,6 +9,7 @@ This version of Giswater is provided by Giswater Association
 --    GIS EDITING VIEWS
 ----------------------------
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_node;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_node AS
 SELECT 
 node.node_id, 
@@ -49,6 +50,7 @@ LEFT JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::t
 LEFT JOIN "SCHEMA_NAME".dma ON (((node.dma_id)::text = (dma.dma_id)::text)));
 
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_arc;
 CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
 SELECT 
 arc.arc_id,
@@ -91,7 +93,7 @@ LEFT JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)
 LEFT JOIN "SCHEMA_NAME".dma ON (((arc.dma_id)::text = (dma.dma_id)::text)));
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_link;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
 SELECT 
 link.link_id,
@@ -106,7 +108,7 @@ LEFT JOIN "SCHEMA_NAME".connec ON (((connec.connec_id)::text = (link.connec_id):
 );
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_edit_valve;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_valve AS 
 SELECT 
 node.node_id,

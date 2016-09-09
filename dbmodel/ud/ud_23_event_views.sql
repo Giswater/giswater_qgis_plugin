@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_node AS 
 SELECT
 event_x_node.id,
@@ -27,7 +27,7 @@ ORDER BY node_id;
 
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_arc;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_arc AS 
 SELECT
 event_x_arc.id,
@@ -49,7 +49,7 @@ JOIN SCHEMA_NAME.arc ON SCHEMA_NAME.arc.arc_id::text = event_x_arc.arc_id::text
 ORDER BY arc_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_element;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element AS 
 SELECT
 event_x_element.id,
@@ -72,7 +72,7 @@ JOIN SCHEMA_NAME.node ON SCHEMA_NAME.node.node_id::text = element_x_node.node_id
 ORDER BY element_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_connec;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_connec AS 
 SELECT
 event_x_connec.id,
@@ -92,7 +92,7 @@ JOIN SCHEMA_NAME.connec ON SCHEMA_NAME.connec.connec_id::text = event_x_connec.c
 ORDER BY connec_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_gully;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_gully AS 
 SELECT
 event_x_gully.id,
@@ -112,7 +112,7 @@ JOIN SCHEMA_NAME.gully ON SCHEMA_NAME.gully.gully_id::text = event_x_gully.gully
 ORDER BY gully_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_element_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_node AS 
  SELECT event_x_element.id,
     node.node_id,
@@ -134,7 +134,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_node AS
   ORDER BY event_x_element.element_id;
   
   
-  
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_element_x_connec;
  CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_connec AS 
  SELECT event_x_element.id,
     connec.connec_id,
@@ -156,7 +156,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_node AS
   ORDER BY event_x_element.element_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_element_x_arc;
  CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_arc AS 
  SELECT event_x_element.id,
     arc.arc_id,
@@ -178,7 +178,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_node AS
   ORDER BY event_x_element.element_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_event_x_element_x_gully;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_event_x_element_x_gully AS 
  SELECT event_x_element.id,
     gully.gully_id,

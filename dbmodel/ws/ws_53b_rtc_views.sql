@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_rtc_hydrometer;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer AS 
  SELECT ext_rtc_hydrometer.hydrometer_id, 
     v_ext_urban_propierties.id as urban_propierties_id,
@@ -20,6 +20,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer AS
    LEFT JOIN SCHEMA_NAME.v_ext_urban_propierties ON v_ext_urban_propierties.connec_id::text = rtc_hydrometer_x_connec.connec_id::text;
 
 
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_scada_x_node; 
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_scada_x_node AS 
 SELECT
 ext_rtc_scada_x_value.id,
@@ -32,7 +33,7 @@ FROM "SCHEMA_NAME".rtc_scada_node
 JOIN "SCHEMA_NAME".ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id::text = rtc_scada_node.scada_id::text;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_ui_hydrometer_x_connec;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_ui_hydrometer_x_connec AS
 SELECT
 ext_rtc_hydrometer.hydrometer_id,
@@ -43,7 +44,7 @@ FROM "SCHEMA_NAME".ext_rtc_hydrometer
 JOIN "SCHEMA_NAME".rtc_hydrometer_x_connec ON "SCHEMA_NAME".rtc_hydrometer_x_connec.hydrometer_id="SCHEMA_NAME".ext_rtc_hydrometer.hydrometer_id;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_rtc_hydrometer_period;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_hydrometer_period AS
 SELECT
 ext_rtc_hydrometer.hydrometer_id,
@@ -59,7 +60,7 @@ JOIN "SCHEMA_NAME".connec ON "SCHEMA_NAME".connec.connec_id = "SCHEMA_NAME".rtc_
 JOIN "SCHEMA_NAME".rtc_options ON  "SCHEMA_NAME".rtc_options.period_id = "SCHEMA_NAME".ext_cat_period.id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_rtc_dma_hydrometer_period;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_dma_hydrometer_period AS 
  SELECT v_rtc_hydrometer_period.dma_id, 
     ext_cat_period.id AS period_id, 
@@ -72,7 +73,7 @@ CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_dma_hydrometer_period AS
   GROUP BY v_rtc_hydrometer_period.dma_id, ext_cat_period.id, ext_cat_period.period_seconds;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_rtc_dma_parameter_period;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_dma_parameter_period AS 
  SELECT v_rtc_dma_hydrometer_period.dma_id, 
     v_rtc_dma_hydrometer_period.period_id, 
@@ -88,7 +89,7 @@ CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_dma_parameter_period AS
   JOIN "SCHEMA_NAME".ext_rtc_scada_dma_period ON ext_rtc_scada_dma_period.cat_period_id::text = v_rtc_dma_hydrometer_period.period_id::text;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_rtc_hydrometer_x_arc;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_hydrometer_x_arc AS 
 SELECT
 rtc_hydrometer_x_connec.hydrometer_id,
@@ -101,6 +102,7 @@ JOIN "SCHEMA_NAME".v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydromet
 JOIN "SCHEMA_NAME".arc ON arc.arc_id::text = v_edit_connec.arc_id;
 
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_rtc_hydrometer_x_node_period;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_rtc_hydrometer_x_node_period AS
 SELECT
 v_rtc_hydrometer_x_arc.node_1 as node_id,
@@ -133,7 +135,7 @@ JOIN "SCHEMA_NAME".v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer
 JOIN "SCHEMA_NAME".v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text=v_rtc_dma_parameter_period.period_id::text;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_inp_demand";
 CREATE OR REPLACE VIEW "SCHEMA_NAME"."v_inp_demand" as
 SELECT
 v_rtc_hydrometer_x_node_period.node_id,

@@ -12,7 +12,7 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 -- Editing views structure
 -- ----------------------------
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_node;
 CREATE VIEW "SCHEMA_NAME".v_edit_node AS
 SELECT node.node_id, 
 node.top_elev, 
@@ -52,6 +52,7 @@ node.the_geom
    JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
    
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_arc;
 CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
 SELECT arc.arc_id, 
 arc.node_1,
@@ -102,7 +103,7 @@ JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 JOIN "SCHEMA_NAME".v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_connec;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_connec AS
 SELECT connec.connec_id, 
 connec.top_elev, 
@@ -147,7 +148,7 @@ LEFT JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
 LEFT JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id);
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_link;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
 SELECT 
 link.link_id,
@@ -161,7 +162,7 @@ FROM ("SCHEMA_NAME".link
 LEFT JOIN "SCHEMA_NAME".connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_gully;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_gully AS
 SELECT gully.gully_id, 
 gully.top_elev, 
@@ -203,7 +204,7 @@ FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat
 WHERE gully.the_geom is not null;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_pgully;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_pgully AS
 SELECT gully.gully_id, 
 gully.top_elev, 

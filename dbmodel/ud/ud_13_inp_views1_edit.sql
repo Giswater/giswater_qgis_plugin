@@ -9,6 +9,7 @@ This version of Giswater is provided by Giswater Association
 -- View structure for v_node
 -- ----------------------------
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_junction;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_junction AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev, 
@@ -18,6 +19,7 @@ FROM ("SCHEMA_NAME".node
 JOIN "SCHEMA_NAME".inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
 
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_divider;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_divider AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev,
@@ -27,6 +29,7 @@ FROM ("SCHEMA_NAME".node
 JOIN "SCHEMA_NAME".inp_divider ON (((node.node_id)::text = (inp_divider.node_id)::text)));
 
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_outfall;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_outfall AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev,  
@@ -36,6 +39,7 @@ FROM ("SCHEMA_NAME".node
 JOIN "SCHEMA_NAME".inp_outfall ON (((node.node_id)::text = (inp_outfall.node_id)::text)));
 
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_storage;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_storage AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev, 
@@ -52,6 +56,7 @@ JOIN "SCHEMA_NAME".inp_storage ON (((node.node_id)::text = (inp_storage.node_id)
 -- View structure for v_arc
 -- ----------------------------
 
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_conduit;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_conduit AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, cat_arc.matcat_id AS "cat_matcat_id", cat_arc.shape AS "cat_shape",arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -60,7 +65,7 @@ FROM (("SCHEMA_NAME".arc
 JOIN "SCHEMA_NAME".inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
 JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_orifice;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_orifice AS
 SELECT
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -68,7 +73,7 @@ inp_orifice.ori_type, inp_orifice."offset", inp_orifice.cd, inp_orifice.orate, i
 FROM ("SCHEMA_NAME".arc
 JOIN "SCHEMA_NAME".inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_outlet;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_outlet AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -76,7 +81,7 @@ inp_outlet.outlet_type, inp_outlet."offset", inp_outlet.curve_id, inp_outlet.cd1
 FROM ("SCHEMA_NAME".arc
 JOIN "SCHEMA_NAME".inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_pump;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_pump AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -84,7 +89,7 @@ inp_pump.curve_id, inp_pump.status, inp_pump.startup, inp_pump.shutoff
 FROM ("SCHEMA_NAME".arc
 JOIN "SCHEMA_NAME".inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_inp_weir;
 CREATE VIEW "SCHEMA_NAME".v_edit_inp_weir AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,

@@ -10,7 +10,7 @@ This version of Giswater is provided by Giswater Association
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc AS 
 SELECT 
 arc.arc_id, 
@@ -38,6 +38,7 @@ FROM SCHEMA_NAME.arc
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
 
+DROP VIEW IF EXISTS SCHEMA_NAME.v_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_node AS
 SELECT
 node.node_id,
@@ -58,14 +59,15 @@ FROM SCHEMA_NAME.node;
 
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc_x_node1;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node1 AS 
 SELECT arc.arc_id, arc.node_1, node.top_elev AS top_elev1, node.ymax AS ymax1, node.top_elev - node.ymax AS elev1, arc.y1, node.ymax - arc.y1 AS z1, cat_arc.geom1, arc.y1 - cat_arc.geom1 AS r1 
 FROM SCHEMA_NAME.v_arc arc 
 	JOIN SCHEMA_NAME.node ON arc.node_1::text = node.node_id::text
 	JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
-
+	
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc_x_node2;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node2 AS 
 SELECT arc.arc_id,arc.node_2,node.top_elev AS top_elev2,node.ymax AS ymax2,node.top_elev - node.ymax AS elev2,arc.y2,node.ymax - arc.y2 AS z2,cat_arc.geom1, arc.y2 - cat_arc.geom1 AS r2
 FROM SCHEMA_NAME.v_arc arc
@@ -73,7 +75,7 @@ FROM SCHEMA_NAME.v_arc arc
    JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node AS 
 SELECT v_arc_x_node1.arc_id, 
 v_arc_x_node1.node_1,

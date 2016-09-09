@@ -10,6 +10,7 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 
 
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc AS 
 SELECT 
 arc.arc_id, 
@@ -30,7 +31,7 @@ FROM SCHEMA_NAME.arc
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_node AS
 SELECT
 node.node_id,

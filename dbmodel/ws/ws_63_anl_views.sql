@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 -- MINCUT
 -- ----------------------------
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_anl_mincut_connec;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_anl_mincut_connec AS 
 SELECT
 connec_id,
@@ -18,7 +18,7 @@ FROM SCHEMA_NAME.anl_mincut_arc
 JOIN SCHEMA_NAME.v_edit_connec on v_edit_connec.arc_id=anl_mincut_arc.arc_id;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_anl_mincut_hydrometer;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_anl_mincut_hydrometer AS 
 SELECT
 hydrometer_id,

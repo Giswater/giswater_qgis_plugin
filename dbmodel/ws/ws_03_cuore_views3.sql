@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc_x_node1;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node1 AS 
 SELECT arc.arc_id, arc.node_1, 
 node.elevation AS elevation1, 
@@ -21,7 +21,7 @@ JOIN SCHEMA_NAME.node ON arc.node_1::text = node.node_id::text
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc_x_node2;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node2 AS 
 SELECT arc.arc_id, arc.node_2, 
 node.elevation AS elevation2, 
@@ -33,6 +33,7 @@ JOIN SCHEMA_NAME.node ON arc.node_2::text = node.node_id::text
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
+DROP VIEW IF EXISTS SCHEMA_NAME.v_arc_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node AS 
 SELECT 
 v_arc_x_node1.arc_id,
@@ -52,7 +53,7 @@ JOIN SCHEMA_NAME.v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc
 JOIN SCHEMA_NAME.arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text; 
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_node AS 
 SELECT
 element_x_node.id,
@@ -68,7 +69,7 @@ FROM SCHEMA_NAME.element_x_node
 JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_node.element_id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_arc;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_arc AS
 SELECT
 element_x_arc.id,
@@ -84,7 +85,7 @@ FROM SCHEMA_NAME.element_x_arc
 JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_arc.element_id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_connec;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_connec AS
 SELECT
 element_x_connec.id,

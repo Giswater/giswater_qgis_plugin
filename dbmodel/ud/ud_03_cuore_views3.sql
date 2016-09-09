@@ -13,7 +13,7 @@ This version of Giswater is provided by Giswater Association
 
 
   
- 
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_node AS 
 SELECT
 element_x_node.id,
@@ -30,7 +30,7 @@ JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_node.element_id
 
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_connec;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_connec AS
 SELECT
 element_x_connec.id,
@@ -46,7 +46,7 @@ FROM SCHEMA_NAME.element_x_connec
 JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_connec.element_id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_gully;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_gully AS
 SELECT
 element_x_gully.id,
@@ -62,6 +62,8 @@ FROM SCHEMA_NAME.element_x_gully
 JOIN SCHEMA_NAME.element ON element.element_id::text = element_x_gully.element_id::text;
 
 
+
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_element_x_arc;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_element_x_arc AS
 SELECT
 element_x_arc.id,

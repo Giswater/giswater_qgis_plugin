@@ -24,7 +24,7 @@ LEFT JOIN "SCHEMA_NAME".price_simple ON (((price_simple.id)::text = (price_compo
 GROUP BY price_compost.id, price_compost.unit, price_compost.descript;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catsoil1";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil1" AS 
 SELECT
 
@@ -37,7 +37,7 @@ FROM ("SCHEMA_NAME".cat_soil
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m3exc_cost")::text = (v_price_compost.id)::text)));
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catsoil2";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil2" AS
 SELECT
   cat_soil.id,
@@ -47,7 +47,7 @@ JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m3fill_cost")::text = (v_pric
 
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catsoil3";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil3" AS
 SELECT
   cat_soil.id,
@@ -56,7 +56,7 @@ FROM ("SCHEMA_NAME".cat_soil
 JOIN "SCHEMA_NAME".v_price_compost ON (((cat_soil."m3excess_cost")::text = (v_price_compost.id)::text)));
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catsoil4";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil4" AS
 SELECT
   cat_soil.id,
@@ -67,7 +67,7 @@ WHERE (((cat_soil.m2trenchl_cost)::text = (v_price_compost.id)::text)  OR  (cat_
 
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME"."v_price_x_catsoil";
 CREATE VIEW "SCHEMA_NAME"."v_price_x_catsoil" AS
 SELECT
   v_price_x_catsoil1.id,

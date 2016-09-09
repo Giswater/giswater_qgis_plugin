@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_doc_x_node;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_node AS 
 SELECT
 doc_x_node.id,
@@ -21,7 +21,7 @@ FROM SCHEMA_NAME.doc_x_node
 JOIN SCHEMA_NAME.doc ON doc.id::text = doc_x_node.doc_id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_doc_x_arc;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_arc AS
 SELECT 
 doc_x_arc.id,
@@ -37,7 +37,7 @@ FROM SCHEMA_NAME.doc_x_arc
 JOIN SCHEMA_NAME.doc ON doc.id::text = doc_x_arc.doc_id::text;
 
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_ui_doc_x_connec;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_ui_doc_x_connec AS
 SELECT
 doc_x_connec.id,

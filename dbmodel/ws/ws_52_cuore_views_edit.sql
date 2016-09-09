@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+DROP VIEW IF EXISTS SCHEMA_NAME.v_rtc_hydrometer_x_connec;
 CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer_x_connec AS
 SELECT 
 connec_id,
@@ -14,7 +14,7 @@ FROM SCHEMA_NAME.rtc_hydrometer_x_connec
 group by connec_id;
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_edit_connec;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_connec AS
 SELECT connec.connec_id, 
 connec.elevation, 

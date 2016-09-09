@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
+DROP VIEW IF EXISTS "SCHEMA_NAME".v_ext_urban_propierties;
 CREATE OR REPLACE VIEW "SCHEMA_NAME".v_ext_urban_propierties AS
 SELECT
     ext_urban_propierties.id,
