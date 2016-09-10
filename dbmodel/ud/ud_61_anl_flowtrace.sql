@@ -4,20 +4,20 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- FLOW TRACE
 -- ----------------------------
 
 
-CREATE TABLE "SCHEMA_NAME"."anl_flow_trace_node" (
+CREATE TABLE "anl_flow_trace_node" (
 node_id varchar (16) NOT NULL,
 the_geom public.geometry (POINT, SRID_VALUE),
 CONSTRAINT anl_flow_trace_node_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."anl_flow_trace_arc" (
+CREATE TABLE "anl_flow_trace_arc" (
 arc_id varchar (16) NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
 CONSTRAINT anl_flow_trace_arc_pkey PRIMARY KEY (arc_id)
@@ -25,6 +25,6 @@ CONSTRAINT anl_flow_trace_arc_pkey PRIMARY KEY (arc_id)
 
 
 
-CREATE INDEX anl_flow_trace_node_index ON "SCHEMA_NAME".anl_flow_trace_node USING GIST (the_geom);
-CREATE INDEX anl_flow_trace_arc_index ON "SCHEMA_NAME".anl_flow_trace_arc USING GIST (the_geom);
+CREATE INDEX anl_flow_trace_node_index ON anl_flow_trace_node USING GIST (the_geom);
+CREATE INDEX anl_flow_trace_arc_index ON anl_flow_trace_arc USING GIST (the_geom);
 

@@ -4,12 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ----------------------------
 --    GIS EDITING VIEWS
 ----------------------------
 
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_node AS
+DROP VIEW IF EXISTS v_edit_node;
+CREATE OR REPLACE VIEW v_edit_node AS
 SELECT 
 node.node_id, 
 node.elevation, 
@@ -45,11 +46,12 @@ node.link,
 node.verified,
 node.the_geom
 FROM ("SCHEMA_NAME".node 
-LEFT JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text))
-LEFT JOIN "SCHEMA_NAME".dma ON (((node.dma_id)::text = (dma.dma_id)::text)));
+LEFT JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text))
+LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text)));
 
 
-CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
+DROP VIEW IF EXISTS v_edit_arc;
+CREATE VIEW v_edit_arc AS
 SELECT 
 arc.arc_id,
 arc.node_1,
@@ -87,12 +89,12 @@ arc.link,
 arc.verified,
 arc.the_geom
 FROM ("SCHEMA_NAME".arc 
-LEFT JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-LEFT JOIN "SCHEMA_NAME".dma ON (((arc.dma_id)::text = (dma.dma_id)::text)));
+LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text)));
 
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
+DROP VIEW IF EXISTS v_edit_link;
+CREATE OR REPLACE VIEW v_edit_link AS
 SELECT 
 link.link_id,
 link.connec_id,
@@ -102,12 +104,12 @@ link.custom_length,
 connec.connecat_id,
 link.the_geom
 FROM ("SCHEMA_NAME".link 
-LEFT JOIN "SCHEMA_NAME".connec ON (((connec.connec_id)::text = (link.connec_id)::text))
+LEFT JOIN connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_edit_valve AS 
+DROP VIEW IF EXISTS v_edit_valve;
+CREATE OR REPLACE VIEW v_edit_valve AS 
 SELECT 
 node.node_id,
 cat_node.nodetype_id,

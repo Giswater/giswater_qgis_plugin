@@ -4,23 +4,22 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- Base map
 -- ----------------------------
 
-
 -- Streeter
 
-CREATE TABLE "SCHEMA_NAME"."ext_type_street" (
+CREATE TABLE "ext_type_street" (
 "id" varchar(20)   NOT NULL,
 "observ" varchar(50)  ,
 CONSTRAINT ext_type_street_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."ext_streetaxis" (
+CREATE TABLE "ext_streetaxis" (
 "id" varchar (16) NOT NULL,
 "type" varchar(18),
 "name" varchar(100),
@@ -36,7 +35,7 @@ CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 -- Urban_structure
 
 
-CREATE TABLE "SCHEMA_NAME"."ext_urban_propierties" (
+CREATE TABLE "ext_urban_propierties" (
 "id" varchar (16) NOT NULL,
 "code" varchar(30),
 "streetaxis" varchar(16),
@@ -59,7 +58,7 @@ CONSTRAINT ext_urban_propierties_pkey PRIMARY KEY (id)
 -- Time Period for CRM & SCADA integrated with math model
 -- ----------------------------
 
-CREATE TABLE "SCHEMA_NAME".ext_cat_period (
+CREATE TABLE ext_cat_period (
   id character varying(16) NOT NULL,
   starttime timestamp (6) without time zone,
   endtime timestamp (6) without time zone,
@@ -99,7 +98,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_dma_period_seq"
 
 
 
-CREATE TABLE "SCHEMA_NAME".ext_cat_scada(
+CREATE TABLE ext_cat_scada(
 "id" character varying(16) NOT NULL,
 "data_type" character varying(30),
 "units" character varying(12),
@@ -115,7 +114,7 @@ CONSTRAINT ext_cat_scada_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_scada(
+CREATE TABLE ext_rtc_scada(
   "scada_id" character varying(16) NOT NULL,
   "cat_scada_id" character varying(16),
   "text" text,
@@ -124,7 +123,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_scada(
 
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_value (
+CREATE TABLE ext_rtc_scada_x_value (
   "id" int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_scada_x_value_seq'::regclass) NOT NULL,
   "scada_id" character varying(16),
   "value" float, 
@@ -136,7 +135,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_value (
 
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_data (
+CREATE TABLE ext_rtc_scada_x_data (
   "id" int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_scada_x_data_seq'::regclass) NOT NULL,
   "scada_id" character varying(16),
   "min" float,  -- l/s or mca
@@ -149,7 +148,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_x_data (
 
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_scada_dma_period (
+CREATE TABLE ext_rtc_scada_dma_period (
   "id" int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_scada_dma_period_seq'::regclass) NOT NULL,
   "dma_id" character varying(16),
   "m3_min" float, 
@@ -182,7 +181,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data_seq"
     CACHE 1;
 
 
-CREATE TABLE "SCHEMA_NAME".ext_cat_hydrometer(
+CREATE TABLE ext_cat_hydrometer(
 "id" character varying(16) NOT NULL,
 "hydrometer_type" character varying(100),
 "text2" character varying(100),
@@ -195,7 +194,7 @@ CONSTRAINT ext_cat_hydrometer_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer(
+CREATE TABLE ext_rtc_hydrometer(
   "hydrometer_id" character varying(16) NOT NULL,
   "cat_hydrometer_id" character varying(16),
   "text" text,
@@ -203,7 +202,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer(
 );
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer_x_value (
+CREATE TABLE ext_rtc_hydrometer_x_value (
   "id" int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_hydrometer_x_value_seq'::regclass) NOT NULL,
   "hydrometer_id" character varying(16),
   "value" float, 
@@ -214,7 +213,7 @@ CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer_x_value (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".ext_rtc_hydrometer_x_data (
+CREATE TABLE ext_rtc_hydrometer_x_data (
   "id" int8 DEFAULT nextval('"SCHEMA_NAME".ext_rtc_hydrometer_x_data_seq'::regclass) NOT NULL,
   "hydrometer_id" character varying(16),
   "min" float,  -- l/s or mca

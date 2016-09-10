@@ -5,12 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE TABLE "SCHEMA_NAME"."version" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
+CREATE TABLE "version" (
+"id" int4 DEFAULT nextval('version_seq'::regclass) NOT NULL,
 "giswater" varchar(16)  ,
 "wsoftware" varchar(16)  ,
 "postgres" varchar(512)  ,
@@ -21,7 +20,7 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "SCHEMA_NAME"."config" (
+CREATE TABLE "config" (
 "id" varchar(18) NOT NULL,
 "node_proximity" double precision,
 "arc_searchnodes" double precision,
@@ -44,14 +43,14 @@ CONSTRAINT "config_pkey" PRIMARY KEY ("id")
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."config_csv_import" (
+CREATE TABLE "config_csv_import" (
 "table_name" varchar(50) NOT NULL,
 "gis_client_layer_name" varchar(50),
 CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name")
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."config_search_plus" (
+CREATE TABLE "config_search_plus" (
 "id" varchar(18) NOT NULL,
 "ppoint_layer" varchar (30),
 "ppoint_field_zone" varchar (30),

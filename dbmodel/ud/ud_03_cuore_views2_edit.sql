@@ -5,15 +5,15 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
 -- ----------------------------
 -- Editing views structure
 -- ----------------------------
-
-CREATE VIEW "SCHEMA_NAME".v_edit_node AS
+DROP VIEW IF EXISTS v_edit_node;
+CREATE VIEW v_edit_node AS
 SELECT node.node_id, 
 node.top_elev, 
 node.ymax,
@@ -48,11 +48,12 @@ node.rotation,
 node.link,
 node.verified,
 node.the_geom
-   FROM ("SCHEMA_NAME".node
-   JOIN "SCHEMA_NAME".cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+   FROM (node
+   JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
    
-CREATE VIEW "SCHEMA_NAME".v_edit_arc AS
+DROP VIEW IF EXISTS v_edit_arc;
+CREATE VIEW v_edit_arc AS
 SELECT arc.arc_id, 
 arc.node_1,
 arc.node_2,
@@ -97,13 +98,13 @@ arc.rotation,
 arc.link,
 arc.verified,
 arc.the_geom
-FROM ("SCHEMA_NAME".arc
-JOIN "SCHEMA_NAME".cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-JOIN "SCHEMA_NAME".v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
+FROM (arc
+JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
 
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_connec AS
+DROP VIEW IF EXISTS v_edit_connec;
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT connec.connec_id, 
 connec.top_elev, 
 connec.ymax, 
@@ -140,15 +141,15 @@ connec.rotation,
 connec.link,
 connec.verified,
 connec.the_geom
-FROM ("SCHEMA_NAME".connec 
-JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
-LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
-LEFT JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
-LEFT JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id);
+FROM (connec 
+JOIN cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
+LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
+LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id);
 
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_link AS
+DROP VIEW IF EXISTS v_edit_link;
+CREATE OR REPLACE VIEW v_edit_link AS
 SELECT 
 link.link_id,
 link.connec_id,
@@ -157,12 +158,12 @@ st_length2d(link.the_geom) as gis_length,
 link.custom_length,
 connec.connecat_id,
 link.the_geom
-FROM ("SCHEMA_NAME".link 
-LEFT JOIN "SCHEMA_NAME".connec ON (((connec.connec_id)::text = (link.connec_id)::text))
+FROM (link 
+LEFT JOIN connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_gully AS
+DROP VIEW IF EXISTS v_edit_gully;
+CREATE OR REPLACE VIEW v_edit_gully AS
 SELECT gully.gully_id, 
 gully.top_elev, 
 gully.ymax, 
@@ -199,12 +200,12 @@ gully.rotation,
 gully.link,
 gully.verified,
 gully.the_geom
-FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
+FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
 WHERE gully.the_geom is not null;
 
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_pgully AS
+DROP VIEW IF EXISTS v_edit_pgully;
+CREATE OR REPLACE VIEW v_edit_pgully AS
 SELECT gully.gully_id, 
 gully.top_elev, 
 gully.ymax, 
@@ -241,7 +242,7 @@ gully.rotation,
 gully.link,
 gully.verified,
 gully.the_geom_pol AS "the_geom"
-FROM ("SCHEMA_NAME".gully LEFT JOIN "SCHEMA_NAME".cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
+FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
 WHERE gully.the_geom_pol is not null;
 
 

@@ -4,14 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc AS 
+DROP VIEW IF EXISTS v_arc;
+CREATE OR REPLACE VIEW v_arc AS 
 SELECT 
 arc.arc_id, 
 arc.node_1, 
@@ -34,11 +34,12 @@ arc.soilcat_id,
 WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- field to use length/customized_length
 ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
 arc.the_geom
-FROM SCHEMA_NAME.arc
-JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text;
+FROM arc
+JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_node AS
+DROP VIEW IF EXISTS v_node;
+CREATE OR REPLACE VIEW v_node AS
 SELECT
 node.node_id,
 (CASE 
@@ -54,27 +55,28 @@ node.sector_id,
 node.dma_id,
 node.state,
 node.the_geom
-FROM SCHEMA_NAME.node;
+FROM node;
 
 
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node1 AS 
+DROP VIEW IF EXISTS v_arc_x_node1;
+CREATE OR REPLACE VIEW v_arc_x_node1 AS 
 SELECT arc.arc_id, arc.node_1, node.top_elev AS top_elev1, node.ymax AS ymax1, node.top_elev - node.ymax AS elev1, arc.y1, node.ymax - arc.y1 AS z1, cat_arc.geom1, arc.y1 - cat_arc.geom1 AS r1 
-FROM SCHEMA_NAME.v_arc arc 
-	JOIN SCHEMA_NAME.node ON arc.node_1::text = node.node_id::text
-	JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+FROM v_arc arc 
+	JOIN node ON arc.node_1::text = node.node_id::text
+	JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node2 AS 
+	
+DROP VIEW IF EXISTS v_arc_x_node2;
+CREATE OR REPLACE VIEW v_arc_x_node2 AS 
 SELECT arc.arc_id,arc.node_2,node.top_elev AS top_elev2,node.ymax AS ymax2,node.top_elev - node.ymax AS elev2,arc.y2,node.ymax - arc.y2 AS z2,cat_arc.geom1, arc.y2 - cat_arc.geom1 AS r2
-FROM SCHEMA_NAME.v_arc arc
-   JOIN SCHEMA_NAME.v_node node ON arc.node_2::text = node.node_id::text
-   JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+FROM v_arc arc
+   JOIN v_node node ON arc.node_2::text = node.node_id::text
+   JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc_x_node AS 
+DROP VIEW IF EXISTS v_arc_x_node;
+CREATE OR REPLACE VIEW v_arc_x_node AS 
 SELECT v_arc_x_node1.arc_id, 
 v_arc_x_node1.node_1,
 v_arc_x_node1.top_elev1,
@@ -96,9 +98,9 @@ ELSE (((((1)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_nod
 arc."state", 
 arc.sector_id, 
 arc.the_geom
-FROM SCHEMA_NAME.v_arc_x_node1
-   JOIN SCHEMA_NAME.v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
-   JOIN SCHEMA_NAME.v_arc arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text;
+FROM v_arc_x_node1
+   JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
+   JOIN v_arc arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text;
 
 
 

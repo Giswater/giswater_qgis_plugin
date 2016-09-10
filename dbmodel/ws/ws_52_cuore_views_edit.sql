@@ -3,19 +3,21 @@ This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_rtc_hydrometer_x_connec AS
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec AS
 SELECT 
 connec_id,
 count(hydrometer_id)::integer as n_hydrometer
 
-FROM SCHEMA_NAME.rtc_hydrometer_x_connec
+FROM rtc_hydrometer_x_connec
 group by connec_id;
 
 
-
-CREATE OR REPLACE VIEW "SCHEMA_NAME".v_edit_connec AS
+DROP VIEW IF EXISTS v_edit_connec;
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT connec.connec_id, 
 connec.elevation, 
 connec.depth, 
@@ -55,11 +57,11 @@ connec.rotation,
 connec.link,
 connec.verified,
 connec.the_geom
-FROM ("SCHEMA_NAME".connec
-JOIN "SCHEMA_NAME".cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
-LEFT JOIN "SCHEMA_NAME".v_rtc_hydrometer_x_connec ON (((connec.connec_id)::text = (v_rtc_hydrometer_x_connec.connec_id)::text))
-LEFT JOIN "SCHEMA_NAME".ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
-LEFT JOIN "SCHEMA_NAME".link ON connec.connec_id::text = link.connec_id::text
-LEFT JOIN "SCHEMA_NAME".vnode ON vnode.vnode_id::text = link.vnode_id
-LEFT JOIN "SCHEMA_NAME".dma ON (((connec.dma_id)::text = (dma.dma_id)::text)));
+FROM (connec
+JOIN cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
+LEFT JOIN v_rtc_hydrometer_x_connec ON (((connec.connec_id)::text = (v_rtc_hydrometer_x_connec.connec_id)::text))
+LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
+LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id
+LEFT JOIN dma ON (((connec.dma_id)::text = (dma.dma_id)::text)));
 

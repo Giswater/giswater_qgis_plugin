@@ -4,13 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- View structure for v_arc_x_node
 -- ----------------------------
 
 
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_arc AS 
+DROP VIEW IF EXISTS v_arc;
+CREATE OR REPLACE VIEW v_arc AS 
 SELECT 
 arc.arc_id, 
 arc.node_1, 
@@ -30,8 +32,8 @@ FROM SCHEMA_NAME.arc
 JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
 
-
-CREATE OR REPLACE VIEW SCHEMA_NAME.v_node AS
+DROP VIEW IF EXISTS v_node;
+CREATE OR REPLACE VIEW v_node AS
 SELECT
 node.node_id,
 node.elevation,

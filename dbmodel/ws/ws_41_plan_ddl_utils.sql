@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 ---------------------------------------------------------------
 -- COMMON SQL (WS & UD)
@@ -14,7 +14,7 @@ This version of Giswater is provided by Giswater Association
 -- ----------------------------
 -- Sequence structure
 -- ----------------------------
-CREATE SEQUENCE "SCHEMA_NAME"."plan_other_x_psector_seq"
+CREATE SEQUENCE "plan_other_x_psector_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -22,7 +22,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."plan_other_x_psector_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."plan_arc_x_psector_seq"
+CREATE SEQUENCE "plan_arc_x_psector_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -30,7 +30,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."plan_arc_x_psector_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."plan_node_x_psector_seq"
+CREATE SEQUENCE "plan_node_x_psector_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -38,7 +38,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."plan_node_x_psector_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."plan_psector_seq"
+CREATE SEQUENCE "plan_psector_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -46,7 +46,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."plan_psector_seq"
   CACHE 1;
   
   
-CREATE SEQUENCE "SCHEMA_NAME"."plan_arc_x_pavement_seq"
+CREATE SEQUENCE "plan_arc_x_pavement_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -55,7 +55,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."plan_arc_x_pavement_seq"
   
 
   
-CREATE SEQUENCE "SCHEMA_NAME"."price_simple_seq"
+CREATE SEQUENCE "price_simple_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -63,7 +63,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."price_simple_seq"
     CACHE 1;
 	
 	
-CREATE SEQUENCE "SCHEMA_NAME"."price_compost_seq"
+CREATE SEQUENCE "price_compost_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -71,7 +71,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."price_compost_seq"
     CACHE 1;
 	
 
-CREATE SEQUENCE "SCHEMA_NAME"."price_simple_value_seq"
+CREATE SEQUENCE "price_simple_value_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -79,7 +79,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."price_simple_value_seq"
   CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."price_compost_value_seq"
+CREATE SEQUENCE "price_compost_value_seq"
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -92,8 +92,8 @@ CREATE SEQUENCE "SCHEMA_NAME"."price_compost_value_seq"
 -- TABLE STRUCTURE FOR PLAN
 ---------------------------------------------
 
-CREATE TABLE "SCHEMA_NAME"."plan_psector" (
-"psector_id" varchar DEFAULT nextval('"SCHEMA_NAME".plan_psector_seq'::regclass) NOT NULL,
+CREATE TABLE "plan_psector" (
+"psector_id" varchar DEFAULT nextval('plan_psector_seq'::regclass) NOT NULL,
 "descript" varchar(254) COLLATE "default",
 "priority" varchar(16) COLLATE "default",
 "text1" varchar(254) COLLATE "default",
@@ -110,8 +110,8 @@ CREATE TABLE "SCHEMA_NAME"."plan_psector" (
  CONSTRAINT plan_psector_pkey PRIMARY KEY (psector_id)
 );
 
-CREATE TABLE "SCHEMA_NAME"."plan_arc_x_psector" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_arc_x_psector_seq'::regclass) NOT NULL,
+CREATE TABLE "plan_arc_x_psector" (
+"id" int4 DEFAULT nextval('plan_arc_x_psector_seq'::regclass) NOT NULL,
 "arc_id" varchar(16) COLLATE "default",
 "psector_id" varchar(16) COLLATE "default",
 "atlas_id" varchar(16) COLLATE "default",
@@ -120,8 +120,8 @@ CREATE TABLE "SCHEMA_NAME"."plan_arc_x_psector" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."plan_node_x_psector" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_node_x_psector_seq'::regclass) NOT NULL,
+CREATE TABLE "plan_node_x_psector" (
+"id" int4 DEFAULT nextval('plan_node_x_psector_seq'::regclass) NOT NULL,
 "node_id" varchar(16) COLLATE "default",
 "psector_id" varchar(16) COLLATE "default",
 "atlas_id" varchar(16) COLLATE "default",
@@ -130,8 +130,8 @@ CREATE TABLE "SCHEMA_NAME"."plan_node_x_psector" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."plan_other_x_psector" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_other_x_psector_seq'::regclass) NOT NULL,
+CREATE TABLE "plan_other_x_psector" (
+"id" int4 DEFAULT nextval('plan_other_x_psector_seq'::regclass) NOT NULL,
 "price_id" varchar(16) COLLATE "default",
 "measurement" numeric (12,2),
 "psector_id" varchar(16) COLLATE "default",
@@ -141,8 +141,8 @@ CREATE TABLE "SCHEMA_NAME"."plan_other_x_psector" (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".plan_arc_x_pavement (
-  "id" int4 DEFAULT nextval('"SCHEMA_NAME".plan_arc_x_pavement_seq'::regclass) NOT NULL,
+CREATE TABLE plan_arc_x_pavement (
+  "id" int4 DEFAULT nextval('plan_arc_x_pavement_seq'::regclass) NOT NULL,
   "arc_id" character varying(16),
   "pavcat_id" character varying(16),
   "percent" numeric (3,2),
@@ -150,7 +150,7 @@ CREATE TABLE "SCHEMA_NAME".plan_arc_x_pavement (
 );
 
 
-CREATE TABLE "SCHEMA_NAME"."plan_value_ps_priority" (
+CREATE TABLE "plan_value_ps_priority" (
 "id" varchar(16) COLLATE "default" NOT NULL,
 "observ" varchar(254) COLLATE "default",
  CONSTRAINT plan_value_ps_priority_pkey PRIMARY KEY (id)
@@ -158,7 +158,7 @@ CREATE TABLE "SCHEMA_NAME"."plan_value_ps_priority" (
 
 
 -- Used to show economic data
-CREATE TABLE "SCHEMA_NAME"."plan_selector_economic" (
+CREATE TABLE "plan_selector_economic" (
   "id" character varying(16) NOT NULL,
   "observ" character varying(254),
   CONSTRAINT plan_selector_economic_pkey PRIMARY KEY (id)
@@ -166,7 +166,7 @@ CREATE TABLE "SCHEMA_NAME"."plan_selector_economic" (
 
 
 -- Used to show a defined range of psector features on map composer
-CREATE TABLE "SCHEMA_NAME"."plan_selector_psector" (
+CREATE TABLE "plan_selector_psector" (
   "id" character varying(16) NOT NULL,
   "observ" character varying(254),
   CONSTRAINT plan_selector_psector_pkey PRIMARY KEY (id)
@@ -179,7 +179,7 @@ CREATE TABLE "SCHEMA_NAME"."plan_selector_psector" (
 ---------------------------------------------
 
 
-CREATE TABLE "SCHEMA_NAME".price_simple (
+CREATE TABLE price_simple (
   id character varying(16) NOT NULL,
   unit character varying(5),
   descript character varying(100),
@@ -190,7 +190,7 @@ CREATE TABLE "SCHEMA_NAME".price_simple (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".price_compost (
+CREATE TABLE price_compost (
   id character varying(16) NOT NULL,
   unit character varying(5),
   descript character varying(100),
@@ -200,8 +200,8 @@ CREATE TABLE "SCHEMA_NAME".price_compost (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".price_compost_value (
-  "id" int4 DEFAULT nextval('"SCHEMA_NAME".price_compost_value_seq'::regclass) NOT NULL,
+CREATE TABLE price_compost_value (
+  "id" int4 DEFAULT nextval('price_compost_value_seq'::regclass) NOT NULL,
   compost_id character varying(16),
   simple_id character varying(16),
   value numeric (16,4),
@@ -209,7 +209,7 @@ CREATE TABLE "SCHEMA_NAME".price_compost_value (
 );
 
 
-CREATE TABLE "SCHEMA_NAME".price_value_unit (
+CREATE TABLE price_value_unit (
   id character varying(16) NOT NULL,
   descript character varying(100),
   CONSTRAINT price_value_unit_pkey PRIMARY KEY (id)
