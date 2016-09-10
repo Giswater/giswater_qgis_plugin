@@ -59,5 +59,6 @@ UNION
 	v_db_cat_columns.column_name cat_column
 	from v_audit_db_columns
 	right join v_db_cat_columns on v_db_cat_columns.id=v_audit_db_columns.id
-	where v_audit_db_columns.column_name is null;
+	where v_audit_db_columns.column_name is null
+	ORDER BY 1;
 
