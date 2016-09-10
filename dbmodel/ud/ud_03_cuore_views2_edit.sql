@@ -49,7 +49,7 @@ node.link,
 node.verified,
 node.the_geom
    FROM (node
-   JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
+   LEFT JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
    
 DROP VIEW IF EXISTS v_edit_arc;
@@ -99,8 +99,8 @@ arc.link,
 arc.verified,
 arc.the_geom
 FROM (arc
-JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
+LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+LEFT JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
 
 
 DROP VIEW IF EXISTS v_edit_connec;
