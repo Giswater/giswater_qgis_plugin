@@ -12,6 +12,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
 -- Catalog of functions
 DROP TABLE IF EXISTS audit_cat_function CASCADE; 
 CREATE TABLE audit_cat_function (
@@ -51,9 +52,18 @@ CREATE TABLE IF NOT EXISTS audit_function_actions (
 );
 
 
-DROP VIEW IF EXISTS v_audit_functions;
-CREATE VIEW v_audit_functions AS 
-SELECT tstamp, audit_cat_error.id, audit_cat_error.error_message, audit_cat_error.hint_message, audit_cat_error.log_level, audit_cat_error.show_user, user_name, addr, debug_info
-FROM audit_function_actions INNER JOIN audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id
-ORDER BY audit_function_actions.id DESC;
+DROP TABLE IF EXISTS audit_db_columns CASCADE;
+CREATE TABLE audit_db_columns
+(
+  id serial NOT NULL,
+  table_name text NOT NULL,
+  column_name text NOT NULL,
+  column_type text,
+  description text,
+  CONSTRAINT audit_db_columns_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+
 
