@@ -9,9 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- FLOW EXIT
 -- ----------------------------
 
-SET search_path = pg_catalog, public;
-
-
 CREATE TABLE "anl_flow_exit_node" (
 node_id varchar (16) NOT NULL,
 the_geom public.geometry (POINT, SRID_VALUE),

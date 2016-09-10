@@ -231,7 +231,7 @@ JOIN inp_selector_sector ON (((arc.sector_id)::text = (inp_selector_sector.secto
 
 
 -- CREATE OR REPLACE VIEW v_inp_vertice AS 
- (SELECT nextval('inp_vertice_id_seq'::regclass) AS id, 
+ (SELECT nextval ('"SCHEMA_NAME".inp_vertice_id_seq'::regclass) AS id, 
     arc.arc_id, 
     st_x(arc.point)::numeric(16,3) AS xcoord, 
     st_y(arc.point)::numeric(16,3) AS ycoord
@@ -245,7 +245,7 @@ JOIN inp_selector_sector ON (((arc.sector_id)::text = (inp_selector_sector.secto
   WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)) AND
 	  arc.arc_id NOT IN (SELECT arc_id FROM temp_arc WHERE arc_id IS NOT NULL)
  UNION
-  SELECT nextval('inp_vertice_id_seq'::regclass) AS id, 
+  SELECT nextval ('"SCHEMA_NAME".inp_vertice_id_seq'::regclass) AS id, 
     arc.arc_id, 
     st_x(arc.point)::numeric(16,3) AS xcoord, 
     st_y(arc.point)::numeric(16,3) AS ycoord

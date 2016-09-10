@@ -93,7 +93,7 @@ CREATE SEQUENCE "price_compost_value_seq"
 ---------------------------------------------
 
 CREATE TABLE "plan_psector" (
-"psector_id" varchar DEFAULT nextval('plan_psector_seq'::regclass) NOT NULL,
+"psector_id" varchar DEFAULT nextval ('"SCHEMA_NAME".plan_psector_seq'::regclass) NOT NULL,
 "descript" varchar(254) COLLATE "default",
 "priority" varchar(16) COLLATE "default",
 "text1" varchar(254) COLLATE "default",
@@ -111,7 +111,7 @@ CREATE TABLE "plan_psector" (
 );
 
 CREATE TABLE "plan_arc_x_psector" (
-"id" int4 DEFAULT nextval('plan_arc_x_psector_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"SCHEMA_NAME".plan_arc_x_psector_seq'::regclass) NOT NULL,
 "arc_id" varchar(16) COLLATE "default",
 "psector_id" varchar(16) COLLATE "default",
 "atlas_id" varchar(16) COLLATE "default",
@@ -121,7 +121,7 @@ CREATE TABLE "plan_arc_x_psector" (
 
 
 CREATE TABLE "plan_node_x_psector" (
-"id" int4 DEFAULT nextval('plan_node_x_psector_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"SCHEMA_NAME".plan_node_x_psector_seq'::regclass) NOT NULL,
 "node_id" varchar(16) COLLATE "default",
 "psector_id" varchar(16) COLLATE "default",
 "atlas_id" varchar(16) COLLATE "default",
@@ -131,7 +131,7 @@ CREATE TABLE "plan_node_x_psector" (
 
 
 CREATE TABLE "plan_other_x_psector" (
-"id" int4 DEFAULT nextval('plan_other_x_psector_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"SCHEMA_NAME".plan_other_x_psector_seq'::regclass) NOT NULL,
 "price_id" varchar(16) COLLATE "default",
 "measurement" numeric (12,2),
 "psector_id" varchar(16) COLLATE "default",
@@ -142,7 +142,7 @@ CREATE TABLE "plan_other_x_psector" (
 
 
 CREATE TABLE plan_arc_x_pavement (
-  "id" int4 DEFAULT nextval('plan_arc_x_pavement_seq'::regclass) NOT NULL,
+  "id" int4 DEFAULT nextval ('"SCHEMA_NAME".plan_arc_x_pavement_seq'::regclass) NOT NULL,
   "arc_id" character varying(16),
   "pavcat_id" character varying(16),
   "percent" numeric (3,2),
@@ -201,7 +201,7 @@ CREATE TABLE price_compost (
 
 
 CREATE TABLE price_compost_value (
-  "id" int4 DEFAULT nextval('price_compost_value_seq'::regclass) NOT NULL,
+  "id" int4 DEFAULT nextval ('"SCHEMA_NAME".price_compost_value_seq'::regclass) NOT NULL,
   compost_id character varying(16),
   simple_id character varying(16),
   value numeric (16,4),

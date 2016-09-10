@@ -57,7 +57,7 @@ CREATE TABLE rtc_scada_node (
 
 
 CREATE TABLE rtc_scada_x_dma (
-  id int4 DEFAULT nextval('rtc_scada_x_dma_seq'::regclass) NOT NULL,
+  id int4 DEFAULT nextval ('"SCHEMA_NAME".rtc_scada_x_dma_seq'::regclass) NOT NULL,
   scada_id character varying(16) NOT NULL,
   dma_id character varying(16),
   flow_sign int2,
@@ -66,7 +66,7 @@ CREATE TABLE rtc_scada_x_dma (
 
 
 CREATE TABLE rtc_scada_x_sector (
-  id int4 DEFAULT nextval('rtc_scada_x_sector_seq'::regclass) NOT NULL,
+  id int4 DEFAULT nextval ('"SCHEMA_NAME".rtc_scada_x_sector_seq'::regclass) NOT NULL,
   scada_id character varying(16) NOT NULL,
   sector_id character varying(16),
   flow_sign int2,

@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 CREATE TABLE "version" (
-"id" int4 DEFAULT nextval('version_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
 "giswater" varchar(16)  ,
 "wsoftware" varchar(16)  ,
 "postgres" varchar(512)  ,
@@ -79,5 +79,5 @@ CREATE TABLE "config_extract_raster_value" (
 "raster_band_value" varchar (30),
 "vector_layer" varchar (30),
 "vector_field_value" varchar (30),
-CONSTRAINT "config_extract_raster_value" PRIMARY KEY ("id")
+CONSTRAINT "config_extract_raster_value_pkey" PRIMARY KEY ("id")
 );

@@ -188,7 +188,7 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_arc" (
-"id" varchar (30) DEFAULT nextval('cat_arc_seq'::regclass) NOT NULL,
+"id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" varchar(16)  ,
 "tsect_id" varchar(16)  ,
@@ -219,7 +219,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_node" (
-"id" varchar (30) DEFAULT nextval('cat_node_seq'::regclass) NOT NULL,
+"id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "geom1" numeric (12,2),
 "geom2" numeric (12,2),
@@ -250,7 +250,7 @@ CONSTRAINT cat_mat_element_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_element" (
 "id" varchar(30)   NOT NULL,
-"elementtype_id" varchar(30)  ,
+"elementtype_id" varchar(18)  ,
 "matcat_id" varchar(30)  ,
 "geometry" varchar(30)  ,
 "descript" varchar(512)  ,
@@ -265,7 +265,7 @@ CONSTRAINT cat_element_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
-"type" varchar(16)  ,
+"type" varchar(18)  ,
 "matcat_id" varchar (16)  ,
 "shape" varchar(16)  ,
 "tsect_id" varchar(16)  ,
@@ -390,7 +390,7 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "connec_type" (
-"id" varchar(20) NOT NULL,
+"id" varchar(18) NOT NULL,
 "observ" varchar(50),
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
@@ -415,7 +415,7 @@ CREATE TABLE "node" (
 "top_elev" numeric(12,3),
 "ymax" numeric(12,3),
 "sander" numeric(12,3),
-"node_type" varchar(16)  ,
+"node_type" varchar(18)  ,
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" varchar(30)  ,
@@ -454,7 +454,7 @@ CREATE TABLE "arc" (
 "node_2" varchar(16)  ,
 "y1" numeric (12,3) ,
 "y2" numeric (12,3) ,
-"arc_type" varchar(16)  ,
+"arc_type" varchar(18)  ,
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" varchar(30)  ,
@@ -510,7 +510,7 @@ CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 
 
 CREATE TABLE "connec" (
-"connec_id" varchar (30) DEFAULT nextval('connec_seq'::regclass) NOT NULL,
+"connec_id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
 "top_elev" numeric(12,4),
 "ymax" numeric(12,4),
 "connecat_id" varchar(30)  ,
@@ -547,10 +547,10 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 
 
 CREATE TABLE "vnode" (
-"vnode_id" varchar(16) DEFAULT nextval('vnode_seq'::regclass) NOT NULL,
+"vnode_id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".vnode_seq'::regclass) NOT NULL,
 "arc_id" varchar(16),
 "userdefined_pos" bool,
-"vnode_type" varchar(30),
+"vnode_type" varchar(18),
 "sector_id" varchar(30),
 "state" varchar(16),
 "annotation" varchar(254),
@@ -561,7 +561,7 @@ CONSTRAINT "vnode_pkey" PRIMARY KEY ("vnode_id")
 
 
 CREATE TABLE "link" (
-link_id varchar (16) DEFAULT nextval('link_seq'::regclass) NOT NULL,
+link_id varchar (16) DEFAULT nextval ('"SCHEMA_NAME".link_seq'::regclass) NOT NULL,
 the_geom public.geometry (LINESTRING, SRID_VALUE),
 connec_id varchar(16)  ,
 vnode_id varchar(16)  ,
@@ -590,9 +590,9 @@ CREATE TABLE "gully" (
 "rotation" numeric (6,3),
 "dma_id" varchar(30)  ,
 "soilcat_id" varchar(16)  ,
-"category_type" varchar(18)  ,
-"fluid_type" varchar(18)  ,
-"location_type" varchar(18)  ,
+"category_type" varchar(50)  ,
+"fluid_type" varchar(50)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
@@ -655,13 +655,13 @@ CONSTRAINT man_conduit_pkey PRIMARY KEY (arc_id)
 -- ----------------------------------
 
 CREATE TABLE "element" (
-"element_id" varchar(16) DEFAULT nextval('element_seq'::regclass) NOT NULL,
+"element_id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_seq'::regclass) NOT NULL,
 "elementcat_id" varchar(30)  ,
 "state" character varying(16) NOT NULL,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"location_type" varchar(18)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" timestamp (6) without time zone,
@@ -675,7 +675,7 @@ CONSTRAINT element_pkey PRIMARY KEY (element_id)
 
 
 CREATE TABLE "element_x_node" (
-"id" varchar(16) DEFAULT nextval('element_x_node_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_x_node_seq'::regclass) NOT NULL,
 "element_id" varchar(16)  ,
 "node_id" varchar(16)  ,
 CONSTRAINT element_x_node_pkey PRIMARY KEY (id)
@@ -683,7 +683,7 @@ CONSTRAINT element_x_node_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "element_x_arc" (
-"id" varchar(16) DEFAULT nextval('element_x_arc_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_x_arc_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "arc_id" varchar(16),
 CONSTRAINT element_x_arc_pkey PRIMARY KEY (id)
@@ -691,14 +691,14 @@ CONSTRAINT element_x_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "element_x_connec" (
-"id" varchar(16) DEFAULT nextval('element_x_connec_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_x_connec_seq'::regclass) NOT NULL,
 "element_id" varchar(16)  ,
 "connec_id" varchar(16)  ,
 CONSTRAINT element_x_connec_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE "element_x_gully" (
-"id" varchar(16) DEFAULT nextval('element_x_gully_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_x_gully_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "gully_id" varchar(16),
 CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)

@@ -83,7 +83,7 @@ CONSTRAINT event_position_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "event" (
-"id" varchar(30) DEFAULT nextval('event_id_seq'::regclass) NOT NULL,
+"id" varchar(30) DEFAULT nextval ('"SCHEMA_NAME".event_id_seq'::regclass) NOT NULL,
 "event_type" varchar(30)  ,
 "startdate" date,
 "enddate" date,
@@ -100,7 +100,7 @@ CONSTRAINT event_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "event_x_node" (
-"id" int8 DEFAULT nextval('event_x_node_seq'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval ('"SCHEMA_NAME".event_x_node_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
 "node_id" varchar(16)  ,  
 "parameter_id" varchar(50)  ,
@@ -113,7 +113,7 @@ CONSTRAINT event_x_node_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "event_x_arc" (
-"id" int8 DEFAULT nextval('event_x_arc_seq'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval ('"SCHEMA_NAME".event_x_arc_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
 "arc_id" varchar(16)  ,  
 "parameter_id" varchar(50)  ,
@@ -126,7 +126,7 @@ CONSTRAINT event_x_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "event_x_connec" (
-"id" int8 DEFAULT nextval('event_x_connec_seq'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval ('"SCHEMA_NAME".event_x_connec_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
 "connec_id" varchar(16)  ,  
 "parameter_id" varchar(50)  ,
@@ -137,7 +137,7 @@ CONSTRAINT event_x_connec_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE "event_x_gully" (
-"id" int8 DEFAULT nextval('event_x_gully_seq'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval ('"SCHEMA_NAME".event_x_gully_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
 "gully_id" varchar(16)  ,  
 "parameter_id" varchar(50)  ,
@@ -149,7 +149,7 @@ CONSTRAINT event_x_gully_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "event_x_element" (
-"id" int8 DEFAULT nextval('event_x_element_seq'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval ('"SCHEMA_NAME".event_x_element_seq'::regclass) NOT NULL,
 "event_id" varchar(30)   NOT NULL,
 "element_id" varchar(16)  ,  
 "parameter_id" varchar(50)  ,

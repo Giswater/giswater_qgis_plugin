@@ -243,19 +243,19 @@ CONSTRAINT inp_giswater_config_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "inp_backdrop" (
-"id" int4 DEFAULT nextval('"".inp_backdrop_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_backdrop_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
 CREATE TABLE "inp_controls" (
-"id" int4 DEFAULT nextval('"".inp_controls_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_controls_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
 CREATE TABLE "inp_curve" (
-"id" int4 DEFAULT nextval('"".inp_curve_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_curve_id_seq'::regclass) NOT NULL,
 "curve_id" varchar(16)   NOT NULL,
 "x_value" numeric(12,4),
 "y_value" numeric(12,4),
@@ -270,7 +270,7 @@ CREATE TABLE "inp_curve_id" (
 
 
 CREATE TABLE "inp_demand" (
-"id" int4 DEFAULT nextval('"".inp_demand_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_demand_id_seq'::regclass) NOT NULL,
 "node_id" varchar(16)   NOT NULL,
 "demand" numeric(12,6),
 "pattern_id" varchar(16)  ,
@@ -310,7 +310,7 @@ CREATE TABLE "inp_junction" (
 
 
 CREATE TABLE "inp_label" (
-"id" int4 DEFAULT nextval('"".inp_labels_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_labels_id_seq'::regclass) NOT NULL,
 "xcoord" numeric(18,6),
 "ycoord" numeric(18,6),
 "label" varchar(50)  ,
@@ -350,7 +350,7 @@ CREATE TABLE "inp_options" (
 
 
 CREATE TABLE "inp_pattern" (
-"id" int4 DEFAULT nextval('"".inp_pattern_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_pattern_id_seq'::regclass) NOT NULL,
 "pattern_id" varchar(16)   NOT NULL,
 "factor_1" numeric(12,4),
 "factor_2" numeric(12,4),
@@ -469,7 +469,7 @@ CREATE TABLE "inp_reservoir" (
 
 
 CREATE TABLE "inp_rules" (
-"id" int4 DEFAULT nextval('"".inp_rules_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_rules_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
@@ -660,7 +660,7 @@ CREATE TABLE "inp_value_plan" (
 -- ----------------------------
 
 CREATE TABLE "rpt_arc" (
-"id" int4 DEFAULT nextval('"".rpt_arc_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arc_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "arc_id" varchar(16)  ,
 "length" numeric,
@@ -678,7 +678,7 @@ CREATE TABLE "rpt_arc" (
 
 
 CREATE TABLE "rpt_nodearcnode" (
-"id" int4 DEFAULT nextval('"".rpt_nodearcnode_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodearcnode_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "elevation_1" numeric,
@@ -712,7 +712,7 @@ CONSTRAINT rpt_nodearc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "rpt_arcnodearc" (
-"id" int4 DEFAULT nextval('"".rpt_arcnodearc_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arcnodearc_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)  ,
 "arc_1" varchar(16)  ,
@@ -751,7 +751,7 @@ CONSTRAINT rpt_arcnodearc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "rpt_energy_usage" (
-"id" int4 DEFAULT nextval('"".rpt_energy_usage_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_energy_usage_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16),
 "usage_fact" numeric,
@@ -764,7 +764,7 @@ CREATE TABLE "rpt_energy_usage" (
 
 
 CREATE TABLE "rpt_hydraulic_status" (
-"id" int4 DEFAULT nextval('"".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "time" varchar(10)  ,
 "text" varchar(100)  
@@ -772,7 +772,7 @@ CREATE TABLE "rpt_hydraulic_status" (
 
 
 CREATE TABLE "rpt_node" (
-"id" int4 DEFAULT nextval('"".rpt_node_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_node_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "node_id" varchar(16)   NOT NULL,
 "elevation" numeric,
@@ -786,7 +786,7 @@ CREATE TABLE "rpt_node" (
 
 
 CREATE TABLE "rpt_cat_result" (
-"id" int4 DEFAULT nextval('"".rpt_cat_result_id_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_cat_result_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "n_junction" numeric,
 "n_reservoir" numeric,

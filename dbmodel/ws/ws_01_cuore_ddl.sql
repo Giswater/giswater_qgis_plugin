@@ -162,7 +162,7 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
-"arctype_id" varchar(16)  ,
+"arctype_id" varchar(18)  ,
 "matcat_id" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -189,7 +189,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_node" (
 "id" varchar (30) DEFAULT nextval('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
-"nodetype_id" varchar(16)  ,
+"nodetype_id" varchar(18)  ,
 "matcat_id" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -219,7 +219,7 @@ CONSTRAINT cat_mat_element_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_element" (
 "id" varchar(30)   NOT NULL,
-"elementtype_id" varchar(30)  ,
+"elementtype_id" varchar(18)  ,
 "matcat_id" varchar(30)  ,
 "geometry" varchar(30)  ,
 "descript" varchar(512)  ,
@@ -233,7 +233,7 @@ CONSTRAINT cat_element_pkey PRIMARY KEY (id)
 
 CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
-"type" varchar(16)  ,
+"type" varchar(18)  ,
 "matcat_id" varchar(16)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
@@ -363,7 +363,7 @@ CREATE TABLE "node" (
 "node_id" varchar(16) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
-"node_type" varchar(30),
+"node_type" varchar(18),
 "nodecat_id" varchar(30),
 "epa_type" varchar(16)  ,
 "sector_id" varchar(30)  ,
@@ -479,7 +479,7 @@ CREATE TABLE "vnode" (
 "vnode_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".vnode_seq'::regclass) NOT NULL,
 "arc_id" varchar(16),
 "userdefined_pos" bool,
-"vnode_type" varchar(30),
+"vnode_type" varchar(18),
 "sector_id" varchar(30),
 "state" varchar(16),
 "annotation" varchar(254),
@@ -528,7 +528,7 @@ CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_valve" (
 "node_id" varchar(16) NOT NULL,
-"type" varchar(30),
+"type" varchar(18),
 "opened" boolean DEFAULT true,
 "acessibility" boolean DEFAULT true,
 "broken" boolean DEFAULT true,
@@ -579,7 +579,7 @@ CREATE TABLE "element" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"location_type" varchar(18)  ,
+"location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
 "buildercat_id" varchar(30)  ,
 "builtdate" timestamp (6) without time zone,
