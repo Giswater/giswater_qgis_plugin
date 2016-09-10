@@ -71,3 +71,13 @@ CREATE TABLE "config_search_plus" (
 "hydrometer_field_code" varchar (30),
 CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id")
 );
+
+
+CREATE TABLE "config_extract_raster_value" (
+"id" varchar(18) NOT NULL,
+"raster_layer" varchar (30),
+"raster_band_value" varchar (30),
+"vector_layer" varchar (30),
+"vector_field_value" varchar (30),
+CONSTRAINT "config_extract_raster_value" PRIMARY KEY ("id")
+);
