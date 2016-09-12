@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec;
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec AS
 SELECT 
 connec_id,
@@ -16,7 +16,7 @@ FROM rtc_hydrometer_x_connec
 group by connec_id;
 
 
-DROP VIEW IF EXISTS v_edit_connec;
+DROP VIEW IF EXISTS v_edit_connec CASCADE;
 CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT connec.connec_id, 
 connec.elevation, 

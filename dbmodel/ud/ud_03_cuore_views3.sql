@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
   
-DROP VIEW IF EXISTS v_ui_element_x_node;
+DROP VIEW IF EXISTS v_ui_element_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_node AS 
 SELECT
 element_x_node.id,
@@ -30,7 +30,7 @@ JOIN element ON element.element_id::text = element_x_node.element_id::text;
 
 
 
-DROP VIEW IF EXISTS v_ui_element_x_connec;
+DROP VIEW IF EXISTS v_ui_element_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_connec AS
 SELECT
 element_x_connec.id,
@@ -46,7 +46,7 @@ FROM element_x_connec
 JOIN element ON element.element_id::text = element_x_connec.element_id::text;
 
 
-DROP VIEW IF EXISTS v_ui_element_x_gully;
+DROP VIEW IF EXISTS v_ui_element_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_gully AS
 SELECT
 element_x_gully.id,
@@ -63,7 +63,7 @@ JOIN element ON element.element_id::text = element_x_gully.element_id::text;
 
 
 
-DROP VIEW IF EXISTS v_ui_element_x_arc;
+DROP VIEW IF EXISTS v_ui_element_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_arc AS
 SELECT
 element_x_arc.id,

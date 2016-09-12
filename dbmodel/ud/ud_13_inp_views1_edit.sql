@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_node
 -- ----------------------------
 
-DROP VIEW IF EXISTS v_edit_inp_junction;
+DROP VIEW IF EXISTS v_edit_inp_junction CASCADE;
 CREATE VIEW v_edit_inp_junction AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev, 
@@ -19,7 +19,7 @@ FROM (node
 JOIN inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text)));
 
 
-DROP VIEW IF EXISTS v_edit_inp_divider;
+DROP VIEW IF EXISTS v_edit_inp_divider CASCADE;
 CREATE VIEW v_edit_inp_divider AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev,
@@ -29,7 +29,7 @@ FROM (node
 JOIN inp_divider ON (((node.node_id)::text = (inp_divider.node_id)::text)));
 
 
-DROP VIEW IF EXISTS v_edit_inp_outfall;
+DROP VIEW IF EXISTS v_edit_inp_outfall CASCADE;
 CREATE VIEW v_edit_inp_outfall AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev,  
@@ -39,7 +39,7 @@ FROM (node
 JOIN inp_outfall ON (((node.node_id)::text = (inp_outfall.node_id)::text)));
 
 
-DROP VIEW IF EXISTS v_edit_inp_storage;
+DROP VIEW IF EXISTS v_edit_inp_storage CASCADE;
 CREATE VIEW v_edit_inp_storage AS
 SELECT 
 node.node_id, node.top_elev, node.ymax, node.sander, node.top_elev-node.ymax as elev, 
@@ -56,7 +56,7 @@ JOIN inp_storage ON (((node.node_id)::text = (inp_storage.node_id)::text)));
 -- View structure for v_arc
 -- ----------------------------
 
-DROP VIEW IF EXISTS v_edit_inp_conduit;
+DROP VIEW IF EXISTS v_edit_inp_conduit CASCADE;
 CREATE VIEW v_edit_inp_conduit AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, cat_arc.matcat_id AS "cat_matcat_id", cat_arc.shape AS "cat_shape",arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -65,7 +65,7 @@ FROM ((arc
 JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
 JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));
 
-DROP VIEW IF EXISTS v_edit_inp_orifice;
+DROP VIEW IF EXISTS v_edit_inp_orifice CASCADE;
 CREATE VIEW v_edit_inp_orifice AS
 SELECT
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -73,7 +73,7 @@ inp_orifice.ori_type, inp_orifice."offset", inp_orifice.cd, inp_orifice.orate, i
 FROM (arc
 JOIN inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text)));
 
-DROP VIEW IF EXISTS v_edit_inp_outlet;
+DROP VIEW IF EXISTS v_edit_inp_outlet CASCADE;
 CREATE VIEW v_edit_inp_outlet AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -81,7 +81,7 @@ inp_outlet.outlet_type, inp_outlet."offset", inp_outlet.curve_id, inp_outlet.cd1
 FROM (arc
 JOIN inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text)));
 
-DROP VIEW IF EXISTS v_edit_inp_pump;
+DROP VIEW IF EXISTS v_edit_inp_pump CASCADE;
 CREATE VIEW v_edit_inp_pump AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
@@ -89,7 +89,7 @@ inp_pump.curve_id, inp_pump.status, inp_pump.startup, inp_pump.shutoff
 FROM (arc
 JOIN inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text)));
 
-DROP VIEW IF EXISTS v_edit_inp_weir;
+DROP VIEW IF EXISTS v_edit_inp_weir CASCADE;
 CREATE VIEW v_edit_inp_weir AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,

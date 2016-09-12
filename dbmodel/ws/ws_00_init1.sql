@@ -23,8 +23,8 @@ CREATE EXTENSION IF NOT EXISTS tablefunc;
 
 
 -- Catalog of table
-DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_table CASCADE; 
-CREATE TABLE SCHEMA_NAME.db_cat_table (
+DROP TABLE IF EXISTS db_cat_table CASCADE; 
+CREATE TABLE db_cat_table (
     id int4 PRIMARY KEY,
     name text NOT NULL,
     project_type text,
@@ -35,8 +35,8 @@ CREATE TABLE SCHEMA_NAME.db_cat_table (
 
 
 -- Catalog of views
-DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_view CASCADE; 
-CREATE TABLE SCHEMA_NAME.db_cat_view (
+DROP TABLE IF EXISTS db_cat_view CASCADE; 
+CREATE TABLE db_cat_view (
     id int4 PRIMARY KEY,
     name text NOT NULL,
     project_type text,
@@ -47,8 +47,8 @@ CREATE TABLE SCHEMA_NAME.db_cat_view (
 
 
 -- Catalog of columns
-DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_columns CASCADE; 
-CREATE TABLE SCHEMA_NAME.db_cat_columns (
+DROP TABLE IF EXISTS db_cat_columns CASCADE; 
+CREATE TABLE db_cat_columns (
     id int4 PRIMARY KEY,
     db_cat_table_id int4 NOT NULL,
     column_name text NOT NULL,
@@ -58,8 +58,8 @@ CREATE TABLE SCHEMA_NAME.db_cat_columns (
 
 
 -- Catalog of client layer
-DROP TABLE IF EXISTS SCHEMA_NAME.db_cat_clientlayer CASCADE; 
-CREATE TABLE SCHEMA_NAME.db_cat_clientlayer (
+DROP TABLE IF EXISTS db_cat_clientlayer CASCADE; 
+CREATE TABLE db_cat_clientlayer (
     id int4 PRIMARY KEY,
     name text NOT NULL,
     group_level_1 text,

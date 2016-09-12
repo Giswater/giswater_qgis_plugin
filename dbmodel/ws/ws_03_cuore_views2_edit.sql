@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 --    GIS EDITING VIEWS
 ----------------------------
 
-DROP VIEW IF EXISTS v_edit_node;
+DROP VIEW IF EXISTS v_edit_node CASCADE;
 CREATE OR REPLACE VIEW v_edit_node AS
 SELECT 
 node.node_id, 
@@ -50,7 +50,7 @@ LEFT JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text))
 LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text)));
 
 
-DROP VIEW IF EXISTS v_edit_arc;
+DROP VIEW IF EXISTS v_edit_arc CASCADE;
 CREATE VIEW v_edit_arc AS
 SELECT 
 arc.arc_id,
@@ -93,7 +93,7 @@ LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text)));
 
 
-DROP VIEW IF EXISTS v_edit_link;
+DROP VIEW IF EXISTS v_edit_link CASCADE;
 CREATE OR REPLACE VIEW v_edit_link AS
 SELECT 
 link.link_id,
@@ -108,7 +108,7 @@ LEFT JOIN connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
 
-DROP VIEW IF EXISTS v_edit_valve;
+DROP VIEW IF EXISTS v_edit_valve CASCADE;
 CREATE OR REPLACE VIEW v_edit_valve AS 
 SELECT 
 node.node_id,
@@ -120,7 +120,7 @@ man_valve.broken,
 man_valve.mincut_anl,
 man_valve.hydraulic_anl,
 node.the_geom
-FROM SCHEMA_NAME.node
-JOIN SCHEMA_NAME.cat_node ON node.nodecat_id::text=cat_node.id::text
-JOIN SCHEMA_NAME.man_valve ON node.node_id::text=man_valve.node_id::text
-JOIN SCHEMA_NAME.man_selector_valve ON cat_node.nodetype_id::text=man_selector_valve.id::text;
+FROM node
+JOIN cat_node ON node.nodecat_id::text=cat_node.id::text
+JOIN man_valve ON node.node_id::text=man_valve.node_id::text
+JOIN man_selector_valve ON cat_node.nodetype_id::text=man_selector_valve.id::text;

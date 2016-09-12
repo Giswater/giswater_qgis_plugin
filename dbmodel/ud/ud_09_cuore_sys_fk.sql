@@ -128,7 +128,7 @@ ALTER TABLE "element_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "connec"
 ALTER TABLE "element_x_gully" ADD FOREIGN KEY ("element_id") REFERENCES "element" ("element_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "element_x_gully" ADD FOREIGN KEY ("gully_id") REFERENCES "gully" ("gully_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE db_cat_table ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE db_cat_view ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES SCHEMA_NAME.db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE db_cat_columns ADD FOREIGN KEY ("db_cat_table_id") REFERENCES SCHEMA_NAME.db_cat_table ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE db_cat_table ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE db_cat_view ADD FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE db_cat_columns ADD FOREIGN KEY ("db_cat_table_id") REFERENCES db_cat_table ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

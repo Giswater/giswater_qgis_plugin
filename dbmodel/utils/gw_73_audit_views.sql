@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-DROP VIEW IF EXISTS v_audit_functions;
+DROP VIEW IF EXISTS v_audit_functions CASCADE;
 CREATE VIEW v_audit_functions AS 
 SELECT tstamp, audit_cat_error.id, audit_cat_error.error_message, audit_cat_error.hint_message, audit_cat_error.log_level, audit_cat_error.show_user, user_name, addr, debug_info
 FROM audit_function_actions INNER JOIN audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id
@@ -17,7 +17,7 @@ ORDER BY audit_function_actions.id DESC;
 
 
 
-DROP VIEW IF EXISTS v_audit_db_columns;
+DROP VIEW IF EXISTS v_audit_db_columns CASCADE;
 CREATE OR REPLACE VIEW v_audit_db_columns AS 
 SELECT (table_name || '_'::text) || column_name AS id, 
     table_name, 
@@ -28,7 +28,7 @@ SELECT (table_name || '_'::text) || column_name AS id,
 
 
 
-DROP VIEW IF EXISTS v_db_cat_columns;
+DROP VIEW IF EXISTS v_db_cat_columns CASCADE;
 CREATE VIEW v_db_cat_columns AS
 SELECT
 	name||'_'||column_name as id,
@@ -41,7 +41,7 @@ SELECT
 
 
 
-DROP VIEW IF EXISTS v_audit_db_columns_diference;
+DROP VIEW IF EXISTS v_audit_db_columns_diference CASCADE;
 CREATE VIEW v_audit_db_columns_diference AS
 SELECT
 	v_audit_db_columns.table_name as audit_table,

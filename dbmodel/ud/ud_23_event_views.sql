@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-DROP VIEW IF EXISTS v_ui_event_x_node;
+DROP VIEW IF EXISTS v_ui_event_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_node AS 
 SELECT
 event_x_node.id,
@@ -27,7 +27,7 @@ ORDER BY node_id;
 
 
 
-DROP VIEW IF EXISTS v_ui_event_x_arc;
+DROP VIEW IF EXISTS v_ui_event_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_arc AS 
 SELECT
 event_x_arc.id,
@@ -49,7 +49,7 @@ JOIN arc ON arc.arc_id::text = event_x_arc.arc_id::text
 ORDER BY arc_id;
 
 
-DROP VIEW IF EXISTS v_ui_event_x_element;
+DROP VIEW IF EXISTS v_ui_event_x_element CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_element AS 
 SELECT
 event_x_element.id,
@@ -72,7 +72,7 @@ JOIN node ON node.node_id::text = element_x_node.node_id::text
 ORDER BY element_id;
 
 
-DROP VIEW IF EXISTS v_ui_event_x_connec;
+DROP VIEW IF EXISTS v_ui_event_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_connec AS 
 SELECT
 event_x_connec.id,
@@ -92,7 +92,7 @@ JOIN connec ON connec.connec_id::text = event_x_connec.connec_id::text
 ORDER BY connec_id;
 
 
-DROP VIEW IF EXISTS v_ui_event_x_gully;
+DROP VIEW IF EXISTS v_ui_event_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_gully AS 
 SELECT
 event_x_gully.id,
@@ -112,7 +112,7 @@ JOIN gully ON gully.gully_id::text = event_x_gully.gully_id::text
 ORDER BY gully_id;
 
 
-DROP VIEW IF EXISTS v_ui_event_x_element_x_node;
+DROP VIEW IF EXISTS v_ui_event_x_element_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_element_x_node AS 
  SELECT event_x_element.id,
     node.node_id,
@@ -134,7 +134,7 @@ CREATE OR REPLACE VIEW v_ui_event_x_element_x_node AS
   ORDER BY event_x_element.element_id;
   
   
-DROP VIEW IF EXISTS v_ui_event_x_element_x_connec;
+DROP VIEW IF EXISTS v_ui_event_x_element_x_connec CASCADE;
  CREATE OR REPLACE VIEW v_ui_event_x_element_x_connec AS 
  SELECT event_x_element.id,
     connec.connec_id,
@@ -156,7 +156,7 @@ DROP VIEW IF EXISTS v_ui_event_x_element_x_connec;
   ORDER BY event_x_element.element_id;
 
 
-DROP VIEW IF EXISTS v_ui_event_x_element_x_arc;
+DROP VIEW IF EXISTS v_ui_event_x_element_x_arc CASCADE;
  CREATE OR REPLACE VIEW v_ui_event_x_element_x_arc AS 
  SELECT event_x_element.id,
     arc.arc_id,
@@ -178,7 +178,7 @@ DROP VIEW IF EXISTS v_ui_event_x_element_x_arc;
   ORDER BY event_x_element.element_id;
 
 
-DROP VIEW IF EXISTS v_ui_event_x_element_x_gully;
+DROP VIEW IF EXISTS v_ui_event_x_element_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_event_x_element_x_gully AS 
  SELECT event_x_element.id,
     gully.gully_id,

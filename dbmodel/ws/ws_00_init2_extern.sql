@@ -73,7 +73,7 @@ CREATE TABLE ext_cat_period (
 -- SCADA
 -- ----------------------------
 
-CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_x_value_seq"
+CREATE SEQUENCE "ext_rtc_scada_x_value_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -81,7 +81,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_x_value_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_x_data_seq"
+CREATE SEQUENCE "ext_rtc_scada_x_data_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -89,7 +89,7 @@ CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_x_data_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_scada_dma_period_seq"
+CREATE SEQUENCE "ext_rtc_scada_dma_period_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -166,14 +166,14 @@ CREATE TABLE ext_rtc_scada_dma_period (
 -- ----------------------------
 
  
-CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_hydrometer_x_value_seq"
+CREATE SEQUENCE "ext_rtc_hydrometer_x_value_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "SCHEMA_NAME"."ext_rtc_hydrometer_x_data_seq"
+CREATE SEQUENCE "ext_rtc_hydrometer_x_data_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE

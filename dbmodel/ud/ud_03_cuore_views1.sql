@@ -38,7 +38,7 @@ FROM arc
 JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
 
-DROP VIEW IF EXISTS v_node;
+DROP VIEW IF EXISTS v_node CASCADE;
 CREATE OR REPLACE VIEW v_node AS
 SELECT
 node.node_id,
@@ -59,7 +59,7 @@ FROM node;
 
 
 
-DROP VIEW IF EXISTS v_arc_x_node1;
+DROP VIEW IF EXISTS v_arc_x_node1 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node1 AS 
 SELECT arc.arc_id, arc.node_1, node.top_elev AS top_elev1, node.ymax AS ymax1, node.top_elev - node.ymax AS elev1, arc.y1, node.ymax - arc.y1 AS z1, cat_arc.geom1, arc.y1 - cat_arc.geom1 AS r1 
 FROM v_arc arc 
@@ -67,7 +67,7 @@ FROM v_arc arc
 	JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 	
-DROP VIEW IF EXISTS v_arc_x_node2;
+DROP VIEW IF EXISTS v_arc_x_node2 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node2 AS 
 SELECT arc.arc_id,arc.node_2,node.top_elev AS top_elev2,node.ymax AS ymax2,node.top_elev - node.ymax AS elev2,arc.y2,node.ymax - arc.y2 AS z2,cat_arc.geom1, arc.y2 - cat_arc.geom1 AS r2
 FROM v_arc arc
@@ -75,7 +75,7 @@ FROM v_arc arc
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
-DROP VIEW IF EXISTS v_arc_x_node;
+DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
 SELECT v_arc_x_node1.arc_id, 
 v_arc_x_node1.node_1,

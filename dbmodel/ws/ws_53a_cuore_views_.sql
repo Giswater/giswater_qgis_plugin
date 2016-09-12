@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-DROP VIEW IF EXISTS v_ext_urban_propierties;
+DROP VIEW IF EXISTS v_ext_urban_propierties CASCADE;
 CREATE OR REPLACE VIEW v_ext_urban_propierties AS
 SELECT
     ext_urban_propierties.id,

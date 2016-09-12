@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-DROP VIEW IF EXISTS v_arc_x_node1;
+DROP VIEW IF EXISTS v_arc_x_node1 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node1 AS 
 SELECT arc.arc_id, arc.node_1, 
 node.elevation AS elevation1, 
@@ -22,7 +22,7 @@ JOIN node ON arc.node_1::text = node.node_id::text
 JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
-DROP VIEW IF EXISTS v_arc_x_node2;
+DROP VIEW IF EXISTS v_arc_x_node2 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node2 AS 
 SELECT arc.arc_id, arc.node_2, 
 node.elevation AS elevation2, 
@@ -34,7 +34,7 @@ JOIN node ON arc.node_2::text = node.node_id::text
 JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
-DROP VIEW IF EXISTS v_arc_x_node;
+DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
 SELECT 
 v_arc_x_node1.arc_id,
@@ -54,7 +54,7 @@ JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
 JOIN arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text; 
 
 
-DROP VIEW IF EXISTS v_ui_element_x_node;
+DROP VIEW IF EXISTS v_ui_element_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_node AS 
 SELECT
 element_x_node.id,
@@ -70,7 +70,7 @@ FROM element_x_node
 JOIN element ON element.element_id::text = element_x_node.element_id::text;
 
 
-DROP VIEW IF EXISTS v_ui_element_x_arc;
+DROP VIEW IF EXISTS v_ui_element_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_arc AS
 SELECT
 element_x_arc.id,
@@ -86,7 +86,7 @@ FROM element_x_arc
 JOIN element ON element.element_id::text = element_x_arc.element_id::text;
 
 
-DROP VIEW IF EXISTS v_ui_element_x_connec;
+DROP VIEW IF EXISTS v_ui_element_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_connec AS
 SELECT
 element_x_connec.id,

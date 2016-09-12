@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-DROP VIEW IF EXISTS v_ui_doc_x_node;
+DROP VIEW IF EXISTS v_ui_doc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_doc_x_node AS 
 SELECT
 doc_x_node.id,
@@ -21,7 +21,7 @@ FROM doc_x_node
 JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
 
 
-DROP VIEW IF EXISTS v_ui_doc_x_arc;
+DROP VIEW IF EXISTS v_ui_doc_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_doc_x_arc AS
 SELECT 
 doc_x_arc.id,
@@ -37,7 +37,7 @@ FROM doc_x_arc
 JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
 
 
-DROP VIEW IF EXISTS v_ui_doc_x_connec;
+DROP VIEW IF EXISTS v_ui_doc_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_ui_doc_x_connec AS
 SELECT
 doc_x_connec.id,

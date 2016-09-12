@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Editing views structure
 -- ----------------------------
-DROP VIEW IF EXISTS v_edit_node;
+DROP VIEW IF EXISTS v_edit_node CASCADE;
 CREATE VIEW v_edit_node AS
 SELECT node.node_id, 
 node.top_elev, 
@@ -52,7 +52,7 @@ node.the_geom
    LEFT JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
    
-DROP VIEW IF EXISTS v_edit_arc;
+DROP VIEW IF EXISTS v_edit_arc CASCADE;
 CREATE VIEW v_edit_arc AS
 SELECT arc.arc_id, 
 arc.node_1,
@@ -103,7 +103,7 @@ LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
 
 
-DROP VIEW IF EXISTS v_edit_connec;
+DROP VIEW IF EXISTS v_edit_connec CASCADE;
 CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT connec.connec_id, 
 connec.top_elev, 
@@ -148,7 +148,7 @@ LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
 LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id);
 
 
-DROP VIEW IF EXISTS v_edit_link;
+DROP VIEW IF EXISTS v_edit_link CASCADE;
 CREATE OR REPLACE VIEW v_edit_link AS
 SELECT 
 link.link_id,
@@ -162,7 +162,7 @@ FROM (link
 LEFT JOIN connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
-DROP VIEW IF EXISTS v_edit_gully;
+DROP VIEW IF EXISTS v_edit_gully CASCADE;
 CREATE OR REPLACE VIEW v_edit_gully AS
 SELECT gully.gully_id, 
 gully.top_elev, 
@@ -204,7 +204,7 @@ FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id):
 WHERE gully.the_geom is not null;
 
 
-DROP VIEW IF EXISTS v_edit_pgully;
+DROP VIEW IF EXISTS v_edit_pgully CASCADE;
 CREATE OR REPLACE VIEW v_edit_pgully AS
 SELECT gully.gully_id, 
 gully.top_elev, 

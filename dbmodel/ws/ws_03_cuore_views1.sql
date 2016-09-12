@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 
 
-DROP VIEW IF EXISTS v_arc;
+DROP VIEW IF EXISTS v_arc CASCADE;
 CREATE OR REPLACE VIEW v_arc AS 
 SELECT 
 arc.arc_id, 
@@ -28,11 +28,11 @@ arc.soilcat_id,
 WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- field to use length/custom_length
 ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
 arc.the_geom
-FROM SCHEMA_NAME.arc
-JOIN SCHEMA_NAME.cat_arc ON arc.arccat_id::text = cat_arc.id::text;
+FROM arc
+JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
 
-DROP VIEW IF EXISTS v_node;
+DROP VIEW IF EXISTS v_node CASCADE;
 CREATE OR REPLACE VIEW v_node AS
 SELECT
 node.node_id,
@@ -45,5 +45,5 @@ node.sector_id,
 node.dma_id,
 node.state,
 node.the_geom
-FROM SCHEMA_NAME.node;
+FROM node;
 
