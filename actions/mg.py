@@ -361,7 +361,7 @@ class Mg():
         ''' Update current type of node and save changes in database '''
 
         # Update node_type in the database
-        sql = "UPDATE "+self.schema_name+".node"
+        sql = "UPDATE "+self.schema_name+".v_edit_node"
         sql+= " SET node_type ='"+self.value_combo2+"'"
         if self.value_combo3 != 'null':
             sql+= ", nodecat_id='"+self.value_combo3+"'"
