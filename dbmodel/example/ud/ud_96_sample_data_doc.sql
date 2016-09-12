@@ -125,7 +125,7 @@ INSERT INTO doc_x_gully VALUES (118, 2, '918');
 
 
 
-SELECT pg_catalog.setval('doc_x_node_seq', 20, true);
-SELECT pg_catalog.setval('doc_x_arc_seq', 17, true);
-SELECT pg_catalog.setval('doc_x_connec_seq', 24, true);
-SELECT pg_catalog.setval('doc_x_gully_seq', 119, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".doc_x_node_seq', 20, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".doc_x_arc_seq', 17, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".doc_x_connec_seq', 24, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".doc_x_gully_seq', 119, true);

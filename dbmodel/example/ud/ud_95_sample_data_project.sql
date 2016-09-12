@@ -2115,15 +2115,15 @@ INSERT INTO subcatchment VALUES ('S237', 'N237', 'RG-01', 0.077540, 90.0000, 17.
 
 
 
-SELECT pg_catalog.setval('element_seq', 1001, true);
-SELECT pg_catalog.setval('element_x_node_seq', 1001, true);
-SELECT pg_catalog.setval('event_id_seq', 1001, true);
-SELECT pg_catalog.setval('event_x_arc_seq', 1001, true);
-SELECT pg_catalog.setval('event_x_element_seq', 1001, true);
-SELECT pg_catalog.setval('event_x_connec_seq', 1001, true);
-SELECT pg_catalog.setval('event_x_gully_seq', 1001, true);
-SELECT pg_catalog.setval('inp_curve_seq', 4, true);
-SELECT pg_catalog.setval('inp_timeseries_seq', 24, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".element_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".element_x_node_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_id_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_arc_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_element_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_connec_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".event_x_gully_seq', 1001, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".inp_curve_seq', 4, true);
+SELECT pg_catalog.setval('"SCHEMA_NAME".inp_timeseries_seq', 24, true);
 
 
 
