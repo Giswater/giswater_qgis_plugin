@@ -39,7 +39,7 @@ INSERT INTO "arc_type" VALUES ('CONDUCTO','CONDUIT', 'CONDUIT', 'man_conduit', '
 INSERT INTO "arc_type" VALUES ('BOMBA','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('SIFON','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('RAPIDO','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('CONDUCTO VIRTUAL','VIRTUAL', 'OUTLET', 'man_virtual', 'inp_outlet', 'event_x_virtual' );
+INSERT INTO "arc_type" VALUES ('VIRTUAL','CONDUIT', 'OUTLET', 'man_virtual', 'inp_outlet', 'event_x_virtual' );
 
 
 

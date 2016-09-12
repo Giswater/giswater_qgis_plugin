@@ -35,7 +35,7 @@ INSERT INTO "arc_type" VALUES ('CONDUIT','CONDUIT', 'CONDUIT', 'man_conduit', 'i
 INSERT INTO "arc_type" VALUES ('PUMP PIPE','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('SIPHON','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('RAPID','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('VIRTUAL','VIRTUAL', 'OUTLET', 'man_virtual', 'inp_outlet', 'event_x_virtual' );
+INSERT INTO "arc_type" VALUES ('VIRTUAL','CONDUIT', 'OUTLET', 'man_virtual', 'inp_outlet', 'event_x_virtual' );
 
 
 
