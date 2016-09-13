@@ -206,7 +206,8 @@ class Giswater(QObject):
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
-        self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
+        self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
+        self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully')    
         self.table_version = self.settings.value('db/table_version', 'version')     
         
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
@@ -239,7 +240,7 @@ class Giswater(QObject):
             self.add_action('02', self.toolbar_ud, self.ag_ud)   
             self.add_action('04', self.toolbar_ud, self.ag_ud)   
             self.add_action('05', self.toolbar_ud, self.ag_ud)   
-            self.add_action('03', self.toolbar_ud, self.ag_ud)   
+            #self.add_action('03', self.toolbar_ud, self.ag_ud)   
                 
         # WS toolbar 
         if self.toolbar_ws_enabled:  
@@ -402,6 +403,7 @@ class Giswater(QObject):
         self.layer_arc = None
         self.layer_node = None
         self.layer_connec = None
+        self.layer_gully = None
         self.layer_version = None
         
         # Iterate over all layers to get the ones specified in 'db' config section 
@@ -414,6 +416,8 @@ class Giswater(QObject):
                     self.layer_node = cur_layer
                 if self.table_connec in uri_table:  
                     self.layer_connec = cur_layer
+                if self.table_gully in uri_table:  
+                    self.layer_gully = cur_layer
                 if self.table_version in uri_table:  
                     self.layer_version = cur_layer     
         
@@ -470,8 +474,17 @@ class Giswater(QObject):
             self.layer_connec.editFormConfig().setUiForm(file_ui) 
             self.layer_connec.editFormConfig().setInitCodeSource(1)
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           
-            self.layer_connec.editFormConfig().setInitFunction('formOpen')                         
-                    
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')   
+            
+        if self.layer_gully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
+            self.layer_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')                       
+
+                      
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
@@ -532,7 +545,10 @@ class Giswater(QObject):
             elif self.table_node in uri_table:  
                 setting_name = 'buttons_node'
             elif self.table_connec in uri_table:  
-                setting_name = 'buttons_connec'                
+                setting_name = 'buttons_connec' 
+            elif self.table_gully in uri_table:  
+                setting_name = 'buttons_gully' 
+                               
         
         if setting_name is not None:
             try:
