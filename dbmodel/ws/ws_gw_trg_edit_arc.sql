@@ -86,11 +86,6 @@ BEGIN
     
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE dma/sector
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-        END IF;
     
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
@@ -119,10 +114,8 @@ BEGIN
         PERFORM audit_function(2,340); 
         RETURN NEW;
 
-     ELSIF TG_OP = 'DELETE' THEN
-     
+     ELSIF TG_OP = 'DELETE' THEN   
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
-
         PERFORM audit_function(3,340); 
         RETURN NULL;
      

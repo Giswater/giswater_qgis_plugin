@@ -32,11 +32,6 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE dma/sector
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-        END IF;
 
         IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
@@ -70,8 +65,6 @@ BEGIN
         RETURN NEW;
         
     ELSIF TG_OP = 'DELETE' THEN
-    --  DELETE FROM node WHERE node_id = OLD.node_id;
-    --  EXECUTE 'DELETE FROM '||node_table||' WHERE node_id = '||quote_literal(OLD.node_id);
         PERFORM audit_function(163,370); 
         RETURN NEW;
     

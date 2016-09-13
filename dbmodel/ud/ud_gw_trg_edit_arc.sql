@@ -98,12 +98,6 @@ BEGIN
     
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE dma/sector
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-        END IF;    
-
         IF (NEW.epa_type <> OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'CONDUIT') THEN 

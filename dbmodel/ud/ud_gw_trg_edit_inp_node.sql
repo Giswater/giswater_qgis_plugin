@@ -27,15 +27,9 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        -- UPDATE dma/sector
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-        END IF;
-
 
         UPDATE node 
-        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
+        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
