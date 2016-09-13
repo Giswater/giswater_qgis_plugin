@@ -820,18 +820,15 @@ CREATE TABLE "rpt_cat_result" (
 
 CREATE TABLE "rpt_selector_result" (
 "result_id" varchar(16)   NOT NULL
-)WITH (OIDS=FALSE)
-;
+);
 
 CREATE TABLE "rpt_selector_compare" (
 "result_id" varchar(16)   NOT NULL
-)WITH (OIDS=FALSE)
-;
+);
 
 CREATE TABLE "inp_selector_sector" (
 "sector_id" varchar(30)   NOT NULL
-)WITH (OIDS=FALSE)
-;
+);
 
 
 CREATE TABLE "inp_selector_state" (

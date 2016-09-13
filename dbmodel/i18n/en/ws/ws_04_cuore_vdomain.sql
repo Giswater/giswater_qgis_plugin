@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET LC_MESSAGES TO 'en_EN.UTF-8';
+SET LC_MESSAGES TO 'en_US.UTF-8';
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
