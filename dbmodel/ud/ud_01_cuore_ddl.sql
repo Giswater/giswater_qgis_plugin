@@ -405,9 +405,7 @@ CREATE TABLE "sector" (
 "descript" varchar(100),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
-)
-WITH (OIDS=FALSE)
-;
+);
 
 
 CREATE TABLE "node" (

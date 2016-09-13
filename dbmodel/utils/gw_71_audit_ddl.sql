@@ -61,9 +61,6 @@ CREATE TABLE audit_db_columns
   column_type text,
   description text,
   CONSTRAINT audit_db_columns_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
 );
 
 
