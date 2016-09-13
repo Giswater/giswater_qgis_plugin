@@ -123,10 +123,10 @@ arc.the_geom
 
 FROM v_arc arc
 	JOIN v_arc_x_node ON ((((arc.arc_id)::text = (v_arc_x_node.arc_id)::text)))
-	JOIN v_price_x_catarc ON ((((arc.arccat_id)::text = (v_price_x_catarc.id)::text)))
-	JOIN v_price_x_catsoil ON ((((arc.soilcat_id)::text = (v_price_x_catsoil.id)::text)))
-	JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id)::text = (arc.arc_id)::text)))
-	JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id)::text = (plan_arc_x_pavement.pavcat_id)::text)))
+	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id)::text = (v_price_x_catarc.id)::text)))
+	LEFT JOIN v_price_x_catsoil ON ((((arc.soilcat_id)::text = (v_price_x_catsoil.id)::text)))
+	LEFT JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id)::text = (arc.arc_id)::text)))
+	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id)::text = (plan_arc_x_pavement.pavcat_id)::text)))
 	GROUP BY arc.arc_id, v_arc_x_node.depth1, v_arc_x_node.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, m2bottom_cost,m3protec_cost,v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom;
 	
 	
@@ -312,7 +312,7 @@ node."state",
 node.the_geom
 
 FROM (v_node node
-JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
+LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
 JOIN plan_selector_economic ON (((node."state")::text = (plan_selector_economic.id)::text));
 
 
