@@ -81,3 +81,13 @@ CREATE TABLE "config_extract_raster_value" (
 "vector_field_value" varchar (30),
 CONSTRAINT "config_extract_raster_value_pkey" PRIMARY KEY ("id")
 );
+
+
+CREATE TABLE "config_ui_forms" (
+"id" serial NOT NULL,
+"ui_form" varchar (50),
+"ui_table" varchar (50),
+"ui_column" varchar (50),
+"width" numeric (6,3),
+CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
+);
