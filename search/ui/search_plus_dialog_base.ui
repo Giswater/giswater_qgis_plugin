@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>376</width>
-    <height>223</height>
+    <width>357</width>
+    <height>212</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>204</x>
-     <y>192</y>
+     <x>190</x>
+     <y>170</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>284</x>
-     <y>192</y>
+     <x>270</x>
+     <y>170</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -42,23 +42,23 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>22</y>
+     <x>10</x>
+     <y>10</y>
      <width>335</width>
      <height>153</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
-     <string>Urban Propierties</string>
+     <string>Urban Properties</string>
     </attribute>
     <widget class="QLabel" name="label_press_zone_2">
      <property name="geometry">
       <rect>
-       <x>12</x>
+       <x>15</x>
        <y>22</y>
        <width>55</width>
        <height>16</height>
@@ -71,9 +71,9 @@
     <widget class="SearchableComboBox" name="urban_propierties_pzone">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>20</y>
-       <width>239</width>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -84,7 +84,7 @@
     <widget class="QLabel" name="label_number_2">
      <property name="geometry">
       <rect>
-       <x>12</x>
+       <x>15</x>
        <y>86</y>
        <width>55</width>
        <height>16</height>
@@ -97,9 +97,9 @@
     <widget class="SearchableComboBox" name="urban_propierties_number">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>82</y>
-       <width>239</width>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -110,22 +110,22 @@
     <widget class="QLabel" name="label_block">
      <property name="geometry">
       <rect>
-       <x>12</x>
+       <x>15</x>
        <y>52</y>
        <width>55</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>block:</string>
+      <string>Block:</string>
      </property>
     </widget>
     <widget class="SearchableComboBox" name="urban_propierties_block">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>50</y>
-       <width>239</width>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -141,9 +141,9 @@
     <widget class="SearchableComboBox" name="ppoint_press_zone">
      <property name="geometry">
       <rect>
-       <x>82</x>
+       <x>90</x>
        <y>20</y>
-       <width>239</width>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -154,7 +154,7 @@
     <widget class="QLabel" name="label_press_zone">
      <property name="geometry">
       <rect>
-       <x>14</x>
+       <x>15</x>
        <y>22</y>
        <width>55</width>
        <height>16</height>
@@ -167,7 +167,7 @@
     <widget class="QLabel" name="label_number">
      <property name="geometry">
       <rect>
-       <x>14</x>
+       <x>15</x>
        <y>58</y>
        <width>55</width>
        <height>16</height>
@@ -180,9 +180,9 @@
     <widget class="SearchableComboBox" name="ppoint_number">
      <property name="geometry">
       <rect>
-       <x>82</x>
+       <x>90</x>
        <y>54</y>
-       <width>239</width>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -198,8 +198,8 @@
     <widget class="QLabel" name="label_street">
      <property name="geometry">
       <rect>
-       <x>16</x>
-       <y>24</y>
+       <x>15</x>
+       <y>22</y>
        <width>55</width>
        <height>16</height>
       </rect>
@@ -211,8 +211,8 @@
     <widget class="QLabel" name="label_number_3">
      <property name="geometry">
       <rect>
-       <x>14</x>
-       <y>60</y>
+       <x>15</x>
+       <y>56</y>
        <width>55</width>
        <height>16</height>
       </rect>
@@ -224,9 +224,9 @@
     <widget class="SearchableComboBox" name="adress_street">
      <property name="geometry">
       <rect>
-       <x>82</x>
-       <y>22</y>
-       <width>239</width>
+       <x>90</x>
+       <y>20</y>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -237,9 +237,9 @@
     <widget class="SearchableComboBox" name="adress_number">
      <property name="geometry">
       <rect>
-       <x>82</x>
-       <y>56</y>
-       <width>239</width>
+       <x>90</x>
+       <y>54</y>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
@@ -255,8 +255,8 @@
     <widget class="QLabel" name="label_code">
      <property name="geometry">
       <rect>
-       <x>16</x>
-       <y>24</y>
+       <x>15</x>
+       <y>22</y>
        <width>55</width>
        <height>16</height>
       </rect>
@@ -268,9 +268,9 @@
     <widget class="SearchableComboBox" name="hydrometer_code">
      <property name="geometry">
       <rect>
-       <x>84</x>
-       <y>22</y>
-       <width>239</width>
+       <x>90</x>
+       <y>20</y>
+       <width>221</width>
        <height>20</height>
       </rect>
      </property>
