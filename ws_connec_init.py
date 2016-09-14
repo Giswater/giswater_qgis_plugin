@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 from qgis.utils import iface
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QMessageBox
 
 from functools import partial
 
 import utils_giswater
 from ws_parent_init import ParentDialog
+
+from ui.add_sum import Add_sum          # @UnresolvedImport
+
+from PyQt4.QtSql import QSqlTableModel
+
+from decimal import Decimal
 
 
 def formOpen(dialog, layer, feature):
@@ -37,7 +43,7 @@ def init_config():
     feature_dialog.change_connec_type_id(-1)      
     
     # Set  button signals      
-    feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.update_sum)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
     
      
@@ -57,7 +63,7 @@ class ConnecDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_connectype_id", False)        
-        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False)             
+        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False)      
         
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
@@ -66,7 +72,9 @@ class ConnecDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")      
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")    
         self.tbl_connec = self.dialog.findChild(QTableView, "tbl_connec")             
-        self.tbl_dae = self.dialog.findChild(QTableView, "tbl_dae")             
+        self.tbl_dae = self.dialog.findChild(QTableView, "tbl_dae")   
+        self.tbl_dae_2 = self.dialog.findChild(QTableView, "tbl_dae_2")    
+            
              
         # Manage tab visibility
         self.set_tabs_visibility()
@@ -91,14 +99,19 @@ class ConnecDialog(ParentDialog):
         table_document = "v_ui_doc_x_connec"
         self.fill_tbl_connec(self.tbl_connec, self.schema_name+"."+table_document, self.filter)
         
-        # Fill tab Hydrometer
+        # Fill tab Hydrometer | feature
         table_hydrometer = "v_ui_hydrometer_x_connec"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
+        # Fill tab Hydrometer | epanet
+        table_hydrometer_epanet = "ext_rtc_hydrometer_x_data"
+        self.fill_tbl_hydrometer_epanet(self.tbl_dae_2, self.schema_name+"."+table_hydrometer_epanet)
+        
         # Set signals                  
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
-        self.dialog.findChild(QPushButton, "delete_row_doc").clicked.connect(partial(self.delete_records, self.tbl_connec, table_document))                   
-        
+        self.dialog.findChild(QPushButton, "delete_row_doc").clicked.connect(partial(self.delete_records, self.tbl_connec, table_document))    
+        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_dae, self.tbl_dae, table_hydrometer))               
+        self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
        
     def set_tabs_visibility(self):
         ''' Hide some tabs '''
@@ -200,8 +213,8 @@ class ConnecDialog(ParentDialog):
         expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
   
         # Refresh model with selected filter
-        self.tbl_connec.model().setFilter(expr)
-        self.tbl_connec.model().select()
+        self.tbl_dae.model().setFilter(expr)
+        self.tbl_dae.model().select()
     
         
     def fill_tbl_info(self, widget, table_name, filter_): 
@@ -227,6 +240,151 @@ class ConnecDialog(ParentDialog):
         
         #Fill scada tab of node
         #Filter and fill table related with node_id        
-        self.set_model_to_table(widget, table_name, filter_)       
+        self.set_model_to_table(widget, table_name, filter_)   
+        
+        
+    def fill_tbl_hydrometer_epanet(self, widget, table_name):
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.select()    
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())      
+
+        # Attach model to table view
+        widget.setModel(model)    
+             
+    
+    def insert_records (self):
+        # Create the dialog and signals
+        self.dlg_sum = Add_sum()
+        utils_giswater.setDialog(self.dlg_sum)
+        
+        # Set signal btn_accept
+        self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept_dae)
+        # Set signal btn_close
+        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close_dae)
+        
+        # Open the dialog
+        self.dlg_sum.exec_() 
+           
+    
+    def btn_accept_dae(self):
+        print("btn accept")
+        
+        # Get widget text - hydtometer_id
+        widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
+        self.hydro_id = widget_hydro.text()
+        print(self.hydro_id)
+        
+        # get connec_id       
+        widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
+        self.connec_id = widget_connec.text()
+        print(self.connec_id)
+
+        # Insert hydrometer_id in ext_rtc_hydrometer
+        sql = "INSERT INTO "+self.schema_name+".ext_rtc_hydrometer (hydrometer_id) "
+        sql+= " VALUES ('"+self.hydro_id+"')"
+        self.dao.execute_sql(sql) 
+        
+        # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
+        sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
+        sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
+        self.dao.execute_sql(sql) 
+        
+        # Refresh table in Qtableview
+        # Fill tab Hydrometer
+        table_hydrometer = "v_ui_hydrometer_x_connec"
+        self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
+        
+        self.dlg_sum.close()
+              
+              
+    def btn_close_dae(self):
+        ''' Close form without saving '''
+        self.dlg_sum.close()
+       
+       
+    def delete_records_dae(self, widget, table_name):
+        ''' Delete selected elements of the table '''
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            self.controller.show_warning("Any record selected")
+            return
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("hydrometer_id")
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            sql= "DELETE FROM "+self.schema_name+".rtc_hydrometer_x_connec WHERE hydrometer_id ='"+id_+"'" 
+            self.dao.execute_sql(sql)
+            widget.model().select()
+            
+            sql= "DELETE FROM "+self.schema_name+".ext_rtc_hydrometer WHERE hydrometer_id ='"+id_+"'" 
+            self.dao.execute_sql(sql)
+            widget.model().select()
+      
+        # Refresh table in Qtableview
+        # Fill tab Hydrometer
+        table_hydrometer = "v_ui_hydrometer_x_connec"
+        self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
+        
+  
+     
+    def update_sum(self,widget):
+
+        
+        # Check if clicked value is from the column "PATH"
+        position_column = self.tbl_dae_2.currentIndex().column()
+        position_row = self.tbl_dae_2.currentIndex().row()
+        print(position_row)
+        if position_column == 5:      
+            # Get data from address in memory (pointer)
+            self.sum = self.tbl_dae_2.selectedIndexes()[0].data()
+            
+            # Get hydrometer_id of selected sum
+            proxyModel=self.tbl_dae_2.model()
+            hydrometer_id=proxyModel.index(position_row, 1).data()
+            
+            # Get sum - check if exist in table, if don't exist user change value -> UPDATE
+            sql = "SELECT DISTINCT(sum) FROM "+self.schema_name+".ext_rtc_hydrometer_x_data WHERE sum = '"+str(self.sum)+"'" 
+            row = self.dao.get_row(sql)
+            if row == None:
+                check = self.update_sum_confirm()
+                if check:
+                    # If is accept ipload database
+                    sql= " UPDATE "+self.schema_name+".ext_rtc_hydrometer_x_data SET" 
+                    sql+= " sum = '"+str(self.sum)+"'"
+                    sql+= " WHERE hydrometer_id = '"+hydrometer_id+"';"
+                    self.dao.execute_sql(sql) 
+                            
+                    self.controller.show_info("Value has been updated")
+                    self.close()
+        else:
+            self.close()
+                    
+            
+    def update_sum_confirm(self):
+        ''' Ask question to the user '''
+        
+        msgBox = QMessageBox()
+        msgBox.setText("Are you sure you want change the data?")
+        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        ret = msgBox.exec_()
+        if ret == QMessageBox.Ok:
+            return True
+        elif ret == QMessageBox.Discard:
+            return False   
+     
+            
 
         
