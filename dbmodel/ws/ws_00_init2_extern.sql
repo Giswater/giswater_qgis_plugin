@@ -195,10 +195,32 @@ CONSTRAINT ext_cat_hydrometer_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE ext_rtc_hydrometer(
-  "hydrometer_id" character varying(16) NOT NULL,
-  "cat_hydrometer_id" character varying(16),
-  "text" text,
-  CONSTRAINT ext_rtc_hydrometer_id_pkey PRIMARY KEY (hydrometer_id)
+"hydrometer_id" character varying(16) NOT NULL,
+"cat_hydrometer_id" character varying(16),
+"client_name"  text,
+"adress"	text,
+"adress_number" text,
+"adress_adjunct" text,
+"hydrometer_code" text,
+"instalation_date" text,
+"flow" text,
+"easel" text,
+"cover" text,
+"diameter" text,
+"kink_date" text,
+"technical_average" text,
+"hydrometer_number" text,
+"hydrometer_flag" text,
+"digits_hydrometer" text,
+"kit_flag_ulmc" text,
+"brand" text,
+"class" text,
+"ulmc" text,
+"voltman_flow" text,
+"multi_jet_flow" text,
+"easel_diameter_pol" text,
+"easel_diameter_mm" text,
+CONSTRAINT ext_rtc_hydrometer_id_pkey PRIMARY KEY (hydrometer_id)
 );
 
 

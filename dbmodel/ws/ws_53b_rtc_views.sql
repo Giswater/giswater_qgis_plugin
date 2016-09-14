@@ -5,43 +5,45 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
-CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
- SELECT ext_rtc_hydrometer.hydrometer_id, 
-    v_ext_urban_propierties.id as urban_propierties_id,
-    ext_rtc_hydrometer.cat_hydrometer_id, 
-    ext_cat_hydrometer.hydrometer_type, 
-    ext_cat_hydrometer.text2, 
-    ext_cat_hydrometer.text3, 
-    ext_rtc_hydrometer.text
-   FROM ext_rtc_hydrometer
-   LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
-   JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id
-   LEFT JOIN v_ext_urban_propierties ON v_ext_urban_propierties.connec_id::text = rtc_hydrometer_x_connec.connec_id::text;
-
-
-DROP VIEW IF EXISTS v_ui_scada_x_node CASCADE; 
-CREATE OR REPLACE VIEW v_ui_scada_x_node AS 
-SELECT
-ext_rtc_scada_x_value.id,
-rtc_scada_node.scada_id,
-rtc_scada_node.node_id,
-ext_rtc_scada_x_value.value,
-ext_rtc_scada_x_value.status,
-ext_rtc_scada_x_value.timestamp
-FROM rtc_scada_node
-JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id::text = rtc_scada_node.scada_id::text;
-
-
-DROP VIEW IF EXISTS v_ui_hydrometer_x_connec CASCADE;
-CREATE OR REPLACE VIEW v_ui_hydrometer_x_connec AS
+CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 SELECT
 ext_rtc_hydrometer.hydrometer_id,
 rtc_hydrometer_x_connec.connec_id,
-ext_rtc_hydrometer.cat_hydrometer_id,
-ext_rtc_hydrometer.text
+connec.code as urban_propierties_code,
+cat_hydrometer_id,
+client_name,
+adress,
+adress_number,
+adress_adjunct,
+hydrometer_code,
+instalation_date,
+flow,
+easel,
+cover,
+diameter,
+kink_date,
+technical_average,
+hydrometer_number,
+hydrometer_flag,
+digits_hydrometer,
+kit_flag_ulmc,
+brand,
+class,
+ulmc,
+voltman_flow,
+multi_jet_flow,
+easel_diameter_pol,
+easel_diameter_mm,
+ext_cat_hydrometer.hydrometer_type, 
+ext_cat_hydrometer.text2, 
+ext_cat_hydrometer.text3
 FROM ext_rtc_hydrometer
-JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id=ext_rtc_hydrometer.hydrometer_id;
+LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
+JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id
+JOIN  connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id;
+
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_period CASCADE;
