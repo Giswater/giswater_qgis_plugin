@@ -90,10 +90,15 @@ class ArcDialog(ParentDialog):
         table_element= "v_ui_element_x_arc"
         self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
+        # Configuration of  info table
+        self.set_configuration(self.tbl_info, table_element)
+        
         # Fill the tab Document
         table_document = "v_ui_doc_x_arc"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-       
+        
+        # Configuration of table document
+        self.set_configuration(self.tbl_document, table_document)
     
     def set_tabs_visibility(self):
         ''' Hide some tabs '''

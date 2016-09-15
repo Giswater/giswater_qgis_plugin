@@ -12,6 +12,7 @@ from ui.add_sum import Add_sum          # @UnresolvedImport
 from PyQt4.QtSql import QSqlTableModel
 
 from decimal import Decimal
+from TiffImagePlugin import ROWSPERSTRIP
 
 
 def formOpen(dialog, layer, feature):
@@ -95,17 +96,29 @@ class ConnecDialog(ParentDialog):
         table_element = "v_ui_element_x_connec"
         self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
+        # Configuration of info table
+        self.set_configuration(self.tbl_info, table_element)
+        
         # Fill the tab Document
         table_document = "v_ui_doc_x_connec"
         self.fill_tbl_connec(self.tbl_connec, self.schema_name+"."+table_document, self.filter)
         
+        # Configuration of table Document
+        self.set_configuration(self.tbl_connec, table_document)
+        
         # Fill tab Hydrometer | feature
-        table_hydrometer = "v_ui_hydrometer_x_connec"
+        table_hydrometer = "v_rtc_hydrometer"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
+        # Configuration of table Hydrometer | feature
+        self.set_configuration(self.tbl_dae, table_hydrometer)
+        
         # Fill tab Hydrometer | epanet
-        table_hydrometer_epanet = "ext_rtc_hydrometer_x_data"
-        self.fill_tbl_hydrometer_epanet(self.tbl_dae_2, self.schema_name+"."+table_hydrometer_epanet)
+        table_hydrometer_epanet = "v_edit_rtc_hydro_data_x_connec"
+        self.fill_tbl_hydrometer_epanet(self.tbl_dae_2, self.schema_name+"."+table_hydrometer_epanet, self.filter)
+        
+        # Configuration of table Hydrometer | epanet
+        self.set_configuration(self.tbl_dae_2, table_hydrometer_epanet)
         
         # Set signals                  
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
@@ -238,23 +251,16 @@ class ConnecDialog(ParentDialog):
         self.date_dae_to.dateChanged.connect(self.set_filter_tbl_hydrometer)
         self.date_dae_from.dateChanged.connect(self.set_filter_tbl_hydrometer)
         
-        #Fill scada tab of node
-        #Filter and fill table related with node_id        
+        #Fill feature tab of connec
+        #Filter and fill table related with connec        
         self.set_model_to_table(widget, table_name, filter_)   
         
         
-    def fill_tbl_hydrometer_epanet(self, widget, table_name):
-        # Set model
-        model = QSqlTableModel();
-        model.setTable(table_name)
-        model.select()    
-
-        # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())      
-
-        # Attach model to table view
-        widget.setModel(model)    
+    def fill_tbl_hydrometer_epanet(self, widget, table_name, filter_):
+        #Fill EPANET tab of hydrometer
+        #Filter and fill table related with connec_id        
+        self.set_model_to_table(widget, table_name, filter_) 
+        #self.set_configuration(widget, table_name) 
              
     
     def insert_records (self):
@@ -284,8 +290,8 @@ class ConnecDialog(ParentDialog):
         self.connec_id = widget_connec.text()
         print(self.connec_id)
 
-        # Insert hydrometer_id in ext_rtc_hydrometer
-        sql = "INSERT INTO "+self.schema_name+".ext_rtc_hydrometer (hydrometer_id) "
+        # Insert hydrometer_id in v_rtc_hydrometer
+        sql = "INSERT INTO "+self.schema_name+".v_rtc_hydrometer (hydrometer_id) "
         sql+= " VALUES ('"+self.hydro_id+"')"
         self.dao.execute_sql(sql) 
         
@@ -296,7 +302,7 @@ class ConnecDialog(ParentDialog):
         
         # Refresh table in Qtableview
         # Fill tab Hydrometer
-        table_hydrometer = "v_ui_hydrometer_x_connec"
+        table_hydrometer = "v_rtc_hydrometer"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
         self.dlg_sum.close()
@@ -329,13 +335,13 @@ class ConnecDialog(ParentDialog):
             self.dao.execute_sql(sql)
             widget.model().select()
             
-            sql= "DELETE FROM "+self.schema_name+".ext_rtc_hydrometer WHERE hydrometer_id ='"+id_+"'" 
+            sql= "DELETE FROM "+self.schema_name+".v_rtc_hydrometer WHERE hydrometer_id ='"+id_+"'" 
             self.dao.execute_sql(sql)
             widget.model().select()
       
         # Refresh table in Qtableview
         # Fill tab Hydrometer
-        table_hydrometer = "v_ui_hydrometer_x_connec"
+        table_hydrometer = "v_rtc_hydrometer"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
   
@@ -343,32 +349,35 @@ class ConnecDialog(ParentDialog):
     def update_sum(self,widget):
 
         
-        # Check if clicked value is from the column "PATH"
+        # Check if clicked value is from the column "SUM"
         position_column = self.tbl_dae_2.currentIndex().column()
         position_row = self.tbl_dae_2.currentIndex().row()
         print(position_row)
-        if position_column == 5:      
+        if position_column == 6:      
             # Get data from address in memory (pointer)
             self.sum = self.tbl_dae_2.selectedIndexes()[0].data()
-            
+            print(self.sum)
             # Get hydrometer_id of selected sum
             proxyModel=self.tbl_dae_2.model()
-            hydrometer_id=proxyModel.index(position_row, 1).data()
-            
+            hydrometer_id=proxyModel.index(position_row, 2).data()
+            print(hydrometer_id)
             # Get sum - check if exist in table, if don't exist user change value -> UPDATE
-            sql = "SELECT DISTINCT(sum) FROM "+self.schema_name+".ext_rtc_hydrometer_x_data WHERE sum = '"+str(self.sum)+"'" 
+            sql = "SELECT DISTINCT(sum) FROM "+self.schema_name+".v_edit_rtc_hydro_data_x_connec WHERE sum = '"+str(self.sum)+"'" 
             row = self.dao.get_row(sql)
             if row == None:
                 check = self.update_sum_confirm()
                 if check:
                     # If is accept ipload database
-                    sql= " UPDATE "+self.schema_name+".ext_rtc_hydrometer_x_data SET" 
+                    sql= " UPDATE "+self.schema_name+".v_edit_rtc_hydro_data_x_connec SET" 
                     sql+= " sum = '"+str(self.sum)+"'"
-                    sql+= " WHERE hydrometer_id = '"+hydrometer_id+"';"
+                    sql+= " WHERE hydrometer_id = '"+hydrometer_id+"'"
+                    print(sql)
                     self.dao.execute_sql(sql) 
                             
                     self.controller.show_info("Value has been updated")
-                    self.close()
+                else :
+                    return
+                    
         else:
             self.close()
                     
@@ -386,5 +395,5 @@ class ConnecDialog(ParentDialog):
             return False   
      
             
-
-        
+            
+    

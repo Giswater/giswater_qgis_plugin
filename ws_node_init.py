@@ -91,14 +91,26 @@ class NodeDialog(ParentDialog):
         # Fill the info table
         table_element= "v_ui_element_x_node"
         self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
+        
+        # Configuration of info table 
+        self.set_configuration(self.tbl_info, table_element)
+        
 
         # Fill the tab Document
         table_document = "v_ui_doc_x_node"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        
+        # Configuration of table document
+        self.set_configuration(self.tbl_document, table_document)
+        
 
         # Fill the tab Scada
         table_scada = "v_ui_scada_x_node"
         self.fill_tbl_scada(self.tbl_rtc, self.schema_name+"."+table_scada, self.filter)
+        
+        # Configuration of table scada
+        self.set_configuration(self.tbl_rtc, table_scada)
+
 
         # Set signals
         self.dialog.findChild(QPushButton, "btn_element_delete").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
