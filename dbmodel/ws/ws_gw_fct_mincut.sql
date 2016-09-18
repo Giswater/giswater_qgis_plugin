@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut(character varying, character varying);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS $BODY$
 DECLARE
     node_1_aux		text;
@@ -44,7 +45,7 @@ BEGIN
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM arc WHERE arc_id = element_id_arg;
 
             -- Check extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_edit_valve WHERE node_id = node_1_aux AND (acessibility = FALSE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_valve WHERE node_id = node_1_aux AND (acessibility = TRUE) AND (broken  = FALSE);
             IF controlValue = 1 THEN
 
                 -- Select public.geometry
@@ -127,6 +128,9 @@ BEGIN
     -- Insert into polygon table
     DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
+
+    -- Insert into result catalog tables
+    PERFORM gw_fct_mincut_result_catalog();
 
     RETURN audit_function(0,310);
 

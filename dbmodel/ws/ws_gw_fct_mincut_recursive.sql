@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_recursive(character varying);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut_recursive(node_id_arg character varying) RETURNS void AS $BODY$
 DECLARE
     exists_id      character varying;
@@ -22,7 +23,7 @@ BEGIN
     SELECT the_geom INTO node_aux FROM node WHERE node_id = node_id_arg;
 
     -- Check node being a valve
-    SELECT node_id INTO exists_id FROM v_edit_valve WHERE node_id = node_id_arg AND (acessibility = FALSE) AND (broken  = FALSE);
+    SELECT node_id INTO exists_id FROM v_edit_valve WHERE node_id = node_id_arg AND (acessibility = TRUE) AND (broken  = FALSE);
     IF FOUND THEN
 
         -- Check if the node is already computed

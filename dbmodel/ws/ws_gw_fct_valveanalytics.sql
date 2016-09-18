@@ -5,6 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_valveanalytics();
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_valveanalytics() RETURNS "pg_catalog"."int4" AS $BODY$
 DECLARE
     exists_id      text;

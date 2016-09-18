@@ -6,6 +6,20 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+DROP VIEW IF EXISTS v_ui_scada_x_node CASCADE;
+CREATE OR REPLACE VIEW v_ui_scada_x_node AS 
+SELECT
+ext_rtc_scada_x_value.id,
+rtc_scada_node.scada_id,
+rtc_scada_node.node_id,
+ext_rtc_scada_x_value.value,
+ext_rtc_scada_x_value.status,
+ext_rtc_scada_x_value.timestamp
+FROM rtc_scada_node
+JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id::text = rtc_scada_node.scada_id::text;
+
+
+
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 SELECT
