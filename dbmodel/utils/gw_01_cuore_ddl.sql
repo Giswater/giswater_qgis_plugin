@@ -94,3 +94,12 @@ CREATE TABLE "config_ui_forms" (
 "alias" varchar (50),
 CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
 );
+
+
+CREATE TABLE "config_ui_forms_tabs"
+(  id serial NOT NULL,
+  ui_form character varying(50),
+  ui_tab character varying(50),
+  ui_table character varying(50),
+  CONSTRAINT config_ui_forms_tabs_pkey PRIMARY KEY (id)
+)
