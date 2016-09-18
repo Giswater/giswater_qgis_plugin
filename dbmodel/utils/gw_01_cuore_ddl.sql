@@ -89,6 +89,8 @@ CREATE TABLE "config_ui_forms" (
 "ui_table" varchar (50),
 "ui_column" varchar (50),
 "status" boolean,
-"width" numeric (6,3),
+"width" int4
+"column_index" int2
+"alias" varchar (50),
 CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
 );
