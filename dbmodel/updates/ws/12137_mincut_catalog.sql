@@ -125,7 +125,7 @@ ALTER TABLE "anl_mincut_result_valve" ADD FOREIGN KEY ("valve_id") REFERENCES "n
 ALTER TABLE "anl_mincut_result_hydrometer" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-ALTER TABLE "anl_mincut_result_polgyon" ADD FOREIGN KEY ("mincut_result_cat_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "anl_mincut_result_polygon" ADD FOREIGN KEY ("mincut_result_cat_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_mincut_result_node" ADD FOREIGN KEY ("mincut_result_cat_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_mincut_result_arc" ADD FOREIGN KEY ("mincut_result_cat_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_mincut_result_connec" ADD FOREIGN KEY ("mincut_result_cat_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
