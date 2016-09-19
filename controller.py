@@ -18,10 +18,10 @@ class DaoController():
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
     
-    def tr(self, message, context=None):
-        if context is None:
-            context = self.plugin_name
-        return QCoreApplication.translate(context, message)                            
+    def tr(self, message, context_name=None):
+        if context_name is None:
+            context_name = self.plugin_name
+        return QCoreApplication.translate(context_name, message)                            
     
     def set_settings(self, settings):
         self.settings = settings      
@@ -93,29 +93,29 @@ class DaoController():
             self.log_codes[log_code_id] = "Error message not found in the database: "+str(log_code_id)
         
     
-    def show_message(self, text, message_level=1, duration=5):
+    def show_message(self, text, message_level=1, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.iface.messageBar().pushMessage("", self.tr(text), message_level, duration)  
+        self.iface.messageBar().pushMessage("", self.tr(text, context_name), message_level, duration)  
         
             
-    def show_info(self, text, duration=5):
+    def show_info(self, text, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.show_message(text, 0, duration)
+        self.show_message(text, 0, duration, context_name)
         
         
-    def show_warning(self, text, duration=5):
+    def show_warning(self, text, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.show_message(text, 1, duration)
+        self.show_message(text, 1, duration, context_name)
      
      
-    def ask_question(self, text, title=None, inf_text=None):
+    def ask_question(self, text, title=None, inf_text=None, context_name=None):
         ''' Ask question to the user '''   
 
         msg_box = QMessageBox()
-        msg_box.setText(self.tr(text))
+        msg_box.setText(self.tr(text, context_name=None))
         if title is not None:
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
