@@ -37,6 +37,12 @@ CREATE SEQUENCE "rtc_scada_x_sector_seq"
 -- tables structure
 -- --------------------------
 
+CREATE TABLE "rtc_hydrometer" (
+hydrometer_id character varying(16) NOT NULL,
+CONSTRAINT rtc_hydrometer_pkey PRIMARY KEY (hydrometer_id)
+);
+
+
 
 CREATE TABLE "rtc_options" (
 "id" varchar(16),

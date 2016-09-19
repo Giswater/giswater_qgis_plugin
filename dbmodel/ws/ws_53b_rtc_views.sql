@@ -23,7 +23,7 @@ JOIN ext_rtc_scada_x_value ON ext_rtc_scada_x_value.scada_id::text = rtc_scada_n
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 SELECT
-ext_rtc_hydrometer.hydrometer_id,
+rtc_hydrometer.hydrometer_id,
 rtc_hydrometer_x_connec.connec_id,
 connec.code as urban_propierties_code,
 cat_hydrometer_id,
@@ -53,7 +53,8 @@ easel_diameter_pol,
 easel_diameter_mm,
 ext_cat_hydrometer.text2, 
 ext_cat_hydrometer.text3
-FROM ext_rtc_hydrometer
+FROM rtc_hydrometer
+JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id
 LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id
 JOIN  connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id;
