@@ -1,271 +1,284 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>searchPlusDockWidget</class>
- <widget class="QDockWidget" name="searchPlusDockWidget">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>344</width>
-    <height>174</height>
+    <width>376</width>
+    <height>223</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="locale">
-   <locale language="Catalan" country="Spain"/>
-  </property>
-  <property name="floating">
-   <bool>true</bool>
-  </property>
-  <property name="features">
-   <set>QDockWidget::AllDockWidgetFeatures</set>
-  </property>
-  <property name="allowedAreas">
-   <set>Qt::AllDockWidgetAreas</set>
-  </property>
   <property name="windowTitle">
-   <string>Search options</string>
+   <string>Search plus</string>
   </property>
-  <widget class="QWidget" name="contents">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QTabWidget" name="searchPlusTabMain">
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="locale">
-       <locale language="Catalan" country="Spain"/>
-      </property>
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <widget class="QWidget" name="searchPlusStreetsTab">
-       <attribute name="title">
-        <string>Street</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="lblStreet">
-            <property name="text">
-             <string>Street:</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="SearchableComboBox" name="cboStreet">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="lblNumber">
-            <property name="text">
-             <string>Number:</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="SearchableComboBox" name="cboNumber">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="searchPlusToponimsTab">
-       <attribute name="title">
-        <string>Topònims</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QLabel" name="lblTopo">
-          <property name="text">
-           <string>Desplegueu per seleccionar un topònim; escriviu per constrènyer la cerca (per exemple, &quot;can&quot;):</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="SearchableComboBox" name="cboTopo">
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="searchPlusEquipmentsTab">
-       <attribute name="title">
-        <string>Equipaments</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="lblType">
-            <property name="text">
-             <string>Tipus:</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="SearchableComboBox" name="cboType">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="lblEquipment">
-            <property name="text">
-             <string>Equipament:</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="SearchableComboBox" name="cboEquipment">
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="searchPlusCadastreTab">
-       <attribute name="title">
-        <string>Cadastre</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="QLabel" name="lblCadastre">
-          <property name="font">
-           <font>
-            <pointsize>9</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Introduïu la referència cadastral i premeu Acceptar (exemple: '5123501DF1952S'):</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="SearchableComboBox" name="cboCadastre">
-          <property name="editable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="searchPlusUTMTab">
-       <attribute name="title">
-        <string>UTM</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <item>
-         <widget class="QLabel" name="lblUTM">
-          <property name="text">
-           <string>Enter coordinates and press Enter (example: X '415165', Y '4592355'):</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-          <property name="textInteractionFlags">
-           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>X:</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="txtCoordX"/>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Y:</string>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="txtCoordY"/>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-   </layout>
+  <widget class="QPushButton" name="btn_accept">
+   <property name="geometry">
+    <rect>
+     <x>204</x>
+     <y>192</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_cancel">
+   <property name="geometry">
+    <rect>
+     <x>284</x>
+     <y>192</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>22</y>
+     <width>335</width>
+     <height>153</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>2</number>
+   </property>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Urban Propierties</string>
+    </attribute>
+    <widget class="QLabel" name="label_press_zone_2">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>22</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Press zone:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_propierties_pzone">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>20</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_number_2">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>86</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Number:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_propierties_number">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>82</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_block">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>52</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>block:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_propierties_block">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>50</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Ppoint</string>
+    </attribute>
+    <widget class="SearchableComboBox" name="ppoint_press_zone">
+     <property name="geometry">
+      <rect>
+       <x>82</x>
+       <y>20</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_press_zone">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>22</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Press zone:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_number">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>58</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Number:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="ppoint_number">
+     <property name="geometry">
+      <rect>
+       <x>82</x>
+       <y>54</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Adress</string>
+    </attribute>
+    <widget class="QLabel" name="label_street">
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>24</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Street:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_number_3">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>60</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Number:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="adress_street">
+     <property name="geometry">
+      <rect>
+       <x>82</x>
+       <y>22</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="adress_number">
+     <property name="geometry">
+      <rect>
+       <x>82</x>
+       <y>56</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>Hydrometer</string>
+    </attribute>
+    <widget class="QLabel" name="label_code">
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>24</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Code:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="hydrometer_code">
+     <property name="geometry">
+      <rect>
+       <x>84</x>
+       <y>22</y>
+       <width>239</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <customwidgets>

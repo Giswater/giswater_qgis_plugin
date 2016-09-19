@@ -27,6 +27,8 @@ from parent_map_tool import ParentMapTool
 
 
 class MoveNodeMapTool(ParentMapTool):
+    ''' Button 16. Move node
+    Execute SQL function: 'gw_fct_node2arc' '''        
 
     def __init__(self, iface, settings, action, index_action, controller, srid):
         ''' Class constructor '''        
@@ -120,7 +122,8 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            self.controller.show_info("Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again")
+            msg = "Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again"
+            self.controller.show_info(msg)
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
@@ -161,6 +164,8 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Node layer
         layer = self.canvas.currentLayer()
+        if layer is None:
+            return
 
         # Select node or arc
         if layer.selectedFeatureCount() == 0:
@@ -219,8 +224,7 @@ class MoveNodeMapTool(ParentMapTool):
     def canvasReleaseEvent(self, event):
         ''' Mouse release event '''         
         
-        # On left click, take action
-        if event.button() == 1:
+        if event.button() == Qt.LeftButton:
             
             # Get the click
             x = event.pos().x()
@@ -272,10 +276,7 @@ class MoveNodeMapTool(ParentMapTool):
                     # Refresh map canvas
                     self.iface.mapCanvas().refresh()               
         
-        # On left click, take action
-        if event.button() == 2:
-            
-            # Node layer
+        elif event.button() == Qt.RightButton:
             self.reset()
                    
         

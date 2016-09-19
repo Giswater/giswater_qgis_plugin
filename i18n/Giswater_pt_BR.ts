@@ -28,55 +28,55 @@
         <translation>Giswater - Urban drainage</translation>
     </message>    
     
-
+    
     <message>
         <source>01_text</source>
-        <translation>Insert junction</translation>
+        <translation>Inserção conexão</translation>
     </message>      
     <message>
         <source>02_text</source>
-        <translation>Insert outfall</translation>
+        <translation>Inserção exutorio</translation>
     </message>   
     <message>
         <source>03_text</source>
-        <translation>Insert virtual arc</translation>
+        <translation>Inserção divisor</translation>
     </message>      
     <message>
         <source>04_text</source>
-        <translation>Insert storage</translation>
+        <translation>Inserção armazenamento</translation>
     </message>      
     <message>
         <source>05_text</source>
-        <translation>Insert conduit</translation>
-    </message>      
+        <translation>Inserção conduto</translation>
+    </message>          
     <message>
         <source>08_text</source>
-        <translation>Insert filter</translation>
-    </message>        
+        <translation>Inserção vertedores</translation>
+    </message>          
     <message>
         <source>10_text</source>
-        <translation>Insert junction</translation>
+        <translation>Inserção conexão</translation>
     </message>      
     <message>
         <source>11_text</source>
-        <translation>Insert hydrant</translation>
+        <translation>Inserção reservatório</translation>
     </message>      
     <message>
         <source>12_text</source>
-        <translation>Insert tank</translation>
+        <translation>Inserção depósito</translation>
     </message>      
     <message>
         <source>13_text</source>
-        <translation>Insert pipe</translation>
+        <translation>Inserção tubulação</translation>
     </message>      
     <message>
         <source>14_text</source>
-        <translation>Insert pump</translation>
+        <translation>Inserção bomba</translation>
     </message> 
     <message>
         <source>15_text</source>
-        <translation>Insert valve</translation>
-    </message>   
+        <translation>Inserção válvula</translation>
+    </message>      
     <message>
         <source>16_text</source>
         <translation>Move unconnected node to split a pipe</translation>
@@ -87,36 +87,36 @@
     </message>      
     <message>
         <source>18_text</source>
-        <translation>Capture raster elevation</translation>
-    </message>      
+        <translation>Captura cota nó</translation>
+    </message>
     <message>
         <source>19_text</source>
         <translation>Topology toolbox</translation>
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Connec tool</translation>
-    </message>      
+        <translation>Ferramenta conexões</translation>
+    </message>
     <message>
         <source>21_text</source>
         <translation>Import CSV</translation>
-    </message>      
+    </message>
     <message>
         <source>22_text</source>
-        <translation>Undo wizard</translation>
-    </message>      
+        <translation>Assistente desfazer</translation>
+    </message>
     <message>
         <source>23_text</source>
-        <translation>Go2Epa</translation>
-    </message>      
+        <translation>Go2epa</translation>
+    </message>
     <message>
         <source>24_text</source>
-        <translation>Go2Epa express</translation>
-    </message>      
+        <translation>Go2epa express</translation>
+    </message>
     <message>
         <source>25_text</source>
-        <translation>Result selector</translation>
-    </message>      
+        <translation>Seleção resultados</translation>
+    </message>
     <message>
         <source>26_text</source>
         <translation>Arc/Node minimum cut</translation>
@@ -149,10 +149,6 @@
         <source>34_text</source>
         <translation>Add file</translation>
     </message> 
-    <message>
-        <source>35_text</source>
-        <translation>Event</translation>
-    </message>
     <message>
         <source>36_text</source>
         <translation>Giswater</translation>
@@ -199,7 +195,7 @@
         <translation>has been unchecked (mg_generic)</translation>
     </message>      
     
-  
+
 </context>
 
 

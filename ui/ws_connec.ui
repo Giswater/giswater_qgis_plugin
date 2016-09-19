@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2566,140 +2566,199 @@
     <attribute name="title">
      <string>Hydrometer</string>
     </attribute>
-    <widget class="QDateEdit" name="date_dae_from">
+    <widget class="QTabWidget" name="tabWidget">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
+       <y>22</y>
+       <width>767</width>
+       <height>411</height>
       </rect>
      </property>
-     <property name="date">
-      <date>
-       <year>2016</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
+     <property name="currentIndex">
+      <number>1</number>
      </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="date_dae_to">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>35</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="date">
-      <date>
-       <year>2017</year>
-       <month>1</month>
-       <day>1</day>
-      </date>
-     </property>
-     <property name="calendarPopup">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_hydrometer">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>125</y>
-       <width>90</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Hydrometer:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_hydrometer_to">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>35</y>
-       <width>31</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="text">
-      <string>to</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="Line" name="line_13">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>105</y>
-       <width>761</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QTableView" name="tbl_dae">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
-     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Feature</string>
+      </attribute>
+      <widget class="QDateEdit" name="date_dae_to">
+       <property name="geometry">
+        <rect>
+         <x>176</x>
+         <y>6</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2017</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QDateEdit" name="date_dae_from">
+       <property name="geometry">
+        <rect>
+         <x>6</x>
+         <y>6</y>
+         <width>121</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="date">
+        <date>
+         <year>2016</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_hydrometer_to">
+       <property name="geometry">
+        <rect>
+         <x>136</x>
+         <y>6</y>
+         <width>31</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>to</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="Line" name="line_13">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>32</y>
+         <width>733</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_delete_hydrometer">
+       <property name="geometry">
+        <rect>
+         <x>638</x>
+         <y>52</y>
+         <width>105</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Delete Hydrometer</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_add_hydrometer">
+       <property name="geometry">
+        <rect>
+         <x>512</x>
+         <y>52</y>
+         <width>111</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Add Hydrometer</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_hydrometer">
+       <property name="geometry">
+        <rect>
+         <x>24</x>
+         <y>48</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Hydrometer:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QTableView" name="tbl_dae">
+       <property name="geometry">
+        <rect>
+         <x>16</x>
+         <y>88</y>
+         <width>729</width>
+         <height>283</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>EPANET</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_dae_2">
+       <property name="geometry">
+        <rect>
+         <x>14</x>
+         <y>22</y>
+         <width>729</width>
+         <height>343</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
   </widget>

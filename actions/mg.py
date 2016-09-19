@@ -91,33 +91,8 @@ class Mg():
             
         # Refresh map canvas
         self.iface.mapCanvas().refresh()             
-            
-                       
-    def mg_connec_tool(self):
-        ''' Button 20. User select connections from layer 'connec' 
-        and executes function: 'gw_fct_connect_to_network' '''      
 
-        # Get selected features (from layer 'connec')
-        aux = "{"         
-        layer = self.iface.activeLayer()  
-        if layer.selectedFeatureCount() == 0:
-            self.controller.show_warning("You have to select at least one feature!")
-            return 
-        features = layer.selectedFeatures()
-        for feature in features:
-            connec_id = feature.attribute('connec_id') 
-            aux+= str(connec_id)+", "
-        connec_array = aux[:-2]+"}"
-        
-        # Execute function
-        function_name = "gw_fct_connect_to_network"        
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"  
-        self.controller.execute_sql(sql) 
-        
-        # Refresh map canvas
-        self.iface.mapCanvas().refresh() 
-        
-        
+
     def mg_table_wizard(self):
         ''' Button 21. WS/UD table wizard ''' 
         
@@ -386,7 +361,7 @@ class Mg():
         ''' Update current type of node and save changes in database '''
 
         # Update node_type in the database
-        sql = "UPDATE "+self.schema_name+".node"
+        sql = "UPDATE "+self.schema_name+".v_edit_node"
         sql+= " SET node_type ='"+self.value_combo2+"'"
         if self.value_combo3 != 'null':
             sql+= ", nodecat_id='"+self.value_combo3+"'"

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import psycopg2
+import psycopg2         #@UnusedImport
 import psycopg2.extras
 
 
@@ -98,6 +98,10 @@ class PgDao():
             return status 
 
 
+    def get_rowcount(self):        
+        return self.cursor.rowcount      
+ 
+ 
     def commit(self):
         self.conn.commit()
         

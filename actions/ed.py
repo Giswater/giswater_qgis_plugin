@@ -33,6 +33,7 @@ class Ed():
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
+        self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
         self.table_version = self.settings.value('db/table_version', 'version')                               
     
                   
@@ -59,7 +60,7 @@ class Ed():
         # Create the dialog and signals
         self.dlg = Add_element()
         utils_giswater.setDialog(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.ed_add_element_confirm)
+        self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
         # Manage i18n of the form
@@ -211,19 +212,26 @@ class Ed():
         sql = "SELECT DISTINCT(element_id) FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"    
         row = self.dao.get_row(sql)
         if row:
-            sql = "UPDATE "+self.schema_name+".element"
-            sql+= " SET element_id = '"+self.element_id+"', elementcat_id= '"+self.elementcat_id+"',state = '"+self.state+"', location_type = '"+self.location_type+"'"
-            sql+= ", workcat_id= '"+self.workcat_id+"',buildercat_id = '"+self.buildercat_id+"', ownercat_id = '"+self.ownercat_id+"'"
-            sql+= ", rotation= '"+self.rotation+"',comment = '"+self.comment+"', annotation = '"+self.annotation+"', observ= '"+self.observ+"',link = '"+self.link+"', verified = '"+self.verified+"'"
-            sql+= " WHERE element_id = '"+self.element_id+"'" 
-            self.dao.execute_sql(sql)  
+            answer = self.ed_add_element_confirm()
+            if answer:
+                sql = "UPDATE "+self.schema_name+".element"
+                sql+= " SET element_id = '"+self.element_id+"', elementcat_id= '"+self.elementcat_id+"',state = '"+self.state+"', location_type = '"+self.location_type+"'"
+                sql+= ", workcat_id= '"+self.workcat_id+"',buildercat_id = '"+self.buildercat_id+"', ownercat_id = '"+self.ownercat_id+"'"
+                sql+= ", rotation= '"+self.rotation+"',comment = '"+self.comment+"', annotation = '"+self.annotation+"', observ= '"+self.observ+"',link = '"+self.link+"', verified = '"+self.verified+"'"
+                sql+= " WHERE element_id = '"+self.element_id+"'" 
+                self.dao.execute_sql(sql)  
+            else:
+                self.close_dialog(self.dlg)
         else:
             sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
             sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified) "
             sql+= " VALUES ('"+self.element_id+"', '"+self.elementcat_id+"', '"+self.state+"', '"+self.location_type+"', '"
             sql+= self.workcat_id+"', '"+self.buildercat_id+"', '"+self.ownercat_id+"', '"+self.rotation+"', '"+self.comment+"', '"
             sql+= self.annotation+"','"+self.observ+"','"+self.link+"','"+self.verified+"')"
-            self.dao.execute_sql(sql) 
+            status = self.controller.execute_sql(sql) 
+            if not status:
+                self.controller.show_warning("Error inserting element in table, you need to review data")
+                return
         
         # Get layers
         layers = self.iface.legendInterface().layers()
@@ -232,10 +240,11 @@ class Ed():
          
         # Initialize variables                          
         self.layer_arc = None
-        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
-        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
-        table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
-   
+        table_arc = self.schema_name+'."'+self.table_arc+'"'
+        table_node = self.schema_name+'."'+self.table_node+'"'
+        table_connec = self.schema_name+'."'+self.table_connec+'"'
+        table_gully = self.schema_name+'."'+self.table_gully+'"'
+        
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     
             uri = cur_layer.dataProvider().dataSourceUri().lower()   
@@ -302,6 +311,25 @@ class Ed():
                         sql+= " VALUES ('"+self.connec_id+"', '"+self.element_id+"')"
                         self.dao.execute_sql(sql)   
                         i+=1
+                        
+                # Table 'gully'   
+                elif table_gully == uri_table:  
+                    self.layer_gully = cur_layer
+                    self.count_gully = self.layer_gully.selectedFeatureCount()  
+                    # Get all selected features-arcs
+                    features_gullys = self.layer_gully.selectedFeatures()
+                    i = 0
+                    while (i < self.count_gully):
+                          
+                        # Get node_id from current gully
+                        feature_gully = features_gullys[i]
+                        self.gully_id = feature_gully.attribute('gully_id')
+
+                        # Execute id(automaticaly),element_id and gully_id to element_x_gully
+                        sql = "INSERT INTO "+self.schema_name+".element_x_gully (gully_id, element_id) "
+                        sql+= " VALUES ('"+self.gully_id+"', '"+self.element_id+"')"
+                        self.dao.execute_sql(sql)   
+                        i+=1
                 
         # Show message to user
         self.controller.show_info("Values has been updated")
@@ -314,7 +342,7 @@ class Ed():
         # Create the dialog and signals
         self.dlg = Add_file()
         utils_giswater.setDialog(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.ed_add_file_confirm)
+        self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
         # Manage i18n of the form
@@ -396,14 +424,21 @@ class Ed():
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'" 
         row = self.dao.get_row(sql)
         if row:
-            sql = "UPDATE "+self.schema_name+".doc "
-            sql+= " SET doc_type = '"+self.row_doc_type[0]+"', tagcat_id= '"+self.row_tagcat[0]+"',observ = '"+self.row_observ[0]+"', path = '"+self.row_path[0]+"'"
-            sql+= " WHERE id = '"+self.doc_id+"'" 
-            self.dao.execute_sql(sql)  
+            answer = self.ed_add_file_confirm()
+            if answer:
+                sql = "UPDATE "+self.schema_name+".doc "
+                sql+= " SET doc_type = '"+self.row_doc_type[0]+"', tagcat_id= '"+self.row_tagcat[0]+"',observ = '"+self.row_observ[0]+"', path = '"+self.row_path[0]+"'"
+                sql+= " WHERE id = '"+self.doc_id+"'" 
+                self.dao.execute_sql(sql) 
+            else:
+                self.close_dialog(self.dlg) 
         else:
             sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
             sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
-            self.dao.execute_sql(sql)
+            status = self.controller.execute_sql(sql) 
+            if not status:
+                self.controller.show_warning("Error inserting element in table, you need to review data")
+                return
         
         # Get layers
         layers = self.iface.legendInterface().layers()
@@ -412,10 +447,11 @@ class Ed():
          
         # Initialize variables                    
         self.layer_arc = None
-        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
-        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
-        table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
-   
+        table_arc = self.schema_name+'."'+self.table_arc+'"'
+        table_node = self.schema_name+'."'+self.table_node+'"'
+        table_connec = self.schema_name+'."'+self.table_connec+'"'
+        table_gully = self.schema_name+'."'+self.table_gully+'"'
+        
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     
             uri = cur_layer.dataProvider().dataSourceUri().lower()   
@@ -485,10 +521,30 @@ class Ed():
                         sql+= " VALUES ('"+self.connec_id+"', '"+self.doc_id+"')"
                         self.dao.execute_sql(sql)  
                         i+=1
+                        
+                # Table 'gully'                          
+                elif table_gully == uri_table:  
+                    self.layer_gully = cur_layer
+                    self.count_gully = self.layer_gully.selectedFeatureCount()  
+                    # Get all selected features-arcs
+                    features_gullys = self.layer_gully.selectedFeatures()
+                    i = 0
+                    while (i<self.count_gully):
+
+                        # Get arc_id from current arc
+                        feature = features_gullys[i]
+                        self.gully_id = feature.attribute('gully_id')
+                        self.doc_id = utils_giswater.getWidgetText("doc_id")
+                                              
+                        # Execute id(automaticaly),element_id and gully_id to element_x_gully
+                        sql = "INSERT INTO "+self.schema_name+".doc_x_gully (gully_id,doc_id) "
+                        sql+= " VALUES ('"+self.gully_id+"','"+self.doc_id+"')"
+                        i+=1
+                        self.dao.execute_sql(sql) 
         
         # Show message to user
-        self.showInfo(self.controller.tr("Values has been updated"))
-        self.close_dialog()    
+        self.controller.show_info("Values has been updated")
+        self.close_dialog()  
         
         
     def ed_add_element_confirm(self):
@@ -499,24 +555,23 @@ class Ed():
         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         ret = msgBox.exec_()
         if ret == QMessageBox.Ok:
-            self.ed_add_element_accept()
+            return True
         elif ret == QMessageBox.Discard:
-            return      
-        self.close_dialog()
+            return False      
+
         
         
     def ed_add_file_confirm(self):
         ''' Ask question to the user '''
-        
+      
         msgBox = QMessageBox()
         msgBox.setText("Are you sure you want change the data?")
         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         ret = msgBox.exec_()
         if ret == QMessageBox.Ok:
-            self.ed_add_file_accept()
+            return True
         elif ret == QMessageBox.Discard:
-            return   
-        self.close_dialog()     
+            return False     
         
             
     def ed_giswater_jar(self):   

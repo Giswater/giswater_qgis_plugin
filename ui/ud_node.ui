@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="doc_tag">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -1097,54 +1097,11 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
-     <property name="geometry">
-      <rect>
-       <x>295</x>
-       <y>15</y>
-       <width>70</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Estimated</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="checkBox_2">
-     <property name="geometry">
-      <rect>
-       <x>295</x>
-       <y>45</y>
-       <width>70</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Estimated</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tab_7">
     <attribute name="title">
      <string>Add. info</string>
     </attribute>
-    <widget class="QTextEdit" name="element_2">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>60</y>
-       <width>761</width>
-       <height>371</height>
-      </rect>
-     </property>
-     <property name="html">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;element.element_id, cat_element.type, cat_element.id, element.builtdate, element.state,  element.enddate,  element.annotation,  element.link&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_elements">
      <property name="geometry">
       <rect>
@@ -1181,6 +1138,29 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
+    <widget class="QTableView" name="tbl_element">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>761</width>
+       <height>366</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_element_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>25</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink element</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_9">
     <attribute name="title">
@@ -1196,7 +1176,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="tab_10">
       <attribute name="title">
@@ -9083,16 +9063,6 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_12">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="Line" name="line_6">
      <property name="geometry">
       <rect>
@@ -9300,7 +9270,7 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_45">
+    <widget class="QComboBox" name="doc_tag">
      <property name="geometry">
       <rect>
        <x>600</x>
@@ -9308,6 +9278,29 @@ p, li { white-space: pre-wrap; }
        <width>111</width>
        <height>20</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_document">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>155</y>
+       <width>761</width>
+       <height>276</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_doc_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>125</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink document</string>
      </property>
     </widget>
    </widget>
@@ -9325,7 +9318,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_15">
       <attribute name="title">
@@ -9528,16 +9521,6 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QTableWidget" name="event_x_junction_state_observ">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>705</width>
-         <height>231</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QComboBox" name="cat_event_junction_eventtype_id">
        <property name="geometry">
         <rect>
@@ -9602,6 +9585,16 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QTableView" name="event_x_junction_state_observ">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>130</y>
+         <width>701</width>
+         <height>246</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -9740,16 +9733,6 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
-      <widget class="QTableWidget" name="event_x_tank_state_observ">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>705</width>
-         <height>231</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QComboBox" name="event_storage_eventcat_id">
        <property name="geometry">
         <rect>
@@ -9882,6 +9865,16 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
+      <widget class="QTableView" name="event_x_tank_state_observ">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>130</y>
+         <width>706</width>
+         <height>256</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_22">
       <attribute name="title">
@@ -9921,16 +9914,6 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="margin">
         <number>3</number>
-       </property>
-      </widget>
-      <widget class="QTableWidget" name="event_x_nodevalve_state_observ">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>705</width>
-         <height>231</height>
-        </rect>
        </property>
       </widget>
       <widget class="QLabel" name="label_event_outfall_user">
@@ -10160,6 +10143,16 @@ p, li { white-space: pre-wrap; }
         <number>3</number>
        </property>
       </widget>
+      <widget class="QTableView" name="event_x_nodevalve_state_observ">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>130</y>
+         <width>706</width>
+         <height>241</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>
@@ -10185,16 +10178,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_15">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
      </property>
     </widget>
     <widget class="Line" name="line_9">
@@ -10394,6 +10377,16 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="QTableView" name="tbl_log">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_21">
     <attribute name="title">
@@ -10417,16 +10410,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_16">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
      </property>
     </widget>
     <widget class="Line" name="line_10">
@@ -10534,6 +10517,16 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="QTableView" name="tbl_scada">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QLineEdit" name="rotation">
@@ -10549,7 +10542,7 @@ p, li { white-space: pre-wrap; }
     <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
+  <widget class="QLineEdit" name="node_id">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -10562,12 +10555,12 @@ p, li { white-space: pre-wrap; }
     <string>node_id</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_44">
+  <widget class="QLineEdit" name="geom1">
    <property name="geometry">
     <rect>
-     <x>790</x>
+     <x>715</x>
      <y>20</y>
-     <width>41</width>
+     <width>106</width>
      <height>20</height>
     </rect>
    </property>
@@ -10580,12 +10573,12 @@ p, li { white-space: pre-wrap; }
     <string>cat_node.geom1</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_30">
+  <widget class="QLineEdit" name="cat_matcat_id">
    <property name="geometry">
     <rect>
-     <x>570</x>
+     <x>575</x>
      <y>20</y>
-     <width>90</width>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
@@ -10621,7 +10614,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QComboBox" name="cat_nodetype_id">
+  <widget class="QComboBox" name="node_type">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -10634,7 +10627,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QComboBox" name="arccat_id">
+  <widget class="QComboBox" name="nodecat_id">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -10642,27 +10635,6 @@ p, li { white-space: pre-wrap; }
      <width>171</width>
      <height>20</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="catnode_shape">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>670</x>
-     <y>20</y>
-     <width>111</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_accept">
@@ -10689,6 +10661,98 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Close</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="est_top_elev">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>540</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="est_ymax">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>540</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_est_top_elev">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>540</y>
+     <width>116</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Estimated top_elev:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_est_ymax">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>540</y>
+     <width>116</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Estimated ymax:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
    </property>
   </widget>
  </widget>

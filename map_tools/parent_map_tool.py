@@ -67,12 +67,8 @@ class ParentMapTool(QgsMapTool):
         self.layer_node = layer_node
         self.snapperManager.set_layers(layer_arc, layer_connec, layer_node)
 
-    def set_schema_name(self, schema_name):
-        self.schema_name = schema_name
 
     def set_controller(self, controller):
         self.controller = controller
-
-    def set_dao(self, dao):
-        self.dao = dao
+        self.schema_name = controller.schema_name
 
