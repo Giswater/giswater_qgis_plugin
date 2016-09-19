@@ -57,7 +57,7 @@ class ConnecDialog(ParentDialog):
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_connectype_id", False)        
-        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False)             
+        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False)    
         
         # Get widget controls
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
@@ -186,13 +186,13 @@ class ConnecDialog(ParentDialog):
         
     def set_filter_tbl_hydrometer(self):
         ''' Get values selected by the user and sets a new filter for its table model '''
-        
+                    
         # Get selected dates
         date_from = self.date_dae_from.date().toString('yyyyMMdd') 
         date_to = self.date_dae_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
+            self.controller.show_warning(message, context_name='ws_parent')                   
             return
         
         # Set filter

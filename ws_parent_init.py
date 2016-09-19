@@ -19,6 +19,7 @@ class ParentDialog(object):
         self.dialog = dialog
         self.layer = layer
         self.feature = feature
+        self.context_name = "ws_parent"        
         self.init_config()             
     
         
@@ -237,7 +238,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
+            self.controller.show_warning(message, context_name=self.context_name)                   
             return
         
         # Set filter

@@ -153,56 +153,67 @@
         <source>35_text</source>
         <translation>Event</translation>
     </message>
-	<message>
+    <message>
         <source>36_text</source>
         <translation>Giswater</translation>
     </message>    
-	<message>
+    <message>
         <source>37_text</source>
         <translation>Help</translation>
-    </message>    	
-	<message>
+    </message>
+    <message>
         <source>99_text</source>
         <translation>Project configuration</translation>
     </message>   
     
-	<message>
+    <message>
         <source>Select the node and move to desired location</source>
-        <translation>(ENGLISH) Select the node and move to desired location</translation>
+        <translation>Select the node and move to desired location</translation>
     </message>  
     <message>
         <source>current_layer_changed:</source>
-        <translation>(ENGLISH) current_layer_changed:</translation>
+        <translation>current_layer_changed:</translation>
     </message>   
     <message>
         <source>has been checked (ws_generic)</source>
-        <translation>(ENGLISH) has been checked (ws_generic)</translation>
+        <translation>has been checked (ws_generic)</translation>
     </message>  
     <message>
         <source>AttributeError:</source>
-        <translation>(ENGLISH) AttributeError:</translation>
+        <translation>AttributeError:</translation>
     </message>
     <message>
         <source>KeyError:</source>
-        <translation>(ENGLISH) KeyError:</translation>
+        <translation>KeyError:</translation>
     </message> 
     <message>
         <source>has been checked</source>
-        <translation>(ENGLISH) has been checked</translation>
+        <translation>has been checked</translation>
     </message>
     <message>
         <source>has been checked (mg_generic)</source>
-        <translation>(ENGLISH) has been checked (mg_generic)</translation>
+        <translation>has been checked (mg_generic)</translation>
     </message> 
     <message>
         <source>has been unchecked (mg_generic)</source>
-        <translation>(ENGLISH) has been unchecked (mg_generic)</translation>
+        <translation>has been unchecked (mg_generic)</translation>
     </message>      
     
   
 </context>
 
 
+
+<context>
+
+    <name>ws_parent</name>
+    
+    <message>
+        <source>Selected date interval is not valid</source>
+        <translation>Selected date interval is not valid</translation>
+    </message>
+    
+</context>
 
 
 
@@ -746,7 +757,7 @@
         <source>label_document</source>
         <translation>Document:</translation>
     </message>  
-	<message>
+    <message>
         <source>delete_row_doc</source>
         <translation>Unlink document</translation>
     </message> 
@@ -785,10 +796,6 @@
     <message>
         <source>label_event_element_event_type</source>
         <translation>Type</translation>
-    </message>  
-    <message>
-        <source>label_event_element_event_type</source>
-        <translation>Event:</translation>
     </message>  
     <message>
         <source>label_log_node_to</source>
@@ -839,16 +846,12 @@
         <translation>RTC:</translation>
     </message> 
     
-    <message>
-        <source>Selected date interval is not valid</source>
-        <translation>(ENGLISH) Selected date interval is not valid</translation>
-    </message>
     
 </context>    
 
 
 
- <context>
+<context>
  
     <name>ws_arc</name>
     
@@ -1024,7 +1027,7 @@
         <source>label_event</source>
         <translation>Event:</translation>
     </message> 
-	<message>
+    <message>
         <source>label_log_to</source>
         <translation>to</translation>
     </message>  
@@ -1041,12 +1044,6 @@
         <translation>Log:</translation>
     </message> 
     
-     <message>
-        <source>Selected date interval is not valid</source>
-        <translation>(ENGLISH) Selected date interval is not valid</translation>
-    </message>
-    
-     
     
 </context>  
 
@@ -1140,26 +1137,26 @@
         <source>label_connec_adress_03</source>
         <translation>Address 03</translation>
     </message>  
-	 <message>
+    <message>
         <source>label_demand</source>
         <translation>Demand</translation>
     </message>  
-	 <message>
+    <message>
         <source>label_n_hydrometer</source>
         <translation>Hydrometers</translation>
     </message>  
-	 <message>
+    <message>
         <source>label_code</source>
         <translation>Code</translation>
     </message>  
-	 <message>
+    <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
-    </message>  	
-	 <message>
+    </message>
+    <message>
         <source>delete_row_info</source>
         <translation>Unlink element</translation>
-    </message>  	
+    </message>
     <message>
         <source>label_doc_to</source>
         <translation>to</translation>
@@ -1236,7 +1233,7 @@
         <source>label_connec_log</source>
         <translation>Log:</translation>
     </message>  
-	<message>
+    <message>
         <source>label_log_element_to</source>
         <translation>to</translation>
     </message>  
@@ -1260,12 +1257,7 @@
         <source>label_hydrometer</source>
         <translation>Hydrometer:</translation>
     </message>   
-    
-    <message>
-        <source>Selected date interval is not valid</source>
-        <translation>(ENGLISH) Selected date interval is not valid</translation>
-    </message>
-    
+       
     
 </context> 
 
@@ -1274,7 +1266,7 @@
 <context>
 
     <name>ud_node</name>
-	
+
     <message>
         <source>label_top_elev</source>
         <translation>Top elevation</translation>
@@ -1287,10 +1279,10 @@
         <source>label_elev</source>
         <translation>Elevation</translation>
     </message>
-   <message>
+    <message>
         <source>label_sander</source>
         <translation>Sander</translation>
-    </message>   	
+    </message> 
     <message>
         <source>label_sector_id</source>
         <translation>Sector</translation>
@@ -1339,7 +1331,7 @@
         <source>label_soilcat_id</source>
         <translation>Soil</translation>
     </message> 
-	<message>
+    <message>
         <source>label_category_type</source>
         <translation>Category</translation>
     </message> 	 
@@ -1983,7 +1975,7 @@
         <source>label_document</source>
         <translation>Document:</translation>
     </message>
-	<message>
+    <message>
         <source>delete_row_doc</source>
         <translation>Unlink document</translation>
     </message>
@@ -2073,8 +2065,6 @@
     </message>
 
     
-    
-    
 </context>
 
 
@@ -2090,7 +2080,7 @@
     <message>
         <source>label_node_2</source>
         <translation>Node 2</translation>
-    </message>	
+    </message>
     <message>
         <source>label_y1</source>
         <translation>Y1</translation>
@@ -2099,35 +2089,35 @@
         <source>label_y2</source>
         <translation>Y2</translation>
     </message>
-	<message>
+    <message>
         <source>label_elev1</source>
         <translation>Elev 1</translation>
     </message>
-	  <message>
+    <message>
         <source>label_elev2</source>
         <translation>Elev 2</translation>
     </message>
-	  <message>
+    <message>
         <source>label_z1</source>
         <translation>Z1</translation>
     </message>
-	  <message>
+    <message>
         <source>label_z2</source>
         <translation>Z2</translation>
     </message>
-	  <message>
+    <message>
         <source>label_r1</source>
         <translation>R1</translation>
     </message>
-	  <message>
+    <message>
         <source>label_r2</source>
         <translation>R2</translation>
     </message>
-	  <message>
+    <message>
         <source>label_y1_estimated</source>
         <translation>Y1 esimated</translation>
     </message>
-	  <message>
+    <message>
         <source>label_y2_estimated</source>
         <translation>Y2 estimated</translation>
     </message>
@@ -2146,8 +2136,8 @@
    <message>
         <source>label_soilcat_id</source>
         <translation>Soil</translation>
-    </message>  	
-	<message>
+    </message>
+    <message>
         <source>label_category_type</source>
         <translation>Category</translation>
     </message>
@@ -2155,7 +2145,7 @@
         <source>label_workcat_id</source>
         <translation>Work</translation>
     </message>
-	<message>
+    <message>
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>   
@@ -2207,7 +2197,7 @@
         <source>label_address_03</source>
         <translation>Address 03</translation>
     </message>
-	<message>
+    <message>
         <source>label_slope</source>
         <translation>Slope</translation>
     </message>
@@ -2649,7 +2639,7 @@
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>
-	<message>
+    <message>
         <source>label_builtdate</source>
         <translation>Builtdate</translation>
     </message>
@@ -2705,7 +2695,7 @@
         <source>label_address_03</source>
         <translation>Address 03</translation>
     </message>
-	<message>
+    <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
     </message>
@@ -2953,20 +2943,20 @@
     
     <message>
         <source>You have to select at least one feature!</source>
-        <translation>(ENGLISH) You have to select at least one feature!</translation>
+        <translation>You have to select at least one feature!</translation>
     </message>
     <message>
         <source>More than one feature selected. Only the first one will be processed!</source>
-        <translation>(ENGLISH) More than one feature selected. Only the first one will be processed!</translation>
+        <translation>More than one feature selected. Only the first one will be processed!</translation>
     </message>
     <message>
         <source>Node type has been update!</source>
-        <translation>(ENGLISH) Node type has been update!</translation>
+        <translation>Node type has been update!</translation>
     </message>
-    
     
 
 </context>
+
 
 
 <context>
@@ -3040,10 +3030,11 @@
     
     <message>
         <source>Values has been updated</source>
-        <translation>(ENGLISH) Values has been updated</translation>
+        <translation>Values has been updated</translation>
     </message>
 
 </context>
+
 
 
 <context>
@@ -3101,19 +3092,20 @@
     
     <message>
         <source>You have to select at least one feature!</source>
-        <translation>(ENGLISH) You have to select at least one feature!</translation>
+        <translation>You have to select at least one feature!</translation>
     </message>
     <message>
         <source>More than one feature selected. Only the first one will be processed!</source>
-        <translation>(ENGLISH) More than one feature selected. Only the first one will be processed!</translation>
+        <translation>More than one feature selected. Only the first one will be processed!</translation>
     </message>
     <message>
         <source>Are you sure you want change the data?</source>
-        <translation>(ENGLISH) Are you sure you want change the data?</translation>
+        <translation>Are you sure you want change the data?</translation>
     </message>
     
 
 </context>
+
 
 
 <context>
@@ -3135,24 +3127,24 @@
     
     <message>
         <source>You have to select at least one feature!</source>
-        <translation>(ENGLISH) You have to select at least one feature!</translation>
+        <translation>You have to select at least one feature!</translation>
     </message>
     <message>
         <source>More than one feature selected. Only the first one will be processed!</source>
-        <translation>(ENGLISH) More than one feature selected. Only the first one will be processed!</translation>
+        <translation>More than one feature selected. Only the first one will be processed!</translation>
     </message>
     <message>
         <source>Values has been updated</source>
-        <translation>(ENGLISH) Values has been updated</translation>
+        <translation>Values has been updated</translation>
     </message>
     <message>
         <source>Are you sure you want change the data?</source>
-        <translation>(ENGLISH) Are you sure you want change the data?</translation>
+        <translation>Are you sure you want change the data?</translation>
     </message>
-    
     
 
 </context>
+
 
 
 <context>
@@ -3174,15 +3166,15 @@
     
     <message>
         <source>Select CSV file</source>
-        <translation>(ENGLISH) Select CSV file</translation>
+        <translation>Select CSV file</translation>
     </message>
     <message>
         <source>Selected file not found:</source>
-        <translation>(ENGLISH) Selected file not found:</translation>
+        <translation>Selected file not found:</translation>
     </message>
     <message>
         <source>Cannot import CSV into table</source>
-        <translation>(ENGLISH) Cannot import CSV into table</translation>
+        <translation>Cannot import CSV into table</translation>
     </message>
     <message>
         <source>. Reason:</source>
@@ -3190,27 +3182,27 @@
     </message>
     <message>
         <source>Import CSV</source>
-        <translation>(ENGLISH) Import CSV</translation>
+        <translation>Import CSV</translation>
     </message>
     <message>
         <source>Selected CSV has been imported successfully</source>
-        <translation>(ENGLISH) Selected CSV has been imported successfully</translation>
+        <translation>Selected CSV has been imported successfully</translation>
     </message>
     <message>
         <source>Java Runtime executable file not found at:</source>
-        <translation>(ENGLISH) Java Runtime executable file not found at:</translation>
+        <translation>Java Runtime executable file not found at:</translation>
     </message>
     <message>
         <source>Giswater executable file not found at:</source>
-        <translation>(ENGLISH) Giswater executable file not found at:</translation>
+        <translation>Giswater executable file not found at:</translation>
     </message>
     <message>
         <source>GSW file not found at:</source>
-        <translation>(ENGLISH) GSW file not found at:</translation>
+        <translation>GSW file not found at:</translation>
     </message>
     <message>
         <source>Executing...</source>
-        <translation>(ENGLISH) Executing...</translation>
+        <translation>Executing...</translation>
     </message>
 
 </context>
@@ -3243,14 +3235,15 @@
     
     <message>
         <source>Selected functions have been executed</source>
-        <translation>(ENGLISH) Selected functions have been executed</translation>
+        <translation>Selected functions have been executed</translation>
     </message>
     <message>
         <source>You have to select at least one feature!</source>
-        <translation>(ENGLISH) You have to select at least one feature!</translation>
+        <translation>You have to select at least one feature!</translation>
     </message>
 
 </context>
+
 
 
 <context>
@@ -3269,32 +3262,34 @@
 </context>
 
 
+
 <context>
 
     <name>move_node</name>
     
     <message>
         <source>Uncatched error. Open PotgreSQL log file to get more details</source>
-        <translation>(ENGLISH) Uncatched error. Open PotgreSQL log file to get more details</translation>
+        <translation>Uncatched error. Open PotgreSQL log file to get more details</translation>
     </message>
     <message>
         <source>Node moved successfully</source>
-        <translation>(ENGLISH) Node moved successfully</translation>
+        <translation>Node moved successfully</translation>
     </message>
     <message>
         <source>Node already related with 2 arcs</source>
-        <translation>(ENGLISH) Node already related with 2 arcs</translation>
+        <translation>Node already related with 2 arcs</translation>
     </message>
     <message>
         <source>Move node: Error updating geometry</source>
-        <translation>(ENGLISH) Move node: Error updating geometry</translation>
+        <translation>Move node: Error updating geometry</translation>
     </message>
     <message>
         <source>Select the node and move to desired location</source>
-        <translation>(ENGLISH) Select the node and move to desired location</translation>
+        <translation>Select the node and move to desired location</translation>
     </message>
 
 </context>
+
 
 
 <context>
@@ -3303,22 +3298,23 @@
     
     <message>
         <source>Uncatched error. Open PotgreSQL log file to get more details</source>
-        <translation>(ENGLISH) Uncatched error. Open PotgreSQL log file to get more details</translation>
+        <translation>Uncatched error. Open PotgreSQL log file to get more details</translation>
     </message>
     <message>
         <source>Parametrize error type 1</source>
-        <translation>(ENGLISH) Parametrize error type 1</translation>
+        <translation>Parametrize error type 1</translation>
     </message>
     <message>
         <source>Undefined error</source>
-        <translation>(ENGLISH) Undefined error</translation>
+        <translation>Undefined error</translation>
     </message>
     <message>
         <source>Expression Error:</source>
-        <translation>(ENGLISH) Expression Error:</translation>
+        <translation>Expression Error:</translation>
     </message>
 
 </context>
+
 
 
 <context>
@@ -3327,22 +3323,23 @@
     
     <message>
         <source>Feature not valid</source>
-        <translation>(ENGLISH) Feature not valid</translation>
+        <translation>Feature not valid</translation>
     </message>
     <message>
         <source>The geometry of the feature you just added isn't valid. Do you want to use it anyway?</source>
-        <translation>(ENGLISH) The geometry of the feature you just added isn't valid. Do you want to use it anyway?</translation>
+        <translation>The geometry of the feature you just added isn't valid. Do you want to use it anyway?</translation>
     </message>
     <message>
         <source>"PostgreSQL error:"</source>
-        <translation>(ENGLISH) "PostgreSQL error:"</translation>
+        <translation>"PostgreSQL error:"</translation>
     </message>
     <message>
         <source>Error adding PIPE: Typically this occurs if\n the first point is not located in a existing\n node or feature is out of the defined sectors.</source>
-        <translation>(ENGLISH) Error adding PIPE: Typically this occurs if\n the first point is not located in a existing\n node or feature is out of the defined sectors.</translation>
+        <translation>Error adding PIPE: Typically this occurs if\n the first point is not located in a existing\n node or feature is out of the defined sectors.</translation>
     </message>
 
 </context>
+
 
 </TS>
 
