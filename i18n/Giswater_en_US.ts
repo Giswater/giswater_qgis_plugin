@@ -212,6 +212,10 @@
         <source>Selected date interval is not valid</source>
         <translation>Selected date interval is not valid</translation>
     </message>
+    <message>
+        <source>Any record selected</source>
+        <translation>Any record selected</translation>
+    </message>    
     
 </context>
 

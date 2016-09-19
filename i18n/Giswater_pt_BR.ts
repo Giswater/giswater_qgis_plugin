@@ -208,6 +208,10 @@
         <source>Selected date interval is not valid</source>
         <translation>Selecionou o intervalo data não é válida</translation>
     </message>
+    <message>
+        <source>Any record selected</source>
+        <translation>Nenhum registro selecionado</translation>
+    </message>       
     
 </context>
 

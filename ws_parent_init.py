@@ -192,7 +192,7 @@ class ParentDialog(object):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
-            self.controller.show_warning("Any record selected")
+            self.controller.show_warning("Any record selected", context_name=self.context_name)
             return
         
         inf_text = ""
@@ -263,34 +263,27 @@ class ParentDialog(object):
         widget.model().select()   
         
         
-        
     def set_configuration(self, widget, table_name):
         ''' Configuration of tables 
         Set visibility of columns
-        Set width of columns'''
+        Set width of columns '''
 
         # Hide columns
-        #--------------
-        # Get indexes of hidden columns
-        sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = FALSE AND ui_table = '"+table_name+"'"
-        # Get rows
-        rows_index_false = self.dao.get_rows(sql)
-        for row in rows_index_false:
-            ind = row[0]-1
-            widget.hideColumn(ind)     
+        sql = "SELECT column_index"
+        sql+= " FROM "+self.schema_name+".config_ui_forms" 
+        sql+= " WHERE status = FALSE AND ui_table = '"+table_name+"'"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                ind = row[0]-1
+                widget.hideColumn(ind)     
             
-        # Set width of columns
-        #-------------
-        # Get indexes of visible columns
-        sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_index_true = self.dao.get_rows(sql)
-        # Get indexes of visible columns
-        # Get width of colums and set width
-        sql = "SELECT width FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_width = self.dao.get_rows(sql)
-        
-        for row_index,row_width in zip(rows_index_true,rows_width):
-            widget.setColumnWidth(row_index[0],row_width[0])
-                
-        
+        # Set width of visible columns
+        sql = "SELECT column_index, width"
+        sql+= " FROM "+self.schema_name+".config_ui_forms"
+        sql+= " WHERE status = TRUE AND ui_table = '"+table_name+"'"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                widget.setColumnWidth(row['column_index'],row['width'])        
         
