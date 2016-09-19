@@ -228,7 +228,10 @@ class Ed():
             sql+= " VALUES ('"+self.element_id+"', '"+self.elementcat_id+"', '"+self.state+"', '"+self.location_type+"', '"
             sql+= self.workcat_id+"', '"+self.buildercat_id+"', '"+self.ownercat_id+"', '"+self.rotation+"', '"+self.comment+"', '"
             sql+= self.annotation+"','"+self.observ+"','"+self.link+"','"+self.verified+"')"
-            self.dao.execute_sql(sql) 
+            status = self.controller.execute_sql(sql) 
+            if not status:
+                self.controller.show_warning("Error inserting element in table, you need to review data")
+                return
         
         # Get layers
         layers = self.iface.legendInterface().layers()
@@ -237,10 +240,10 @@ class Ed():
          
         # Initialize variables                          
         self.layer_arc = None
-        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
-        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
-        table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
-        table_gully = '"'+self.schema_name+'"."'+self.table_gully+'"'
+        table_arc = self.schema_name+'."'+self.table_arc+'"'
+        table_node = self.schema_name+'."'+self.table_node+'"'
+        table_connec = self.schema_name+'."'+self.table_connec+'"'
+        table_gully = self.schema_name+'."'+self.table_gully+'"'
         
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     
@@ -432,7 +435,10 @@ class Ed():
         else:
             sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
             sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
-            self.dao.execute_sql(sql)
+            status = self.controller.execute_sql(sql) 
+            if not status:
+                self.controller.show_warning("Error inserting element in table, you need to review data")
+                return
         
         # Get layers
         layers = self.iface.legendInterface().layers()
@@ -441,10 +447,10 @@ class Ed():
          
         # Initialize variables                    
         self.layer_arc = None
-        table_arc = '"'+self.schema_name+'"."'+self.table_arc+'"'
-        table_node = '"'+self.schema_name+'"."'+self.table_node+'"'
-        table_connec = '"'+self.schema_name+'"."'+self.table_connec+'"'
-        table_gully = '"'+self.schema_name+'"."'+self.table_gully+'"'
+        table_arc = self.schema_name+'."'+self.table_arc+'"'
+        table_node = self.schema_name+'."'+self.table_node+'"'
+        table_connec = self.schema_name+'."'+self.table_connec+'"'
+        table_gully = self.schema_name+'."'+self.table_gully+'"'
         
         # Iterate over all layers to get the ones set in config file        
         for cur_layer in layers:     

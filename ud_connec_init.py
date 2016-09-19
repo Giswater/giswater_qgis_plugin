@@ -63,10 +63,16 @@ class ConnecDialog(ParentDialog):
         # Fill the info table
         table_element= "v_ui_element_x_connec"
         self.fill_tbl_element(self.tbl_element, self.schema_name+"."+table_element, self.filter)
+        
+        # Configuration of info table
+        self.set_configuration(self.tbl_element, table_element)
        
         # Fill the tab Document
         table_document = "v_ui_doc_x_connec"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        
+        # Configuration of document table
+        self.set_configuration(self.tbl_document, table_document)
         
         # Set signals                  
         self.dialog.findChild(QPushButton, "btn_element_delete").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))                 
@@ -120,19 +126,10 @@ class ConnecDialog(ParentDialog):
         
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)   
-
-        # Hide columns
-        widget.hideColumn(1)  
-        widget.hideColumn(3)  
-        widget.hideColumn(5)            
+       
     
             
     def fill_tbl_element(self, widget, table_name, filter_): 
         ''' Fill info tab of connec '''
         
         self.set_model_to_table(widget, table_name, filter_)  
-          
-        # Hide columns
-        widget.hideColumn(1)  
-        widget.hideColumn(5)  
-        widget.hideColumn(6)  

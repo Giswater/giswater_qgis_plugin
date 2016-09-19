@@ -109,13 +109,14 @@ class ConnecDialog(ParentDialog):
         table_hydrometer = "v_rtc_hydrometer"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
+        
         # Configuration of table Hydrometer | feature
         self.set_configuration(self.tbl_dae, table_hydrometer)
         
         # Fill tab Hydrometer | epanet
         table_hydrometer_epanet = "v_edit_rtc_hydro_data_x_connec"
         self.fill_tbl_hydrometer_epanet(self.tbl_dae_2, self.schema_name+"."+table_hydrometer_epanet, self.filter)
-        
+
         # Configuration of table Hydrometer | epanet
         self.set_configuration(self.tbl_dae_2, table_hydrometer_epanet)
         
@@ -124,6 +125,7 @@ class ConnecDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_doc").clicked.connect(partial(self.delete_records, self.tbl_connec, table_document))    
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_dae, self.tbl_dae, table_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
+       
        
     def set_tabs_visibility(self):
         ''' Hide some tabs '''
@@ -202,11 +204,6 @@ class ConnecDialog(ParentDialog):
         
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)   
-
-        # Hide columns
-        widget.hideColumn(1)  
-        widget.hideColumn(3)  
-        widget.hideColumn(5)          
         
         
     def set_filter_tbl_hydrometer(self):
@@ -233,11 +230,6 @@ class ConnecDialog(ParentDialog):
         ''' Fill info tab of node '''
         
         self.set_model_to_table(widget, table_name, filter_)  
-          
-        # Hide columns
-        widget.hideColumn(1)  
-        widget.hideColumn(5)  
-        widget.hideColumn(6)           
 
        
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
@@ -259,8 +251,7 @@ class ConnecDialog(ParentDialog):
         #Fill EPANET tab of hydrometer
         #Filter and fill table related with connec_id        
         self.set_model_to_table(widget, table_name, filter_) 
-        #self.set_configuration(widget, table_name) 
-             
+
     
     def insert_records (self):
         # Create the dialog and signals
@@ -277,17 +268,14 @@ class ConnecDialog(ParentDialog):
            
     
     def btn_accept_dae(self):
-        print("btn accept")
         
         # Get widget text - hydtometer_id
         widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
         self.hydro_id = widget_hydro.text()
-        print(self.hydro_id)
         
         # get connec_id       
         widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
         self.connec_id = widget_connec.text()
-        print(self.connec_id)
 
         # Insert hydrometer_id in v_rtc_hydrometer
         sql = "INSERT INTO "+self.schema_name+".v_rtc_hydrometer (hydrometer_id) "
@@ -344,24 +332,22 @@ class ConnecDialog(ParentDialog):
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
   
-     
     def update_sum(self,widget):
-
         
         # Check if clicked value is from the column "SUM"
         position_column = self.tbl_dae_2.currentIndex().column()
         position_row = self.tbl_dae_2.currentIndex().row()
-        print(position_row)
-        if position_column == 6:      
+        
+        if position_column == 6:    
+              
             # Get data from address in memory (pointer)
             self.sum = self.tbl_dae_2.selectedIndexes()[0].data()
-            print(self.sum)
             # Get hydrometer_id of selected sum
             proxyModel=self.tbl_dae_2.model()
             hydrometer_id=proxyModel.index(position_row, 2).data()
-            print(hydrometer_id)
             # Get sum - check if exist in table, if don't exist user change value -> UPDATE
             sql = "SELECT DISTINCT(sum) FROM "+self.schema_name+".v_edit_rtc_hydro_data_x_connec WHERE sum = '"+str(self.sum)+"'" 
+            print sql
             row = self.dao.get_row(sql)
             if row == None:
                 check = self.update_sum_confirm()
@@ -370,12 +356,13 @@ class ConnecDialog(ParentDialog):
                     sql= " UPDATE "+self.schema_name+".v_edit_rtc_hydro_data_x_connec SET" 
                     sql+= " sum = '"+str(self.sum)+"'"
                     sql+= " WHERE hydrometer_id = '"+hydrometer_id+"'"
-                    print(sql)
                     self.dao.execute_sql(sql) 
                             
                     self.controller.show_info("Value has been updated")
                 else :
                     return
+            else:
+                print "else"
                     
         else:
             self.close()
@@ -394,5 +381,6 @@ class ConnecDialog(ParentDialog):
             return False   
      
             
+    
             
     

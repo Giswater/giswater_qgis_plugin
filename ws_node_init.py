@@ -90,13 +90,22 @@ class NodeDialog(ParentDialog):
         table_element= "v_ui_element_x_node"
         self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
+        # Configuration of info table
+        self.set_configuration(self.tbl_info, table_element)
+        
         # Fill the tab Document
         table_document = "v_ui_doc_x_node"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
+        # Configuration of info table
+        self.set_configuration(self.tbl_document, table_document)
+        
         # Fill the tab Scada
         table_scada = "v_ui_scada_x_node"
         self.fill_tbl_scada(self.tbl_rtc, self.schema_name+"."+table_scada, self.filter)
+        
+        # Configuration of info table
+        self.set_configuration(self.tbl_rtc, table_scada)
         
         # Set signals                  
         self.dialog.findChild(QPushButton, "btn_element_delete").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
@@ -340,22 +349,12 @@ class NodeDialog(ParentDialog):
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)   
 
-        # Hide columns
-        widget.hideColumn(1)  
-        widget.hideColumn(3)  
-        widget.hideColumn(5)            
-    
             
     def fill_tbl_info(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
         
         self.set_model_to_table(widget, table_name, filter_)  
           
-        # Hide columns
-        widget.hideColumn(1)  
-        widget.hideColumn(5)  
-        widget.hideColumn(6)           
-
         
     def fill_tbl_scada(self, widget, table_name, filter_):
         ''' Fill scada tab of node
