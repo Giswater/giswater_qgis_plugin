@@ -30,16 +30,22 @@ class PointMapTool(QgsMapTool):
         if self.schema_name is None:
             self.schema_name = self.settings.value('db/schema_name')  
             
-        if self.elem_type_type is not None:   
+        if self.elem_type_type is not None: 
+            
             # Get elem_type_id and epa_default from selected elem_type_type (get only first record)
             sql = "SELECT node_type.id, node_type.epa_default"
             sql+= " FROM "+self.schema_name+".node_type"
-            sql+= " INNER JOIN "+self.schema_name+".cat_node ON cat_node.nodetype_id = node_type.id"
+            wsoftware = self.search_project_type()
+            if wsoftware == 'ws':  
+                sql+= " INNER JOIN "+self.schema_name+".cat_node ON cat_node.nodetype_id = node_type.id"
+                
             sql+= " WHERE node_type.type = '"+self.elem_type_type+"'"
             sql+= " ORDER BY node_type.id ASC"
             sql+= " LIMIT 1"
-            row = self.dao.get_row(sql)  
+            row = self.dao.get_row(sql) 
+             
             if row:
+                last_id = -1
                 elem_type_id = row[0]
                 epa_default = row[1]
                 # Insert element with selected coordinates
@@ -49,13 +55,31 @@ class PointMapTool(QgsMapTool):
                 sql+= " RETURNING node_id;";
                 row = self.dao.get_row(sql)
                 self.dao.commit()
-                last_id = -1
-                if row:
+                if row is None:
+                    self.controller.show_warning(str(self.dao.last_error), 50)   
+                    return False
+                else:
                     last_id = row[0]
                 return last_id 
             else:
-                self.controller.show_info("Any record found in table 'cat_node' related with selected 'node_type.type'")
+                if wsoftware == 'ws':                
+                    self.controller.show_info("Any record found in table 'cat_node' related with selected 'node_type.type'")
+                elif wsoftware == 'ud':                
+                    self.controller.show_info("Any record found in table 'node_type' related with selected 'node_type.type'")
     
+    
+    def search_project_type(self):
+        ''' Search in table 'version' project type of current QGIS project '''
+        
+        sql = "SELECT wsoftware FROM "+self.schema_name+".version"
+        row = self.dao.get_row(sql)
+        if row:                    
+            wsoftware = row['wsoftware']
+            if wsoftware.lower() == 'epanet':
+                return 'ws'                              
+            elif wsoftware.lower() == 'epaswmm':
+                return 'ud'             
+            
     
     ''' QgsMapTools inherited event functions '''
    
@@ -80,6 +104,6 @@ class PointMapTool(QgsMapTool):
                 self.iface.openFeatureForm(layer, feature)
                 break
         else:
-            print "Error inserting node"          
+            self.controller.show_warning("Error inserting node")       
         
         

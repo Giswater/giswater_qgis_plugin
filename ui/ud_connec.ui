@@ -28,7 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QTabWidget" name="tabWidget_2">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -1022,23 +1022,6 @@
     <attribute name="title">
      <string>Add info</string>
     </attribute>
-    <widget class="QTextEdit" name="element">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>90</y>
-       <width>771</width>
-       <height>341</height>
-      </rect>
-     </property>
-     <property name="html">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;element.element_id, cat_element.type, cat_element.id, element.builtdate, element.state,  element.enddate,  element.annotation,  element.link&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_elements">
      <property name="geometry">
       <rect>
@@ -1075,6 +1058,29 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
+    <widget class="QTableView" name="tbl_element">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>90</y>
+       <width>771</width>
+       <height>341</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_element_delete">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>60</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink element</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_7">
     <attribute name="title">
@@ -1098,16 +1104,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_12">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
      </property>
     </widget>
     <widget class="Line" name="line_6">
@@ -1323,7 +1319,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
-    <widget class="QComboBox" name="doc_event">
+    <widget class="QComboBox" name="doc_type">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -1351,6 +1347,29 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_document">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_doc_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>120</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink document</string>
      </property>
     </widget>
    </widget>
@@ -1438,16 +1457,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="margin">
       <number>3</number>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_14">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
      </property>
     </widget>
     <widget class="QDateEdit" name="date_event_to">
@@ -1638,6 +1647,16 @@ p, li { white-space: pre-wrap; }
       <number>3</number>
      </property>
     </widget>
+    <widget class="QTableView" name="tbl_event">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_11">
     <attribute name="title">
@@ -1733,16 +1752,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tbl_log">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
      </property>
     </widget>
     <widget class="Line" name="line_9">
@@ -1870,6 +1879,16 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
     </widget>
+    <widget class="QTableView" name="tbl_log">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_12">
     <attribute name="title">
@@ -1932,16 +1951,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tbl_iptu">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>150</y>
-       <width>761</width>
-       <height>281</height>
-      </rect>
      </property>
     </widget>
     <widget class="QLabel" name="label_iptu_iptu">
@@ -2054,6 +2063,16 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_IPTU">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>761</width>
+       <height>281</height>
+      </rect>
      </property>
     </widget>
    </widget>

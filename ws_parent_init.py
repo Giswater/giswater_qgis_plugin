@@ -275,15 +275,14 @@ class ParentDialog(object):
         # Get rows
         rows_index_false = self.dao.get_rows(sql)
         for row in rows_index_false:
-            widget.hideColumn(row[0])
-            
+            ind = row[0]-1
+            widget.hideColumn(ind)     
             
         # Set width of columns
         #-------------
         # Get indexes of visible columns
         sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
         rows_index_true = self.dao.get_rows(sql)
-        print(rows_index_true)
         # Get indexes of visible columns
         # Get width of colums and set width
         sql = "SELECT width FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
