@@ -105,7 +105,8 @@ class LineMapTool(QgsMapTool):
         ''' On left click, we add a point '''
         
         if event.button()  ==  1:
-            layer = self.canvas.currentLayer()
+            # layer = self.canvas.currentLayer()
+            layer = self.iface.activeLayer() 
     
             # Declare, that are we going to work
             self.started = True
@@ -240,7 +241,9 @@ class LineMapTool(QgsMapTool):
         
         if event.button() == 2:
       
-            layer = self.canvas.currentLayer()
+            # layer = self.canvas.currentLayer()
+            layer = self.iface.activeLayer()
+            
             x = event.pos().x()
             y = event.pos().y()
             
@@ -268,7 +271,9 @@ class LineMapTool(QgsMapTool):
     
     def sendGeometry(self):
         
-        layer = self.canvas.currentLayer() 
+        #layer = self.canvas.currentLayer()
+        layer = self.iface.activeLayer()        
+        
         coords = []
         self.rubberBand.removeLastPoint()
         
@@ -298,7 +303,7 @@ class LineMapTool(QgsMapTool):
                  
         # Add geometry to feature.
         g = QgsGeometry().fromPolyline(coords)
-    
+
         self.rubberBand.reset(QGis.Line)
         self.started = False
         
@@ -308,10 +313,11 @@ class LineMapTool(QgsMapTool):
         
     def createFeature(self, geom):
 
-        layer = self.canvas.currentLayer() 
+        # layer = self.canvas.currentLayer()
+        layer = self.iface.activeLayer()        
         provider = layer.dataProvider()
         f = QgsFeature()
-    
+    	
         if (geom.isGeosValid()):
             f.setGeometry(geom)
         else:
@@ -322,6 +328,7 @@ class LineMapTool(QgsMapTool):
                 f.setGeometry(geom)
             else:
                 return False
+				
       
         # Add attribute fields to feature.
         fields = layer.pendingFields()

@@ -164,8 +164,7 @@
 	<message>
         <source>99_text</source>
         <translation>Project configuration</translation>
-    </message>    
-  
+    </message>
 </context>
 
 

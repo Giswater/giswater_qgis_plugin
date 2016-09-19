@@ -252,7 +252,7 @@ class ConnecDialog(ParentDialog):
         #Filter and fill table related with connec_id        
         self.set_model_to_table(widget, table_name, filter_) 
 
-    
+        
     def insert_records (self):
         # Create the dialog and signals
         self.dlg_sum = Add_sum()
@@ -333,7 +333,7 @@ class ConnecDialog(ParentDialog):
         
   
     def update_sum(self,widget):
-        
+
         # Check if clicked value is from the column "SUM"
         position_column = self.tbl_dae_2.currentIndex().column()
         position_row = self.tbl_dae_2.currentIndex().row()

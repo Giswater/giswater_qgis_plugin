@@ -94,7 +94,7 @@ class PointMapTool(QgsMapTool):
         layer = self.iface.activeLayer()     
         
         # Insert new node into selected point. Open its feature form
-        last_id = self.insert_node(int(self.point.x()), int(self.point.y()))  
+        last_id = self.insert_node(self.point.x(), self.point.y())
         if last_id != -1:
             filter_expr = "node_id = '"+str(last_id)+"'"    
             expr = QgsExpression(filter_expr)

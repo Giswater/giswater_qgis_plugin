@@ -28,21 +28,20 @@ from parent_map_tool import ParentMapTool
 
 class DeleteNodeMapTool(ParentMapTool):
     ''' Button 17. User select one node.
-    Execute SQL function: 'gw_fct_delete_node' '''    
+    Execute SQL function: 'gw_fct_delete_node' '''
 
-    def __init__(self, iface, settings, action, index_action):  
+    def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
 
         # Call ParentMapTool constructor
-        super(DeleteNodeMapTool, self).__init__(iface, settings, action, index_action)     
+        super(DeleteNodeMapTool, self).__init__(iface, settings, action, index_action)
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
         self.vertexMarker.setColor(QColor(255, 25, 25))
         self.vertexMarker.setIconSize(12)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE) # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)   
-
+        self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
+        self.vertexMarker.setPenWidth(5)
 
     ''' QgsMapTools inherited event functions '''
 
@@ -54,11 +53,10 @@ class DeleteNodeMapTool(ParentMapTool):
         # Get the click
         x = event.pos().x()
         y = event.pos().y()
-        eventPoint = QPoint(x,y)
+        eventPoint = QPoint(x, y)
 
-        # Snapping        
-        (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
-        self.current_layer = None
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
         # That's the snapped point
         if result <> []:
@@ -67,7 +65,6 @@ class DeleteNodeMapTool(ParentMapTool):
             for snapPoint in result:
 
                 if snapPoint.layer.name() == self.layer_node.name():
-
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
 
@@ -75,33 +72,53 @@ class DeleteNodeMapTool(ParentMapTool):
                     self.vertexMarker.setCenter(point)
                     self.vertexMarker.show()
 
-                    # Data for function
-                    self.current_layer = result[0].layer
-                    self.snappFeat = next(
-                        result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-
                     break
 
-
     def canvasReleaseEvent(self, event):
-        
+
         # With left click the digitizing is finished
-        if event.button() == Qt.LeftButton and self.current_layer is not None:
+        if event.button() == Qt.LeftButton:
 
-            # Get selected features and layer type: 'node'
-            feature = self.snappFeat
-            node_id = feature.attribute('node_id')
+            # Get the click
+            x = event.pos().x()
+            y = event.pos().y()
+            eventPoint = QPoint(x, y)
 
-            # Execute SQL function and show result to the user
-            function_name = "gw_fct_delete_node"
-            sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
-            status = self.controller.execute_sql(sql)
-            if status:
-                self.controller.show_info("Node deleted successfully")
+            snappFeat = None
 
-            # Refresh map canvas
-            self.iface.mapCanvas().refresh()
+            # Snapping
+            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
+            # That's the snapped point
+            if result <> []:
+
+                # Check Arc or Node
+                for snapPoint in result:
+
+                    if snapPoint.layer.name() == self.layer_node.name():
+                        # Get the point
+                        point = QgsPoint(result[0].snappedVertex)
+
+                        snappFeat = next(
+                            result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+
+                        break
+
+            if snappFeat is not None:
+
+                # Get selected features and layer type: 'node'
+                feature = snappFeat
+                node_id = feature.attribute('node_id')
+
+                # Execute SQL function and show result to the user
+                function_name = "gw_fct_delete_node"
+                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+                status = self.controller.execute_sql(sql)
+                if status:
+                    self.controller.show_info("Node deleted successfully")
+
+                # Refresh map canvas
+                self.iface.mapCanvas().refresh()
 
     def activate(self):
 
@@ -131,7 +148,6 @@ class DeleteNodeMapTool(ParentMapTool):
         except:
             self.canvas.setCurrentLayer(self.layer_node)
 
-
     def deactivate(self):
 
         # Check button
@@ -145,5 +161,4 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Removehighlight
         self.h = None
-        
-        
+
