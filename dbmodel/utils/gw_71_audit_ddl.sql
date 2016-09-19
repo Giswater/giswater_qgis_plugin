@@ -51,16 +51,3 @@ CREATE TABLE IF NOT EXISTS audit_function_actions (
     debug_info text
 );
 
-
-DROP TABLE IF EXISTS audit_db_columns CASCADE;
-CREATE TABLE audit_db_columns
-(
-  id serial NOT NULL,
-  table_name text NOT NULL,
-  column_name text NOT NULL,
-  column_type text,
-  description text,
-  CONSTRAINT audit_db_columns_pkey PRIMARY KEY (id)
-);
-
-

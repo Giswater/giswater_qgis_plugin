@@ -8,57 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
 DROP VIEW IF EXISTS v_audit_functions CASCADE;
 CREATE VIEW v_audit_functions AS 
 SELECT tstamp, audit_cat_error.id, audit_cat_error.error_message, audit_cat_error.hint_message, audit_cat_error.log_level, audit_cat_error.show_user, user_name, addr, debug_info
 FROM audit_function_actions INNER JOIN audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id
 ORDER BY audit_function_actions.id DESC;
-
-
-
-DROP VIEW IF EXISTS v_audit_db_columns CASCADE;
-CREATE OR REPLACE VIEW v_audit_db_columns AS 
-SELECT (table_name || '_'::text) || column_name AS id, 
-    table_name, 
-    column_name, 
-    column_type
-	FROM audit_db_columns
-	ORDER BY table_name, column_name;
-
-
-
-DROP VIEW IF EXISTS v_db_cat_columns CASCADE;
-CREATE VIEW v_db_cat_columns AS
-SELECT
-	name||'_'||column_name as id,
-	name as table_name,
-	column_name,
-	column_type,
-	db_cat_columns.description
-	FROM db_cat_columns
-	JOIN db_cat_table ON db_cat_table_id=db_cat_table.id;
-
-
-
-DROP VIEW IF EXISTS v_audit_db_columns_diference CASCADE;
-CREATE VIEW v_audit_db_columns_diference AS
-SELECT
-	v_audit_db_columns.table_name as audit_table,
-	v_audit_db_columns.column_name as audit_column,
-	v_db_cat_columns.table_name as cat_table,
-	v_db_cat_columns.column_name cat_column
-	from v_audit_db_columns
-	left join v_db_cat_columns on v_db_cat_columns.id=v_audit_db_columns.id
-	where v_db_cat_columns.column_name is null
-UNION
-	select
-	v_audit_db_columns.table_name as audit_table,
-	v_audit_db_columns.column_name as audit_column,
-	v_db_cat_columns.table_name as cat_table,
-	v_db_cat_columns.column_name cat_column
-	from v_audit_db_columns
-	right join v_db_cat_columns on v_db_cat_columns.id=v_audit_db_columns.id
-	where v_audit_db_columns.column_name is null
-	ORDER BY 1;
 
