@@ -575,7 +575,7 @@ CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
 CREATE TABLE "element" (
 "element_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_seq'::regclass) NOT NULL,
 "elementcat_id" varchar(30)  ,
-"state" character varying(16) NOT NULL,
+"state" character varying(16) ,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
@@ -587,7 +587,7 @@ CREATE TABLE "element" (
 "enddate" timestamp (6) without time zone,
 "rotation" numeric (6,3),
 "link" character varying(512),
-"verified" varchar(20)   NOT NULL,
+"verified" varchar(20) ,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 

@@ -13,11 +13,11 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    --Delete previous
-	PERFORM gw_fct_audit_schema_structure(foreign_schema)
-	PERFORM gw_fct_audit_schema_data(foreign_schema)
-	
-   RETURN;
+    --Execute functions
+	PERFORM gw_fct_audit_schema_structure(foreign_schema);
+	PERFORM gw_fct_audit_schema_data_integrity();
+   
+	RETURN;
        
 END;
 $BODY$

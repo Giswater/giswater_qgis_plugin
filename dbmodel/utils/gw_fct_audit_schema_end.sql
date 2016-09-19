@@ -20,6 +20,7 @@ BEGIN
 	DROP VIEW IF EXISTS "v_audit_schema_catalog_compare_column" CASCADE;
    	DROP VIEW IF EXISTS "v_audit_schema_foreign_table" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_column" CASCADE;
+	DROP VIEW IF EXISTS "v_audit_schema_foreign_column_aux" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_compare_table" CASCADE;
 	DROP VIEW IF EXISTS "v_audit_schema_foreign_compare_column" CASCADE;
 
@@ -29,6 +30,7 @@ BEGIN
 	
    RETURN;
        
+     
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
