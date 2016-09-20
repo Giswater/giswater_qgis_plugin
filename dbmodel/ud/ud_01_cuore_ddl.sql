@@ -55,7 +55,7 @@ CREATE SEQUENCE "pol_id_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "catchment_id_seq"
+CREATE SEQUENCE "catchment_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
