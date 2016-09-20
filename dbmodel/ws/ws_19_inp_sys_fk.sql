@@ -64,13 +64,7 @@ ALTER TABLE "inp_times" ADD FOREIGN KEY ("statistic") REFERENCES "inp_value_time
 ALTER TABLE "inp_valve" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "rpt_arc" ADD FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "rpt_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "rpt_nodearcnode" ADD FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "rpt_nodearcnode" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "rpt_arcnodearc" ADD FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "rpt_arcnodearc" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- ALTER TABLE "rpt_arc" ADD FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "rpt_energy_usage" ADD FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "rpt_energy_usage" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -78,6 +72,6 @@ ALTER TABLE "rpt_energy_usage" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("n
 ALTER TABLE "rpt_hydraulic_status" ADD FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "rpt_node" ADD FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "rpt_node" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- ALTER TABLE "rpt_node" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_selector_state" ADD FOREIGN KEY ("id") REFERENCES "value_state" ("id");
