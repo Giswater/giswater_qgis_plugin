@@ -10,49 +10,48 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-DROP VIEW IF EXISTS v_arc_x_node1 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node1 AS 
-SELECT arc.arc_id, arc.node_1, 
-node.elevation AS elevation1, 
-node.depth AS depth1, 
-(cat_arc.dext)/1000 AS dext, 
-node.depth - (cat_arc.dext)/1000 AS r1
-FROM arc
-JOIN node ON arc.node_1::text = node.node_id::text
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+ SELECT temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_node.elevation AS elevation1,
+    temp_node.depth AS depth1,
+    cat_arc.dext / 1000::numeric AS dext,
+    temp_node.depth - cat_arc.dext / 1000::numeric AS r1
+   FROM temp_arc
+     JOIN temp_node ON temp_arc.node_1::text = temp_node.node_id::text
+     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text AND temp_arc.arccat_id::text = cat_arc.id::text;
 
 
-DROP VIEW IF EXISTS v_arc_x_node2 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node2 AS 
-SELECT arc.arc_id, arc.node_2, 
-node.elevation AS elevation2, 
-node.depth AS depth2,
-(cat_arc.dext)/1000 AS dext, 
-node.depth - (cat_arc.dext)/1000 AS r2
-FROM arc
-JOIN node ON arc.node_2::text = node.node_id::text
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+ SELECT temp_arc.arc_id,
+    temp_arc.node_2,
+    temp_node.elevation AS elevation2,
+    temp_node.depth AS depth2,
+    cat_arc.dext / 1000::numeric AS dext,
+    temp_node.depth - cat_arc.dext / 1000::numeric AS r2
+   FROM temp_arc
+     JOIN temp_node ON temp_arc.node_2::text = temp_node.node_id::text
+     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text AND temp_arc.arccat_id::text = cat_arc.id::text;
+
 
 
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
-SELECT 
-v_arc_x_node1.arc_id,
-v_arc_x_node1.node_1,
-v_arc_x_node1.elevation1,
-v_arc_x_node1.depth1,
-v_arc_x_node1.r1,
-v_arc_x_node2.node_2,
-v_arc_x_node2.elevation2,
-v_arc_x_node2.depth2,
-v_arc_x_node2.r2,
-arc."state",
-arc.sector_id,
-arc.the_geom
-FROM v_arc_x_node1
-JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
-JOIN arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text; 
-
+ SELECT v_arc_x_node1.arc_id,
+    v_arc_x_node1.node_1,
+    v_arc_x_node1.elevation1,
+    v_arc_x_node1.depth1,
+    v_arc_x_node1.r1,
+    v_arc_x_node2.node_2,
+    v_arc_x_node2.elevation2,
+    v_arc_x_node2.depth2,
+    v_arc_x_node2.r2,
+    temp_arc.state,
+    temp_arc.sector_id,
+    temp_arc.the_geom
+   FROM v_arc_x_node1
+     JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
+     JOIN temp_arc ON v_arc_x_node2.arc_id::text = temp_arc.arc_id::text;
 
 DROP VIEW IF EXISTS v_ui_element_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_node AS 

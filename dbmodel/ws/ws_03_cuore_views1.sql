@@ -13,37 +13,39 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 DROP VIEW IF EXISTS v_arc CASCADE;
 CREATE OR REPLACE VIEW v_arc AS 
-SELECT 
-arc.arc_id, 
-arc.node_1, 
-arc.node_2,
-arc.arccat_id,
-cat_arc.matcat_id,																	-- field to customize de source of the data matcat_id (from arc catalog or directly from arc table)
-arc.epa_type,
-arc.sector_id,
-arc.dma_id,
-arc.state,
-arc.soilcat_id,
-(CASE 
-WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- field to use length/custom_length
-ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
-arc.the_geom
-FROM arc
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text;
+ SELECT temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+    temp_arc.arccat_id,
+    cat_arc.matcat_id,
+    temp_arc.epa_type,
+    temp_arc.sector_id,
+    temp_arc.dma_id,
+    temp_arc.state,
+    temp_arc.soilcat_id,
+        CASE
+            WHEN temp_arc.custom_length IS NOT NULL THEN temp_arc.custom_length::numeric(12,3)
+            ELSE st_length2d(temp_arc.the_geom)::numeric(12,3)
+        END AS length,
+    temp_arc.the_geom
+   FROM temp_arc
+   JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text;
 
 
 DROP VIEW IF EXISTS v_node CASCADE;
-CREATE OR REPLACE VIEW v_node AS
-SELECT
-node.node_id,
-node.elevation,
-node.depth,
-node.node_type,
-node.nodecat_id,
-node.epa_type,
-node.sector_id,
-node.dma_id,
-node.state,
-node.the_geom
-FROM node;
+CREATE OR REPLACE VIEW v_node AS 
+ SELECT temp_node.node_id,
+    temp_node.elevation,
+    temp_node.depth,
+    temp_node.node_type,
+    temp_node.nodecat_id,
+    temp_node.epa_type,
+    temp_node.sector_id,
+    temp_node.dma_id,
+    temp_node.state,
+    temp_node.the_geom
+   FROM gw_saa.temp_node;
+
+
+
 
