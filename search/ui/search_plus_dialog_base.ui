@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>searchPlusDockWidget</class>
+ <widget class="QDialog" name="searchPlusDockWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,7 +16,7 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>170</y>
      <width>75</width>
      <height>23</height>
@@ -29,7 +29,7 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>260</x>
      <y>170</y>
      <width>75</width>
      <height>23</height>
@@ -39,17 +39,17 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QTabWidget" name="tabWidget">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>335</width>
+     <width>331</width>
      <height>153</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -68,7 +68,7 @@
       <string>Press zone:</string>
      </property>
     </widget>
-    <widget class="SearchableComboBox" name="urban_propierties_pzone">
+    <widget class="SearchableComboBox" name="urban_properties_pzone">
      <property name="geometry">
       <rect>
        <x>90</x>
@@ -85,7 +85,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>86</y>
+       <y>90</y>
        <width>55</width>
        <height>16</height>
       </rect>
@@ -94,11 +94,11 @@
       <string>Number:</string>
      </property>
     </widget>
-    <widget class="SearchableComboBox" name="urban_propierties_number">
+    <widget class="SearchableComboBox" name="urban_properties_number">
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>82</y>
+       <y>88</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -111,7 +111,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>52</y>
+       <y>56</y>
        <width>55</width>
        <height>16</height>
       </rect>
@@ -120,11 +120,11 @@
       <string>Block:</string>
      </property>
     </widget>
-    <widget class="SearchableComboBox" name="urban_propierties_block">
+    <widget class="SearchableComboBox" name="urban_properties_block">
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>50</y>
+       <y>54</y>
        <width>221</width>
        <height>20</height>
       </rect>

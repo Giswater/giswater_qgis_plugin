@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer
-from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt, pyqtSignal, QPyNullVariant
+from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant   # @UnresolvedImport
 
 import operator
 import os.path
@@ -44,9 +44,9 @@ class SearchPlus(QObject):
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
         
         # set signals
-        self.dlg.cboStreet.currentIndexChanged.connect(self.getStreetNumbers)
-        self.dlg.cboStreet.currentIndexChanged.connect(self.zoomOnStreet)
-        self.dlg.cboNumber.currentIndexChanged.connect(self.displayStreetData)        
+        self.dlg.adress_street.currentIndexChanged.connect(self.getStreetNumbers)
+        self.dlg.adress_street.currentIndexChanged.connect(self.zoomOnStreet)
+        self.dlg.adress_number.currentIndexChanged.connect(self.displayStreetData)        
     
     
     def loadPluginSettings(self):
@@ -90,10 +90,9 @@ class SearchPlus(QObject):
         ''' Populate the interface with values get from layers '''  
         
         # Remove unused tabs
-        self.dlg.searchPlusTabMain.removeTab(4)          
-        self.dlg.searchPlusTabMain.removeTab(3)          
-        self.dlg.searchPlusTabMain.removeTab(2)          
-        self.dlg.searchPlusTabMain.removeTab(1)          
+        self.dlg.tab_main.removeTab(3)   
+        self.dlg.tab_main.removeTab(1)
+        self.dlg.tab_main.removeTab(0)                           
              
         # Get layers and full extent
         self.getLayers()       
@@ -126,26 +125,27 @@ class SearchPlus(QObject):
                 records.append(elem)
 
         # Fill street combo
-        self.dlg.cboStreet.blockSignals(True)
-        self.dlg.cboStreet.clear()
+        self.dlg.adress_street.blockSignals(True)
+        self.dlg.adress_street.clear()
         records_sorted = sorted(records, key = operator.itemgetter(1))            
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            self.dlg.cboStreet.addItem(record[1], record)
-        self.dlg.cboStreet.blockSignals(False)    
+            self.dlg.adress_street.addItem(record[1], record)
+        self.dlg.adress_street.blockSignals(False)    
         
         return True
         
                  
     def zoomOnStreet(self):
         ''' Zoom on the street with the prefined scale '''
+        
         # get selected street
-        selected = self.dlg.cboStreet.currentText()
+        selected = self.dlg.adress_street.currentText()
         if selected == '':
             return
         
         # get code
-        data = self.dlg.cboStreet.itemData(self.dlg.cboStreet.currentIndex())
+        data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
         wkt = data[3] # to know the index see the query that populate the combo
         geom = QgsGeometry.fromWkt(wkt)
         if not geom:
@@ -164,12 +164,12 @@ class SearchPlus(QObject):
             Available civic numbers are linked with self.STREET_FIELD_CODE column code in self.PORTAL_LAYER and self.STREET_LAYER
         '''                      
         # get selected street
-        selected = self.dlg.cboStreet.currentText()
+        selected = self.dlg.adress_street.currentText()
         if selected == '':
             return
         
         # get street code
-        sel_street = self.dlg.cboStreet.itemData(self.dlg.cboStreet.currentIndex())
+        sel_street = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
         code = sel_street[2] # to know the index see the query that populate the combo
         records = [[-1, '']]
         
@@ -207,16 +207,17 @@ class SearchPlus(QObject):
                   
         # Fill numbers combo
         records_sorted = sorted(records, key = operator.itemgetter(1))           
-        self.dlg.cboNumber.blockSignals(True)
-        self.dlg.cboNumber.clear()
+        self.dlg.adress_number.blockSignals(True)
+        self.dlg.adress_number.clear()
         for record in records_sorted:
-            self.dlg.cboNumber.addItem(str(record[1]), record)
-        self.dlg.cboNumber.blockSignals(False)  
+            self.dlg.adress_number.addItem(str(record[1]), record)
+        self.dlg.adress_number.blockSignals(False)  
         
     
     def manageMemLayer(self, layer):
         ''' Delete previous features from all memory layers 
             Make layer not visible '''
+        
         if layer is not None:
             try:
                 layer.startEditing()        
@@ -236,11 +237,12 @@ class SearchPlus(QObject):
     
     def copySelected(self, layer, mem_layer, geom_type):
         ''' Copy from selected layer to memory layer '''
+        
         self.manageMemLayers()
         
         # Create memory layer if not already set
         if mem_layer is None: 
-            uri = geom_type+"?crs=epsg:"+self.srid 
+            uri = geom_type+"?crs=epsg:"+str(self.srid) 
             mem_layer = QgsVectorLayer(uri, "selected_"+layer.name(), "memory")                     
          
             # Copy attributes from main layer to memory layer
@@ -288,13 +290,13 @@ class SearchPlus(QObject):
     def displayStreetData(self):
         ''' Show street data on the canvas when selected street and number in street tab '''  
                 
-        street = self.dlg.cboStreet.currentText()
-        civic = self.dlg.cboNumber.currentText()
+        street = self.dlg.adress_street.currentText()
+        civic = self.dlg.adress_number.currentText()
         if street == '' or civic == '':
             return  
                 
         # get selected portal
-        elem = self.dlg.cboNumber.itemData(self.dlg.cboNumber.currentIndex())
+        elem = self.dlg.adress_number.itemData(self.dlg.adress_number.currentIndex())
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
@@ -327,7 +329,7 @@ class SearchPlus(QObject):
           
 
     def loadStyle(self, layer, qml):
-    
+        ''' Load QML style file into selected layer '''
         path_qml = self.stylesFolder+qml      
         if os.path.exists(path_qml): 
             layer.loadNamedStyle(path_qml)      
