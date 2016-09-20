@@ -103,19 +103,6 @@ CREATE SEQUENCE "rpt_node_id_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "rpt_nodearcnode_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "rpt_arcnodearc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 CREATE SEQUENCE "rpt_cat_result_id_seq"
     START WITH 1
@@ -679,78 +666,6 @@ CREATE TABLE "rpt_arc" (
 "status" varchar(16)  
 );
 
-
-CREATE TABLE "rpt_nodearcnode" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_nodearcnode_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
-"node_id" varchar(16)  ,
-"elevation_1" numeric,
-"demand_1" numeric,
-"head_1" numeric,
-"press_1" numeric,
-"other_1" varchar(100)  ,
-"time_1" varchar(100)  ,
-"quality_1" numeric(12,4),
-"length" numeric,
-"diameter" numeric,
-"flow" numeric,
-"vel" numeric,
-"headloss" numeric,
-"setting" numeric,
-"reaction" numeric,
-"ffactor" numeric,
-"other" varchar(100)  ,
-"time" varchar(100)  ,
-"status" varchar(16)  ,
-"node_2" varchar(16)  ,
-"elevation_2" numeric,
-"demand_2" numeric,
-"head_2" numeric,
-"press_2" numeric,
-"other_2" varchar(100)  ,
-"time_2" varchar(100)  ,
-"quality_2" numeric(12,4),
-CONSTRAINT rpt_nodearc_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "rpt_arcnodearc" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arcnodearc_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
-"node_id" varchar(16)  ,
-"arc_1" varchar(16)  ,
-"length_1" numeric,
-"diameter_1" numeric,
-"flow_1" numeric,
-"vel_1" numeric,
-"headloss_1" numeric,
-"setting_1" numeric,
-"reaction_1" numeric,
-"ffactor_1" numeric,
-"other_1" varchar(100)  ,
-"time_1" varchar(100)  ,
-"status_1" varchar(16)  ,
-"elevation" numeric,
-"demand" numeric,
-"head" numeric,
-"press" numeric,
-"other" varchar(100)  ,
-"time" varchar(100)  ,
-"quality" numeric(12,4),
-"arc_2" varchar(16)  ,
-"length_2" numeric,
-"diameter_2" numeric,
-"flow_2" numeric,
-"vel_2" numeric,
-"headloss_2" numeric,
-"setting_2" numeric,
-"reaction_2" numeric,
-"ffactor_2" numeric,
-"other_2" varchar(100)  ,
-"time_2" varchar(100)  ,
-"status_2" varchar(16)  ,
-CONSTRAINT rpt_arcnodearc_pkey PRIMARY KEY (id)
-);
 
 
 CREATE TABLE "rpt_energy_usage" (
