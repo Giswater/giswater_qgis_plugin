@@ -100,6 +100,7 @@ class ArcDialog(ParentDialog):
         # Configuration of table document
         self.set_configuration(self.tbl_document, table_document)
     
+    
     def set_tabs_visibility(self):
         ''' Hide some tabs '''
         
@@ -172,7 +173,6 @@ class ArcDialog(ParentDialog):
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
         self.tbl_document.doubleClicked.connect(self.open_selected_document)
         
-        # TODO: Get data from related tables!
         # Fill ComboBox tagcat_id
         sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".v_ui_doc_x_arc ORDER BY tagcat_id" 
         rows = self.dao.get_rows(sql)

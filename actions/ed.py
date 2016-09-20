@@ -358,12 +358,12 @@ class Ed():
             self.controller.show_info("More than one feature selected. Only the first one will be processed!") 
         
         # Fill comboBox elementcat_id
-        sql = "SELECT DISTINCT(doc_type) FROM "+self.schema_name+".doc ORDER BY doc_type"
+        sql = "SELECT id FROM "+self.schema_name+".doc_type ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows) 
         
         # Fill comboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".doc ORDER BY tagcat_id"
+        sql = "SELECT id FROM "+self.schema_name+".cat_tag ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("tagcat_id", rows) 
         

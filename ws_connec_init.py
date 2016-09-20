@@ -6,12 +6,7 @@ from functools import partial
 
 import utils_giswater
 from ws_parent_init import ParentDialog
-
 from ui.add_sum import Add_sum          # @UnresolvedImport
-
-from PyQt4.QtSql import QSqlTableModel
-
-
 
 
 def formOpen(dialog, layer, feature):
@@ -42,7 +37,7 @@ def init_config():
     feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id_dummy").activated.connect(feature_dialog.change_connec_type_id)  
     feature_dialog.change_connec_type_id(-1)      
     
-    # Set  button signals      
+    # Set button signals      
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.update_sum)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
     
@@ -74,7 +69,6 @@ class ConnecDialog(ParentDialog):
         self.tbl_connec = self.dialog.findChild(QTableView, "tbl_connec")             
         self.tbl_dae = self.dialog.findChild(QTableView, "tbl_dae")   
         self.tbl_dae_2 = self.dialog.findChild(QTableView, "tbl_dae_2")    
-            
              
         # Manage tab visibility
         self.set_tabs_visibility()
@@ -108,7 +102,6 @@ class ConnecDialog(ParentDialog):
         # Fill tab Hydrometer | feature
         table_hydrometer = "v_rtc_hydrometer"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
-        
         
         # Configuration of table Hydrometer | feature
         self.set_configuration(self.tbl_dae, table_hydrometer)
@@ -185,7 +178,6 @@ class ConnecDialog(ParentDialog):
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_connec))
         self.tbl_connec.doubleClicked.connect(self.open_selected_document)
         
-        # TODO: Get data from related tables!
         # Fill ComboBox tagcat_id
         sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".v_ui_doc_x_connec ORDER BY tagcat_id" 
         rows = self.dao.get_rows(sql)
@@ -214,7 +206,7 @@ class ConnecDialog(ParentDialog):
         date_to = self.date_dae_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message)                   
+            self.controller.show_warning(message, context_name='ws_parent')                   
             return
         
         # Set filter
@@ -242,25 +234,25 @@ class ConnecDialog(ParentDialog):
         self.date_dae_to.dateChanged.connect(self.set_filter_tbl_hydrometer)
         self.date_dae_from.dateChanged.connect(self.set_filter_tbl_hydrometer)
         
-        #Fill feature tab of connec
-        #Filter and fill table related with connec        
+        # Fill feature tab of connec
+        # Filter and fill table related with connec        
         self.set_model_to_table(widget, table_name, filter_)   
         
         
     def fill_tbl_hydrometer_epanet(self, widget, table_name, filter_):
-        #Fill EPANET tab of hydrometer
-        #Filter and fill table related with connec_id        
+        # Fill EPANET tab of hydrometer
+        # Filter and fill table related with connec_id        
         self.set_model_to_table(widget, table_name, filter_) 
 
         
     def insert_records (self):
+        
         # Create the dialog and signals
         self.dlg_sum = Add_sum()
         utils_giswater.setDialog(self.dlg_sum)
         
-        # Set signal btn_accept
+        # Set signals
         self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept_dae)
-        # Set signal btn_close
         self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close_dae)
         
         # Open the dialog
@@ -302,6 +294,7 @@ class ConnecDialog(ParentDialog):
        
     def delete_records_dae(self, widget, table_name):
         ''' Delete selected elements of the table '''
+        
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
@@ -332,40 +325,18 @@ class ConnecDialog(ParentDialog):
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
   
-    def update_sum(self,widget):
+    def update_sum(self, widget):
+        ''' Update contents of the selected widget '''
 
-        # Check if clicked value is from the column "SUM"
-        position_column = self.tbl_dae_2.currentIndex().column()
-        position_row = self.tbl_dae_2.currentIndex().row()
-        
-        if position_column == 6:    
-              
-            # Get data from address in memory (pointer)
-            self.sum = self.tbl_dae_2.selectedIndexes()[0].data()
-            # Get hydrometer_id of selected sum
-            proxyModel=self.tbl_dae_2.model()
-            hydrometer_id=proxyModel.index(position_row, 2).data()
-            # Get sum - check if exist in table, if don't exist user change value -> UPDATE
-            sql = "SELECT DISTINCT(sum) FROM "+self.schema_name+".v_edit_rtc_hydro_data_x_connec WHERE sum = '"+str(self.sum)+"'" 
-            print sql
-            row = self.dao.get_row(sql)
-            if row == None:
-                check = self.update_sum_confirm()
-                if check:
-                    # If is accept ipload database
-                    sql= " UPDATE "+self.schema_name+".v_edit_rtc_hydro_data_x_connec SET" 
-                    sql+= " sum = '"+str(self.sum)+"'"
-                    sql+= " WHERE hydrometer_id = '"+hydrometer_id+"'"
-                    self.dao.execute_sql(sql) 
-                            
-                    self.controller.show_info("Value has been updated")
-                else :
-                    return
-            else:
-                print "else"
-                    
+        # Submit all changes made to the table
+        # View will automatically control with fields can be updated
+        status = widget.model().submitAll()
+        if status:
+            widget.model().database().commit()
         else:
-            self.close()
+            widget.model().database().rollback()
+            error = widget.model().lastError()
+            print str(error.text())  
                     
             
     def update_sum_confirm(self):
@@ -379,8 +350,5 @@ class ConnecDialog(ParentDialog):
             return True
         elif ret == QMessageBox.Discard:
             return False   
-     
-            
     
-            
     

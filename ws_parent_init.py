@@ -175,8 +175,9 @@ class ParentDialog(object):
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
         model.setFilter(filter_)
-        model.select()    
+        model.select()         
 
         # Check for errors
         if model.lastError().isValid():
@@ -268,6 +269,11 @@ class ParentDialog(object):
         Set visibility of columns
         Set width of columns '''
 
+        exists = self.dao.check_table(self.schema_name, "config_ui_forms")
+        if not exists:
+            #print "Table not found: "+self.schema_name+".config_ui_forms"
+            return
+        
         # Hide columns
         sql = "SELECT column_index"
         sql+= " FROM "+self.schema_name+".config_ui_forms" 
