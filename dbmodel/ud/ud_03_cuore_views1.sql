@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-DROP VIEW IF EXISTS v_arc;
+DROP VIEW IF EXISTS v_arc CASCADE;
 CREATE OR REPLACE VIEW v_arc AS 
 SELECT 
 arc.arc_id, 

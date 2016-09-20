@@ -89,17 +89,8 @@ CREATE TABLE "config_ui_forms" (
 "ui_table" varchar (50),
 "ui_column" varchar (50),
 "status" boolean,
-"width" int4
-"column_index" int2
+"width" int4,
+"column_index" int2,
 "alias" varchar (50),
 CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
 );
-
-
-CREATE TABLE "config_ui_forms_tabs"
-(  id serial NOT NULL,
-  ui_form character varying(50),
-  ui_tab character varying(50),
-  ui_table character varying(50),
-  CONSTRAINT config_ui_forms_tabs_pkey PRIMARY KEY (id)
-)
