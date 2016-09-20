@@ -634,11 +634,6 @@ CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "man_virtual" (
-"arc_id" varchar(16) NOT NULL,
-CONSTRAINT man_virtualarc_pkey PRIMARY KEY (arc_id)
-);
-
 
 CREATE TABLE "man_conduit" (
 "arc_id" varchar(16) NOT NULL,
