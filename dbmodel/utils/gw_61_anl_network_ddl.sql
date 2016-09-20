@@ -24,7 +24,7 @@ CREATE TABLE "anl_node_sink" (
 node_id varchar (16) NOT NULL,
 num_arcs integer,
 the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_sinks_pkey PRIMARY KEY (node_id)
+CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
 );
 
 
