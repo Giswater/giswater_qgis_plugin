@@ -54,7 +54,13 @@ CREATE SEQUENCE "pol_id_seq"
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-	
+
+CREATE SEQUENCE "catchment_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;	
 	
 CREATE SEQUENCE "connec_seq"
     START WITH 1
@@ -403,8 +409,17 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 CREATE TABLE "sector" (
 "sector_id" varchar(30) NOT NULL,
 "descript" varchar(100),
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"the_geom" public.geometry (POLYGON, SRID_VALUE),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
+);
+
+
+CREATE TABLE "catchment" (
+"catchment_id" varchar(30)  DEFAULT nextval ('"SCHEMA_NAME".catchment_seq'::regclass) NOT NULL,
+"descript" varchar(100),
+"text" text,
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+CONSTRAINT catchment_pkey PRIMARY KEY (catchment_id)
 );
 
 
