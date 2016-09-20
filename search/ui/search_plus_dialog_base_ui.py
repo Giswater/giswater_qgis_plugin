@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'search_plus_dialog_base.ui'
 #
-# Created: Tue Sep 20 11:26:35 2016
+# Created: Tue Sep 20 12:18:42 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -70,7 +70,7 @@ class Ui_searchPlusDockWidget(object):
         self.label_press_zone.setGeometry(QtCore.QRect(15, 22, 55, 16))
         self.label_press_zone.setObjectName(_fromUtf8("label_press_zone"))
         self.label_number = QtGui.QLabel(self.tab)
-        self.label_number.setGeometry(QtCore.QRect(15, 58, 55, 16))
+        self.label_number.setGeometry(QtCore.QRect(15, 56, 55, 16))
         self.label_number.setObjectName(_fromUtf8("label_number"))
         self.ppoint_number = SearchableComboBox(self.tab)
         self.ppoint_number.setGeometry(QtCore.QRect(90, 54, 221, 20))
@@ -120,7 +120,7 @@ class Ui_searchPlusDockWidget(object):
         self.label_press_zone.setText(_translate("searchPlusDockWidget", "Press zone:", None))
         self.label_number.setText(_translate("searchPlusDockWidget", "Number:", None))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab), _translate("searchPlusDockWidget", "Ppoint", None))
-        self.label_street.setText(_translate("searchPlusDockWidget", "Street_1:", None))
+        self.label_street.setText(_translate("searchPlusDockWidget", "Street:", None))
         self.label_number_3.setText(_translate("searchPlusDockWidget", "Number:", None))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_3), _translate("searchPlusDockWidget", "Adress", None))
         self.label_code.setText(_translate("searchPlusDockWidget", "Code:", None))

@@ -38,18 +38,19 @@ class SearchPlus(QObject):
         self.stylesFolder = self.plugin_dir+"/styles/"         
             
         # load plugin settings
-        self.loadPluginSettings()      
+        self.load_plugin_settings()      
         
         # create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
         
         # set signals
-        self.dlg.adress_street.currentIndexChanged.connect(self.getStreetNumbers)
-        self.dlg.adress_street.currentIndexChanged.connect(self.zoomOnStreet)
-        self.dlg.adress_number.currentIndexChanged.connect(self.displayStreetData)        
+        self.dlg.adress_street.currentIndexChanged.connect(self.address_get_numbers)
+        self.dlg.adress_street.currentIndexChanged.connect(self.address_zoom_street)
+        self.dlg.adress_number.currentIndexChanged.connect(self.address_zoom_portal)  
+
+        
     
-    
-    def loadPluginSettings(self):
+    def load_plugin_settings(self):
         ''' Load plugin settings '''
         
         # get layers configuration to populate the GUI
@@ -86,7 +87,7 @@ class SearchPlus(QObject):
         return QCoreApplication.translate('SearchPlus', message)
 
                          
-    def populateGui(self):
+    def populate_dialog(self):
         ''' Populate the interface with values get from layers '''  
         
         # Remove unused tabs
@@ -95,14 +96,18 @@ class SearchPlus(QObject):
         self.dlg.tab_main.removeTab(0)                           
              
         # Get layers and full extent
-        self.getLayers()       
+        self.get_layers()       
                 
-        # tab Streets      
-        status = self.populateStreets()
-        return status
+        # Tab 'Address'      
+        status = self.address_populate()
+        if not status:
+            return False
         
-                    
-    def populateStreets(self):
+        
+        return True
+        
+                
+    def address_populate(self):
         
         # Check if we have this search option available
         if self.streetLayer is None or self.portalLayer is None:  
@@ -134,35 +139,13 @@ class SearchPlus(QObject):
         self.dlg.adress_street.blockSignals(False)    
         
         return True
-        
-                 
-    def zoomOnStreet(self):
-        ''' Zoom on the street with the prefined scale '''
-        
-        # get selected street
-        selected = self.dlg.adress_street.currentText()
-        if selected == '':
-            return
-        
-        # get code
-        data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
-        wkt = data[3] # to know the index see the query that populate the combo
-        geom = QgsGeometry.fromWkt(wkt)
-        if not geom:
-            message = self.tr('Can not correctly get geometry')
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
-            return
-        
-        # zoom on it's centroid
-        centroid = geom.centroid()
-        self.iface.mapCanvas().setCenter(centroid.asPoint())
-        self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
+           
     
-    
-    def getStreetNumbers(self):
+    def address_get_numbers(self):
         ''' Populate civic numbers depending on selected street. 
             Available civic numbers are linked with self.STREET_FIELD_CODE column code in self.PORTAL_LAYER and self.STREET_LAYER
-        '''                      
+        '''   
+                           
         # get selected street
         selected = self.dlg.adress_street.currentText()
         if selected == '':
@@ -213,8 +196,72 @@ class SearchPlus(QObject):
             self.dlg.adress_number.addItem(str(record[1]), record)
         self.dlg.adress_number.blockSignals(False)  
         
-    
-    def manageMemLayer(self, layer):
+                 
+    def address_zoom_street(self):
+        ''' Zoom on the street with the prefined scale '''
+        
+        # get selected street
+        selected = self.dlg.adress_street.currentText()
+        if selected == '':
+            return
+        
+        # get code
+        data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
+        wkt = data[3] # to know the index see the query that populate the combo
+        geom = QgsGeometry.fromWkt(wkt)
+        if not geom:
+            message = self.tr('Can not correctly get geometry')
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
+            return
+        
+        # zoom on it's centroid
+        centroid = geom.centroid()
+        self.iface.mapCanvas().setCenter(centroid.asPoint())
+        self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
+        
+                
+    def address_zoom_portal(self):
+        ''' Show street data on the canvas when selected street and number in street tab '''  
+                
+        street = self.dlg.adress_street.currentText()
+        civic = self.dlg.adress_number.currentText()
+        if street == '' or civic == '':
+            return  
+                
+        # get selected portal
+        elem = self.dlg.adress_number.itemData(self.dlg.adress_number.currentIndex())
+        if not elem:
+            # that means that user has edited manually the combo but the element
+            # does not correspond to any combo element
+            message = self.tr('Element {} does not exist'.format(civic))
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
+            return
+        
+        # select this feature in order to copy to memory layer        
+        aux = self.PORTAL_FIELD_CODE+"='"+str(elem[0])+"' AND "+self.PORTAL_FIELD_NUMBER+"='"+str(elem[1])+"'"
+        expr = QgsExpression(aux)     
+        if expr.hasParserError():   
+            self.iface.messageBar().pushMessage(expr.parserErrorString() + ": " + aux, self.app_name, QgsMessageBar.WARNING, 5)        
+            return    
+        
+        # Get a featureIterator from an expression
+        # Build a list of feature Ids from the previous result       
+        # Select featureswith the ids obtained             
+        it = self.portalLayer.getFeatures(QgsFeatureRequest(expr))
+        ids = [i.id() for i in it]
+        self.portalLayer.setSelectedFeatures(ids)
+        
+        # Copy selected features to memory layer     
+        self.portalMemLayer = self.copy_selected(self.portalLayer, self.portalMemLayer, "Point")       
+
+        # Zoom to point layer
+        self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
+        
+        # Load style
+        self.load_style(self.portalMemLayer, self.QML_PORTAL)    
+        
+                
+    def manage_mem_layer(self, layer):
         ''' Delete previous features from all memory layers 
             Make layer not visible '''
         
@@ -230,15 +277,15 @@ class SearchPlus(QObject):
                 self.iface.messageBar().pushMessage(str(e), '', QgsMessageBar.WARNING)  
 
 
-    def manageMemLayers(self):
+    def manage_mem_layers(self):
         ''' Delete previous features from all memory layers '''        
-        self.manageMemLayer(self.portalMemLayer)
+        self.manage_mem_layer(self.portalMemLayer)
       
     
-    def copySelected(self, layer, mem_layer, geom_type):
+    def copy_selected(self, layer, mem_layer, geom_type):
         ''' Copy from selected layer to memory layer '''
         
-        self.manageMemLayers()
+        self.manage_mem_layers()
         
         # Create memory layer if not already set
         if mem_layer is None: 
@@ -284,58 +331,17 @@ class SearchPlus(QObject):
         # Make sure layer is always visible 
         self.iface.legendInterface().setLayerVisible(mem_layer, True)
                     
-        return mem_layer    
-    
-    
-    def displayStreetData(self):
-        ''' Show street data on the canvas when selected street and number in street tab '''  
-                
-        street = self.dlg.adress_street.currentText()
-        civic = self.dlg.adress_number.currentText()
-        if street == '' or civic == '':
-            return  
-                
-        # get selected portal
-        elem = self.dlg.adress_number.itemData(self.dlg.adress_number.currentIndex())
-        if not elem:
-            # that means that user has edited manually the combo but the element
-            # does not correspond to any combo element
-            message = self.tr('Element {} does not exist'.format(civic))
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
-            return
-        
-        # select this feature in order to copy to memory layer        
-        aux = self.PORTAL_FIELD_CODE+"='"+str(elem[0])+"' AND "+self.PORTAL_FIELD_NUMBER+"='"+str(elem[1])+"'"
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            self.iface.messageBar().pushMessage(expr.parserErrorString() + ": " + aux, self.app_name, QgsMessageBar.WARNING, 5)        
-            return    
-        
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained             
-        it = self.portalLayer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        self.portalLayer.setSelectedFeatures(ids)
-        
-        # Copy selected features to memory layer     
-        self.portalMemLayer = self.copySelected(self.portalLayer, self.portalMemLayer, "Point")       
-
-        # Zoom to point layer
-        self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
-        
-        # Load style
-        self.loadStyle(self.portalMemLayer, self.QML_PORTAL)         
+        return mem_layer
           
 
-    def loadStyle(self, layer, qml):
+    def load_style(self, layer, qml):
         ''' Load QML style file into selected layer '''
         path_qml = self.stylesFolder+qml      
         if os.path.exists(path_qml): 
             layer.loadNamedStyle(path_qml)      
             
                 
-    def removeMemoryLayers(self):
+    def remove_memory_layers(self):
         ''' Iterate over all layers and remove memory ones '''         
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:     
