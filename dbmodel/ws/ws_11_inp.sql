@@ -6,122 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- ----------------------------
--- temporals
--- ----------------------------
-
-CREATE SEQUENCE "temp_node_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "temp_arc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE "temp_arcnodearc_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "temp_nodearcnode_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE TABLE temp_node
-(
-  node_id character varying(16) NOT NULL,
-  elevation numeric(12,4),
-  depth numeric(12,4),
-  node_type character varying(30),
-  nodecat_id character varying(30),
-  epa_type character varying(16),
-  sector_id character varying(30),
-  state character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  comment character varying(254),
-  dma_id character varying(30),
-  soilcat_id character varying(16),
-  category_type character varying(18),
-  fluid_type character varying(18),
-  location_type character varying(18),
-  workcat_id character varying(255),
-  buildercat_id character varying(30),
-  builtdate date,
-  ownercat_id character varying(30),
-  adress_01 character varying(50),
-  adress_02 character varying(50),
-  adress_03 character varying(50),
-  descript character varying(254),
-  rotation numeric(6,3),
-  link character varying(512),
-  verified character varying(16),
-"the_geom" public.geometry (POINT, SRID_VALUE),
-  CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
-)
-
-
-CREATE TABLE temp_arc
-(
-  arc_id character varying(16) NOT NULL,
-  node_1 character varying(16),
-  node_2 character varying(16),
-  arccat_id character varying(30),
-  epa_type character varying(16),
-  sector_id character varying(30),
-  state character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  comment character varying(254),
-  custom_length numeric(12,2),
-  dma_id character varying(30),
-  soilcat_id character varying(16),
-  category_type character varying(18),
-  fluid_type character varying(18),
-  location_type character varying(18),
-  workcat_id character varying(255),
-  buildercat_id character varying(30),
-  builtdate date,
-  ownercat_id character varying(30),
-  adress_01 character varying(50),
-  adress_02 character varying(50),
-  adress_03 character varying(50),
-  descript character varying(254),
-  rotation numeric(6,3),
-  link character varying(512),
-  verified character varying(16),
- "the_geom" public.geometry (LINESTRING, SRID_VALUE),
-  CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id));
-
-
-CREATE TABLE "temp_nodearcnode" (
-node_id varchar(16)  ,
-arc_id varchar(16)  ,
-node_2 varchar(16)  ,
-CONSTRAINT temp_nodearcnode_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "temp_arcnodearc" (
-node_id varchar(16)  ,
-arc_1 varchar(16)  ,
-arc_2 varchar(16)  ,
-CONSTRAINT temp_arcnodearc_pkey PRIMARY KEY (node_id)
-);
-
 
 
 -- ----------------------------
@@ -240,11 +124,102 @@ CREATE SEQUENCE "rpt_cat_result_id_seq"
     NO MAXVALUE
     CACHE 1;
 
-    
+
+CREATE SEQUENCE "temp_node_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE "temp_arc_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+
+-- ----------------------------
+-- Table structure INP temporal
+-- ----------------------------
+
+
+CREATE TABLE temp_node
+(
+  node_id character varying(16) NOT NULL,
+  elevation numeric(12,4),
+  depth numeric(12,4),
+  node_type character varying(30),
+  nodecat_id character varying(30),
+  epa_type character varying(16),
+  sector_id character varying(30),
+  state character varying(16),
+  annotation character varying(254),
+  observ character varying(254),
+  comment character varying(254),
+  dma_id character varying(30),
+  soilcat_id character varying(16),
+  category_type character varying(18),
+  fluid_type character varying(18),
+  location_type character varying(18),
+  workcat_id character varying(255),
+  buildercat_id character varying(30),
+  builtdate date,
+  ownercat_id character varying(30),
+  adress_01 character varying(50),
+  adress_02 character varying(50),
+  adress_03 character varying(50),
+  descript character varying(254),
+  rotation numeric(6,3),
+  link character varying(512),
+  verified character varying(16),
+"the_geom" public.geometry (POINT, SRID_VALUE),
+  CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
+)
+;
+
+
+CREATE TABLE temp_arc
+(
+  arc_id character varying(16) NOT NULL,
+  node_1 character varying(16),
+  node_2 character varying(16),
+  arccat_id character varying(30),
+  epa_type character varying(16),
+  sector_id character varying(30),
+  state character varying(16),
+  annotation character varying(254),
+  observ character varying(254),
+  comment character varying(254),
+  custom_length numeric(12,2),
+  dma_id character varying(30),
+  soilcat_id character varying(16),
+  category_type character varying(18),
+  fluid_type character varying(18),
+  location_type character varying(18),
+  workcat_id character varying(255),
+  buildercat_id character varying(30),
+  builtdate date,
+  ownercat_id character varying(30),
+  adress_01 character varying(50),
+  adress_02 character varying(50),
+  adress_03 character varying(50),
+  descript character varying(254),
+  rotation numeric(6,3),
+  link character varying(512),
+  verified character varying(16),
+ "the_geom" public.geometry (LINESTRING, SRID_VALUE),
+  CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id));
+
 
 -- ----------------------------
 -- Table structure INP
 -- ----------------------------
+
+
+
 
 CREATE TABLE "inp_arc_type" (
 "id" varchar(16)   NOT NULL,
@@ -923,10 +898,6 @@ ALTER TABLE "rpt_node" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
 
 
-
-----------------
--- SPATIAL INDEX
-----------------
 
 CREATE INDEX temp_arc_index ON temp_arc USING GIST (the_geom);
 CREATE INDEX temp_node_index ON temp_node USING GIST (the_geom);

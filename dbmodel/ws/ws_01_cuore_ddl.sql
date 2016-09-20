@@ -134,6 +134,11 @@ CONSTRAINT element_type_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "point_type" (
+"id" varchar(18)   NOT NULL,
+"text" text,
+CONSTRAINT point_type_pkey PRIMARY KEY (id)
+);
 
 -- ----------------------------
 -- Table: Catalogs
@@ -499,6 +504,28 @@ CONSTRAINT link_pkey PRIMARY KEY (link_id)
 
 
 
+CREATE TABLE "point" (
+"point_id" varchar(30)   NOT NULL,
+"point_type" varchar(18),
+"observ" character varying(512),
+"text" text,
+"the_geom" public.geometry (POINT, SRID_VALUE),
+CONSTRAINT point_pkey PRIMARY KEY (point_id)
+);
+
+
+CREATE TABLE "presszone" (
+"presszone_id" varchar(30)   NOT NULL,
+"presszonecat_id" varchar(18),
+"observ" character varying(512),
+"text" text,
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+CONSTRAINT presszone_pkey PRIMARY KEY (presszone_id)
+);
+
+
+
+
 -- -----------------------------------
 -- Table: Add info of GIS feature 
 -- -----------------------------------
@@ -575,7 +602,7 @@ CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
 CREATE TABLE "element" (
 "element_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_seq'::regclass) NOT NULL,
 "elementcat_id" varchar(30)  ,
-"state" character varying(16) ,
+"state" character varying(16) NOT NULL,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
@@ -587,7 +614,7 @@ CREATE TABLE "element" (
 "enddate" timestamp (6) without time zone,
 "rotation" numeric (6,3),
 "link" character varying(512),
-"verified" varchar(20) ,
+"verified" varchar(20)   NOT NULL,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
@@ -651,7 +678,6 @@ CREATE TABLE "man_selector_valve" (
 );
 
 
-
 ----------------
 -- SPATIAL INDEX
 ----------------
@@ -663,4 +689,7 @@ CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);
 CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
 CREATE INDEX link_index ON link USING GIST (the_geom);
+CREATE INDEX point_index ON point USING GIST (the_geom);
+CREATE INDEX presszone_index ON presszone USING GIST (the_geom);
+
 

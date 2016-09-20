@@ -138,4 +138,8 @@ ALTER TABLE "element_x_connec" ADD FOREIGN KEY ("element_id") REFERENCES "elemen
 ALTER TABLE "element_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE "point" ADD FOREIGN KEY ("point_type") REFERENCES "point_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
 
