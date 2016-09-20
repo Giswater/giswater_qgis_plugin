@@ -495,15 +495,16 @@ class Giswater(QObject):
         # Create SearchPlus object
         try:
             if self.search_plus is None:
-                self.search_plus = SearchPlus(self.iface, self.srid)
-                self.search_plus.remove_memory_layers()   
+                self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
+                self.search_plus.remove_memory_layers() 
+            self.ed.search_plus = self.search_plus             
             status = self.search_plus.populate_dialog()
             self.actions['32'].setEnabled(status) 
             self.actions['32'].setCheckable(False) 
-            if not status:
-                self.search_plus.dlg.setVisible(False)  
-            self.ed.search_plus = self.search_plus                   
         except:
+            self.search_plus.dlg.setVisible(False) 
+            self.actions['32'].setVisible(False)                     
+            self.controller.show_warning("Error setting searchplus button")
             pass   
         
         self.custom_enable_actions()

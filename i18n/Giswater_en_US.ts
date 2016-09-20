@@ -3016,7 +3016,7 @@
     <message>
         <source>label_link</source>
         <translation>Link</translation>
-    </message>	
+    </message>
     <message>
         <source>label_rotation</source>
         <translation>Rotation</translation>
@@ -3107,6 +3107,20 @@
     </message>
 
 </context>
+
+
+<context>
+
+    <name>searchplus</name>
+    
+    <message>
+        <source>Config file not found at</source>
+        <translation>Config file not found at</translation>
+    </message>
+
+</context>
+
+
 
 </TS>
 

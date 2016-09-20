@@ -48,7 +48,7 @@ class Ed():
                   
             
     def ed_search_plus(self):   
-        ''' Button 32. Open dialog to select street and portal number ''' 
+        ''' Button 32. Open search plus dialog ''' 
         if self.search_plus is not None:
             self.search_plus.dlg.setVisible(True) 
             

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsMessageBar
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer
 from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant   # @UnresolvedImport
 
@@ -11,11 +10,12 @@ from search_plus_dockwidget import SearchPlusDockWidget
 class SearchPlus(QObject):
 
 
-    def __init__(self, iface, srid):
+    def __init__(self, iface, srid, controller):
         ''' Constructor '''
         
         self.iface = iface
         self.srid = srid
+        self.controller = controller
         
         # initialize plugin directory and locale
         self.plugin_dir = os.path.dirname(__file__)
@@ -32,11 +32,11 @@ class SearchPlus(QObject):
         self.setting_file = os.path.join(self.plugin_dir, 'config', self.app_name+'.config')   
         if not os.path.isfile(self.setting_file):
             message = "Config file not found at: "+self.setting_file            
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)            
+            self.controller.show_warning(message)                
             return False        
         self.settings = QSettings(self.setting_file, QSettings.IniFormat)
         self.stylesFolder = self.plugin_dir+"/styles/"         
-            
+        
         # load plugin settings
         self.load_plugin_settings()      
         
@@ -48,6 +48,8 @@ class SearchPlus(QObject):
         self.dlg.adress_street.currentIndexChanged.connect(self.address_zoom_street)
         self.dlg.adress_number.currentIndexChanged.connect(self.address_zoom_portal)  
 
+        self.dlg.ppoint_press_zone.currentIndexChanged.connect(self.ppoint_get_numbers)    
+        self.dlg.ppoint_number.currentIndexChanged.connect(self.ppoint_zoom_number)              
         
     
     def load_plugin_settings(self):
@@ -60,18 +62,23 @@ class SearchPlus(QObject):
         self.PORTAL_LAYER = self.settings.value('layers/PORTAL_LAYER', '').lower()
         self.PORTAL_FIELD_CODE = self.settings.value('layers/PORTAL_FIELD_CODE', '').lower()
         self.PORTAL_FIELD_NUMBER = self.settings.value('layers/PORTAL_FIELD_NUMBER', '').lower()   
+        self.PPOINT_LAYER = self.settings.value('layers/PPOINT_LAYER', '').lower()
+        self.PPOINT_FIELD_ZONE = self.settings.value('layers/PPOINT_FIELD_ZONE', '').lower()
+        self.PPOINT_FIELD_NUMBER = self.settings.value('layers/PPOINT_FIELD_NUMBER', '').lower()   
         self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()            
         
         # get initial Scale
-        self.defaultZoomScale = self.settings.value('status/defaultZoomScale', 2500)
+        self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
 
             
-    def getLayers(self): 
+    def get_layers(self): 
         ''' Iterate over all layers to get the ones set in config file '''
         
         self.streetLayer = None
         self.portalLayer = None     
+        self.ppointLayer = None     
         self.portalMemLayer = None            
+        self.ppointMemLayer = None            
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:            
             name = cur_layer.name().lower()
@@ -79,20 +86,15 @@ class SearchPlus(QObject):
                 self.streetLayer = cur_layer
             elif self.PORTAL_LAYER in name:  
                 self.portalLayer = cur_layer       
+            elif self.PPOINT_LAYER in name:  
+                self.ppointLayer = cur_layer       
             
-            
-    # noinspection PyMethodMayBeStatic
-    def tr(self, message):
-        ''' Get the translation for a string using Qt translation API '''
-        return QCoreApplication.translate('SearchPlus', message)
-
                          
     def populate_dialog(self):
         ''' Populate the interface with values get from layers '''  
         
         # Remove unused tabs
         self.dlg.tab_main.removeTab(3)   
-        self.dlg.tab_main.removeTab(1)
         self.dlg.tab_main.removeTab(0)                           
              
         # Get layers and full extent
@@ -103,6 +105,11 @@ class SearchPlus(QObject):
         if not status:
             return False
         
+        # Tab 'Ppoint'      
+        status = self.ppoint_populate_zone()
+        if not status:
+            print "Error populating Tab 'ppoint'"
+            return False
         
         return True
         
@@ -164,18 +171,17 @@ class SearchPlus(QObject):
         
         # Check filter and existence of fields
         expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            self.iface.messageBar().pushMessage(expr.parserErrorString() + ": " + aux, self.app_name, QgsMessageBar.WARNING, 10)        
+        if expr.hasParserError():    
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)    
             return               
         if idx_field_code == -1:    
-            message = self.tr("Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'".
-                format(self.PORTAL_FIELD_CODE, layer.name(), self.setting_file, 'PORTAL_FIELD_CODE'))            
-            self.iface.messageBar().pushMessage(message, '', QgsMessageBar.WARNING)        
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'".format(self.PORTAL_FIELD_CODE, layer.name(), self.setting_file, 'PORTAL_FIELD_CODE')            
+            self.controller.show_warning(message)         
             return      
         if idx_field_number == -1:    
-            message = self.tr("Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'".
-                format(self.PORTAL_FIELD_NUMBER, layer.name(), self.setting_file, 'PORTAL_FIELD_NUMBER'))            
-            self.iface.messageBar().pushMessage(message, '', QgsMessageBar.WARNING)        
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'".format(self.PORTAL_FIELD_NUMBER, layer.name(), self.setting_file, 'PORTAL_FIELD_NUMBER')            
+            self.controller.show_warning(message)         
             return      
             
         # Get a featureIterator from an expression:
@@ -210,14 +216,14 @@ class SearchPlus(QObject):
         wkt = data[3] # to know the index see the query that populate the combo
         geom = QgsGeometry.fromWkt(wkt)
         if not geom:
-            message = self.tr('Can not correctly get geometry')
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
+            message = "Can not correctly get geometry"
+            self.controller.show_warning(message) 
             return
         
         # zoom on it's centroid
         centroid = geom.centroid()
         self.iface.mapCanvas().setCenter(centroid.asPoint())
-        self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
+        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
         
                 
     def address_zoom_portal(self):
@@ -233,15 +239,16 @@ class SearchPlus(QObject):
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
-            message = self.tr('Element {} does not exist'.format(civic))
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)
+            message = 'Element {} does not exist'.format(civic)
+            self.controller.show_warning(message) 
             return
         
         # select this feature in order to copy to memory layer        
         aux = self.PORTAL_FIELD_CODE+"='"+str(elem[0])+"' AND "+self.PORTAL_FIELD_NUMBER+"='"+str(elem[1])+"'"
         expr = QgsExpression(aux)     
         if expr.hasParserError():   
-            self.iface.messageBar().pushMessage(expr.parserErrorString() + ": " + aux, self.app_name, QgsMessageBar.WARNING, 5)        
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)        
             return    
         
         # Get a featureIterator from an expression
@@ -255,11 +262,146 @@ class SearchPlus(QObject):
         self.portalMemLayer = self.copy_selected(self.portalLayer, self.portalMemLayer, "Point")       
 
         # Zoom to point layer
-        self.iface.mapCanvas().zoomScale(float(self.defaultZoomScale))
+        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
         
         # Load style
         self.load_style(self.portalMemLayer, self.QML_PORTAL)    
         
+        
+    def ppoint_populate_zone(self):
+        
+        # Check if we have this search option available
+        if self.ppointLayer is None:  
+            return False
+
+        # Get distinct 'zones'
+        layer = self.ppointLayer
+        records = []
+        records.append(' ')
+        idx_field_zone = layer.fieldNameIndex(self.PPOINT_FIELD_ZONE) 
+        if idx_field_zone == -1:           
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.PPOINT_FIELD_ZONE, layer.name(), self.setting_file, 'PPOINT_FIELD_ZONE')           
+            self.controller.show_warning(message)
+            return       
+                       
+        for feature in layer.getFeatures():
+            attrs = feature.attributes() 
+            field_zone = attrs[idx_field_zone]  
+            if not type(field_zone) is QPyNullVariant:
+                records.append(field_zone)
+        
+        # Remove duplicates
+        zones = set(records)
+        
+        # Fill combo 'press_zone'
+        self.dlg.ppoint_press_zone.blockSignals(True)
+        self.dlg.ppoint_press_zone.clear()
+        zones_sorted = sorted(zones, key = operator.itemgetter(0))  
+        for zone in zones_sorted:    
+            try:
+                self.dlg.ppoint_press_zone.addItem(zone, zone)
+            except AttributeError, e:
+                print str(e)
+        self.dlg.ppoint_press_zone.blockSignals(False)    
+        
+        return True
+           
+    
+    def ppoint_get_numbers(self):
+        ''' Populate numbers depending on selected press_zone. 
+            Available numbers are linked with self.PPOINT_FIELD_ZONE '''   
+                           
+        # Check existence of layer and related fields                          
+        layer = self.ppointLayer           
+        idx_field_number = layer.fieldNameIndex(self.PPOINT_FIELD_NUMBER)   
+        if idx_field_number == -1:    
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.PPOINT_FIELD_NUMBER, layer.name(), self.setting_file, 'PPOINT_FIELD_NUMBER')         
+            self.controller.show_warning(message)         
+            return     
+                         
+        # Get selected press_zone
+        aux = None
+        records = [[None]]
+        selected = self.dlg.ppoint_press_zone.currentText()
+        if selected.strip() != '':
+            zone = self.dlg.ppoint_press_zone.itemData(self.dlg.ppoint_press_zone.currentIndex())
+            aux = self.PPOINT_FIELD_ZONE+"='"+str(zone)+"'" 
+            # Set filter expression        
+            expr = QgsExpression(aux)     
+            if expr.hasParserError():   
+                message = expr.parserErrorString()+": "+aux        
+                self.controller.show_warning(message)               
+                return                
+             
+        # Get a featureIterator from an expression:
+        # Get features from the iterator and do something
+        if aux is None:
+            it = layer.getFeatures(QgsFeatureRequest())
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+        for feature in it: 
+            attrs = feature.attributes() 
+            field_number = attrs[idx_field_number]    
+            if not type(field_number) is QPyNullVariant:
+                elem = [field_number]
+                records.append(elem)
+                  
+        # Fill combo 'numbers'
+        records_sorted = sorted(records, key = operator.itemgetter(0))           
+        self.dlg.ppoint_number.blockSignals(True)
+        self.dlg.ppoint_number.clear()
+        for record in records_sorted:
+            if record[0] is None:
+                self.dlg.ppoint_number.addItem('', record)
+            else:
+                self.dlg.ppoint_number.addItem(str(record[0]), record)
+        self.dlg.ppoint_number.blockSignals(False)          
+        
+        
+                
+    def ppoint_zoom_number(self):
+        ''' Show selected ppoint_number on the canvas when user number in tab 'Ppoint' '''  
+                
+        number = self.dlg.ppoint_number.currentText()
+        if number.strip() == '':
+            print "Any number selected"
+            return  
+                
+        # Get selected ppoint_number
+        elem = self.dlg.ppoint_number.itemData(self.dlg.ppoint_number.currentIndex())
+        if not elem:
+            # that means that user has edited manually the combo but the element
+            # does not correspond to any combo element
+            message = 'Element {} does not exist'.format(number)
+            self.controller.show_warning(message) 
+            return
+        
+        # Select this feature in order to copy to memory layer        
+        aux = self.PPOINT_FIELD_NUMBER+"='"+str(elem[0])+"'"
+        expr = QgsExpression(aux)     
+        if expr.hasParserError():   
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)        
+            return    
+        
+        # Get a featureIterator from an expression
+        # Build a list of feature Ids from the previous result       
+        # Select featureswith the ids obtained             
+        it = self.ppointLayer.getFeatures(QgsFeatureRequest(expr))
+        ids = [i.id() for i in it]
+        self.ppointLayer.setSelectedFeatures(ids)
+        
+        # Copy selected features to memory layer     
+        self.ppointMemLayer = self.copy_selected(self.ppointLayer, self.ppointMemLayer, "Polygon")       
+
+        # Zoom to point layer
+        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+        
+        # Load style
+        #self.load_style(self.portalMemLayer, self.QML_PORTAL)
+                
                 
     def manage_mem_layer(self, layer):
         ''' Delete previous features from all memory layers 
@@ -274,12 +416,13 @@ class SearchPlus(QObject):
                 layer.commitChanges()     
                 self.iface.legendInterface().setLayerVisible(layer, False)
             except RuntimeError as e:
-                self.iface.messageBar().pushMessage(str(e), '', QgsMessageBar.WARNING)  
+                self.controller.show_warning(str(e)) 
 
 
     def manage_mem_layers(self):
         ''' Delete previous features from all memory layers '''        
         self.manage_mem_layer(self.portalMemLayer)
+        self.manage_mem_layer(self.ppointMemLayer)
       
     
     def copy_selected(self, layer, mem_layer, geom_type):
