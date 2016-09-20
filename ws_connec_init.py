@@ -325,17 +325,18 @@ class ConnecDialog(ParentDialog):
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
   
-    def update_sum(self, widget):
+    def update_sum(self):
         ''' Update contents of the selected widget '''
 
         # Submit all changes made to the table
         # View will automatically control with fields can be updated
-        status = widget.model().submitAll()
+        status = self.tbl_dae_2.model().submitAll()
         if status:
-            widget.model().database().commit()
+            self.tbl_dae_2.model().database().commit()
+            self.tbl_dae_2.model().select()
         else:
-            widget.model().database().rollback()
-            error = widget.model().lastError()
+            self.tbl_dae_2.model().database().rollback()
+            error = self.tbl_dae_2.model().lastError()
             print str(error.text())  
                     
             
