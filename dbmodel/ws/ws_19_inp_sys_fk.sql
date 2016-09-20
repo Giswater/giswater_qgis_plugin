@@ -34,6 +34,7 @@ ALTER TABLE "inp_options" ADD FOREIGN KEY ("unbalanced") REFERENCES "inp_value_o
 ALTER TABLE "inp_pipe" ADD FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_pump" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_shortpipe" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_report" ADD FOREIGN KEY ("pressure") REFERENCES "inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_report" ADD FOREIGN KEY ("demand") REFERENCES "inp_value_yesno" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
