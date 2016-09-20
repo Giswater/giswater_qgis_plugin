@@ -141,7 +141,7 @@ ALTER TABLE "element_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "connec"
 
 
 ALTER TABLE "point" ADD FOREIGN KEY ("point_type") REFERENCES "point_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
+ALTER TABLE "presszone" ADD FOREIGN KEY ("presszonecat_id") REFERENCES "cat_press_zone" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 
