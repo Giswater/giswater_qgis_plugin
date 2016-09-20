@@ -515,12 +515,12 @@ CONSTRAINT point_pkey PRIMARY KEY (point_id)
 
 
 CREATE TABLE "presszone" (
-"presszone_id" varchar(30)   NOT NULL,
-"presszonecat_id" varchar(18),
-"observ" character varying(512),
-"text" text,
+"id" serial NOT NULL,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
-CONSTRAINT presszone_pkey PRIMARY KEY (presszone_id)
+"presszonecat_id" varchar(18),
+"sector" character varying(512),
+"text" text,
+CONSTRAINT presszone_pkey PRIMARY KEY (id)
 );
 
 
