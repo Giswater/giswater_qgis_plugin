@@ -40,71 +40,43 @@ CREATE SEQUENCE "temp_nodearcnode_seq"
     CACHE 1;
 
 
-CREATE TABLE temp_node
-(
-  node_id character varying(16) NOT NULL,
-  elevation numeric(12,4),
-  depth numeric(12,4),
-  node_type character varying(30),
-  nodecat_id character varying(30),
-  epa_type character varying(16),
-  sector_id character varying(30),
-  state character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  comment character varying(254),
-  dma_id character varying(30),
-  soilcat_id character varying(16),
-  category_type character varying(18),
-  fluid_type character varying(18),
-  location_type character varying(18),
-  workcat_id character varying(255),
-  buildercat_id character varying(30),
-  builtdate date,
-  ownercat_id character varying(30),
-  adress_01 character varying(50),
-  adress_02 character varying(50),
-  adress_03 character varying(50),
-  descript character varying(254),
-  rotation numeric(6,3),
-  link character varying(512),
-  verified character varying(16),
+CREATE TABLE "temp_node" (
+"node_id" varchar(16)   NOT NULL,
+"elevation" numeric(12,4),
+"depth" numeric(12,4),
+"nodecat_id" varchar(30)   NOT NULL,
+"epa_type" varchar(16)   NOT NULL,
+"sector_id" varchar(30)   NOT NULL,
+"state" character varying(16) NOT NULL,
+"annotation" character varying(254),
+"observ" character varying(254),
+"comment" character varying(254),
+"rotation" numeric (6,3),
+"link" character varying(512),
+"verified" varchar(16)   NOT NULL,
 "the_geom" public.geometry (POINT, SRID_VALUE),
-  CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
-)
+CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
+);
 
 
-CREATE TABLE temp_arc
-(
-  arc_id character varying(16) NOT NULL,
-  node_1 character varying(16),
-  node_2 character varying(16),
-  arccat_id character varying(30),
-  epa_type character varying(16),
-  sector_id character varying(30),
-  state character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  comment character varying(254),
-  custom_length numeric(12,2),
-  dma_id character varying(30),
-  soilcat_id character varying(16),
-  category_type character varying(18),
-  fluid_type character varying(18),
-  location_type character varying(18),
-  workcat_id character varying(255),
-  buildercat_id character varying(30),
-  builtdate date,
-  ownercat_id character varying(30),
-  adress_01 character varying(50),
-  adress_02 character varying(50),
-  adress_03 character varying(50),
-  descript character varying(254),
-  rotation numeric(6,3),
-  link character varying(512),
-  verified character varying(16),
- "the_geom" public.geometry (LINESTRING, SRID_VALUE),
-  CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id));
+CREATE TABLE "temp_arc" (
+"arc_id" varchar(16)   NOT NULL,
+"node_1" varchar(16)  ,
+"node_2" varchar(16)  ,
+"arccat_id" varchar(30)   NOT NULL,
+"epa_type" varchar(16)   NOT NULL,
+"sector_id" varchar(30)   NOT NULL,
+"state" character varying(16) NOT NULL,
+"annotation" character varying(254),
+"observ" character varying(254),
+"comment" character varying(254),
+"custom_length" numeric (12,2),
+"rotation" numeric (6,3),
+"link" character varying(512),
+"verified" varchar(16)   NOT NULL,
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
+CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id)
+);
 
 
 CREATE TABLE "temp_nodearcnode" (
