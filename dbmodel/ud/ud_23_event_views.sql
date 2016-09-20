@@ -19,7 +19,7 @@ event_x_node.value,
 event_x_node.position_id,
 event_x_node.text,
 event.timestamp,
-event.user
+event.user_name
 FROM event_x_node
 JOIN event ON event.id::text = event_x_node.event_id::text
 JOIN node ON node.node_id::text = event_x_node.node_id::text
@@ -42,7 +42,7 @@ event_x_arc.text,
 event.startdate,
 event.enddate,
 event.timestamp,
-event.user
+event.user_name
 FROM event_x_arc
 JOIN event ON event.id::text = event_x_arc.event_id::text
 JOIN arc ON arc.arc_id::text = event_x_arc.arc_id::text
@@ -63,7 +63,7 @@ event_x_element.value,
 event_x_element.position_id,
 event_x_element.text,
 event.timestamp,
-event.user
+event.user_name
 FROM event_x_element
 JOIN event ON event.id::text = event_x_element.event_id::text
 JOIN element ON element.element_id::text = event_x_element.element_id::text
@@ -85,7 +85,7 @@ event_x_connec.value,
 event_x_connec.position_id,
 event_x_connec.text,
 event.timestamp,
-event.user
+event.user_name
 FROM event_x_connec
 JOIN event ON event.id::text = event_x_connec.event_id::text
 JOIN connec ON connec.connec_id::text = event_x_connec.connec_id::text
@@ -105,7 +105,7 @@ event_x_gully.value,
 event_x_gully.position_id,
 event_x_gully.text,
 event.timestamp,
-event.user
+event.user_name
 FROM event_x_gully
 JOIN event ON event.id::text = event_x_gully.event_id::text
 JOIN gully ON gully.gully_id::text = event_x_gully.gully_id::text
@@ -125,7 +125,7 @@ CREATE OR REPLACE VIEW v_ui_event_x_element_x_node AS
     event_x_element.position_id,
     event_x_element.text,
     event."timestamp",
-    event."user"
+    event."user_name"
    FROM event_x_element
      JOIN event ON event.id::text = event_x_element.event_id::text
      JOIN element ON element.element_id::text = event_x_element.element_id::text
@@ -147,7 +147,7 @@ DROP VIEW IF EXISTS v_ui_event_x_element_x_connec CASCADE;
     event_x_element.position_id,
     event_x_element.text,
     event."timestamp",
-    event."user"
+    event."user_name"
    FROM event_x_element
      JOIN event ON event.id::text = event_x_element.event_id::text
      JOIN element ON element.element_id::text = event_x_element.element_id::text
@@ -169,7 +169,7 @@ DROP VIEW IF EXISTS v_ui_event_x_element_x_arc CASCADE;
     event_x_element.position_id,
     event_x_element.text,
     event."timestamp",
-    event."user"
+    event."user_name"
    FROM event_x_element
      JOIN event ON event.id::text = event_x_element.event_id::text
      JOIN element ON element.element_id::text = event_x_element.element_id::text
@@ -191,7 +191,7 @@ CREATE OR REPLACE VIEW v_ui_event_x_element_x_gully AS
     event_x_element.position_id,
     event_x_element.text,
     event."timestamp",
-    event."user"
+    event."user_name"
    FROM event_x_element
      JOIN event ON event.id::text = event_x_element.event_id::text
      JOIN element ON element.element_id::text = event_x_element.element_id::text

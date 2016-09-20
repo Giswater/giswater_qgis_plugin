@@ -93,7 +93,7 @@ CREATE TABLE "event" (
 "observ" varchar(512)  ,
 "tag" varchar(16)  ,
 "timestamp" timestamp(6) DEFAULT now(),
-"user" varchar(16)  ,
+"user_name" varchar(50) DEFAULT user,
 CONSTRAINT event_pkey PRIMARY KEY (id)
 );
 

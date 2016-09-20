@@ -16,7 +16,7 @@ doc.path,
 doc.observ,
 doc.tagcat_id,
 doc.date,
-doc.user
+doc.user_name
 FROM doc_x_node
 JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
 
@@ -32,7 +32,7 @@ doc.path,
 doc.observ,
 doc.tagcat_id,
 doc.date,
-doc.user
+doc.user_name
 FROM doc_x_arc
 JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
 
@@ -48,7 +48,7 @@ doc.path,
 doc.observ,
 doc.tagcat_id,
 doc.date,
-doc.user
+doc.user_name
 FROM doc_x_connec
 JOIN doc ON doc.id::text = doc_x_connec.doc_id::text;
 
