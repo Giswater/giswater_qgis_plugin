@@ -216,12 +216,6 @@ class ConnecDialog(ParentDialog):
         # Refresh model with selected filter
         self.tbl_dae.model().setFilter(expr)
         self.tbl_dae.model().select()
-    
-        
-    def fill_tbl_info(self, widget, table_name, filter_): 
-        ''' Fill info tab of node '''
-        
-        self.set_model_to_table(widget, table_name, filter_)  
 
        
     def fill_tbl_hydrometer(self, widget, table_name, filter_):

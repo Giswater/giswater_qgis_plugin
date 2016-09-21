@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit
 from PyQt4.QtSql import QSqlTableModel
 
+from functools import partial
 import os.path
 import sys  
 
@@ -269,58 +270,69 @@ class ParentDialog(object):
         Set visibility of columns
         Set width of columns '''
         
-        # Hide columns
-        sql = "SELECT column_index"
-        sql+= " FROM "+self.schema_name+".config_ui_forms" 
-        sql+= " WHERE status = FALSE AND ui_table = '"+table_name+"'"
-        rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:
-                ind = row[0]-1
-                widget.hideColumn(ind)     
-        
-        
-        # Set width of columns
-        #-------------
-        # Get indexes of visible columns
-        sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_index_true = self.dao.get_rows(sql)
-        # Get width of colums 
-        sql = "SELECT width FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_width = self.dao.get_rows(sql)
-        # Get alias of colums and set alias
-        sql = "SELECT alias FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_alias = self.dao.get_rows(sql)
-    
-        # Set width
-        for row_index,row_width in zip(rows_index_true,rows_width):
-            ind_ind = row_index[0]-1
-            ind_width =row_width[0]-1
-            widget.setColumnWidth(ind_ind,ind_width)
-        
-        # Set alias
-        for row_index,row_alias in zip(rows_index_true,rows_alias):
-            ind_ind = row_index[0]-1
-            ind_alias =row_alias[0-1]
-            #widget.setColumnWidth(ind_ind,ind_alias)
-            #widget.model().setHeaderData(row['column_index'], Qt.Horizontal, row['alias'])
-            
-            widget.model().setHeaderData(ind_ind, Qt.Horizontal, ind_alias)    
-        
-        
-        
-        # TO DO alias 
-        '''
         # Set width and alias of visible columns
-        sql = "SELECT column_index, width, alias"
+        columns_to_delete = []
+        sql = "SELECT column_index, width, alias, status"
         sql+= " FROM "+self.schema_name+".config_ui_forms"
-        sql+= " WHERE status = TRUE AND ui_table = '"+table_name+"'"
+        sql+= " WHERE ui_table = '"+table_name+"'"
+        sql+= " ORDER BY column_index"
         rows = self.controller.get_rows(sql)
         if rows:
-            for row in rows:         
-                widget.setColumnWidth(row['column_index'], row['width'])
+            for row in rows:        
+                if not row['status']:
+                    columns_to_delete.append(row['column_index']-1)
+                else:
+                    width = row['width']
+                    if width is None:
+                        width = 100
+                    widget.setColumnWidth(row['column_index']-1, width)
+                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+        
+        for column in columns_to_delete:
+            widget.hideColumn(column) 
+
+
+    def fill_tbl_document(self, widget, table_name, filter_):
+        ''' Fill the table control to show documents'''
+        
+        # Get widgets
+        doc_user = self.dialog.findChild(QComboBox, "doc_user")
+        doc_type = self.dialog.findChild(QComboBox, "doc_type")
+        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+
+        # Set signals
+        doc_user.activated.connect(partial(self.set_filter_table, widget))
+        doc_type.activated.connect(partial(self.set_filter_table, widget))
+        doc_tag.activated.connect(partial(self.set_filter_table, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, widget))
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+
+        # Fill ComboBox tagcat_id
+        sql = "SELECT DISTINCT(tagcat_id) FROM "+table_name+" ORDER BY tagcat_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_tag", rows)
+
+        # Fill ComboBox doccat_id
+        sql = "SELECT DISTINCT(doc_type) FROM "+table_name+" ORDER BY doc_type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_type", rows)
+
+        # Fill ComboBox doc_user
+        sql = "SELECT DISTINCT(user_name) FROM "+table_name+" ORDER BY user_name"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_user", rows)
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)
+        
+
+    def fill_tbl_info(self, widget, table_name, filter_): 
+        ''' Fill info tab of node '''
+        self.set_model_to_table(widget, table_name, filter_)  
+        
                 
-                #widget.model().setHeaderData(row['column_index'], Qt.Horizontal, row['alias'])				
-        '''
                 
         

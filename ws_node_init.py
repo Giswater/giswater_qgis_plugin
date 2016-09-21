@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.utils import iface
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget
+from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 
 from functools import partial
 
@@ -322,60 +322,6 @@ class NodeDialog(ParentDialog):
         ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)
-
-
-    def fill_tbl_document(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents'''
-
-        # Get widgets
-        doc_user = self.dialog.findChild(QComboBox, "doc_user")
-        doc_type = self.dialog.findChild(QComboBox, "doc_type")
-        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-
-        # Set signals
-        doc_user.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        doc_type.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        doc_tag.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-
-        # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM " + self.schema_name + ".v_ui_doc_x_node ORDER BY tagcat_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_tag", rows)
-
-        # Fill ComboBox doccat_id
-        sql = "SELECT DISTINCT(doc_type) FROM " + self.schema_name + ".v_ui_doc_x_node ORDER BY doc_type"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_type", rows)
-
-        # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user) FROM "+self.schema_name+".v_ui_doc_x_node ORDER BY user"
-        rows = self.dao.get_rows(sql)
-        # rows = [['gis'], ['postgres']]
-        utils_giswater.fillComboBox("doc_user", rows)
-
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)
-
-        # Hide columns
-        widget.hideColumn(1)
-        widget.hideColumn(3)
-        widget.hideColumn(5)
-
-
-    def fill_tbl_info(self, widget, table_name, filter_):
-        ''' Fill info tab of node '''
-
-        self.set_model_to_table(widget, table_name, filter_)
-
-        # Hide columns
-        widget.hideColumn(1)
-        widget.hideColumn(5)
-        widget.hideColumn(6)
 
 
     def fill_tbl_scada(self, widget, table_name, filter_):
