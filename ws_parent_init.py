@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMessageBar
-from PyQt4.QtCore import QSettings
-from PyQt4.QtGui import QLabel
+from PyQt4.QtCore import QSettings, Qt
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit
 from PyQt4.QtSql import QSqlTableModel
 
+from functools import partial
 import os.path
 import sys  
 
@@ -175,8 +176,9 @@ class ParentDialog(object):
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
         model.setFilter(filter_)
-        model.select()    
+        model.select()         
 
         # Check for errors
         if model.lastError().isValid():
@@ -192,7 +194,8 @@ class ParentDialog(object):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
-            self.controller.show_warning("Any record selected")
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
             return
         
         inf_text = ""
@@ -224,7 +227,8 @@ class ParentDialog(object):
             # Check if file exist
             if not os.path.exists(self.path):
                 message = "File not found!"
-                self.controller.show_warning(message)                
+                self.controller.show_warning(message, context_name='ui_message')
+               
             else:
                 # Open the document
                 os.startfile(self.path)                      
@@ -238,7 +242,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name=self.context_name)                   
+            self.controller.show_warning(message, context_name='ui_message')                   
             return
         
         # Set filter
@@ -252,45 +256,83 @@ class ParentDialog(object):
         doc_tag_value = utils_giswater.getWidgetText("doc_tag")
         if doc_tag_value != 'null': 
             expr+= " AND tagcat_id = '"+doc_tag_value+"'"
-        
-        # TODO: Bug because 'user' is a reserverd word
-#         doc_user_value = utils_giswater.getWidgetText("doc_user")
-#         if doc_user_value != 'null': 
-#             expr+= " AND user = '"+doc_user_value+"'"
+        doc_user_value = utils_giswater.getWidgetText("doc_user")
+        if doc_user_value != 'null':
+            expr+= " AND user_name = '"+doc_user_value+"'"
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()   
         
         
-        
     def set_configuration(self, widget, table_name):
         ''' Configuration of tables 
         Set visibility of columns
-        Set width of columns'''
+        Set width of columns '''
+        
+        # Set width and alias of visible columns
+        columns_to_delete = []
+        sql = "SELECT column_index, width, alias, status"
+        sql+= " FROM "+self.schema_name+".config_ui_forms"
+        sql+= " WHERE ui_table = '"+table_name+"'"
+        sql+= " ORDER BY column_index"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:        
+                if not row['status']:
+                    columns_to_delete.append(row['column_index']-1)
+                else:
+                    width = row['width']
+                    if width is None:
+                        width = 100
+                    widget.setColumnWidth(row['column_index']-1, width)
+                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+        
+        for column in columns_to_delete:
+            widget.hideColumn(column) 
 
-        # Hide columns
-        #--------------
-        # Get indexes of hidden columns
-        sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = FALSE AND ui_table = '"+table_name+"'"
-        # Get rows
-        rows_index_false = self.dao.get_rows(sql)
-        for row in rows_index_false:
-            ind = row[0]-1
-            widget.hideColumn(ind)     
-            
-        # Set width of columns
-        #-------------
-        # Get indexes of visible columns
-        sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_index_true = self.dao.get_rows(sql)
-        # Get indexes of visible columns
-        # Get width of colums and set width
-        sql = "SELECT width FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
-        rows_width = self.dao.get_rows(sql)
+
+    def fill_tbl_document(self, widget, table_name, filter_):
+        ''' Fill the table control to show documents'''
         
-        for row_index,row_width in zip(rows_index_true,rows_width):
-            widget.setColumnWidth(row_index[0],row_width[0])
+        # Get widgets
+        doc_user = self.dialog.findChild(QComboBox, "doc_user")
+        doc_type = self.dialog.findChild(QComboBox, "doc_type")
+        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+
+        # Set signals
+        doc_user.activated.connect(partial(self.set_filter_table, widget))
+        doc_type.activated.connect(partial(self.set_filter_table, widget))
+        doc_tag.activated.connect(partial(self.set_filter_table, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, widget))
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+
+        # Fill ComboBox tagcat_id
+        sql = "SELECT DISTINCT(tagcat_id) FROM "+table_name+" ORDER BY tagcat_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_tag", rows)
+
+        # Fill ComboBox doccat_id
+        sql = "SELECT DISTINCT(doc_type) FROM "+table_name+" ORDER BY doc_type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_type", rows)
+
+        # Fill ComboBox doc_user
+        sql = "SELECT DISTINCT(user_name) FROM "+table_name+" ORDER BY user_name"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_user", rows)
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)
+        
+
+    def fill_tbl_info(self, widget, table_name, filter_): 
+        ''' Fill info tab of node '''
+        self.set_model_to_table(widget, table_name, filter_)  
+        
                 
-        
+                
         

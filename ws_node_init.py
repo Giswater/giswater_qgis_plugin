@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.utils import iface
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget
+from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 
 from functools import partial
 
@@ -94,7 +94,6 @@ class NodeDialog(ParentDialog):
         
         # Configuration of info table 
         self.set_configuration(self.tbl_info, table_element)
-        
 
         # Fill the tab Document
         table_document = "v_ui_doc_x_node"
@@ -102,15 +101,13 @@ class NodeDialog(ParentDialog):
         
         # Configuration of table document
         self.set_configuration(self.tbl_document, table_document)
-        
-
+         
         # Fill the tab Scada
         table_scada = "v_ui_scada_x_node"
         self.fill_tbl_scada(self.tbl_rtc, self.schema_name+"."+table_scada, self.filter)
-        
+         
         # Configuration of table scada
         self.set_configuration(self.tbl_rtc, table_scada)
-
 
         # Set signals
         self.dialog.findChild(QPushButton, "btn_element_delete").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
@@ -222,6 +219,7 @@ class NodeDialog(ParentDialog):
                     widget_name = self.epa_table + "_" + self.fields_tank[i]
                     utils_giswater.setWidgetText(widget_name, str(row[i]))
 
+
     def save_tab_add_info(self):
         ''' Save tab from tab 'Add. info' '''
 
@@ -239,6 +237,7 @@ class NodeDialog(ParentDialog):
                 sql = "INSERT INTO " + self.schema_name + ".man_tank (node_id, vmax, area) VALUES"
                 sql += " ('" + self.id + "', " + str(vmax) + ", " + str(area) + ");"
                 self.dao.execute_sql(sql)
+
 
     def save_tab_analysis(self):
         ''' Save tab from tab 'Analysis' '''
@@ -268,6 +267,7 @@ class NodeDialog(ParentDialog):
             sql += " WHERE node_id = '" + self.id + "'"
             self.dao.execute_sql(sql)
 
+
     def fill_node_type_id(self):
         ''' Define and execute query to populate combo 'node_type_dummy' '''
 
@@ -284,6 +284,7 @@ class NodeDialog(ParentDialog):
             rows = self.dao.get_rows(sql)
             utils_giswater.fillComboBox("node_type_dummy", rows, False)
             utils_giswater.setWidgetText("node_type_dummy", self.node_type)
+
 
     def change_node_type_id(self, index):
         ''' Define and execute query to populate combo 'cat_nodetype_id' '''
@@ -310,68 +311,18 @@ class NodeDialog(ParentDialog):
             else:
                 self.loaded = True
 
+
     def change_node_cat(self):
         ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
         nodecat_id_dummy = utils_giswater.getWidgetText("nodecat_id_dummy")
         utils_giswater.setWidgetText("nodecat_id", nodecat_id_dummy)
+
 
     def change_epa_type(self, index):
         ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)
 
-    def fill_tbl_document(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents'''
-
-        # Get widgets
-        doc_user = self.dialog.findChild(QComboBox, "doc_user")
-        doc_type = self.dialog.findChild(QComboBox, "doc_type")
-        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-
-        # Set signals
-        doc_user.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        doc_type.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        doc_tag.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-
-        # TODO: Get data from related tables!
-        # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM " + self.schema_name + ".v_ui_doc_x_node ORDER BY tagcat_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_tag", rows)
-
-        # Fill ComboBox doccat_id
-        sql = "SELECT DISTINCT(doc_type) FROM " + self.schema_name + ".v_ui_doc_x_node ORDER BY doc_type"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_type", rows)
-
-        # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user) FROM " + self.schema_name + ".v_ui_doc_x_node ORDER BY user"
-        rows = self.dao.get_rows(sql)
-        # rows = [['gis'], ['postgres']]
-        utils_giswater.fillComboBox("doc_user", rows)
-
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)
-
-        # Hide columns
-        widget.hideColumn(1)
-        widget.hideColumn(3)
-        widget.hideColumn(5)
-
-    def fill_tbl_info(self, widget, table_name, filter_):
-        ''' Fill info tab of node '''
-
-        self.set_model_to_table(widget, table_name, filter_)
-
-        # Hide columns
-        widget.hideColumn(1)
-        widget.hideColumn(5)
-        widget.hideColumn(6)
 
     def fill_tbl_scada(self, widget, table_name, filter_):
         ''' Fill scada tab of node

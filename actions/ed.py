@@ -71,11 +71,13 @@ class Ed():
         count = layer.selectedFeatureCount()   
         
         if count == 0:
-            self.controller.show_info("You have to select at least one feature!")
+            message = "You have to select at least one feature!"
+            self.controller.show_info(message, context_name='ui_message' )  
             return 
         elif count > 1:  
-            self.controller.show_info("More than one feature selected. Only the first one will be processed!")
-        
+            message = "More than one feature selected. Only the first one will be processed!"
+            self.controller.show_info(message, context_name='ui_message' ) 
+            
         # Fill  comboBox elementcat_id
         sql = "SELECT DISTINCT(elementcat_id) FROM "+self.schema_name+".element ORDER BY elementcat_id"
         rows = self.dao.get_rows(sql)
@@ -230,7 +232,8 @@ class Ed():
             sql+= self.annotation+"','"+self.observ+"','"+self.link+"','"+self.verified+"')"
             status = self.controller.execute_sql(sql) 
             if not status:
-                self.controller.show_warning("Error inserting element in table, you need to review data")
+                message = "Error inserting element in table, you need to review data"
+                self.controller.show_warning(message, context_name='ui_message' ) 
                 return
         
         # Get layers
@@ -332,7 +335,8 @@ class Ed():
                         i+=1
                 
         # Show message to user
-        self.controller.show_info("Values has been updated")
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message' )
         self.close_dialog()
     
     
@@ -352,18 +356,20 @@ class Ed():
         layer = self.iface.activeLayer()  
         count = layer.selectedFeatureCount()           
         if count == 0:
-            self.controller.show_info("You have to select at least one feature!")
+            message = "You have to select at least one feature!"
+            self.controller.show_info(message, context_name='ui_message' )
             return 
         elif count > 1:  
-            self.controller.show_info("More than one feature selected. Only the first one will be processed!") 
-        
+            message = "More than one feature selected. Only the first one will be processed!"
+            self.controller.show_info(message, context_name='ui_message' )
+            
         # Fill comboBox elementcat_id
-        sql = "SELECT DISTINCT(doc_type) FROM "+self.schema_name+".doc ORDER BY doc_type"
+        sql = "SELECT id FROM "+self.schema_name+".doc_type ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows) 
         
         # Fill comboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".doc ORDER BY tagcat_id"
+        sql = "SELECT id FROM "+self.schema_name+".cat_tag ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("tagcat_id", rows) 
         
@@ -437,7 +443,8 @@ class Ed():
             sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
             status = self.controller.execute_sql(sql) 
             if not status:
-                self.controller.show_warning("Error inserting element in table, you need to review data")
+                message = "Error inserting element in table, you need to review data"
+                self.controller.show_warning(message, context_name='ui_message' )
                 return
         
         # Get layers
@@ -543,7 +550,8 @@ class Ed():
                         self.dao.execute_sql(sql) 
         
         # Show message to user
-        self.controller.show_info("Values has been updated")
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message' )
         self.close_dialog()  
         
         
@@ -579,17 +587,20 @@ class Ed():
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
-            self.controller.show_warning("Java Runtime executable file not found at: "+self.java_exe), 10
+            message = "Java Runtime executable file not found at: "+self.java_exe
+            self.controller.show_warning(message, 10, context_name='ui_message')
             return  
         
         # Check if giswater.jar file exists
         if not os.path.exists(self.giswater_jar):
-            self.controller.show_warning("Giswater executable file not found at: "+self.giswater_jar), 10
+            message = "Giswater executable file not found at: "+self.giswater_jar
+            self.controller.show_warning(message, 10, context_name='ui_message')
             return  
                   
         # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
         if not os.path.exists(self.gsw_file):
-            self.controller.show_info("GSW file not found at: "+self.gsw_file), 10
+            message = "GSW file not found at: "+self.giswater_jar
+            self.controller.show_info(message, 10, context_name='ui_message')
             self.gsw_file = "" 
             
         # Start program     
@@ -603,6 +614,7 @@ class Ed():
         self.controller.start_program(program)               
         
         # Show information message    
-        self.controller.show_info("Executing... "+aux)
+        message = "Executing... "+aux
+        self.controller.show_info(message, context_name='ui_message' )
                                             
         

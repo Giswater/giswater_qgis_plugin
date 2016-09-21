@@ -82,7 +82,8 @@ class MoveNodeMapTool(ParentMapTool):
             sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
             self.controller.execute_sql(sql)
         else:
-            self.controller.show_warning("Move node: Error updating geometry")
+            message = "Move node: Error updating geometry"
+            self.controller.show_warning(message, context_name='ui_message')
             
         # Refresh map canvas
         self.canvas.currentLayer().triggerRepaint()  
@@ -122,8 +123,8 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            msg = "Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again"
-            self.controller.show_info(msg)
+            message = "Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again"
+            self.controller.show_info(message, context_name='ui_message' )
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
