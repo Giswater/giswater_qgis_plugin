@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'search_plus_dialog_base.ui'
 #
-# Created: Tue Sep 20 12:18:42 2016
+# Created: Wed Sep 21 12:19:27 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,15 +26,9 @@ except AttributeError:
 class Ui_searchPlusDockWidget(object):
     def setupUi(self, searchPlusDockWidget):
         searchPlusDockWidget.setObjectName(_fromUtf8("searchPlusDockWidget"))
-        searchPlusDockWidget.resize(357, 212)
-        self.btn_accept = QtGui.QPushButton(searchPlusDockWidget)
-        self.btn_accept.setGeometry(QtCore.QRect(180, 170, 75, 23))
-        self.btn_accept.setObjectName(_fromUtf8("btn_accept"))
-        self.btn_cancel = QtGui.QPushButton(searchPlusDockWidget)
-        self.btn_cancel.setGeometry(QtCore.QRect(260, 170, 75, 23))
-        self.btn_cancel.setObjectName(_fromUtf8("btn_cancel"))
+        searchPlusDockWidget.resize(357, 179)
         self.tab_main = QtGui.QTabWidget(searchPlusDockWidget)
-        self.tab_main.setGeometry(QtCore.QRect(10, 10, 331, 153))
+        self.tab_main.setGeometry(QtCore.QRect(10, 20, 331, 153))
         self.tab_main.setObjectName(_fromUtf8("tab_main"))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
@@ -111,8 +105,6 @@ class Ui_searchPlusDockWidget(object):
 
     def retranslateUi(self, searchPlusDockWidget):
         searchPlusDockWidget.setWindowTitle(_translate("searchPlusDockWidget", "Search plus", None))
-        self.btn_accept.setText(_translate("searchPlusDockWidget", "OK", None))
-        self.btn_cancel.setText(_translate("searchPlusDockWidget", "Cancel", None))
         self.label_press_zone_2.setText(_translate("searchPlusDockWidget", "Press zone:", None))
         self.label_number_2.setText(_translate("searchPlusDockWidget", "Number:", None))
         self.label_block.setText(_translate("searchPlusDockWidget", "Block:", None))

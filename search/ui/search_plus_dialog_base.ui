@@ -7,43 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>357</width>
-    <height>212</height>
+    <height>179</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search plus</string>
   </property>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>170</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OK</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_cancel">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>170</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-  </widget>
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>20</y>
      <width>331</width>
      <height>153</height>
     </rect>
