@@ -153,20 +153,20 @@
         <source>35_text</source>
         <translation>Event</translation>
     </message>
-    <message>
+	<message>
         <source>36_text</source>
         <translation>Giswater</translation>
     </message>    
-    <message>
+	<message>
         <source>37_text</source>
         <translation>Help</translation>
-    </message>
-    <message>
+    </message>    	
+	<message>
         <source>99_text</source>
         <translation>Project configuration</translation>
     </message>   
     
-    <message>
+	<message>
         <source>Select the node and move to desired location</source>
         <translation>Select the node and move to desired location</translation>
     </message>  
@@ -202,22 +202,6 @@
   
 </context>
 
-
-
-<context>
-
-    <name>ws_parent</name>
-    
-    <message>
-        <source>Selected date interval is not valid</source>
-        <translation>Selected date interval is not valid</translation>
-    </message>
-    <message>
-        <source>Any record selected</source>
-        <translation>Any record selected</translation>
-    </message>    
-    
-</context>
 
 
 
@@ -761,7 +745,7 @@
         <source>label_document</source>
         <translation>Document:</translation>
     </message>  
-    <message>
+	<message>
         <source>delete_row_doc</source>
         <translation>Unlink document</translation>
     </message> 
@@ -800,6 +784,10 @@
     <message>
         <source>label_event_element_event_type</source>
         <translation>Type</translation>
+    </message>  
+    <message>
+        <source>label_event_element_event_type</source>
+        <translation>Event:</translation>
     </message>  
     <message>
         <source>label_log_node_to</source>
@@ -850,12 +838,11 @@
         <translation>RTC:</translation>
     </message> 
     
-    
 </context>    
 
 
 
-<context>
+ <context>
  
     <name>ws_arc</name>
     
@@ -1031,7 +1018,7 @@
         <source>label_event</source>
         <translation>Event:</translation>
     </message> 
-    <message>
+	<message>
         <source>label_log_to</source>
         <translation>to</translation>
     </message>  
@@ -1048,6 +1035,7 @@
         <translation>Log:</translation>
     </message> 
     
+     
     
 </context>  
 
@@ -1141,26 +1129,26 @@
         <source>label_connec_adress_03</source>
         <translation>Address 03</translation>
     </message>  
-    <message>
+	 <message>
         <source>label_demand</source>
         <translation>Demand</translation>
     </message>  
-    <message>
+	 <message>
         <source>label_n_hydrometer</source>
         <translation>Hydrometers</translation>
     </message>  
-    <message>
+	 <message>
         <source>label_code</source>
         <translation>Code</translation>
     </message>  
-    <message>
+	 <message>
         <source>label_elements</source>
         <translation>Elements:</translation>
-    </message>
-    <message>
+    </message>  	
+	 <message>
         <source>delete_row_info</source>
         <translation>Unlink element</translation>
-    </message>
+    </message>  	
     <message>
         <source>label_doc_to</source>
         <translation>to</translation>
@@ -1237,7 +1225,7 @@
         <source>label_connec_log</source>
         <translation>Log:</translation>
     </message>  
-    <message>
+	<message>
         <source>label_log_element_to</source>
         <translation>to</translation>
     </message>  
@@ -1261,7 +1249,7 @@
         <source>label_hydrometer</source>
         <translation>Hydrometer:</translation>
     </message>   
-       
+  
     
 </context> 
 
@@ -1270,7 +1258,7 @@
 <context>
 
     <name>ud_node</name>
-
+	
     <message>
         <source>label_top_elev</source>
         <translation>Top elevation</translation>
@@ -1283,10 +1271,10 @@
         <source>label_elev</source>
         <translation>Elevation</translation>
     </message>
-    <message>
+   <message>
         <source>label_sander</source>
         <translation>Sander</translation>
-    </message> 
+    </message>   	
     <message>
         <source>label_sector_id</source>
         <translation>Sector</translation>
@@ -1335,7 +1323,7 @@
         <source>label_soilcat_id</source>
         <translation>Soil</translation>
     </message> 
-    <message>
+	<message>
         <source>label_category_type</source>
         <translation>Category</translation>
     </message> 	 
@@ -1979,7 +1967,7 @@
         <source>label_document</source>
         <translation>Document:</translation>
     </message>
-    <message>
+	<message>
         <source>delete_row_doc</source>
         <translation>Unlink document</translation>
     </message>
@@ -2069,6 +2057,8 @@
     </message>
 
     
+    
+    
 </context>
 
 
@@ -2084,7 +2074,7 @@
     <message>
         <source>label_node_2</source>
         <translation>Node 2</translation>
-    </message>
+    </message>	
     <message>
         <source>label_y1</source>
         <translation>Y1</translation>
@@ -2093,35 +2083,35 @@
         <source>label_y2</source>
         <translation>Y2</translation>
     </message>
-    <message>
+	<message>
         <source>label_elev1</source>
         <translation>Elev 1</translation>
     </message>
-    <message>
+	  <message>
         <source>label_elev2</source>
         <translation>Elev 2</translation>
     </message>
-    <message>
+	  <message>
         <source>label_z1</source>
         <translation>Z1</translation>
     </message>
-    <message>
+	  <message>
         <source>label_z2</source>
         <translation>Z2</translation>
     </message>
-    <message>
+	  <message>
         <source>label_r1</source>
         <translation>R1</translation>
     </message>
-    <message>
+	  <message>
         <source>label_r2</source>
         <translation>R2</translation>
     </message>
-    <message>
+	  <message>
         <source>label_y1_estimated</source>
         <translation>Y1 esimated</translation>
     </message>
-    <message>
+	  <message>
         <source>label_y2_estimated</source>
         <translation>Y2 estimated</translation>
     </message>
@@ -2140,8 +2130,8 @@
    <message>
         <source>label_soilcat_id</source>
         <translation>Soil</translation>
-    </message>
-    <message>
+    </message>  	
+	<message>
         <source>label_category_type</source>
         <translation>Category</translation>
     </message>
@@ -2149,7 +2139,7 @@
         <source>label_workcat_id</source>
         <translation>Work</translation>
     </message>
-    <message>
+	<message>
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>   
@@ -2201,7 +2191,7 @@
         <source>label_address_03</source>
         <translation>Address 03</translation>
     </message>
-    <message>
+	<message>
         <source>label_slope</source>
         <translation>Slope</translation>
     </message>
@@ -2643,7 +2633,7 @@
         <source>label_buildercat_id</source>
         <translation>Builder</translation>
     </message>
-    <message>
+	<message>
         <source>label_builtdate</source>
         <translation>Builtdate</translation>
     </message>
@@ -2699,7 +2689,7 @@
         <source>label_address_03</source>
         <translation>Address 03</translation>
     </message>
-    <message>
+	<message>
         <source>label_elements</source>
         <translation>Elements:</translation>
     </message>
@@ -2944,23 +2934,9 @@
         <source>label_catalog_id</source>
         <translation>Catalog</translation>
     </message>
-    
-    <message>
-        <source>You have to select at least one feature!</source>
-        <translation>You have to select at least one feature!</translation>
-    </message>
-    <message>
-        <source>More than one feature selected. Only the first one will be processed!</source>
-        <translation>More than one feature selected. Only the first one will be processed!</translation>
-    </message>
-    <message>
-        <source>Node type has been update!</source>
-        <translation>Node type has been update!</translation>
-    </message>
-    
+     
 
 </context>
-
 
 
 <context>
@@ -3031,14 +3007,8 @@
         <source>label_audit_function_control</source>
         <translation>Audit function control</translation>
     </message>
-    
-    <message>
-        <source>Values has been updated</source>
-        <translation>Values has been updated</translation>
-    </message>
 
 </context>
-
 
 
 <context>
@@ -3095,21 +3065,12 @@
     </message>
     
     <message>
-        <source>You have to select at least one feature!</source>
-        <translation>You have to select at least one feature!</translation>
-    </message>
-    <message>
-        <source>More than one feature selected. Only the first one will be processed!</source>
-        <translation>More than one feature selected. Only the first one will be processed!</translation>
-    </message>
-    <message>
         <source>Are you sure you want change the data?</source>
         <translation>Are you sure you want change the data?</translation>
     </message>
     
 
 </context>
-
 
 
 <context>
@@ -3129,26 +3090,15 @@
         <translation>Link</translation>
     </message>
     
-    <message>
-        <source>You have to select at least one feature!</source>
-        <translation>You have to select at least one feature!</translation>
-    </message>
-    <message>
-        <source>More than one feature selected. Only the first one will be processed!</source>
-        <translation>More than one feature selected. Only the first one will be processed!</translation>
-    </message>
-    <message>
-        <source>Values has been updated</source>
-        <translation>Values has been updated</translation>
-    </message>
+
     <message>
         <source>Are you sure you want change the data?</source>
         <translation>Are you sure you want change the data?</translation>
     </message>
     
+    
 
 </context>
-
 
 
 <context>
@@ -3172,42 +3122,22 @@
         <source>Select CSV file</source>
         <translation>Select CSV file</translation>
     </message>
-    <message>
-        <source>Selected file not found:</source>
-        <translation>Selected file not found:</translation>
-    </message>
+
+    
     <message>
         <source>Cannot import CSV into table</source>
         <translation>Cannot import CSV into table</translation>
     </message>
     <message>
         <source>. Reason:</source>
-        <translation>(ENGLISH). Reason:</translation>
+        <translation>. Reason:</translation>
     </message>
     <message>
         <source>Import CSV</source>
         <translation>Import CSV</translation>
     </message>
-    <message>
-        <source>Selected CSV has been imported successfully</source>
-        <translation>Selected CSV has been imported successfully</translation>
-    </message>
-    <message>
-        <source>Java Runtime executable file not found at:</source>
-        <translation>Java Runtime executable file not found at:</translation>
-    </message>
-    <message>
-        <source>Giswater executable file not found at:</source>
-        <translation>Giswater executable file not found at:</translation>
-    </message>
-    <message>
-        <source>GSW file not found at:</source>
-        <translation>GSW file not found at:</translation>
-    </message>
-    <message>
-        <source>Executing...</source>
-        <translation>Executing...</translation>
-    </message>
+
+
 
 </context>
 
@@ -3237,17 +3167,8 @@
         <translation>     Sink node identifier (only for ud projects)</translation>
     </message>
     
-    <message>
-        <source>Selected functions have been executed</source>
-        <translation>Selected functions have been executed</translation>
-    </message>
-    <message>
-        <source>You have to select at least one feature!</source>
-        <translation>You have to select at least one feature!</translation>
-    </message>
 
 </context>
-
 
 
 <context>
@@ -3266,7 +3187,6 @@
 </context>
 
 
-
 <context>
 
     <name>move_node</name>
@@ -3276,24 +3196,13 @@
         <translation>Uncatched error. Open PotgreSQL log file to get more details</translation>
     </message>
     <message>
-        <source>Node moved successfully</source>
-        <translation>Node moved successfully</translation>
-    </message>
-    <message>
         <source>Node already related with 2 arcs</source>
         <translation>Node already related with 2 arcs</translation>
     </message>
-    <message>
-        <source>Move node: Error updating geometry</source>
-        <translation>Move node: Error updating geometry</translation>
-    </message>
-    <message>
-        <source>Select the node and move to desired location</source>
-        <translation>Select the node and move to desired location</translation>
-    </message>
+
+  
 
 </context>
-
 
 
 <context>
@@ -3320,7 +3229,6 @@
 </context>
 
 
-
 <context>
 
     <name>line_map</name>
@@ -3344,6 +3252,120 @@
 
 </context>
 
+
+
+<context>
+
+    <name>ui_message</name>
+    
+    <message>
+        <source>Selected date interval is not valid</source>
+        <translation>Selected date interval is not valid</translation>
+    </message>
+    <message>
+        <source>Any record selected</source>
+        <translation>Any record selected</translation>
+    </message>
+    <message>
+        <source>Error inserting element in table, you need to review data</source>
+        <translation>Error inserting element in table, you need to review data</translation>
+    </message>
+    <message>
+        <source>Values has been updated</source>
+        <translation>Values has been updated</translation>
+    </message>
+    <message>
+        <source>You have to select at least one feature!</source>
+        <translation>You have to select at least one feature!</translation>
+    </message>
+    <message>
+        <source>More than one feature selected. Only the first one will be processed!</source>
+        <translation>More than one feature selected. Only the first one will be processed!</translation>
+    </message>
+    <message>
+        <source>Java Runtime executable file not found at: </source>
+        <translation>Java Runtime executable file not found at: </translation>
+    </message>
+    <message>
+        <source>Giswater executable file not found at: </source>
+        <translation>Giswater executable file not found at: </translation>
+    </message>
+    <message>
+        <source>GSW file not found at: </source>
+        <translation>"GSW file not found at: </translation>
+    </message>
+    <message>
+        <source>Executing... </source>
+        <translation>Executing... </translation>
+    </message>
+    <message>
+        <source>Selected file not found: </source>
+        <translation>Selected file not found: </translation>
+    </message>
+    <message>
+        <source>Selected CSV has been imported successfully</source>
+        <translation>Selected CSV has been imported successfully</translation>
+    </message>
+    <message>
+        <source>Node type has been update!</source>
+        <translation>Node type has been update!</translation>
+    </message>
+    <message>
+        <source>File not found!</source>
+        <translation>File not found!</translation>
+    </message>
+    <message>
+        <source>Selected functions have been executed</source>
+        <translation>Selected functions have been executed</translation>
+    </message>
+    <message>
+        <source>Valve analytics executed successfully</source>
+        <translation>Valve analytics executed successfully</translation>
+    </message>
+    <message>
+        <source>Current layer not valid</source>
+        <translation>Current layer not valid</translation>
+    </message>
+    <message>
+        <source>Move node: Error updating geometry</source>
+        <translation>Move node: Error updating geometry</translation>
+    </message>
+    <message>
+        <source>Any record found in table 'cat_node' related with selected 'node_type.type'</source>
+        <translation>Any record found in table 'cat_node' related with selected 'node_type.type'</translation>
+    </message>
+    <message>
+        <source>Any record found in table 'node_type' related with selected 'node_type.type'</source>
+        <translation>Any record found in table 'node_type' related with selected 'node_type.type'</translation>
+    </message>
+    <message>
+        <source>Error inserting node</source>
+        <translation>Error inserting node</translation>
+    </message>
+    <message>
+        <source>Right click to use current selection, select connec points by clicking or dragging (selection box)</source>
+        <translation>Right click to use current selection, select connec points by clicking or dragging (selection box)</translation>
+    </message>
+    <message>
+        <source>Node deleted successfully</source>
+        <translation>Node deleted successfully</translation>
+    </message>
+    <message>
+        <source>Select the node inside a pipe by clicking on it and it will be removed</source>
+        <translation>Select the node inside a pipe by clicking on it and it will be removed</translation>
+    </message>
+    <message>
+        <source>Select a node or pipe and click on it, the valves minimum cut polygon is computed</source>
+        <translation>Select a node or pipe and click on it, the valves minimum cut polygon is computed</translation>
+    </message>
+    <message>
+        <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
+        <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
+    </message>
+   
+
+
+</context>
 
 </TS>
 

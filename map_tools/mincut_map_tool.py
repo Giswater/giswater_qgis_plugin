@@ -103,7 +103,8 @@ class MincutMapTool(ParentMapTool):
             elif self.current_layer.name() == self.layer_node.name():
                 elem_type = 'node'
             else:
-                self.controller.show_warning("Current layer not valid")
+                message = "Current layer not valid"
+                self.controller.show_warning(message, context_name='ui_message')
                 return
 
             feature = self.snappFeat
@@ -138,7 +139,8 @@ class MincutMapTool(ParentMapTool):
             # Get a featureIterator from this expression:
             expr = QgsExpression(aux)
             if expr.hasParserError():
-                self.controller.show_warning("Expression Error: " + str(expr.parserErrorString()))
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message, context_name='ui_message')
                 return
             it = layer.getFeatures(QgsFeatureRequest(expr))
     
@@ -169,8 +171,8 @@ class MincutMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            self.controller.show_info("Select a node or pipe and click on it, the valves minimum cut polygon is computed")
-
+            message = "Select a node or pipe and click on it, the valves minimum cut polygon is computed"
+            self.controller.show_info(message, context_name='ui_message' )  
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:

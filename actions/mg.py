@@ -84,9 +84,9 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
             self.controller.execute_sql(sql) 
          
-        # Show message and close the dialog   
-        msg = "Selected functions have been executed"
-        self.controller.show_info(msg)   
+        # Show message and close the dialog    
+        message = "Selected functions have been executed"
+        self.controller.show_info(message, context_name='ui_message' ) 
         self.close_dialog()         
             
         # Refresh map canvas
@@ -151,8 +151,8 @@ class Mg():
         # Get CSV file. Check if file exists
         self.file_path = self.dlg.txt_file_path.toPlainText()
         if not os.path.exists(self.file_path):
-            msg = "Selected file not found: "+self.file_path
-            self.controller.show_warning(msg)
+            message = "Selected file not found: "+self.file_path
+            self.controller.show_warning(message, context_name='ui_message' )
             return False      
               
         # Open CSV file for read and copy into database
@@ -169,8 +169,8 @@ class Mg():
             return False
         else:
             self.dao.commit()
-            msg = "Selected CSV has been imported successfully"
-            self.controller.show_info(msg)
+            message = "Selected CSV has been imported successfully"
+            self.controller.show_info(message, context_name='ui_message' )
             
                     
     def mg_go2epa_express(self):
@@ -181,17 +181,20 @@ class Mg():
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
-            self.controller.show_warning("Java Runtime executable file not found at: "+self.java_exe, 10)
+            message = "Java Runtime executable file not found at: "+self.java_exe
+            self.controller.show_warning(message, context_name='ui_message' ),10
             return  
         
         # Check if giswater.jar file exists
         if not os.path.exists(self.giswater_jar):
-            self.controller.show_warning("Giswater executable file not found at: "+self.giswater_jar, 10)
+            message = "Giswater executable file not found at: "+self.giswater_jar
+            self.controller.show_warning(message, context_name='ui_message' ),10
             return  
 
         # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
         if not os.path.exists(self.gsw_file):
-            self.controller.show_info("GSW file not found at: "+self.gsw_file, 10)
+            message = "GSW file not found at: "+self.gsw_file
+            self.controller.show_info(message, context_name='ui_message' ),10
             self.gsw_file = ""    
         
         # Start program     
@@ -205,8 +208,8 @@ class Mg():
         self.controller.start_program(program)   
         
         # Show information message    
-        self.controller.show_info("Executing... "+aux)    
-                
+        message = "Executing... "+aux
+        self.controller.show_info(message, context_name='ui_message' )       
                 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
@@ -256,7 +259,8 @@ class Mg():
         self.dao.execute_sql(sql)
 
         # Show message to user
-        self.controller.show_info("Values has been updated")
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message' ) 
         self.close_dialog(self.dlg) 
 
 
@@ -268,7 +272,8 @@ class Mg():
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
         result = self.controller.execute_sql(sql)      
         if result:
-            self.controller.show_info("Valve analytics executed successfully", 30)
+            message = "Valve analytics executed successfully"
+            self.controller.show_info(message, 30, context_name='ui_message' )
 
 
     def mg_change_elem_type(self):                
@@ -283,10 +288,13 @@ class Mg():
         layer = self.iface.activeLayer()  
         count = layer.selectedFeatureCount()     
         if count == 0:
-            self.controller.show_info("You have to select at least one feature!")
+            message = "You have to select at least one feature!"
+            self.controller.show_info(message, context_name='ui_message' )   
             return 
         elif count > 1:  
-            self.controller.show_info("More than one feature selected. Only the first one will be processed!")
+            message = "More than one feature selected. Only the first one will be processed!"
+            self.controller.show_info(message, context_name='ui_message' ) 
+            
                     
         # Get selected features (nodes)           
         features = layer.selectedFeatures()
@@ -369,7 +377,8 @@ class Mg():
         self.dao.execute_sql(sql)
         
         # Show message to the user
-        self.controller.show_info("Node type has been update!")
+        message = "Node type has been update!"
+        self.controller.show_info(message, context_name='ui_message' ) 
         
         # Close dialog
         self.close_dialog()
@@ -475,7 +484,9 @@ class Mg():
         self.dao.execute_sql(sql)
 
         # Show message to user
-        self.controller.show_info("Values has been updated")
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message' ) 
+
         self.close_dialog(self.dlg)       
                         
                 

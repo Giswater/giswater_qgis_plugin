@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMessageBar
-from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import QSettings, Qt
 from PyQt4.QtGui import QLabel
 from PyQt4.QtSql import QSqlTableModel
 
@@ -193,7 +193,8 @@ class ParentDialog(object):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
-            self.controller.show_warning("Any record selected", context_name=self.context_name)
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
             return
         
         inf_text = ""
@@ -225,7 +226,8 @@ class ParentDialog(object):
             # Check if file exist
             if not os.path.exists(self.path):
                 message = "File not found!"
-                self.controller.show_warning(message)                
+                self.controller.show_warning(message, context_name='ui_message')
+               
             else:
                 # Open the document
                 os.startfile(self.path)                      
@@ -239,7 +241,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name=self.context_name)                   
+            self.controller.show_warning(message, context_name='ui_message')                   
             return
         
         # Set filter
@@ -253,11 +255,9 @@ class ParentDialog(object):
         doc_tag_value = utils_giswater.getWidgetText("doc_tag")
         if doc_tag_value != 'null': 
             expr+= " AND tagcat_id = '"+doc_tag_value+"'"
-        
-        # TODO: Bug because 'user' is a reserverd word
-#         doc_user_value = utils_giswater.getWidgetText("doc_user")
-#         if doc_user_value != 'null': 
-#             expr+= " AND user = '"+doc_user_value+"'"
+        doc_user_value = utils_giswater.getWidgetText("doc_user")
+        if doc_user_value != 'null':
+            expr+= " AND user_name = '"+doc_user_value+"'"
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
@@ -268,11 +268,6 @@ class ParentDialog(object):
         ''' Configuration of tables 
         Set visibility of columns
         Set width of columns '''
-
-        exists = self.dao.check_table(self.schema_name, "config_ui_forms")
-        if not exists:
-            #print "Table not found: "+self.schema_name+".config_ui_forms"
-            return
         
         # Hide columns
         sql = "SELECT column_index"
@@ -283,13 +278,49 @@ class ParentDialog(object):
             for row in rows:
                 ind = row[0]-1
                 widget.hideColumn(ind)     
+        
+        
+        # Set width of columns
+        #-------------
+        # Get indexes of visible columns
+        sql = "SELECT column_index FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
+        rows_index_true = self.dao.get_rows(sql)
+        # Get width of colums 
+        sql = "SELECT width FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
+        rows_width = self.dao.get_rows(sql)
+        # Get alias of colums and set alias
+        sql = "SELECT alias FROM "+self.schema_name+".config_ui_forms WHERE status = TRUE AND ui_table = '"+table_name+"'"
+        rows_alias = self.dao.get_rows(sql)
+    
+        # Set width
+        for row_index,row_width in zip(rows_index_true,rows_width):
+            ind_ind = row_index[0]-1
+            ind_width =row_width[0]-1
+            widget.setColumnWidth(ind_ind,ind_width)
+        
+        # Set alias
+        for row_index,row_alias in zip(rows_index_true,rows_alias):
+            ind_ind = row_index[0]-1
+            ind_alias =row_alias[0-1]
+            #widget.setColumnWidth(ind_ind,ind_alias)
+            #widget.model().setHeaderData(row['column_index'], Qt.Horizontal, row['alias'])
             
-        # Set width of visible columns
-        sql = "SELECT column_index, width"
+            widget.model().setHeaderData(ind_ind, Qt.Horizontal, ind_alias)    
+        
+        
+        
+        # TO DO alias 
+        '''
+        # Set width and alias of visible columns
+        sql = "SELECT column_index, width, alias"
         sql+= " FROM "+self.schema_name+".config_ui_forms"
         sql+= " WHERE status = TRUE AND ui_table = '"+table_name+"'"
         rows = self.controller.get_rows(sql)
         if rows:
-            for row in rows:
-                widget.setColumnWidth(row['column_index'],row['width'])        
+            for row in rows:         
+                widget.setColumnWidth(row['column_index'], row['width'])
+                
+                #widget.model().setHeaderData(row['column_index'], Qt.Horizontal, row['alias'])				
+        '''
+                
         

@@ -115,7 +115,8 @@ class DeleteNodeMapTool(ParentMapTool):
                 sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
                 status = self.controller.execute_sql(sql)
                 if status:
-                    self.controller.show_info("Node deleted successfully")
+                    message = "Node deleted successfully"
+                    self.controller.show_warning(message, context_name='ui_message' )  
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refresh()
@@ -139,8 +140,9 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            self.controller.show_info("Select the node inside a pipe by clicking on it and it will be removed")
-
+            message = "Select the node inside a pipe by clicking on it and it will be removed"
+            self.controller.show_warning(message, context_name='ui_message')
+               
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:

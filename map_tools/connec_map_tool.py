@@ -197,8 +197,8 @@ class ConnecMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            msg = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
-            self.controller.show_info(msg)
+            message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
+            self.controller.show_info(message, context_name='ui_message' )  
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
@@ -230,7 +230,9 @@ class ConnecMapTool(ParentMapTool):
         aux = "{"
         layer = self.layer_connec
         if layer.selectedFeatureCount() == 0:
-            self.controller.show_warning("You have to select at least one feature!")
+            message = "You have to select at least one feature!"
+            self.controller.show_warning(message, context_name='ui_message')
+               
             return
         features = layer.selectedFeatures()
         for feature in features:

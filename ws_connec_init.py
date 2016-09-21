@@ -206,7 +206,7 @@ class ConnecDialog(ParentDialog):
         date_to = self.date_dae_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ws_parent')                   
+            self.controller.show_warning(message, context_name='ui_message' )                   
             return
         
         # Set filter
@@ -270,7 +270,7 @@ class ConnecDialog(ParentDialog):
         self.connec_id = widget_connec.text()
 
         # Insert hydrometer_id in v_rtc_hydrometer
-        sql = "INSERT INTO "+self.schema_name+".v_rtc_hydrometer (hydrometer_id) "
+        sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
         sql+= " VALUES ('"+self.hydro_id+"')"
         self.dao.execute_sql(sql) 
         
@@ -298,7 +298,8 @@ class ConnecDialog(ParentDialog):
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
-            self.controller.show_warning("Any record selected")
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' )
             return
         inf_text = ""
         list_id = ""
