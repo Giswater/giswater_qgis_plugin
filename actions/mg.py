@@ -392,7 +392,7 @@ class Mg():
         self.dlg.btn_accept.pressed.connect(self.mg_config_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
-        # Set values from widgets of type QSoubleSpinBox
+        # Set values from widgets of type QDoubleSpinBox
         utils_giswater.setWidgetText("node_proximity", row["node_proximity"])
         utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
         utils_giswater.setWidgetText("node2arc", row["node2arc"])
@@ -400,12 +400,13 @@ class Mg():
         #utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
         utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
         utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
-        #utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
+        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
 
         # Set values from widgets of type QCheckbox  
         self.dlg.orphannode.setChecked(bool(row["orphannode_delete"]))
         self.dlg.arcendpoint.setChecked(bool(row["nodeinsert_arcendpoint"]))
         self.dlg.nodetypechanged.setChecked(bool(row["nodetype_change_enabled"]))
+        self.dlg.arc_searchnodes_control.setChecked(bool(row["arc_searchnodes_control"]))
         self.dlg.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
         self.dlg.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
         self.dlg.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
@@ -433,7 +434,7 @@ class Mg():
         #self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
         self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
         self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
-        #self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
+        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
         
         # Get new values from widgets of type QComboBox
         self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
@@ -442,6 +443,7 @@ class Mg():
         self.new_value_orpha = self.dlg.orphannode.isChecked()
         self.new_value_nodetypechanged = self.dlg.nodetypechanged.isChecked()
         self.new_value_arcendpoint = self.dlg.arcendpoint.isChecked()
+        self.new_value_arc_searchnodes_control = self.dlg.arc_searchnodes_control.isChecked()
         self.new_value_samenode_init_end_control = self.dlg.samenode_init_end_control.isChecked()
         self.new_value_node_proximity_control = self.dlg.node_proximity_control.isChecked()
         self.new_value_connec_proximity_control = self.dlg.connec_proximity_control.isChecked()
@@ -463,11 +465,12 @@ class Mg():
         #sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
-        #sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
+        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
         sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
         sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
         sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
         sql+= ", nodeinsert_arcendpoint = '"+str(self.new_value_arcendpoint)+"'"
+        sql+= ", arc_searchnodes_control = '"+str(self.new_value_arc_searchnodes_control)+"'"
         sql+= ", samenode_init_end_control = '"+str(self.new_value_samenode_init_end_control)+"'"
         sql+= ", node_proximity_control = '"+str(self.new_value_node_proximity_control)+"'"
         sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
