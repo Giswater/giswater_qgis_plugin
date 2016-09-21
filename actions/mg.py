@@ -94,26 +94,20 @@ class Mg():
 
 
     def mg_table_wizard(self):
-        ''' Button 21. WS/UD table wizard ''' 
-        
-        if self.project_type == 'ws':
-            table_list = ['inp_controls', 'inp_curve', 'inp_demand', 'inp_pattern', 'inp_rules', 'cat_node', 'cat_arc']
-        elif self.project_type == 'ud':   
-            table_list = {'inp_controls', 'inp_curve', 'inp_transects', 'inp_timeseries', 'inp_dwf', 'inp_hydrograph', 'inp_inflows', 'inp_lid_control', 'cat_node', 'cat_arc'}
-        else:
-            return
+        ''' Button 21. WS/UD table wizard 
+        Create dialog to select CSV file and table to import contents to ''' 
         
         # Get CSV file path from settings file          
         self.file_path = self.settings.value('files/csv_file')
         if self.file_path is None:             
             self.file_path = self.plugin_dir+"/test.csv"        
         
-        # Create dialog to select CSV file and table to import contents to
+        # Create dialog
         self.dlg = TableWizard()
-        self.dlg.txt_file_path.setText(self.file_path)   
-        table_list.sort()  
-        for row in table_list:
-            self.dlg.cbo_table.addItem(row)                
+        self.dlg.txt_file_path.setText(self.file_path)  
+        
+        # Fill combo 'table' 
+        self.mg_table_wizard_get_tables()          
  
         # Set signals
         self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
@@ -123,6 +117,24 @@ class Mg():
         self.controller.translate_form(self.dlg, 'table_wizard')  
         self.dlg.exec_()            
 
+        
+    def mg_table_wizard_get_tables(self):
+        ''' Get available tables from configuration table 'config_csv_import' '''
+        
+        self.table_dict = {} 
+        self.dlg.cbo_table.addItem('', '')             
+        sql = "SELECT gis_client_layer_name, table_name"
+        sql+= " FROM "+self.schema_name+".config_csv_import"
+        sql+= " ORDER BY gis_client_layer_name"
+        rows = self.dao.get_rows(sql)
+        if rows:
+            for row in rows:
+                elem = [row[0], row[1]]
+                self.table_dict[row[0]] = row[1]     
+                self.dlg.cbo_table.addItem(row[0], elem)                                 
+        else:
+            self.controller.show_warning("Table 'config_csv_import' is empty")
+            
         
     def mg_table_wizard_select_file(self):
 
@@ -144,7 +156,8 @@ class Mg():
     def mg_table_wizard_import_csv(self):
 
         # Get selected table, delimiter, and header
-        table_name = utils_giswater.getWidgetText(self.dlg.cbo_table)  
+        alias = utils_giswater.getWidgetText(self.dlg.cbo_table)  
+        table_name = self.table_dict[alias]
         delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)  
         header_status = self.dlg.chk_header.checkState()             
         
@@ -210,6 +223,7 @@ class Mg():
         # Show information message    
         message = "Executing... "+aux
         self.controller.show_info(message, context_name='ui_message' )       
+                
                 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
