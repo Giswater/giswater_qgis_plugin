@@ -402,11 +402,11 @@ class Mg():
         ''' Button 99 - Open a dialog showing data from table "config" 
         User can changge its values '''
         
-        # Get data from database "config"
-        # Get entire row from database 
+        # Get data from table 'config'
         sql = "SELECT * FROM "+self.schema_name+".config"
         row = self.dao.get_row(sql)
         if not row:
+            self.controller.show_warning("Any data found in table 'config'")
             return
         
         # Create the dialog and signals
@@ -420,7 +420,6 @@ class Mg():
         utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
         utils_giswater.setWidgetText("node2arc", row["node2arc"])
         utils_giswater.setWidgetText("connec_proximity", row["connec_proximity"])
-        #utils_giswater.setWidgetText("arc_toporepair", row["arc_toporepair"])
         utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
         utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
         utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
@@ -439,12 +438,55 @@ class Mg():
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])        
+        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])    
+        
+        # Get data from tables 'config_search_plus' and 'config_extract_raster_value'
+        #self.mg_config_search_plus()    
+        self.search_plus_columns = self.mg_config_get_data('config_search_plus')    
+        self.raster_columns = self.mg_config_get_data('config_extract_raster_value')    
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'config')               
         self.dlg.exec_()    
     
+    
+    def mg_config_search_plus(self):                
+        ''' Get data from table 'config_search_plus' '''
+        
+        sql = "SELECT *"
+        sql+= " FROM "+self.schema_name+".config_search_plus"
+        row = self.dao.get_row(sql)
+        if not row:
+            self.controller.show_warning("Any data found in table 'config_search_plus'")
+            return
+        
+        # Iterate over all columns and populate its corresponding widget
+        self.search_plus_columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            utils_giswater.setWidgetText(column_name, row[column_name])
+            self.search_plus_columns.append(column_name)            
+    
+    
+    def mg_config_get_data(self, tablename):                
+        ''' Get data from selected table '''
+        
+        sql = "SELECT *"
+        sql+= " FROM "+self.schema_name+"."+tablename
+        row = self.dao.get_row(sql)
+        if not row:
+            self.controller.show_warning("Any data found in table "+tablename)
+            return None
+        
+        # Iterate over all columns and populate its corresponding widget
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            utils_giswater.setWidgetText(column_name, row[column_name])
+            columns.append(column_name) 
+            
+        return columns           
+
   
     def mg_config_get_new_values(self):
         ''' Get new values from all the widgets '''
@@ -485,7 +527,6 @@ class Mg():
         sql+= ", arc_searchnodes = "+self.new_value_arc
         sql+= ", node2arc = "+self.new_value_node
         sql+= ", connec_proximity = "+self.new_value_con
-        #sql+= ", arc_toporepair = "+self.new_value_arc_top
         sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
         sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
         sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
@@ -499,11 +540,34 @@ class Mg():
         sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
         sql+= ", audit_function_control = '"+str(self.new_value_audit_function_control)+"'"        
         self.dao.execute_sql(sql)
+        
+        self.mg_config_accept_table('config_search_plus', self.search_plus_columns)
+        self.mg_config_accept_table('config_extract_raster_value', self.raster_columns)
 
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message' ) 
 
         self.close_dialog(self.dlg)       
+    
+    
+    def mg_config_accept_table(self, tablename, columns):
+        ''' Update values of selected 'tablename' with the content of 'columns' '''
+        
+        if columns is not None:       
+            sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
+            for column_name in columns:
+                if column_name == 'id':
+                    sql+= column_name+" = 1, "  
+                else:
+                    value = utils_giswater.getWidgetText(column_name)
+                    if value is None or value == 'null':
+                        sql+= column_name+" = null, "     
+                    else:
+                        sql+= column_name+" = '"+value+"', "           
+            
+            sql = sql[:-2]
+            print sql
+            self.dao.execute_sql(sql)
                         
                 

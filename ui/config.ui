@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>546</width>
-    <height>387</height>
+    <width>509</width>
+    <height>366</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>340</y>
+     <x>330</x>
+     <y>330</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>340</y>
+     <x>415</x>
+     <y>330</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -42,8 +42,8 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>30</y>
+     <x>20</x>
+     <y>20</y>
      <width>471</width>
      <height>301</height>
     </rect>
@@ -733,7 +733,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -1643,7 +1643,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLineEdit" name="db_project_vector_layer_name">
+    <widget class="QLineEdit" name="raster_layer">
      <property name="geometry">
       <rect>
        <x>222</x>
@@ -1728,7 +1728,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="db_project_vector_layer_name_2">
+    <widget class="QLineEdit" name="vector_layer">
      <property name="geometry">
       <rect>
        <x>222</x>
@@ -1777,7 +1777,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="vector_layer_field_value">
+    <widget class="QLineEdit" name="vector_field_value">
      <property name="geometry">
       <rect>
        <x>222</x>
