@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>357</width>
-    <height>179</height>
+    <height>153</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>20</y>
      <width>331</width>
-     <height>153</height>
+     <height>121</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -29,50 +29,24 @@
     <attribute name="title">
      <string>Urban Properties</string>
     </attribute>
-    <widget class="QLabel" name="label_press_zone_2">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>22</y>
-       <width>55</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Press zone:</string>
-     </property>
-    </widget>
-    <widget class="SearchableComboBox" name="urban_properties_pzone">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>20</y>
-       <width>221</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_number_2">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>90</y>
-       <width>55</width>
+       <y>56</y>
+       <width>71</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Number:</string>
+      <string>Postnumber:</string>
      </property>
     </widget>
     <widget class="SearchableComboBox" name="urban_properties_number">
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>88</y>
+       <y>54</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -85,20 +59,20 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>56</y>
+       <y>22</y>
        <width>55</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Block:</string>
+      <string>Square:</string>
      </property>
     </widget>
     <widget class="SearchableComboBox" name="urban_properties_block">
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>54</y>
+       <y>20</y>
        <width>221</width>
        <height>20</height>
       </rect>

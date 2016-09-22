@@ -45,16 +45,15 @@ class SearchPlus(QObject):
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
         
         # set signals
+        self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom, self.PPOINT_FIELD_NUMBER, self.dlg.ppoint_number))     
+        self.dlg.ppoint_press_zone.activated.connect(partial(self.ppoint_zoom, self.PPOINT_FIELD_ZONE, self.dlg.ppoint_press_zone)) 
+           
         self.dlg.adress_street.activated.connect(self.address_get_numbers)
         self.dlg.adress_street.activated.connect(self.address_zoom_street)
         self.dlg.adress_number.activated.connect(self.address_zoom_portal)  
         
-        self.dlg.ppoint_press_zone.activated.connect(self.ppoint_get_numbers)    
-        self.dlg.ppoint_number.activated.connect(self.ppoint_zoom_number)     
-        
-        self.dlg.hydrometer_code.activated.connect(self.hydrometer_zoom)
-        
-        self.dlg.urban_properties_pzone.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_PZONE, self.dlg.urban_properties_pzone))        
+        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.HYDROMETER_FIELD, self.dlg.hydrometer_code))
+              
         self.dlg.urban_properties_block.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_BLOCK, self.dlg.urban_properties_block))        
         self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_NUMBER, self.dlg.urban_properties_number))        
                  
@@ -87,6 +86,15 @@ class SearchPlus(QObject):
         self.QML_PPOINT = None          
         self.QML_HYDROMETER = None          
         self.QML_URBAN = None    
+
+        # get initial Scale
+        self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
+                 
+    
+    def load_config_data(self):
+        ''' TODO: Load configuration data from tables '''
+        
+        # get layers configuration to populate the GUI
 
         # get initial Scale
         self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
@@ -132,12 +140,13 @@ class SearchPlus(QObject):
         # Get layers and full extent
         self.get_layers()       
         
-        # Tab 'Hydrometer'      
-        status = self.populate_combo(self.hydrometerLayer, self.HYDROMETER_FIELD, self.dlg.hydrometer_code)
-        if not status:
-            print "Error populating Tab 'Hydrometer'"
-            self.dlg.tab_main.removeTab(3)
-            
+        # Tab 'Hydrometer'
+        self.dlg.tab_main.removeTab(3)              
+#         status = self.populate_combo(self.hydrometerLayer, self.HYDROMETER_FIELD, self.dlg.hydrometer_code)
+#         if not status:
+#             print "Error populating Tab 'Hydrometer'"
+#             self.dlg.tab_main.removeTab(3)
+#             
         # Tab 'Address'      
         status = self.address_populate(self.streetLayer)
         if not status:
@@ -145,8 +154,9 @@ class SearchPlus(QObject):
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
-        status = self.populate_combo(self.ppointLayer, self.PPOINT_FIELD_ZONE, self.dlg.ppoint_press_zone,)
-        if not status:
+        status = self.populate_combo(self.ppointLayer, self.PPOINT_FIELD_ZONE, self.dlg.ppoint_press_zone)
+        status_2 = self.populate_combo(self.ppointLayer, self.PPOINT_FIELD_NUMBER, self.dlg.ppoint_number)
+        if not status or not status_2:
             print "Error populating Tab 'Ppoint'"
             self.dlg.tab_main.removeTab(1)              
              
@@ -168,19 +178,19 @@ class SearchPlus(QObject):
             return False
 
         # Get layer features
-        records = [(-1, '', '', '')]
-        idx_id = layer.fieldNameIndex('id')
-        idx_field_name = layer.fieldNameIndex(self.STREET_FIELD_NAME)
+        records = [(-1, '', '')]
         idx_field_code = layer.fieldNameIndex(self.STREET_FIELD_CODE)    
+        idx_field_name = layer.fieldNameIndex(self.STREET_FIELD_NAME)
         for feature in layer.getFeatures():
             geom = feature.geometry()
-            attrs = feature.attributes()
-            field_id = attrs[idx_id]    
-            field_name = attrs[idx_field_name]    
+            attrs = feature.attributes() 
             field_code = attrs[idx_field_code]  
+            field_name = attrs[idx_field_name]    
             if not type(field_code) is QPyNullVariant and geom is not None:
-                elem = [field_id, field_name, field_code, geom.exportToWkt()]
-                records.append(elem)
+                elem = [field_code, field_name, geom.exportToWkt()]
+            else:
+                elem = [field_code, field_name, None]
+            records.append(elem)
 
         # Fill combo 'address_street'
         self.dlg.adress_street.blockSignals(True)
@@ -206,15 +216,15 @@ class SearchPlus(QObject):
             return
         
         # get street code
-        sel_street = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
-        code = sel_street[2] # to know the index see the query that populate the combo
+        elem = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
+        code = elem[0] # to know the index see the query that populate the combo
         records = [[-1, '']]
         
         # Set filter expression
         layer = self.portalLayer  
         idx_field_code = layer.fieldNameIndex(self.PORTAL_FIELD_CODE)            
         idx_field_number = layer.fieldNameIndex(self.PORTAL_FIELD_NUMBER)   
-        aux = self.PORTAL_FIELD_CODE+"='"+str(code)+"'" 
+        aux = self.PORTAL_FIELD_CODE+" = '"+str(code)+"'" 
         
         # Check filter and existence of fields
         expr = QgsExpression(aux)     
@@ -223,11 +233,13 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)    
             return               
         if idx_field_code == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'".format(self.PORTAL_FIELD_CODE, layer.name(), self.setting_file, 'PORTAL_FIELD_CODE')            
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.PORTAL_FIELD_CODE, layer.name(), self.setting_file, 'PORTAL_FIELD_CODE')            
             self.controller.show_warning(message)         
             return      
         if idx_field_number == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'".format(self.PORTAL_FIELD_NUMBER, layer.name(), self.setting_file, 'PORTAL_FIELD_NUMBER')            
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.PORTAL_FIELD_NUMBER, layer.name(), self.setting_file, 'PORTAL_FIELD_NUMBER')            
             self.controller.show_warning(message)         
             return      
             
@@ -253,18 +265,17 @@ class SearchPlus(QObject):
     def address_zoom_street(self):
         ''' Zoom on the street with the prefined scale '''
         
-        # get selected street
+        # Get selected street
         selected = self.dlg.adress_street.currentText()
         if selected == '':
             print "Any record selected"            
             return
-        
-        # get code
+
         data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
-        wkt = data[3] # to know the index see the query that populate the combo
+        wkt = data[2]   # to know the index see the query that populate the combo
         geom = QgsGeometry.fromWkt(wkt)
         if not geom:
-            message = "Can not correctly get geometry"
+            message = "Geometry not valid or not defined"
             self.controller.show_warning(message) 
             return
         
@@ -283,7 +294,7 @@ class SearchPlus(QObject):
             print "Any record selected"
             return  
                 
-        # get selected portal
+        # Get selected portal
         elem = self.dlg.adress_number.itemData(self.dlg.adress_number.currentIndex())
         if not elem:
             # that means that user has edited manually the combo but the element
@@ -315,85 +326,41 @@ class SearchPlus(QObject):
         
         # Load style
         self.load_style(self.portalMemLayer, self.QML_PORTAL)    
-           
+          
     
-    def ppoint_get_numbers(self):
-        ''' Populate numbers depending on selected press_zone. 
-            Available numbers are linked with self.PPOINT_FIELD_ZONE '''   
-                           
-        # Check existence of layer and related fields                          
-        layer = self.ppointLayer           
-        idx_field_number = layer.fieldNameIndex(self.PPOINT_FIELD_NUMBER)   
-        if idx_field_number == -1:    
-            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.PPOINT_FIELD_NUMBER, layer.name(), self.setting_file, 'PPOINT_FIELD_NUMBER')         
-            self.controller.show_warning(message)         
-            return     
-                         
-        # Get selected press_zone
-        aux = None
-        records = [[None]]
-        selected = self.dlg.ppoint_press_zone.currentText()
-        if selected.strip() != '':
-            zone = self.dlg.ppoint_press_zone.itemData(self.dlg.ppoint_press_zone.currentIndex())
-            aux = self.PPOINT_FIELD_ZONE+"='"+str(zone)+"'" 
-            # Set filter expression        
-            expr = QgsExpression(aux)     
-            if expr.hasParserError():   
-                message = expr.parserErrorString()+": "+aux        
-                self.controller.show_warning(message)               
-                return                
-             
-        # Get a featureIterator from an expression:
-        # Get features from the iterator and do something
-        if aux is None:
-            it = layer.getFeatures(QgsFeatureRequest())
-        else:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-        for feature in it: 
-            attrs = feature.attributes() 
-            field_number = attrs[idx_field_number]    
-            if not type(field_number) is QPyNullVariant:
-                elem = [field_number]
-                records.append(elem)
-                  
-        # Fill combo 'numbers'
-        records_sorted = sorted(records, key = operator.itemgetter(0))           
-        self.dlg.ppoint_number.blockSignals(True)
-        self.dlg.ppoint_number.clear()
-        for record in records_sorted:
-            if record[0] is None:
-                self.dlg.ppoint_number.addItem('', record)
-            else:
-                self.dlg.ppoint_number.addItem(str(record[0]), record)
-        self.dlg.ppoint_number.blockSignals(False)          
+    def generic_zoom(self, fieldname, combo):  
         
-          
-    def ppoint_zoom_number(self):
-        ''' Show selected ppoint_number on the canvas when user number in tab 'Ppoint' '''  
-          
-        # Get selected ppoint_number       
-        number = self.dlg.ppoint_number.currentText()
-        if number.strip() == '':
+        # Get selected element from combo    
+        element = combo.currentText()
+        if element.strip() == '':
             print "Any record selected"
-            return  
+            return None
                 
-        # Get selected ppoint_number
-        elem = self.dlg.ppoint_number.itemData(self.dlg.ppoint_number.currentIndex())
+        elem = combo.itemData(combo.currentIndex())
         if not elem:
             # that means that user has edited manually the combo but the element
             # does not correspond to any combo element
-            message = 'Element {} does not exist'.format(number)
+            message = 'Element {} does not exist'.format(element)
             self.controller.show_warning(message) 
-            return
+            return None
         
-        # Select this feature in order to copy to memory layer        
-        aux = self.PPOINT_FIELD_NUMBER+"='"+str(elem[0])+"'"
+        # Select this feature in order to copy to memory layer              
+        aux = fieldname+" = '"+str(elem[0])+"'"
         expr = QgsExpression(aux)     
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)        
-            return    
+            return     
+        
+        return expr
+            
+            
+    def ppoint_zoom(self, fieldname, combo):
+        ''' Zoom to layer 'point' '''  
+
+        expr = self.generic_zoom(fieldname, combo)
+        if expr is None:
+            return
         
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
@@ -403,7 +370,7 @@ class SearchPlus(QObject):
         self.ppointLayer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.ppointMemLayer = self.copy_selected(self.ppointLayer, self.ppointMemLayer, "Polygon")       
+        self.ppointMemLayer = self.copy_selected(self.ppointLayer, self.ppointMemLayer, "Point")       
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
@@ -413,32 +380,13 @@ class SearchPlus(QObject):
             self.load_style(self.ppointMemLayer, self.QML_PPOINT)
   
   
-    def hydrometer_zoom(self):
-        ''' Show selected hydrometer on the canvas '''  
+    def hydrometer_zoom(self, fieldname, combo):
+        ''' Zoom to layer 'hydrometer' '''  
           
-        # Get selected ppoint_number       
-        element = self.dlg.hydrometer_code.currentText()
-        if element.strip() == '':
-            print "Any record selected"
-            return    
-                
-        # Get selected ppoint_number
-        elem = self.dlg.hydrometer_code.itemData(self.dlg.hydrometer_code.currentIndex())
-        if not elem:
-            # that means that user has edited manually the combo but the element
-            # does not correspond to any combo element
-            message = 'Element {} does not exist'.format(element)
-            self.controller.show_warning(message) 
-            return
-        
-        # Select this feature in order to copy to memory layer        
-        aux = self.HYDROMETER_FIELD+"='"+str(elem)+"'"
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return    
-    
+        expr = self.generic_zoom(fieldname, combo)
+        if expr is None:
+            return          
+  
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
         # Select featureswith the ids obtained             
@@ -460,9 +408,6 @@ class SearchPlus(QObject):
     def urban_populate(self, layer):
         ''' Populate combos tab 'urban properties' '''
         
-        status = self.populate_combo(layer, self.URBAN_FIELD_PZONE, self.dlg.urban_properties_pzone)
-        if not status:
-            return False
         status = self.populate_combo(layer, self.URBAN_FIELD_BLOCK, self.dlg.urban_properties_block)
         if not status:
             return False
@@ -474,84 +419,21 @@ class SearchPlus(QObject):
                 
     
     def urban_zoom(self, fieldname, combo):
-        ''' Zoom to selected combo '''  
+        ''' Zoom to layer 'urban' '''  
           
-        # Get selected record   
-        element = combo.currentText()
-        if element.strip() == '':
-            print "Any record selected"
-            return    
-                
-        # Get selected ppoint_number
-        elem = combo.itemData(combo.currentIndex())
-        if not elem:
-            # that means that user has edited manually the combo but the element
-            # does not correspond to any combo element
-            message = 'Element {} does not exist'.format(element)
-            self.controller.show_warning(message) 
-            return
-        
-        # Select this feature in order to copy to memory layer        
-        aux = fieldname+"='"+str(elem)+"'"
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return    
+        expr = self.generic_zoom(fieldname, combo)
+        if expr is None:
+            return       
     
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained             
+        # Select features with the ids obtained             
         it = self.urbanLayer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         self.urbanLayer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
         self.urbanMemLayer = self.copy_selected(self.urbanLayer, self.urbanMemLayer, "Polygon")       
-
-        # Zoom to point layer
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
-        
-            
-    def urban_pzone_zoom(self):
-        ''' Zoom to selected urban_pzone '''  
-          
-        combo = self.dlg.urban_properties_pzone 
-        fieldname = self.URBAN_FIELD_PZONE
-        layer = self.urbanLayer
-          
-        # Get selected record   
-        element = combo.currentText()
-        if element.strip() == '':
-            print "Any record selected"
-            return    
-                
-        # Get selected ppoint_number
-        elem = combo.itemData(combo.currentIndex())
-        if not elem:
-            # that means that user has edited manually the combo but the element
-            # does not correspond to any combo element
-            message = 'Element {} does not exist'.format(element)
-            self.controller.show_warning(message) 
-            return
-        
-        # Select this feature in order to copy to memory layer        
-        aux = fieldname+"='"+str(elem)+"'"
-        expr = QgsExpression(aux)     
-        if expr.hasParserError():   
-            message = expr.parserErrorString() + ": " + aux
-            self.controller.show_warning(message)        
-            return    
-    
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained             
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.setSelectedFeatures(ids)
-        
-        # Copy selected features to memory layer     
-        self.urbanMemLayer = self.copy_selected(layer, self.urbanMemLayer, "Polygon")       
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
@@ -566,33 +448,27 @@ class SearchPlus(QObject):
             return False
 
         # Iterate over all features to get distinct records
-        records = []
-        records.append(' ')
+        records = [(-1, '')]
         idx_field = layer.fieldNameIndex(fieldname) 
         if idx_field == -1:           
             message = "Field '{}' not found in layer '{}'.".format(fieldname, layer.name())           
             self.controller.show_warning(message)
             return False      
-               
-        for feature in layer.getFeatures():
+ 
+        for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
             field = attrs[idx_field]  
             if not type(field) is QPyNullVariant:
-                records.append(field)
+                elem = [field, field]               
+                records.append(elem)
         
-        # Remove duplicates
-        records_set = set(records)
-        
-        # Fill combo 'hydrometer_code'
         combo.blockSignals(True)
         combo.clear()
-        records_sorted = sorted(records_set, key = operator.itemgetter(0))  
-        for record in records_sorted:    
-            try:
-                combo.addItem(record, record)
-            except AttributeError, e:
-                print str(e)
-        combo.blockSignals(False)    
+        records_sorted = sorted(records, key = operator.itemgetter(1))            
+        for i in range(len(records_sorted)):
+            record = records_sorted[i]
+            combo.addItem(record[1], record)
+        combo.blockSignals(False)     
         
         return True
                     

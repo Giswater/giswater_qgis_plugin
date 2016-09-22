@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'search_plus_dialog_base.ui'
 #
-# Created: Wed Sep 21 12:19:27 2016
+# Created: Thu Sep 22 18:33:20 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,31 +26,24 @@ except AttributeError:
 class Ui_searchPlusDockWidget(object):
     def setupUi(self, searchPlusDockWidget):
         searchPlusDockWidget.setObjectName(_fromUtf8("searchPlusDockWidget"))
-        searchPlusDockWidget.resize(357, 179)
+        searchPlusDockWidget.resize(357, 153)
         self.tab_main = QtGui.QTabWidget(searchPlusDockWidget)
-        self.tab_main.setGeometry(QtCore.QRect(10, 20, 331, 153))
+        self.tab_main.setGeometry(QtCore.QRect(10, 20, 331, 121))
         self.tab_main.setObjectName(_fromUtf8("tab_main"))
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
-        self.label_press_zone_2 = QtGui.QLabel(self.tab_2)
-        self.label_press_zone_2.setGeometry(QtCore.QRect(15, 22, 55, 16))
-        self.label_press_zone_2.setObjectName(_fromUtf8("label_press_zone_2"))
-        self.urban_properties_pzone = SearchableComboBox(self.tab_2)
-        self.urban_properties_pzone.setGeometry(QtCore.QRect(90, 20, 221, 20))
-        self.urban_properties_pzone.setEditable(True)
-        self.urban_properties_pzone.setObjectName(_fromUtf8("urban_properties_pzone"))
         self.label_number_2 = QtGui.QLabel(self.tab_2)
-        self.label_number_2.setGeometry(QtCore.QRect(15, 90, 55, 16))
+        self.label_number_2.setGeometry(QtCore.QRect(15, 56, 71, 16))
         self.label_number_2.setObjectName(_fromUtf8("label_number_2"))
         self.urban_properties_number = SearchableComboBox(self.tab_2)
-        self.urban_properties_number.setGeometry(QtCore.QRect(90, 88, 221, 20))
+        self.urban_properties_number.setGeometry(QtCore.QRect(90, 54, 221, 20))
         self.urban_properties_number.setEditable(True)
         self.urban_properties_number.setObjectName(_fromUtf8("urban_properties_number"))
         self.label_block = QtGui.QLabel(self.tab_2)
-        self.label_block.setGeometry(QtCore.QRect(15, 56, 55, 16))
+        self.label_block.setGeometry(QtCore.QRect(15, 22, 55, 16))
         self.label_block.setObjectName(_fromUtf8("label_block"))
         self.urban_properties_block = SearchableComboBox(self.tab_2)
-        self.urban_properties_block.setGeometry(QtCore.QRect(90, 54, 221, 20))
+        self.urban_properties_block.setGeometry(QtCore.QRect(90, 20, 221, 20))
         self.urban_properties_block.setEditable(True)
         self.urban_properties_block.setObjectName(_fromUtf8("urban_properties_block"))
         self.tab_main.addTab(self.tab_2, _fromUtf8(""))
@@ -105,9 +98,8 @@ class Ui_searchPlusDockWidget(object):
 
     def retranslateUi(self, searchPlusDockWidget):
         searchPlusDockWidget.setWindowTitle(_translate("searchPlusDockWidget", "Search plus", None))
-        self.label_press_zone_2.setText(_translate("searchPlusDockWidget", "Press zone:", None))
-        self.label_number_2.setText(_translate("searchPlusDockWidget", "Number:", None))
-        self.label_block.setText(_translate("searchPlusDockWidget", "Block:", None))
+        self.label_number_2.setText(_translate("searchPlusDockWidget", "Postnumber:", None))
+        self.label_block.setText(_translate("searchPlusDockWidget", "Square:", None))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_2), _translate("searchPlusDockWidget", "Urban Properties", None))
         self.label_press_zone.setText(_translate("searchPlusDockWidget", "Press zone:", None))
         self.label_number.setText(_translate("searchPlusDockWidget", "Number:", None))
