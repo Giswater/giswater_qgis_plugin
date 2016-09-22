@@ -52,7 +52,7 @@ class SearchPlus(QObject):
         self.dlg.adress_street.activated.connect(self.address_zoom_street)
         self.dlg.adress_number.activated.connect(self.address_zoom_portal)  
         
-        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.HYDROMETER_FIELD, self.dlg.hydrometer_code))
+        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.HYDROMETER_FIELD_TO, self.dlg.hydrometer_code))
               
         self.dlg.urban_properties_block.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_BLOCK, self.dlg.urban_properties_block))        
         self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_NUMBER, self.dlg.urban_properties_number))        
@@ -76,6 +76,7 @@ class SearchPlus(QObject):
         self.HYDROMETER_LAYER = self.settings.value('layers/HYDROMETER_LAYER', '').lower()
         self.HYDROMETER_LAYER_TO = self.settings.value('layers/HYDROMETER_LAYER_TO', '').lower()
         self.HYDROMETER_FIELD = self.settings.value('layers/HYDROMETER_FIELD', '').lower()
+        self.HYDROMETER_FIELD_TO = self.settings.value('layers/HYDROMETER_FIELD_TO', '').lower()
          
         self.URBAN_LAYER = self.settings.value('layers/URBAN_LAYER', '').lower()
         self.URBAN_FIELD_PZONE = self.settings.value('layers/URBAN_FIELD_PZONE', '').lower() 
@@ -120,17 +121,17 @@ class SearchPlus(QObject):
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:            
             name = cur_layer.name().lower()
-            if self.STREET_LAYER in name:    
+            if self.STREET_LAYER == name:    
                 self.streetLayer = cur_layer
-            elif self.PORTAL_LAYER in name:  
+            elif self.PORTAL_LAYER == name:  
                 self.portalLayer = cur_layer       
-            elif self.PPOINT_LAYER in name:  
+            elif self.PPOINT_LAYER == name:  
                 self.ppointLayer = cur_layer       
-            elif self.HYDROMETER_LAYER in name:  
+            elif self.HYDROMETER_LAYER == name:  
                 self.hydrometerLayer = cur_layer       
-            if self.HYDROMETER_LAYER_TO in name:  
-                self.hydrometerLayerTo = cur_layer       
-            if self.URBAN_LAYER in name:
+            if self.HYDROMETER_LAYER_TO == name:  
+                self.hydrometerLayerTo = cur_layer    
+            if self.URBAN_LAYER == name:
                 self.urbanLayer = cur_layer       
             
                          
@@ -140,13 +141,12 @@ class SearchPlus(QObject):
         # Get layers and full extent
         self.get_layers()       
         
-        # Tab 'Hydrometer'
-        self.dlg.tab_main.removeTab(3)              
-#         status = self.populate_combo(self.hydrometerLayer, self.HYDROMETER_FIELD, self.dlg.hydrometer_code)
-#         if not status:
-#             print "Error populating Tab 'Hydrometer'"
-#             self.dlg.tab_main.removeTab(3)
-#             
+        # Tab 'Hydrometer'            
+        status = self.populate_combo(self.hydrometerLayer, self.dlg.hydrometer_code, self.HYDROMETER_FIELD_TO, self.HYDROMETER_FIELD)
+        if not status:
+            print "Error populating Tab 'Hydrometer'"
+            self.dlg.tab_main.removeTab(3)
+             
         # Tab 'Address'      
         status = self.address_populate(self.streetLayer)
         if not status:
@@ -154,8 +154,8 @@ class SearchPlus(QObject):
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
-        status = self.populate_combo(self.ppointLayer, self.PPOINT_FIELD_ZONE, self.dlg.ppoint_press_zone)
-        status_2 = self.populate_combo(self.ppointLayer, self.PPOINT_FIELD_NUMBER, self.dlg.ppoint_number)
+        status = self.populate_combo(self.ppointLayer, self.dlg.ppoint_press_zone, self.PPOINT_FIELD_ZONE)
+        status_2 = self.populate_combo(self.ppointLayer, self.dlg.ppoint_number, self.PPOINT_FIELD_NUMBER)
         if not status or not status_2:
             print "Error populating Tab 'Ppoint'"
             self.dlg.tab_main.removeTab(1)              
@@ -328,7 +328,7 @@ class SearchPlus(QObject):
         self.load_style(self.portalMemLayer, self.QML_PORTAL)    
           
     
-    def generic_zoom(self, fieldname, combo):  
+    def generic_zoom(self, fieldname, combo, field_index=0):  
         
         # Get selected element from combo    
         element = combo.currentText()
@@ -344,8 +344,8 @@ class SearchPlus(QObject):
             self.controller.show_warning(message) 
             return None
         
-        # Select this feature in order to copy to memory layer              
-        aux = fieldname+" = '"+str(elem[0])+"'"
+        # Select this feature in order to copy to memory layer       
+        aux = fieldname+" = '"+str(elem[field_index])+"'"
         expr = QgsExpression(aux)     
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux
@@ -381,15 +381,15 @@ class SearchPlus(QObject):
   
   
     def hydrometer_zoom(self, fieldname, combo):
-        ''' Zoom to layer 'hydrometer' '''  
-          
+        ''' Zoom to layer 'connec' '''  
+        
         expr = self.generic_zoom(fieldname, combo)
         if expr is None:
-            return          
+            return        
   
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained             
+        # Select featureswith the ids obtained           
         it = self.hydrometerLayerTo.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         self.hydrometerLayerTo.setSelectedFeatures(ids)
@@ -408,10 +408,10 @@ class SearchPlus(QObject):
     def urban_populate(self, layer):
         ''' Populate combos tab 'urban properties' '''
         
-        status = self.populate_combo(layer, self.URBAN_FIELD_BLOCK, self.dlg.urban_properties_block)
+        status = self.populate_combo(layer, self.dlg.urban_properties_block, self.URBAN_FIELD_BLOCK)
         if not status:
             return False
-        status = self.populate_combo(layer, self.URBAN_FIELD_NUMBER, self.dlg.urban_properties_number)   
+        status = self.populate_combo(layer, self.dlg.urban_properties_number, self.URBAN_FIELD_NUMBER)   
         if not status:
             return False
 
@@ -439,27 +439,38 @@ class SearchPlus(QObject):
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
             
                 
-    def populate_combo(self, layer, fieldname, combo):
+    def populate_combo(self, layer, combo, fieldname, fieldname_2=None):
         ''' Populate selected combo from features of selected layer '''        
         
         # Check if we have this search option available
         if layer is None:  
-            print "Layer not found. Fieldname: "+fieldname          
+            print "Layer not found. Related fieldname: "+fieldname          
             return False
 
-        # Iterate over all features to get distinct records
+        # Fields management
         records = [(-1, '')]
         idx_field = layer.fieldNameIndex(fieldname) 
         if idx_field == -1:           
             message = "Field '{}' not found in layer '{}'.".format(fieldname, layer.name())           
             self.controller.show_warning(message)
             return False      
+        if fieldname_2 is not None:
+            idx_field_2 = layer.fieldNameIndex(fieldname_2) 
+            if idx_field_2 == -1:           
+                message = "Field '{}' not found in layer '{}'.".format(fieldname_2, layer.name())           
+                self.controller.show_warning(message)
+                return False   
+        else:
+            idx_field_2 = idx_field
+            fieldname_2 = fieldname   
  
+        # Iterate over all features to get distinct records
         for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
             field = attrs[idx_field]  
+            field_2 = attrs[idx_field_2]  
             if not type(field) is QPyNullVariant:
-                elem = [field, field]               
+                elem = [field, field_2]               
                 records.append(elem)
         
         combo.blockSignals(True)
