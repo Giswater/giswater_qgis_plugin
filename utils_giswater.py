@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox
 from PyQt4.QtCore import QCoreApplication
 from qgis.gui import QgsMessageBar
 
@@ -102,6 +102,15 @@ def setText(widget, text):
         widget.setValue(float(value))     
           
 
+def getWidgetType(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
+        return None   
+    return type(widget)
+
+
 def getWidgetText(widget, add_quote=False):
     
     if type(widget) is str:
@@ -132,6 +141,26 @@ def setWidgetText(widget, text):
         setText(widget, text)           
     elif type(widget) is QComboBox:
         setSelectedItem(widget, text)
+
+
+def isChecked(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QCheckBox, widget)        
+    checked = False    
+    if widget:
+        checked = widget.isChecked()       
+    return checked    
+
+
+def setChecked(widget, checked):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)       
+    if not widget:
+        return
+    if type(widget) is QCheckBox:
+        widget.setChecked(bool(checked))
 
 
 def getSelectedItem(widget):

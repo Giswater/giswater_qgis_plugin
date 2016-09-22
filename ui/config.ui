@@ -65,7 +65,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QCheckBox" name="arcendpoint">
+    <widget class="QCheckBox" name="nodeinsert_arcendpoint">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -273,7 +273,7 @@
       <double>0.010000000000000</double>
      </property>
     </widget>
-    <widget class="QCheckBox" name="orphannode">
+    <widget class="QCheckBox" name="orphannode_delete">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -705,7 +705,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="nodetypechanged">
+    <widget class="QCheckBox" name="nodetype_change_enabled">
      <property name="geometry">
       <rect>
        <x>320</x>

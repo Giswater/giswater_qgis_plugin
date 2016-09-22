@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QFileDialog, QMessageBox
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox
 
 import os
 import sys
@@ -402,70 +402,25 @@ class Mg():
         ''' Button 99 - Open a dialog showing data from table "config" 
         User can changge its values '''
         
-        # Get data from table 'config'
-        sql = "SELECT * FROM "+self.schema_name+".config"
-        row = self.dao.get_row(sql)
-        if not row:
-            self.controller.show_warning("Any data found in table 'config'")
-            return
-        
         # Create the dialog and signals
         self.dlg = Config()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.mg_config_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
-        # Set values from widgets of type QDoubleSpinBox
-        utils_giswater.setWidgetText("node_proximity", row["node_proximity"])
-        utils_giswater.setWidgetText("arc_searchnodes", row["arc_searchnodes"])
-        utils_giswater.setWidgetText("node2arc", row["node2arc"])
-        utils_giswater.setWidgetText("connec_proximity", row["connec_proximity"])
-        utils_giswater.setWidgetText("vnode_update_tolerance", row["vnode_update_tolerance"])
-        utils_giswater.setWidgetText("node_duplicated_tolerance", row["node_duplicated_tolerance"])
-        utils_giswater.setWidgetText("connec_duplicated_tolerance", row["connec_duplicated_tolerance"])
-
-        # Set values from widgets of type QCheckbox  
-        self.dlg.orphannode.setChecked(bool(row["orphannode_delete"]))
-        self.dlg.arcendpoint.setChecked(bool(row["nodeinsert_arcendpoint"]))
-        self.dlg.nodetypechanged.setChecked(bool(row["nodetype_change_enabled"]))
-        self.dlg.arc_searchnodes_control.setChecked(bool(row["arc_searchnodes_control"]))
-        self.dlg.samenode_init_end_control.setChecked(bool(row["samenode_init_end_control"]))
-        self.dlg.node_proximity_control.setChecked(bool(row["node_proximity_control"]))
-        self.dlg.connec_proximity_control.setChecked(bool(row["connec_proximity_control"]))
-        self.dlg.audit_function_control.setChecked(bool(row["audit_function_control"]))
-  
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        utils_giswater.setWidgetText("nodeinsert_catalog_vdefault", row["nodeinsert_catalog_vdefault"])    
         
-        # Get data from tables 'config_search_plus' and 'config_extract_raster_value'
-        #self.mg_config_search_plus()    
+        # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value' 
+        self.generic_columns = self.mg_config_get_data('config')    
         self.search_plus_columns = self.mg_config_get_data('config_search_plus')    
         self.raster_columns = self.mg_config_get_data('config_extract_raster_value')    
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'config')               
-        self.dlg.exec_()    
-    
-    
-    def mg_config_search_plus(self):                
-        ''' Get data from table 'config_search_plus' '''
-        
-        sql = "SELECT *"
-        sql+= " FROM "+self.schema_name+".config_search_plus"
-        row = self.dao.get_row(sql)
-        if not row:
-            self.controller.show_warning("Any data found in table 'config_search_plus'")
-            return
-        
-        # Iterate over all columns and populate its corresponding widget
-        self.search_plus_columns = []
-        for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
-            utils_giswater.setWidgetText(column_name, row[column_name])
-            self.search_plus_columns.append(column_name)            
+        self.dlg.exec_()        
     
     
     def mg_config_get_data(self, tablename):                
@@ -482,72 +437,26 @@ class Mg():
         columns = []
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
-            utils_giswater.setWidgetText(column_name, row[column_name])
+            widget_type = utils_giswater.getWidgetType(column_name)
+            if widget_type is QCheckBox:
+                utils_giswater.setChecked(column_name, row[column_name])                        
+            else:
+                utils_giswater.setWidgetText(column_name, row[column_name])
             columns.append(column_name) 
             
         return columns           
 
-  
-    def mg_config_get_new_values(self):
-        ''' Get new values from all the widgets '''
-        
-        # Get new values from widgets of type QSoubleSpinBox
-        self.new_value_prox = utils_giswater.getWidgetText("node_proximity").replace(",", ".")
-        self.new_value_arc = utils_giswater.getWidgetText("arc_searchnodes").replace(",", ".")
-        self.new_value_node = utils_giswater.getWidgetText("node2arc").replace(",", ".")
-        self.new_value_con = utils_giswater.getWidgetText("connec_proximity").replace(",", ".")
-        #self.new_value_arc_top = utils_giswater.getWidgetText("arc_toporepair").replace(",", ".")
-        self.new_value_arc_tolerance = utils_giswater.getWidgetText("vnode_update_tolerance").replace(",", ".")
-        self.new_value_node_duplicated_tolerance = utils_giswater.getWidgetText("node_duplicated_tolerance").replace(",", ".")
-        self.new_value_connec_duplicated_tolerance = utils_giswater.getWidgetText("connec_duplicated_tolerance").replace(",", ".")
-        
-        # Get new values from widgets of type QComboBox
-        self.new_value_combobox = utils_giswater.getWidgetText("nodeinsert_catalog_vdefault")
-        
-        # Get new values from widgets of type  QCheckBox
-        self.new_value_orpha = self.dlg.orphannode.isChecked()
-        self.new_value_nodetypechanged = self.dlg.nodetypechanged.isChecked()
-        self.new_value_arcendpoint = self.dlg.arcendpoint.isChecked()
-        self.new_value_arc_searchnodes_control = self.dlg.arc_searchnodes_control.isChecked()
-        self.new_value_samenode_init_end_control = self.dlg.samenode_init_end_control.isChecked()
-        self.new_value_node_proximity_control = self.dlg.node_proximity_control.isChecked()
-        self.new_value_connec_proximity_control = self.dlg.connec_proximity_control.isChecked()
-        self.new_value_audit_function_control = self.dlg.audit_function_control.isChecked()
-
     
     def mg_config_accept(self):
-        ''' Update current values to the table '''
+        ''' Update current values to the configuration tables '''
         
-        # Get new values from all the widgets
-        self.mg_config_get_new_values()
-
-        # Set these values to table "config"
-        sql = "UPDATE "+self.schema_name+".config" 
-        sql+= " SET node_proximity = "+self.new_value_prox
-        sql+= ", arc_searchnodes = "+self.new_value_arc
-        sql+= ", node2arc = "+self.new_value_node
-        sql+= ", connec_proximity = "+self.new_value_con
-        sql+= ", vnode_update_tolerance = "+self.new_value_arc_tolerance      
-        sql+= ", node_duplicated_tolerance = "+self.new_value_node_duplicated_tolerance      
-        sql+= ", connec_duplicated_tolerance = "+self.new_value_connec_duplicated_tolerance      
-        sql+= ", nodeinsert_catalog_vdefault = '"+self.new_value_combobox+"'"
-        sql+= ", orphannode_delete = '"+str(self.new_value_orpha)+"'"
-        sql+= ", nodetype_change_enabled = '"+str(self.new_value_nodetypechanged)+"'"
-        sql+= ", nodeinsert_arcendpoint = '"+str(self.new_value_arcendpoint)+"'"
-        sql+= ", arc_searchnodes_control = '"+str(self.new_value_arc_searchnodes_control)+"'"
-        sql+= ", samenode_init_end_control = '"+str(self.new_value_samenode_init_end_control)+"'"
-        sql+= ", node_proximity_control = '"+str(self.new_value_node_proximity_control)+"'"
-        sql+= ", connec_proximity_control = '"+str(self.new_value_connec_proximity_control)+"'"        
-        sql+= ", audit_function_control = '"+str(self.new_value_audit_function_control)+"'"        
-        self.dao.execute_sql(sql)
-        
+        self.mg_config_accept_table('config', self.generic_columns)
         self.mg_config_accept_table('config_search_plus', self.search_plus_columns)
         self.mg_config_accept_table('config_extract_raster_value', self.raster_columns)
 
-        # Show message to user
+        # Show message and close form
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message' ) 
-
         self.close_dialog(self.dlg)       
     
     
@@ -557,17 +466,20 @@ class Mg():
         if columns is not None:       
             sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
             for column_name in columns:
-                if column_name == 'id':
-                    sql+= column_name+" = 1, "  
-                else:
-                    value = utils_giswater.getWidgetText(column_name)
+                if column_name != 'id':
+                    widget_type = utils_giswater.getWidgetType(column_name)
+                    if widget_type is QCheckBox:
+                        value = utils_giswater.isChecked(column_name)                      
+                    else:
+                        value = utils_giswater.getWidgetText(column_name)
                     if value is None or value == 'null':
                         sql+= column_name+" = null, "     
                     else:
-                        sql+= column_name+" = '"+value+"', "           
+                        if type(value) is not bool:
+                            value = value.replace(",", ".")
+                        sql+= column_name+" = '"+str(value)+"', "           
             
             sql = sql[:-2]
-            print sql
             self.dao.execute_sql(sql)
                         
                 
