@@ -36,52 +36,31 @@ class SearchPlus(QObject):
             self.controller.show_warning(message)                
             return False        
         self.settings = QSettings(self.setting_file, QSettings.IniFormat)
-        self.stylesFolder = self.plugin_dir+"/styles/"         
+        self.stylesFolder = self.plugin_dir+"/styles/"          
         
-        # load plugin settings
-        self.load_plugin_settings()      
-        
+        # Load configuration data from tables
+        if not self.load_config_data():
+            return      
+    
         # create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
         
         # set signals
-        self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom, self.PPOINT_FIELD_NUMBER, self.dlg.ppoint_number))     
-        self.dlg.ppoint_press_zone.activated.connect(partial(self.ppoint_zoom, self.PPOINT_FIELD_ZONE, self.dlg.ppoint_press_zone)) 
+        self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_number'], self.dlg.ppoint_number))     
+        self.dlg.ppoint_press_zone.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_zone'], self.dlg.ppoint_press_zone)) 
            
         self.dlg.adress_street.activated.connect(self.address_get_numbers)
         self.dlg.adress_street.activated.connect(self.address_zoom_street)
         self.dlg.adress_number.activated.connect(self.address_zoom_portal)  
         
-        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.HYDROMETER_FIELD_TO, self.dlg.hydrometer_code))
+        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))
               
-        self.dlg.urban_properties_block.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_BLOCK, self.dlg.urban_properties_block))        
-        self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom, self.URBAN_FIELD_NUMBER, self.dlg.urban_properties_number))        
-                 
+        self.dlg.urban_properties_block.activated.connect(partial(self.urban_zoom, self.params['urban_propierties_field_block'], self.dlg.urban_properties_block))        
+        self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom, self.params['urban_propierties_field_number'], self.dlg.urban_properties_number))        
+
     
     def load_plugin_settings(self):
         ''' Load plugin settings '''
-        
-        # get layers configuration to populate the GUI
-        self.STREET_LAYER = self.settings.value('layers/STREET_LAYER', '').lower()
-        self.STREET_FIELD_CODE = self.settings.value('layers/STREET_FIELD_CODE', '').lower()
-        self.STREET_FIELD_NAME = self.settings.value('layers/STREET_FIELD_NAME', '').lower()
-        self.PORTAL_LAYER = self.settings.value('layers/PORTAL_LAYER', '').lower()
-        self.PORTAL_FIELD_CODE = self.settings.value('layers/PORTAL_FIELD_CODE', '').lower()
-        self.PORTAL_FIELD_NUMBER = self.settings.value('layers/PORTAL_FIELD_NUMBER', '').lower()  
-         
-        self.PPOINT_LAYER = self.settings.value('layers/PPOINT_LAYER', '').lower()
-        self.PPOINT_FIELD_ZONE = self.settings.value('layers/PPOINT_FIELD_ZONE', '').lower()
-        self.PPOINT_FIELD_NUMBER = self.settings.value('layers/PPOINT_FIELD_NUMBER', '').lower()  
-         
-        self.HYDROMETER_LAYER = self.settings.value('layers/HYDROMETER_LAYER', '').lower()
-        self.HYDROMETER_LAYER_TO = self.settings.value('layers/HYDROMETER_LAYER_TO', '').lower()
-        self.HYDROMETER_FIELD = self.settings.value('layers/HYDROMETER_FIELD', '').lower()
-        self.HYDROMETER_FIELD_TO = self.settings.value('layers/HYDROMETER_FIELD_TO', '').lower()
-         
-        self.URBAN_LAYER = self.settings.value('layers/URBAN_LAYER', '').lower()
-        self.URBAN_FIELD_PZONE = self.settings.value('layers/URBAN_FIELD_PZONE', '').lower() 
-        self.URBAN_FIELD_BLOCK = self.settings.value('layers/URBAN_FIELD_BLOCK', '').lower() 
-        self.URBAN_FIELD_NUMBER = self.settings.value('layers/URBAN_FIELD_NUMBER', '').lower() 
           
         self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()                       
         self.QML_PPOINT = None          
@@ -93,12 +72,22 @@ class SearchPlus(QObject):
                  
     
     def load_config_data(self):
-        ''' TODO: Load configuration data from tables '''
+        ''' Load configuration data from tables '''
         
-        # get layers configuration to populate the GUI
+        self.load_plugin_settings()
+        
+        self.params = {}
+        sql = "SELECT * FROM "+self.controller.schema_name+".config_search_plus"
+        row = self.controller.dao.get_row(sql)
+        if not row:
+            self.controller.warning("No data found in configuration table 'config_search_plus'")
+            return False
 
-        # get initial Scale
-        self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
+        for i in range(0, len(row)):
+            column_name = self.controller.dao.get_column_name(i)
+            self.params[column_name] = str(row[i])
+        
+        return True
 
             
     def get_layers(self): 
@@ -121,19 +110,20 @@ class SearchPlus(QObject):
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:            
             name = cur_layer.name().lower()
-            if self.STREET_LAYER == name:    
+
+            if self.params['street_layer'] == name:    
                 self.streetLayer = cur_layer
-            elif self.PORTAL_LAYER == name:  
+            elif self.params['portal_layer'] == name:  
                 self.portalLayer = cur_layer       
-            elif self.PPOINT_LAYER == name:  
+            elif self.params['ppoint_layer'] == name:  
                 self.ppointLayer = cur_layer       
-            elif self.HYDROMETER_LAYER == name:  
+            elif self.params['hydrometer_layer'] == name:   
                 self.hydrometerLayer = cur_layer       
-            if self.HYDROMETER_LAYER_TO == name:  
+            if self.params['hydrometer_urban_propierties_layer'] == name:
                 self.hydrometerLayerTo = cur_layer    
-            if self.URBAN_LAYER == name:
+            if self.params['urban_propierties_layer'] == name:
                 self.urbanLayer = cur_layer       
-            
+           
                          
     def populate_dialog(self):
         ''' Populate the interface with values get from layers '''                      
@@ -142,11 +132,12 @@ class SearchPlus(QObject):
         self.get_layers()       
         
         # Tab 'Hydrometer'            
-        status = self.populate_combo(self.hydrometerLayer, self.dlg.hydrometer_code, self.HYDROMETER_FIELD_TO, self.HYDROMETER_FIELD)
+        status = self.populate_combo(self.hydrometerLayer, self.dlg.hydrometer_code, 
+                                     self.params['hydrometer_urban_propierties_field_code'], self.params['hydrometer_field_code'])
         if not status:
             print "Error populating Tab 'Hydrometer'"
             self.dlg.tab_main.removeTab(3)
-             
+              
         # Tab 'Address'      
         status = self.address_populate(self.streetLayer)
         if not status:
@@ -154,12 +145,12 @@ class SearchPlus(QObject):
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
-        status = self.populate_combo(self.ppointLayer, self.dlg.ppoint_press_zone, self.PPOINT_FIELD_ZONE)
-        status_2 = self.populate_combo(self.ppointLayer, self.dlg.ppoint_number, self.PPOINT_FIELD_NUMBER)
+        status = self.populate_combo(self.ppointLayer, self.dlg.ppoint_press_zone, self.params['ppoint_field_zone'])
+        status_2 = self.populate_combo(self.ppointLayer, self.dlg.ppoint_number, self.params['ppoint_field_number'])
         if not status or not status_2:
             print "Error populating Tab 'Ppoint'"
             self.dlg.tab_main.removeTab(1)              
-             
+              
         # Tab 'Urban Properties'      
         status = self.urban_populate(self.urbanLayer)
         if not status:
@@ -179,8 +170,8 @@ class SearchPlus(QObject):
 
         # Get layer features
         records = [(-1, '', '')]
-        idx_field_code = layer.fieldNameIndex(self.STREET_FIELD_CODE)    
-        idx_field_name = layer.fieldNameIndex(self.STREET_FIELD_NAME)
+        idx_field_code = layer.fieldNameIndex(self.params['street_field_code'])    
+        idx_field_name = layer.fieldNameIndex(self.params['street_field_name'])
         for feature in layer.getFeatures():
             geom = feature.geometry()
             attrs = feature.attributes() 
@@ -206,7 +197,7 @@ class SearchPlus(QObject):
     
     def address_get_numbers(self):
         ''' Populate civic numbers depending on selected street. 
-            Available civic numbers are linked with self.STREET_FIELD_CODE column code in self.PORTAL_LAYER and self.STREET_LAYER
+            Available civic numbers are linked with self.street_field_code column code in self.portal_layer and self.street_layer
         '''   
                            
         # get selected street
@@ -222,9 +213,9 @@ class SearchPlus(QObject):
         
         # Set filter expression
         layer = self.portalLayer  
-        idx_field_code = layer.fieldNameIndex(self.PORTAL_FIELD_CODE)            
-        idx_field_number = layer.fieldNameIndex(self.PORTAL_FIELD_NUMBER)   
-        aux = self.PORTAL_FIELD_CODE+" = '"+str(code)+"'" 
+        idx_field_code = layer.fieldNameIndex(self.params['portal_field_code'])            
+        idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])   
+        aux = self.params['portal_field_code']+" = '"+str(code)+"'" 
         
         # Check filter and existence of fields
         expr = QgsExpression(aux)     
@@ -234,12 +225,12 @@ class SearchPlus(QObject):
             return               
         if idx_field_code == -1:    
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.PORTAL_FIELD_CODE, layer.name(), self.setting_file, 'PORTAL_FIELD_CODE')            
+                .format(self.params['portal_field_code'], layer.name(), self.setting_file, 'portal_field_code')            
             self.controller.show_warning(message)         
             return      
         if idx_field_number == -1:    
             message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
-                .format(self.PORTAL_FIELD_NUMBER, layer.name(), self.setting_file, 'PORTAL_FIELD_NUMBER')            
+                .format(self.params['portal_field_number'], layer.name(), self.setting_file, 'portal_field_number')            
             self.controller.show_warning(message)         
             return      
             
@@ -304,7 +295,7 @@ class SearchPlus(QObject):
             return
         
         # select this feature in order to copy to memory layer        
-        aux = self.PORTAL_FIELD_CODE+"='"+str(elem[0])+"' AND "+self.PORTAL_FIELD_NUMBER+"='"+str(elem[1])+"'"
+        aux = self.params['portal_field_code']+"='"+str(elem[0])+"' AND "+self.params['portal_field_number']+"='"+str(elem[1])+"'"
         expr = QgsExpression(aux)     
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux
@@ -325,7 +316,8 @@ class SearchPlus(QObject):
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
         
         # Load style
-        self.load_style(self.portalMemLayer, self.QML_PORTAL)    
+        if self.QML_PORTAL is not None:        
+            self.load_style(self.portalMemLayer, self.QML_PORTAL)    
           
     
     def generic_zoom(self, fieldname, combo, field_index=0):  
@@ -408,10 +400,10 @@ class SearchPlus(QObject):
     def urban_populate(self, layer):
         ''' Populate combos tab 'urban properties' '''
         
-        status = self.populate_combo(layer, self.dlg.urban_properties_block, self.URBAN_FIELD_BLOCK)
+        status = self.populate_combo(layer, self.dlg.urban_properties_block, self.params['urban_propierties_field_block'])
         if not status:
             return False
-        status = self.populate_combo(layer, self.dlg.urban_properties_number, self.URBAN_FIELD_NUMBER)   
+        status = self.populate_combo(layer, self.dlg.urban_properties_number, self.params['urban_propierties_field_number'])   
         if not status:
             return False
 

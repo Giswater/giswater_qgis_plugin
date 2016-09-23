@@ -501,11 +501,13 @@ class Giswater(QObject):
             status = self.search_plus.populate_dialog()
             self.actions['32'].setEnabled(status) 
             self.actions['32'].setCheckable(False) 
-        except:
-            self.search_plus.dlg.setVisible(False) 
+        except KeyError as e:
+            self.controller.show_warning("Error setting searchplus button: "+str(e))
             self.actions['32'].setVisible(False)                     
-            self.controller.show_warning("Error setting searchplus button")
             pass   
+        except RuntimeError as e:
+            self.controller.show_warning("Error setting searchplus button: "+str(e))
+            self.actions['32'].setVisible(False)                     
         
         self.custom_enable_actions()
             
