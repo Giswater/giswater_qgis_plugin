@@ -49,9 +49,12 @@ class Ed():
                   
             
     def ed_search_plus(self):   
-        ''' Button 32. Open dialog to select street and portal number ''' 
-        if self.search_plus is not None:
-            self.search_plus.dlg.setVisible(True) 
+        ''' Button 32. Open search plus dialog ''' 
+        try:
+            if self.search_plus is not None:         
+                self.search_plus.dlg.setVisible(True)             
+        except RuntimeError as e:
+            print "Error ed_search_plus: "+str(e)
             
                 
     def ed_add_element(self):
