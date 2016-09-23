@@ -37,13 +37,14 @@ class SearchPlus(QObject):
             return False        
         self.settings = QSettings(self.setting_file, QSettings.IniFormat)
         self.stylesFolder = self.plugin_dir+"/styles/"          
-        
-        # Load configuration data from tables
-        if not self.load_config_data():
-            return      
     
         # create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
+        
+        # Load configuration data from tables
+        if not self.load_config_data():
+            self.enabled = False
+            return      
         
         # set signals
         self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_number'], self.dlg.ppoint_number))     
@@ -58,6 +59,8 @@ class SearchPlus(QObject):
         self.dlg.urban_properties_block.activated.connect(partial(self.urban_zoom, self.params['urban_propierties_field_block'], self.dlg.urban_properties_block))        
         self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom, self.params['urban_propierties_field_number'], self.dlg.urban_properties_number))        
 
+        self.enabled = True
+            
     
     def load_plugin_settings(self):
         ''' Load plugin settings '''
@@ -80,7 +83,7 @@ class SearchPlus(QObject):
         sql = "SELECT * FROM "+self.controller.schema_name+".config_search_plus"
         row = self.controller.dao.get_row(sql)
         if not row:
-            self.controller.warning("No data found in configuration table 'config_search_plus'")
+            self.controller.show_warning("No data found in configuration table 'config_search_plus'")
             return False
 
         for i in range(0, len(row)):
@@ -93,66 +96,62 @@ class SearchPlus(QObject):
     def get_layers(self): 
         ''' Iterate over all layers to get the ones set in config file '''
         
-        # Initialize class variables
-        self.streetLayer = None
-        self.portalLayer = None     
-        self.ppointLayer = None 
-        self.hydrometerLayer = None
-        self.hydrometerLayerTo = None   
-        self.urbanLayer = None   
-         
+        # Initialize class variables        
         self.portalMemLayer = None            
         self.ppointMemLayer = None            
         self.hydrometerMemLayerTo = None
         self.urbanMemLayer = None
         
-        # Iterate over all layers            
+        # Iterate over all layers    
+        self.layers = {}        
         layers = self.iface.legendInterface().layers()
         for cur_layer in layers:            
             name = cur_layer.name().lower()
-
-            if self.params['street_layer'] == name:    
-                self.streetLayer = cur_layer
-            elif self.params['portal_layer'] == name:  
-                self.portalLayer = cur_layer       
+            if self.params['street_layer'] == name: 
+                self.layers['street_layer'] = cur_layer 
+            elif self.params['portal_layer'] == name:    
+                self.layers['portal_layer'] = cur_layer 
             elif self.params['ppoint_layer'] == name:  
-                self.ppointLayer = cur_layer       
+                self.layers['ppoint_layer'] = cur_layer     
             elif self.params['hydrometer_layer'] == name:   
-                self.hydrometerLayer = cur_layer       
+                self.layers['hydrometer_layer'] = cur_layer      
             if self.params['hydrometer_urban_propierties_layer'] == name:
-                self.hydrometerLayerTo = cur_layer    
+                self.layers['hydrometer_urban_propierties_layer'] = cur_layer  
             if self.params['urban_propierties_layer'] == name:
-                self.urbanLayer = cur_layer       
+                self.layers['urban_propierties_layer'] = cur_layer     
            
                          
     def populate_dialog(self):
         ''' Populate the interface with values get from layers '''                      
              
+        if not self.enabled:
+            return False
+                     
         # Get layers and full extent
         self.get_layers()       
         
         # Tab 'Hydrometer'            
-        status = self.populate_combo(self.hydrometerLayer, self.dlg.hydrometer_code, 
+        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_code, 
                                      self.params['hydrometer_urban_propierties_field_code'], self.params['hydrometer_field_code'])
         if not status:
             print "Error populating Tab 'Hydrometer'"
             self.dlg.tab_main.removeTab(3)
               
         # Tab 'Address'      
-        status = self.address_populate(self.streetLayer)
+        status = self.address_populate('street_layer')
         if not status:
             print "Error populating Tab 'Address'"   
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
-        status = self.populate_combo(self.ppointLayer, self.dlg.ppoint_press_zone, self.params['ppoint_field_zone'])
-        status_2 = self.populate_combo(self.ppointLayer, self.dlg.ppoint_number, self.params['ppoint_field_number'])
+        status = self.populate_combo('ppoint_layer', self.dlg.ppoint_press_zone, self.params['ppoint_field_zone'])
+        status_2 = self.populate_combo('ppoint_layer', self.dlg.ppoint_number, self.params['ppoint_field_number'])
         if not status or not status_2:
             print "Error populating Tab 'Ppoint'"
             self.dlg.tab_main.removeTab(1)              
               
         # Tab 'Urban Properties'      
-        status = self.urban_populate(self.urbanLayer)
+        status = self.urban_populate('urban_propierties_layer')
         if not status:
             print "Error populating Tab 'Urban Properties'"
             self.dlg.tab_main.removeTab(0)              
@@ -160,15 +159,18 @@ class SearchPlus(QObject):
         return True
         
                 
-    def address_populate(self, layer):
+    def address_populate(self, parameter):
         ''' Populate combo 'address_street' '''
         
         # Check if we have this search option available
-        if layer is None:  
-            print "Layer not found: Address"
+        if not parameter in self.layers:
+            layername = self.params[parameter]
+            message = "Layer '{}' not found in parameter '{}'".format(layername, parameter)  
+            self.controller.show_warning(message)          
             return False
 
         # Get layer features
+        layer = self.layers[parameter]        
         records = [(-1, '', '')]
         idx_field_code = layer.fieldNameIndex(self.params['street_field_code'])    
         idx_field_name = layer.fieldNameIndex(self.params['street_field_name'])
@@ -212,7 +214,7 @@ class SearchPlus(QObject):
         records = [[-1, '']]
         
         # Set filter expression
-        layer = self.portalLayer  
+        layer = self.layers['portal_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['portal_field_code'])            
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])   
         aux = self.params['portal_field_code']+" = '"+str(code)+"'" 
@@ -304,13 +306,14 @@ class SearchPlus(QObject):
         
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained             
-        it = self.portalLayer.getFeatures(QgsFeatureRequest(expr))
+        # Select featureswith the ids obtained         
+        layer = self.layers['portal_layer']    
+        it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        self.portalLayer.setSelectedFeatures(ids)
+        layer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.portalMemLayer = self.copy_selected(self.portalLayer, self.portalMemLayer, "Point")       
+        self.portalMemLayer = self.copy_selected(layer, self.portalMemLayer, "Point")       
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
@@ -356,13 +359,14 @@ class SearchPlus(QObject):
         
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained             
-        it = self.ppointLayer.getFeatures(QgsFeatureRequest(expr))
+        # Select featureswith the ids obtained  
+        layer = self.layers['ppoint_layer']           
+        it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        self.ppointLayer.setSelectedFeatures(ids)
+        layer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.ppointMemLayer = self.copy_selected(self.ppointLayer, self.ppointMemLayer, "Point")       
+        self.ppointMemLayer = self.copy_selected(layer, self.ppointMemLayer, "Point")       
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
@@ -381,13 +385,14 @@ class SearchPlus(QObject):
   
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained           
-        it = self.hydrometerLayerTo.getFeatures(QgsFeatureRequest(expr))
+        # Select featureswith the ids obtained 
+        layer = self.layers['hydrometer_urban_propierties_layer']          
+        it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        self.hydrometerLayerTo.setSelectedFeatures(ids)
+        layer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.hydrometerMemLayerTo = self.copy_selected(self.hydrometerLayerTo, self.hydrometerMemLayerTo, "Point")       
+        self.hydrometerMemLayerTo = self.copy_selected(layer, self.hydrometerMemLayerTo, "Point")       
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
@@ -419,37 +424,41 @@ class SearchPlus(QObject):
     
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
-        # Select features with the ids obtained             
-        it = self.urbanLayer.getFeatures(QgsFeatureRequest(expr))
+        # Select features with the ids obtained       
+        layer = self.layers['urban_propierties_layer']      
+        it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        self.urbanLayer.setSelectedFeatures(ids)
+        layer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.urbanMemLayer = self.copy_selected(self.urbanLayer, self.urbanMemLayer, "Polygon")       
+        self.urbanMemLayer = self.copy_selected(layer, self.urbanMemLayer, "Polygon")       
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
             
                 
-    def populate_combo(self, layer, combo, fieldname, fieldname_2=None):
+    def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
         ''' Populate selected combo from features of selected layer '''        
         
         # Check if we have this search option available
-        if layer is None:  
-            print "Layer not found. Related fieldname: "+fieldname          
+        if not parameter in self.layers:
+            layername = self.params[parameter]
+            message = "Layer '{}' not found in parameter '{}'".format(layername, parameter)  
+            self.controller.show_warning(message)          
             return False
 
         # Fields management
+        layer = self.layers[parameter]
         records = [(-1, '')]
         idx_field = layer.fieldNameIndex(fieldname) 
         if idx_field == -1:           
-            message = "Field '{}' not found in layer '{}'.".format(fieldname, layer.name())           
+            message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)           
             self.controller.show_warning(message)
             return False      
         if fieldname_2 is not None:
             idx_field_2 = layer.fieldNameIndex(fieldname_2) 
             if idx_field_2 == -1:           
-                message = "Field '{}' not found in layer '{}'.".format(fieldname_2, layer.name())           
+                message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname_2, parameter)           
                 self.controller.show_warning(message)
                 return False   
         else:

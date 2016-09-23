@@ -499,6 +499,7 @@ class Giswater(QObject):
                 self.search_plus.remove_memory_layers() 
             self.ed.search_plus = self.search_plus             
             status = self.search_plus.populate_dialog()
+            self.actions['32'].setVisible(status) 
             self.actions['32'].setEnabled(status) 
             self.actions['32'].setCheckable(False) 
         except KeyError as e:
