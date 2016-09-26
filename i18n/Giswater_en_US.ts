@@ -3058,7 +3058,7 @@
     <message>
         <source>label_link</source>
         <translation>Link</translation>
-    </message>	
+    </message>
     <message>
         <source>label_rotation</source>
         <translation>Rotation</translation>
@@ -3200,7 +3200,7 @@
         <translation>Node already related with 2 arcs</translation>
     </message>
 
-  
+
 
 </context>
 
