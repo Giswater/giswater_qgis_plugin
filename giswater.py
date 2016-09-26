@@ -25,6 +25,7 @@ from map_tools.move_node_map_tool import MoveNodeMapTool
 from map_tools.mincut_map_tool import MincutMapTool
 from map_tools.delete_node_map_tool import DeleteNodeMapTool
 from map_tools.connec_map_tool import ConnecMapTool
+from map_tools.extract_raster_value_map_tool import ExtractRasterValue
 from search.search_plus import SearchPlus
 
 
@@ -176,13 +177,16 @@ class Giswater(QObject):
             elif int(index_action) == 17:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 18:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
             elif int(index_action) == 26:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 27:
+            elif int(index_action) in (27, 99):
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
@@ -505,6 +509,11 @@ class Giswater(QObject):
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
         map_tool.set_controller(self.controller)
 
+        map_tool = self.map_tools['mg_extract_raster_value']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        map_tool.set_config_action(self.actions['99'])
+
         # Create SearchPlus object
         try:
             if self.search_plus is None:
@@ -572,8 +581,7 @@ class Giswater(QObject):
         ''' Enable selected actions '''
         
         # Enable MG toolbar
-        self.enable_actions(True, 16, 27)        
-        self.enable_action(False, 18)        
+        self.enable_actions(True, 16, 27)
         self.enable_action(False, 22)        
         self.enable_action(False, 23)        
         

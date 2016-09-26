@@ -96,6 +96,11 @@ class SnappingConfigManager():
         QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
 
 
+    def snapToLayer(self, Layer):
+        ''' Set snapping to Layer '''
+        QgsProject.instance().setSnapSettingsForLayer(Layer.id(), True, 2, 2, 1.0, False)
+
+
     def applySnappingOptions(self, snappingsOptions):
         ''' Function that restores the previous snapping '''
 
