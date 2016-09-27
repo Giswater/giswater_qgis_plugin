@@ -34,8 +34,10 @@ class SnappingConfigManager():
 
         # Snapper
         self.snapper = QgsMapCanvasSnapper(self.canvas)
-        
-        
+        proj = QgsProject.instance()
+        proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
+
+
     def set_layers(self, layer_arc, layer_connec, layer_node):
         self.layer_arc = layer_arc
         self.layer_connec = layer_connec

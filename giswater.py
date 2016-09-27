@@ -23,6 +23,7 @@ from map_tools.line_map_tool import LineMapTool
 from map_tools.point_map_tool import PointMapTool
 from map_tools.move_node_map_tool import MoveNodeMapTool
 from map_tools.mincut_map_tool import MincutMapTool
+from map_tools.flow_trace_flow_exit_map_tool import FlowTraceFlowExitMapTool
 from map_tools.delete_node_map_tool import DeleteNodeMapTool
 from map_tools.connec_map_tool import ConnecMapTool
 from map_tools.extract_raster_value_map_tool import ExtractRasterValue
@@ -186,6 +187,12 @@ class Giswater(QObject):
             elif int(index_action) == 20:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 56:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 57:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) in (27, 99):
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
@@ -193,7 +200,7 @@ class Giswater(QObject):
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
 
             if map_tool:
-                self.map_tools[function_name] = map_tool       
+                self.map_tools[function_name] = map_tool
         
         return action         
         
@@ -266,6 +273,8 @@ class Giswater(QObject):
             for i in range(17,28):
                 self.add_action(str(i), self.toolbar_mg, self.ag_mg)
             self.add_action('99', self.toolbar_mg, self.ag_mg)
+            self.add_action('56', self.toolbar_mg, self.ag_mg)
+            self.add_action('57', self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
@@ -371,12 +380,20 @@ class Giswater(QObject):
             for feature in features:
                 wsoftware = feature['wsoftware']
                 if wsoftware.lower() == 'epanet':
-                    self.mg.project_type = 'ws'     
-                    if self.toolbar_ws_enabled:                
+                    self.mg.project_type = 'ws'
+                    self.actions['26'].setVisible(True)
+                    self.actions['27'].setVisible(True)
+                    self.actions['56'].setVisible(False)
+                    self.actions['57'].setVisible(False)
+                    if self.toolbar_ws_enabled:
                         self.toolbar_ws.setVisible(True)                            
                 elif wsoftware.lower() == 'epaswmm':
                     self.mg.project_type = 'ud'
-                    if self.toolbar_ud_enabled:                
+                    self.actions['26'].setVisible(False)
+                    self.actions['27'].setVisible(False)
+                    self.actions['56'].setVisible(True)
+                    self.actions['57'].setVisible(True)
+                    if self.toolbar_ud_enabled:
                         self.toolbar_ud.setVisible(True)                
             
             # Set visible MANAGEMENT and EDIT toolbar  
@@ -501,10 +518,18 @@ class Giswater(QObject):
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
         map_tool.set_controller(self.controller)
         
+        map_tool = self.map_tools['mg_mincut']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
         map_tool = self.map_tools['mg_flow_trace']
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
         map_tool.set_controller(self.controller)
-        
+
+        map_tool = self.map_tools['mg_flow_exit']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
         map_tool = self.map_tools['mg_connec_tool']
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
         map_tool.set_controller(self.controller)

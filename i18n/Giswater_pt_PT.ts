@@ -194,6 +194,14 @@
         <translation>Valves configuration analysis</translation>
     </message>
     <message>
+        <source>56_text</source>
+        <translation>Select upstream nodes</translation>
+    </message>
+    <message>
+        <source>57_text</source>
+        <translation>Select downstream nodes</translation>
+    </message>
+    <message>
         <source>28_text</source>
         <translation>Change node type</translation>
     </message>

@@ -312,8 +312,9 @@ class ExtractRasterValue(ParentMapTool):
             self.writeInterpolation(f, self.fieldIdx)
             QCoreApplication.processEvents()
 
-            self.controller.show_warning(
-                "%u values have been updated in layer %s over %u points" % (c, self.vectorLayer.name(), k))
+        self.controller.show_info(
+            "%u values have been updated in layer %s.%s over %u points using %s raster" % (
+            c, self.vectorLayer.name(), self.fieldName, k, self.table_raster))
 
         # Check editable
         if layer.isEditable():
