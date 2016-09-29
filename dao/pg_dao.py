@@ -10,6 +10,7 @@ class PgDao():
         
         
     def init_db(self):
+        ''' Initializes database connection '''        
         try:
             self.conn = psycopg2.connect(self.conn_string)
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -22,16 +23,18 @@ class PgDao():
 
 
     def set_params(self, host, port, dbname, user, password):
+        ''' Set database parameters '''        
         self.host = host
         self.port = port
         self.dbname = dbname
         self.user = user
         self.password = password
-        self.conn_string = "host="+self.host+" port="+self.port+" dbname="+self.dbname+" user="+self.user+" password="+self.password       
+        self.conn_string = "host="+self.host+" port="+self.port
+        self.conn_string+= " dbname="+self.dbname+" user="+self.user+" password="+self.password
         
         
     def get_rows(self, sql):
-        
+        ''' Get multiple rows from selected query '''
         self.last_error = None           
         rows = None
         try:
@@ -46,7 +49,7 @@ class PgDao():
     
     
     def get_row(self, sql):
-        
+        ''' Get single row from selected query '''        
         self.last_error = None           
         row = None
         try:
@@ -61,7 +64,7 @@ class PgDao():
         
         
     def get_column_name(self, index):
-        
+        ''' Get column name of selected index '''        
         name = None
         try:
             name = self.cursor.description[index][0]
@@ -72,7 +75,7 @@ class PgDao():
         
         
     def get_columns_length(self):
-        
+        ''' Get number of columns of current query '''        
         total = None
         try:
             total = len(self.cursor.description)
@@ -83,12 +86,13 @@ class PgDao():
 
 
     def execute_sql(self, sql, autocommit=True):
-        
+        ''' Execute selected query '''
         self.last_error = None         
         status = True
         try:
             self.cursor.execute(sql) 
-            self.commit()
+            if autocommit:
+                self.commit()
         except Exception as e:
             print "execute_sql: {0}".format(e)   
             self.last_error = e               
@@ -98,42 +102,48 @@ class PgDao():
             return status 
 
 
-    def get_rowcount(self):        
+    def get_rowcount(self):       
+        ''' Returns number of rows of current query '''         
         return self.cursor.rowcount      
  
  
     def commit(self):
+        ''' Commit current database transaction '''
         self.conn.commit()
         
         
     def rollback(self):
+        ''' Rollback current database transaction '''
         self.conn.rollback()
         
         
-    def check_schema(self, schemaName):
-        
+    def check_schema(self, schemaname):
+        ''' Check if selected schema exists ''' 
         exists = True
-        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = '"+schemaName+"'"    
+        sql = "SELECT schema_name FROM information_schema.schemata"
+        sql+= " WHERE schema_name = '"+schemaname+"'"    
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
         return exists         
     
     
-    def check_table(self, schemaName, tableName):
-        
+    def check_table(self, schemaname, tablename):
+        ''' Check if selected table exists in selected schema '''        
         exists = True
-        sql = "SELECT * FROM pg_tables WHERE schemaname = '"+schemaName+"' AND tablename = '"+tableName+"'"    
+        sql = "SELECT * FROM pg_tables"
+        sql+= " WHERE schemaname = '"+schemaname+"' AND tablename = '"+tablename+"'"    
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
         return exists         
     
     
-    def check_view(self, schemaName, viewName):
-        
+    def check_view(self, schemaname, viewname):
+        ''' Check if selected view exists in selected schema '''
         exists = True
-        sql = "SELECT * FROM pg_views WHERE schemaname = '"+schemaName+"' AND viewname = '"+viewName+"'"    
+        sql = "SELECT * FROM pg_views"
+        sql+= " WHERE schemaname = '"+schemaname+"' AND viewname = '"+viewname+"'"    
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
@@ -141,7 +151,7 @@ class PgDao():
 
 
     def copy_expert(self, sql, csv_file):
-        
+        ''' Dumps contents of the query to selected CSV file '''
         try:
             self.cursor.copy_expert(sql, csv_file)
             return None
