@@ -18,23 +18,22 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle
+from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QgsRaster, QgsFeature, QgsFeatureRequest
 from qgis.gui import QgsRubberBand, QgsVertexMarker
-from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor
+from PyQt4.QtCore import QPoint, QRect, Qt, QCoreApplication
+from PyQt4.QtGui import QApplication, QColor, QAction
 
-from parent_map_tool import ParentMapTool
+from map_tools.parent import ParentMapTool
 
 
-class ConnecMapTool(ParentMapTool):
-    ''' Button 20. User select connections from layer 'connec'
-    Execute SQL function: 'gw_fct_connect_to_network' '''    
+class ExtractRasterValue(ParentMapTool):
+    ''' Button 18. User select nodes and assign raster elevation or value '''
 
     def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
 
         # Call ParentMapTool constructor
-        super(ConnecMapTool, self).__init__(iface, settings, action, index_action)
+        super(ExtractRasterValue, self).__init__(iface, settings, action, index_action)
 
         self.dragging = False
 
@@ -56,11 +55,15 @@ class ConnecMapTool(ParentMapTool):
         # Select rectangle
         self.selectRect = QRect()
 
+        # Init
+        self.vectorLayer = None
+        self.rasterLayer = None
+
 
     def reset(self):
         ''' Clear selected features '''
         
-        layer = self.layer_connec
+        layer = self.vectorLayer
         if layer is not None:
             layer.removeSelection()
 
@@ -68,11 +71,17 @@ class ConnecMapTool(ParentMapTool):
         self.rubberBand.reset()
 
 
+    def set_config_action(self, action_99):
+        ''' Get the config form action'''
+        self.configAction = action_99
 
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
+
+        if self.vectorLayer is None:
+            return
         
         if event.buttons() == Qt.LeftButton:
 
@@ -102,7 +111,7 @@ class ConnecMapTool(ParentMapTool):
                 # Check Arc or Node
                 for snapPoint in result:
 
-                    if snapPoint.layer == self.layer_connec:
+                    if snapPoint.layer == self.vectorLayer:
 
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)
@@ -131,7 +140,7 @@ class ConnecMapTool(ParentMapTool):
             eventPoint = QPoint(x, y)
 
             # Node layer
-            layer = self.layer_connec
+            layer = self.vectorLayer
 
             # Not dragging, just simple selection
             if not self.dragging:
@@ -140,14 +149,14 @@ class ConnecMapTool(ParentMapTool):
                 (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
                 # That's the snapped point
-                if result <> [] and (result[0].layer.name() == self.layer_connec.name()):
+                if result <> [] and (result[0].layer.name() == self.vectorLayer.name()):
                     
                     point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                     layer.removeSelection()
                     layer.select([result[0].snappedAtGeometry])
 
-                    # Create link
-                    self.link_connec()
+                    # Interpolate values
+                    self.raster_interpolate()
 
                     # Hide highlight
                     self.vertexMarker.hide()
@@ -166,13 +175,13 @@ class ConnecMapTool(ParentMapTool):
                 self.select_multiple_features(self.selectRectMapCoord)
                 self.dragging = False
 
-                # Create link
-                self.link_connec()
+                # Interpolate values
+                self.raster_interpolate()
 
         elif event.button() == Qt.RightButton:
 
-            # Create link
-            self.link_connec()
+            # Interpolate values
+            self.raster_interpolate()
 
 
     def activate(self):
@@ -189,8 +198,11 @@ class ConnecMapTool(ParentMapTool):
         # Clear snapping
         self.snapperManager.clearSnapping()
 
-        # Set snapping to arc and node
-        self.snapperManager.snapToConnec()
+        # Get layers
+        res = self.find_raster_layers()
+#        if res == 0:
+#            self.controller.show_warning("Raster configuration tool not properly configured.")
+#            return
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -203,9 +215,9 @@ class ConnecMapTool(ParentMapTool):
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(self.layer_connec)
+                self.canvas.setCurrentLayer(self.layer_arc)
         except:
-            self.canvas.setCurrentLayer(self.layer_connec)
+            self.canvas.setCurrentLayer(self.layer_arc)
 
 
     def deactivate(self):
@@ -223,27 +235,91 @@ class ConnecMapTool(ParentMapTool):
         self.canvas.setCursor(self.stdCursor)
 
 
-    def link_connec(self):
-        ''' Link selected connec to the pipe '''
+    def nearestNeighbor(self, thePoint):
 
-        # Get selected features (from layer 'connec')
-        aux = "{"
-        layer = self.layer_connec
+        ident = self.dataProv.identify(thePoint, QgsRaster.IdentifyFormatValue)
+        value = None
+        if ident is not None:  # and ident.has_key(choosenBand+1):
+            try:
+                value = float(ident.results()[int(self.band)])
+            except TypeError:
+                value = None
+        if value == self.noDataValue:
+            return None
+        return value
+
+
+    def writeInterpolation(self, f, fieldIdx):
+
+        thePoint = f.geometry().asPoint()
+        value = self.nearestNeighbor(thePoint)
+        self.vectorLayer.changeAttributeValue(f.id(), fieldIdx, value)
+
+
+    def raster_interpolate(self):
+        ''' Interpolate features value from raster '''
+
+        # Interpolate values
+        if self.vectorLayer is None and self.rasterLayer is None:
+            return
+
+        # Get data provider
+        layer = self.vectorLayer
+        self.dataProv = self.rasterLayer.dataProvider()
+        if self.dataProv.srcNoDataValue(int(self.band)):
+            self.noDataValue = self.dataProv.srcNoDataValue(int(self.band))
+        else:
+            self.noDataValue = None
+
+        self.continueProcess = True
+
+        self.fieldIdx = ""
+        self.fieldIdx = layer.fieldNameIndex(self.fieldName)
+
+        if self.band == 0:
+            self.controller.show_warning("You must choose a band for the raster layer.")
+            return
+        if self.fieldName == "":
+            self.controller.show_warning("You must choose a field to write values.")
+            return
+        if self.fieldIdx < 0:
+            self.controller.show_warning("Selected field does not exist in feature layer.")
+            return
+
+        k = 0
+        c = 0
+        f = QgsFeature()
+
+        # Check features selected
         if layer.selectedFeatureCount() == 0:
             message = "You have to select at least one feature!"
             self.controller.show_warning(message, context_name='ui_message')
-               
-            return
-        features = layer.selectedFeatures()
-        for feature in features:
-            connec_id = feature.attribute('connec_id')
-            aux += str(connec_id) + ", "
-        connec_array = aux[:-2] + "}"
 
-        # Execute function
-        function_name = "gw_fct_connect_to_network"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
-        self.controller.execute_sql(sql)
+            return
+
+        # Check editable
+        if not layer.isEditable():
+            layer.startEditing()
+
+        # Get selected id's
+        ids = self.vectorLayer.selectedFeaturesIds()
+
+        for fid in ids:
+
+            k += 1
+            layer.getFeatures(QgsFeatureRequest(fid)).nextFeature(f)
+            c += 1
+            self.writeInterpolation(f, self.fieldIdx)
+            QCoreApplication.processEvents()
+
+        self.controller.show_info(
+            "%u values have been updated in layer %s.%s over %u points using %s raster" % (
+            c, self.vectorLayer.name(), self.fieldName, k, self.table_raster))
+
+        # Check editable
+        if layer.isEditable():
+            layer.commitChanges()
+
 
         # Refresh map canvas
         self.rubberBand.reset()
@@ -285,15 +361,89 @@ class ConnecMapTool(ParentMapTool):
         elif modifiers == Qt.ShiftModifier:
             behaviour = QgsVectorLayer.RemoveFromSelection
 
-        if self.layer_connec is None:
+        if self.vectorLayer is None:
             return
 
         # Change cursor
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
         # Selection
-        self.layer_connec.selectByRect(selectGeometry, behaviour)
+        self.vectorLayer.selectByRect(selectGeometry, behaviour)
 
         # Old cursor
         QApplication.restoreOverrideCursor()
 
+
+    def find_raster_layers(self):
+
+        # Query database (form data)
+        sql = "SELECT *"
+        sql += " FROM " + self.schema_name + ".config_extract_raster_value"
+
+        rows = self.controller.get_rows(sql)
+
+        if not rows:
+            self.controller.show_warning("Any data found in table config_extract_raster_value")
+            self.configAction.activate(QAction.Trigger)
+            return 0
+
+        # Layers
+        row = rows[0]
+        self.table_raster = row[1]
+        self.band = row[2]
+        self.table_vector = row[3]
+        self.fieldName = row[4]
+
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return
+
+        # Init layers
+        self.rasterLayer = None
+        self.vectorLayer = None
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+
+            if cur_layer.name() == self.table_raster:
+                self.rasterLayer = cur_layer
+
+            (uri_schema, uri_table) = self.get_layer_source(cur_layer)  # @UnusedVariable
+            if uri_table is not None:
+                if self.table_vector in uri_table:
+                    self.vectorLayer = cur_layer
+
+
+        # Check config
+        if self.vectorLayer is None or self.rasterLayer is None:
+            self.configAction.activate(QAction.Trigger)
+
+        # Set snapping
+        if self.vectorLayer <> None:
+            self.snapperManager.snapToLayer(self.vectorLayer)
+        else:
+            self.controller.show_warning("Check vector_layer in config form, layer does not exist or is not defined.")
+            return 0
+
+        if self.rasterLayer == None:
+            self.controller.show_warning("Check raster_layer in config form, layer does not exist or is not defined.")
+            return 0
+
+        return 1
+
+
+    def get_layer_source(self, layer):
+        ''' Get table or view name of selected layer '''
+
+        uri_schema = None
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.rfind('.')
+        pos_fi = uri.find('" ')
+        if pos_ini <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini + 6:pos_end_schema]
+            uri_table = uri[pos_ini + 6:pos_fi + 1]
+
+        return uri_schema, uri_table

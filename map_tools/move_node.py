@@ -23,7 +23,7 @@ from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
-from parent_map_tool import ParentMapTool
+from map_tools.parent import ParentMapTool
 
 
 class MoveNodeMapTool(ParentMapTool):

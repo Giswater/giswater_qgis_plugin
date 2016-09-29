@@ -19,14 +19,14 @@ from functools import partial
 from actions.ed import Ed
 from actions.mg import Mg
 from controller import DaoController
-from map_tools.line_map_tool import LineMapTool
-from map_tools.point_map_tool import PointMapTool
-from map_tools.move_node_map_tool import MoveNodeMapTool
-from map_tools.mincut_map_tool import MincutMapTool
-from map_tools.flow_trace_flow_exit_map_tool import FlowTraceFlowExitMapTool
-from map_tools.delete_node_map_tool import DeleteNodeMapTool
-from map_tools.connec_map_tool import ConnecMapTool
-from map_tools.extract_raster_value_map_tool import ExtractRasterValue
+from map_tools.line import LineMapTool
+from map_tools.point import PointMapTool
+from map_tools.move_node import MoveNodeMapTool
+from map_tools.mincut import MincutMapTool
+from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
+from map_tools.delete_node import DeleteNodeMapTool
+from map_tools.connec import ConnecMapTool
+from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
 
 
