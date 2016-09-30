@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QMessageBox
+from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel
 
 import os
 import sys
@@ -38,7 +38,6 @@ class Ed():
     
                   
     def close_dialog(self, dlg=None): 
-        
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
@@ -57,6 +56,37 @@ class Ed():
             print "Error ed_search_plus: "+str(e)
             
                 
+    def ed_check(self):
+        ''' Initial check for buttons 33 and 34 '''
+        
+        # Check if at least one node is checked          
+        self.layer = self.iface.activeLayer()  
+        if self.layer is None:
+            message = "You have to select a layer"
+            self.controller.show_info(message, context_name='ui_message')  
+            return False       
+            
+        count = self.layer.selectedFeatureCount()   
+        if count == 0:
+            message = "You have to select at least one feature!"
+            self.controller.show_info(message, context_name='ui_message')  
+            return False  
+        elif count > 1:  
+            message = "More than one feature selected. Only the first one will be processed!"
+            self.controller.show_info(message, context_name='ui_message') 
+
+        return True
+    
+    
+    def populate_combo(self, widget, table_name, field_name="id"): 
+        ''' Executes query and fill combo box ''' 
+        sql = "SELECT "+field_name+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field_name
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox(widget, rows)
+        if len(rows) > 0:  
+            utils_giswater.setCurrentIndex(widget, 1);             
+        
+                          
     def ed_add_element(self):
         ''' Button 33. Add element '''
           
@@ -69,55 +99,22 @@ class Ed():
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'element')            
         
-        # Check if at least one node is checked          
-        layer = self.iface.activeLayer()  
-        count = layer.selectedFeatureCount()   
-        
-        if count == 0:
-            message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message' )  
-            return 
-        elif count > 1:  
-            message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message' ) 
+        # Check if we have at least one feature selected
+        if not self.ed_check():
+            return
             
-        # Fill  comboBox elementcat_id
-        sql = "SELECT DISTINCT(elementcat_id) FROM "+self.schema_name+".element ORDER BY elementcat_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("elementcat_id", rows) 
-        
-        # Fill  comboBox state
-        sql = "SELECT DISTINCT(state) FROM "+self.schema_name+".element ORDER BY state"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("state", rows)
-        
-        # Fill comboBox location_type 
-        sql = "SELECT DISTINCT(location_type) FROM "+self.schema_name+".element ORDER BY location_type"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("location_type", rows)
-        
-        # Fill comboBox workcat_id 
-        sql = "SELECT DISTINCT(workcat_id) FROM "+self.schema_name+".element ORDER BY workcat_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("workcat_id", rows)
-        
-        # Fill comboBox buildercat_id
-        sql = "SELECT DISTINCT(buildercat_id) FROM "+self.schema_name+".element ORDER BY buildercat_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("buildercat_id", rows)
-        
-        # Fill comboBox ownercat_id 
-        sql = "SELECT DISTINCT(ownercat_id) FROM "+self.schema_name+".element ORDER BY ownercat_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("ownercat_id", rows)
-        
-        # Fill comboBox verified
-        sql = "SELECT DISTINCT(verified) FROM "+self.schema_name+".element ORDER BY verified"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("verified", rows)
+        # Fill combo boxes
+        self.populate_combo("elementcat_id", "cat_element")
+        self.populate_combo("state", "value_state")
+        self.populate_combo("location_type", "man_type_location")
+        self.populate_combo("workcat_id", "cat_work")
+        self.populate_combo("buildercat_id", "cat_builder")
+        self.populate_combo("elementcat_id", "cat_element")
+        self.populate_combo("ownercat_id", "cat_owner")
+        self.populate_combo("verified", "value_verified")
         
         # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit,"element_id")
+        self.edit = self.dlg.findChild(QLineEdit, "element_id")
         self.completer = QCompleter()
         self.edit.setCompleter(self.completer)
         model = QStringListModel()
@@ -129,7 +126,7 @@ class Ed():
         model.setStringList(row)
         self.completer.setModel(model)
         
-        # Set signal to reach sellected value from QCompleter
+        # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_el_autocomplete)
         
         # Open the dialog
@@ -137,209 +134,74 @@ class Ed():
         
     
     def ed_add_el_autocomplete(self):    
+        ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
 
-        # Action on click when value is selected ( ComboBox - Qcompleter )
-        # Qcompleter event- get selected value
         self.dlg.element_id.setCompleter(self.completer)
-        self.element_id = utils_giswater.getWidgetText("element_id") 
+        element_id = utils_giswater.getWidgetText("element_id") 
         
-        sql = "SELECT elementcat_id FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.elementcat_id = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("elementcat_id", self.elementcat_id[0])
+        # Get values from database       
+        sql = "SELECT elementcat_id, location_type, ownercat_id, state, workcat_id," 
+        sql+= " buildercat_id, annotation, observ, comment, link, verified, rotation"
+        sql+= " FROM "+self.schema_name+".element" 
+        sql+= " WHERE element_id = '"+element_id+"'"
+        row = self.dao.get_row(sql)
         
-        sql = "SELECT location_type FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.location_type  = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("location_type", self.location_type[0])
-        
-        sql = "SELECT ownercat_id FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.ownercat_id = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("ownercat_id", self.ownercat_id[0])
-        
-        sql = "SELECT state FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.state = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("state", self.state[0])
-        
-        sql = "SELECT workcat_id FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.workcat_id = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("workcat_id", self.workcat_id[0]) 
-        
-        sql = "SELECT buildercat_id FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.buildercat_id = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("buildercat_id", self.buildercat_id[0])
-        
-        sql = "SELECT annotation FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.annotation = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("annotation", self.annotation[0]) 
-        
-        sql = "SELECT observ FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.observ = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("observ", self.observ[0])
-        
-        sql = "SELECT comment FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.comment = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("comment", self.comment[0]) 
-        
-        sql = "SELECT link FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.link = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("link", self.link[0])  
-        
-        sql = "SELECT verified FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.verified = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("verified", self.verified[0])
-        
-        sql = "SELECT rotation FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"
-        self.rotation = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("rotation", self.rotation[0])
-         
+        # Fill widgets
+        columns_length = self.dao.get_columns_length()
+        for i in range(0, columns_length):
+            column_name = self.dao.get_column_name(i)
+            utils_giswater.setWidgetText(column_name, row[column_name]) 
+
     
     def ed_add_element_accept(self):
            
-        # Get values from comboboxes-elementcat_id
-        self.elementcat_id = utils_giswater.getWidgetText("elementcat_id")  
-        
-        # Get state from combobox
-        self.state = utils_giswater.getWidgetText("state")   
-               
-        # Get element_id entered by user
-        self.element_id = utils_giswater.getWidgetText("element_id")
-        self.annotation = utils_giswater.getWidgetText("annotation")
-        self.observ = utils_giswater.getWidgetText("observ")
-        self.comment = utils_giswater.getWidgetText("comment")
-        self.location_type = utils_giswater.getWidgetText("location_type")
-        self.workcat_id = utils_giswater.getWidgetText("workcat_id")
-        self.buildercat_id = utils_giswater.getWidgetText("buildercat_id")
-        self.ownercat_id = utils_giswater.getWidgetText("ownercat_id")
-        self.rotation = utils_giswater.getWidgetText("rotation")
-        self.link = utils_giswater.getWidgetText("link")
-        self.verified = utils_giswater.getWidgetText("verified")
+        # Get values from dialog
+        element_id = utils_giswater.getWidgetText("element_id")
+        elementcat_id = utils_giswater.getWidgetText("elementcat_id")  
+        state = utils_giswater.getWidgetText("state")   
+        annotation = utils_giswater.getWidgetText("annotation")
+        observ = utils_giswater.getWidgetText("observ")
+        comment = utils_giswater.getWidgetText("comment")
+        location_type = utils_giswater.getWidgetText("location_type")
+        workcat_id = utils_giswater.getWidgetText("workcat_id")
+        buildercat_id = utils_giswater.getWidgetText("buildercat_id")
+        ownercat_id = utils_giswater.getWidgetText("ownercat_id")
+        rotation = utils_giswater.getWidgetText("rotation")
+        link = utils_giswater.getWidgetText("link")
+        verified = utils_giswater.getWidgetText("verified")
 
         # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(element_id) FROM "+self.schema_name+".element WHERE element_id = '"+self.element_id+"'"    
+        sql = "SELECT DISTINCT(element_id) FROM "+self.schema_name+".element WHERE element_id = '"+element_id+"'"    
         row = self.dao.get_row(sql)
         if row:
-            answer = self.ed_add_element_confirm()
+            answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
                 sql = "UPDATE "+self.schema_name+".element"
-                sql+= " SET element_id = '"+self.element_id+"', elementcat_id= '"+self.elementcat_id+"',state = '"+self.state+"', location_type = '"+self.location_type+"'"
-                sql+= ", workcat_id= '"+self.workcat_id+"',buildercat_id = '"+self.buildercat_id+"', ownercat_id = '"+self.ownercat_id+"'"
-                sql+= ", rotation= '"+self.rotation+"',comment = '"+self.comment+"', annotation = '"+self.annotation+"', observ= '"+self.observ+"',link = '"+self.link+"', verified = '"+self.verified+"'"
-                sql+= " WHERE element_id = '"+self.element_id+"'" 
+                sql+= " SET element_id = '"+element_id+"', elementcat_id= '"+elementcat_id+"',state = '"+state+"', location_type = '"+location_type+"'"
+                sql+= ", workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
+                sql+= ", rotation= '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ= '"+observ+"',link = '"+link+"', verified = '"+verified+"'"
+                sql+= " WHERE element_id = '"+element_id+"'" 
                 self.dao.execute_sql(sql)  
             else:
                 self.close_dialog(self.dlg)
         else:
             sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
             sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified) "
-            sql+= " VALUES ('"+self.element_id+"', '"+self.elementcat_id+"', '"+self.state+"', '"+self.location_type+"', '"
-            sql+= self.workcat_id+"', '"+self.buildercat_id+"', '"+self.ownercat_id+"', '"+self.rotation+"', '"+self.comment+"', '"
-            sql+= self.annotation+"','"+self.observ+"','"+self.link+"','"+self.verified+"')"
+            sql+= " VALUES ('"+element_id+"', '"+elementcat_id+"', '"+state+"', '"+location_type+"', '"
+            sql+= workcat_id+"', '"+buildercat_id+"', '"+ownercat_id+"', '"+rotation+"', '"+comment+"', '"
+            sql+= annotation+"','"+observ+"','"+link+"','"+verified+"')"
             status = self.controller.execute_sql(sql) 
             if not status:
                 message = "Error inserting element in table, you need to review data"
-                self.controller.show_warning(message, context_name='ui_message' ) 
+                self.controller.show_warning(message, context_name='ui_message') 
                 return
         
-        # Get layers
-        layers = self.iface.legendInterface().layers()
-        if len(layers) == 0:
-            return
-         
-        # Initialize variables                          
-        self.layer_arc = None
-        table_arc = self.schema_name+'."'+self.table_arc+'"'
-        table_node = self.schema_name+'."'+self.table_node+'"'
-        table_connec = self.schema_name+'."'+self.table_connec+'"'
-        table_gully = self.schema_name+'."'+self.table_gully+'"'
-        
-        # Iterate over all layers to get the ones set in config file        
-        for cur_layer in layers:     
-            uri = cur_layer.dataProvider().dataSourceUri().lower()   
-            pos_ini = uri.find('table=')
-            pos_fi = uri.find('" ')  
-            uri_table = uri 
-
-            if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]    
-                
-                # Table 'arc'                       
-                if table_arc == uri_table:  
-                    self.layer_arc = cur_layer
-                    self.count_arc = self.layer_arc.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_arcs = self.layer_arc.selectedFeatures()
-                    i = 0
-                    while (i < self.count_arc):
-                     
-                        # Get arc_id from current arc
-                        feature = features_arcs[i]
-                        self.arc_id = feature.attribute('arc_id')
-                        
-                        # Execute id(automaticaly),element_id and node_id to element_x_arc
-                        sql = "INSERT INTO "+self.schema_name+".element_x_arc (arc_id,element_id) "
-                        sql+= " VALUES ('"+self.arc_id+"','"+self.element_id+"')"
-                        self.dao.execute_sql()
-                        i+=1
-                 
-                # Table 'node'   
-                elif table_node == uri_table:  
-                    self.layer_node = cur_layer
-                    self.count_node = self.layer_node.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_nodes = self.layer_node.selectedFeatures()
-                    i = 0
-                    while (i < self.count_node):
-                          
-                        # Get node_id from current node
-                        feature_node = features_nodes[i]
-                        self.node_id = feature_node.attribute('node_id')
-
-                        # Execute id(automaticaly),element_id and node_id to element_x_node
-                        sql = "INSERT INTO "+self.schema_name+".element_x_node (node_id, element_id) "
-                        sql+= " VALUES ('"+self.node_id+"', '"+self.element_id+"')"
-                        self.dao.execute_sql(sql)   
-                        i+=1
-
-                # Table 'connec'       
-                elif table_connec == uri_table:  
-                    self.layer_connec = cur_layer
-                    self.count_connec = self.layer_connec.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_connecs = self.layer_connec.selectedFeatures()
-                    i = 0
-                    while (i < self.count_connec):
-
-                        # Get connec_id from current connec
-                        feature_connec = features_connecs[i]
-                        self.connec_id = feature_connec.attribute('connec_id')
-
-                        # Execute id(automaticaly),element_id and node_id to element_x_node
-                        sql = "INSERT INTO "+self.schema_name+".element_x_connec (connec_id, element_id) "
-                        sql+= " VALUES ('"+self.connec_id+"', '"+self.element_id+"')"
-                        self.dao.execute_sql(sql)   
-                        i+=1
-                        
-                # Table 'gully'   
-                elif table_gully == uri_table:  
-                    self.layer_gully = cur_layer
-                    self.count_gully = self.layer_gully.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_gullys = self.layer_gully.selectedFeatures()
-                    i = 0
-                    while (i < self.count_gully):
-                          
-                        # Get node_id from current gully
-                        feature_gully = features_gullys[i]
-                        self.gully_id = feature_gully.attribute('gully_id')
-
-                        # Execute id(automaticaly),element_id and gully_id to element_x_gully
-                        sql = "INSERT INTO "+self.schema_name+".element_x_gully (gully_id, element_id) "
-                        sql+= " VALUES ('"+self.gully_id+"', '"+self.element_id+"')"
-                        self.dao.execute_sql(sql)   
-                        i+=1
+        # Add document to selected feature
+        self.ed_add_to_feature("element", element_id)
                 
         # Show message to user
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message' )
+        self.controller.show_info(message, context_name='ui_message')
         self.close_dialog()
     
     
@@ -355,29 +217,16 @@ class Ed():
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')               
         
-        # Check if at least one node is checked          
-        layer = self.iface.activeLayer()  
-        count = layer.selectedFeatureCount()           
-        if count == 0:
-            message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message' )
-            return 
-        elif count > 1:  
-            message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message' )
+        # Check if we have at least one feature selected
+        if not self.ed_check():
+            return
             
-        # Fill comboBox elementcat_id
-        sql = "SELECT id FROM "+self.schema_name+".doc_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_type", rows) 
-        
-        # Fill comboBox tagcat_id
-        sql = "SELECT id FROM "+self.schema_name+".cat_tag ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("tagcat_id", rows) 
+        # Fill combo boxes
+        self.populate_combo("doc_type", "doc_type")
+        self.populate_combo("tagcat_id", "cat_tag")
         
         # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit,"doc_id")
+        self.edit = self.dlg.findChild(QLineEdit, "doc_id")
         self.completer = QCompleter()
         self.edit.setCompleter(self.completer)
         model = QStringListModel()
@@ -390,200 +239,108 @@ class Ed():
         model.setStringList(row)
         self.completer.setModel(model)
         
-        # Set signal to reach sellected value from QCompleter
+        # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_file_autocomplete)
         
         # Open the dialog
         self.dlg.exec_()
         
         
-    def ed_add_file_autocomplete(self):    
+    def ed_add_file_autocomplete(self): 
+        ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
 
-        # Action on click when value is selected ( ComboBox - Qcompleter )
-        # Qcompleter event- get selected value
         self.dlg.doc_id.setCompleter(self.completer)
-        self.doc_id = utils_giswater.getWidgetText("doc_id") 
+        doc_id = utils_giswater.getWidgetText("doc_id") 
         
-        sql = "SELECT doc_type FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_doc_type = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("doc_type", self.row_doc_type[0]) 
-        
-        sql = "SELECT tagcat_id FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_tagcat = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("tagcat_id", self.row_tagcat[0]) 
-        
-        sql = "SELECT observ FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_observ = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("observ", self.row_observ[0]) 
-        
-        sql = "SELECT path FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'"
-        self.row_path = self.dao.get_row(sql)
-        utils_giswater.setWidgetText("link", self.row_path[0]) 
-       
-        
-    def ed_add_file_accept(self):   
-        
-        # Get values from comboboxes
-        self.doc_id = utils_giswater.getWidgetText("doc_id") 
-        self.doc_type = utils_giswater.getWidgetText("doc_type")   
-        self.tagcat_id = utils_giswater.getWidgetText("tagcat_id")  
-        self.observ = utils_giswater.getWidgetText("observ")
-        self.link = utils_giswater.getWidgetText("link")
-        
-        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc WHERE id = '"+self.doc_id+"'" 
+        # Get values from database           
+        sql = "SELECT doc_type, tagcat_id, observ, path"
+        sql+= " FROM "+self.schema_name+".doc" 
+        sql+= " WHERE id = '"+doc_id+"'"
         row = self.dao.get_row(sql)
-        if row:
-            answer = self.ed_add_file_confirm()
-            if answer:
-                sql = "UPDATE "+self.schema_name+".doc "
-                sql+= " SET doc_type = '"+self.row_doc_type[0]+"', tagcat_id= '"+self.row_tagcat[0]+"',observ = '"+self.row_observ[0]+"', path = '"+self.row_path[0]+"'"
-                sql+= " WHERE id = '"+self.doc_id+"'" 
-                self.dao.execute_sql(sql) 
-            else:
-                self.close_dialog(self.dlg) 
-        else:
-            sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
-            sql+= " VALUES ('"+self.doc_id+"', '"+self.doc_type+"', '"+self.link+"', '"+self.observ+"', '"+self.tagcat_id+"')"
-            status = self.controller.execute_sql(sql) 
-            if not status:
-                message = "Error inserting element in table, you need to review data"
-                self.controller.show_warning(message, context_name='ui_message' )
-                return
         
-        # Get layers
-        layers = self.iface.legendInterface().layers()
-        if len(layers) == 0:
-            return
-         
+        # Fill widgets
+        columns_length = self.dao.get_columns_length()
+        for i in range(0, columns_length):
+            column_name = self.dao.get_column_name(i)
+            utils_giswater.setWidgetText(column_name, row[column_name])       
+    
+    
+    def ed_add_to_feature(self, table_name, value_id):   
+        ''' Add document or element to selected features '''
+
         # Initialize variables                    
-        self.layer_arc = None
         table_arc = self.schema_name+'."'+self.table_arc+'"'
         table_node = self.schema_name+'."'+self.table_node+'"'
         table_connec = self.schema_name+'."'+self.table_connec+'"'
         table_gully = self.schema_name+'."'+self.table_gully+'"'
         
-        # Iterate over all layers to get the ones set in config file        
-        for cur_layer in layers:     
-            uri = cur_layer.dataProvider().dataSourceUri().lower()   
-            pos_ini = uri.find('table=')
-            pos_fi = uri.find('" ')  
-            uri_table = uri 
+        # Get schema and table name of selected layer       
+        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        if uri_table is None:
+            self.controller.show_warning("Error getting table name from selected layer")
+            return
 
-            if pos_ini <> -1 and pos_fi <> -1:
-                uri_table = uri[pos_ini+6:pos_fi+1]   
-                
-                # Table 'arc                        
-                if table_arc == uri_table:  
-                    self.layer_arc = cur_layer
-                    self.count_arc = self.layer_arc.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_arcs = self.layer_arc.selectedFeatures()
-                    i=0
-                    while (i<self.count_arc):
-                     
-                        # Get arc_id from current arc
-                        feature = features_arcs[i]
-                        self.arc_id = feature.attribute('arc_id')
-                        self.doc_id = utils_giswater.getWidgetText("doc_id")
-                                              
-                        # Execute id(automaticaly),element_id and arc_id to element_x_arc
-                        sql = "INSERT INTO "+self.schema_name+".doc_x_arc (arc_id, doc_id) "
-                        sql+= " VALUES ('"+self.arc_id+"', '"+self.doc_id+"')"
-                        i+=1
-                        self.dao.execute_sql(sql) 
-                
-                # Table 'node'                          
-                elif table_node == uri_table:  
-                    self.layer_node = cur_layer
-                    self.count_node = self.layer_node.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_nodes = self.layer_node.selectedFeatures()
-                    i = 0
-                    while (i<self.count_node):
+        if table_arc in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+        elif table_node in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        elif table_connec in uri_table:  
+            elem_type = "connec"
+            field_id = "connec_id"
+        elif table_gully in uri_table:  
+            elem_type = "gully"
+            field_id = "gully_id"
 
-                        # Get arc_id from current arc
-                        feature = features_nodes[i]
-                        self.node_id = feature.attribute('node_id')
-                        self.doc_id = utils_giswater.getWidgetText("doc_id")
-                                              
-                        # Execute id(automaticaly),element_id and arc_id to element_x_arc
-                        sql = "INSERT INTO "+self.schema_name+".doc_x_node (node_id,doc_id) "
-                        sql+= " VALUES ('"+self.node_id+"','"+self.doc_id+"')"
-                        i+=1
-                        self.dao.execute_sql(sql) 
-                
-                # Table 'connec'                              
-                elif table_connec == uri_table:  
-                    self.layer_connec = cur_layer
-                    self.count_connec = self.layer_connec.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_connecs = self.layer_connec.selectedFeatures()
-                    i = 0
-                    while (i<self.count_connec):
-                     
-                        # Get arc_id from current arc
-                        feature = features_connecs[i]
-                        self.connec_id = feature.attribute('connec_id')
-                        self.doc_id = utils_giswater.getWidgetText("doc_id")
-
-                        # Execute id(automaticaly),element_id and arc_id to element_x_arc
-                        sql = "INSERT INTO "+self.schema_name+".doc_x_connec (connec_id, doc_id) "
-                        sql+= " VALUES ('"+self.connec_id+"', '"+self.doc_id+"')"
-                        self.dao.execute_sql(sql)  
-                        i+=1
-                        
-                # Table 'gully'                          
-                elif table_gully == uri_table:  
-                    self.layer_gully = cur_layer
-                    self.count_gully = self.layer_gully.selectedFeatureCount()  
-                    # Get all selected features-arcs
-                    features_gullys = self.layer_gully.selectedFeatures()
-                    i = 0
-                    while (i<self.count_gully):
-
-                        # Get arc_id from current arc
-                        feature = features_gullys[i]
-                        self.gully_id = feature.attribute('gully_id')
-                        self.doc_id = utils_giswater.getWidgetText("doc_id")
-                                              
-                        # Execute id(automaticaly),element_id and gully_id to element_x_gully
-                        sql = "INSERT INTO "+self.schema_name+".doc_x_gully (gully_id,doc_id) "
-                        sql+= " VALUES ('"+self.gully_id+"','"+self.doc_id+"')"
-                        i+=1
-                        self.dao.execute_sql(sql) 
+        # Get selected features
+        features = self.layer.selectedFeatures()
+        for feature in features:
+            elem_id = feature.attribute(field_id)
+            sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
+            sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
+            self.dao.execute_sql(sql)   
+                          
         
+    def ed_add_file_accept(self): 
+        ''' Insert or update document. Add document to selected feature '''  
+        
+        # Get values from dialog
+        doc_id = utils_giswater.getWidgetText("doc_id") 
+        doc_type = utils_giswater.getWidgetText("doc_type")   
+        tagcat_id = utils_giswater.getWidgetText("tagcat_id")  
+        observ = utils_giswater.getWidgetText("observ")
+        path = utils_giswater.getWidgetText("path")
+        
+        # Check if this document already exists
+        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc WHERE id = '"+doc_id+"'" 
+        row = self.dao.get_row(sql)
+        if row:
+            answer = self.controller.ask_question("Are you sure you want change the data?")
+            if answer:
+                sql = "UPDATE "+self.schema_name+".doc "
+                sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"',observ = '"+observ+"', path = '"+path+"'"
+                sql+= " WHERE id = '"+doc_id+"'" 
+                self.dao.execute_sql(sql) 
+            else:
+                self.close_dialog(self.dlg) 
+        else:
+            sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
+            sql+= " VALUES ('"+doc_id+"', '"+doc_type+"', '"+path+"', '"+observ+"', '"+tagcat_id+"')"
+            status = self.controller.execute_sql(sql) 
+            if not status:
+                message = "Error inserting element in table, you need to review data"
+                self.controller.show_warning(message, context_name='ui_message')
+                return
+        
+        # Add document to selected feature
+        self.ed_add_to_feature("doc", doc_id)
+           
         # Show message to user
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message' )
+        self.controller.show_info(message, context_name='ui_message')
         self.close_dialog()  
-        
-        
-    def ed_add_element_confirm(self):
-        ''' Ask question to the user '''
-        
-        msgBox = QMessageBox()
-        msgBox.setText("Are you sure you want change the data?")
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        ret = msgBox.exec_()
-        if ret == QMessageBox.Ok:
-            return True
-        elif ret == QMessageBox.Discard:
-            return False      
-
-        
-        
-    def ed_add_file_confirm(self):
-        ''' Ask question to the user '''
-      
-        msgBox = QMessageBox()
-        msgBox.setText("Are you sure you want change the data?")
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        ret = msgBox.exec_()
-        if ret == QMessageBox.Ok:
-            return True
-        elif ret == QMessageBox.Discard:
-            return False     
-        
+                
             
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
@@ -618,6 +375,6 @@ class Ed():
         
         # Show information message    
         message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message' )
+        self.controller.show_info(message, context_name='ui_message')
                                             
         

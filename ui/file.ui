@@ -210,7 +210,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="link">
+  <widget class="QLineEdit" name="path">
    <property name="geometry">
     <rect>
      <x>125</x>

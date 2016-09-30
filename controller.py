@@ -115,7 +115,7 @@ class DaoController():
         ''' Ask question to the user '''   
 
         msg_box = QMessageBox()
-        msg_box.setText(self.tr(text, context_name=None))
+        msg_box.setText(self.tr(text, context_name))
         if title is not None:
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
@@ -230,6 +230,22 @@ class DaoController():
         info = subprocess.STARTUPINFO()
         info.dwFlags = subprocess.STARTF_USESHOWWINDOW
         info.wShowWindow = SW_MINIMIZE   
-        subprocess.Popen(program, startupinfo=info)                            
+        subprocess.Popen(program, startupinfo=info)   
+        
+        
+    def get_layer_source(self, layer):
+        ''' Get table or view name of selected layer '''
+
+        uri_schema = None
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.rfind('.')
+        pos_fi = uri.find('" ')
+        if pos_ini <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini + 6:pos_end_schema]
+            uri_table = uri[pos_ini + 6:pos_fi + 1]
+
+        return uri_schema, uri_table                                 
         
     
