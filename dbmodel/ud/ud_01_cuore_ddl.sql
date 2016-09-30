@@ -409,7 +409,7 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 CREATE TABLE "sector" (
 "sector_id" varchar(30) NOT NULL,
 "descript" varchar(100),
-"the_geom" public.geometry (POLYGON, SRID_VALUE),
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 );
 
