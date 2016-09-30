@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.utils import iface
 from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 
 import utils_giswater
@@ -12,7 +11,7 @@ def formOpen(dialog, layer, feature):
     global feature_dialog
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
-    feature_dialog = ArcDialog(iface, dialog, layer, feature)
+    feature_dialog = ArcDialog(dialog, layer, feature)
     init_config()
 
     
@@ -43,17 +42,22 @@ def init_config():
      
 class ArcDialog(ParentDialog):   
     
-    def __init__(self, iface, dialog, layer, feature):
+    def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-        super(ArcDialog, self).__init__(iface, dialog, layer, feature)      
-        self.init_config()
+        super(ArcDialog, self).__init__(dialog, layer, feature)      
+        self.init_config_form()
         
         
-    def init_config_arc(self):
+    def init_config_form(self):
         ''' Custom form initial configuration '''
         
+        # Define local variables
+        context_name = "ws_arc"            
+        table_element = "v_ui_element_x_arc"           
+        table_document = "v_ui_doc_x_arc"
+        
         # Define class variables
-        self.field_id = "arc_id"        
+        self.field_id = "arc_id" 
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.arc_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
@@ -73,7 +77,7 @@ class ArcDialog(ParentDialog):
         self.set_tabs_visibility()
         
         # Manage i18n
-        self.translate_form('ws_arc')        
+        self.translate_form(context_name)        
         
         # Define and execute query to populate combo 'cat_arctype_id_dummy'
         self.fill_arc_type_id()        
@@ -85,14 +89,12 @@ class ArcDialog(ParentDialog):
         self.layer.startEditing()
         
         # Fill the info table
-        table_element = "v_ui_element_x_arc"
-        self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
+        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
         # Configuration of  info table
         self.set_configuration(self.tbl_info, table_element)
         
         # Fill the tab Document
-        table_document = "v_ui_doc_x_arc"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
         # Configuration of table document

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.utils import iface
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
 from functools import partial
@@ -15,7 +14,7 @@ def formOpen(dialog, layer, feature):
     global feature_dialog
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
-    feature_dialog = ConnecDialog(iface, dialog, layer, feature)
+    feature_dialog = ConnecDialog(dialog, layer, feature)
     init_config()
 
     
@@ -44,14 +43,21 @@ def init_config():
      
 class ConnecDialog(ParentDialog):   
     
-    def __init__(self, iface, dialog, layer, feature):
+    def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-        super(ConnecDialog, self).__init__(iface, dialog, layer, feature)      
-        self.init_config()
+        super(ConnecDialog, self).__init__(dialog, layer, feature)      
+        self.init_config_form()
         
         
-    def init_config(self):
+    def init_config_form(self):
         ''' Custom form initial configuration '''
+
+        # Define local variables
+        context_name = "ws_connec"    
+        table_element = "v_ui_element_x_connec" 
+        table_document = "v_ui_doc_x_connec"   
+        table_hydrometer = "v_rtc_hydrometer"   
+        table_hydrometer_epanet = "v_edit_rtc_hydro_data_x_connec"                     
         
         # Define class variables
         self.field_id = "connec_id"        
@@ -66,7 +72,7 @@ class ConnecDialog(ParentDialog):
         self.tab_event_2 = self.dialog.findChild(QTabWidget, "tab_event_2")        
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")      
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")    
-        self.tbl_connec = self.dialog.findChild(QTableView, "tbl_connec")             
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_connec")             
         self.tbl_dae = self.dialog.findChild(QTableView, "tbl_dae")   
         self.tbl_dae_2 = self.dialog.findChild(QTableView, "tbl_dae_2")    
              
@@ -74,7 +80,7 @@ class ConnecDialog(ParentDialog):
         self.set_tabs_visibility()
         
         # Manage i18n
-        self.translate_form('ws_connec')        
+        self.translate_form(context_name)        
         
         # Define and execute query to populate combo 'cat_connectype_id_dummy' 
         self.fill_connec_type_id()
@@ -86,28 +92,24 @@ class ConnecDialog(ParentDialog):
         self.layer.startEditing()
         
         # Fill the info table
-        table_element = "v_ui_element_x_connec"
-        self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
+        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)
         
         # Fill the tab Document
-        table_document = "v_ui_doc_x_connec"
-        self.fill_tbl_connec(self.tbl_connec, self.schema_name+"."+table_document, self.filter)
+        self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
         # Configuration of table Document
-        self.set_configuration(self.tbl_connec, table_document)
+        self.set_configuration(self.tbl_document, table_document)
         
         # Fill tab Hydrometer | feature
-        table_hydrometer = "v_rtc_hydrometer"
         self.fill_tbl_hydrometer(self.tbl_dae, self.schema_name+"."+table_hydrometer, self.filter)
         
         # Configuration of table Hydrometer | feature
         self.set_configuration(self.tbl_dae, table_hydrometer)
         
         # Fill tab Hydrometer | epanet
-        table_hydrometer_epanet = "v_edit_rtc_hydro_data_x_connec"
         self.fill_tbl_hydrometer_epanet(self.tbl_dae_2, self.schema_name+"."+table_hydrometer_epanet, self.filter)
 
         # Configuration of table Hydrometer | epanet
@@ -115,7 +117,7 @@ class ConnecDialog(ParentDialog):
         
         # Set signals                  
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))                 
-        self.dialog.findChild(QPushButton, "delete_row_doc").clicked.connect(partial(self.delete_records, self.tbl_connec, table_document))    
+        self.dialog.findChild(QPushButton, "delete_row_doc").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))    
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_dae, self.tbl_dae, table_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
        
@@ -158,44 +160,6 @@ class ConnecDialog(ParentDialog):
         ''' Just select item to 'real' combo 'connecat_id' (that is hidden) '''
         connecat_id_dummy = utils_giswater.getWidgetText("connecat_id_dummy")
         utils_giswater.setWidgetText("connecat_id", connecat_id_dummy)           
-        
-        
-    def fill_tbl_connec(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents''' 
-         
-        # Get widgets
-        doc_user = self.dialog.findChild(QComboBox, "doc_user") 
-        doc_type = self.dialog.findChild(QComboBox, "doc_type") 
-        doc_tag = self.dialog.findChild(QComboBox, "doc_tag") 
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-        
-        # Set signals
-        doc_user.activated.connect(partial(self.set_filter_table, self.tbl_connec))
-        doc_type.activated.connect(partial(self.set_filter_table, self.tbl_connec))
-        doc_tag.activated.connect(partial(self.set_filter_table, self.tbl_connec))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, self.tbl_connec))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_connec))
-        self.tbl_connec.doubleClicked.connect(self.open_selected_document)
-        
-        # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".v_ui_doc_x_connec ORDER BY tagcat_id" 
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_tag",rows)
-        
-        # Fill ComboBox doccat_id
-        sql = "SELECT DISTINCT(doc_type) FROM "+self.schema_name+".v_ui_doc_x_connec ORDER BY doc_type" 
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_type",rows)
-        
-        # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user) FROM "+self.schema_name+".v_ui_doc_x_connec ORDER BY user" 
-        rows = self.dao.get_rows(sql)
-        #rows = [['gis'], ['postgres']]
-        utils_giswater.fillComboBox("doc_user",rows)        
-        
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)   
         
         
     def set_filter_tbl_hydrometer(self):
@@ -333,5 +297,6 @@ class ConnecDialog(ParentDialog):
             self.tbl_dae_2.model().database().rollback()
             error = self.tbl_dae_2.model().lastError()
             print str(error.text())  
-    
+            
+        self.save()
     

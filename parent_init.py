@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings, Qt
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit
@@ -14,13 +15,13 @@ from controller import DaoController
         
 class ParentDialog(object):   
     
-    def __init__(self, iface, dialog, layer, feature):
+    def __init__(self, dialog, layer, feature):
         ''' Constructor class '''     
-        self.iface = iface
         self.dialog = dialog
         self.layer = layer
         self.feature = feature
-        self.context_name = "ws_parent"        
+        self.context_name = "ws_parent"    
+        self.iface = iface    
         self.init_config()             
     
         
@@ -44,7 +45,8 @@ class ParentDialog(object):
         
         # Set controller to handle settings and database connection
         # TODO: Try to make only one connection
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller = DaoController(self.settings, self.plugin_name, iface)
+        print self.controller
         status = self.controller.set_database_connection()      
         if not status:
             message = self.controller.getLastError()
@@ -67,7 +69,7 @@ class ParentDialog(object):
         ''' Translate widget text '''
         if widget:
             widget_name = widget.objectName()
-            text = utils_giswater.tr(context_name, widget_name)
+            text = self.controller.tr(widget_name, context_name)
             if text != widget_name:
                 widget.setText(text)         
          
@@ -311,17 +313,23 @@ class ParentDialog(object):
         self.tbl_document.doubleClicked.connect(self.open_selected_document)
 
         # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM "+table_name+" ORDER BY tagcat_id"
+        sql = "SELECT DISTINCT(tagcat_id)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY tagcat_id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
         # Fill ComboBox doccat_id
-        sql = "SELECT DISTINCT(doc_type) FROM "+table_name+" ORDER BY doc_type"
+        sql = "SELECT DISTINCT(doc_type)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY doc_type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user_name) FROM "+table_name+" ORDER BY user_name"
+        sql = "SELECT DISTINCT(user_name)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY user_name"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_user", rows)
 
@@ -329,7 +337,7 @@ class ParentDialog(object):
         self.set_model_to_table(widget, table_name, filter_)
         
 
-    def fill_tbl_info(self, widget, table_name, filter_): 
+    def fill_table(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
         self.set_model_to_table(widget, table_name, filter_)                  
                 

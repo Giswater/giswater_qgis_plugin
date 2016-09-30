@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.utils import iface
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 
 from functools import partial
 
@@ -14,24 +13,29 @@ def formOpen(dialog, layer, feature):
     global feature_dialog
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
-    feature_dialog = ArcDialog(iface, dialog, layer, feature)
+    feature_dialog = ArcDialog(dialog, layer, feature)
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
         
 
 class ArcDialog(ParentDialog):   
     
-    def __init__(self, iface, dialog, layer, feature):
+    def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-        super(ArcDialog, self).__init__(iface, dialog, layer, feature)      
-        self.init_config()
+        super(ArcDialog, self).__init__(dialog, layer, feature)      
+        self.init_config_form()
         
         
-    def init_config(self):
+    def init_config_form(self):
         ''' Custom form initial configuration '''
-    
+        
+        # Define local variables
+        context_name = "ud_arc"    
+        table_element = "v_ui_element_x_arc" 
+        table_document = "v_ui_doc_x_arc" 
+            
         # Define class variables
-        self.field_id = "arc_id"        
+        self.field_id = "arc_id"                  
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")      
@@ -40,33 +44,35 @@ class ArcDialog(ParentDialog):
     
         # Manage tab visibility
         self.set_tabs_visibility()
-        '''
+    
         # Manage i18n
-        #self.translate_form('ws_node')        
+        self.translate_form(context_name)        
     
         # Load data from related tables
-        self.load_data()
-        '''
+        #self.load_data()
+        
         # Set layer in editing mode
         self.layer.startEditing()
         
         # Fill the info table
-        table_element = "v_ui_element_x_arc"
-        self.fill_tbl_element(self.tbl_element, self.schema_name+"."+table_element, self.filter)
+        self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
         
         # Configuration of info table
         self.set_configuration(self.tbl_element, table_element)
        
         # Fill the tab Document
-        table_document = "v_ui_doc_x_arc"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
         # Configuration of document table
         self.set_configuration(self.tbl_document, table_document)
         
-        # Set signals                  
-        self.dialog.findChild(QPushButton, "btn_element_delete").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))                 
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))                   
+        # Set signals    
+        btn_element_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
+        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
+        if btn_element_delete:             
+            btn_element_delete.clicked.connect(partial(self.delete_records, self.tbl_element, table_element))  
+        if btn_doc_delete:               
+            btn_doc_delete.clicked.connect(partial(self.delete_records, self.tbl_document, table_document))                   
           
         
     def set_tabs_visibility(self):
@@ -78,46 +84,4 @@ class ArcDialog(ParentDialog):
         self.tab_main.removeTab(5)     
         self.tab_main.removeTab(4) 
         self.tab_main.removeTab(2) 
-        
-        
-    def fill_tbl_document(self, widget, table_name, filter_):
-        ''' Fill the table control to show documents''' 
-         
-        # Get widgets
-        doc_user = self.dialog.findChild(QComboBox, "doc_user") 
-        doc_type = self.dialog.findChild(QComboBox, "doc_type") 
-        doc_tag = self.dialog.findChild(QComboBox, "doc_tag") 
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-        
-        # Set signals
-        doc_user.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        doc_type.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        doc_tag.activated.connect(partial(self.set_filter_table, self.tbl_document))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table, self.tbl_document))
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-        # Fill ComboBox tagcat_id
-        sql = "SELECT DISTINCT(tagcat_id) FROM "+self.schema_name+".v_ui_doc_x_arc ORDER BY tagcat_id" 
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_tag", rows)
-        
-        # Fill ComboBox doccat_id
-        sql = "SELECT DISTINCT(doc_type) FROM "+self.schema_name+".v_ui_doc_x_arc ORDER BY doc_type" 
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_type", rows)
-        
-        # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user_name) FROM "+self.schema_name+".v_ui_doc_x_arc ORDER BY user" 
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("doc_user", rows)        
-        
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)   
-      
-            
-    def fill_tbl_element(self, widget, table_name, filter_): 
-        ''' Fill info tab of arc '''
-        self.set_model_to_table(widget, table_name, filter_)  
-          
+             

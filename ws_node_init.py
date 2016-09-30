@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.utils import iface
 from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 
 from functools import partial
@@ -14,7 +13,7 @@ def formOpen(dialog, layer, feature):
     global feature_dialog
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction
-    feature_dialog = NodeDialog(iface, dialog, layer, feature)
+    feature_dialog = NodeDialog(dialog, layer, feature)
     init_config()
 
 
@@ -42,20 +41,24 @@ def init_config():
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)
 
 
-
 class NodeDialog(ParentDialog):
 
-    def __init__(self, iface, dialog, layer, feature):
+    def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-        super(NodeDialog, self).__init__(iface, dialog, layer, feature)
-
+        super(NodeDialog, self).__init__(dialog, layer, feature)
         self.loaded = False
-        self.init_config_node()
+        self.init_config_form()
 
 
-    def init_config_node(self):
-        ''' Custom form initial configuration for 'Node' '''
+    def init_config_form(self):
+        ''' Custom form initial configuration '''
 
+        # Define local variables
+        context_name = "ws_node"    
+        table_element = "v_ui_element_x_node" 
+        table_document = "v_ui_doc_x_node" 
+        table_scada = "v_ui_scada_x_node"        
+        
         # Define class variables
         self.field_id = "node_id"
         self.id = utils_giswater.getWidgetText(self.field_id, False)
@@ -77,7 +80,7 @@ class NodeDialog(ParentDialog):
         self.set_tabs_visibility()
 
         # Manage i18n
-        self.translate_form('ws_node')
+        self.translate_form(context_name)
 
         # Define and execute query to populate combo 'node_type_dummy'
         self.fill_node_type_id()
@@ -89,21 +92,18 @@ class NodeDialog(ParentDialog):
         self.layer.startEditing()
 
         # Fill the info table
-        table_element= "v_ui_element_x_node"
-        self.fill_tbl_info(self.tbl_info, self.schema_name+"."+table_element, self.filter)
+        self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
         # Configuration of info table 
         self.set_configuration(self.tbl_info, table_element)
 
         # Fill the tab Document
-        table_document = "v_ui_doc_x_node"
         self.fill_tbl_document(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
         # Configuration of table document
         self.set_configuration(self.tbl_document, table_document)
          
         # Fill the tab Scada
-        table_scada = "v_ui_scada_x_node"
         self.fill_tbl_scada(self.tbl_rtc, self.schema_name+"."+table_scada, self.filter)
          
         # Configuration of table scada
