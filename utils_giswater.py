@@ -1,34 +1,14 @@
 ﻿# -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox
-from PyQt4.QtCore import QCoreApplication
-from qgis.gui import QgsMessageBar
-
-
 ''' Module with utility functions to interact with dialog and its widgets '''
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox   #@UnresolvedImport
 
-def tr(context, message):
-    return QCoreApplication.translate(context, message)
+import inspect
 
 
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
  
-         
-def setInterface(p_iface):
-    global _iface, MSG_DURATION
-    _iface = p_iface
-    MSG_DURATION = 5        
- 
-    
-def isFirstTime():
-    global first
-    if not 'first' in globals():
-        first = True
-    else:    
-        first = False
-    return first
-
 
 def fillComboBox(widget, rows, allow_nulls=True):
     
@@ -41,33 +21,24 @@ def fillComboBox(widget, rows, allow_nulls=True):
         widget.addItem(row[0])    
         
         
-def getStringValue(widget):
-    
-    if type(widget) is str:
-        widget = _dialog.findChild(QLineEdit, widget)        
-    widget_name = widget.objectName()
-    if widget:    
-        if widget.text():
-            elem_text = widget_name + " = '"+widget.text()+"'"
-        else:
-            elem_text = widget_name + " = null"
-    else:
-        elem_text = widget_name + " = null"
-    return elem_text
+def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
-
-def getStringValue2(widget):
-    
     if type(widget) is str:
-        widget = _dialog.findChild(QLineEdit, widget)          
-    if widget:
-        if widget.text():
-            elem_text = "'"+widget.text()+"'"
-        else:
-            elem_text = "null"
-    else:
-        elem_text = "null"
-    return elem_text      
+        widget = _dialog.findChild(QComboBox, widget)    
+    if widget is None:
+        print "Combo not found: "+str(widget)
+        return None
+
+    # Populate combo with values stored in dictionary variable
+    if allow_nulls:
+        widget.addItem('') 
+    for key, value in dict_object.iteritems():   # @UnusedVariable 
+        # Get variables of selected objects
+        # Search for the one specified in parameter <dict_field>
+        aux = inspect.getmembers(value)
+        for elem in aux:
+            if elem[0] == dict_field:
+                widget.addItem(elem[1])          
 
 
 def getText(widget):
@@ -185,6 +156,16 @@ def setSelectedItem(widget, text):
         widget.setCurrentIndex(index);        
 
 
+def setCurrentIndex(widget, index):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QComboBox, widget)    
+    if widget:
+        if index == -1:
+            index = 0        
+        widget.setCurrentIndex(index);        
+
+
 def isNull(widget):
 
     if type(widget) is str:
@@ -202,18 +183,5 @@ def setWidgetVisible(widget, visible=True):
         widget = _dialog.findChild(QWidget, widget)    
     if widget:
         widget.setVisible(visible)
-
-
-def showInfo(text, duration = None):
-    if duration is None:
-        _iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, MSG_DURATION)  
-    else:
-        _iface.messageBar().pushMessage("", text, QgsMessageBar.INFO, duration)              
-  
-    
-def showWarning(text, duration = None):
-    if duration is None:
-        _iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, MSG_DURATION)  
-    else:
-        _iface.messageBar().pushMessage("", text, QgsMessageBar.WARNING, duration)   
-        
+                
+                

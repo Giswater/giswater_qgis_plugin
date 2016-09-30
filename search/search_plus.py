@@ -134,26 +134,26 @@ class SearchPlus(QObject):
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_code, 
                                      self.params['hydrometer_urban_propierties_field_code'], self.params['hydrometer_field_code'])
         if not status:
-            print "Error populating Tab 'Hydrometer'"
+            #print "Error populating Tab 'Hydrometer'"
             self.dlg.tab_main.removeTab(3)
               
         # Tab 'Address'      
         status = self.address_populate('street_layer')
         if not status:
-            print "Error populating Tab 'Address'"   
+            #print "Error populating Tab 'Address'"   
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
         status = self.populate_combo('ppoint_layer', self.dlg.ppoint_press_zone, self.params['ppoint_field_zone'])
         status_2 = self.populate_combo('ppoint_layer', self.dlg.ppoint_number, self.params['ppoint_field_number'])
         if not status or not status_2:
-            print "Error populating Tab 'Ppoint'"
+            #print "Error populating Tab 'Ppoint'"
             self.dlg.tab_main.removeTab(1)              
               
         # Tab 'Urban Properties'      
         status = self.urban_populate('urban_propierties_layer')
         if not status:
-            print "Error populating Tab 'Urban Properties'"
+            #print "Error populating Tab 'Urban Properties'"
             self.dlg.tab_main.removeTab(0)              
             
         return True
@@ -166,7 +166,8 @@ class SearchPlus(QObject):
         if not parameter in self.layers:
             layername = self.params[parameter]
             message = "Layer '{}' not found in parameter '{}'".format(layername, parameter)  
-            self.controller.show_warning(message)          
+            #self.controller.show_warning(message)
+            #print message          
             return False
 
         # Get layer features
@@ -435,6 +436,10 @@ class SearchPlus(QObject):
 
         # Zoom to point layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+
+        # Load style
+        if self.QML_URBAN is not None:
+            self.load_style(self.urbanMemLayer, self.QML_URBAN)        
             
                 
     def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
@@ -444,7 +449,7 @@ class SearchPlus(QObject):
         if not parameter in self.layers:
             layername = self.params[parameter]
             message = "Layer '{}' not found in parameter '{}'".format(layername, parameter)  
-            self.controller.show_warning(message)          
+            #print(message)    
             return False
 
         # Fields management

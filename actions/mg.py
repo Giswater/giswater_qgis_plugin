@@ -195,19 +195,19 @@ class Mg():
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
             message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, context_name='ui_message' ),10
+            self.controller.show_warning(message, context_name='ui_message')
             return  
         
         # Check if giswater.jar file exists
         if not os.path.exists(self.giswater_jar):
             message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, context_name='ui_message' ),10
+            self.controller.show_warning(message, context_name='ui_message')
             return  
 
         # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
         if not os.path.exists(self.gsw_file):
             message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, context_name='ui_message' ),10
+            self.controller.show_info(message, context_name='ui_message')
             self.gsw_file = ""    
         
         # Start program     
@@ -274,7 +274,7 @@ class Mg():
 
         # Show message to user
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message' ) 
+        self.controller.show_info(message, context_name='ui_message') 
         self.close_dialog(self.dlg) 
 
 
@@ -287,7 +287,7 @@ class Mg():
         result = self.controller.execute_sql(sql)      
         if result:
             message = "Valve analytics executed successfully"
-            self.controller.show_info(message, 30, context_name='ui_message' )
+            self.controller.show_info(message, 30, context_name='ui_message')
 
 
     def mg_change_elem_type(self):                
