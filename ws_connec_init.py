@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from qgis.utils import iface
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QMessageBox
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
 from functools import partial
 
 import utils_giswater
-from ws_parent_init import ParentDialog
+from parent_init import ParentDialog
 from ui.add_sum import Add_sum          # @UnresolvedImport
 
 
@@ -47,11 +47,11 @@ class ConnecDialog(ParentDialog):
     def __init__(self, iface, dialog, layer, feature):
         ''' Constructor class '''
         super(ConnecDialog, self).__init__(iface, dialog, layer, feature)      
-        self.init_config_connec()
+        self.init_config()
         
         
-    def init_config_connec(self):
-        ''' Custom form initial configuration for 'Connec' '''
+    def init_config(self):
+        ''' Custom form initial configuration '''
         
         # Define class variables
         self.field_id = "connec_id"        
@@ -333,18 +333,5 @@ class ConnecDialog(ParentDialog):
             self.tbl_dae_2.model().database().rollback()
             error = self.tbl_dae_2.model().lastError()
             print str(error.text())  
-                    
-            
-    def update_sum_confirm(self):
-        ''' Ask question to the user '''
-        
-        msgBox = QMessageBox()
-        msgBox.setText("Are you sure you want change the data?")
-        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        ret = msgBox.exec_()
-        if ret == QMessageBox.Ok:
-            return True
-        elif ret == QMessageBox.Discard:
-            return False   
     
     

@@ -409,7 +409,7 @@ class ExtractRasterValue(ParentMapTool):
             if cur_layer.name() == self.table_raster:
                 self.rasterLayer = cur_layer
 
-            (uri_schema, uri_table) = self.get_layer_source(cur_layer)  # @UnusedVariable
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)  # @UnusedVariable
             if uri_table is not None:
                 if self.table_vector in uri_table:
                     self.vectorLayer = cur_layer
@@ -432,18 +432,3 @@ class ExtractRasterValue(ParentMapTool):
 
         return 1
 
-
-    def get_layer_source(self, layer):
-        ''' Get table or view name of selected layer '''
-
-        uri_schema = None
-        uri_table = None
-        uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('table=')
-        pos_end_schema = uri.rfind('.')
-        pos_fi = uri.find('" ')
-        if pos_ini <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini + 6:pos_end_schema]
-            uri_table = uri[pos_ini + 6:pos_fi + 1]
-
-        return uri_schema, uri_table

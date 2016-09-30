@@ -5,7 +5,7 @@ from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 from functools import partial
 
 import utils_giswater
-from ws_parent_init import ParentDialog
+from parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
@@ -318,7 +318,7 @@ class NodeDialog(ParentDialog):
         utils_giswater.setWidgetText("nodecat_id", nodecat_id_dummy)
 
 
-    def change_epa_type(self, index):
+    def change_epa_type(self, index):   #@UnusedVariable
         ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)

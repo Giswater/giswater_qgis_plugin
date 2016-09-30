@@ -3,11 +3,11 @@ from qgis.utils import iface
 from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 
 import utils_giswater
-from ws_parent_init import ParentDialog
+from parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a node is identified in the map '''
+    ''' Function called when an arc is identified in the map '''
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -46,11 +46,11 @@ class ArcDialog(ParentDialog):
     def __init__(self, iface, dialog, layer, feature):
         ''' Constructor class '''
         super(ArcDialog, self).__init__(iface, dialog, layer, feature)      
-        self.init_config_arc()
+        self.init_config()
         
         
     def init_config_arc(self):
-        ''' Custom form initial configuration for 'Node' '''
+        ''' Custom form initial configuration '''
         
         # Define class variables
         self.field_id = "arc_id"        
@@ -147,7 +147,7 @@ class ArcDialog(ParentDialog):
         utils_giswater.setWidgetText("arccat_id", arccat_id_dummy)           
         
                 
-    def change_epa_type(self, index):
+    def change_epa_type(self, index):   #@UnusedVariable
         ''' Refresh form '''
         self.save()
         self.iface.openFeatureForm(self.layer, self.feature)

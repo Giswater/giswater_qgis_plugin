@@ -5,7 +5,8 @@ from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidge
 from functools import partial
 
 import utils_giswater
-from ws_parent_init import ParentDialog
+from parent_init import ParentDialog
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a node is identified in the map '''
@@ -14,37 +15,26 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = NodeDialog(iface, dialog, layer, feature)
-    init_config()
-    
-
-def init_config():
-
-    
-    # Set 'epa_type' and button signals      
-    #feature_dialog.dialog.findChild(QComboBox, "epa_type").activated.connect(feature_dialog.change_epa_type)  
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
-    
+        
 
 class NodeDialog(ParentDialog):   
     
     def __init__(self, iface, dialog, layer, feature):
         ''' Constructor class '''
         super(NodeDialog, self).__init__(iface, dialog, layer, feature)      
-        self.init_config_node()
+        self.init_config()
         
         
-    def init_config_node(self):
-        ''' Custom form initial configuration for 'Node' '''
+    def init_config(self):
+        ''' Custom form initial configuration '''
     
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-    
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-  
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")      
-        
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")    
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")             
    

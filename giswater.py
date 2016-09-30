@@ -353,23 +353,7 @@ class Giswater(QObject):
             print "unload_AttributeError: "+str(e)
         except KeyError, e:
             print "unload_KeyError: "+str(e)                      
-                               
-    
-    def get_layer_source(self, layer):
-        ''' Get table or view name of selected layer '''
-         
-        uri_schema = None
-        uri_table = None
-        uri = layer.dataProvider().dataSourceUri().lower()   
-        pos_ini = uri.find('table=')
-        pos_end_schema = uri.rfind('.')  
-        pos_fi = uri.find('" ')  
-        if pos_ini <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini+6:pos_end_schema]                             
-            uri_table = uri[pos_ini+6:pos_fi+1]                             
-             
-        return uri_schema, uri_table
-    
+                                  
         
     def search_project_type(self):
         ''' Search in table 'version' project type of current QGIS project '''
@@ -429,7 +413,7 @@ class Giswater(QObject):
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            (uri_schema, uri_table) = self.get_layer_source(cur_layer)   #@UnusedVariable
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
             if uri_table is not None:
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
@@ -449,7 +433,7 @@ class Giswater(QObject):
                  
         # Get schema name from table 'version'
         # Check if really exists
-        (self.schema_name, uri_table) = self.get_layer_source(self.layer_version)  
+        (self.schema_name, uri_table) = self.controller.get_layer_source(self.layer_version)  
         schema_name = self.schema_name.replace('"', '')
         if self.schema_name is None or not self.dao.check_schema(schema_name):
             self.controller.show_warning("Schema not found: "+self.schema_name)            
@@ -576,7 +560,7 @@ class Giswater(QObject):
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        (uri_schema, uri_table) = self.get_layer_source(layer)  #@UnusedVariable  
+        (uri_schema, uri_table) = self.controller.get_layer_source(layer)  #@UnusedVariable  
         if uri_table is not None:
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'

@@ -331,8 +331,6 @@ class ParentDialog(object):
 
     def fill_tbl_info(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
-        self.set_model_to_table(widget, table_name, filter_)  
-        
-                
+        self.set_model_to_table(widget, table_name, filter_)                  
                 
         
