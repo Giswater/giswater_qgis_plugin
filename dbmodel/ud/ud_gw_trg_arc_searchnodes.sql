@@ -33,10 +33,6 @@ BEGIN
 
     SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
 
-    -- UPDATE dma/sector
-    NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(ST_centroid(NEW.the_geom), sector.the_geom,0.001) LIMIT 1);          
-    NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);   
-
     -- Control of start/end node
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 

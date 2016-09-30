@@ -26,10 +26,7 @@ BEGIN
 
     SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
-
-    -- UPDATE dma/sector
-    NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(ST_centroid(NEW.the_geom), sector.the_geom,0.001) LIMIT 1);          
-    NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+   
 
     -- Control of length line
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
