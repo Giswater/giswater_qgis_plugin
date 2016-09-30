@@ -250,7 +250,7 @@ class ConnecDialog(ParentDialog):
         self.dlg_sum.close()
        
        
-    def delete_records_dae(self, widget, table_name):
+    def delete_records_dae(self, widget, table_name):   #@UnusedVariable
         ''' Delete selected elements of the table '''
         
         # Get selected rows

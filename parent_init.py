@@ -46,7 +46,6 @@ class ParentDialog(object):
         # Set controller to handle settings and database connection
         # TODO: Try to make only one connection
         self.controller = DaoController(self.settings, self.plugin_name, iface)
-        print self.controller
         status = self.controller.set_database_connection()      
         if not status:
             message = self.controller.getLastError()

@@ -43,8 +43,8 @@ class Ed():
             dlg = self.dlg
         try:
             dlg.close()
-        except AttributeError as e:
-            print "AttributeError: "+str(e)    
+        except AttributeError:
+            pass    
                   
             
     def ed_search_plus(self):   

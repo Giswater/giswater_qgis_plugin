@@ -315,10 +315,10 @@ class Giswater(QObject):
                 del self.toolbar_ed
                 if self.search_plus is not None:
                     self.search_plus.unload()
-        except AttributeError, e:
-            print "unload_AttributeError: "+str(e)
-        except KeyError, e:
-            print "unload_KeyError: "+str(e)
+        except AttributeError:
+            pass
+        except KeyError:
+            pass
     
     
     ''' Slots '''             
@@ -349,10 +349,10 @@ class Giswater(QObject):
                 self.toolbar_mg.setVisible(False)
             if self.toolbar_ed_enabled:                
                 self.toolbar_ed.setVisible(False)
-        except AttributeError, e:
-            print "unload_AttributeError: "+str(e)
-        except KeyError, e:
-            print "unload_KeyError: "+str(e)                      
+        except AttributeError:
+            pass
+        except KeyError:
+            pass                      
                                   
         
     def search_project_type(self):
@@ -571,7 +571,6 @@ class Giswater(QObject):
             elif self.table_gully in uri_table:  
                 setting_name = 'buttons_gully' 
                                
-        
         if setting_name is not None:
             try:
                 list_index_action = self.settings.value('layers/'+setting_name, None)
@@ -610,8 +609,7 @@ class Giswater(QObject):
             sender = self.sender()                            
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
-                self.iface.mapCanvas().setMapTool(map_tool)
-                #print function_name+" has been checked (ws_generic)"       
+                self.iface.mapCanvas().setMapTool(map_tool)     
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
@@ -628,8 +626,7 @@ class Giswater(QObject):
             sender = self.sender()            
             map_tool = self.map_tools[function_name]
             if sender.isChecked():
-                self.iface.mapCanvas().setMapTool(map_tool)
-                #print function_name+" has been checked"       
+                self.iface.mapCanvas().setMapTool(map_tool)  
             else:
                 self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
@@ -646,7 +643,6 @@ class Giswater(QObject):
                 map_tool = self.map_tools[function_name]
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
-                    #print function_name + " has been checked (mg_generic)"
                 else:
                     self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:

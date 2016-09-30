@@ -40,8 +40,8 @@ class Mg():
             dlg = self.dlg
         try:
             dlg.close()
-        except AttributeError as e:
-            print "AttributeError: "+str(e)   
+        except AttributeError:
+            pass   
                 
 
     def mg_arc_topo_repair(self):
@@ -339,7 +339,7 @@ class Mg():
         self.dlg.exec_()    
      
      
-    def mg_change_elem_type_get_value(self, index):
+    def mg_change_elem_type_get_value(self, index):   #@UnusedVariable
         ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) ''' 
         
         # Get selected value from 1st combobox
@@ -375,7 +375,7 @@ class Mg():
             utils_giswater.fillComboBox("node_nodecat_id", rows)     
     
     
-    def mg_change_elem_type_get_value_3(self, index):
+    def mg_change_elem_type_get_value_3(self, index):   #@UnusedVariable
         self.value_combo3 = utils_giswater.getWidgetText("node_nodecat_id")      
         
         
