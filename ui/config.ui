@@ -723,7 +723,7 @@
     <attribute name="title">
      <string>Search</string>
     </attribute>
-    <widget class="QTabWidget" name="portal_layer">
+    <widget class="QTabWidget" name="tab_search">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -857,7 +857,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>ppoint</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="ppoint_field_zone">
@@ -870,7 +870,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>presszonecat_id</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="ppoint_field_number">
@@ -883,7 +883,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>number</string>
+        <string/>
        </property>
       </widget>
      </widget>
@@ -1009,7 +1009,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>presszonecat_id</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="urban_propierties_field_number">
@@ -1022,7 +1022,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>code</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="urban_propierties_layer">
@@ -1035,7 +1035,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>v_ext_urban_propierties</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLabel" name="label_node2arc_31">
@@ -1084,7 +1084,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>adress_02</string>
+        <string/>
        </property>
       </widget>
      </widget>
@@ -1210,7 +1210,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>streetaxis_id</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="portal_field_number">
@@ -1223,10 +1223,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>postnumber</string>
+        <string/>
        </property>
       </widget>
-      <widget class="QLineEdit" name="node_13">
+      <widget class="QLineEdit" name="portal_layer">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -1236,7 +1236,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>v_edit_connec</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLabel" name="label_node2arc_5">
@@ -1285,7 +1285,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>name</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLabel" name="label_node2arc_3">
@@ -1334,7 +1334,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>ext_streetaxis</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLabel" name="label_node2arc_4">
@@ -1383,7 +1383,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>id</string>
+        <string/>
        </property>
       </widget>
      </widget>
@@ -1473,7 +1473,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>connec_id</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="hydrometer_layer">
@@ -1486,7 +1486,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>v_rtc_hydrometer</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLineEdit" name="hydrometer_urban_propierties_field_code">
@@ -1499,7 +1499,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>connec_id</string>
+        <string/>
        </property>
       </widget>
       <widget class="QLabel" name="label_node2arc_29">
@@ -1584,7 +1584,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>v_ext_urban_propierties</string>
+        <string/>
        </property>
       </widget>
      </widget>
@@ -1653,7 +1653,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>DEM</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="label_qgis_project_raster_layer_name">
@@ -1738,7 +1738,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>v_edit_node</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="label_vector_layer_field_value">
@@ -1787,7 +1787,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>elev</string>
+      <string/>
      </property>
     </widget>
    </widget>
