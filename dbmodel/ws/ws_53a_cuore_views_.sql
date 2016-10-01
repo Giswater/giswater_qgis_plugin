@@ -47,9 +47,9 @@ SELECT
     connec.verified, 
     ext_urban_propierties.the_geom
    FROM connec
-   JOIN ext_urban_propierties ON connec.code::text = ext_urban_propierties.code::text
-   JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
-   JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+   LEFT OIN ext_urban_propierties ON connec.code::text = ext_urban_propierties.code::text
+   LEFT OIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
+   LEFT JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
    LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
    LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
    LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text

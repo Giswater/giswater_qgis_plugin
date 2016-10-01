@@ -48,7 +48,6 @@ CREATE TABLE "config_csv_import" (
 "table_name" varchar(50) NOT NULL,
 "gis_client_layer_name" varchar(50),
 CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name"),
-CONSTRAINT "oor_csv_import"  CHECK( id = '1' )
 );
 
 
@@ -71,6 +70,7 @@ CREATE TABLE "config_search_plus" (
 "hydrometer_urban_propierties_field_code" varchar (30),
 "hydrometer_layer" varchar (30),
 "hydrometer_field_code" varchar (30),
+"hydrometer_field_urban_propierties_code" varchar (30),
 CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id"),
 CONSTRAINT "oor_search_plus"  CHECK( id = '1' )
 );
