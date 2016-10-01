@@ -15,6 +15,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false, true, true, true, 0.001, 0.001, false, true);
 
+INSERT INTO config_extract_raster_value VALUES ('1', 'topo', '1', 'v_edit_node', 'elev');
+
+INSERT INTO config_search_plus VALUES ('1', 'point', 'point_type', 'text', 'Urban propierties', 'placement', 'square', 'postnumber', 'Streetaxis', 'id', 'name', 'Connec', 'adress_01', 'postnumber', 'Urban propierties', 'code', 'Hydrometer', 'code');
 
 
 INSERT INTO config_ui_forms VALUES (340, NULL, 'v_rtc_hydrometer', 'instalation_date', false, NULL, 11);

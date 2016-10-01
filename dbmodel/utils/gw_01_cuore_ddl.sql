@@ -39,14 +39,16 @@ CREATE TABLE "config" (
 "connec_duplicated_tolerance" float,
 "audit_function_control" boolean,
 "arc_searchnodes_control" boolean,
-CONSTRAINT "config_pkey" PRIMARY KEY ("id")
+CONSTRAINT "config_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "oor_config"  CHECK( id = '1' )
 );
 
 
 CREATE TABLE "config_csv_import" (
 "table_name" varchar(50) NOT NULL,
 "gis_client_layer_name" varchar(50),
-CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name")
+CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name"),
+CONSTRAINT "oor_csv_import"  CHECK( id = '1' )
 );
 
 
@@ -69,7 +71,8 @@ CREATE TABLE "config_search_plus" (
 "hydrometer_urban_propierties_field_code" varchar (30),
 "hydrometer_layer" varchar (30),
 "hydrometer_field_code" varchar (30),
-CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id")
+CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "oor_search_plus"  CHECK( id = '1' )
 );
 
 
@@ -79,7 +82,8 @@ CREATE TABLE "config_extract_raster_value" (
 "raster_band_value" varchar (30),
 "vector_layer" varchar (30),
 "vector_field_value" varchar (30),
-CONSTRAINT "config_extract_raster_value_pkey" PRIMARY KEY ("id")
+CONSTRAINT "config_extract_raster_value_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "oor_csv_import"  CHECK( id = '1' )
 );
 
 
