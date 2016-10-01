@@ -13,8 +13,8 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Clear tables
-    DELETE FROM anl_flow_trace_node;
-    DELETE FROM anl_flow_trace_arc;
+    DELETE FROM anl_flow_exit_node;
+    DELETE FROM anl_flow_exit_arc;
 
     -- Compute the tributary area using DFS
     PERFORM gw_fct_flow_exit_recursive(node_id_arg);
