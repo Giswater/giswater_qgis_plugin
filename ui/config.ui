@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -723,7 +723,7 @@
     <attribute name="title">
      <string>Search</string>
     </attribute>
-    <widget class="QTabWidget" name="tab_search">
+    <widget class="QTabWidget" name="Search_tap">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -733,7 +733,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -1185,7 +1185,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Portal field code</string>
+        <string>Street field code</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1412,7 +1412,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Hydrometer layer</string>
+        <string>Hydrometer layer:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1448,7 +1448,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Hydrometer field code</string>
+        <string>Hydrometer id field:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1505,7 +1505,7 @@
       <widget class="QLabel" name="label_node2arc_29">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>18</x>
          <y>30</y>
          <width>191</width>
          <height>22</height>
@@ -1523,7 +1523,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Urban propierties layer</string>
+        <string>Connec layer:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1541,7 +1541,7 @@
       <widget class="QLabel" name="label_node2arc_30">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>38</x>
          <y>60</y>
          <width>171</width>
          <height>22</height>
@@ -1559,7 +1559,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Urban prop. field code</string>
+        <string>Connec id field:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1579,6 +1579,55 @@
         <rect>
          <x>200</x>
          <y>30</y>
+         <width>211</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_node2arc_12">
+       <property name="geometry">
+        <rect>
+         <x>42</x>
+         <y>162</y>
+         <width>151</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Connec id field:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="hydrometer_field_urban_propierties_code">
+       <property name="geometry">
+        <rect>
+         <x>202</x>
+         <y>162</y>
          <width>211</width>
          <height>20</height>
         </rect>
