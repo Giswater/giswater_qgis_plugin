@@ -19,7 +19,6 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 );
 
 
-
 CREATE TABLE "config" (
 "id" varchar(18) NOT NULL,
 "node_proximity" double precision,
@@ -40,14 +39,14 @@ CREATE TABLE "config" (
 "audit_function_control" boolean,
 "arc_searchnodes_control" boolean,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id"),
-CONSTRAINT "oor_config"  CHECK( id = '1' )
+CONSTRAINT "config_check" CHECK(id = '1')
 );
 
 
 CREATE TABLE "config_csv_import" (
 "table_name" varchar(50) NOT NULL,
 "gis_client_layer_name" varchar(50),
-CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name"),
+CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name")
 );
 
 
@@ -72,7 +71,7 @@ CREATE TABLE "config_search_plus" (
 "hydrometer_field_code" varchar (30),
 "hydrometer_field_urban_propierties_code" varchar (30),
 CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id"),
-CONSTRAINT "oor_search_plus"  CHECK( id = '1' )
+CONSTRAINT "config_search_plus_check" CHECK(id = '1')
 );
 
 
@@ -83,7 +82,7 @@ CREATE TABLE "config_extract_raster_value" (
 "vector_layer" varchar (30),
 "vector_field_value" varchar (30),
 CONSTRAINT "config_extract_raster_value_pkey" PRIMARY KEY ("id"),
-CONSTRAINT "oor_csv_import"  CHECK( id = '1' )
+CONSTRAINT "config_extract_raster_value_check" CHECK(id = '1')
 );
 
 
@@ -98,3 +97,4 @@ CREATE TABLE "config_ui_forms" (
 "alias" varchar (50),
 CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
 );
+
