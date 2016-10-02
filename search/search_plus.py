@@ -132,7 +132,7 @@ class SearchPlus(QObject):
         
         # Tab 'Hydrometer'            
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_code, 
-                                     self.params['hydrometer_urban_propierties_field_code'], self.params['hydrometer_field_code'])
+                                     self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             #print "Error populating Tab 'Hydrometer'"
             self.dlg.tab_main.removeTab(3)
@@ -325,6 +325,7 @@ class SearchPlus(QObject):
           
     
     def generic_zoom(self, fieldname, combo, field_index=0):  
+        ''' Get selected element from the combo, and returns a feature request expression '''
         
         # Get selected element from combo    
         element = combo.currentText()
@@ -340,9 +341,9 @@ class SearchPlus(QObject):
             self.controller.show_warning(message) 
             return None
         
-        # Select this feature in order to copy to memory layer       
+        # Select this feature in order to copy to memory layer   
         aux = fieldname+" = '"+str(elem[field_index])+"'"
-        expr = QgsExpression(aux)     
+        expr = QgsExpression(aux)    
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux
             self.controller.show_warning(message)        
@@ -378,7 +379,7 @@ class SearchPlus(QObject):
   
   
     def hydrometer_zoom(self, fieldname, combo):
-        ''' Zoom to layer 'connec' '''  
+        ''' Zoom to layer 'v_edit_connec' '''  
         
         expr = self.generic_zoom(fieldname, combo)
         if expr is None:
