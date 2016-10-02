@@ -66,9 +66,9 @@ class SearchPlus(QObject):
         ''' Load plugin settings '''
           
         self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()                       
-        self.QML_PPOINT = None          
-        self.QML_HYDROMETER = None          
-        self.QML_URBAN = None    
+        self.QML_PPOINT = self.settings.value('layers/QML_PPOINT', 'point.qml').lower()             
+        self.QML_HYDROMETER = self.settings.value('layers/QML_HYDROMETER', 'hydrometer.qml').lower()             
+        self.QML_URBAN = self.settings.value('layers/QML_URBAN', 'urban.qml').lower()       
 
         # get initial Scale
         self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
@@ -102,23 +102,28 @@ class SearchPlus(QObject):
         self.hydrometerMemLayerTo = None
         self.urbanMemLayer = None
         
-        # Iterate over all layers    
-        self.layers = {}        
+        # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
-        for cur_layer in layers:            
-            name = cur_layer.name().lower()
-            if self.params['street_layer'] == name: 
-                self.layers['street_layer'] = cur_layer 
-            elif self.params['portal_layer'] == name:    
-                self.layers['portal_layer'] = cur_layer 
-            elif self.params['ppoint_layer'] == name:  
-                self.layers['ppoint_layer'] = cur_layer     
-            elif self.params['hydrometer_layer'] == name:   
-                self.layers['hydrometer_layer'] = cur_layer      
-            if self.params['hydrometer_urban_propierties_layer'] == name:
-                self.layers['hydrometer_urban_propierties_layer'] = cur_layer  
-            if self.params['urban_propierties_layer'] == name:
-                self.layers['urban_propierties_layer'] = cur_layer     
+        if len(layers) == 0:
+            return            
+        
+        # Iterate over all layers to get the ones specified in 'db' config section 
+        self.layers = {}            
+        for cur_layer in layers:     
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            if uri_table is not None:
+                if self.params['street_layer'] in uri_table: 
+                    self.layers['street_layer'] = cur_layer 
+                elif self.params['portal_layer'] in uri_table:    
+                    self.layers['portal_layer'] = cur_layer 
+                elif self.params['ppoint_layer'] in uri_table:  
+                    self.layers['ppoint_layer'] = cur_layer     
+                elif self.params['hydrometer_layer'] in uri_table:   
+                    self.layers['hydrometer_layer'] = cur_layer      
+                if self.params['hydrometer_urban_propierties_layer'] in uri_table:
+                    self.layers['hydrometer_urban_propierties_layer'] = cur_layer  
+                if self.params['urban_propierties_layer'] in uri_table:
+                    self.layers['urban_propierties_layer'] = cur_layer      
            
                          
     def populate_dialog(self):
@@ -401,7 +406,7 @@ class SearchPlus(QObject):
         
         # Load style
         if self.QML_HYDROMETER is not None:
-            self.load_style(self.ppointMemLayer, self.QML_HYDROMETER)
+            self.load_style(self.hydrometerMemLayerTo, self.QML_HYDROMETER)
             
             
     def urban_populate(self, layer):
@@ -568,8 +573,10 @@ class SearchPlus(QObject):
 
     def load_style(self, layer, qml):
         ''' Load QML style file into selected layer '''
-        path_qml = self.stylesFolder+qml      
-        if os.path.exists(path_qml): 
+        if layer is None:
+            return
+        path_qml = self.stylesFolder+qml     
+        if os.path.exists(path_qml) and os.path.isfile(path_qml): 
             layer.loadNamedStyle(path_qml)      
             
                 
