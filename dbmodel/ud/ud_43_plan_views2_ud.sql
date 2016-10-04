@@ -86,8 +86,6 @@ JOIN v_price_compost ON (((cat_node."cost")::text = (v_price_compost.id)::text))
 
 
 
-
-
 -- ----------------------------
 -- View structure for v_plan_ml_arc
 -- ----------------------------
@@ -468,11 +466,14 @@ v_price_compost.id AS price_id,
 v_price_compost.descript,
 v_price_compost.price,
 plan_other_x_psector.measurement,
-(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget
+(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget,
+plan_other_x_psector.atlas_id
 
 FROM (plan_other_x_psector 
 JOIN v_price_compost ON ((((v_price_compost.id)::text = (plan_other_x_psector.price_id)::text))))
-ORDER BY psector_id;
+ORDER BY 
+plan_other_x_psector.psector_id,
+plan_other_x_psector.atlas_id;
 
 
 DROP VIEW IF EXISTS  "v_plan_psector_other" CASCADE;
@@ -518,8 +519,9 @@ plan_psector.other,
 plan_psector.atlas_id;
 
 
-DROP VIEW IF EXISTS v_plan_psector CASCADE;
- CREATE OR REPLACE VIEW v_plan_psector AS 
+DROP VIEW IF EXISTS "v_plan_psector" CASCADE;
+ 
+ CREATE OR REPLACE VIEW "v_plan_psector" AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,
         sum(wtotal.pec::numeric(12,2)) AS pec,
@@ -558,8 +560,9 @@ DROP VIEW IF EXISTS v_plan_psector CASCADE;
 
 
 				
-DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;				
- CREATE OR REPLACE VIEW v_plan_psector_filtered AS 
+DROP VIEW IF EXISTS "v_plan_psector_filtered" CASCADE;			
+	
+ CREATE OR REPLACE VIEW "v_plan_psector_filtered" AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,
 	sum(wtotal.pec::numeric(12,2)) AS pec,
@@ -599,4 +602,3 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
 				   
 				   
 				GROUP BY wtotal.psector_id, wtotal.atlas_id, wtotal.the_geom;
-  
