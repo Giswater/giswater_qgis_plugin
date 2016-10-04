@@ -54,9 +54,9 @@ easel_diameter_mm,
 ext_cat_hydrometer.text2, 
 ext_cat_hydrometer.text3
 FROM rtc_hydrometer
-JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id
+LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id
 LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
-JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id
+JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id
 JOIN  connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id;
 
 
