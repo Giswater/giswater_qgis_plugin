@@ -72,8 +72,9 @@ class ExtractRasterValue(ParentMapTool):
 
 
     def set_config_action(self, action_99):
-        ''' Get the config form action'''
+        ''' Set the config form action '''
         self.configAction = action_99
+
 
     ''' QgsMapTools inherited event functions '''
 
@@ -272,7 +273,6 @@ class ExtractRasterValue(ParentMapTool):
             self.noDataValue = None
 
         self.continueProcess = True
-
         self.fieldIdx = ""
         self.fieldIdx = layer.fieldNameIndex(self.fieldName)
 
@@ -294,7 +294,6 @@ class ExtractRasterValue(ParentMapTool):
         if layer.selectedFeatureCount() == 0:
             message = "You have to select at least one feature!"
             self.controller.show_warning(message, context_name='ui_message')
-
             return
 
         # Check editable
@@ -303,9 +302,7 @@ class ExtractRasterValue(ParentMapTool):
 
         # Get selected id's
         ids = self.vectorLayer.selectedFeaturesIds()
-
         for fid in ids:
-
             k += 1
             layer.getFeatures(QgsFeatureRequest(fid)).nextFeature(f)
             c += 1
@@ -319,7 +316,6 @@ class ExtractRasterValue(ParentMapTool):
         # Check editable
         if layer.isEditable():
             layer.commitChanges()
-
 
         # Refresh map canvas
         self.rubberBand.reset()
@@ -345,7 +341,7 @@ class ExtractRasterValue(ParentMapTool):
         self.rubberBand.addPoint(ul, False)
         self.rubberBand.addPoint(ll, True)
 
-        self.selectRectMapCoord = 	QgsRectangle(ll, ur)
+        self.selectRectMapCoord = QgsRectangle(ll, ur)
 
 
     def select_multiple_features(self, selectGeometry):
@@ -378,8 +374,7 @@ class ExtractRasterValue(ParentMapTool):
 
         # Query database (form data)
         sql = "SELECT *"
-        sql += " FROM " + self.schema_name + ".config_extract_raster_value"
-
+        sql+= " FROM " + self.schema_name + ".config_extract_raster_value"
         rows = self.controller.get_rows(sql)
 
         if not rows:
@@ -409,11 +404,11 @@ class ExtractRasterValue(ParentMapTool):
             if cur_layer.name() == self.table_raster:
                 self.rasterLayer = cur_layer
 
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)  # @UnusedVariable
+            layer_source = self.controller.get_layer_source(cur_layer)
+            uri_table = layer_source['table']
             if uri_table is not None:
                 if self.table_vector in uri_table:
                     self.vectorLayer = cur_layer
-
 
         # Check config
         if self.vectorLayer is None or self.rasterLayer is None:

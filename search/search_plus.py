@@ -110,7 +110,8 @@ class SearchPlus(QObject):
         # Iterate over all layers to get the ones specified in 'db' config section 
         self.layers = {}            
         for cur_layer in layers:     
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            layer_source = self.controller.get_layer_source(cur_layer)  
+            uri_table = layer_source['table']            
             if uri_table is not None:
                 if self.params['street_layer'] in uri_table: 
                     self.layers['street_layer'] = cur_layer 

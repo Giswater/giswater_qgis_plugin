@@ -234,18 +234,29 @@ class DaoController():
         
         
     def get_layer_source(self, layer):
-        ''' Get table or view name of selected layer '''
+        ''' Get database, schema and table or view name of selected layer '''
 
-        uri_schema = None
-        uri_table = None
+        # Initialize dictionary
+        layer_source = {'db': None, 'schema': None, 'table': None}
+        
+        # Get database name
         uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini_db = uri.find('dbname=')
+        pos_end_db = uri.find(' host=')
+        if pos_ini_db <> -1 and pos_end_db <> -1:
+            uri_db = uri[pos_ini_db + 8:pos_end_db - 1]    
+        layer_source['db'] = uri_db       
+         
+        # Get schema and table or view name     
         pos_ini = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
         if pos_ini <> -1 and pos_fi <> -1:
             uri_schema = uri[pos_ini + 6:pos_end_schema]
             uri_table = uri[pos_ini + 6:pos_fi + 1]
+            layer_source['schema'] = uri_schema            
+            layer_source['table'] = uri_table            
 
-        return uri_schema, uri_table                                 
+        return layer_source                                 
         
     

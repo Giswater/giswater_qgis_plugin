@@ -275,7 +275,8 @@ class Ed():
         table_gully = self.schema_name+'."'+self.table_gully+'"'
         
         # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        layer_source = self.controller.get_layer_source(self.layer)
+        uri_table = layer_source['table']        
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return

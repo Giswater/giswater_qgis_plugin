@@ -199,6 +199,7 @@ class Giswater(QObject):
             else:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
 
+            # If this action has an associated map tool, add this to dictionary of available map_tools
             if map_tool:
                 self.map_tools[function_name] = map_tool
         
@@ -413,7 +414,8 @@ class Giswater(QObject):
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            layer_source = self.controller.get_layer_source(cur_layer)
+            uri_table = layer_source['table']
             if uri_table is not None:
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
@@ -433,7 +435,8 @@ class Giswater(QObject):
                  
         # Get schema name from table 'version'
         # Check if really exists
-        (self.schema_name, uri_table) = self.controller.get_layer_source(self.layer_version)  
+        layer_source = self.controller.get_layer_source(self.layer_version)  
+        self.schema_name = layer_source['schema']
         schema_name = self.schema_name.replace('"', '')
         if self.schema_name is None or not self.dao.check_schema(schema_name):
             self.controller.show_warning("Schema not found: "+self.schema_name)            
@@ -560,7 +563,8 @@ class Giswater(QObject):
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        (uri_schema, uri_table) = self.controller.get_layer_source(layer)  #@UnusedVariable  
+        layer_source = self.controller.get_layer_source(layer)  
+        uri_table = layer_source['table']
         if uri_table is not None:
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'
