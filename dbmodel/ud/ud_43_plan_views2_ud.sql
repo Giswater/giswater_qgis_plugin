@@ -384,6 +384,7 @@ plan_psector.vat,
 (((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pec_vat,
 plan_psector.other,
 (((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_arc.budget)))::numeric(14,2) AS pca,
+plan_psector.atlas_id,
 plan_psector.the_geom
 
 FROM (((((plan_psector
@@ -404,7 +405,8 @@ plan_psector.sector_id,
 plan_psector.the_geom,
 plan_psector.gexpenses,
 plan_psector.vat,
-plan_psector.other;
+plan_psector.other,
+plan_psector.atlas_id;
 
 
 
@@ -430,6 +432,7 @@ plan_psector.vat,
 (((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pec_vat,
 plan_psector.other,
 (((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_node.budget)))::numeric(14,2) AS pca,
+plan_psector.atlas_id,
 plan_psector.the_geom
 
 FROM (((((plan_psector
@@ -450,7 +453,8 @@ plan_psector.sector_id,
 plan_psector.the_geom,
 plan_psector.gexpenses,
 plan_psector.vat,
-plan_psector.other;
+plan_psector.other,
+plan_psector.atlas_id;
 
 
 
@@ -491,6 +495,7 @@ plan_psector.vat,
 (((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pec_vat,
 plan_psector.other,
 (((100+plan_psector.gexpenses)/100)*((100+plan_psector.vat)/100)*((100+plan_psector.other)/100)*(sum(v_plan_other_x_psector.budget)))::numeric(14,2) AS pca,
+plan_psector.atlas_id,
 plan_psector.the_geom
 
 FROM (((plan_psector
@@ -509,42 +514,47 @@ plan_psector.sector_id,
 plan_psector.the_geom,
 plan_psector.gexpenses,
 plan_psector.vat,
-plan_psector.other;
+plan_psector.other,
+plan_psector.atlas_id;
 
 
 DROP VIEW IF EXISTS v_plan_psector CASCADE;
  CREATE OR REPLACE VIEW v_plan_psector AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,
-    sum(wtotal.pec::numeric(12,2)) AS pec,
+        sum(wtotal.pec::numeric(12,2)) AS pec,
 	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
-    sum(wtotal.pca::numeric(12,2)) AS pca,
-    wtotal.the_geom
+        sum(wtotal.pca::numeric(12,2)) AS pca,
+        wtotal.atlas_id,
+        wtotal.the_geom
    FROM (         SELECT v_plan_psector_arc.psector_id,
-					v_plan_psector_arc.pem,
-                    v_plan_psector_arc.pec,
-					v_plan_psector_arc.pec_vat,
-                    v_plan_psector_arc.pca,
-                    v_plan_psector_arc.the_geom
+			v_plan_psector_arc.pem,
+			v_plan_psector_arc.pec,
+			v_plan_psector_arc.pec_vat,
+			v_plan_psector_arc.pca,
+			v_plan_psector_arc.atlas_id,
+			v_plan_psector_arc.the_geom
                    FROM v_plan_psector_arc
         UNION
                  SELECT v_plan_psector_node.psector_id,
-					v_plan_psector_node.pem,
-                    v_plan_psector_node.pec,
-					v_plan_psector_node.pec_vat,
-                    v_plan_psector_node.pca,
-                    v_plan_psector_node.the_geom
+			v_plan_psector_node.pem,
+			v_plan_psector_node.pec,
+			v_plan_psector_node.pec_vat,
+			v_plan_psector_node.pca,
+			v_plan_psector_node.atlas_id,
+			v_plan_psector_node.the_geom
                    FROM v_plan_psector_node
 		UNION
                  SELECT v_plan_psector_other.psector_id,
-					v_plan_psector_other.pem,
-                    v_plan_psector_other.pec,
-					v_plan_psector_other.pec_vat,
-                    v_plan_psector_other.pca,
-                    v_plan_psector_other.the_geom
+			v_plan_psector_other.pem,
+			v_plan_psector_other.pec,
+			v_plan_psector_other.pec_vat,
+			v_plan_psector_other.pca,
+			v_plan_psector_other.atlas_id,
+			v_plan_psector_other.the_geom
                    FROM v_plan_psector_other) wtotal	  
 				   
-				GROUP BY wtotal.psector_id, wtotal.the_geom;
+				GROUP BY wtotal.psector_id, wtotal.atlas_id, wtotal.the_geom;
 
 
 				
@@ -552,40 +562,41 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
  CREATE OR REPLACE VIEW v_plan_psector_filtered AS 
  SELECT wtotal.psector_id,
 	sum(wtotal.pem::numeric(12,2)) AS pem,
-    sum(wtotal.pec::numeric(12,2)) AS pec,
+	sum(wtotal.pec::numeric(12,2)) AS pec,
 	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
-    sum(wtotal.pca::numeric(12,2)) AS pca,
-    wtotal.the_geom
+	sum(wtotal.pca::numeric(12,2)) AS pca,
+	wtotal.atlas_id,
+	wtotal.the_geom
    FROM (         SELECT v_plan_psector_arc.psector_id,
-					v_plan_psector_arc.pem,
-                    v_plan_psector_arc.pec,
-					v_plan_psector_arc.pec_vat,
-                    v_plan_psector_arc.pca,
-                    v_plan_psector_arc.the_geom
+			v_plan_psector_arc.pem,
+			v_plan_psector_arc.pec,
+			v_plan_psector_arc.pec_vat,
+			v_plan_psector_arc.pca,
+			v_plan_psector_arc.atlas_id,
+			v_plan_psector_arc.the_geom
                    FROM v_plan_psector_arc
-				   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_arc.psector_id)::text
+		   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_arc.psector_id)::text
         UNION
                  SELECT v_plan_psector_node.psector_id,
-					v_plan_psector_node.pem,
-                    v_plan_psector_node.pec,
-					v_plan_psector_node.pec_vat,
-                    v_plan_psector_node.pca,
-                    v_plan_psector_node.the_geom
+			v_plan_psector_node.pem,
+			v_plan_psector_node.pec,
+			v_plan_psector_node.pec_vat,
+			v_plan_psector_node.pca,
+			v_plan_psector_node.atlas_id,
+			v_plan_psector_node.the_geom
                    FROM v_plan_psector_node
-				   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_node.psector_id)::text
+		   JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_node.psector_id)::text
 		UNION
                  SELECT v_plan_psector_other.psector_id,
-					v_plan_psector_other.pem,
-                    v_plan_psector_other.pec,
-					v_plan_psector_other.pec_vat,
-                    v_plan_psector_other.pca,
-                    v_plan_psector_other.the_geom
+			v_plan_psector_other.pem,
+			v_plan_psector_other.pec,
+			v_plan_psector_other.pec_vat,
+			v_plan_psector_other.pca,
+			v_plan_psector_other.atlas_id,
+			v_plan_psector_other.the_geom
                    FROM v_plan_psector_other
                    JOIN plan_selector_psector  ON (plan_selector_psector.id)::text = (v_plan_psector_other.psector_id)::text) wtotal
 				   
 				   
-				GROUP BY wtotal.psector_id, wtotal.the_geom;
+				GROUP BY wtotal.psector_id, wtotal.atlas_id, wtotal.the_geom;
   
-
-
-
