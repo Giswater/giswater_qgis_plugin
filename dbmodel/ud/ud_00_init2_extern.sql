@@ -29,12 +29,19 @@ CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 );
 
 
--- Postnumber layer is not needed because connec acts as postnumber
+-- Postnumber
 
+CREATE TABLE "ext_postnumber"(
+  id character varying(16) NOT NULL,
+  streetaxis character varying(16),
+  postnumber character varying(16),
+  urban_properties_id character varying(16),
+  the_geom geometry(Point,25831),
+  CONSTRAINT ext_postnumber_pkey PRIMARY KEY (id)
+  );
 
+  
 -- Urban_structure
-
-
 
 CREATE TABLE "ext_urban_propierties" (
 "id" varchar (16) NOT NULL,
