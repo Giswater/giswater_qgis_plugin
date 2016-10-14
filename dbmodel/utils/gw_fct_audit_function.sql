@@ -50,7 +50,7 @@ BEGIN
 
     BEGIN
     
-        IF control_rec IS TRUE THEN
+        IF control_rec IS TRUE audit_cat_error_rec.log_level < 3 THEN
             INSERT INTO audit_function_actions (audit_cat_error_id, audit_cat_function_id, debug_info, query, user_name, addr) 
             VALUES (p_audit_cat_error_id, p_audit_cat_function_id, p_debug_info, current_query(), session_user, inet_client_addr());
         END IF;
