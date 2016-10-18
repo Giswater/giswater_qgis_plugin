@@ -25,3 +25,7 @@ ALTER TABLE "rtc_hydrometer_x_connec" ADD FOREIGN KEY ("connec_id") REFERENCES "
 ALTER TABLE "rtc_options" ADD FOREIGN KEY ("period_id") REFERENCES "ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "rtc_options" ADD FOREIGN KEY ("rtc_status") REFERENCES "rtc_value_opti_status" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "rtc_options" ADD FOREIGN KEY ("coefficient") REFERENCES "rtc_value_opti_coef" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "ext_rtc_hydrometer_x_value" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
+

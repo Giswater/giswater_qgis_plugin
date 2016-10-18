@@ -21,7 +21,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
         UPDATE ext_rtc_hydrometer_x_data 
-        SET sum=NEW.sum
+        SET custom_sum=NEW.custom_sum
         WHERE id=OLD.id;
         -- to do PERFORM audit_function(2,370); 
         RETURN NEW;
