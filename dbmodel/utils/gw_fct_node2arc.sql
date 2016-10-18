@@ -4,8 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_node2arc"(node_id_arg varchar) RETURNS "pg_catalog"."int2" AS $BODY$
+DROP FUNCTION SCHEMA_NAME.gw_fct_node2arc(character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc(node_id_arg character varying)
+  RETURNS smallint AS
+$BODY$
 DECLARE
     node_geom	geometry;
     arc_id_aux	varchar;
@@ -76,6 +78,15 @@ BEGIN
 
         --	Insert new record into arc table
         INSERT INTO arc SELECT rec_aux2.*;
+        
+	IF epa_type_aux = 'PIPE' THEN
+		INSERT INTO inp_pipe SELECT rec_aux2.arc_id;	
+		INSERT INTO man_pipe SELECT rec_aux2.arc_id;
+	ELSIF epa_type_aux = 'CONDUIT' THEN
+		INSERT INTO inp_conduit SELECT rec_aux2.arc_id;
+		INSERT INTO man_conduit SELECT rec_aux2.arc_id;
+	END IF;
+
 
     END IF;
 
@@ -84,5 +95,5 @@ BEGIN
         
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE COST 100;
-
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
