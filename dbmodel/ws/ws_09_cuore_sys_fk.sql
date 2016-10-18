@@ -22,14 +22,8 @@ ALTER TABLE "ext_rtc_scada_x_value" ADD FOREIGN KEY ("scada_id") REFERENCES "ext
 ALTER TABLE "ext_rtc_scada_x_data" ADD FOREIGN KEY ("scada_id") REFERENCES "ext_rtc_scada" ("scada_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "ext_rtc_scada_x_data" ADD FOREIGN KEY ("cat_period_id") REFERENCES "ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
-ALTER TABLE "ext_cat_hydrometer" ADD FOREIGN KEY ("hydrometer_type") REFERENCES "connec_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
 ALTER TABLE "ext_rtc_hydrometer" ADD FOREIGN KEY ("cat_hydrometer_id") REFERENCES "ext_cat_hydrometer" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ext_rtc_hydrometer_x_value" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "ext_rtc_hydrometer_x_data" ADD FOREIGN KEY ("cat_period_id") REFERENCES "ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
