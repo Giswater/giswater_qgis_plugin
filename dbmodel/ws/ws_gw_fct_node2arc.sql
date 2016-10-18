@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node2arc();
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node2arc() RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc()  RETURNS integer AS $BODY$
 DECLARE
     
     record_node SCHEMA_NAME.node%ROWTYPE;
@@ -21,6 +21,7 @@ DECLARE
     node_id_aux text;
     num_arcs integer;
     shortpipe_record record;
+    to_arc_aux text;
     
 
 BEGIN
@@ -46,9 +47,10 @@ BEGIN
 --  Move valves to arc
     RAISE NOTICE 'Start loop.';
 
-    FOR node_id_aux IN (SELECT node_id FROM SCHEMA_NAME.inp_valve UNION SELECT node_id FROM SCHEMA_NAME.inp_shortpipe)
+    
+    FOR node_id_aux IN (SELECT node_id FROM SCHEMA_NAME.inp_valve UNION SELECT node_id FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id FROM SCHEMA_NAME.inp_pump)
     LOOP
-
+	
 --        RAISE NOTICE 'Process valve: %', node_id_aux;
 
         -- Get node data
@@ -170,11 +172,26 @@ BEGIN
 
         -- Insert into arc table
         record_new_arc.arc_id := concat(node_id_aux, '_n2a');
-        record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-        record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
         record_new_arc.custom_length := NULL;
         --record_new_arc.epa_type := 'VALVE';
         record_new_arc.the_geom := valve_arc_geometry;
+
+	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM SCHEMA_NAME.inp_valve UNION SELECT node_id,to_arc FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id,to_arc FROM SCHEMA_NAME.inp_pump) A
+					WHERE node_id=node_id_aux;
+
+
+	IF to_arc_aux ='INVERT' THEN
+
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+	
+	ELSIF to_arc_aux ISNULL or to_arc_aux = 'NONE' THEN
+
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+		
+	END IF;
+
 
         --Print insert data
         --RAISE NOTICE 'Data: %', record_new_arc;

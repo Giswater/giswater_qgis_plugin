@@ -398,7 +398,8 @@ CREATE TABLE "inp_pump" (
 "curve_id" varchar  ,
 "speed" numeric(12,6),
 "pattern" varchar  ,
-"status" varchar(12)  
+"status" varchar(12),
+"to_arc" varchar(16)
 );
 
 
@@ -513,7 +514,8 @@ CREATE TABLE "inp_valve" (
 "coef_loss" numeric(12,4),
 "curve_id" int4,
 "minorloss" numeric(12,4),
-"status" varchar(12)  
+"status" varchar(12),
+"to_arc" varchar(16)
 );
 
 
