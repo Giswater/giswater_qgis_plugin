@@ -71,9 +71,6 @@ class Ed():
             message = "You have to select at least one feature!"
             self.controller.show_info(message, context_name='ui_message')  
             return False  
-        elif count > 1:  
-            message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message') 
 
         return True
     

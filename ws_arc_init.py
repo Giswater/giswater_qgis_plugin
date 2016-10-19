@@ -62,15 +62,13 @@ class ArcDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.arc_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.arccat_id = utils_giswater.getWidgetText("arccat_id", False)        
-        self.epa_type = utils_giswater.getWidgetText("epa_type", False)        
-        
-        # Get widget controls
+        self.epa_type = utils_giswater.getWidgetText("epa_type", False) 
         self.tab_analysis = self.dialog.findChild(QTabWidget, "tab_analysis")            
         self.tab_event = self.dialog.findChild(QTabWidget, "tab_event")  
         self.tab_event_2 = self.dialog.findChild(QTabWidget, "tab_event_2")        
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")      
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")    
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")             
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_rtc = self.dialog.findChild(QTableView, "tbl_rtc")             
              
         # Manage tab visibility
@@ -99,6 +97,14 @@ class ArcDialog(ParentDialog):
         
         # Configuration of table document
         self.set_configuration(self.tbl_document, table_document)
+
+        # Set signals    
+        btn_element_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
+        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
+        if btn_element_delete:             
+            btn_element_delete.clicked.connect(partial(self.delete_records, self.tbl_info, table_element))  
+        if btn_doc_delete:               
+            btn_doc_delete.clicked.connect(partial(self.delete_records, self.tbl_document, table_document))   
     
     
     def set_tabs_visibility(self):

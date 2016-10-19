@@ -54,10 +54,10 @@ class ArcDialog(ParentDialog):
         # Set layer in editing mode
         self.layer.startEditing()
         
-        # Fill the info table
+        # Fill the element table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
         
-        # Configuration of info table
+        # Configuration of element table
         self.set_configuration(self.tbl_element, table_element)
        
         # Fill the tab Document
@@ -68,7 +68,7 @@ class ArcDialog(ParentDialog):
         
         # Set signals    
         btn_element_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
-        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
+        btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
         if btn_element_delete:             
             btn_element_delete.clicked.connect(partial(self.delete_records, self.tbl_element, table_element))  
         if btn_doc_delete:               

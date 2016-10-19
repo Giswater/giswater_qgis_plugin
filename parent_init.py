@@ -167,7 +167,7 @@ class ParentDialog(object):
     def close(self):
         ''' Close form without saving '''
         self.layer.rollBack()   
-        self.dialog.parent().setVisible(False)    
+        self.dialog.parent().setVisible(False)         
         
         
     def set_model_to_table(self, widget, table_name, filter_): 
@@ -289,6 +289,11 @@ class ParentDialog(object):
                     widget.setColumnWidth(row['column_index']-1, width)
                     widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
         
+        # Set order
+        widget.model().setSort(0, Qt.AscendingOrder)    
+        widget.model().select()
+        
+        # Delete columns        
         for column in columns_to_delete:
             widget.hideColumn(column) 
 
