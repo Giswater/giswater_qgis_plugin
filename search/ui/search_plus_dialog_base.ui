@@ -84,7 +84,7 @@
     <widget class="SearchableComboBox" name="urban_properties_block">
      <property name="geometry">
       <rect>
-       <x>91</x>
+       <x>90</x>
        <y>52</y>
        <width>221</width>
        <height>20</height>

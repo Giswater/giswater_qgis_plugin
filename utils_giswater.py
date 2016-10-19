@@ -18,7 +18,7 @@ def fillComboBox(widget, rows, allow_nulls=True):
     if allow_nulls:
         widget.addItem('')     
     for row in rows:
-        widget.addItem(row[0])    
+        widget.addItem(str(row[0]))    
         
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'search_plus_dialog_base.ui'
 #
-# Created: Wed Oct 19 09:57:36 2016
+# Created: Wed Oct 19 11:27:52 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,7 +47,7 @@ class Ui_searchPlusDockWidget(object):
         self.urban_properties_zone.setEditable(True)
         self.urban_properties_zone.setObjectName(_fromUtf8("urban_properties_zone"))
         self.urban_properties_block = SearchableComboBox(self.tab_2)
-        self.urban_properties_block.setGeometry(QtCore.QRect(91, 52, 221, 20))
+        self.urban_properties_block.setGeometry(QtCore.QRect(90, 52, 221, 20))
         self.urban_properties_block.setEditable(True)
         self.urban_properties_block.setObjectName(_fromUtf8("urban_properties_block"))
         self.label_block = QtGui.QLabel(self.tab_2)

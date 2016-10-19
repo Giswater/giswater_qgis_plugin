@@ -4,8 +4,13 @@ from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplica
 
 from functools import partial
 import operator
-import os.path
+import os
+import sys
 from search_plus_dockwidget import SearchPlusDockWidget
+  
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+import utils_giswater      
 
 
 class SearchPlus(QObject):
@@ -47,7 +52,7 @@ class SearchPlus(QObject):
             return      
         
         # set signals
-        self.dlg.ppoint_field_zone.activated.connect(self.ppoint_zoom) 
+        self.dlg.ppoint_field_zone.activated.connect(self.ppoint_field_zone) 
         self.dlg.ppoint_number.activated.connect(self.ppoint_zoom)     
            
         self.dlg.adress_street.activated.connect(self.address_get_numbers)
@@ -56,8 +61,8 @@ class SearchPlus(QObject):
         
         self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))
 
-        self.dlg.urban_properties_zone.activated.connect(self.urban_zoom)               
-        self.dlg.urban_properties_block.activated.connect(self.urban_zoom)        
+        self.dlg.urban_properties_zone.activated.connect(self.urban_field_zone)               
+        self.dlg.urban_properties_block.activated.connect(self.urban_field_block)        
         self.dlg.urban_properties_number.activated.connect(self.urban_zoom)        
 
         self.enabled = True
@@ -121,9 +126,7 @@ class SearchPlus(QObject):
                     self.layers['ppoint_layer'] = cur_layer     
                 elif self.params['hydrometer_layer'] in uri_table:   
                     self.layers['hydrometer_layer'] = cur_layer      
-                if self.params['hydrometer_urban_propierties_layer'] in uri_table:
-                    self.layers['hydrometer_urban_propierties_layer'] = cur_layer  
-                if self.params['urban_propierties_layer'] in uri_table:
+                elif self.params['urban_propierties_layer'] in uri_table:
                     self.layers['urban_propierties_layer'] = cur_layer      
            
                          
@@ -323,8 +326,8 @@ class SearchPlus(QObject):
         # Copy selected features to memory layer     
         self.portalMemLayer = self.copy_selected(layer, self.portalMemLayer, "Point")       
 
-        # Zoom to point layer
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+        # Zoom to generated memory layer
+        self.zoom_to_scale()
         
         # Load style
         if self.QML_PORTAL is not None:        
@@ -360,7 +363,24 @@ class SearchPlus(QObject):
             return     
         
         return expr
-            
+    
+    
+    def ppoint_field_zone(self):
+        ''' Executed when field_zone is activated '''
+        
+        # Filter combo 'ppoint_number' with value selected in combo 'ppoint_field_zone'
+        text = utils_giswater.getSelectedItem(self.dlg.ppoint_field_zone) 
+        sql = "SELECT DISTINCT("+self.params['ppoint_field_number']+"::int4)"
+        sql+= " FROM "+self.controller.schema_name+"."+self.params['ppoint_layer']
+        if text != 'null':
+            sql+= " WHERE "+self.params['ppoint_field_zone']+" = '"+str(text)+"'"
+        sql+= " ORDER BY "+self.params['ppoint_field_number']
+        rows = self.controller.dao.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg.ppoint_number, rows)
+        
+        # Make zoom to selected elements
+        self.ppoint_zoom()   
+             
             
     def ppoint_zoom(self):
         ''' Zoom to layer 'point' filtering values of all combos '''  
@@ -370,7 +390,7 @@ class SearchPlus(QObject):
         layer = self.layers['ppoint_layer']      
         fieldname = self.params['ppoint_field_zone']
         combo =  self.dlg.ppoint_field_zone
-        text = self.getSelectedItem(combo)
+        text = utils_giswater.getSelectedItem(combo)
         if text != "null":
             if aux != "":
                 aux+= " AND "
@@ -378,7 +398,7 @@ class SearchPlus(QObject):
             
         fieldname = self.params['ppoint_field_number']
         combo =  self.dlg.ppoint_number
-        text = self.getSelectedItem(combo)
+        text = utils_giswater.getSelectedItem(combo)
         if text != "null":
             if aux != "":
                 aux+= " AND "
@@ -401,8 +421,8 @@ class SearchPlus(QObject):
         # Copy selected features to memory layer     
         self.ppointMemLayer = self.copy_selected(layer, self.ppointMemLayer, "Point")       
 
-        # Zoom to point layer
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+        # Zoom to generated memory layer
+        self.zoom_to_scale()
         
         # Load style
         if self.QML_PPOINT is not None:
@@ -422,7 +442,7 @@ class SearchPlus(QObject):
         # Get a featureIterator from an expression
         # Build a list of feature Ids from the previous result       
         # Select featureswith the ids obtained 
-        layer = self.layers['hydrometer_urban_propierties_layer']          
+        layer = self.layers['hydrometer_layer']          
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.setSelectedFeatures(ids)
@@ -430,8 +450,8 @@ class SearchPlus(QObject):
         # Copy selected features to memory layer     
         self.hydrometerMemLayerTo = self.copy_selected(layer, self.hydrometerMemLayerTo, "Point")       
 
-        # Zoom to point layer
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+        # Zoom to generated memory layer
+        self.zoom_to_scale()
         
         # Load style
         if self.QML_HYDROMETER is not None:
@@ -457,6 +477,45 @@ class SearchPlus(QObject):
         return True
                        
     
+    def urban_field_zone(self):
+        ''' Executed when 'urban_propierties_field_pzone' is activated '''
+        
+        # Filter combo 'urban_properties_block' with value selected in combo 'urban_properties_zone'
+        text = utils_giswater.getSelectedItem(self.dlg.urban_properties_zone)
+        sql = "SELECT DISTINCT("+self.params['urban_propierties_field_block']+"::int4)"
+        sql+= " FROM "+self.controller.schema_name+"."+self.params['urban_propierties_layer']
+        if text != 'null':
+            sql+= " WHERE "+self.params['urban_propierties_field_pzone']+" = '"+str(text)+"'"
+        sql+= " ORDER BY "+self.params['urban_propierties_field_block']
+        print sql
+        rows = self.controller.dao.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg.urban_properties_block, rows)
+        
+        # Make zoom to selected elements
+        self.urban_zoom()   
+    
+    
+    def urban_field_block(self):
+        ''' Executed when 'urban_propierties_field_block' is activated '''
+        
+        text_zone = utils_giswater.getSelectedItem(self.dlg.urban_properties_zone)
+        text_block = utils_giswater.getSelectedItem(self.dlg.urban_properties_block)
+            
+        # Filter combo 'urban_properties_number' with values selected in combos 'urban_properties_zone' and 'urban_properties_block'
+        sql = "SELECT DISTINCT("+self.params['urban_propierties_field_number']+"::int4)"
+        sql+= " FROM "+self.controller.schema_name+"."+self.params['urban_propierties_layer']
+        if text_zone != 'null':
+            sql+= " WHERE "+self.params['urban_propierties_field_pzone']+" = '"+str(text_zone)+"'"
+        if text_block != 'null':
+            sql+= " AND "+self.params['urban_propierties_field_block']+" = '"+str(text_block)+"'"
+        sql+= " ORDER BY "+self.params['urban_propierties_field_number']
+        rows = self.controller.dao.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg.urban_properties_number, rows)
+        
+        # Make zoom to selected elements
+        self.urban_zoom()   
+             
+                 
     def urban_zoom(self):
         ''' Zoom to layer 'urban' filtering values of all combos '''  
 
@@ -465,7 +524,7 @@ class SearchPlus(QObject):
         layer = self.layers['urban_propierties_layer']      
         fieldname = self.params['urban_propierties_field_pzone']
         combo =  self.dlg.urban_properties_zone
-        text = self.getSelectedItem(combo)
+        text = utils_giswater.getSelectedItem(combo)
         if text != "null":
             if aux != "":
                 aux+= " AND "
@@ -473,7 +532,7 @@ class SearchPlus(QObject):
             
         fieldname = self.params['urban_propierties_field_block']
         combo =  self.dlg.urban_properties_block
-        text = self.getSelectedItem(combo)
+        text = utils_giswater.getSelectedItem(combo)
         if text != "null":
             if aux != "":
                 aux+= " AND "
@@ -481,7 +540,7 @@ class SearchPlus(QObject):
             
         fieldname = self.params['urban_propierties_field_number']
         combo =  self.dlg.urban_properties_number
-        text = self.getSelectedItem(combo)
+        text = utils_giswater.getSelectedItem(combo)
         if text != "null":
             if aux != "":
                 aux+= " AND "
@@ -504,8 +563,8 @@ class SearchPlus(QObject):
         # Copy selected features to memory layer     
         self.urbanMemLayer = self.copy_selected(layer, self.urbanMemLayer, "Polygon")       
 
-        # Zoom to layer
-        self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
+        # Zoom to generated memory layer
+        self.zoom_to_scale()
         
         # Load style
         if self.QML_URBAN is not None:
@@ -526,7 +585,8 @@ class SearchPlus(QObject):
 
         # Fields management
         layer = self.layers[parameter]
-        records = [(-1, '')]
+        #records = [(-1, '')]
+        records = []
         idx_field = layer.fieldNameIndex(fieldname) 
         if idx_field == -1:           
             message = "Field '{}' not found in the layer specified in parameter '{}'".format(fieldname, parameter)           
@@ -565,16 +625,7 @@ class SearchPlus(QObject):
         combo.blockSignals(False)     
         
         return True
-                   
-    
-    def getSelectedItem(self, widget):
-        
-        widget_text = "null"    
-        if widget:
-            if widget.currentText():
-                widget_text = widget.currentText()       
-        return widget_text    
-    
+                    
         
     def show_feature_count(self):
         ''' Toggles 'Show Feature Count' of all the layers in the root path of the TOC '''   
@@ -582,7 +633,14 @@ class SearchPlus(QObject):
         root = QgsProject.instance().layerTreeRoot()
         for child in root.children():
             if isinstance(child, QgsLayerTreeLayer):
-                child.setCustomProperty("showFeatureCount", True)      
+                child.setCustomProperty("showFeatureCount", True)     
+        
+                
+    def zoom_to_scale(self):
+        ''' Zoom to scale '''
+        scale = self.iface.mapCanvas().scale()
+        if int(scale) < int(self.scale_zoom):
+            self.iface.mapCanvas().zoomScale(float(self.scale_zoom))                 
                                     
                 
     def manage_mem_layer(self, layer):
