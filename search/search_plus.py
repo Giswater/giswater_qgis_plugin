@@ -126,9 +126,10 @@ class SearchPlus(QObject):
                     self.layers['ppoint_layer'] = cur_layer     
                 elif self.params['hydrometer_layer'] in uri_table:   
                     self.layers['hydrometer_layer'] = cur_layer      
-                elif self.params['urban_propierties_layer'] in uri_table:
+                if self.params['urban_propierties_layer'] in uri_table:
                     self.layers['urban_propierties_layer'] = cur_layer      
-           
+                if self.params['hydrometer_urban_propierties_layer'] in uri_table:
+                    self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
                          
     def populate_dialog(self):
         ''' Populate the interface with values get from layers '''                      
@@ -439,10 +440,12 @@ class SearchPlus(QObject):
         if expr is None:
             return        
   
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained 
-        layer = self.layers['hydrometer_layer']          
+        # Build a list of feature id's from the expression and select them  
+        try:
+            layer = self.layers['hydrometer_urban_propierties_layer']
+        except KeyError as e:
+            self.controller.show_warning(str(e))    
+            return False      
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
         layer.setSelectedFeatures(ids)
@@ -703,7 +706,8 @@ class SearchPlus(QObject):
             attributes = []
             attributes.extend(sel_feature.attributes())
             cfeature = QgsFeature()    
-            cfeature.setGeometry(sel_feature.geometry())
+            if sel_feature.geometry() is not None:
+                cfeature.setGeometry(sel_feature.geometry())
             cfeature.setAttributes(attributes)
             cfeatures.append(cfeature)
                      
