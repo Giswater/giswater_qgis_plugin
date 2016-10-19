@@ -47,8 +47,8 @@ class SearchPlus(QObject):
             return      
         
         # set signals
-        self.dlg.ppoint_field_zone.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_zone'], self.dlg.ppoint_field_zone)) 
-        self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_number'], self.dlg.ppoint_number))     
+        self.dlg.ppoint_field_zone.activated.connect(self.ppoint_zoom) 
+        self.dlg.ppoint_number.activated.connect(self.ppoint_zoom)     
            
         self.dlg.adress_street.activated.connect(self.address_get_numbers)
         self.dlg.adress_street.activated.connect(self.address_zoom_street)
@@ -362,20 +362,41 @@ class SearchPlus(QObject):
         return expr
             
             
-    def ppoint_zoom(self, fieldname, combo):
-        ''' Zoom to layer 'point' '''  
-
-        expr = self.generic_zoom(fieldname, combo)
-        if expr is None:
-            return
-        
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select featureswith the ids obtained  
-        layer = self.layers['ppoint_layer']           
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.setSelectedFeatures(ids)
+    def ppoint_zoom(self):
+        ''' Zoom to layer 'point' filtering values of all combos '''  
+         
+        # Build expresion search
+        aux = ""
+        layer = self.layers['ppoint_layer']      
+        fieldname = self.params['ppoint_field_zone']
+        combo =  self.dlg.ppoint_field_zone
+        text = self.getSelectedItem(combo)
+        if text != "null":
+            if aux != "":
+                aux+= " AND "
+            aux+= fieldname+" = '"+str(text)+"'"
+            
+        fieldname = self.params['ppoint_field_number']
+        combo =  self.dlg.ppoint_number
+        text = self.getSelectedItem(combo)
+        if text != "null":
+            if aux != "":
+                aux+= " AND "
+            aux+= fieldname+" = '"+str(text)+"'"
+         
+        # Build a list of feature id's from the expression and select them       
+        if aux != '':
+            expr = QgsExpression(aux)    
+            if expr.hasParserError():   
+                message = expr.parserErrorString() + ": " + aux
+                self.controller.show_warning(message)        
+                return              
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            ids = [i.id() for i in it]
+            layer.setSelectedFeatures(ids)
+        # Select all features
+        else:
+            layer.selectAll()       
         
         # Copy selected features to memory layer     
         self.ppointMemLayer = self.copy_selected(layer, self.ppointMemLayer, "Point")       
@@ -437,7 +458,7 @@ class SearchPlus(QObject):
                        
     
     def urban_zoom(self):
-        ''' Zoom to layer 'urban' filtering values of all combos'''  
+        ''' Zoom to layer 'urban' filtering values of all combos '''  
 
         # Build expresion search
         aux = ""
