@@ -146,26 +146,24 @@ SELECT
 	JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)));
 
 
-DROP VIEW IF EXISTS "v_inp_status" CASCADE;
-CREATE VIEW "v_inp_status" AS 
+CREATE OR REPLACE VIEW v_inp_status AS
 SELECT 
-	inp_valve.node_id, inp_valve.status 
-	FROM ((inp_valve
-	JOIN v_inp_node node ON (((node.node_id)::text = (inp_valve.node_id)::text)))
-	JOIN inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text))
-	JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)))
-	WHERE inp_valve.status::text = 'OPEN'::text OR inp_valve.status::text = 'CLOSED'::text;
-
-
-DROP VIEW IF EXISTS "v_inp_status_pump" CASCADE;
-CREATE VIEW "v_inp_status_pump" AS 
-SELECT
-	inp_pump.node_id, inp_pump.status 
-	FROM ((inp_pump
-	JOIN v_inp_node node ON (((node.node_id)::text = (inp_pump.node_id)::text)))
-	JOIN inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text))
-	JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)))
-	WHERE inp_pump.status::text = 'OPEN'::text OR inp_pump.status::text = 'CLOSED'::text;
+    temp_arc.arc_id,
+    inp_valve.status
+    FROM temp_arc
+    JOIN inp_valve ON temp_arc.arc_id::text = concat(inp_valve.node_id, '_n2a')
+    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
+    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    WHERE inp_valve.status::text = 'OPEN'::text OR inp_valve.status::text = 'CLOSED'::text
+UNION
+    SELECT 
+    temp_arc.arc_id,
+    inp_pump.status
+    FROM temp_arc
+    JOIN inp_pump ON temp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
+    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
+    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    WHERE inp_pump.status::text = 'OPEN'::text OR inp_pump.status::text = 'CLOSED'::text;
 
 
 DROP VIEW IF EXISTS "v_inp_emitter" CASCADE;
@@ -431,7 +429,7 @@ FROM (rpt_selector_compare JOIN rpt_energy_usage ON (((rpt_selector_compare.resu
 DROP VIEW IF EXISTS "v_rpt_comp_hydraulic_status" CASCADE;
 CREATE VIEW "v_rpt_comp_hydraulic_status" AS 
 SELECT rpt_hydraulic_status.id, rpt_hydraulic_status.result_id, rpt_hydraulic_status."time", rpt_hydraulic_status.text 
-FROM (rpt_hydraulic_status JOIN rpt_selector_compare ON (((rpt_selector_compare.result_id)::text = (rpt_hydraulic_status.result_id)::text)));
+FROM (rpt_hydraulic_status JOIN rpt_selector_compare ON (((rpt_selector_compare.result_id)::text = (rpt_hydraulic_.result_id)::text)));
 
 
 DROP VIEW IF EXISTS "v_rpt_comp_node" CASCADE;

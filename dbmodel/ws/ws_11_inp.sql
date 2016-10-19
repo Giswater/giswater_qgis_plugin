@@ -673,7 +673,7 @@ CREATE TABLE "rpt_arc" (
 CREATE TABLE "rpt_energy_usage" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_energy_usage_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
-"node_id" varchar(16),
+"nodarc_id" varchar(16),
 "usage_fact" numeric,
 "avg_effic" numeric,
 "kwhr_mgal" numeric,
