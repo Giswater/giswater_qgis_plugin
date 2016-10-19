@@ -149,7 +149,7 @@ class Giswater(QObject):
                     callback_function = getattr(self, water_soft+'_generic')  
                     action.triggered.connect(partial(callback_function, function_name))
             except AttributeError:
-                print index_action+". Callback function not found: "+function_name
+                #print index_action+". Callback function not found: "+function_name
                 action.setEnabled(False)                
         else:
             action.setEnabled(False)

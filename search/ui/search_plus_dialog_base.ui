@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>357</width>
-    <height>153</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>331</width>
-     <height>121</height>
+     <width>329</width>
+     <height>153</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -33,20 +33,59 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>56</y>
+       <y>88</y>
        <width>71</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Postnumber:</string>
+      <string>Number:</string>
      </property>
     </widget>
     <widget class="SearchableComboBox" name="urban_properties_number">
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>54</y>
+       <y>86</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_zone">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>22</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Zone:</string>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_properties_zone">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_properties_block">
+     <property name="geometry">
+      <rect>
+       <x>91</x>
+       <y>52</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -58,27 +97,14 @@
     <widget class="QLabel" name="label_block">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>22</y>
+       <x>16</x>
+       <y>54</y>
        <width>55</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Square:</string>
-     </property>
-    </widget>
-    <widget class="SearchableComboBox" name="urban_properties_block">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>20</y>
-       <width>221</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
+      <string>Block:</string>
      </property>
     </widget>
    </widget>
@@ -86,7 +112,7 @@
     <attribute name="title">
      <string>Ppoint</string>
     </attribute>
-    <widget class="SearchableComboBox" name="ppoint_press_zone">
+    <widget class="SearchableComboBox" name="ppoint_field_zone">
      <property name="geometry">
       <rect>
        <x>90</x>
@@ -99,7 +125,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_press_zone">
+    <widget class="QLabel" name="label_field_zone">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -109,7 +135,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Press zone:</string>
+      <string>Field zone:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_number">

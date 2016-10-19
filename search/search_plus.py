@@ -47,17 +47,18 @@ class SearchPlus(QObject):
             return      
         
         # set signals
+        self.dlg.ppoint_field_zone.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_zone'], self.dlg.ppoint_field_zone)) 
         self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_number'], self.dlg.ppoint_number))     
-        self.dlg.ppoint_press_zone.activated.connect(partial(self.ppoint_zoom, self.params['ppoint_field_zone'], self.dlg.ppoint_press_zone)) 
            
         self.dlg.adress_street.activated.connect(self.address_get_numbers)
         self.dlg.adress_street.activated.connect(self.address_zoom_street)
         self.dlg.adress_number.activated.connect(self.address_zoom_portal)  
         
         self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))
-              
-        self.dlg.urban_properties_block.activated.connect(partial(self.urban_zoom, self.params['urban_propierties_field_block'], self.dlg.urban_properties_block))        
-        self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom, self.params['urban_propierties_field_number'], self.dlg.urban_properties_number))        
+
+        self.dlg.urban_properties_zone.activated.connect(self.urban_zoom)               
+        self.dlg.urban_properties_block.activated.connect(self.urban_zoom)        
+        self.dlg.urban_properties_number.activated.connect(self.urban_zoom)        
 
         self.enabled = True
             
@@ -128,20 +129,20 @@ class SearchPlus(QObject):
                          
     def populate_dialog(self):
         ''' Populate the interface with values get from layers '''                      
-             
+          
         if not self.enabled:
             return False
                      
         # Get layers and full extent
         self.get_layers()       
         
-        # Tab 'Hydrometer'            
+        # Tab 'Hydrometer'             
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_code, 
                                      self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             #print "Error populating Tab 'Hydrometer'"
             self.dlg.tab_main.removeTab(3)
-              
+                 
         # Tab 'Address'      
         status = self.address_populate('street_layer')
         if not status:
@@ -149,7 +150,7 @@ class SearchPlus(QObject):
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
-        status = self.populate_combo('ppoint_layer', self.dlg.ppoint_press_zone, self.params['ppoint_field_zone'])
+        status = self.populate_combo('ppoint_layer', self.dlg.ppoint_field_zone, self.params['ppoint_field_zone'])
         status_2 = self.populate_combo('ppoint_layer', self.dlg.ppoint_number, self.params['ppoint_field_number'])
         if not status or not status_2:
             #print "Error populating Tab 'Ppoint'"
@@ -169,9 +170,7 @@ class SearchPlus(QObject):
         
         # Check if we have this search option available
         if not parameter in self.layers:
-            layername = self.params[parameter]
-            message = "Layer '{}' not found in parameter '{}'".format(layername, parameter)  
-            #self.controller.show_warning(message)
+            #message = "Layer '{}' not found in parameter '{}'".format(self.params[parameter], parameter)  
             #print message          
             return False
 
@@ -283,6 +282,9 @@ class SearchPlus(QObject):
         self.iface.mapCanvas().setCenter(centroid.asPoint())
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
         
+        # Toggles 'Show feature count'
+        self.show_feature_count()              
+        
                 
     def address_zoom_portal(self):
         ''' Show street data on the canvas when selected street and number in street tab '''  
@@ -327,6 +329,9 @@ class SearchPlus(QObject):
         # Load style
         if self.QML_PORTAL is not None:        
             self.load_style(self.portalMemLayer, self.QML_PORTAL)    
+            
+        # Toggles 'Show feature count'
+        self.show_feature_count()                  
           
     
     def generic_zoom(self, fieldname, combo, field_index=0):  
@@ -381,6 +386,9 @@ class SearchPlus(QObject):
         # Load style
         if self.QML_PPOINT is not None:
             self.load_style(self.ppointMemLayer, self.QML_PPOINT)
+            
+        # Toggles 'Show feature count'
+        self.show_feature_count()                  
   
   
     def hydrometer_zoom(self, fieldname, combo):
@@ -408,10 +416,16 @@ class SearchPlus(QObject):
         if self.QML_HYDROMETER is not None:
             self.load_style(self.hydrometerMemLayerTo, self.QML_HYDROMETER)
             
+        # Toggles 'Show feature count'
+        self.show_feature_count()                  
+            
             
     def urban_populate(self, layer):
         ''' Populate combos tab 'urban properties' '''
         
+        status = self.populate_combo(layer, self.dlg.urban_properties_zone, self.params['urban_propierties_field_pzone'])
+        if not status:
+            return False        
         status = self.populate_combo(layer, self.dlg.urban_properties_block, self.params['urban_propierties_field_block'])
         if not status:
             return False
@@ -420,42 +434,73 @@ class SearchPlus(QObject):
             return False
 
         return True
-                
+                       
     
-    def urban_zoom(self, fieldname, combo):
-        ''' Zoom to layer 'urban' '''  
-          
-        expr = self.generic_zoom(fieldname, combo)
-        if expr is None:
-            return       
-    
-        # Get a featureIterator from an expression
-        # Build a list of feature Ids from the previous result       
-        # Select features with the ids obtained       
+    def urban_zoom(self):
+        ''' Zoom to layer 'urban' filtering values of all combos'''  
+
+        # Build expresion search
+        aux = ""
         layer = self.layers['urban_propierties_layer']      
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.setSelectedFeatures(ids)
+        fieldname = self.params['urban_propierties_field_pzone']
+        combo =  self.dlg.urban_properties_zone
+        text = self.getSelectedItem(combo)
+        if text != "null":
+            if aux != "":
+                aux+= " AND "
+            aux+= fieldname+" = '"+str(text)+"'"
+            
+        fieldname = self.params['urban_propierties_field_block']
+        combo =  self.dlg.urban_properties_block
+        text = self.getSelectedItem(combo)
+        if text != "null":
+            if aux != "":
+                aux+= " AND "
+            aux+= fieldname+" = '"+str(text)+"'"
+            
+        fieldname = self.params['urban_propierties_field_number']
+        combo =  self.dlg.urban_properties_number
+        text = self.getSelectedItem(combo)
+        if text != "null":
+            if aux != "":
+                aux+= " AND "
+            aux+= fieldname+" = '"+str(text)+"'"
+         
+        # Build a list of feature id's from the expression and select them       
+        if aux != '':
+            expr = QgsExpression(aux)    
+            if expr.hasParserError():   
+                message = expr.parserErrorString() + ": " + aux
+                self.controller.show_warning(message)        
+                return              
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            ids = [i.id() for i in it]
+            layer.setSelectedFeatures(ids)
+        # Select all features
+        else:
+            layer.selectAll()       
         
         # Copy selected features to memory layer     
         self.urbanMemLayer = self.copy_selected(layer, self.urbanMemLayer, "Polygon")       
 
-        # Zoom to point layer
+        # Zoom to layer
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
-
+        
         # Load style
         if self.QML_URBAN is not None:
-            self.load_style(self.urbanMemLayer, self.QML_URBAN)        
+            self.load_style(self.urbanMemLayer, self.QML_URBAN) 
+              
+        # Toggles 'Show feature count'
+        self.show_feature_count()                             
             
-                
+          
     def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
         ''' Populate selected combo from features of selected layer '''        
         
         # Check if we have this search option available
         if not parameter in self.layers:
-            layername = self.params[parameter]
-            message = "Layer '{}' not found in parameter '{}'".format(layername, parameter)  
-            #print(message)    
+            message = "Layer '{}' not found in parameter '{}'".format(self.params[parameter], parameter)  
+            print(message)    
             return False
 
         # Fields management
@@ -477,24 +522,47 @@ class SearchPlus(QObject):
             fieldname_2 = fieldname   
  
         # Iterate over all features to get distinct records
+        list_elements = []
         for feature in layer.getFeatures():                                
             attrs = feature.attributes() 
             field = attrs[idx_field]  
             field_2 = attrs[idx_field_2]  
             if not type(field) is QPyNullVariant:
-                elem = [field, field_2]               
-                records.append(elem)
+                if field not in list_elements:
+                    elem = [field, field_2]               
+                    list_elements.append(field)
+                    records.append(elem)
         
+        # Fill combo box
         combo.blockSignals(True)
         combo.clear()
-        records_sorted = sorted(records, key = operator.itemgetter(1))            
+        records_sorted = sorted(records, key = operator.itemgetter(1)) 
+        combo.addItem('', '')                 
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            combo.addItem(record[1], record)
+            combo.addItem(str(record[1]), record)
         combo.blockSignals(False)     
         
         return True
-                    
+                   
+    
+    def getSelectedItem(self, widget):
+        
+        widget_text = "null"    
+        if widget:
+            if widget.currentText():
+                widget_text = widget.currentText()       
+        return widget_text    
+    
+        
+    def show_feature_count(self):
+        ''' Toggles 'Show Feature Count' of all the layers in the root path of the TOC '''   
+                     
+        root = QgsProject.instance().layerTreeRoot()
+        for child in root.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                child.setCustomProperty("showFeatureCount", True)      
+                                    
                 
     def manage_mem_layer(self, layer):
         ''' Delete previous features from all memory layers 
@@ -517,6 +585,7 @@ class SearchPlus(QObject):
         self.manage_mem_layer(self.portalMemLayer)
         self.manage_mem_layer(self.ppointMemLayer)
         self.manage_mem_layer(self.hydrometerMemLayerTo)
+        self.manage_mem_layer(self.urbanMemLayer)
       
     
     def copy_selected(self, layer, mem_layer, geom_type):
@@ -568,7 +637,7 @@ class SearchPlus(QObject):
         # Make sure layer is always visible 
         self.iface.legendInterface().setLayerVisible(mem_layer, True)
                     
-        return mem_layer
+        return mem_layer  
           
 
     def load_style(self, layer, qml):
@@ -594,4 +663,5 @@ class SearchPlus(QObject):
         if self.dlg:
             self.dlg.deleteLater()
             del self.dlg            
-                                                         
+                                                            
+    
