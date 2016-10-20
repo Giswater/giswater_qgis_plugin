@@ -52,25 +52,25 @@ class SearchPlus(QObject):
             return      
         
         # set signals
-        self.dlg.ppoint_field_zone.activated.connect(self.ppoint_field_zone) 
-        self.dlg.ppoint_number.activated.connect(self.ppoint_zoom)     
+        self.dlg.ppoint_field_zone.activated.connect(partial(self.ppoint_field_zone))         
+        self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom))     
            
-        self.dlg.adress_street.activated.connect(self.address_get_numbers)
-        self.dlg.adress_street.activated.connect(self.address_zoom_street)
-        self.dlg.adress_number.activated.connect(self.address_zoom_portal)  
+        self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
+        self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
+        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal)) 
         
         self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))
 
-        self.dlg.urban_properties_zone.activated.connect(self.urban_field_zone)               
-        self.dlg.urban_properties_block.activated.connect(self.urban_field_block)        
-        self.dlg.urban_properties_number.activated.connect(self.urban_zoom)        
+        self.dlg.urban_properties_zone.activated.connect(partial(self.urban_field_zone))               
+        self.dlg.urban_properties_block.activated.connect(partial(self.urban_field_block))       
+        self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom))        
 
         self.enabled = True
-            
+    
     
     def load_plugin_settings(self):
         ''' Load plugin settings '''
-          
+         
         self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()                       
         self.QML_PPOINT = self.settings.value('layers/QML_PPOINT', 'point.qml').lower()             
         self.QML_HYDROMETER = self.settings.value('layers/QML_HYDROMETER', 'hydrometer.qml').lower()             
@@ -122,7 +122,7 @@ class SearchPlus(QObject):
                     self.layers['street_layer'] = cur_layer 
                 elif self.params['portal_layer'] in uri_table:    
                     self.layers['portal_layer'] = cur_layer 
-                elif self.params['ppoint_layer'] in uri_table:  
+                elif self.params['ppoint_layer'] in uri_table: 
                     self.layers['ppoint_layer'] = cur_layer     
                 elif self.params['hydrometer_layer'] in uri_table:   
                     self.layers['hydrometer_layer'] = cur_layer      
@@ -130,7 +130,8 @@ class SearchPlus(QObject):
                     self.layers['urban_propierties_layer'] = cur_layer      
                 if self.params['hydrometer_urban_propierties_layer'] in uri_table:
                     self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
-                         
+     
+     
     def populate_dialog(self):
         ''' Populate the interface with values get from layers '''                      
           
@@ -368,7 +369,7 @@ class SearchPlus(QObject):
     
     def ppoint_field_zone(self):
         ''' Executed when field_zone is activated '''
-        
+
         # Filter combo 'ppoint_number' with value selected in combo 'ppoint_field_zone'
         text = utils_giswater.getSelectedItem(self.dlg.ppoint_field_zone) 
         sql = "SELECT DISTINCT("+self.params['ppoint_field_number']+"::int4)"
@@ -435,7 +436,7 @@ class SearchPlus(QObject):
   
     def hydrometer_zoom(self, fieldname, combo):
         ''' Zoom to layer 'v_edit_connec' '''  
-        
+
         expr = self.generic_zoom(fieldname, combo)
         if expr is None:
             return        
@@ -490,7 +491,6 @@ class SearchPlus(QObject):
         if text != 'null':
             sql+= " WHERE "+self.params['urban_propierties_field_pzone']+" = '"+str(text)+"'"
         sql+= " ORDER BY "+self.params['urban_propierties_field_block']
-        print sql
         rows = self.controller.dao.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg.urban_properties_block, rows)
         
@@ -500,7 +500,7 @@ class SearchPlus(QObject):
     
     def urban_field_block(self):
         ''' Executed when 'urban_propierties_field_block' is activated '''
-        
+
         text_zone = utils_giswater.getSelectedItem(self.dlg.urban_properties_zone)
         text_block = utils_giswater.getSelectedItem(self.dlg.urban_properties_block)
             
