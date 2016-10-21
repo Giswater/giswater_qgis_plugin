@@ -50,20 +50,25 @@ JOIN  connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id;
 
 
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_period CASCADE;
-CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS
-SELECT
-ext_rtc_hydrometer.hydrometer_id,
-ext_cat_period.id as period_id,
-connec.dma_id,
-ext_rtc_hydrometer_x_data.sum as m3_total_period,
-((ext_rtc_hydrometer_x_data.sum*1000)/(ext_cat_period.period_seconds)) AS lps_avg
-FROM ext_rtc_hydrometer
-JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::integer= ext_rtc_hydrometer.hydrometer_id
-JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id = ext_cat_period.id
-JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::integer=ext_rtc_hydrometer.hydrometer_id
-JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
-JOIN rtc_options ON  rtc_options.period_id = ext_cat_period.id;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
+ SELECT ext_rtc_hydrometer.hydrometer_id,
+    ext_cat_period.id AS period_id,
+    connec.dma_id,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
+            ELSE ext_rtc_hydrometer_x_data.sum
+        END AS m3_total_period,
+        CASE
+            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
+        END AS lps_avg
+   FROM ext_rtc_hydrometer
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::integer = ext_rtc_hydrometer.hydrometer_id
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::integer = ext_rtc_hydrometer.hydrometer_id
+     JOIN connec ON connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN rtc_options ON rtc_options.period_id::text = ext_cat_period.id::text;
+
 
 
 DROP VIEW IF EXISTS v_rtc_dma_hydrometer_period CASCADE;
