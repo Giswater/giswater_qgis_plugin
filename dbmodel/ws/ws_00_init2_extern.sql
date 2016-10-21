@@ -43,7 +43,7 @@ CREATE TABLE "ext_postnumber"(
 
 
 CREATE TABLE "ext_urban_propierties" (
-"id" varchar (16) NOT NULL,
+"id" integer (16) NOT NULL,
 "code" varchar(30),
 "streetaxis" varchar(16),
 "postnumber" varchar(16),

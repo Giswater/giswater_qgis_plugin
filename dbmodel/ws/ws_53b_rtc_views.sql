@@ -110,7 +110,7 @@ JOIN arc ON arc.arc_id::text = v_edit_connec.arc_id;
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
 
-CREATE OR REPLACE VIEW gw_saa.v_rtc_hydrometer_x_node_period AS 
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
  SELECT v_rtc_hydrometer_x_arc.node_1 AS node_id,
     v_rtc_hydrometer_period.dma_id,
     v_rtc_hydrometer_period.period_id,
@@ -121,9 +121,9 @@ CREATE OR REPLACE VIEW gw_saa.v_rtc_hydrometer_x_node_period AS
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmin AS lps_min,
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
-   FROM gw_saa.v_rtc_hydrometer_x_arc
-     JOIN gw_saa.v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::text = v_rtc_hydrometer_x_arc.hydrometer_id::text
-     LEFT JOIN gw_saa.v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text = v_rtc_dma_parameter_period.period_id::text
+   FROM v_rtc_hydrometer_x_arc
+     JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::text = v_rtc_hydrometer_x_arc.hydrometer_id::text
+     LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text = v_rtc_dma_parameter_period.period_id::text
 UNION
  SELECT v_rtc_hydrometer_x_arc.node_2 AS node_id,
     v_rtc_hydrometer_period.dma_id,
@@ -135,33 +135,31 @@ UNION
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmin AS lps_min,
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
-   FROM gw_saa.v_rtc_hydrometer_x_arc
-     JOIN gw_saa.v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::text = v_rtc_hydrometer_x_arc.hydrometer_id::text
-     LEFT JOIN gw_saa.v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text = v_rtc_dma_parameter_period.period_id::text;
+   FROM v_rtc_hydrometer_x_arc
+     JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::text = v_rtc_hydrometer_x_arc.hydrometer_id::text
+     LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text = v_rtc_dma_parameter_period.period_id::text;
 
 
 
 DROP VIEW IF EXISTS "v_inp_demand" CASCADE;
-CREATE OR REPLACE VIEW "v_inp_demand" as
-SELECT
-v_rtc_hydrometer_x_node_period.node_id,
-(CASE 
-WHEN (rtc_options.coefficient='MIN') THEN (sum(v_rtc_hydrometer_x_node_period.lps_min)) 
-WHEN (rtc_options.coefficient='AVG') THEN (sum(v_rtc_hydrometer_x_node_period.lps_avg))
-ELSE (sum(v_rtc_hydrometer_x_node_period.lps_max)) END) as demand,
-(CASE 
-WHEN (rtc_options.coefficient='MIN') THEN null
-WHEN (rtc_options.coefficient='AVG') THEN inp_junction.pattern_id
-ELSE null END) as pattern_id
-FROM inp_junction
-JOIN node ON (((node.node_id)::text = (inp_junction.node_id)::text)) 
-JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id=node.node_id
-JOIN rtc_options ON rtc_options.period_id=v_rtc_hydrometer_x_node_period.period_id
-JOIN inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text))
-JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text))
-WHERE rtc_options.rtc_status='ON'
-GROUP BY
-v_rtc_hydrometer_x_node_period.node_id,
-pattern_id,
-v_rtc_hydrometer_x_node_period.period_id,
-rtc_options.coefficient;
+CREATE OR REPLACE VIEW v_inp_demand AS 
+ SELECT v_rtc_hydrometer_x_node_period.node_id,
+        CASE
+            WHEN rtc_options.coefficient::text = 'MIN'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_min)
+            WHEN rtc_options.coefficient::text = 'AVG'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_avg)
+            WHEN rtc_options.coefficient::text = 'AVG'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_max)
+            WHEN rtc_options.coefficient::text = 'REAL'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_avg_real)
+            ELSE NULL::double precision
+        END AS demand,
+        CASE
+            WHEN rtc_options.coefficient::text = 'AVG'::text THEN inp_junction.pattern_id
+            ELSE NULL::character varying
+        END AS pattern_id
+   FROM inp_junction
+     JOIN node ON node.node_id::text = inp_junction.node_id::text
+     JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id::text = node.node_id::text
+     JOIN rtc_options ON rtc_options.period_id::text = v_rtc_hydrometer_x_node_period.period_id::text
+     JOIN inp_selector_sector ON node.sector_id::text = inp_selector_sector.sector_id::text
+     JOIN inp_selector_state ON node.state::text = inp_selector_state.id::text
+  WHERE rtc_options.rtc_status::text = 'ON'::text
+  GROUP BY v_rtc_hydrometer_x_node_period.node_id, inp_junction.pattern_id, v_rtc_hydrometer_x_node_period.period_id, rtc_options.coefficient;

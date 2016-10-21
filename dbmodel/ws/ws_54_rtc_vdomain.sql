@@ -13,6 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 INSERT INTO "rtc_value_opti_coef" VALUES ('MIN');
 INSERT INTO "rtc_value_opti_coef" VALUES ('AVG');
 INSERT INTO "rtc_value_opti_coef" VALUES ('MAX');
+INSERT INTO "rtc_value_opti_coef" VALUES ('REAL');
 
 INSERT INTO "rtc_value_opti_status" VALUES ('ON');
 INSERT INTO "rtc_value_opti_status" VALUES ('OFF');
