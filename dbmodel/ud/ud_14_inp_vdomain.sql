@@ -14,10 +14,6 @@ INSERT INTO "inp_arc_type" VALUES ('ORIFICE');
 INSERT INTO "inp_arc_type" VALUES ('OUTLET');
 INSERT INTO "inp_arc_type" VALUES ('PUMP');
 INSERT INTO "inp_arc_type" VALUES ('WEIR');
-INSERT INTO "inp_arc_type" VALUES ('PUMP-CONDUIT');
-INSERT INTO "inp_arc_type" VALUES ('ORIFICE-CONDUIT');
-INSERT INTO "inp_arc_type" VALUES ('OUTLET-CONDUIT');
-INSERT INTO "inp_arc_type" VALUES ('WEIR-CONDUIT');
 INSERT INTO "inp_arc_type" VALUES ('NOT DEFINED');
 
 
