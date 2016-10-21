@@ -10570,7 +10570,7 @@
     </font>
    </property>
    <property name="text">
-    <string>cat_node.geom1</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="cat_matcat_id">
@@ -10588,7 +10588,7 @@
     </font>
    </property>
    <property name="text">
-    <string>cat_node.matcat_id</string>
+    <string/>
    </property>
   </widget>
   <widget class="QComboBox" name="verified">
