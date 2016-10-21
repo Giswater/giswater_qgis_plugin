@@ -17,8 +17,12 @@ def fillComboBox(widget, rows, allow_nulls=True):
     widget.clear()
     if allow_nulls:
         widget.addItem('')     
-    for row in rows:
-        widget.addItem(row[0])    
+    for row in rows:       
+        elem = row[0]
+        if isinstance(elem, int) or isinstance(elem, float):
+            widget.addItem(str(elem))
+        else:
+            widget.addItem(elem)
         
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
