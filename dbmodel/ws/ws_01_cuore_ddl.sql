@@ -148,7 +148,6 @@ CONSTRAINT point_type_pkey PRIMARY KEY (id)
 CREATE TABLE "cat_mat_arc" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
-"roughness" numeric(12,4),
 "link" varchar(512)  ,
 "url" varchar(512)  ,
 "picture" varchar(512)  ,
@@ -361,6 +360,7 @@ CREATE TABLE "sector" (
 "sector_id" varchar(30) NOT NULL,
 "descript" varchar(100),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 );
 
@@ -394,6 +394,7 @@ CREATE TABLE "node" (
 "link" character varying(512),
 "verified" varchar(20)  ,
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -428,6 +429,7 @@ CREATE TABLE "arc" (
 "link" character varying(512),
 "verified" varchar(20)  ,
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -439,6 +441,7 @@ CREATE TABLE "dma" (
 "descript" varchar(255),
 "observ" character varying(512),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 );
 
@@ -476,6 +479,7 @@ CREATE TABLE "connec" (
 "link" character varying(512),
 "verified" varchar(20)  ,
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -510,6 +514,7 @@ CREATE TABLE "point" (
 "observ" character varying(512),
 "text" text,
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT point_pkey PRIMARY KEY (point_id)
 );
 
@@ -520,6 +525,7 @@ CREATE TABLE "presszone" (
 "presszonecat_id" varchar(18),
 "sector" character varying(512),
 "text" text,
+"undelete" boolean,
 CONSTRAINT presszone_pkey PRIMARY KEY (id)
 );
 

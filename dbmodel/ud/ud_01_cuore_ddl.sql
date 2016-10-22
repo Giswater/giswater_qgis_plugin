@@ -410,6 +410,7 @@ CREATE TABLE "sector" (
 "sector_id" varchar(30) NOT NULL,
 "descript" varchar(100),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
 );
 
@@ -419,6 +420,7 @@ CREATE TABLE "catchment" (
 "descript" varchar(100),
 "text" text,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT catchment_pkey PRIMARY KEY (catchment_id)
 );
 
@@ -456,6 +458,7 @@ CREATE TABLE "node" (
 "link" character varying(512),
 "verified" varchar(20) ,
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -497,6 +500,7 @@ CREATE TABLE "arc" (
 "link" character varying(512),
 "verified" varchar(20),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -507,6 +511,7 @@ CREATE TABLE "polygon" (
 "node_id" varchar(16)  ,
 "text" varchar(254)  ,
 "the_geom" public.geometry (POLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT polygon_pkey PRIMARY KEY (pol_id)
 );
 
@@ -518,6 +523,7 @@ CREATE TABLE "dma" (
 "descript" varchar(255)  ,
 "observ" character varying(512),
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT dma_pkey PRIMARY KEY (dma_id)
 );
 
@@ -554,6 +560,7 @@ CREATE TABLE "connec" (
 "link" character varying(512),
 "verified" varchar(20)  , 
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -618,6 +625,7 @@ CREATE TABLE "gully" (
 "verified" varchar(20),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "the_geom_pol" public.geometry (POLYGON, SRID_VALUE),
+"undelete" boolean,
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
 
