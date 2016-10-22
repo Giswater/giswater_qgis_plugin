@@ -567,7 +567,8 @@ CREATE TABLE "inp_conduit" (
 "flap" varchar(3)  ,
 "q0" numeric(12,4),
 "qmax" numeric(12,4),
-"seepage" numeric (12,4)
+"seepage" numeric (12,4),
+"custom_n" numeric(12,4)
 );
 
 
