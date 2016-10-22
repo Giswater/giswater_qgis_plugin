@@ -14,6 +14,7 @@ ALTER TABLE "arc" ADD FOREIGN KEY ("epa_type") REFERENCES "inp_arc_type" ("id") 
 
 ALTER TABLE "node" ADD FOREIGN KEY ("epa_type") REFERENCES "inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "inp_cat_mat_roughness" ADD FOREIGN KEY ("matcat_id") REFERENCES "cat_mat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_curve" ADD FOREIGN KEY ("curve_id") REFERENCES "inp_curve_id" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

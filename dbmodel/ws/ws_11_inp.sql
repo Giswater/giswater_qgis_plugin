@@ -206,8 +206,6 @@ CREATE TABLE temp_arc
 -- ----------------------------
 
 
-
-
 CREATE TABLE "inp_arc_type" (
 "id" varchar(16)   NOT NULL,
 CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
@@ -219,6 +217,17 @@ CREATE TABLE "inp_node_type" (
 CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 );
 
+
+CREATE TABLE "inp_cat_mat_roughness" (
+  id serial NOT NULL,
+  matcat_id character varying(30) NOT NULL,
+  period_type character varying(30),
+  init_age integer,
+  end_age integer,
+  roughness numeric(12,4),
+  descript text,
+  CONSTRAINT inp_cat_mat_roughness_pkey PRIMARY KEY (id)
+)
 
 CREATE TABLE "inp_giswater_config" (
 "id" varchar(16) NOT NULL,
@@ -372,7 +381,9 @@ CREATE TABLE "inp_pattern" (
 CREATE TABLE "inp_pipe" (
 "arc_id" varchar(16)   NOT NULL,
 "minorloss" numeric(12,6),
-"status" varchar(12)  
+"status" varchar(12),
+"custom_roughness" numeric(12,4),  
+"custom_dint" numeric(12,3)
 );
 
 

@@ -10,20 +10,24 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 DROP VIEW IF EXISTS v_inp_arc CASCADE;
 CREATE OR REPLACE VIEW v_inp_arc AS 
- SELECT temp_arc.arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
-    temp_arc.arccat_id,
-    cat_arc.matcat_id,
-    temp_arc.epa_type,
-    temp_arc.sector_id,
-    temp_arc.dma_id,
-    temp_arc.state,
-    temp_arc.soilcat_id,
+ SELECT temp_arc.arc_id, 
+    temp_arc.node_1, 
+    temp_arc.node_2, 
+    temp_arc.arccat_id, 
+    cat_arc.matcat_id, 
+    temp_arc.epa_type, 
+    temp_arc.sector_id, 
+    temp_arc.dma_id, 
+    temp_arc.state, 
+    temp_arc.soilcat_id, 
+        CASE
+            WHEN temp_arc.builtdate IS NOT NULL THEN temp_arc.builtdate
+            ELSE now()::date
+        END AS builtdate, 
         CASE
             WHEN temp_arc.custom_length IS NOT NULL THEN temp_arc.custom_length::numeric(12,3)
             ELSE st_length2d(temp_arc.the_geom)::numeric(12,3)
-        END AS length,
+        END AS length, 
     temp_arc.the_geom
    FROM temp_arc
    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text;
@@ -311,41 +315,57 @@ SELECT concat(inp_valve.node_id, '_n2a') AS arc_id,
 
 DROP VIEW IF EXISTS v_inp_pipe CASCADE;
 CREATE OR REPLACE VIEW v_inp_pipe AS 
-         SELECT arc.arc_id, 
-            arc.node_1, 
-            arc.node_2, 
-            CASE WHEN arc.length < 0.10 THEN 0.100::numeric(12,3) ELSE arc.length::numeric(12,3) END AS length,
-            arc.arccat_id, 
-            arc.sector_id, 
-            arc.state, 
-            cat_arc.dint AS diameter, 
-            cat_mat_arc.roughness, 
-            inp_pipe.minorloss, 
-            inp_pipe.status
-           FROM v_inp_arc arc
-      JOIN inp_pipe ON arc.arc_id::text = inp_pipe.arc_id::text
+    SELECT arc.arc_id, 
+    arc.node_1, 
+    arc.node_2, 
+    CASE
+        WHEN arc.length < 0.10 THEN 0.100::numeric(12,3)
+        ELSE arc.length
+    END AS length, 
+    arc.arccat_id, 
+    arc.sector_id, 
+    arc.state, 
+    CASE
+		WHEN custom_dint IS NOT NULL THEN custom_dint
+		ELSE dint
+	END AS diameter, 
+	CASE
+		WHEN custom_roughness IS NOT NULL THEN custom_roughness
+		ELSE cat_mat_roughness.roughness
+	END AS roughness,  
+    inp_pipe.minorloss, 
+    inp_pipe.status
+    FROM v_inp_arc arc
+   JOIN inp_pipe ON arc.arc_id::text = inp_pipe.arc_id::text
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
+   JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text 
+   where (now()::date - builtdate)/365 >= cat_mat_roughness.init_age and (now()::date - builtdate)/365 < cat_mat_roughness.end_age 
 UNION 
-         SELECT arc.arc_id, 
-            arc.node_1, 
-            arc.node_2, 
-            CASE WHEN arc.length < 0.10 THEN 0.100::numeric(12,3) ELSE arc.length::numeric(12,3) END AS length,
-            arc.arccat_id, 
-            arc.sector_id, 
-            arc.state, 
-            cat_arc.dint AS diameter, 
-            cat_mat_arc.roughness, 
-            inp_shortpipe.minorloss, 
-            inp_shortpipe.status
-           FROM v_inp_arc arc
-      JOIN inp_shortpipe ON arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
+    SELECT 
+    arc.arc_id, 
+    arc.node_1, 
+    arc.node_2, 
+    CASE
+        WHEN arc.length < 0.10 THEN 0.100::numeric(12,3)
+        ELSE arc.length
+    END AS length, 
+    arc.arccat_id, 
+    arc.sector_id, 
+    arc.state, 
+    cat_arc.dint AS diameter, 
+    cat_mat_roughness.roughness, 
+    inp_shortpipe.minorloss, 
+    inp_shortpipe.status
+    FROM v_inp_arc arc
+   JOIN inp_shortpipe ON arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
-   JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text;
+   JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
+   JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
 
 
 
