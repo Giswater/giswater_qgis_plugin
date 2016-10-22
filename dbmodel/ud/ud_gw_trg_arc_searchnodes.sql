@@ -53,7 +53,7 @@ BEGIN
                     z2 := NEW.y2;
             END IF;
 
-            IF ((z1 > z2) AND NEW.inverted_slope is false) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
+            IF ((z1 > z2) AND NEW.inverted_slope is not true) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
                 NEW.node_1 := nodeRecord1.node_id; 
                 NEW.node_2 := nodeRecord2.node_id;
             ELSE 
