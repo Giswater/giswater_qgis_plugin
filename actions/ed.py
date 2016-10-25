@@ -49,6 +49,11 @@ class Ed():
             
     def ed_search_plus(self):   
         ''' Button 32. Open search plus dialog ''' 
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)
+                
         try:
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
@@ -71,9 +76,6 @@ class Ed():
             message = "You have to select at least one feature!"
             self.controller.show_info(message, context_name='ui_message')  
             return False  
-        elif count > 1:  
-            message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message') 
 
         return True
     
@@ -89,6 +91,10 @@ class Ed():
                           
     def ed_add_element(self):
         ''' Button 33. Add element '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 33)        
           
         # Create the dialog and signals
         self.dlg = Add_element()
@@ -207,6 +213,10 @@ class Ed():
     
     def ed_add_file(self):
         ''' Button 34. Add file '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 34)        
                         
         # Create the dialog and signals
         self.dlg = Add_file()
@@ -345,6 +355,10 @@ class Ed():
             
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 36)        
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):

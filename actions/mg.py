@@ -47,6 +47,10 @@ class Mg():
     def mg_arc_topo_repair(self):
         ''' Button 19. Topology repair '''
 
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 19)
+        
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()     
         if self.project_type == 'ws':
@@ -97,6 +101,10 @@ class Mg():
         ''' Button 21. WS/UD table wizard 
         Create dialog to select CSV file and table to import contents to ''' 
         
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 21)
+                
         # Get CSV file path from settings file          
         self.file_path = self.settings.value('files/csv_file')
         if self.file_path is None:             
@@ -191,7 +199,11 @@ class Mg():
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
         '''
-        
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 24)
+                
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
             message = "Java Runtime executable file not found at: "+self.java_exe
@@ -228,6 +240,10 @@ class Mg():
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
         
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 25)
+                
         # Create the dialog and signals
         self.dlg = ResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
@@ -280,6 +296,10 @@ class Mg():
 
     def mg_flow_exit(self):
         ''' Button 27. Valve analytics ''' 
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 27)        
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
@@ -297,6 +317,10 @@ class Mg():
         Combo to select new cat_node.id
         TODO: Trigger 'gw_trg_edit_node' has to be disabled temporarily 
         '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 28)        
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
@@ -309,10 +333,10 @@ class Mg():
             message = "More than one feature selected. Only the first one will be processed!"
             self.controller.show_info(message, context_name='ui_message' ) 
             
-                    
         # Get selected features (nodes)           
         features = layer.selectedFeatures()
         feature = features[0]
+        
         # Get node_id form current node
         self.node_id = feature.attribute('node_id')
 
@@ -401,6 +425,10 @@ class Mg():
     def mg_config(self):                
         ''' Button 99 - Open a dialog showing data from table "config" 
         User can changge its values '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 99)        
         
         # Create the dialog and signals
         self.dlg = Config()

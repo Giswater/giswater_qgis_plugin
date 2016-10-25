@@ -28,6 +28,26 @@ class DaoController():
         
     def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
+        
+    def set_actions(self, actions):
+        self.actions = actions
+        
+    def check_actions(self, check=True):
+        ''' Utility to check/uncheck all actions '''
+        for action_index, action in self.actions.iteritems():   #@UnusedVariable
+            action.setChecked(check)    
+                             
+    def check_action(self, check=True, index=1):
+        ''' Check/Uncheck selected action '''
+        key = index
+        if type(index) is int:
+            key = str(index).zfill(2)
+        print key
+        if key in self.actions:
+            action = self.actions[key]
+            action.setChecked(check)  
+        else:
+            print "not found: "+str(index)            
     
     
     def set_database_connection(self):

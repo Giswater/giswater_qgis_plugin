@@ -104,7 +104,32 @@ class Giswater(QObject):
         if self.controller:
             return self.controller.tr(message)      
         
+    
+    def manage_action(self, index_action, function_name):  
         
+        if function_name is not None:
+            try:
+                action = self.actions[index_action]                
+                # Management toolbar actions
+                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
+                    callback_function = getattr(self.mg, function_name)  
+                    action.triggered.connect(callback_function)
+                # Edit toolbar actions
+                elif int(index_action) in (32, 33, 34, 36):                       
+                    callback_function = getattr(self.ed, function_name)  
+                    action.triggered.connect(callback_function)                    
+                # Generic function
+                else:        
+                    water_soft = function_name[:2] 
+                    callback_function = getattr(self, water_soft+'_generic')  
+                    action.triggered.connect(partial(callback_function, function_name))
+            except AttributeError, e:
+                action.setEnabled(False)                
+                self.controller.show_warning(str(e))
+        else:
+            action.setEnabled(False)  
+                  
+          
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
         if parent is None:
@@ -132,27 +157,9 @@ class Giswater(QObject):
         else:
             self.actions[text] = action
                                      
-        if function_name is not None:
-            try:
-                action.setCheckable(is_checkable) 
-                # Management toolbar actions
-                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
-                    callback_function = getattr(self.mg, function_name)  
-                    action.triggered.connect(callback_function)
-                # Edit toolbar actions
-                elif int(index_action) in (32, 33, 34, 36):    
-                    callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)                    
-                # Generic function
-                else:        
-                    water_soft = function_name[:2] 
-                    callback_function = getattr(self, water_soft+'_generic')  
-                    action.triggered.connect(partial(callback_function, function_name))
-            except AttributeError:
-                print index_action+". Callback function not found: "+function_name
-                action.setEnabled(False)                
-        else:
-            action.setEnabled(False)
+        action.setCheckable(is_checkable)   
+                                           
+        self.manage_action(index_action, function_name)
             
         return action
           
@@ -164,40 +171,34 @@ class Giswater(QObject):
         action = None
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
+        
         if function_name:
+            
             map_tool = None
-            if int(index_action) in (3, 5, 13):
+            if int(index_action) not in (27, 99):
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+            else:
+                # 27 and 99 should be not checkable
+                action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
+                            
+            if int(index_action) in (3, 5, 13):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) in (1, 2, 4, 10, 11, 12, 14, 15, 8, 29):
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             elif int(index_action) == 16:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)
             elif int(index_action) == 17:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 18:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
             elif int(index_action) == 26:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 57:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) in (27, 99):
-                # 27 should be not checkeable
-                action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
-            else:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
 
             # If this action has an associated map tool, add this to dictionary of available map_tools
             if map_tool:
@@ -244,44 +245,36 @@ class Giswater(QObject):
             self.toolbar_ed_name = self.tr('toolbar_ed_name')
             self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
+        
+        # Set an action list for every toolbar    
+        self.list_actions_ud = ['01','02','04','05']
+        self.list_actions_ws = ['10','11','12','14','15','08','29','13']
+        self.list_actions_mg = ['16','28','17','18','19','20','21','22','23','24','25','26','27','99','56','57']
+        self.list_actions_ed = ['30','31','32','33','34','35','36']
                 
         # UD toolbar   
         if self.toolbar_ud_enabled:        
-            self.ag_ud = QActionGroup(parent);
-            self.add_action('01', self.toolbar_ud, self.ag_ud)   
-            self.add_action('02', self.toolbar_ud, self.ag_ud)   
-            self.add_action('04', self.toolbar_ud, self.ag_ud)   
-            self.add_action('05', self.toolbar_ud, self.ag_ud)   
-            #self.add_action('03', self.toolbar_ud, self.ag_ud)   
+            self.ag_ud = QActionGroup(parent)
+            for elem in self.list_actions_ws:
+                self.add_action(elem, self.toolbar_ud, self.ag_ud)            
                 
         # WS toolbar 
         if self.toolbar_ws_enabled:  
-            self.ag_ws = QActionGroup(parent);
-            self.add_action('10', self.toolbar_ws, self.ag_ws)
-            self.add_action('11', self.toolbar_ws, self.ag_ws)
-            self.add_action('12', self.toolbar_ws, self.ag_ws)
-            self.add_action('14', self.toolbar_ws, self.ag_ws)
-            self.add_action('15', self.toolbar_ws, self.ag_ws)
-            self.add_action('08', self.toolbar_ws, self.ag_ws)
-            self.add_action('29', self.toolbar_ws, self.ag_ws)
-            self.add_action('13', self.toolbar_ws, self.ag_ws)
+            self.ag_ws = QActionGroup(parent)
+            for elem in self.list_actions_ws:
+                self.add_action(elem, self.toolbar_ws, self.ag_ws)
                 
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
-            self.ag_mg = QActionGroup(parent);
-            self.add_action('16', self.toolbar_mg, self.ag_mg)
-            self.add_action('28', self.toolbar_mg, self.ag_mg)            
-            for i in range(17,28):
-                self.add_action(str(i), self.toolbar_mg, self.ag_mg)
-            self.add_action('99', self.toolbar_mg, self.ag_mg)
-            self.add_action('56', self.toolbar_mg, self.ag_mg)
-            self.add_action('57', self.toolbar_mg, self.ag_mg)
+            self.ag_mg = QActionGroup(parent)
+            for elem in self.list_actions_mg:
+                self.add_action(elem, self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
             self.ag_ed = QActionGroup(parent);
-            for i in range(30,37):
-                self.add_action(str(i), self.toolbar_ed, self.ag_ed)                   
+            for elem in self.list_actions_ed:
+                self.add_action(elem, self.toolbar_ed, self.ag_ed)                   
          
         # Disable and hide all toolbars
         self.enable_actions(False)
@@ -325,17 +318,17 @@ class Giswater(QObject):
     ''' Slots '''             
 
     def enable_actions(self, enable=True, start=1, stop=36):
-        ''' Utility to enable all actions '''
+        ''' Utility to enable/disable all actions '''
         for i in range(start, stop+1):
             self.enable_action(enable, i)              
 
 
     def enable_action(self, enable=True, index=1):
-        ''' Enable selected action '''
+        ''' Enable/Disable selected action '''
         key = str(index).zfill(2)
         if key in self.actions:
             action = self.actions[key]
-            action.setEnabled(enable)                   
+            action.setEnabled(enable)            
 
 
     def hide_toolbars(self):
@@ -458,75 +451,66 @@ class Giswater(QObject):
         
         # Search project type in table 'version'
         self.search_project_type()
+        
+        self.controller.set_actions(self.actions)
                                          
         # Set layer custom UI form and init function   
-        if self.layer_arc is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_arc.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_arc_init.py')                     
-            self.layer_arc.editFormConfig().setUiForm(file_ui) 
-            self.layer_arc.editFormConfig().setInitCodeSource(1)
-            self.layer_arc.editFormConfig().setInitFilePath(file_init)           
-            self.layer_arc.editFormConfig().setInitFunction('formOpen') 
-         
-        if self.layer_node is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_node.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_node_init.py')       
-            self.layer_node.editFormConfig().setUiForm(file_ui) 
-            self.layer_node.editFormConfig().setInitCodeSource(1)
-            self.layer_node.editFormConfig().setInitFilePath(file_init)           
-            self.layer_node.editFormConfig().setInitFunction('formOpen')                         
-                                    
-        if self.layer_connec is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_connec.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_connec_init.py')       
-            self.layer_connec.editFormConfig().setUiForm(file_ui) 
-            self.layer_connec.editFormConfig().setInitCodeSource(1)
-            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
-            self.layer_connec.editFormConfig().setInitFunction('formOpen')   
-            
-        if self.layer_gully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
-            self.layer_connec.editFormConfig().setUiForm(file_ui) 
-            self.layer_connec.editFormConfig().setInitCodeSource(1)
-            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
-            self.layer_connec.editFormConfig().setInitFunction('formOpen')                       
-
+        if self.load_custom_forms:
+            if self.layer_arc is not None:    
+                self.set_layer_custom_form(self.layer_arc, 'arc')   
+            if self.layer_node is not None:       
+                self.set_layer_custom_form(self.layer_arc, 'node')                                       
+            if self.layer_connec is not None:       
+                self.set_layer_custom_form(self.layer_arc, 'connec')
+            if self.layer_gully is not None:       
+                self.set_layer_custom_form(self.layer_arc, 'gully')   
                       
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
         # Set objects for map tools classes
-        map_tool = self.map_tools['mg_move_node']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
+        self.set_map_tool('mg_move_node')
+        self.set_map_tool('mg_delete_node')
+        self.set_map_tool('mg_mincut')
+        self.set_map_tool('mg_flow_trace')
+        self.set_map_tool('mg_flow_exit')
+        self.set_map_tool('mg_connec_tool')
+        self.set_map_tool('mg_extract_raster_value')
+
+        # Set SearchPlus object
+        #self.set_search_plus()
+            
+    
+    def set_layer_custom_form(self, layer, name):
+        ''' Set custom UI form and init python code of selected layer '''
         
-        map_tool = self.map_tools['mg_delete_node']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
+        name_ui = self.mg.project_type+'_'+name+'.ui'
+        name_init = self.mg.project_type+'_'+name+'_init.py'
+        name_function = 'formOpen'
+        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
+        file_init = os.path.join(self.plugin_dir, name_init)                     
+        layer.editFormConfig().setUiForm(file_ui) 
+        layer.editFormConfig().setInitCodeSource(1)
+        layer.editFormConfig().setInitFilePath(file_init)           
+        layer.editFormConfig().setInitFunction(name_function)         
+    
+    
+    def set_map_tool(self, map_tool_name):
+        ''' Set objects for map tools classes '''  
+         
+        if map_tool_name in self.map_tools:
+            map_tool = self.map_tools[map_tool_name]
+            map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+            map_tool.set_controller(self.controller)
+            if map_tool_name == 'mg_extract_raster_value':
+                map_tool.set_config_action(self.actions['99'])                
+        else:
+            print "key not found: "+map_tool_name
+                
+    
+    def set_search_plus(self):
+        ''' Set SearchPlus object '''
         
-        map_tool = self.map_tools['mg_mincut']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
-
-        map_tool = self.map_tools['mg_flow_trace']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
-
-        map_tool = self.map_tools['mg_flow_exit']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
-
-        map_tool = self.map_tools['mg_connec_tool']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
-
-        map_tool = self.map_tools['mg_extract_raster_value']
-        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-        map_tool.set_controller(self.controller)
-        map_tool.set_config_action(self.actions['99'])
-
-        # Create SearchPlus object
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
@@ -538,28 +522,25 @@ class Giswater(QObject):
             self.actions['32'].setCheckable(False) 
         except KeyError as e:
             self.controller.show_warning("Error setting searchplus button: "+str(e))
-            self.actions['32'].setVisible(False)                     
-            pass   
+            self.actions['32'].setVisible(False)                      
         except RuntimeError as e:
             self.controller.show_warning("Error setting searchplus button: "+str(e))
-            self.actions['32'].setVisible(False)                     
+            self.actions['32'].setVisible(False)           
         
-        self.custom_enable_actions()
-            
-                                
+                                    
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
 
         # Disable all actions (buttons)
         self.enable_actions(False)
         
+        # Enable selected actions         
         self.custom_enable_actions()     
         
         if layer is None:
             layer = self.iface.activeLayer() 
             if layer is None:
                 return            
-        self.current_layer = layer
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
@@ -603,19 +584,15 @@ class Giswater(QObject):
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 36)
-                
-                    
+                                 
+
     def ws_generic(self, function_name):   
         ''' Water supply generic callback function '''
         
         try:
-            # Get sender (selected action) and map tool associated 
-            sender = self.sender()                            
+            self.controller.check_actions(False)
             map_tool = self.map_tools[function_name]
-            if sender.isChecked():
-                self.iface.mapCanvas().setMapTool(map_tool)     
-            else:
-                self.iface.mapCanvas().unsetMapTool(map_tool)
+            self.iface.mapCanvas().setMapTool(map_tool)             
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
@@ -626,13 +603,9 @@ class Giswater(QObject):
         ''' Urban drainage generic callback function '''
         
         try:        
-            # Get sender (selected action) and map tool associated 
-            sender = self.sender()            
+            self.controller.check_actions(False)
             map_tool = self.map_tools[function_name]
-            if sender.isChecked():
-                self.iface.mapCanvas().setMapTool(map_tool)  
-            else:
-                self.iface.mapCanvas().unsetMapTool(map_tool)
+            self.iface.mapCanvas().setMapTool(map_tool)     
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
@@ -642,8 +615,9 @@ class Giswater(QObject):
     def mg_generic(self, function_name):   
         ''' Management generic callback function '''
         
-        try:        
+        try:   
             if function_name in self.map_tools:          
+                self.controller.check_actions(False)                        
                 map_tool = self.map_tools[function_name]
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
