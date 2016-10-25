@@ -115,6 +115,8 @@ BEGIN
     -- Error, no existing nodes
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
         RETURN audit_function (182,330);
+    ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
+        RETURN NEW;
     ELSE
         RETURN audit_function (182,750);
     END IF;
