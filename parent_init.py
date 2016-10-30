@@ -27,33 +27,40 @@ class ParentDialog(object):
         
     def init_config(self):    
         
-        # initialize plugin directory
-        user_folder = os.path.expanduser("~") 
-        self.plugin_name = 'giswater'  
-        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/'+self.plugin_name)    
-        
+        # Initialize plugin directory
+        cur_path = os.path.dirname(__file__)
+        self.plugin_dir = os.path.abspath(cur_path)
+        self.plugin_name = os.path.basename(self.plugin_dir) 
+        print self.plugin_dir
+                
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         if not os.path.isfile(setting_file):
             message = "Config file not found at: "+setting_file
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)  
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 20)  
             self.close()
             return
             
+        # Set plugin settings            
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
         
+        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
+        self.qgis_settings = QSettings()
+        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())            
+        
         # Set controller to handle settings and database connection
-        # TODO: Try to make only one connection
         self.controller = DaoController(self.settings, self.plugin_name, iface)
+        self.controller.set_qgis_settings(self.qgis_settings)             
         status = self.controller.set_database_connection()      
         if not status:
-            message = self.controller.getLastError()
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
+            message = self.controller.last_error
+            self.controller.show_warning(message) 
             return 
-             
-        self.schema_name = self.settings.value("db/schema_name")           
+          
+        # Get schema_name and DAO object                
         self.dao = self.controller.dao
+        self.schema_name = self.controller.schema_name          
             
             
     def translate_form(self, context_name):
@@ -82,23 +89,23 @@ class ParentDialog(object):
         pass
                 
     def load_tab_document(self):
-        ''' TODO: Load data from tab 'Document' '''   
+        ''' Load data from tab 'Document' '''   
         pass
                 
     def load_tab_picture(self):
-        ''' TODO: Load data from tab 'Document' '''   
+        ''' Load data from tab 'Document' '''   
         pass
                 
     def load_tab_event(self):
-        ''' TODO: Load data from tab 'Event' '''   
+        ''' Load data from tab 'Event' '''   
         pass
                 
     def load_tab_log(self):
-        ''' TODO: Load data from tab 'Log' '''   
+        ''' Load data from tab 'Log' '''   
         pass
         
     def load_tab_rtc(self):
-        ''' TODO: Load data from tab 'RTC' '''   
+        ''' Load data from tab 'RTC' '''   
         pass
     
     def load_data(self):
@@ -122,23 +129,23 @@ class ParentDialog(object):
         pass
                 
     def save_tab_document(self):
-        ''' TODO: Save tab from tab 'Document' '''   
+        ''' Save tab from tab 'Document' '''   
         pass
                 
     def save_tab_picture(self):
-        ''' TODO: Save tab from tab 'Document' '''   
+        ''' Save tab from tab 'Document' '''   
         pass
                 
     def save_tab_event(self):
-        ''' TODO: Save tab from tab 'Event' '''   
+        ''' Save tab from tab 'Event' '''   
         pass
                 
     def save_tab_log(self):
-        ''' TODO: Save tab from tab 'Log' '''   
+        ''' Save tab from tab 'Log' '''   
         pass
         
     def save_tab_rtc(self):
-        ''' TODO: Save tab from tab 'RTC' '''   
+        ''' Save tab from tab 'RTC' '''   
         pass
         
                         
@@ -167,7 +174,7 @@ class ParentDialog(object):
     def close(self):
         ''' Close form without saving '''
         self.layer.rollBack()   
-        self.dialog.parent().setVisible(False)    
+        self.dialog.parent().setVisible(False)         
         
         
     def set_model_to_table(self, widget, table_name, filter_): 
@@ -271,6 +278,10 @@ class ParentDialog(object):
         Set visibility of columns
         Set width of columns '''
         
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return        
+        
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = "SELECT column_index, width, alias, status"
@@ -278,17 +289,24 @@ class ParentDialog(object):
         sql+= " WHERE ui_table = '"+table_name+"'"
         sql+= " ORDER BY column_index"
         rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:        
-                if not row['status']:
-                    columns_to_delete.append(row['column_index']-1)
-                else:
-                    width = row['width']
-                    if width is None:
-                        width = 100
-                    widget.setColumnWidth(row['column_index']-1, width)
-                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+        if not rows:
+            return
         
+        for row in rows:        
+            if not row['status']:
+                columns_to_delete.append(row['column_index']-1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index']-1, width)
+                widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+    
+        # Set order
+        widget.model().setSort(0, Qt.AscendingOrder)    
+        widget.model().select()
+        
+        # Delete columns        
         for column in columns_to_delete:
             widget.hideColumn(column) 
 

@@ -481,7 +481,7 @@ class Giswater(QObject):
         self.set_map_tool('mg_extract_raster_value')
 
         # Set SearchPlus object
-        #self.set_search_plus()
+        self.set_search_plus()
             
     
     def set_layer_custom_form(self, layer, name):

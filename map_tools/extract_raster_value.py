@@ -200,10 +200,7 @@ class ExtractRasterValue(ParentMapTool):
         self.snapperManager.clearSnapping()
 
         # Get layers
-        res = self.find_raster_layers()
-#        if res == 0:
-#            self.controller.show_warning("Raster configuration tool not properly configured.")
-#            return
+        self.find_raster_layers()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -211,7 +208,7 @@ class ExtractRasterValue(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
-            self.controller.show_info(message, context_name='ui_message' )  
+            self.controller.show_info(message, context_name='ui_message')  
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
@@ -236,7 +233,7 @@ class ExtractRasterValue(ParentMapTool):
         self.canvas.setCursor(self.stdCursor)
 
 
-    def nearestNeighbor(self, thePoint):
+    def nearest_neighbor(self, thePoint):
 
         ident = self.dataProv.identify(thePoint, QgsRaster.IdentifyFormatValue)
         value = None
@@ -250,10 +247,10 @@ class ExtractRasterValue(ParentMapTool):
         return value
 
 
-    def writeInterpolation(self, f, fieldIdx):
+    def write_interpolation(self, f, fieldIdx):
 
         thePoint = f.geometry().asPoint()
-        value = self.nearestNeighbor(thePoint)
+        value = self.nearest_neighbor(thePoint)
         self.vectorLayer.changeAttributeValue(f.id(), fieldIdx, value)
 
 
@@ -306,7 +303,7 @@ class ExtractRasterValue(ParentMapTool):
             k += 1
             layer.getFeatures(QgsFeatureRequest(fid)).nextFeature(f)
             c += 1
-            self.writeInterpolation(f, self.fieldIdx)
+            self.write_interpolation(f, self.fieldIdx)
             QCoreApplication.processEvents()
 
         self.controller.show_info(
@@ -380,7 +377,7 @@ class ExtractRasterValue(ParentMapTool):
         if not rows:
             self.controller.show_warning("Any data found in table config_extract_raster_value")
             self.configAction.activate(QAction.Trigger)
-            return 0
+            return False
 
         # Layers
         row = rows[0]
@@ -392,7 +389,7 @@ class ExtractRasterValue(ParentMapTool):
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
-            return
+            return False
 
         # Init layers
         self.rasterLayer = None
@@ -419,11 +416,11 @@ class ExtractRasterValue(ParentMapTool):
             self.snapperManager.snapToLayer(self.vectorLayer)
         else:
             self.controller.show_warning("Check vector_layer in config form, layer does not exist or is not defined.")
-            return 0
+            return False
 
         if self.rasterLayer == None:
             self.controller.show_warning("Check raster_layer in config form, layer does not exist or is not defined.")
-            return 0
+            return False
 
-        return 1
+        return True
 

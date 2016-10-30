@@ -71,6 +71,13 @@ def setText(widget, text):
         if value == 'None':    
             value = 0        
         widget.setValue(float(value))     
+        
+
+def getWidget(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)    
+    return widget        
           
 
 def getWidgetType(widget):

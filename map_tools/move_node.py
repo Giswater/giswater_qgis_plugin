@@ -35,6 +35,7 @@ class MoveNodeMapTool(ParentMapTool):
         
         # Call ParentMapTool constructor     
         super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
+        self.controller = controller
         self.srid = srid  
 
         # Vertex marker
@@ -67,9 +68,9 @@ class MoveNodeMapTool(ParentMapTool):
         ''' Move selected node to the current point '''  
            
         if self.srid is None:
-            self.srid = self.settings.value('db/srid')  
+            self.srid = self.controller.plugin_settings_value('srid')  
         if self.schema_name is None:
-            self.schema_name = self.settings.value('db/schema_name')               
+            self.schema_name = self.controller.plugin_settings_value('schema_name')               
                    
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";

@@ -26,9 +26,9 @@ class PointMapTool(QgsMapTool):
         ''' Insert a new node in the selected coordinates '''
         
         if self.srid is None:
-            self.srid = self.settings.value('db/srid')  
+            self.srid = self.controller.plugin_settings_value('srid')  
         if self.schema_name is None:
-            self.schema_name = self.settings.value('db/schema_name')  
+            self.schema_name = self.controller.plugin_settings_value('schema_name')  
             
         if self.elem_type_type is not None: 
             
