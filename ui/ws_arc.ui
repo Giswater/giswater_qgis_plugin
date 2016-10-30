@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1080,6 +1080,19 @@
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="btn_element_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>16</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink element</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="page_analysis">
     <attribute name="title">
@@ -1824,7 +1837,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>125</y>
+       <y>128</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -1972,9 +1985,9 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>150</y>
+       <y>154</y>
        <width>761</width>
-       <height>271</height>
+       <height>267</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -1982,6 +1995,19 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_doc_delete">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>120</y>
+       <width>100</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unlink document</string>
      </property>
     </widget>
    </widget>

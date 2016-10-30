@@ -305,7 +305,7 @@ class ParentDialog(object):
         # Set order
         widget.model().setSort(0, Qt.AscendingOrder)    
         widget.model().select()
-        
+
         # Delete columns        
         for column in columns_to_delete:
             widget.hideColumn(column) 
