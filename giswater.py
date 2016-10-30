@@ -421,7 +421,7 @@ class Giswater(QObject):
                     self.layer_connec = cur_layer
                 if self.table_gully in uri_table:  
                     self.layer_gully = cur_layer
-                if self.table_version in uri_table:  
+                if self.table_version in uri_table: 
                     self.layer_version = cur_layer     
         
         # Check if table 'version' exists
@@ -462,11 +462,11 @@ class Giswater(QObject):
             if self.layer_arc is not None:    
                 self.set_layer_custom_form(self.layer_arc, 'arc')   
             if self.layer_node is not None:       
-                self.set_layer_custom_form(self.layer_arc, 'node')                                       
+                self.set_layer_custom_form(self.layer_node, 'node')                                       
             if self.layer_connec is not None:       
-                self.set_layer_custom_form(self.layer_arc, 'connec')
+                self.set_layer_custom_form(self.layer_connec, 'connec')
             if self.layer_gully is not None:       
-                self.set_layer_custom_form(self.layer_arc, 'gully')   
+                self.set_layer_custom_form(self.layer_gully, 'gully')   
                       
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
