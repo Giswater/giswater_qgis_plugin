@@ -27,7 +27,7 @@ class Ed():
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')  
+        self.gsw_file = self.controller.plugin_settings_value('gsw_file') 
         
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
@@ -49,6 +49,11 @@ class Ed():
             
     def ed_search_plus(self):   
         ''' Button 32. Open search plus dialog ''' 
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)
+                
         try:
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
@@ -86,6 +91,10 @@ class Ed():
                           
     def ed_add_element(self):
         ''' Button 33. Add element '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 33)        
           
         # Create the dialog and signals
         self.dlg = Add_element()
@@ -204,6 +213,10 @@ class Ed():
     
     def ed_add_file(self):
         ''' Button 34. Add file '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 34)        
                         
         # Create the dialog and signals
         self.dlg = Add_file()
@@ -272,7 +285,8 @@ class Ed():
         table_gully = self.schema_name+'."'+self.table_gully+'"'
         
         # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        layer_source = self.controller.get_layer_source(self.layer)
+        uri_table = layer_source['table']        
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return
@@ -341,6 +355,10 @@ class Ed():
             
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 36)        
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
