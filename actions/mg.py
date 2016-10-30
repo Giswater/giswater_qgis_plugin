@@ -30,7 +30,7 @@ class Mg():
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')                    
+        self.gsw_file = self.controller.plugin_settings_value('gsw_file')      
     
                   
     def close_dialog(self, dlg=None): 
@@ -105,8 +105,8 @@ class Mg():
         self.controller.check_actions(False)
         self.controller.check_action(True, 21)
                 
-        # Get CSV file path from settings file          
-        self.file_path = self.settings.value('files/csv_file')
+        # Get CSV file path from settings file 
+        self.file_path = self.controller.plugin_settings_value('csv_file')        
         if self.file_path is None:             
             self.file_path = self.plugin_dir+"/test.csv"        
         
@@ -158,13 +158,17 @@ class Mg():
         self.dlg.txt_file_path.setText(self.file_path)     
 
         # Save CSV file path into settings
-        self.settings.setValue('files/csv_file', self.file_path)       
+        self.controller.plugin_settings_set_value('csv_file', self.file_path)    
         
         
     def mg_table_wizard_import_csv(self):
 
         # Get selected table, delimiter, and header
-        alias = utils_giswater.getWidgetText(self.dlg.cbo_table)  
+        alias = utils_giswater.getWidgetText(self.dlg.cbo_table) 
+        if not alias:
+            self.controller.show_warning("Any table has been selected", context_name='ui_message')
+            return False
+        
         table_name = self.table_dict[alias]
         delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)  
         header_status = self.dlg.chk_header.checkState()             
@@ -173,7 +177,7 @@ class Mg():
         self.file_path = self.dlg.txt_file_path.toPlainText()
         if not os.path.exists(self.file_path):
             message = "Selected file not found: "+self.file_path
-            self.controller.show_warning(message, context_name='ui_message' )
+            self.controller.show_warning(message, context_name='ui_message')
             return False      
               
         # Open CSV file for read and copy into database
@@ -191,7 +195,7 @@ class Mg():
         else:
             self.dao.commit()
             message = "Selected CSV has been imported successfully"
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message, context_name='ui_message')
             
                     
     def mg_go2epa_express(self):

@@ -23,14 +23,23 @@ class DaoController():
             context_name = self.plugin_name
         return QCoreApplication.translate(context_name, message)                            
     
-    def set_settings(self, settings):
-        self.settings = settings      
+    def set_qgis_settings(self, qgis_settings):
+        self.qgis_settings = qgis_settings      
         
     def set_plugin_name(self, plugin_name):
         self.plugin_name = plugin_name
-        
+                 
+    def plugin_settings_value(self, key, default_value=""):
+        key = self.plugin_name+"/"+key
+        value = self.qgis_settings.value(key, default_value)
+        return value    
+
+    def plugin_settings_set_value(self, key, value):
+        self.qgis_settings.setValue(self.plugin_name+"/"+key, value)            
+    
+    
     def set_actions(self, actions):
-        self.actions = actions
+        self.actions = actions     
         
     def check_actions(self, check=True):
         ''' Utility to check/uncheck all actions '''
@@ -47,8 +56,8 @@ class DaoController():
             action = self.actions[key]
             action.setChecked(check)  
         else:
-            print "not found: "+str(index)            
-    
+            print "not found: "+str(index)          
+                
     
     def set_database_connection(self):
         
@@ -56,21 +65,21 @@ class DaoController():
         self.dao = None 
         self.last_error = None      
         self.connection_name = self.settings.value('db/connection_name', self.plugin_name)
-        self.schema_name = self.settings.value('db/schema_name')
+        self.schema_name = self.plugin_settings_value('schema_name')
         self.log_codes = {}
         
         # Look for connection data in QGIS configuration (if exists)    
-        qgis_settings = QSettings()     
+        connection_settings = QSettings()     
         root_conn = "/PostgreSQL/connections/"          
-        qgis_settings.beginGroup(root_conn);           
-        groups = qgis_settings.childGroups();                                
+        connection_settings.beginGroup(root_conn);           
+        groups = connection_settings.childGroups();                                
         if self.connection_name in groups:      
             root = self.connection_name+"/"  
-            host = qgis_settings.value(root+"host", '')
-            port = qgis_settings.value(root+"port", '')            
-            db = qgis_settings.value(root+"database", '')
-            user = qgis_settings.value(root+"username", '')
-            pwd = qgis_settings.value(root+"password", '') 
+            host = connection_settings.value(root+"host", '')
+            port = connection_settings.value(root+"port", '')            
+            db = connection_settings.value(root+"database", '')
+            user = connection_settings.value(root+"username", '')
+            pwd = connection_settings.value(root+"password", '') 
             # We need to create this connections for Table Views
             self.db = QSqlDatabase.addDatabase("QPSQL")
             self.db.setHostName(host)
@@ -80,10 +89,13 @@ class DaoController():
             self.db.setPassword(pwd)
             self.status = self.db.open()    
             if not self.status:
-                msg = "Database connection error"
-                self.last_error = self.tr(msg)           
+                msg = "Database connection error. Please check connection parameters"
+                self.show_warning(msg)
+                self.last_error = self.tr(msg)
+                return False              
         else:
-            msg = "Database connection name '"+self.connection_name+"' not set in QGIS. Please define it or check parameter 'configuration_name' in file 'giswater.config'"
+            msg = "Database connection name not found. Please check configuration file 'sewernet_qgis.config'"
+            self.show_warning(msg)
             self.last_error = self.tr(msg)
             return False
     
@@ -91,8 +103,6 @@ class DaoController():
         self.dao = PgDao()     
         self.dao.set_params(host, port, db, user, pwd)
         status = self.dao.init_db()
-        
-        # TODO: Get postgresql data folder
        
         return status    
     
@@ -278,5 +288,5 @@ class DaoController():
             layer_source['table'] = uri_table            
 
         return layer_source                                 
-        
+                  
     

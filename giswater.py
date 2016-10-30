@@ -41,15 +41,21 @@ class Giswater(QObject):
         '''
         super(Giswater, self).__init__()
         
-        # Save reference to the QGIS interface
+        # Initialize instance attributes
         self.iface = iface
         self.legend = iface.legendInterface()    
+        self.dao = None
+        self.actions = {}
+        self.search_plus = None
+        self.map_tools = {}
+        self.srid = None
             
-        # initialize plugin directory
+        # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
         self.plugin_name = os.path.basename(self.plugin_dir)   
+        self.icon_folder = self.plugin_dir+'/icons/'        
 
-        # initialize locale
+        # Initialize locale
         locale = QSettings().value('locale/userLocale')
         locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
         if os.path.exists(locale_path):
@@ -57,35 +63,32 @@ class Giswater(QObject):
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
          
-        # Load local settings of the plugin
+        # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
+        if not os.path.exists(setting_file):
+            message = "Config file not found at: "+setting_file
+            self.iface.messageBar().pushMessage("", message, 1, 20) 
+            return  
+          
+        # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())    
-        
-        # Declare instance attributes
-        self.icon_folder = self.plugin_dir+'/icons/'        
-        self.actions = {}
-        self.map_tools = {}
-        self.search_plus = None
-        self.srid = None
+
+        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
+        self.qgis_settings = QSettings()
+        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())    
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        
-        # Check if config file exists    
-        if not os.path.exists(setting_file):
-            msg = "Config file not found at: "+setting_file
-            self.controller.show_message(msg, 1, 100) 
-            return    
-        
-        # Check connection status   
+        self.controller.set_qgis_settings(self.qgis_settings)
         connection_status = self.controller.set_database_connection()
-        self.dao = self.controller.dao        
         if not connection_status:
             msg = self.controller.last_error  
             self.controller.show_message(msg, 1, 100) 
             return 
         
+        self.dao = self.controller.dao
+                
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -283,7 +286,7 @@ class Giswater(QObject):
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')   
+        self.gsw_file = self.controller.plugin_settings_value('gsw_file')        
                          
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
@@ -436,7 +439,7 @@ class Giswater(QObject):
             return
         
         # Set schema_name in controller and in config file
-        self.settings.setValue("db/schema_name", self.schema_name)    
+        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name)    
         
         # Cache error message with log_code = -1 (uncatched error)
@@ -447,7 +450,7 @@ class Giswater(QObject):
         row = self.dao.get_row(sql)
         if row:
             self.srid = row[0]   
-            self.settings.setValue("db/srid", self.srid)                           
+            self.controller.plugin_settings_set_value("srid", self.srid)                           
         
         # Search project type in table 'version'
         self.search_project_type()

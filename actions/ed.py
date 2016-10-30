@@ -27,7 +27,7 @@ class Ed():
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')  
+        self.gsw_file = self.controller.plugin_settings_value('gsw_file') 
         
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
