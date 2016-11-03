@@ -31,7 +31,6 @@ class ParentDialog(object):
         cur_path = os.path.dirname(__file__)
         self.plugin_dir = os.path.abspath(cur_path)
         self.plugin_name = os.path.basename(self.plugin_dir) 
-        print self.plugin_dir
                 
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
@@ -167,13 +166,11 @@ class ParentDialog(object):
         ''' Save feature '''
         self.save_data()   
         self.dialog.accept()
-        self.layer.commitChanges()    
         self.close()     
         
         
     def close(self):
         ''' Close form without saving '''
-        self.layer.rollBack()   
         self.dialog.parent().setVisible(False)         
         
         
