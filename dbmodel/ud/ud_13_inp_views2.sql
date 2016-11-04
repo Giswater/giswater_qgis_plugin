@@ -281,7 +281,7 @@ FROM ((((((v_arc arc
 JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
 JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)))   
 JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))) 
-JOIN cat_mat_arc ON (((cat_arc.matcat_id)::text = (cat_mat_arc.id)::text)))
+JOIN cat_mat_arc ON (((arc.matcat_id)::text = (cat_mat_arc.id)::text)))
 JOIN inp_selector_sector ON (((inp_selector_sector.sector_id)::text = (arc.sector_id)::text))) 
 JOIN inp_selector_state ON (((arc."state")::text = (inp_selector_state.id)::text)))
 WHERE ((cat_arc.shape)::text = 'CUSTOM'::text);
@@ -301,7 +301,7 @@ FROM ((((((v_arc arc
 JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
 JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)))   
 JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))) 
-JOIN cat_mat_arc ON (((cat_arc.matcat_id)::text = (cat_mat_arc.id)::text)))
+JOIN cat_mat_arc ON (((arc.matcat_id)::text = (cat_mat_arc.id)::text)))
 JOIN inp_selector_sector ON (((inp_selector_sector.sector_id)::text = (arc.sector_id)::text))) 
 JOIN inp_selector_state ON (((arc."state")::text = (inp_selector_state.id)::text))) 
 WHERE ((((cat_arc.shape)::text < 'CUSTOM'::text) OR (((cat_arc.shape)::text > 'CUSTOM'::text) AND ((cat_arc.shape)::text < 'IRREGULAR'::text))) OR ((cat_arc.shape)::text > 'IRREGULAR'::text));
@@ -320,7 +320,7 @@ FROM ((((((v_arc arc
 JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
 JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)))   
 JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))) 
-JOIN cat_mat_arc ON (((cat_arc.matcat_id)::text = (cat_mat_arc.id)::text)))
+JOIN cat_mat_arc ON (((arc.matcat_id)::text = (cat_mat_arc.id)::text)))
 JOIN inp_selector_sector ON (((inp_selector_sector.sector_id)::text = (arc.sector_id)::text))) 
 JOIN inp_selector_state ON (((arc."state")::text = (inp_selector_state.id)::text)))
 WHERE ((cat_arc.shape)::text = 'IRREGULAR'::text);
