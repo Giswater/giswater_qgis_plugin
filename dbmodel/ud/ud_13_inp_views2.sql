@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+-- WARNING: SCHEMA_NAME IS NOT ONLY PRESENT ON THE HEADER OF THIS FILE. IT EXISTS ALSO INTO IT. PLEASE REVIEW IT BEFORE REPLACE....
 
 
 -- ----------------------------
