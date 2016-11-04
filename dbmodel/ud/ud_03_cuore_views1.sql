@@ -77,27 +77,35 @@ FROM v_arc arc
 
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
-SELECT v_arc_x_node1.arc_id, 
-v_arc_x_node1.node_1,
-v_arc_x_node1.top_elev1,
-v_arc_x_node1.ymax1,
-v_arc_x_node1.elev1,
-v_arc_x_node1.y1,
-v_arc_x_node2.node_2,
-v_arc_x_node2.top_elev2,
-v_arc_x_node2.ymax2,
-v_arc_x_node2.elev2,
-v_arc_x_node2.y2,
-v_arc_x_node1.z1,
-v_arc_x_node2.z2,
-v_arc_x_node1.geom1,
-v_arc_x_node1.r1,
-v_arc_x_node2.r2,
-(CASE WHEN ((((((1)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_node2.elev2 + v_arc_x_node2.z2))))::double precision / (public.st_length(arc.the_geom)))>1)) THEN null::numeric(6,4)
-ELSE (((((1)::numeric * ((v_arc_x_node1.elev1 + v_arc_x_node1.z1) - (v_arc_x_node2.elev2 + v_arc_x_node2.z2))))::double precision / (public.st_length(arc.the_geom))))::numeric(6,4) END) AS slope,
-arc."state", 
-arc.sector_id, 
-arc.the_geom
+SELECT v_arc_x_node1.arc_id,
+    v_arc_x_node1.node_1,
+    v_arc_x_node1.top_elev1,
+    v_arc_x_node1.ymax1,
+    v_arc_x_node1.elev1,
+    v_arc_x_node1.y1,
+    v_arc_x_node2.node_2,
+    v_arc_x_node2.top_elev2,
+    v_arc_x_node2.ymax2,
+    v_arc_x_node2.elev2,
+    v_arc_x_node2.y2,
+        CASE
+            WHEN v_arc_x_node1.y1 IS NOT NULL THEN v_arc_x_node1.z1
+            ELSE 0::numeric
+        END AS z1,
+        CASE
+            WHEN v_arc_x_node2.y2 IS NOT NULL THEN v_arc_x_node2.z2
+            ELSE 0::numeric
+        END AS z2,
+    v_arc_x_node1.geom1,
+    v_arc_x_node1.r1,
+    v_arc_x_node2.r2,
+        CASE
+            WHEN ((1::numeric * (v_arc_x_node1.elev1 + v_arc_x_node1.z1 - (v_arc_x_node2.elev2 + v_arc_x_node2.z2)))::double precision / st_length(arc.the_geom)) > 1::double precision THEN NULL::numeric(6,4)
+            ELSE ((1::numeric * (v_arc_x_node1.elev1 + v_arc_x_node1.z1 - (v_arc_x_node2.elev2 + v_arc_x_node2.z2)))::double precision / st_length(arc.the_geom))::numeric(6,4)
+        END AS slope,
+    arc.state,
+    arc.sector_id,
+    arc.the_geom
 FROM v_arc_x_node1
    JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
    JOIN v_arc arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text;
