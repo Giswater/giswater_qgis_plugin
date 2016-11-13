@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -624,7 +624,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>170</y>
+       <y>200</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -660,7 +660,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>200</y>
+       <y>230</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -695,8 +695,8 @@
     <widget class="QCheckBox" name="audit_function_control">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>200</y>
+       <x>270</x>
+       <y>230</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -708,7 +708,20 @@
     <widget class="QCheckBox" name="nodetype_change_enabled">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>270</x>
+       <y>200</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="insert_double_geometry">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
        <y>170</y>
        <width>20</width>
        <height>21</height>
@@ -716,6 +729,58 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="buffer_value">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>170</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_double_geometry_enabled">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>170</y>
+       <width>231</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Double geometry enabled</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
      </property>
     </widget>
    </widget>
@@ -742,7 +807,7 @@
       <widget class="QLabel" name="label_node2arc_22">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>10</x>
          <y>80</y>
          <width>151</width>
          <height>22</height>
@@ -814,7 +879,7 @@
       <widget class="QLabel" name="label_node2arc_21">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>10</x>
          <y>50</y>
          <width>151</width>
          <height>22</height>
