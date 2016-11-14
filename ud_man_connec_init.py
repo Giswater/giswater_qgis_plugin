@@ -68,8 +68,8 @@ class ManConnecDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         self.tbl_event_connec = self.dialog.findChild(QTableView, "tbl_event_connec")  
-        self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
-        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
+        self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydro") 
+        self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydro_value") 
               
         # Load data from related tables
         self.load_data()
@@ -103,7 +103,7 @@ class ManConnecDialog(ParentDialog):
         self.set_configuration(self.tbl_event_connec, table_event_connec)
         
   
-        '''
+        
         # Fill tab hydrometer | hydrometer
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
         
@@ -115,7 +115,7 @@ class ManConnecDialog(ParentDialog):
         
         # Configuration of table hydrometer | hydrometer value
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
-        '''
+        
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            

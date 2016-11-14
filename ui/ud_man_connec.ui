@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -46,8 +46,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1845,7 +1845,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -1877,7 +1877,7 @@
         <string>Add Hydrometer</string>
        </property>
       </widget>
-      <widget class="QTableView" name="tbl_dae">
+      <widget class="QTableView" name="tbl_hydro">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1892,7 +1892,7 @@
       <attribute name="title">
        <string>Hydrometer values</string>
       </attribute>
-      <widget class="QTableView" name="tbl_dae_2">
+      <widget class="QTableView" name="tbl_hydro_value">
        <property name="geometry">
         <rect>
          <x>10</x>

@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1140,8 +1140,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1982,13 +1982,13 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_event_node_2">
       <attribute name="title">
        <string>Scada</string>
       </attribute>
-      <widget class="QTableView" name="tbl_event_node_2">
+      <widget class="QTableView" name="tbl_scada">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -2003,7 +2003,7 @@
       <attribute name="title">
        <string>Scada values</string>
       </attribute>
-      <widget class="QTableView" name="tbl_event_element_2">
+      <widget class="QTableView" name="tbl_scada_value">
        <property name="geometry">
         <rect>
          <x>10</x>
