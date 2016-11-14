@@ -267,7 +267,35 @@ class ParentDialog(object):
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select()   
+        widget.model().select() 
+        
+        
+    def set_filter_table_man(self, widget):
+        ''' Get values selected by the user and sets a new filter for its table model '''
+        
+        # Get selected dates
+        date_from = self.date_document_from.date().toString('yyyyMMdd') 
+        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message, context_name='ui_message')                   
+            return
+        
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        
+        # Get selected values in Comboboxes        
+        doc_type_value = utils_giswater.getWidgetText("doc_type")
+        if doc_type_value != 'null': 
+            expr+= " AND doc_type = '"+doc_type_value+"'"
+        doc_tag_value = utils_giswater.getWidgetText("doc_tag")
+        if doc_tag_value != 'null': 
+            expr+= " AND tagcat_id = '"+doc_tag_value+"'"
+  
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()  
         
         
     def set_configuration(self, widget, table_name):
@@ -341,18 +369,152 @@ class ParentDialog(object):
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user_name)"
+        sql = "SELECT DISTINCT(user)"
         sql+= " FROM "+table_name
-        sql+= " ORDER BY user_name"
+        sql+= " ORDER BY user"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_user", rows)
+        
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)
+        
+        
+        
+    def fill_tbl_document_man(self, widget, table_name, filter_):
+        ''' Fill the table control to show documents'''
+        
+        # Get widgets  
+        doc_type = self.dialog.findChild(QComboBox, "doc_type")
+        doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+
+        # Set signals
+        doc_type.activated.connect(partial(self.set_filter_table_man, widget))
+        doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_man, widget))
+        #self.tbl_document.doubleClicked.connect(self.open_selected_document)
+
+        # Fill ComboBox tagcat_id
+        sql = "SELECT DISTINCT(tagcat_id)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY tagcat_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_tag", rows)
+
+        # Fill ComboBox doccat_id
+        sql = "SELECT DISTINCT(doc_type)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY doc_type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("doc_type", rows)
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)
+    
+
+    def fill_table(self, widget, table_name, filter_): 
+        ''' Fill info tab of node '''
+        self.set_model_to_table(widget, table_name, filter_)          
+        
+        
+    def fill_tbl_event(self, widget, table_name, filter_):
+        ''' Fill the table control to show documents'''
+        
+        # Get widgets  
+        event_type = self.dialog.findChild(QComboBox, "event_type")
+        event_id = self.dialog.findChild(QComboBox, "event_id")
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+
+        # Set signals
+        event_type.activated.connect(partial(self.set_filter_table_event, widget))
+        event_id.activated.connect(partial(self.set_filter_table_event, widget))
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
+    
+
+        # Fill ComboBox event_id
+        sql = "SELECT DISTINCT(event_id)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY event_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("event_id", rows)
+
+        # Fill ComboBox event_type
+        sql = "SELECT DISTINCT(event_type)"
+        sql+= " FROM "+table_name
+        sql+= " ORDER BY event_type"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("event_type", rows)
+
+        # Set model of selected widget
+        self.set_model_to_table(widget, table_name, filter_)        
+             
+    
+    def set_filter_table_event(self, widget):
+        ''' Get values selected by the user and sets a new filter for its table model '''
+
+        
+        # Get selected dates
+        date_from = self.date_document_from.date().toString('yyyyMMdd') 
+        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message, context_name='ui_message')                   
+            return
+        
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        
+        # Get selected values in Comboboxes        
+        event_type_value = utils_giswater.getWidgetText("event_type")
+        if event_type_value != 'null': 
+            expr+= " AND event_type = '"+event_type_value+"'"
+        event_id_value = utils_giswater.getWidgetText("event_id")
+        if event_id_value != 'null': 
+            expr+= " AND event_id = '"+event_id_value+"'"
+  
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()  
+        
+        
+    def fill_tbl_hydrometer(self, widget, table_name, filter_):
+        ''' Fill the table control to show documents'''
+        
+        # Get widgets  
+        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
+        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+
+        # Set signals
+        self.date_document_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
+        self.date_document_from.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
         
+        
+    def set_filter_hydrometer(self, widget):
+        ''' Get values selected by the user and sets a new filter for its table model '''
 
-    def fill_table(self, widget, table_name, filter_): 
-        ''' Fill info tab of node '''
-        self.set_model_to_table(widget, table_name, filter_)                  
-                
+        
+        # Get selected dates
+        date_from = self.date_document_from.date().toString('yyyyMMdd') 
+        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message, context_name='ui_message')                   
+            return
+        
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+  
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()  
         

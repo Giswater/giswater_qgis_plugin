@@ -224,7 +224,24 @@ class Giswater(QObject):
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully')    
-        self.table_version = self.settings.value('db/table_version', 'version')     
+        self.table_version = self.settings.value('db/table_version', 'version') 
+        
+        self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
+        self.table_page = self.settings.value('db/table_page', 'v_edit_man_page')
+        self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_man_greentap')
+        self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_man_fountain')
+        
+        self.table_tank = self.settings.value('db/table_tank', 'v_edit_man_tank')
+        self.table_pump = self.settings.value('db/table_pump', 'v_edit_man_pump')
+        self.table_source = self.settings.value('db/table_source', 'v_edit_man_source')
+        self.table_meter = self.settings.value('db/table_meter', 'v_edit_man_meter')
+        self.table_junction = self.settings.value('db/table_junction', 'v_edit_man_junction')
+        self.table_waterwell = self.settings.value('db/table_waterwell', 'v_edit_man_waterwell')
+        self.table_reduction = self.settings.value('db/table_reduction', 'v_edit_man_reduction')
+        self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_man_hydrant')
+        self.table_valve = self.settings.value('db/table_valve', 'v_edit_man_valve')
+        self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_man_manhole')
+        
         
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
         parent = self.iface.mainWindow()
@@ -421,8 +438,38 @@ class Giswater(QObject):
                     self.layer_connec = cur_layer
                 if self.table_gully in uri_table:  
                     self.layer_gully = cur_layer
-                if self.table_version in uri_table: 
-                    self.layer_version = cur_layer     
+                if self.table_version in uri_table:  
+                    self.layer_version = cur_layer 
+                    
+                if self.table_wjoin in uri_table:  
+                    self.layer_wjoin = cur_layer 
+                if self.table_page in uri_table:  
+                    self.layer_page = cur_layer 
+                if self.table_greentap in uri_table:  
+                    self.layer_greentap = cur_layer 
+                if self.table_fountain in uri_table:  
+                    self.layer_fountain = cur_layer  
+                    
+                if self.table_tank in uri_table:  
+                    self.layer_tank = cur_layer 
+                if self.table_pump in uri_table:  
+                    self.layer_pump = cur_layer 
+                if self.table_source in uri_table:  
+                    self.layer_source = cur_layer 
+                if self.table_meter in uri_table:  
+                    self.layer_meter = cur_layer 
+                if self.table_junction in uri_table:  
+                    self.layer_junction = cur_layer 
+                if self.table_waterwell in uri_table:  
+                    self.layer_waterwell = cur_layer 
+                if self.table_reduction in uri_table:  
+                    self.layer_reduction = cur_layer 
+                if self.table_hydrant in uri_table:  
+                    self.layer_hydrant = cur_layer
+                if self.table_valve in uri_table:  
+                    self.layer_valve = cur_layer 
+                if self.table_manhole in uri_table:  
+                    self.layer_manhole = cur_layer    
         
         # Check if table 'version' exists
         if self.layer_version is None:
