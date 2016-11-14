@@ -314,23 +314,21 @@ class ParentDialog(object):
         sql+= " WHERE ui_table = '"+table_name+"'"
         sql+= " ORDER BY column_index"
         rows = self.controller.get_rows(sql)
-        if not rows:
-            return
+        if rows:
+            for row in rows:        
+                if not row['status']:
+                    columns_to_delete.append(row['column_index']-1)
+                else:
+                    width = row['width']
+                    if width is None:
+                        width = 100
+                    widget.setColumnWidth(row['column_index']-1, width)
+                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
         
-        for row in rows:        
-            if not row['status']:
-                columns_to_delete.append(row['column_index']-1)
-            else:
-                width = row['width']
-                if width is None:
-                    width = 100
-                widget.setColumnWidth(row['column_index']-1, width)
-                widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
-    
         # Set order
         widget.model().setSort(0, Qt.AscendingOrder)    
         widget.model().select()
-
+        
         # Delete columns        
         for column in columns_to_delete:
             widget.hideColumn(column) 
@@ -338,6 +336,7 @@ class ParentDialog(object):
 
     def fill_tbl_document(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
+        
         
         # Get widgets
         doc_user = self.dialog.findChild(QComboBox, "doc_user")
@@ -369,9 +368,9 @@ class ParentDialog(object):
         utils_giswater.fillComboBox("doc_type", rows)
 
         # Fill ComboBox doc_user
-        sql = "SELECT DISTINCT(user)"
+        sql = "SELECT DISTINCT(user_name)"
         sql+= " FROM "+table_name
-        sql+= " ORDER BY user"
+        sql+= " ORDER BY user_name"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_user", rows)
         
