@@ -22,7 +22,8 @@ class ParentDialog(object):
         self.feature = feature
         self.context_name = "ws_parent"    
         self.iface = iface    
-        self.init_config()             
+        self.init_config() 
+        self.set_signals()            
     
         
     def init_config(self):    
@@ -61,7 +62,15 @@ class ParentDialog(object):
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name          
             
-            
+    
+    def set_signals(self):
+        try: 
+            self.dialog.parent().accepted.connect(self.save)
+            self.dialog.parent().rejected.connect(self.close)
+        except:
+            pass
+                     
+                     
     def translate_form(self, context_name):
         ''' Translate widgets of the form to current language '''
         # Get objects of type: QLabel
