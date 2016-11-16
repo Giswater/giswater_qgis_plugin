@@ -2,7 +2,7 @@
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -11,6 +11,8 @@ import sys
 
 import utils_giswater
 from controller import DaoController
+
+from ui.add_sum import Add_sum          # @UnresolvedImport
         
         
 class ParentDialog(object):   
@@ -26,40 +28,51 @@ class ParentDialog(object):
     
         
     def init_config(self):    
+     
+        # initialize plugin directory
+        user_folder = os.path.expanduser("~") 
+        self.plugin_name = 'giswater'  
+        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/'+self.plugin_name)    
         
-        # Initialize plugin directory
-        cur_path = os.path.dirname(__file__)
-        self.plugin_dir = os.path.abspath(cur_path)
-        self.plugin_name = os.path.basename(self.plugin_dir) 
-                
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         if not os.path.isfile(setting_file):
             message = "Config file not found at: "+setting_file
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 20)  
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)  
             self.close()
             return
             
-        # Set plugin settings            
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
         
-        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
-        self.qgis_settings = QSettings()
-        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())            
-        
         # Set controller to handle settings and database connection
+        # TODO: Try to make only one connection
         self.controller = DaoController(self.settings, self.plugin_name, iface)
-        self.controller.set_qgis_settings(self.qgis_settings)             
         status = self.controller.set_database_connection()      
         if not status:
-            message = self.controller.last_error
-            self.controller.show_warning(message) 
+            message = self.controller.getLastError()
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return 
-          
-        # Get schema_name and DAO object                
+             
+        self.schema_name = self.settings.value("db/schema_name")           
         self.dao = self.controller.dao
-        self.schema_name = self.controller.schema_name          
+  
+        # Initialize variables            
+        self.table_wjoin = self.schema_name+'."v_edit_man_wjoin"' 
+        self.table_tap = self.schema_name+'."v_edit_man_tap"'
+        self.table_greentap = self.schema_name+'."v_edit_man_greentap"'
+        self.table_fountain = self.schema_name+'."v_edit_man_fountain"'
+        
+        self.table_tank = self.schema_name+'."v_edit_man_tank"'
+        self.table_pump = self.schema_name+'."v_edit_man_pump"'
+        self.table_source = self.schema_name+'."v_edit_man_source"'
+        self.table_meter = self.schema_name+'."v_edit_man_meter"'
+        self.table_junction = self.schema_name+'."v_edit_man_junction"'
+        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
+        self.table_reduction = self.schema_name+'."v_edit_man_reduction"'
+        self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
+        self.table_valve = self.schema_name+'."v_edit_man_valve"'
+        self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
             
             
     def translate_form(self, context_name):
@@ -219,7 +232,56 @@ class ParentDialog(object):
             self.dao.execute_sql(sql)
             widget.model().select()
             
-   
+            
+    def insert_records (self):
+        ''' Insert value  Hydrometer | Hydrometer'''
+        
+        # Create the dialog and signals
+        self.dlg_sum = Add_sum()
+        utils_giswater.setDialog(self.dlg_sum)
+        # Set signals
+        self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept)
+        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close)
+        
+        # Open the dialog
+        self.dlg_sum.exec_() 
+        
+        
+    def btn_accept(self):
+        ''' Save new value oh hydrometer'''
+        
+        # Get widget text - hydtometer_id
+        widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
+        self.hydro_id = widget_hydro.text()
+        
+        # get connec_id       
+        widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
+        self.connec_id = widget_connec.text()
+
+        # Insert hydrometer_id in v_rtc_hydrometer
+        sql = "INSERT INTO "+self.schema_name+".v_rtc_hydrometer (hydrometer_id) "
+        sql+= " VALUES ('"+self.hydro_id+"')"
+        self.dao.execute_sql(sql) 
+        
+        # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
+        sql = "INSERT INTO "+self.schema_name+".v_edit_rtc_hydro_data_x_connec (hydrometer_id, connec_id) "
+        sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
+        self.dao.execute_sql(sql) 
+        
+        # Refresh table in Qtableview
+        # Fill tab Hydrometer
+        table_hydrometer = "v_rtc_hydrometer"
+        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
+        
+        self.dlg_sum.close()
+              
+              
+    def btn_close(self):
+        ''' Close form without saving '''
+        self.dlg_sum.close()
+       
+        
+        
     def open_selected_document(self):
         ''' Get value from selected cell ("PATH")
         Open the document ''' 
@@ -515,5 +577,79 @@ class ParentDialog(object):
   
         # Refresh model with selected filter
         widget.model().setFilter(expr)
-        widget.model().select()  
+        widget.model().select() 
+        
+        
+    def set_tabs_visibility(self):
+        ''' Hide some tabs '''     
+        
+        # Get schema and table name of selected layer       
+        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        if uri_table is None:
+            self.controller.show_warning("Error getting table name from selected layer")
+            return
+        
+        if uri_table == self.table_wjoin :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+        
+        if uri_table == self.table_tap :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(0)
+
+        if uri_table == self.table_greentap :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0)
+
+        if uri_table == self.table_fountain :
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0) 
+            
+           
+        
+        if uri_table == self.table_tank :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 0):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_pump :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 1):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_source :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 2):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_meter :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 3):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_junction :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 4):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_waterwell :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 5):
+                    self.tab_main.removeTab(i) 
+                    
+        if uri_table == self.table_reduction :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 6):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_hydrant :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 7):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_valve :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 8):
+                    self.tab_main.removeTab(i) 
+        if uri_table == self.table_manhole :
+            for i in xrange(13,-1,-1):
+                if (i != 11) & (i != 10) & (i != 5):
+                    self.tab_main.removeTab(i) 
         

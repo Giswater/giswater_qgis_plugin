@@ -121,28 +121,7 @@ class ManConnecDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
-        
-  
-    def set_tabs_visibility(self):
-        ''' Hide some tabs '''
-        
-        layer = self.iface.activeLayer()
+        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records, self.tbl_hydrometer, table_hydrometer))               
+        self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
 
-       
-        if layer.name() =="Escomesa" :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-        if layer.name() =="Font pública" :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(0)
-        if layer.name() =="Boca de reg" :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0)
-        if layer.name() =="Font ornamental" :
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0)
-            
+

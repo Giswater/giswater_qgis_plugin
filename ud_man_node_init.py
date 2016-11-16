@@ -53,7 +53,7 @@ class ManNodeDialog(ParentDialog):
         table_event_element = "v_ui_event_x_element_x_node" 
         table_event_connec = "v_ui_event_x_node"
         table_scada = "v_rtc_scada"    
-        table_scada_value = "v_edit_rtc_scada_data_x_node"    
+        table_scada_value = "v_rtc_scada_value"    
               
         # Define class variables
         self.field_id = "node_id"        
