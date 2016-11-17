@@ -2,9 +2,10 @@
 """
 /***************************************************************************
  *                                                                         *
+ *   This file is part of Giswater 2.0                                     *                                 *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
@@ -425,11 +426,29 @@ class Giswater(QObject):
         self.layer_gully = None
         self.layer_version = None
         
+        self.layer_wjoin = None
+        self.layer_page = None
+        self.layer_greentap = None
+        self.layer_fountain = None
+        
+        self.layer_tank = None
+        self.layer_pump = None
+        self.layer_source = None
+        self.layer_meter = None
+        self.layer_junction = None
+        self.layer_waterwell = None
+        self.layer_reduction = None
+        self.layer_hydrant = None
+        self.layer_valve = None
+        self.layer_manhole = None
+      
+        
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
-            layer_source = self.controller.get_layer_source(cur_layer)
-            uri_table = layer_source['table']
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
             if uri_table is not None:
+                
+                
                 if self.table_arc in uri_table:  
                     self.layer_arc = cur_layer
                 if self.table_node in uri_table:  
@@ -497,70 +516,207 @@ class Giswater(QObject):
         row = self.dao.get_row(sql)
         if row:
             self.srid = row[0]   
-            self.controller.plugin_settings_set_value("srid", self.srid)                           
+            self.settings.setValue("db/srid", self.srid)                           
         
         # Search project type in table 'version'
         self.search_project_type()
-        
-        self.controller.set_actions(self.actions)
                                          
         # Set layer custom UI form and init function   
-        if self.load_custom_forms:
-            if self.layer_arc is not None:    
-                self.set_layer_custom_form(self.layer_arc, 'arc')   
-            if self.layer_node is not None:       
-                self.set_layer_custom_form(self.layer_node, 'node')                                       
-            if self.layer_connec is not None:       
-                self.set_layer_custom_form(self.layer_connec, 'connec')
-            if self.layer_gully is not None:       
-                self.set_layer_custom_form(self.layer_gully, 'gully')   
-                      
+        if self.layer_arc is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                     
+            self.layer_arc.editFormConfig().setUiForm(file_ui) 
+            self.layer_arc.editFormConfig().setInitCodeSource(1)
+            self.layer_arc.editFormConfig().setInitFilePath(file_init)           
+            self.layer_arc.editFormConfig().setInitFunction('formOpen') 
+         
+        if self.layer_node is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_node_init.py')       
+            self.layer_node.editFormConfig().setUiForm(file_ui) 
+            self.layer_node.editFormConfig().setInitCodeSource(1)
+            self.layer_node.editFormConfig().setInitFilePath(file_init)           
+            self.layer_node.editFormConfig().setInitFunction('formOpen')                         
+                                    
+        if self.layer_connec is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
+            self.layer_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')   
+        
+
+        
+        if self.layer_gully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
+            self.layer_gully.editFormConfig().setUiForm(file_ui) 
+            self.layer_gully.editFormConfig().setInitCodeSource(1)
+            self.layer_gully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_gully.editFormConfig().setInitFunction('formOpen') 
+            
+            
+        if self.layer_wjoin is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
+            self.layer_wjoin.editFormConfig().setUiForm(file_ui) 
+            self.layer_wjoin.editFormConfig().setInitCodeSource(1)
+            self.layer_wjoin.editFormConfig().setInitFilePath(file_init)           
+            self.layer_wjoin.editFormConfig().setInitFunction('formOpen')   
+            
+        
+        if self.layer_page is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')  
+            self.layer_page.editFormConfig().setUiForm(file_ui) 
+            self.layer_page.editFormConfig().setInitCodeSource(1)
+            self.layer_page.editFormConfig().setInitFilePath(file_init)           
+            self.layer_page.editFormConfig().setInitFunction('formOpen')   
+            
+        
+        if self.layer_greentap is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')      
+            self.layer_greentap.editFormConfig().setUiForm(file_ui) 
+            self.layer_greentap.editFormConfig().setInitCodeSource(1)
+            self.layer_greentap.editFormConfig().setInitFilePath(file_init)           
+            self.layer_greentap.editFormConfig().setInitFunction('formOpen')   
+            
+            
+        if self.layer_fountain is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')      
+            self.layer_fountain.editFormConfig().setUiForm(file_ui) 
+            self.layer_fountain.editFormConfig().setInitCodeSource(1)
+            self.layer_fountain.editFormConfig().setInitFilePath(file_init)           
+            self.layer_fountain.editFormConfig().setInitFunction('formOpen')  
+            
+        
+        if self.layer_tank is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')       
+            self.layer_tank.editFormConfig().setUiForm(file_ui) 
+            self.layer_tank.editFormConfig().setInitCodeSource(1)
+            self.layer_tank.editFormConfig().setInitFilePath(file_init)           
+            self.layer_tank.editFormConfig().setInitFunction('formOpen') 
+            
+        
+        if self.layer_pump is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')         
+            self.layer_pump.editFormConfig().setUiForm(file_ui) 
+            self.layer_pump.editFormConfig().setInitCodeSource(1)
+            self.layer_pump.editFormConfig().setInitFilePath(file_init)           
+            self.layer_pump.editFormConfig().setInitFunction('formOpen') 
+            
+        
+        if self.layer_source is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')        
+            self.layer_source.editFormConfig().setUiForm(file_ui) 
+            self.layer_source.editFormConfig().setInitCodeSource(1)
+            self.layer_source.editFormConfig().setInitFilePath(file_init)           
+            self.layer_source.editFormConfig().setInitFunction('formOpen')
+            
+            
+        if self.layer_meter is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')        
+            self.layer_meter.editFormConfig().setUiForm(file_ui) 
+            self.layer_meter.editFormConfig().setInitCodeSource(1)
+            self.layer_meter.editFormConfig().setInitFilePath(file_init)           
+            self.layer_meter.editFormConfig().setInitFunction('formOpen') 
+            
+        
+        if self.layer_junction is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')         
+            self.layer_junction.editFormConfig().setUiForm(file_ui) 
+            self.layer_junction.editFormConfig().setInitCodeSource(1)
+            self.layer_junction.editFormConfig().setInitFilePath(file_init)           
+            self.layer_junction.editFormConfig().setInitFunction('formOpen') 
+            
+            
+        if self.layer_waterwell is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')         
+            self.layer_waterwell.editFormConfig().setUiForm(file_ui) 
+            self.layer_waterwell.editFormConfig().setInitCodeSource(1)
+            self.layer_waterwell.editFormConfig().setInitFilePath(file_init)           
+            self.layer_waterwell.editFormConfig().setInitFunction('formOpen')
+            
+            
+        if self.layer_reduction is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')        
+            self.layer_reduction.editFormConfig().setUiForm(file_ui) 
+            self.layer_reduction.editFormConfig().setInitCodeSource(1)
+            self.layer_reduction.editFormConfig().setInitFilePath(file_init)           
+            self.layer_reduction.editFormConfig().setInitFunction('formOpen') 
+            
+            
+        if self.layer_hydrant is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')         
+            self.layer_hydrant.editFormConfig().setUiForm(file_ui) 
+            self.layer_hydrant.editFormConfig().setInitCodeSource(1)
+            self.layer_hydrant.editFormConfig().setInitFilePath(file_init)           
+            self.layer_hydrant.editFormConfig().setInitFunction('formOpen') 
+            
+            
+        if self.layer_valve is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')    
+            self.layer_valve.editFormConfig().setUiForm(file_ui) 
+            self.layer_valve.editFormConfig().setInitCodeSource(1)
+            self.layer_valve.editFormConfig().setInitFilePath(file_init)           
+            self.layer_valve.editFormConfig().setInitFunction('formOpen')
+            
+            
+        if self.layer_manhole is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_manhole.editFormConfig().setUiForm(file_ui) 
+            self.layer_manhole.editFormConfig().setInitCodeSource(1)
+            self.layer_manhole.editFormConfig().setInitFilePath(file_init)           
+            self.layer_manhole.editFormConfig().setInitFunction('formOpen')    
+
+
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
         # Set objects for map tools classes
-        self.set_map_tool('mg_move_node')
-        self.set_map_tool('mg_delete_node')
-        self.set_map_tool('mg_mincut')
-        self.set_map_tool('mg_flow_trace')
-        self.set_map_tool('mg_flow_exit')
-        self.set_map_tool('mg_connec_tool')
-        self.set_map_tool('mg_extract_raster_value')
+        map_tool = self.map_tools['mg_move_node']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        
+        map_tool = self.map_tools['mg_delete_node']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        
+        map_tool = self.map_tools['mg_mincut']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
 
-        # Set SearchPlus object
-        self.set_search_plus()
-            
-    
-    def set_layer_custom_form(self, layer, name):
-        ''' Set custom UI form and init python code of selected layer '''
-        
-        name_ui = self.mg.project_type+'_'+name+'.ui'
-        name_init = self.mg.project_type+'_'+name+'_init.py'
-        name_function = 'formOpen'
-        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, name_init)                     
-        layer.editFormConfig().setUiForm(file_ui) 
-        layer.editFormConfig().setInitCodeSource(1)
-        layer.editFormConfig().setInitFilePath(file_init)           
-        layer.editFormConfig().setInitFunction(name_function)         
-    
-    
-    def set_map_tool(self, map_tool_name):
-        ''' Set objects for map tools classes '''  
-         
-        if map_tool_name in self.map_tools:
-            map_tool = self.map_tools[map_tool_name]
-            map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
-            map_tool.set_controller(self.controller)
-            if map_tool_name == 'mg_extract_raster_value':
-                map_tool.set_config_action(self.actions['99'])                
-        else:
-            print "key not found: "+map_tool_name
-                
-    
-    def set_search_plus(self):
-        ''' Set SearchPlus object '''
-        
+        map_tool = self.map_tools['mg_flow_trace']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_flow_exit']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_connec_tool']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_extract_raster_value']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        map_tool.set_config_action(self.actions['99'])
+
+        # Create SearchPlus object
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)

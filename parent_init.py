@@ -1,4 +1,16 @@
 # -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ *                                                                         *
+ *   This file is part of Giswater 2.0                                     *                                 *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
+
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings, Qt
@@ -486,14 +498,15 @@ class ParentDialog(object):
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+        self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
+        self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
+
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
         event_id.activated.connect(partial(self.set_filter_table_event, widget))
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
+        self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
+        self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
     
 
         # Fill ComboBox event_id
@@ -511,16 +524,15 @@ class ParentDialog(object):
         utils_giswater.fillComboBox("event_type", rows)
 
         # Set model of selected widget
-        self.set_model_to_table(widget, table_name, filter_)        
-             
+        self.set_model_to_table(widget, table_name, filter_)    
+        
+                 
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
-
-        
         # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+        date_from = self.date_event_from.date().toString('yyyyMMdd') 
+        date_to = self.date_event_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message, context_name='ui_message')                   
@@ -542,17 +554,18 @@ class ParentDialog(object):
         widget.model().setFilter(expr)
         widget.model().select()  
         
+
         
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
         
         # Get widgets  
-        self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
-        self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+        self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
+        self.date_el_from = self.dialog.findChild(QDateEdit, "date_el_from")
 
         # Set signals
-        self.date_document_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
-        self.date_document_from.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
+        self.date_el_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
+        self.date_el_from.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
         self.tbl_document.doubleClicked.connect(self.open_selected_document)
 
         # Set model of selected widget
@@ -564,8 +577,8 @@ class ParentDialog(object):
 
         
         # Get selected dates
-        date_from = self.date_document_from.date().toString('yyyyMMdd') 
-        date_to = self.date_document_to.date().toString('yyyyMMdd') 
+        date_from = self.date_el_from.date().toString('yyyyMMdd') 
+        date_to = self.date_el_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message, context_name='ui_message')                   
