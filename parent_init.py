@@ -113,23 +113,23 @@ class ParentDialog(object):
         pass
                 
     def load_tab_document(self):
-        ''' Load data from tab 'Document' '''   
+        ''' TODO: Load data from tab 'Document' '''   
         pass
                 
     def load_tab_picture(self):
-        ''' Load data from tab 'Document' '''   
+        ''' TODO: Load data from tab 'Document' '''   
         pass
                 
     def load_tab_event(self):
-        ''' Load data from tab 'Event' '''   
+        ''' TODO: Load data from tab 'Event' '''   
         pass
                 
     def load_tab_log(self):
-        ''' Load data from tab 'Log' '''   
+        ''' TODO: Load data from tab 'Log' '''   
         pass
         
     def load_tab_rtc(self):
-        ''' Load data from tab 'RTC' '''   
+        ''' TODO: Load data from tab 'RTC' '''   
         pass
     
     def load_data(self):
@@ -153,23 +153,23 @@ class ParentDialog(object):
         pass
                 
     def save_tab_document(self):
-        ''' Save tab from tab 'Document' '''   
+        ''' TODO: Save tab from tab 'Document' '''   
         pass
                 
     def save_tab_picture(self):
-        ''' Save tab from tab 'Document' '''   
+        ''' TODO: Save tab from tab 'Document' '''   
         pass
                 
     def save_tab_event(self):
-        ''' Save tab from tab 'Event' '''   
+        ''' TODO: Save tab from tab 'Event' '''   
         pass
                 
     def save_tab_log(self):
-        ''' Save tab from tab 'Log' '''   
+        ''' TODO: Save tab from tab 'Log' '''   
         pass
         
     def save_tab_rtc(self):
-        ''' Save tab from tab 'RTC' '''   
+        ''' TODO: Save tab from tab 'RTC' '''   
         pass
         
                         
@@ -183,19 +183,20 @@ class ParentDialog(object):
         self.save_tab_log()
         self.save_tab_rtc()       
                 
-        
-        
+
     ''' Slot functions '''           
                
     def save(self):
         ''' Save feature '''
         self.save_data()   
         self.dialog.accept()
+        self.layer.commitChanges()    
         self.close()     
         
         
     def close(self):
         ''' Close form without saving '''
+        self.layer.rollBack()   
         self.dialog.parent().setVisible(False)         
         
         
@@ -220,7 +221,7 @@ class ParentDialog(object):
         
     def delete_records(self, widget, table_name):
         ''' Delete selected elements of the table '''
-        
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
@@ -243,6 +244,39 @@ class ParentDialog(object):
             sql+= " WHERE id IN ("+list_id+")"
             self.dao.execute_sql(sql)
             widget.model().select()
+            
+    def delete_records_hydro(self, widget, table_name):   #@UnusedVariable
+        ''' Delete selected elements of the table hydrometer'''
+        
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' )
+            return
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("hydrometer_id")
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            sql= "DELETE FROM "+self.schema_name+".rtc_hydrometer_x_connec WHERE hydrometer_id ='"+id_+"'" 
+            self.dao.execute_sql(sql)
+            widget.model().select()
+            
+            sql= "DELETE FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id ='"+id_+"'" 
+            self.dao.execute_sql(sql)
+            widget.model().select()
+      
+        # Refresh table in Qtableview
+        # Fill tab Hydrometer
+        table_hydrometer = "v_rtc_hydrometer"
+        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
             
             
     def insert_records (self):
@@ -271,12 +305,12 @@ class ParentDialog(object):
         self.connec_id = widget_connec.text()
 
         # Insert hydrometer_id in v_rtc_hydrometer
-        sql = "INSERT INTO "+self.schema_name+".v_rtc_hydrometer (hydrometer_id) "
+        sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
         sql+= " VALUES ('"+self.hydro_id+"')"
         self.dao.execute_sql(sql) 
         
         # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
-        sql = "INSERT INTO "+self.schema_name+".v_edit_rtc_hydro_data_x_connec (hydrometer_id, connec_id) "
+        sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
         sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
         self.dao.execute_sql(sql) 
         
@@ -376,10 +410,6 @@ class ParentDialog(object):
         ''' Configuration of tables 
         Set visibility of columns
         Set width of columns '''
-        
-        widget = utils_giswater.getWidget(widget)
-        if not widget:
-            return        
         
         # Set width and alias of visible columns
         columns_to_delete = []

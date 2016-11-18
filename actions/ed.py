@@ -27,15 +27,31 @@ class Ed():
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file') 
+        self.gsw_file = self.settings.value('files/gsw_file')  
         
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
-        self.table_version = self.settings.value('db/table_version', 'version')                               
-    
+        self.table_version = self.settings.value('db/table_version', 'version') 
+        
+        self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_wjoin')
+        self.table_tap = self.settings.value('db/table_tap', 'v_edit_tap')
+        self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_greentap')
+        self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_fountain')
+        
+        self.table_tank = self.settings.value('db/table_tank', 'v_edit_tank')
+        self.table_pump = self.settings.value('db/table_pump', 'v_edit_pump')
+        self.table_source = self.settings.value('db/table_source', 'v_edit_source')
+        self.table_meter = self.settings.value('db/table_meter', 'v_edit_meter')
+        self.table_junction = self.settings.value('db/table_junction', 'v_edit_junction')
+        self.table_waterwell = self.settings.value('db/table_waterwell', 'v_edit_waterwell')
+        self.table_reduction = self.settings.value('db/table_reduction', 'v_edit_reduction')
+        self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_hydrant')
+        self.table_valve = self.settings.value('db/table_valve', 'v_edit_valve')
+        self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_manhole')
+  
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
@@ -49,11 +65,6 @@ class Ed():
             
     def ed_search_plus(self):   
         ''' Button 32. Open search plus dialog ''' 
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
-                
         try:
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
@@ -91,10 +102,6 @@ class Ed():
                           
     def ed_add_element(self):
         ''' Button 33. Add element '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 33)        
           
         # Create the dialog and signals
         self.dlg = Add_element()
@@ -213,10 +220,6 @@ class Ed():
     
     def ed_add_file(self):
         ''' Button 34. Add file '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 34)        
                         
         # Create the dialog and signals
         self.dlg = Add_file()
@@ -284,35 +287,107 @@ class Ed():
         table_connec = self.schema_name+'."'+self.table_connec+'"'
         table_gully = self.schema_name+'."'+self.table_gully+'"'
         
+        table_wjoin = self.schema_name+'."'+self.table_wjoin+'"'
+        table_tap = self.schema_name+'."'+self.table_tap+'"'
+        table_greentap = self.schema_name+'."'+self.table_greentap+'"'
+        table_fountain = self.schema_name+'."'+self.table_fountain+'"'
+        
+        table_tank = self.schema_name+'."'+self.table_tank+'"'
+        table_pump = self.schema_name+'."'+self.table_pump+'"'
+        table_source = self.schema_name+'."'+self.table_source+'"'
+        table_meter = self.schema_name+'."'+self.table_meter+'"'
+        table_junction = self.schema_name+'."'+self.table_junction+'"'
+        table_waterwell = self.schema_name+'."'+self.table_waterwell+'"'
+        table_reduction = self.schema_name+'."'+self.table_reduction+'"'
+        table_hydrant = self.schema_name+'."'+self.table_hydrant+'"'
+        table_valve = self.schema_name+'."'+self.table_valve+'"'
+        table_manhole = self.schema_name+'."'+self.table_manhole+'"'
+  
+        
         # Get schema and table name of selected layer       
-        layer_source = self.controller.get_layer_source(self.layer)
-        uri_table = layer_source['table']        
+        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return
-
+        
+        print uri_table
+        '''
         if table_arc in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
-        elif table_node in uri_table:  
+        if table_node in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        elif table_connec in uri_table:  
+        if table_connec in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
-        elif table_gully in uri_table:  
+            '''
+        if table_gully in uri_table:  
             elem_type = "gully"
             field_id = "gully_id"
-
+        else :
+            print "kaj je " 
+        print elem_type
+        '''
+        if table_wjoin in uri_table:  
+            elem_type = "connec"
+            field_id = "connec_id"
+        if table_tap in uri_table:  
+            elem_type = "connec"
+            field_id = "connec_id"
+        if table_greentap in uri_table:  
+            elem_type = "connec"
+            field_id = "connec_id"
+        if table_fountain in uri_table:  
+            elem_type = "connec"
+            field_id = "connec_id"
+            
+        
+        if table_tank in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_pump in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"    
+        if table_source in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"    
+        if table_meter in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_junction in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_waterwell in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_reduction in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_hydrant in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_valve in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_manhole in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+            '''
+        print("field_id")
+        print field_id  
+        
         # Get selected features
         features = self.layer.selectedFeatures()
+        print features
+        '''
         for feature in features:
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
+            print sql
             self.dao.execute_sql(sql)   
-                          
-        
+        '''
     def ed_add_file_accept(self): 
         ''' Insert or update document. Add document to selected feature '''  
         
@@ -355,10 +430,6 @@ class Ed():
             
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 36)        
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):

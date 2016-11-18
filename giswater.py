@@ -728,39 +728,73 @@ class Giswater(QObject):
             self.actions['32'].setCheckable(False) 
         except KeyError as e:
             self.controller.show_warning("Error setting searchplus button: "+str(e))
-            self.actions['32'].setVisible(False)                      
+            self.actions['32'].setVisible(False)                     
+            pass   
         except RuntimeError as e:
             self.controller.show_warning("Error setting searchplus button: "+str(e))
-            self.actions['32'].setVisible(False)           
+            self.actions['32'].setVisible(False)                     
         
-                                    
+        self.custom_enable_actions()
+            
+                                
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
 
         # Disable all actions (buttons)
         self.enable_actions(False)
         
-        # Enable selected actions         
         self.custom_enable_actions()     
         
         if layer is None:
             layer = self.iface.activeLayer() 
             if layer is None:
                 return            
+        self.current_layer = layer
         
         # Check is selected layer is 'arc', 'node' or 'connec'
         setting_name = None
-        layer_source = self.controller.get_layer_source(layer)  
-        uri_table = layer_source['table']
+        (uri_schema, uri_table) = self.controller.get_layer_source(layer)  #@UnusedVariable  
         if uri_table is not None:
             if self.table_arc in uri_table:  
-                setting_name = 'buttons_arc'
+                setting_name = 'buttons_arc'     
             elif self.table_node in uri_table:  
                 setting_name = 'buttons_node'
             elif self.table_connec in uri_table:  
                 setting_name = 'buttons_connec' 
             elif self.table_gully in uri_table:  
                 setting_name = 'buttons_gully' 
+                
+            elif self.table_wjoin in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_page in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_greentap in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_fountain in uri_table:  
+                setting_name = 'buttons_connec'
+            
+            
+            elif self.table_tank in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_pump in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_source in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_meter in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_junction in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_waterwell in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_reduction in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_hydrant in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_valve in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_manhole in uri_table:  
+                setting_name = 'buttons_node'             
+                
                                
         if setting_name is not None:
             try:
