@@ -275,7 +275,7 @@ class DaoController():
         pos_end_db = uri.find(' host=')
         if pos_ini_db <> -1 and pos_end_db <> -1:
             uri_db = uri[pos_ini_db + 8:pos_end_db - 1]    
-        layer_source['db'] = uri_db       
+            layer_source['db'] = uri_db       
          
         # Get schema and table or view name     
         pos_ini = uri.find('table=')
