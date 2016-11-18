@@ -114,7 +114,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
+                if int(index_action) in (19, 21, 23, 24, 25, 27, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -127,8 +127,9 @@ class Giswater(QObject):
                     callback_function = getattr(self, water_soft+'_generic')  
                     action.triggered.connect(partial(callback_function, function_name))
             except AttributeError, e:
-                action.setEnabled(False)                
-                self.controller.show_warning(str(e))
+                action.setEnabled(False)     
+                #self.controller.show_warning(str(e))
+                print str(e)           
         else:
             action.setEnabled(False)  
                   
@@ -582,8 +583,7 @@ class Giswater(QObject):
         
         # Enable MG toolbar
         self.enable_actions(True, 16, 27)
-        self.enable_action(False, 22)        
-        self.enable_action(False, 23)        
+        self.enable_action(False, 22)           
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 36)

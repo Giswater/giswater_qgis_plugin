@@ -14,6 +14,7 @@ from ..ui.config import Config                                  # @UnresolvedImp
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
 from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
+from ..ui.file_manager import FileManager                       # @UnresolvedImport
 
 
 class Mg():
@@ -196,7 +197,26 @@ class Mg():
             self.dao.commit()
             message = "Selected CSV has been imported successfully"
             self.controller.show_info(message, context_name='ui_message')
-            
+
+
+    def mg_go2epa(self):
+        ''' Button 23. Open form to set INP, RPT and project '''
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 23) 
+        
+        # Create dialog
+        self.dlg = FileManager()
+
+        # Set widgets
+        
+        # Set signals
+
+        # Manage i18n of the form and open it
+        self.controller.translate_form(self.dlg, 'file_manager')  
+        self.dlg.exec_()           
+        
                     
     def mg_go2epa_express(self):
         ''' Button 24. Open giswater in silent mode
