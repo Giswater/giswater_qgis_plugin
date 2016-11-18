@@ -39,7 +39,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="inp_giswater_config_inp_file_folder">
+  <widget class="QLineEdit" name="txt_file_inp">
    <property name="geometry">
     <rect>
      <x>170</x>
@@ -52,7 +52,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="sector_selection">
+  <widget class="QPushButton" name="btn_sector_selection">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -65,7 +65,7 @@
     <string>Sector Selection</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="times">
+  <widget class="QPushButton" name="btn_times">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -78,7 +78,7 @@
     <string>Times</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="options">
+  <widget class="QPushButton" name="btn_options">
    <property name="geometry">
     <rect>
      <x>310</x>
@@ -91,7 +91,7 @@
     <string>Options</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="state_selection">
+  <widget class="QPushButton" name="btn_state_selection">
    <property name="geometry">
     <rect>
      <x>170</x>
@@ -104,7 +104,7 @@
     <string>State selection</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_cancel_2">
+  <widget class="QPushButton" name="btn_file_inp">
    <property name="geometry">
     <rect>
      <x>520</x>
@@ -117,7 +117,7 @@
     <string>...</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="chk_export">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -143,7 +143,7 @@
     <string>INP file:</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_2">
+  <widget class="QCheckBox" name="chk_exec">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -156,7 +156,7 @@
     <string>Execute EPA software</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="inp_giswater_config_rpt_file_folder">
+  <widget class="QLineEdit" name="txt_file_rpt">
    <property name="geometry">
     <rect>
      <x>170</x>
@@ -169,7 +169,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_cancel_3">
+  <widget class="QPushButton" name="btn_file_rpt">
    <property name="geometry">
     <rect>
      <x>520</x>
@@ -195,7 +195,7 @@
     <string>RPT file:</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_3">
+  <widget class="QCheckBox" name="chk_import">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -208,7 +208,7 @@
     <string>Import results</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="inp_giswater_config_rpt_result_id">
+  <widget class="QLineEdit" name="txt_result_name">
    <property name="geometry">
     <rect>
      <x>170</x>
