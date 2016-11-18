@@ -58,10 +58,14 @@ class Giswater(QObject):
         # Initialize locale
         locale = QSettings().value('locale/userLocale')
         locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
-            QCoreApplication.installTranslator(self.translator)
+
+        # If user locale not exists, load English
+        if not os.path.exists(locale_path):
+            locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_en_US.qm')
+
+        self.translator = QTranslator()
+        self.translator.load(locale_path)
+        QCoreApplication.installTranslator(self.translator)
          
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
