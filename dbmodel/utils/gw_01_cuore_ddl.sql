@@ -15,6 +15,8 @@ CREATE TABLE "version" (
 "postgres" varchar(512)  ,
 "postgis" varchar(512)  ,
 "date" timestamp(6) DEFAULT now(),
+"language" varchar (50),
+"epsg" int4,
 CONSTRAINT version_pkey PRIMARY KEY (id)
 );
 
