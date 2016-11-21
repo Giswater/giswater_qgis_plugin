@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel
+from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit
 
 import os
 import sys
@@ -98,10 +98,53 @@ class Ed():
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:  
             utils_giswater.setCurrentIndex(widget, 1);             
+
+            
+    def ed_giswater_jar(self):   
+        ''' Button 36. Open giswater.jar with selected .gsw file '''
+        
+        # Check if java.exe file exists
+        if not os.path.exists(self.java_exe):
+            message = "Java Runtime executable file not found at: "+self.java_exe
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return  
+        
+        # Check if giswater.jar file exists
+        if not os.path.exists(self.giswater_jar):
+            message = "Giswater executable file not found at: "+self.giswater_jar
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return  
+                  
+        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
+        if not os.path.exists(self.gsw_file):
+            message = "GSW file not found at: "+self.giswater_jar
+            self.controller.show_info(message, 10, context_name='ui_message')
+            self.gsw_file = "" 
+            
+        # Start program     
+        aux = '"'+self.giswater_jar+'"'
+        if self.gsw_file != "":
+            aux+= ' "'+self.gsw_file+'"'
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"]
+        else:
+            program = [self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"]
+            
+        self.controller.start_program(program)               
+        
+        # Show information message    
+        message = "Executing... "+aux
+        self.controller.show_info(message, context_name='ui_message')
+                                            
+    
+         
         
                           
     def ed_add_element(self):
         ''' Button 33. Add element '''
+
+        # Uncheck all actions (buttons) except this one
+        #self.controller.check_actions(False)
+        #self.controller.check_action(True, 33)        
           
         # Create the dialog and signals
         self.dlg = Add_element()
@@ -122,7 +165,7 @@ class Ed():
         self.populate_combo("location_type", "man_type_location")
         self.populate_combo("workcat_id", "cat_work")
         self.populate_combo("buildercat_id", "cat_builder")
-        self.populate_combo("elementcat_id", "cat_element")
+        #self.populate_combo("elementcat_id", "cat_element")
         self.populate_combo("ownercat_id", "cat_owner")
         self.populate_combo("verified", "value_verified")
         
@@ -136,6 +179,9 @@ class Ed():
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
+            
+        print("date")
+        self.get_date()
         model.setStringList(row)
         self.completer.setModel(model)
         
@@ -145,7 +191,31 @@ class Ed():
         # Open the dialog
         self.dlg.exec_()    
         
-    
+    def get_date(self):
+        ''' Get date_from and date_to from ComboBoxes
+        Filter the table related on selected value
+        '''
+        #self.tbl_document.setModel(self.model)
+        self.date_document_from = self.dlg.findChild(QDateTimeEdit, "builtdate") 
+        self.date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
+        
+        date_from=self.date_document_from.date() 
+        date_to=self.date_document_to.date() 
+        print("date")
+        x=self.date_document_from.dateTime().toString('yyyyMMdd  HH:mm:ss')
+        print x
+        print (date_from)
+        print (date_to)
+        '''
+        if (date_from < date_to):
+            expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
+
+        else :
+            message="Valid interval!"
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
+            return
+        '''
+        
     def ed_add_el_autocomplete(self):    
         ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
 
@@ -220,6 +290,10 @@ class Ed():
     
     def ed_add_file(self):
         ''' Button 34. Add file '''
+
+        # Uncheck all actions (buttons) except this one
+        #self.controller.check_actions(False)
+        #self.controller.check_action(True, 34)        
                         
         # Create the dialog and signals
         self.dlg = Add_file()
@@ -254,6 +328,7 @@ class Ed():
         
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_file_autocomplete)
+        # Refresh
         
         # Open the dialog
         self.dlg.exec_()
@@ -280,12 +355,15 @@ class Ed():
     
     def ed_add_to_feature(self, table_name, value_id):   
         ''' Add document or element to selected features '''
-
+        
+        print("schema name")
+        print(self.schema_name)
         # Initialize variables                    
         table_arc = self.schema_name+'."'+self.table_arc+'"'
         table_node = self.schema_name+'."'+self.table_node+'"'
         table_connec = self.schema_name+'."'+self.table_connec+'"'
         table_gully = self.schema_name+'."'+self.table_gully+'"'
+        
         
         table_wjoin = self.schema_name+'."'+self.table_wjoin+'"'
         table_tap = self.schema_name+'."'+self.table_tap+'"'
@@ -302,36 +380,51 @@ class Ed():
         table_hydrant = self.schema_name+'."'+self.table_hydrant+'"'
         table_valve = self.schema_name+'."'+self.table_valve+'"'
         table_manhole = self.schema_name+'."'+self.table_manhole+'"'
-  
         
+        print table_wjoin 
         # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        layer_source = self.controller.get_layer_source(self.layer)
+        print ("layer_source")
+        print (layer_source)
+        
+        #uri_table = layer_source['table']
+        uri_table = layer_source[1]
+        print("uri table")
+        print uri_table
+                
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return
         
-        print uri_table
+        field_id= None
+        '''
+        print("---table_gully----")
+        print(table_gully)
+        print("---uri_table----")
+        print(uri_table)
         '''
         if table_arc in uri_table:  
+            print("enter")
             elem_type = "arc"
             field_id = "arc_id"
-        if table_node in uri_table:  
+        if table_node in uri_table: 
+            print("enter") 
             elem_type = "node"
             field_id = "node_id"
-        if table_connec in uri_table:  
+        if table_connec in uri_table: 
+            print("enter") 
             elem_type = "connec"
             field_id = "connec_id"
-            '''
         if table_gully in uri_table:  
+            print("enter")
             elem_type = "gully"
             field_id = "gully_id"
-        else :
-            print "kaj je " 
-        print elem_type
-        '''
+            
+            
         if table_wjoin in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
+            print("enter")
         if table_tap in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
@@ -373,21 +466,20 @@ class Ed():
         if table_manhole in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-            '''
-        print("field_id")
-        print field_id  
+        
+        print ("field_id")
+        print (field_id)
         
         # Get selected features
         features = self.layer.selectedFeatures()
-        print features
-        '''
         for feature in features:
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
-            print sql
-            self.dao.execute_sql(sql)   
-        '''
+            self.dao.execute_sql(sql) 
+        
+                          
+        
     def ed_add_file_accept(self): 
         ''' Insert or update document. Add document to selected feature '''  
         
@@ -426,41 +518,3 @@ class Ed():
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
         self.close_dialog()  
-                
-            
-    def ed_giswater_jar(self):   
-        ''' Button 36. Open giswater.jar with selected .gsw file '''
-        
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return  
-        
-        # Check if giswater.jar file exists
-        if not os.path.exists(self.giswater_jar):
-            message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return  
-                  
-        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
-        if not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.giswater_jar
-            self.controller.show_info(message, 10, context_name='ui_message')
-            self.gsw_file = "" 
-            
-        # Start program     
-        aux = '"'+self.giswater_jar+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"]
-            
-        self.controller.start_program(program)               
-        
-        # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message')
-                                            
-        

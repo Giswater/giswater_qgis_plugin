@@ -14,7 +14,7 @@
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QMessageBox, QWidget
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -234,6 +234,8 @@ class ParentDialog(object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value("id")
+            print("******id******")
+            print(id_)
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
         inf_text = inf_text[:-2]
@@ -243,40 +245,53 @@ class ParentDialog(object):
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
             self.dao.execute_sql(sql)
+            print("sql")
+            print sql
             widget.model().select()
-            
-    def delete_records_hydro(self, widget, table_name):   #@UnusedVariable
-        ''' Delete selected elements of the table hydrometer'''
-        
+ 
+         
+    def delete_records_hydro(self, widget, table_name):
+        ''' Delete selected elements of the table '''
+
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' )
+            self.controller.show_warning(message, context_name='ui_message' ) 
             return
+        
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value("hydrometer_id")
+            print("id************")
+            print(id_)
+            print("id************")
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
+
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        table_name = '"rtc_hydrometer_x_connec"'
+        table_name2 = '"rtc_hydrometer"'
         if answer:
-            sql= "DELETE FROM "+self.schema_name+".rtc_hydrometer_x_connec WHERE hydrometer_id ='"+id_+"'" 
+            sql = "DELETE FROM "+self.schema_name+"."+table_name 
+            sql+= " WHERE hydrometer_id IN ("+list_id+")"
             self.dao.execute_sql(sql)
+            print("sql")
+            print sql
+            
+            
+            sql = "DELETE FROM "+self.schema_name+"."+table_name2 
+            sql+= " WHERE hydrometer_id IN ("+list_id+")"
+            self.dao.execute_sql(sql)
+            print("sql")
+            print sql
+            
             widget.model().select()
             
-            sql= "DELETE FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id ='"+id_+"'" 
-            self.dao.execute_sql(sql)
-            widget.model().select()
-      
-        # Refresh table in Qtableview
-        # Fill tab Hydrometer
-        table_hydrometer = "v_rtc_hydrometer"
-        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
             
             
     def insert_records (self):
@@ -295,32 +310,45 @@ class ParentDialog(object):
         
     def btn_accept(self):
         ''' Save new value oh hydrometer'''
+
         
         # Get widget text - hydtometer_id
         widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
         self.hydro_id = widget_hydro.text()
+    
         
         # get connec_id       
         widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
         self.connec_id = widget_connec.text()
 
-        # Insert hydrometer_id in v_rtc_hydrometer
-        sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
-        sql+= " VALUES ('"+self.hydro_id+"')"
-        self.dao.execute_sql(sql) 
         
-        # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
-        sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
-        sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
-        self.dao.execute_sql(sql) 
+        # Check if Hydrometer_id already exists
+        sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
+        row = self.dao.get_row(sql)
+        if row:
+        # if exist - show warning
+            self.controller.show_info_box("Hydrometer_id "+self.hydro_id+" exist in data base!", "Info")
+        else:
+        # in not exist insert hydrometer_id
+            # if not exist - insert new Hydrometer id
+            # Insert hydrometer_id in v_rtc_hydrometer
+            sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
+            sql+= " VALUES ('"+self.hydro_id+"')"
+            self.dao.execute_sql(sql) 
+            
+            # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
+            sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
+            sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
+            self.dao.execute_sql(sql) 
         
-        # Refresh table in Qtableview
-        # Fill tab Hydrometer
-        table_hydrometer = "v_rtc_hydrometer"
-        self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
-        
-        self.dlg_sum.close()
-              
+    
+            # Refresh table in Qtableview
+            # Fill tab Hydrometer
+            table_hydrometer = "v_rtc_hydrometer"
+            self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
+          
+            self.dlg_sum.close()
+                
               
     def btn_close(self):
         ''' Close form without saving '''
