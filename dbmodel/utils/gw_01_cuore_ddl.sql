@@ -100,3 +100,13 @@ CREATE TABLE "config_ui_forms" (
 CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "config_py_tables" (
+"id" serial NOT NULL,
+"table_name" varchar (50),
+"context" varchar (50),
+"plugin_version" varchar (20), 
+"hidden" boolean,
+"observ" varchar(50),
+CONSTRAINT "config_py_tables_pkey" PRIMARY KEY ("id")
+);
+
