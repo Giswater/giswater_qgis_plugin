@@ -26,6 +26,7 @@ from PyQt4.QtGui import QColor
 from map_tools.parent import ParentMapTool
 
 
+
 class DeleteNodeMapTool(ParentMapTool):
     ''' Button 17. User select one node.
     Execute SQL function: 'gw_fct_delete_node' '''
@@ -109,7 +110,20 @@ class DeleteNodeMapTool(ParentMapTool):
                 # Get selected features and layer type: 'node'
                 feature = snappFeat
                 node_id = feature.attribute('node_id')
-
+                node_type = feature.attribute('node_type')
+                
+                
+                if node_type == "POU":
+                    inf_text= "text"
+                    answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+                    table_name = '"v_ui_doc_x_node'
+                    if answer:
+                        # Unlink document
+                        sql = "DELETE FROM "+self.schema_name+"."+table_name 
+                        sql+= " WHERE node_id='"+node_id+"'"
+                        self.dao.execute_sql(sql)
+          
+                    
                 # Execute SQL function and show result to the user
                 function_name = "gw_fct_delete_node"
                 sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
@@ -120,6 +134,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refresh()
+                
 
     def activate(self):
 
