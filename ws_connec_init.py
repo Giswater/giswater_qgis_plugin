@@ -227,12 +227,12 @@ class ConnecDialog(ParentDialog):
         # Insert hydrometer_id in v_rtc_hydrometer
         sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
         sql+= " VALUES ('"+self.hydro_id+"')"
-        self.dao.execute_sql(sql) 
+        self.controller.execute_sql(sql) 
         
         # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
         sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
         sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
-        self.dao.execute_sql(sql) 
+        self.controller.execute_sql(sql) 
         
         # Refresh table in Qtableview
         # Fill tab Hydrometer
@@ -268,11 +268,11 @@ class ConnecDialog(ParentDialog):
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
         if answer:
             sql= "DELETE FROM "+self.schema_name+".rtc_hydrometer_x_connec WHERE hydrometer_id ='"+id_+"'" 
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
             widget.model().select()
             
             sql= "DELETE FROM "+self.schema_name+".v_rtc_hydrometer WHERE hydrometer_id ='"+id_+"'" 
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
             widget.model().select()
       
         # Refresh table in Qtableview

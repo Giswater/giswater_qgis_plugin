@@ -130,9 +130,8 @@ class Giswater(QObject):
                     water_soft = function_name[:2] 
                     callback_function = getattr(self, water_soft+'_generic')  
                     action.triggered.connect(partial(callback_function, function_name))
-            except AttributeError, e:
+            except AttributeError:
                 action.setEnabled(False)                
-                self.controller.show_warning(str(e))
         else:
             action.setEnabled(False)  
                   

@@ -187,7 +187,7 @@ class Ed():
                 sql+= ", workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
                 sql+= ", rotation= '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ= '"+observ+"',link = '"+link+"', verified = '"+verified+"'"
                 sql+= " WHERE element_id = '"+element_id+"'" 
-                self.dao.execute_sql(sql)  
+                self.controller.execute_sql(sql)  
             else:
                 self.close_dialog(self.dlg)
         else:
@@ -310,7 +310,7 @@ class Ed():
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
-            self.dao.execute_sql(sql)   
+            self.controller.execute_sql(sql)   
                           
         
     def ed_add_file_accept(self): 
@@ -332,7 +332,7 @@ class Ed():
                 sql = "UPDATE "+self.schema_name+".doc "
                 sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"',observ = '"+observ+"', path = '"+path+"'"
                 sql+= " WHERE id = '"+doc_id+"'" 
-                self.dao.execute_sql(sql) 
+                self.controller.execute_sql(sql) 
             else:
                 self.close_dialog(self.dlg) 
         else:

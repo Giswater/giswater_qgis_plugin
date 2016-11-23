@@ -225,7 +225,7 @@ class ParentDialog(object):
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
             widget.model().select()
             
    

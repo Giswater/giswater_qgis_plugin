@@ -284,13 +284,13 @@ class Mg():
         # Delete previous values
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql= "DELETE FROM "+self.schema_name+".rpt_selector_result" 
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         sql= "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         sql= "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         sql= "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
@@ -416,7 +416,7 @@ class Mg():
         if self.value_combo3 != 'null':
             sql+= ", nodecat_id='"+self.value_combo3+"'"
         sql+= " WHERE node_id ='"+self.node_id+"'"
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         
         # Show message to the user
         message = "Node type has been update!"
@@ -512,6 +512,6 @@ class Mg():
                         sql+= column_name+" = '"+str(value)+"', "           
             
             sql = sql[:-2]
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
                         
                 
