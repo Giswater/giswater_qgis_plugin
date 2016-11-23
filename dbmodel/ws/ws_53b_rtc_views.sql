@@ -152,7 +152,7 @@ CREATE OR REPLACE VIEW v_inp_demand AS
         CASE
             WHEN rtc_options.coefficient::text = 'MIN'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_min)
             WHEN rtc_options.coefficient::text = 'AVG'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_avg)
-            WHEN rtc_options.coefficient::text = 'AVG'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_max)
+            WHEN rtc_options.coefficient::text = 'MAX'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_max)
             WHEN rtc_options.coefficient::text = 'REAL'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_avg_real)
             ELSE NULL::double precision
         END AS demand,
