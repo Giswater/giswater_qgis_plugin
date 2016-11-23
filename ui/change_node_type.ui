@@ -83,16 +83,13 @@
     </font>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>catalog id</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <string>catalog id:</string>
    </property>
    <property name="margin">
     <number>3</number>
@@ -113,16 +110,13 @@
     </font>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>new system node type</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <string>new system node type:</string>
    </property>
    <property name="margin">
     <number>3</number>
@@ -143,19 +137,19 @@
     </font>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>current system node type</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <string>current system node type:</string>
    </property>
    <property name="margin">
     <number>3</number>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::LinksAccessibleByMouse</set>
    </property>
   </widget>
   <widget class="QLineEdit" name="node_node_type">
@@ -202,16 +196,13 @@
     </font>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>custom node type</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <string>custom node type:</string>
    </property>
    <property name="margin">
     <number>3</number>

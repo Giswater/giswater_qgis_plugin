@@ -85,6 +85,24 @@ class ParentDialog(object):
         self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
         self.table_valve = self.schema_name+'."v_edit_man_valve"'
         self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
+        
+        self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
+        self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'
+        self.table_netgully = self.schema_name+'."v_edit_man_netgully"'
+        self.table_netgully_pol = self.schema_name+'."v_edit_man_netgully_pol"'
+        self.table_netinit = self.schema_name+'."v_edit_man_netinit"'
+        self.table_wjump = self.schema_name+'."v_edit_man_wjump"'
+        self.table_wwtp = self.schema_name+'."v_edit_man_wwtp"'
+        self.table_wwtp_pol = self.schema_name+'."v_edit_man_wwtp_pol"'
+        self.table_storage = self.schema_name+'."v_edit_man_storage"'
+        self.table_storage_pol = self.schema_name+'."v_edit_man_storage_pol"'
+        self.table_outfall = self.schema_name+'."v_edit_man_outfall"'
+        
+        self.table_varc = self.schema_name+'."v_edit_man_varc"'
+        self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
+        self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
+        self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
+   
             
             
     def translate_form(self, context_name):
@@ -723,4 +741,30 @@ class ParentDialog(object):
             for i in xrange(13,-1,-1):
                 if (i != 11) & (i != 10) & (i != 5):
                     self.tab_main.removeTab(i) 
+                    
+        if uri_table == self.table_varc :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(0)
+            
+        if uri_table == self.table_siphon :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0) 
+            
+        print uri_table
+        print("test")
+        if uri_table == self.table_conduit :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+            
+        if uri_table == self.table_waccel :
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0)
         
+        
+        
+        
+    

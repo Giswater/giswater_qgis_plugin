@@ -227,11 +227,13 @@ class Giswater(QObject):
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully')    
         self.table_version = self.settings.value('db/table_version', 'version') 
         
+        # Tables connec
         self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
         self.table_page = self.settings.value('db/table_page', 'v_edit_man_page')
         self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_man_greentap')
         self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_man_fountain')
         
+        # Tables node
         self.table_tank = self.settings.value('db/table_tank', 'v_edit_man_tank')
         self.table_pump = self.settings.value('db/table_pump', 'v_edit_man_pump')
         self.table_source = self.settings.value('db/table_source', 'v_edit_man_source')
@@ -243,7 +245,26 @@ class Giswater(QObject):
         self.table_valve = self.settings.value('db/table_valve', 'v_edit_man_valve')
         self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_man_manhole')
         
+        self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_man_chamber')
+        self.table_chamber_pol = self.settings.value('db/table_chamber_pol', 'v_edit_man_chamber_pol')
+        self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_man_netgully')
+        self.table_netgully_pol = self.settings.value('db/table_netgully_pol', 'v_edit_man_netgully_pol')
+        self.table_netinit = self.settings.value('db/table_netinit', 'v_edit_man_netinit')
+        self.table_wjump = self.settings.value('db/table_wjump', 'v_edit_man_wjump')
+        self.table_wwtp = self.settings.value('db/table_wwtp', 'v_edit_man_wwtp')
+        self.table_wwtp_pol = self.settings.value('db/table_wwtp_pol', 'v_edit_man_wwtp_pol')
+        self.table_storage = self.settings.value('db/table_storage', 'v_edit_man_storage')
+        self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')
+        self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')
+
+      
+        # Tables arc
+        self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')
+        self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
+        self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')
+        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
         
+  
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
         parent = self.iface.mainWindow()
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
@@ -304,7 +325,7 @@ class Giswater(QObject):
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')        
+        self.gsw_file = self.settings.value('files/gsw_file')   
                          
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
@@ -407,10 +428,10 @@ class Giswater(QObject):
                                 
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
-        
+
         if self.dao is None:
             return
-                
+        print("test balalalalla")    
         # Hide all toolbars
         self.hide_toolbars()
                     
@@ -441,7 +462,24 @@ class Giswater(QObject):
         self.layer_hydrant = None
         self.layer_valve = None
         self.layer_manhole = None
-      
+        
+        self.layer_chamber = None
+        self.layer_chamber_pol = None
+        self.layer_netgully = None
+        self.layer_netgully_pol = None
+        self.layer_netinit = None
+        self.layer_wjump = None
+        self.layer_wwtp = None
+        self.layer_wwtp_pol = None
+        self.layer_storage = None
+        self.layer_storage_pol = None
+        self.layer_outfall = None
+        
+        self.layer_varc = None
+        self.layer_siphon = None
+        self.layer_conduit = None
+        self.layer_waccel = None
+        
         
         # Iterate over all layers to get the ones specified in 'db' config section 
         for cur_layer in layers:     
@@ -460,6 +498,7 @@ class Giswater(QObject):
                 if self.table_version in uri_table:  
                     self.layer_version = cur_layer 
                     
+                # Connec
                 if self.table_wjoin in uri_table:  
                     self.layer_wjoin = cur_layer 
                 if self.table_page in uri_table:  
@@ -469,6 +508,7 @@ class Giswater(QObject):
                 if self.table_fountain in uri_table:  
                     self.layer_fountain = cur_layer  
                     
+                # Node
                 if self.table_tank in uri_table:  
                     self.layer_tank = cur_layer 
                 if self.table_pump in uri_table:  
@@ -488,7 +528,42 @@ class Giswater(QObject):
                 if self.table_valve in uri_table:  
                     self.layer_valve = cur_layer 
                 if self.table_manhole in uri_table:  
-                    self.layer_manhole = cur_layer    
+                    self.layer_manhole = cur_layer 
+                    
+                if self.table_chamber in uri_table:  
+                    self.layer_chamber = cur_layer  
+                if self.table_chamber_pol in uri_table:  
+                    self.layer_chamber_pol = cur_layer
+                if self.table_netgully in uri_table:  
+                    self.layer_netgully = cur_layer
+                if self.table_netgully_pol in uri_table:  
+                    self.layer_netgully_pol = cur_layer 
+                if self.table_netinit in uri_table:  
+                    self.layer_netinit = cur_layer 
+                if self.table_wjump in uri_table:  
+                    self.layer_wjump = cur_layer 
+                if self.table_wwtp in uri_table:  
+                    self.layer_wwtp = cur_layer   
+                if self.table_wwtp_pol in uri_table:  
+                    self.layer_wwtp_pol = cur_layer 
+                if self.table_storage in uri_table:  
+                    self.layer_storage = cur_layer
+                if self.table_storage_pol in uri_table:  
+                    self.layer_storage_pol = cur_layer 
+                if self.table_outfall in uri_table:  
+                    self.layer_outfall = cur_layer          
+              
+                    
+                # Arc
+                if self.table_varc in uri_table:  
+                    self.layer_varc = cur_layer  
+                if self.table_siphon in uri_table:  
+                    self.layer_siphon = cur_layer 
+                if self.table_conduit in uri_table:  
+                    self.layer_conduit = cur_layer 
+                if self.table_waccel in uri_table:  
+                    self.layer_waccel = cur_layer    
+                 
         
         # Check if table 'version' exists
         if self.layer_version is None:
@@ -681,6 +756,129 @@ class Giswater(QObject):
             self.layer_manhole.editFormConfig().setInitCodeSource(1)
             self.layer_manhole.editFormConfig().setInitFilePath(file_init)           
             self.layer_manhole.editFormConfig().setInitFunction('formOpen')    
+            
+            
+        if self.layer_chamber is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_chamber.editFormConfig().setUiForm(file_ui) 
+            self.layer_chamber.editFormConfig().setInitCodeSource(1)
+            self.layer_chamber.editFormConfig().setInitFilePath(file_init)           
+            self.layer_chamber.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_chamber_pol is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_chamber_pol.editFormConfig().setUiForm(file_ui) 
+            self.layer_chamber_pol.editFormConfig().setInitCodeSource(1)
+            self.layer_chamber_pol.editFormConfig().setInitFilePath(file_init)           
+            self.layer_chamber_pol.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_netgully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_netgully.editFormConfig().setUiForm(file_ui) 
+            self.layer_netgully.editFormConfig().setInitCodeSource(1)
+            self.layer_netgully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_netgully.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_netgully_pol is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_netgully_pol.editFormConfig().setUiForm(file_ui) 
+            self.layer_netgully_pol.editFormConfig().setInitCodeSource(1)
+            self.layer_netgully_pol.editFormConfig().setInitFilePath(file_init)           
+            self.layer_netgully_pol.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_netinit is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_netinit.editFormConfig().setUiForm(file_ui) 
+            self.layer_netinit.editFormConfig().setInitCodeSource(1)
+            self.layer_netinit.editFormConfig().setInitFilePath(file_init)           
+            self.layer_netinit.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_wjump is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_wjump.editFormConfig().setUiForm(file_ui) 
+            self.layer_wjump.editFormConfig().setInitCodeSource(1)
+            self.layer_wjump.editFormConfig().setInitFilePath(file_init)           
+            self.layer_wjump.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_wwtp is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_wwtp.editFormConfig().setUiForm(file_ui) 
+            self.layer_wwtp.editFormConfig().setInitCodeSource(1)
+            self.layer_wwtp.editFormConfig().setInitFilePath(file_init)           
+            self.layer_wwtp.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_wwtp_pol is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_wwtp_pol.editFormConfig().setUiForm(file_ui) 
+            self.layer_wwtp_pol.editFormConfig().setInitCodeSource(1)
+            self.layer_wwtp_pol.editFormConfig().setInitFilePath(file_init)           
+            self.layer_wwtp_pol.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_storage is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_storage.editFormConfig().setUiForm(file_ui) 
+            self.layer_storage.editFormConfig().setInitCodeSource(1)
+            self.layer_storage.editFormConfig().setInitFilePath(file_init)           
+            self.layer_storage.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_storage_pol is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_storage_pol.editFormConfig().setUiForm(file_ui) 
+            self.layer_storage_pol.editFormConfig().setInitCodeSource(1)
+            self.layer_storage_pol.editFormConfig().setInitFilePath(file_init)           
+            self.layer_storage_pol.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_outfall is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')      
+            self.layer_outfall.editFormConfig().setUiForm(file_ui) 
+            self.layer_outfall.editFormConfig().setInitCodeSource(1)
+            self.layer_outfall.editFormConfig().setInitFilePath(file_init)           
+            self.layer_outfall.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_varc is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')      
+            self.layer_varc.editFormConfig().setUiForm(file_ui) 
+            self.layer_varc.editFormConfig().setInitCodeSource(1)
+            self.layer_varc.editFormConfig().setInitFilePath(file_init)           
+            self.layer_varc.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_siphon is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')      
+            self.layer_siphon.editFormConfig().setUiForm(file_ui) 
+            self.layer_siphon.editFormConfig().setInitCodeSource(1)
+            self.layer_siphon.editFormConfig().setInitFilePath(file_init)           
+            self.layer_siphon.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_conduit is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')      
+            self.layer_conduit.editFormConfig().setUiForm(file_ui) 
+            self.layer_conduit.editFormConfig().setInitCodeSource(1)
+            self.layer_conduit.editFormConfig().setInitFilePath(file_init)           
+            self.layer_conduit.editFormConfig().setInitFunction('formOpen') 
+            
+        if self.layer_waccel is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')      
+            self.layer_waccel.editFormConfig().setUiForm(file_ui) 
+            self.layer_waccel.editFormConfig().setInitCodeSource(1)
+            self.layer_waccel.editFormConfig().setInitFilePath(file_init)           
+            self.layer_waccel.editFormConfig().setInitFunction('formOpen') 
+            
+        
 
 
         # Manage current layer selected     
@@ -793,9 +991,43 @@ class Giswater(QObject):
             elif self.table_valve in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_manhole in uri_table:  
-                setting_name = 'buttons_node'             
-                
-                               
+                setting_name = 'buttons_node'   
+            
+            elif self.table_chamber in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_chamber_pol in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_netgully in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_netgully_pol in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_netinit in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_wjump in uri_table:  
+                setting_name = 'buttons_node'   
+            elif self.table_wwtp in uri_table:  
+                setting_name = 'buttons_node'     
+            elif self.table_wwtp_pol in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_storage in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_storage_pol in uri_table:  
+                setting_name = 'buttons_node'  
+            elif self.table_outfall in uri_table:  
+                setting_name = 'buttons_node'        
+              
+            
+            elif self.table_varc in uri_table:  
+                setting_name = 'buttons_arc'  
+            elif self.table_siphon in uri_table:  
+                setting_name = 'buttons_arc' 
+            elif self.table_conduit in uri_table:  
+                setting_name = 'buttons_arc'   
+            elif self.table_waccel in uri_table:  
+                setting_name = 'buttons_arc'      
+            
+            
+            
         if setting_name is not None:
             try:
                 list_index_action = self.settings.value('layers/'+setting_name, None)

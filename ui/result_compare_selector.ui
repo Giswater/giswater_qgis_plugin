@@ -67,16 +67,13 @@
     </font>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>Result name (to show)</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <string>Result name (to show):</string>
    </property>
    <property name="margin">
     <number>3</number>
@@ -110,16 +107,13 @@
     </font>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>Result name (to compare)</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <string>Result name (to compare):</string>
    </property>
    <property name="margin">
     <number>3</number>
