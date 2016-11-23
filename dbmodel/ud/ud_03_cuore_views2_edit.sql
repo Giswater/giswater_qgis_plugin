@@ -56,6 +56,7 @@ node.label_rotation
    FROM (node
    LEFT JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
+
    
 DROP VIEW IF EXISTS v_edit_arc CASCADE;
 CREATE VIEW v_edit_arc AS
@@ -277,7 +278,7 @@ WHERE gully.the_geom_pol is not null;
 
 
 
-DROP VIEW v_edit_man_junction;
+DROP VIEW IF EXISTS v_edit_man_junction CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_junction AS 
  SELECT node.node_id,
     node.top_elev AS junction_top_elev,
@@ -321,8 +322,7 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 
 
 	 
-DROP VIEW v_edit_man_outfall;
-
+DROP VIEW IF EXISTS v_edit_man_outfall CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_outfall AS 
  SELECT node.node_id,
     node.top_elev AS outfall_top_elev,
@@ -367,8 +367,7 @@ CREATE OR REPLACE VIEW v_edit_man_outfall AS
 
 
 	 
-DROP VIEW v_edit_man_storage;
-
+DROP VIEW IF EXISTS v_edit_man_storage CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_storage AS 
  SELECT node.node_id,
     node.top_elev AS storage_top_elev,
@@ -420,8 +419,7 @@ CREATE OR REPLACE VIEW v_edit_man_storage AS
 
 	 
 
-DROP VIEW v_edit_man_storage_pol;
-
+DROP VIEW IF EXISTS v_edit_man_storage_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_storage_pol AS 
  SELECT 
     polygon.pol_id,
@@ -476,8 +474,7 @@ CREATE OR REPLACE VIEW v_edit_man_storage_pol AS
 	 
 	 
 	 
-DROP VIEW v_edit_man_valve;
-
+DROP VIEW IF EXISTS v_edit_man_valve CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_valve AS 
  SELECT node.node_id,
     node.top_elev AS valve_top_elev,
@@ -522,8 +519,7 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 
 	 
 	 
-DROP VIEW v_edit_man_netinit;
-
+DROP VIEW IF EXISTS v_edit_man_netinit CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_netinit AS 
  SELECT node.node_id,
     node.top_elev AS netinit_top_elev,
@@ -571,8 +567,7 @@ CREATE OR REPLACE VIEW v_edit_man_netinit AS
 
 
 	 
-DROP VIEW v_edit_man_manhole;
-
+DROP VIEW IF EXISTS v_edit_man_manhole CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_manhole AS 
  SELECT node.node_id,
     node.top_elev AS manhole_top_elev,
@@ -617,8 +612,7 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
      JOIN man_manhole ON man_manhole.node_id::text = node.node_id::text;
 
 	 
-DROP VIEW v_edit_man_wjump;
-
+DROP VIEW IF EXISTS v_edit_man_wjump CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_wjump AS 
  SELECT node.node_id,
     node.top_elev AS wjump_top_elev,
@@ -671,8 +665,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjump AS
 
 
 	 
-DROP VIEW v_edit_man_netgully;
-
+DROP VIEW IF EXISTS v_edit_man_netgully CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_netgully AS 
  SELECT node.node_id,
     node.top_elev AS netgully_top_elev,
@@ -716,8 +709,7 @@ CREATE OR REPLACE VIEW v_edit_man_netgully AS
      JOIN man_netgully ON man_netgully.node_id::text = node.node_id::text;
 	 
 
-DROP VIEW v_edit_man_netgully_pol;
-
+DROP VIEW IF EXISTS v_edit_man_netgully_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_netgully_pol AS 
  SELECT 
  polygon.pol_id,
@@ -763,8 +755,9 @@ CREATE OR REPLACE VIEW v_edit_man_netgully_pol AS
      JOIN polygon ON polygon.pol_id::text = man_netgully.pol_id::text;	 
 	 DROP VIEW v_edit_man_netgully_pol;	 
 
- DROP VIEW v_edit_man_chamber;
 
+
+DROP VIEW IF EXISTS v_edit_man_chamber CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_chamber AS 
  SELECT node.node_id,
     node.top_elev AS chamber_top_elev,
@@ -813,11 +806,8 @@ CREATE OR REPLACE VIEW v_edit_man_chamber AS
      JOIN man_chamber ON man_chamber.node_id::text = node.node_id::text;
 	 
 	 
-
 	 
-	 
-DROP VIEW v_edit_man_chamber_pol;
-
+DROP VIEW IF EXISTS v_edit_man_chamber_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_chamber_pol AS 
  SELECT 
  polygon.pol_id,node.node_id,
@@ -866,8 +856,9 @@ CREATE OR REPLACE VIEW v_edit_man_chamber_pol AS
      JOIN man_chamber ON man_chamber.node_id::text = node.node_id::text
       JOIN polygon ON polygon.pol_id::text = man_chamber.pol_id::text;
 
-DROP VIEW v_edit_man_wwtp;
 
+
+DROP VIEW IF EXISTS v_edit_man_wwtp CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_wwtp AS 
  SELECT node.node_id,
     node.top_elev AS wwtp_top_elev,
@@ -912,8 +903,8 @@ CREATE OR REPLACE VIEW v_edit_man_wwtp AS
      JOIN man_wwtp ON man_wwtp.node_id::text = node.node_id::text;
 
 
-DROP VIEW v_edit_man_wwtp_pol;
 
+DROP VIEW IF EXISTS v_edit_man_wwtp_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_wwtp_pol AS 
  SELECT 
     polygon.pol_id,
@@ -962,8 +953,7 @@ CREATE OR REPLACE VIEW v_edit_man_wwtp_pol AS
 
 	 
 
-DROP VIEW v_edit_man_conduit;
-
+DROP VIEW IF EXISTS v_edit_man_conduit CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_conduit AS 
  SELECT arc.arc_id,
     arc.node_1 AS conduit_node_1,
@@ -1022,15 +1012,9 @@ CREATE OR REPLACE VIEW v_edit_man_conduit AS
      LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
      JOIN man_conduit ON man_conduit.arc_id::text = arc.arc_id::text;
 
-ALTER TABLE v_edit_man_conduit
-  OWNER TO postgres;
 
 
-
-
-
-DROP VIEW v_edit_man_siphon;
-
+DROP VIEW IF EXISTS v_edit_man_siphon CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_siphon AS 
  SELECT arc.arc_id,
     arc.node_1 AS siphon_node_1,
@@ -1096,8 +1080,7 @@ CREATE OR REPLACE VIEW v_edit_man_siphon AS
 
 
 
-DROP VIEW v_edit_man_waccel;
-
+DROP VIEW IF EXISTS v_edit_man_waccel CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_waccel AS 
  SELECT arc.arc_id,
     arc.node_1 AS waccel_node_1,
@@ -1165,8 +1148,7 @@ CREATE OR REPLACE VIEW v_edit_man_waccel AS
 
 
 
-DROP VIEW v_edit_man_varc;
-
+DROP VIEW IF EXISTS v_edit_man_varc CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_varc AS 
  SELECT arc.arc_id,
     arc.node_1 AS varc_node_1,
