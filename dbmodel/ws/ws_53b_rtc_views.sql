@@ -168,3 +168,36 @@ CREATE OR REPLACE VIEW v_inp_demand AS
      JOIN inp_selector_state ON node.state::text = inp_selector_state.id::text
   WHERE rtc_options.rtc_status::text = 'ON'::text
   GROUP BY v_rtc_hydrometer_x_node_period.node_id, inp_junction.pattern_id, v_rtc_hydrometer_x_node_period.period_id, rtc_options.coefficient;
+
+
+DROP VIEW IF EXISTS "v_rtc_scada" CASCADE;
+CREATE OR REPLACE VIEW v_rtc_scada AS 
+SELECT ext_rtc_scada.scada_id,
+rtc_scada_node.node_id,
+ext_rtc_scada.cat_scada_id,
+ext_rtc_scada.text
+FROM ext_rtc_scada
+JOIN rtc_scada_node ON rtc_scada_node.scada_id::text = ext_rtc_scada.scada_id::text;
+
+
+DROP VIEW IF EXISTS "v_rtc_scada_data" CASCADE;
+CREATE OR REPLACE VIEW v_rtc_scada_data AS SELECT
+ext_rtc_scada_x_data.scada_id,
+rtc_scada_node.node_id,
+ext_rtc_scada_x_data.min,
+ext_rtc_scada_x_data.max,
+ext_rtc_scada_x_data.avg,
+ext_rtc_scada_x_data.sum,
+ext_rtc_scada_x_data.cat_period_id
+FROM ext_rtc_scada_x_data JOIN rtc_scada_node ON rtc_scada_node.scada_id::text=ext_rtc_scada_x_data.scada_id::text;
+
+
+DROP VIEW IF EXISTS "v_rtc_scada_value" CASCADE;
+CREATE OR REPLACE VIEW v_rtc_scada_value AS SELECT
+ext_rtc_scada_x_value.scada_id,
+rtc_scada_node.node_id,
+ext_rtc_scada_x_value.value,
+ext_rtc_scada_x_value.status,
+ext_rtc_scada_x_value."timestamp",
+ext_rtc_scada_x_value.interval_seconds
+FROM ext_rtc_scada_x_value JOIN rtc_scada_node ON rtc_scada_node.scada_id=ext_rtc_scada_x_value.scada_id;

@@ -56,7 +56,7 @@ BEGIN
         -- FEATURE INSERT
         INSERT INTO connec VALUES (NEW.connec_id, NEW.elevation, NEW."depth", NEW.connecat_id, NEW.sector_id, NEW.code, NEW.n_hydrometer, NEW.demand, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom);
+                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.workcat_id_end,NEW.connec_type,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation);
               
         PERFORM audit_function(1,350);     
         RETURN NEW;
@@ -75,7 +75,7 @@ BEGIN
             annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.workcat_id_end, connec_type=NEW.connec_type,undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation 
         WHERE connec_id = OLD.connec_id;
       
         PERFORM audit_function(2,350);     

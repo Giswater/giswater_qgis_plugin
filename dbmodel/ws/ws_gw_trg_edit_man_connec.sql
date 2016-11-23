@@ -1,0 +1,163 @@
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec()
+  RETURNS trigger AS
+$BODY$
+DECLARE 
+    v_sql varchar;
+	man_table varchar;
+
+BEGIN
+
+    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+    man_table:= TG_ARGV[0];
+	
+    -- Control insertions ID
+    IF TG_OP = 'INSERT' THEN
+
+        -- connec ID
+        IF (NEW.connec_id IS NULL) THEN
+            NEW.connec_id:= (SELECT nextval('connec_seq'));
+        END IF;
+
+        -- connec Catalog ID
+        IF (NEW.connecat_id IS NULL) THEN
+            --PERFORM audit_function(150,350); 
+            RETURN NULL;                   
+        END IF;
+
+        -- Sector ID
+        IF (NEW.sector_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
+                PERFORM audit_function(115,350); 
+                RETURN NULL;                     
+            END IF;
+            NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+            IF (NEW.sector_id IS NULL) THEN
+                PERFORM audit_function(120,350); 
+                RETURN NULL;                     
+            END IF;
+        END IF;
+        
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                PERFORM audit_function(125,350); 
+                RETURN NULL;                         
+            END IF;
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                PERFORM audit_function(130,350); 
+                RETURN NULL;                     
+            END IF;
+        END IF;
+        
+        -- FEATURE INSERT
+		IF man_table='man_greentap' THEN
+		  INSERT INTO connec (connec_id, elevation, "depth",connecat_id, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, workcat_id_end,label_x,label_y,label_rotation) VALUES (NEW.connec_id, NEW.greentap_elevation, NEW.greentap_depth, NEW.connecat_id, NEW.sector_id, NEW.greentap_code, NEW.greentap_n_hydrometer, NEW.greentap_demand, NEW.greentap_state, NEW.greentap_annotation, NEW.greentap_observ, NEW.greentap_comment, NEW.greentap_rotation,NEW.dma_id, NEW.greentap_soilcat_id, NEW.greentap_category_type, NEW.greentap_fluid_type, NEW.greentap_location_type, NEW.greentap_workcat_id, NEW.greentap_buildercat_id, NEW.greentap_builtdate,NEW.greentap_ownercat_id, NEW.greentap_adress_01, NEW.greentap_adress_02, NEW.greentap_adress_03, NEW.greentap_streetname, NEW.greentap_postnumber, NEW.greentap_descript, NEW.greentap_link, NEW.verified, NEW.the_geom,NEW.greentap_workcat_id_end,NEW.greentap_label_x,NEW.greentap_label_y,NEW.greentap_label_rotation);
+		  
+		  INSERT INTO man_greentap (connec_id) VALUES(NEW.connec_id);
+		  
+		ELSIF man_table='man_fountain' THEN
+		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom,workcat_id_end,label_x,label_y,label_rotation) VALUES (NEW.connec_id, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_code, NEW.fountain_n_hydrometer, NEW.fountain_demand, NEW.fountain_state, NEW.fountain_annotation, NEW.fountain_observ, NEW.fountain_comment, NEW.fountain_rotation,NEW.dma_id, NEW.fountain_soilcat_id, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, NEW.fountain_buildercat_id, NEW.fountain_builtdate,NEW.fountain_ownercat_id, NEW.fountain_adress_01, NEW.fountain_adress_02, NEW.fountain_adress_03, NEW.fountain_streetname, NEW.fountain_postnumber, NEW.fountain_descript, NEW.fountain_link, NEW.verified, NEW.the_geom,NEW.fountain_workcat_id_end,NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation);
+		 
+		 INSERT INTO man_fountain(connec_id, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator) VALUES (NEW.connec_id, NEW.fountain_vmax, NEW.fountain_vtotal, NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, NEW.fountain_connection, NEW.fountain_chlorinator);
+		 
+		ELSIF man_table='man_tap' THEN
+		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber,descript,link,verified, the_geom,workcat_id_end,label_x,label_y,label_rotation) VALUES (NEW.connec_id, NEW.tap_elevation, NEW.tap_depth, NEW.connecat_id, NEW.sector_id, NEW.tap_code, NEW.tap_n_hydrometer, NEW.tap_demand, NEW.tap_state, NEW.tap_annotation, NEW.tap_observ, NEW.tap_comment, NEW.tap_rotation,NEW.dma_id, NEW.tap_soilcat_id, NEW.tap_category_type, NEW.tap_fluid_type, NEW.tap_location_type, NEW.tap_workcat_id, NEW.tap_buildercat_id, NEW.tap_builtdate,NEW.tap_ownercat_id, NEW.tap_adress_01, NEW.tap_adress_02, NEW.tap_adress_03, NEW.tap_streetname, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_link, NEW.verified, NEW.the_geom, NEW.tap_workcat_id_end,NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation);
+		  
+		  INSERT INTO man_tap(connec_id, type, connection, continous, shutvalve_type, shutvalve_diam, shutvalve_number, drain_diam, drain_exit, drain_gully, drain_distance, arquitect_patrimony, communication) VALUES (NEW.connec_id, NEW.tap_type, NEW.tap_connection, NEW.tap_continous, NEW.tap_shutvalve_type,NEW.tap_shutvalve_diam, NEW.tap_shutvalve_number, NEW.tap_drain_diam, NEW.tap_drain_exit, NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arquitect_patrimony, NEW.tap_communication);
+		  
+		ELSIF man_table='man_wjoin' THEN  
+		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom,workcat_id_end,label_x,label_y,label_rotation) VALUES (NEW.connec_id, NEW.wjoin_elevation, NEW.wjoin_depth, NEW.connecat_id, NEW.sector_id, NEW.wjoin_code, NEW.wjoin_n_hydrometer, NEW.wjoin_demand, NEW.wjoin_state, NEW.wjoin_annotation, NEW.wjoin_observ, NEW.wjoin_comment, NEW.wjoin_rotation,NEW.dma_id, NEW.wjoin_soilcat_id, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.wjoin_buildercat_id, NEW.wjoin_builtdate,NEW.wjoin_ownercat_id, NEW.wjoin_adress_01, NEW.wjoin_adress_02, NEW.wjoin_adress_03, NEW.wjoin_streetname, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_link, NEW.verified, NEW.the_geom, NEW.wjoin_workcat_id_end,NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation); 
+		 
+		 INSERT INTO man_wjoin (connec_id, arc_id, length, top_floor, lead_verified, lead_facade) VALUES (NEW.connec_id, NEW.arc_id, NEW.wjoin_length, NEW.wjoin_top_floor, NEW.wjoin_lead_verified, NEW.wjoin_lead_facade);
+		 
+		END IF;		 
+		RETURN NEW;
+
+	
+	ELSIF TG_OP = 'UPDATE' THEN
+
+       -- UPDATE dma/sector
+        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
+            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+        END IF;
+
+            
+		-- MANAGEMENT UPDATE	
+        IF man_table ='man_greentap' THEN
+			UPDATE connec 
+			SET connec_id=NEW.connec_id, elevation=NEW.greentap_elevation, "depth"=NEW.greentap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, code=NEW.greentap_code, n_hydrometer=NEW.greentap_n_hydrometer, demand=NEW.greentap_demand, "state"=NEW.greentap_state, annotation=NEW.greentap_annotation, observ=NEW.greentap_observ, "comment"=NEW.greentap_comment, rotation=NEW.greentap_rotation,dma_id=NEW.dma_id, soilcat_id=NEW.greentap_soilcat_id, category_type=NEW.greentap_category_type, fluid_type=NEW.greentap_fluid_type, location_type=NEW.greentap_location_type, workcat_id=NEW.greentap_workcat_id, buildercat_id=NEW.greentap_buildercat_id, builtdate=NEW.greentap_builtdate,ownercat_id=NEW.greentap_ownercat_id, adress_01=NEW.greentap_adress_01, adress_02=NEW.greentap_adress_02, adress_03=NEW.greentap_adress_03, streetaxis_id=NEW.greentap_streetname, postnumber=NEW.greentap_postnumber, descript=NEW.greentap_descript, link=NEW.greentap_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.greentap_workcat_id_end, label_x=NEW.greentap_label_x,label_y=NEW.greentap_label_y, label_rotation=NEW.greentap_label_rotation
+			WHERE connec_id=OLD.connec_id;
+			
+            UPDATE man_greentap 
+			SET connec_id=NEW.connec_id
+			WHERE connec_id=OLD.connec_id;
+			
+        ELSIF man_table ='man_wjoin' THEN
+			UPDATE connec 
+			SET connec_id=NEW.connec_id, elevation=NEW.wjoin_elevation, "depth"=NEW.wjoin_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, code=NEW.wjoin_code, n_hydrometer=NEW.wjoin_n_hydrometer, demand=NEW.wjoin_demand, "state"=NEW.wjoin_state, annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,ownercat_id=NEW.wjoin_ownercat_id, adress_01=NEW.wjoin_adress_01, adress_02=NEW.wjoin_adress_02, adress_03=NEW.wjoin_adress_03, streetaxis_id=NEW.wjoin_streetname, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.wjoin_workcat_id_end,label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, label_rotation=NEW.wjoin_label_rotation
+			WHERE connec_id=OLD.connec_id;
+		
+            UPDATE man_wjoin 
+			SET connec_id=NEW.connec_id, arc_id=NEW.arc_id,length=NEW.wjoin_length,top_floor=NEW.wjoin_top_floor,lead_verified=NEW.wjoin_lead_verified,lead_facade=NEW.wjoin_lead_facade
+			WHERE connec_id=OLD.connec_id;
+			
+		ELSIF man_table ='man_tap' THEN
+			UPDATE connec 
+			SET connec_id=NEW.connec_id, elevation=NEW.tap_elevation, "depth"=NEW.tap_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, code=NEW.tap_code, n_hydrometer=NEW.tap_n_hydrometer, demand=NEW.tap_demand, "state"=NEW.tap_state, annotation=NEW.tap_annotation, observ=NEW.tap_observ, "comment"=NEW.tap_comment, rotation=NEW.tap_rotation,dma_id=NEW.dma_id, soilcat_id=NEW.tap_soilcat_id, category_type=NEW.tap_category_type, fluid_type=NEW.tap_fluid_type, location_type=NEW.tap_location_type, workcat_id=NEW.tap_workcat_id, buildercat_id=NEW.tap_buildercat_id, builtdate=NEW.tap_builtdate,ownercat_id=NEW.tap_ownercat_id, adress_01=NEW.tap_adress_01, adress_02=NEW.tap_adress_02, adress_03=NEW.tap_adress_03, streetaxis_id=NEW.tap_streetname, postnumber=NEW.tap_postnumber, descript=NEW.tap_descript, link=NEW.tap_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.tap_workcat_id_end,label_x=NEW.tap_label_x,label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation
+			WHERE connec_id=OLD.connec_id;
+			
+            UPDATE man_tap 
+			SET connec_id=NEW.connec_id, type=NEW.tap_type, connection=NEW.tap_connection, continous=NEW.tap_continous,shutvalve_type=NEW.tap_shutvalve_type,shutvalve_diam=NEW.tap_shutvalve_diam,shutvalve_number=NEW.tap_shutvalve_number,drain_diam=NEW.tap_drain_diam,drain_exit=NEW.tap_drain_exit,drain_gully=NEW.tap_drain_gully,drain_distance=NEW.tap_drain_distance,arquitect_patrimony=NEW.tap_arquitect_patrimony,communication=NEW.tap_communication
+			WHERE connec_id=OLD.connec_id;
+			
+        ELSIF man_table ='man_fountain' THEN
+            UPDATE connec 
+			SET connec_id=NEW.connec_id, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, code=NEW.fountain_code, n_hydrometer=NEW.fountain_n_hydrometer, demand=NEW.fountain_demand, "state"=NEW.fountain_state, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, soilcat_id=NEW.fountain_soilcat_id, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, workcat_id=NEW.fountain_workcat_id, buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, adress_01=NEW.fountain_adress_01, adress_02=NEW.fountain_adress_02, adress_03=NEW.fountain_adress_03, streetaxis_id=NEW.fountain_streetname, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, link=NEW.fountain_link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation
+			WHERE connec_id=OLD.connec_id;
+			
+			UPDATE man_fountain 
+			SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator
+			WHERE connec_id=OLD.connec_id;
+		END IF;
+
+        --PERFORM audit_function(2,350);     
+        RETURN NEW;
+    
+
+    ELSIF TG_OP = 'DELETE' THEN
+
+        DELETE FROM connec WHERE connec_id = OLD.connec_id;
+
+        --PERFORM audit_function(3,350);     
+        RETURN NULL;
+   
+    
+
+END IF;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+
+DROP TRIGGER IF EXISTS gw_trg_edit_man_greentap ON "SCHEMA_NAME".v_edit_man_greentap;
+CREATE TRIGGER gw_trg_edit_man_greentap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_greentap FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_greentap');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_man_wjoin ON "SCHEMA_NAME".v_edit_man_wjoin;
+CREATE TRIGGER gw_trg_edit_man_wjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_wjoin FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_wjoin');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_man_tap ON "SCHEMA_NAME".v_edit_man_tap;
+CREATE TRIGGER gw_trg_edit_man_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tap FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_tap');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain ON "SCHEMA_NAME".v_edit_man_fountain;
+CREATE TRIGGER gw_trg_edit_man_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_fountain FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_fountain');
