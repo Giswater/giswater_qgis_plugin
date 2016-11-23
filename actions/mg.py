@@ -84,13 +84,17 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"  
             self.controller.execute_sql(sql) 
             
+        if self.dlg.check_topology_repair.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_arc_topology();"  
+            self.controller.execute_sql(sql) 
+            
         if self.dlg.check_node_sink.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
             self.controller.execute_sql(sql) 
          
         # Show message and close the dialog    
-        message = "Selected functions have been executed"
-        self.controller.show_info(message, context_name='ui_message' ) 
+        #message = "Selected functions have been executed"
+        #self.controller.show_info(message, context_name='ui_message') 
         self.close_dialog()         
             
         # Refresh map canvas
