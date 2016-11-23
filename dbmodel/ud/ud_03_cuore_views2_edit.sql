@@ -47,7 +47,12 @@ node.est_ymax,
 node.rotation,
 node.link,
 node.verified,
-node.the_geom
+node.the_geom,
+node.workcat_id_end,
+node.undelete,
+node.label_x,
+node.label_y,
+node.label_rotation
    FROM (node
    LEFT JOIN cat_node ON (((node.nodecat_id)::text = (cat_node.id)::text)));
 
@@ -99,7 +104,12 @@ arc.est_y2,
 arc.rotation,
 arc.link,
 arc.verified,
-arc.the_geom
+arc.the_geom,
+arc.workcat_id_end,
+arc.undelete,
+arc.label_x,
+arc.label_y,
+arc.label_rotation
 FROM (arc
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)));
@@ -142,7 +152,19 @@ cat_connec.svg AS "cat_svg",
 connec.rotation,
 connec.link,
 connec.verified,
-connec.the_geom
+connec.the_geom,
+connec.workcat_id_end,
+connec.y1,
+connec.y2,
+connec.undelete,
+connec.featurecat_id,
+connec.feature_id,
+connec.private_connecat_id,
+connec.label_x,
+connec.label_y,
+connec.label_rotation,
+connec.accessibility,
+connec.diagonal
 FROM (connec 
 JOIN cat_connec ON (((connec.connecat_id)::text = (cat_connec.id)::text))
 LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id)::text = (ext_streetaxis.id)::text))
@@ -201,7 +223,13 @@ cat_grate.svg AS "cat_svg",
 gully.rotation,
 gully.link,
 gully.verified,
-gully.the_geom
+gully.the_geom,
+gully.workcat_id_end,
+gully.featurecat_id,
+gully.feature_id,
+gully.label_x,
+gully.label_y,
+gully.label_rotation
 FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
 WHERE gully.the_geom is not null;
 
@@ -246,5 +274,955 @@ gully.verified,
 gully.the_geom_pol AS "the_geom"
 FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
 WHERE gully.the_geom_pol is not null;
+
+
+
+DROP VIEW v_edit_man_junction;
+CREATE OR REPLACE VIEW v_edit_man_junction AS 
+ SELECT node.node_id,
+    node.top_elev AS junction_top_elev,
+    node.ymax AS junction_ymax,
+    node.sander AS junction_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS junction_state,
+    node.annotation AS junction_annotation,
+    node.observ AS junction_observ,
+    node.comment AS junction_comment,
+    node.dma_id,
+    node.soilcat_id AS junction_soilcat_id,
+    node.category_type AS junction_category_type,
+    node.fluid_type AS junction_fluid_type,
+    node.location_type AS junction_location_type,
+    node.workcat_id AS junction_workcat_id,
+    node.buildercat_id AS junction_buildercat_id,
+    node.builtdate AS junction_builderdate,
+    node.ownercat_id AS junction_ownercat_id,
+    node.adress_01 AS junction_adress_01,
+    node.adress_02 AS junction_adress_02,
+    node.adress_03 AS junction_adress_03,
+    node.descript AS junction_descript,
+    node.est_top_elev AS junction_est_top_elev,
+    node.est_ymax AS junction_est_ymax,
+    node.rotation AS junction_rotation,
+    node.link AS junction_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS junction_workcat_id_end,
+    node.undelete,
+    node.label_x AS junction_label_x,
+    node.label_y AS junction_label_y,
+    node.label_rotation AS junction_label_rotation,
+    man_junction.add_info AS junction_add_info
+   FROM node
+     JOIN man_junction ON man_junction.node_id::text = node.node_id::text;
+
+
+	 
+DROP VIEW v_edit_man_outfall;
+
+CREATE OR REPLACE VIEW v_edit_man_outfall AS 
+ SELECT node.node_id,
+    node.top_elev AS outfall_top_elev,
+    node.ymax AS outfall_ymax,
+    node.sander AS outfall_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS outfall_state,
+    node.annotation AS outfall_annotation,
+    node.observ AS outfall_observ,
+    node.comment AS outfall_comment,
+    node.dma_id,
+    node.soilcat_id AS outfall_soilcat_id,
+    node.category_type AS outfall_category_type,
+    node.fluid_type AS outfall_fluid_type,
+    node.location_type AS outfall_location_type,
+    node.workcat_id AS outfall_workcat_id,
+    node.buildercat_id AS outfall_buildercat_id,
+    node.builtdate AS outfall_builderdate,
+    node.ownercat_id AS outfall_ownercat_id,
+    node.adress_01 AS outfall_adress_01,
+    node.adress_02 AS outfall_adress_02,
+    node.adress_03 AS outfall_adress_03,
+    node.descript AS outfall_descript,
+    node.est_top_elev AS outfall_est_top_elev,
+    node.est_ymax AS outfall_est_ymax,
+    node.rotation AS outfall_rotation,
+    node.link AS outfall_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS outfall_workcat_id_end,
+    node.undelete,
+    node.label_x AS outfall_label_x,
+    node.label_y AS outfall_label_y,
+    node.label_rotation AS outfall_label_rotation,
+    man_outfall.add_info AS outfall_add_info,
+    man_outfall.outfall_name
+   FROM node
+     JOIN man_outfall ON man_outfall.node_id::text = node.node_id::text;
+
+
+	 
+DROP VIEW v_edit_man_storage;
+
+CREATE OR REPLACE VIEW v_edit_man_storage AS 
+ SELECT node.node_id,
+    node.top_elev AS storage_top_elev,
+    node.ymax AS storage_ymax,
+    node.sander AS storage_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS storage_state,
+    node.annotation AS storage_annotation,
+    node.observ AS storage_observ,
+    node.comment AS storage_comment,
+    node.dma_id,
+    node.soilcat_id AS storage_soilcat_id,
+    node.category_type AS storage_category_type,
+    node.fluid_type AS storage_fluid_type,
+    node.location_type AS storage_location_type,
+    node.workcat_id AS storage_workcat_id,
+    node.buildercat_id AS storage_buildercat_id,
+    node.builtdate AS storage_builderdate,
+    node.ownercat_id AS storage_ownercat_id,
+    node.adress_01 AS storage_adress_01,
+    node.adress_02 AS storage_adress_02,
+    node.adress_03 AS storage_adress_03,
+    node.descript AS storage_descript,
+    node.est_top_elev AS storage_est_top_elev,
+    node.est_ymax AS storage_est_ymax,
+    node.rotation AS storage_rotation,
+    node.link AS storage_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS storage_workcat_id_end,
+    node.undelete,
+    node.label_x AS storage_label_x,
+    node.label_y AS storage_label_y,
+    node.label_rotation AS storage_label_rotation,
+    man_storage.add_info AS storage_add_info,
+    man_storage.total_volume AS storage_total_volume,
+    man_storage.util_volume AS storage_util_volume,
+    man_storage.min_height AS storage_min_height,
+    man_storage.total_height AS storage_total_height,
+    man_storage.total_length AS storage_total_length,
+    man_storage.total_width AS storage_total_width,
+    man_storage.pol_id,
+    man_storage.storage_name
+   FROM node
+     JOIN man_storage ON man_storage.node_id::text = node.node_id::text;
+
+	 
+
+DROP VIEW v_edit_man_storage_pol;
+
+CREATE OR REPLACE VIEW v_edit_man_storage_pol AS 
+ SELECT 
+    polygon.pol_id,
+    node.node_id,
+    node.top_elev AS storage_top_elev,
+    node.ymax AS storage_ymax,
+    node.sander AS storage_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS storage_state,
+    node.annotation AS storage_annotation,
+    node.observ AS storage_observ,
+    node.comment AS storage_comment,
+    node.dma_id,
+    node.soilcat_id AS storage_soilcat_id,
+    node.category_type AS storage_category_type,
+    node.fluid_type AS storage_fluid_type,
+    node.location_type AS storage_location_type,
+    node.workcat_id AS storage_workcat_id,
+    node.buildercat_id AS storage_buildercat_id,
+    node.builtdate AS storage_builderdate,
+    node.ownercat_id AS storage_ownercat_id,
+    node.adress_01 AS storage_adress_01,
+    node.adress_02 AS storage_adress_02,
+    node.adress_03 AS storage_adress_03,
+    node.descript AS storage_descript,
+    node.est_top_elev AS storage_est_top_elev,
+    node.est_ymax AS storage_est_ymax,
+    node.rotation AS storage_rotation,
+    node.link AS storage_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS storage_workcat_id_end,
+    node.undelete,
+    node.label_x AS storage_label_x,
+    node.label_y AS storage_label_y,
+    node.label_rotation AS storage_label_rotation,
+    man_storage.add_info AS storage_add_info,
+    man_storage.total_volume AS storage_total_volume,
+    man_storage.util_volume AS storage_util_volume,
+    man_storage.min_height AS storage_min_height,
+    man_storage.total_height AS storage_total_height,
+    man_storage.total_length AS storage_total_length,
+    man_storage.total_width AS storage_total_width,
+    man_storage.storage_name
+   FROM node
+     JOIN man_storage ON man_storage.node_id::text = node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_storage.pol_id::text;
+
+	 
+	 
+	 
+DROP VIEW v_edit_man_valve;
+
+CREATE OR REPLACE VIEW v_edit_man_valve AS 
+ SELECT node.node_id,
+    node.top_elev AS valve_top_elev,
+    node.ymax AS valve_ymax,
+    node.sander AS valve_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS valve_state,
+    node.annotation AS valve_annotation,
+    node.observ AS valve_observ,
+    node.comment AS valve_comment,
+    node.dma_id,
+    node.soilcat_id AS valve_soilcat_id,
+    node.category_type AS valve_category_type,
+    node.fluid_type AS valve_fluid_type,
+    node.location_type AS valve_location_type,
+    node.workcat_id AS valve_workcat_id,
+    node.buildercat_id AS valve_buildercat_id,
+    node.builtdate AS valve_builderdate,
+    node.ownercat_id AS valve_ownercat_id,
+    node.adress_01 AS valve_adress_01,
+    node.adress_02 AS valve_adress_02,
+    node.adress_03 AS valve_adress_03,
+    node.descript AS valve_descript,
+    node.est_top_elev AS valve_est_top_elev,
+    node.est_ymax AS valve_est_ymax,
+    node.rotation AS valve_rotation,
+    node.link AS valve_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS valve_workcat_id_end,
+    node.undelete,
+    node.label_x AS valve_label_x,
+    node.label_y AS valve_label_y,
+    node.label_rotation AS valve_label_rotation,
+    man_valve.add_info AS valve_add_info,
+    man_valve.valve_name
+   FROM node
+     JOIN man_valve ON man_valve.node_id::text = node.node_id::text;
+
+	 
+	 
+DROP VIEW v_edit_man_netinit;
+
+CREATE OR REPLACE VIEW v_edit_man_netinit AS 
+ SELECT node.node_id,
+    node.top_elev AS netinit_top_elev,
+    node.ymax AS netinit_ymax,
+    node.sander AS netinit_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS netinit_state,
+    node.annotation AS netinit_annotation,
+    node.observ AS netinit_observ,
+    node.comment AS netinit_comment,
+    node.dma_id,
+    node.soilcat_id AS netinit_soilcat_id,
+    node.category_type AS netinit_category_type,
+    node.fluid_type AS netinit_fluid_type,
+    node.location_type AS netinit_location_type,
+    node.workcat_id AS netinit_workcat_id,
+    node.buildercat_id AS netinit_buildercat_id,
+    node.builtdate AS netinit_builderdate,
+    node.ownercat_id AS netinit_ownercat_id,
+    node.adress_01 AS netinit_adress_01,
+    node.adress_02 AS netinit_adress_02,
+    node.adress_03 AS netinit_adress_03,
+    node.descript AS netinit_descript,
+    node.est_top_elev AS netinit_est_top_elev,
+    node.est_ymax AS netinit_est_ymax,
+    node.rotation AS netinit_rotation,
+    node.link AS netinit_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS netinit_workcat_id_end,
+    node.undelete,
+    node.label_x AS netinit_label_x,
+    node.label_y AS netinit_label_y,
+    node.label_rotation AS netinit_label_rotation,
+    man_netinit.add_info AS netinit_add_info,
+    man_netinit.mheight AS netinit_mheight,
+    man_netinit.mlength AS netinit_mlength,
+    man_netinit.mwidth AS netinit_mwidth,
+    man_netinit.netinit_name
+   FROM node
+     JOIN man_netinit ON man_netinit.node_id::text = node.node_id::text;
+
+
+	 
+DROP VIEW v_edit_man_manhole;
+
+CREATE OR REPLACE VIEW v_edit_man_manhole AS 
+ SELECT node.node_id,
+    node.top_elev AS manhole_top_elev,
+    node.ymax AS manhole_ymax,
+    node.sander AS manhole_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS manhole_state,
+    node.annotation AS manhole_annotation,
+    node.observ AS manhole_observ,
+    node.comment AS manhole_comment,
+    node.dma_id,
+    node.soilcat_id AS manhole_soilcat_id,
+    node.category_type AS manhole_category_type,
+    node.fluid_type AS manhole_fluid_type,
+    node.location_type AS manhole_location_type,
+    node.workcat_id AS manhole_workcat_id,
+    node.buildercat_id AS manhole_buildercat_id,
+    node.builtdate AS manhole_builderdate,
+    node.ownercat_id AS manhole_ownercat_id,
+    node.adress_01 AS manhole_adress_01,
+    node.adress_02 AS manhole_adress_02,
+    node.adress_03 AS manhole_adress_03,
+    node.descript AS manhole_descript,
+    node.est_top_elev AS manhole_est_top_elev,
+    node.est_ymax AS manhole_est_ymax,
+    node.rotation AS manhole_rotation,
+    node.link AS manhole_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS manhole_workcat_id_end,
+    node.undelete,
+    node.label_x AS manhole_label_x,
+    node.label_y AS manhole_label_y,
+    node.label_rotation AS manhole_label_rotation,
+    man_manhole.add_info AS manhole_add_info,
+    man_manhole.sander_depth AS manhole_sander_depth,
+    man_manhole.prot_surface AS manhole_prot_surface
+   FROM node
+     JOIN man_manhole ON man_manhole.node_id::text = node.node_id::text;
+
+	 
+DROP VIEW v_edit_man_wjump;
+
+CREATE OR REPLACE VIEW v_edit_man_wjump AS 
+ SELECT node.node_id,
+    node.top_elev AS wjump_top_elev,
+    node.ymax AS wjump_ymax,
+    node.sander AS wjump_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS wjump_state,
+    node.annotation AS wjump_annotation,
+    node.observ AS wjump_observ,
+    node.comment AS wjump_comment,
+    node.dma_id,
+    node.soilcat_id AS wjump_soilcat_id,
+    node.category_type AS wjump_category_type,
+    node.fluid_type AS wjump_fluid_type,
+    node.location_type AS wjump_location_type,
+    node.workcat_id AS wjump_workcat_id,
+    node.buildercat_id AS wjump_buildercat_id,
+    node.builtdate AS wjump_builderdate,
+    node.ownercat_id AS wjump_ownercat_id,
+    node.adress_01 AS wjump_adress_01,
+    node.adress_02 AS wjump_adress_02,
+    node.adress_03 AS wjump_adress_03,
+    node.descript AS wjump_descript,
+    node.est_top_elev AS wjump_est_top_elev,
+    node.est_ymax AS wjump_est_ymax,
+    node.rotation AS wjump_rotation,
+    node.link AS wjump_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS wjump_workcat_id_end,
+    node.undelete,
+    node.label_x AS wjump_label_x,
+    node.label_y AS wjump_label_y,
+    node.label_rotation AS wjump_label_rotation,
+    man_wjump.add_info AS wjump_add_info,
+    man_wjump.mheight AS wjump_mheight,
+    man_wjump.mlength AS wjump_mlength,
+    man_wjump.mwidth AS wjump_mwidth,
+    man_wjump.sander_length AS wjump_sander_length,
+    man_wjump.sander_depth AS wjump_sander_depth,
+    man_wjump.security_bar AS wjump_security_bar,
+    man_wjump.steps AS wjump_steps,
+    man_wjump.prot_surface AS wjump_prot_surface,
+    man_wjump.wjump_name
+   FROM node
+     JOIN man_wjump ON man_wjump.node_id::text = node.node_id::text;
+
+
+	 
+DROP VIEW v_edit_man_netgully;
+
+CREATE OR REPLACE VIEW v_edit_man_netgully AS 
+ SELECT node.node_id,
+    node.top_elev AS netgully_top_elev,
+    node.ymax AS netgully_ymax,
+    node.sander AS netgully_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS netgully_state,
+    node.annotation AS netgully_annotation,
+    node.observ AS netgully_observ,
+    node.comment AS netgully_comment,
+    node.dma_id,
+    node.soilcat_id AS netgully_soilcat_id,
+    node.category_type AS netgully_category_type,
+    node.fluid_type AS netgully_fluid_type,
+    node.location_type AS netgully_location_type,
+    node.workcat_id AS netgully_workcat_id,
+    node.buildercat_id AS netgully_buildercat_id,
+    node.builtdate AS netgully_builderdate,
+    node.ownercat_id AS netgully_ownercat_id,
+    node.adress_01 AS netgully_adress_01,
+    node.adress_02 AS netgully_adress_02,
+    node.adress_03 AS netgully_adress_03,
+    node.descript AS netgully_descript,
+    node.est_top_elev AS netgully_est_top_elev,
+    node.est_ymax AS netgully_est_ymax,
+    node.rotation AS netgully_rotation,
+    node.link AS netgully_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS netgully_workcat_id_end,
+    node.undelete,
+    node.label_x AS netgully_label_x,
+    node.label_y AS netgully_label_y,
+    node.label_rotation AS netgully_label_rotation,
+    man_netgully.add_info AS netgully_add_info,
+    man_netgully.pol_id
+   FROM node
+     JOIN man_netgully ON man_netgully.node_id::text = node.node_id::text;
+	 
+
+DROP VIEW v_edit_man_netgully_pol;
+
+CREATE OR REPLACE VIEW v_edit_man_netgully_pol AS 
+ SELECT 
+ polygon.pol_id,
+ node.node_id,
+    node.top_elev AS netgully_top_elev,
+    node.ymax AS netgully_ymax,
+    node.sander AS netgully_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS netgully_state,
+    node.annotation AS netgully_annotation,
+    node.observ AS netgully_observ,
+    node.comment AS netgully_comment,
+    node.dma_id,
+    node.soilcat_id AS netgully_soilcat_id,
+    node.category_type AS netgully_category_type,
+    node.fluid_type AS netgully_fluid_type,
+    node.location_type AS netgully_location_type,
+    node.workcat_id AS netgully_workcat_id,
+    node.buildercat_id AS netgully_buildercat_id,
+    node.builtdate AS netgully_builderdate,
+    node.ownercat_id AS netgully_ownercat_id,
+    node.adress_01 AS netgully_adress_01,
+    node.adress_02 AS netgully_adress_02,
+    node.adress_03 AS netgully_adress_03,
+    node.descript AS netgully_descript,
+    node.est_top_elev AS netgully_est_top_elev,
+    node.est_ymax AS netgully_est_ymax,
+    node.rotation AS netgully_rotation,
+    node.link AS netgully_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS netgully_workcat_id_end,
+    node.undelete,
+    node.label_x AS netgully_label_x,
+    node.label_y AS netgully_label_y,
+    node.label_rotation AS netgully_label_rotation,
+    man_netgully.add_info AS netgully_add_info
+   FROM node
+     JOIN man_netgully ON man_netgully.node_id::text = node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_netgully.pol_id::text;	 
+	 DROP VIEW v_edit_man_netgully_pol;	 
+
+ DROP VIEW v_edit_man_chamber;
+
+CREATE OR REPLACE VIEW v_edit_man_chamber AS 
+ SELECT node.node_id,
+    node.top_elev AS chamber_top_elev,
+    node.ymax AS chamber_ymax,
+    node.sander AS chamber_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS chamber_state,
+    node.annotation AS chamber_annotation,
+    node.observ AS chamber_observ,
+    node.comment AS chamber_comment,
+    node.dma_id,
+    node.soilcat_id AS chamber_soilcat_id,
+    node.category_type AS chamber_category_type,
+    node.fluid_type AS chamber_fluid_type,
+    node.location_type AS chamber_location_type,
+    node.workcat_id AS chamber_workcat_id,
+    node.buildercat_id AS chamber_buildercat_id,
+    node.builtdate AS chamber_builderdate,
+    node.ownercat_id AS chamber_ownercat_id,
+    node.adress_01 AS chamber_adress_01,
+    node.adress_02 AS chamber_adress_02,
+    node.adress_03 AS chamber_adress_03,
+    node.descript AS chamber_descript,
+    node.est_top_elev AS chamber_est_top_elev,
+    node.est_ymax AS chamber_est_ymax,
+    node.rotation AS chamber_rotation,
+    node.link AS chamber_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS chamber_workcat_id_end,
+    node.undelete,
+    node.label_x AS chamber_label_x,
+    node.label_y AS chamber_label_y,
+    node.label_rotation AS chamber_label_rotation,
+    man_chamber.add_info AS chamber_add_info,
+    man_chamber.pol_id,
+    man_chamber.total_volume AS chamber_total_volume,
+    man_chamber.total_height AS chamber_total_height,
+    man_chamber.total_length AS chamber_total_length,
+    man_chamber.total_width AS chamber_total_width,
+    man_chamber.chamber_name
+   FROM node
+     JOIN man_chamber ON man_chamber.node_id::text = node.node_id::text;
+	 
+	 
+
+	 
+	 
+DROP VIEW v_edit_man_chamber_pol;
+
+CREATE OR REPLACE VIEW v_edit_man_chamber_pol AS 
+ SELECT 
+ polygon.pol_id,node.node_id,
+    node.top_elev AS chamber_top_elev,
+    node.ymax AS chamber_ymax,
+    node.sander AS chamber_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS chamber_state,
+    node.annotation AS chamber_annotation,
+    node.observ AS chamber_observ,
+    node.comment AS chamber_comment,
+    node.dma_id,
+    node.soilcat_id AS chamber_soilcat_id,
+    node.category_type AS chamber_category_type,
+    node.fluid_type AS chamber_fluid_type,
+    node.location_type AS chamber_location_type,
+    node.workcat_id AS chamber_workcat_id,
+    node.buildercat_id AS chamber_buildercat_id,
+    node.builtdate AS chamber_builderdate,
+    node.ownercat_id AS chamber_ownercat_id,
+    node.adress_01 AS chamber_adress_01,
+    node.adress_02 AS chamber_adress_02,
+    node.adress_03 AS chamber_adress_03,
+    node.descript AS chamber_descript,
+    node.est_top_elev AS chamber_est_top_elev,
+    node.est_ymax AS chamber_est_ymax,
+    node.rotation AS chamber_rotation,
+    node.link AS chamber_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS chamber_workcat_id_end,
+    node.undelete,
+    node.label_x AS chamber_label_x,
+    node.label_y AS chamber_label_y,
+    node.label_rotation AS chamber_label_rotation,
+    man_chamber.add_info AS chamber_add_info,
+    man_chamber.total_volume AS chamber_total_volume,
+    man_chamber.total_height AS chamber_total_height,
+    man_chamber.total_length AS chamber_total_length,
+    man_chamber.total_width AS chamber_total_width,
+    man_chamber.chamber_name
+   FROM node
+     JOIN man_chamber ON man_chamber.node_id::text = node.node_id::text
+      JOIN polygon ON polygon.pol_id::text = man_chamber.pol_id::text;
+
+DROP VIEW v_edit_man_wwtp;
+
+CREATE OR REPLACE VIEW v_edit_man_wwtp AS 
+ SELECT node.node_id,
+    node.top_elev AS wwtp_top_elev,
+    node.ymax AS wwtp_ymax,
+    node.sander AS wwtp_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS wwtp_state,
+    node.annotation AS wwtp_annotation,
+    node.observ AS wwtp_observ,
+    node.comment AS wwtp_comment,
+    node.dma_id,
+    node.soilcat_id AS wwtp_soilcat_id,
+    node.category_type AS wwtp_category_type,
+    node.fluid_type AS wwtp_fluid_type,
+    node.location_type AS wwtp_location_type,
+    node.workcat_id AS wwtp_workcat_id,
+    node.buildercat_id AS wwtp_buildercat_id,
+    node.builtdate AS wwtp_builderdate,
+    node.ownercat_id AS wwtp_ownercat_id,
+    node.adress_01 AS wwtp_adress_01,
+    node.adress_02 AS wwtp_adress_02,
+    node.adress_03 AS wwtp_adress_03,
+    node.descript AS wwtp_descript,
+    node.est_top_elev AS wwtp_est_top_elev,
+    node.est_ymax AS wwtp_est_ymax,
+    node.rotation AS wwtp_rotation,
+    node.link AS wwtp_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS wwtp_workcat_id_end,
+    node.undelete,
+    node.label_x AS wwtp_label_x,
+    node.label_y AS wwtp_label_y,
+    node.label_rotation AS wwtp_label_rotation,
+    man_wwtp.add_info AS wwtp_add_info,
+    man_wwtp.pol_id,
+    man_wwtp.wwtp_name
+   FROM node
+     JOIN man_wwtp ON man_wwtp.node_id::text = node.node_id::text;
+
+
+DROP VIEW v_edit_man_wwtp_pol;
+
+CREATE OR REPLACE VIEW v_edit_man_wwtp_pol AS 
+ SELECT 
+    polygon.pol_id,
+    node.node_id,
+    node.top_elev AS wwtp_top_elev,
+    node.ymax AS wwtp_ymax,
+    node.sander AS wwtp_sander,
+    node.node_type,
+    node.nodecat_id,
+    node.epa_type,
+    node.sector_id,
+    node.state AS wwtp_state,
+    node.annotation AS wwtp_annotation,
+    node.observ AS wwtp_observ,
+    node.comment AS wwtp_comment,
+    node.dma_id,
+    node.soilcat_id AS wwtp_soilcat_id,
+    node.category_type AS wwtp_category_type,
+    node.fluid_type AS wwtp_fluid_type,
+    node.location_type AS wwtp_location_type,
+    node.workcat_id AS wwtp_workcat_id,
+    node.buildercat_id AS wwtp_buildercat_id,
+    node.builtdate AS wwtp_builderdate,
+    node.ownercat_id AS wwtp_ownercat_id,
+    node.adress_01 AS wwtp_adress_01,
+    node.adress_02 AS wwtp_adress_02,
+    node.adress_03 AS wwtp_adress_03,
+    node.descript AS wwtp_descript,
+    node.est_top_elev AS wwtp_est_top_elev,
+    node.est_ymax AS wwtp_est_ymax,
+    node.rotation AS wwtp_rotation,
+    node.link AS wwtp_link,
+    node.verified,
+    node.the_geom,
+    node.workcat_id_end AS wwtp_workcat_id_end,
+    node.undelete,
+    node.label_x AS wwtp_label_x,
+    node.label_y AS wwtp_label_y,
+    node.label_rotation AS wwtp_label_rotation,
+    man_wwtp.add_info AS wwtp_add_info,
+    man_wwtp.wwtp_name
+   FROM node
+     JOIN man_wwtp ON man_wwtp.node_id::text = node.node_id::text
+     JOIN polygon ON polygon.pol_id::text = man_wwtp.pol_id::text;
+
+
+	 
+
+DROP VIEW v_edit_man_conduit;
+
+CREATE OR REPLACE VIEW v_edit_man_conduit AS 
+ SELECT arc.arc_id,
+    arc.node_1 AS conduit_node_1,
+    arc.node_2 AS conduit_node_2,
+    arc.y1 AS conduit_y1,
+    arc.y2 AS conduit_y2,
+    v_arc_x_node.z1 AS conduit_z1,
+    v_arc_x_node.z2 AS conduit_z2,
+    v_arc_x_node.r1 AS conduit_r1,
+    v_arc_x_node.r2 AS conduit_r2,
+    v_arc_x_node.slope AS conduit_slope,
+    arc.arc_type,
+    arc.arccat_id,
+    cat_arc.matcat_id AS cat_matcat_id,
+    cat_arc.shape AS conduit_cat_shape,
+    cat_arc.geom1 AS cat_geom1,
+    st_length2d(arc.the_geom)::numeric(12,2) AS conduit_gis_length,
+    arc.epa_type,
+    arc.sector_id,
+    arc.state AS conduit_state,
+    arc.annotation AS conduit_annotation,
+    arc.observ AS conduit_observ,
+    arc.comment AS conduit_comment,
+    arc.inverted_slope AS conduit_inverted_slope,
+    arc.custom_length AS conduit_custom_length,
+    arc.dma_id,
+    arc.soilcat_id AS conduit_soilcat_id,
+    arc.category_type AS conduit_category_type,
+    arc.fluid_type AS conduit_fluid_type,
+    arc.location_type AS conduit_location_type,
+    arc.workcat_id AS conduit_workcat_id,
+    arc.buildercat_id AS conduit_buildercat_id,
+    arc.builtdate AS conduit_builtdate,
+    arc.ownercat_id AS conduit_ownercat_id,
+    arc.adress_01 AS conduit_adress_01,
+    arc.adress_02 AS conduit_adress_02,
+    arc.adress_03 AS conduit_adress_03,
+    arc.descript AS conduit_descript,
+    cat_arc.svg AS conduit_cat_svg,
+    arc.est_y1 AS conduit_est_y1,
+    arc.est_y2 AS conduit_est_y2,
+    arc.rotation AS conduit_rotation,
+    arc.link AS conduit_link,
+    arc.verified,
+    arc.the_geom,
+    v_arc_x_node.elev1 AS conduit_elev1,
+    v_arc_x_node.elev2 AS conduit_elev2,
+    arc.workcat_id_end AS conduit_workcat_id_end,
+    arc.undelete,
+    arc.label_x AS conduit_label_x,
+    arc.label_y AS conduit_label_y,
+    arc.label_rotation AS conduit_label_rotation,
+    man_conduit.add_info AS conduit_add_info
+   FROM arc
+     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN man_conduit ON man_conduit.arc_id::text = arc.arc_id::text;
+
+ALTER TABLE v_edit_man_conduit
+  OWNER TO postgres;
+
+
+
+
+
+DROP VIEW v_edit_man_siphon;
+
+CREATE OR REPLACE VIEW v_edit_man_siphon AS 
+ SELECT arc.arc_id,
+    arc.node_1 AS siphon_node_1,
+    arc.node_2 AS siphon_node_2,
+    arc.y1 AS siphon_y1,
+    arc.y2 AS siphon_y2,
+    v_arc_x_node.z1 AS siphon_z1,
+    v_arc_x_node.z2 AS siphon_z2,
+    v_arc_x_node.r1 AS siphon_r1,
+    v_arc_x_node.r2 AS siphon_r2,
+    v_arc_x_node.slope AS siphon_slope,
+    arc.arc_type,
+    arc.arccat_id,
+    cat_arc.matcat_id AS cat_matcat_id,
+    cat_arc.shape AS siphon_cat_shape,
+    cat_arc.geom1 AS cat_geom1,
+    st_length2d(arc.the_geom)::numeric(12,2) AS siphon_gis_length,
+    arc.epa_type,
+    arc.sector_id,
+    arc.state AS siphon_state,
+    arc.annotation AS siphon_annotation,
+    arc.observ AS siphon_observ,
+    arc.comment AS siphon_comment,
+    arc.inverted_slope AS siphon_inverted_slope,
+    arc.custom_length AS siphon_custom_length,
+    arc.dma_id,
+    arc.soilcat_id AS siphon_soilcat_id,
+    arc.category_type AS siphon_category_type,
+    arc.fluid_type AS siphon_fluid_type,
+    arc.location_type AS siphon_location_type,
+    arc.workcat_id AS siphon_workcat_id,
+    arc.buildercat_id AS siphon_buildercat_id,
+    arc.builtdate AS siphon_builtdate,
+    arc.ownercat_id AS siphon_ownercat_id,
+    arc.adress_01 AS siphon_adress_01,
+    arc.adress_02 AS siphon_adress_02,
+    arc.adress_03 AS siphon_adress_03,
+    arc.descript AS siphon_descript,
+    cat_arc.svg AS siphon_cat_svg,
+    arc.est_y1 AS siphon_est_y1,
+    arc.est_y2 AS siphon_est_y2,
+    arc.rotation AS siphon_rotation,
+    arc.link AS siphon_link,
+    arc.verified,
+    arc.the_geom,
+    v_arc_x_node.elev1 AS siphon_elev1,
+    v_arc_x_node.elev2 AS siphon_elev2,
+    arc.workcat_id_end AS siphon_workcat_id_end,
+    arc.undelete,
+    arc.label_x AS siphon_label_x,
+    arc.label_y AS siphon_label_y,
+    arc.label_rotation AS siphon_label_rotation,
+    man_siphon.add_info AS siphon_add_info,
+    man_siphon.security_bar AS siphon_security_bar,
+    man_siphon.steps AS siphon_steps,
+    man_siphon.siphon_name
+   FROM arc
+     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN man_siphon ON man_siphon.arc_id::text = arc.arc_id::text;
+
+
+
+
+
+DROP VIEW v_edit_man_waccel;
+
+CREATE OR REPLACE VIEW v_edit_man_waccel AS 
+ SELECT arc.arc_id,
+    arc.node_1 AS waccel_node_1,
+    arc.node_2 AS waccel_node_2,
+    arc.y1 AS waccel_y1,
+    arc.y2 AS waccel_y2,
+    v_arc_x_node.z1 AS waccel_z1,
+    v_arc_x_node.z2 AS waccel_z2,
+    v_arc_x_node.r1 AS waccel_r1,
+    v_arc_x_node.r2 AS waccel_r2,
+    v_arc_x_node.slope AS waccel_slope,
+    arc.arc_type,
+    arc.arccat_id,
+    cat_arc.matcat_id AS cat_matcat_id,
+    cat_arc.shape AS waccel_cat_shape,
+    cat_arc.geom1 AS cat_geom1,
+    st_length2d(arc.the_geom)::numeric(12,2) AS waccel_gis_length,
+    arc.epa_type,
+    arc.sector_id,
+    arc.state AS waccel_state,
+    arc.annotation AS waccel_annotation,
+    arc.observ AS waccel_observ,
+    arc.comment AS waccel_comment,
+    arc.inverted_slope AS waccel_inverted_slope,
+    arc.custom_length AS waccel_custom_length,
+    arc.dma_id,
+    arc.soilcat_id AS waccel_soilcat_id,
+    arc.category_type AS waccel_category_type,
+    arc.fluid_type AS waccel_fluid_type,
+    arc.location_type AS waccel_location_type,
+    arc.workcat_id AS waccel_workcat_id,
+    arc.buildercat_id AS waccel_buildercat_id,
+    arc.builtdate AS waccel_builtdate,
+    arc.ownercat_id AS waccel_ownercat_id,
+    arc.adress_01 AS waccel_adress_01,
+    arc.adress_02 AS waccel_adress_02,
+    arc.adress_03 AS waccel_adress_03,
+    arc.descript AS waccel_descript,
+    cat_arc.svg AS waccel_cat_svg,
+    arc.est_y1 AS waccel_est_y1,
+    arc.est_y2 AS waccel_est_y2,
+    arc.rotation AS waccel_rotation,
+    arc.link AS waccel_link,
+    arc.verified,
+    arc.the_geom,
+    v_arc_x_node.elev1 AS waccel_elev1,
+    v_arc_x_node.elev2 AS waccel_elev2,
+    arc.workcat_id_end AS waccel_workcat_id_end,
+    arc.undelete,
+    arc.label_x AS waccel_label_x,
+    arc.label_y AS waccel_label_y,
+    arc.label_rotation AS waccel_label_rotation,
+    man_waccel.add_info AS waccel_add_info,
+    man_waccel.sander_length AS waccel_sander_length,
+    man_waccel.sander_depth AS waccel_sander_depth,
+    man_waccel.security_bar AS waccel_security_bar,
+    man_waccel.steps AS waccel_steps,
+    man_waccel.prot_surface AS waccel_prot_surface,
+    man_waccel.waccel_name
+   FROM arc
+     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN man_waccel ON man_waccel.arc_id::text = arc.arc_id::text;
+
+
+
+
+DROP VIEW v_edit_man_varc;
+
+CREATE OR REPLACE VIEW v_edit_man_varc AS 
+ SELECT arc.arc_id,
+    arc.node_1 AS varc_node_1,
+    arc.node_2 AS varc_node_2,
+    arc.y1 AS varc_y1,
+    arc.y2 AS varc_y2,
+    v_arc_x_node.z1 AS varc_z1,
+    v_arc_x_node.z2 AS varc_z2,
+    v_arc_x_node.r1 AS varc_r1,
+    v_arc_x_node.r2 AS varc_r2,
+    v_arc_x_node.slope AS varc_slope,
+    arc.arc_type,
+    arc.arccat_id,
+    cat_arc.matcat_id AS cat_matcat_id,
+    cat_arc.shape AS varc_cat_shape,
+    cat_arc.geom1 AS cat_geom1,
+    st_length2d(arc.the_geom)::numeric(12,2) AS varc_gis_length,
+    arc.epa_type,
+    arc.sector_id,
+    arc.state AS varc_state,
+    arc.annotation AS varc_annotation,
+    arc.observ AS varc_observ,
+    arc.comment AS varc_comment,
+    arc.inverted_slope AS varc_inverted_slope,
+    arc.custom_length AS varc_custom_length,
+    arc.dma_id,
+    arc.soilcat_id AS varc_soilcat_id,
+    arc.category_type AS varc_category_type,
+    arc.fluid_type AS varc_fluid_type,
+    arc.location_type AS varc_location_type,
+    arc.workcat_id AS varc_workcat_id,
+    arc.buildercat_id AS varc_buildercat_id,
+    arc.builtdate AS varc_builtdate,
+    arc.ownercat_id AS varc_ownercat_id,
+    arc.adress_01 AS varc_adress_01,
+    arc.adress_02 AS varc_adress_02,
+    arc.adress_03 AS varc_adress_03,
+    arc.descript AS varc_descript,
+    cat_arc.svg AS varc_cat_svg,
+    arc.est_y1 AS varc_est_y1,
+    arc.est_y2 AS varc_est_y2,
+    arc.rotation AS varc_rotation,
+    arc.link AS varc_link,
+    arc.verified,
+    arc.the_geom,
+    v_arc_x_node.elev1 AS varc_elev1,
+    v_arc_x_node.elev2 AS varc_elev2,
+    arc.workcat_id_end AS varc_workcat_id_end,
+    arc.undelete,
+    arc.label_x AS varc_label_x,
+    arc.label_y AS varc_label_y,
+    arc.label_rotation AS varc_label_rotation,
+    man_varc.add_info AS varc_add_info
+   FROM arc
+     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN man_varc ON man_varc.arc_id::text = arc.arc_id::text;
 
 

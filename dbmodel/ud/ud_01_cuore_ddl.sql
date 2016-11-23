@@ -220,6 +220,10 @@ CREATE TABLE "cat_arc" (
 "cost" varchar (16),
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
+"geom5" numeric(12,4) DEFAULT 0.00,
+"geom6" numeric(12,4) DEFAULT 0.00,
+"geom7" numeric(12,4) DEFAULT 0.00,
+"geom8" numeric(12,4) DEFAULT 0.00,
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
@@ -368,6 +372,11 @@ id varchar (18),
  CONSTRAINT cat_pavement_pkey PRIMARY KEY (id)
  );
 
+ 
+ CREATE TABLE "cat_feature" (
+id character varying(50) NOT NULL,
+CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
+);
 
 
 -----------
@@ -459,6 +468,10 @@ CREATE TABLE "node" (
 "verified" varchar(20) ,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
+"workcat_id_end" character varying(255),
+"label_x" character varying(30),
+"label_y" character varying(30),
+"label_rotation" numeric(6,3),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -501,6 +514,10 @@ CREATE TABLE "arc" (
 "verified" varchar(20),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "undelete" boolean,
+"label_x" character varying(30),
+"label_y" character varying(30),
+"label_rotation" numeric(6,3),
+"workcat_id_end" character varying(255),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -561,6 +578,17 @@ CREATE TABLE "connec" (
 "verified" varchar(20)  , 
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
+"workcat_id_end" character varying(255),
+"y1" numeric(12,4),
+"y2" numeric(12,4),
+"featurecat_id" character varying(50),
+"feature_id" character varying(16),
+"private_connecat_id" character varying(30),
+"label_x" character varying(30),
+"label_y" character varying(30),
+"label_rotation" numeric(6,3),
+"accessibility" boolean,
+"diagonal" character varying(50),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -626,8 +654,32 @@ CREATE TABLE "gully" (
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "the_geom_pol" public.geometry (POLYGON, SRID_VALUE),
 "undelete" boolean,
+"workcat_id_end" character varying(255),
+"featurecat_id" character varying(50),
+"feature_id" character varying(16),
+"label_x" character varying(30),
+"label_y" character varying(30),
+"label_rotation" numeric(6,3),
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
+
+CREATE TABLE "samplepoint"
+(
+  "sample_id" character varying(16) NOT NULL,
+  "state" character varying(150),
+  "featurecat_id" character varying(50),
+  "feature_id2" character varying(15),
+  "rotation" numeric(12,3),
+  "code_lab" integer,
+  "element_type" character varying(150),
+  "street1" character varying(254),
+  "street2" character varying(254),
+  "representative" boolean,
+  "place_name" character varying(254),
+  "origin" character varying(254),
+  "the_geom" geometry(Point,25831),
+  CONSTRAINT samplepoint_pkey PRIMARY KEY (sample_id)
+  );
 
 
 
@@ -636,26 +688,108 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 -- ----------------------------
 
 
+CREATE TABLE "man_netinit" (
+"node_id" varchar(16) NOT NULL,
+"mheight" numeric(12,3),
+"mlength" numeric(12,3),
+"mwidth" numeric(12,3),
+"add_info" varchar(255),
+"netinit_name" varchar(255),
+CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
+);
+
+
 CREATE TABLE "man_junction" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
-CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
+CONSTRAINT man_netinit_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_manhole" (
+"node_id" varchar(16) NOT NULL,
+"sander_depth" numeric(12,3),
+"prot_surface" bool,
+"add_info" varchar(255),
+CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_wjump" (
+"node_id" varchar(16) NOT NULL,
+"mheight" numeric(12,3),
+"mlength" numeric(12,3),
+"mwidth" numeric(12,3),
+"sander_length" numeric(12,3),
+"sander_depth" numeric(12,3),
+"security_bar" bool,
+"steps" bool,
+"prot_surface" bool,
+"add_info" varchar(255),
+"wjump_name" varchar(255),
+CONSTRAINT man_wjump_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_valve" (
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
+"valve_name" varchar(255),
+CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
+);
+
+CREATE TABLE "man_outfall" (
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
+"otufall_name" varchar(255),
+CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
+);
+
+
+
+CREATE TABLE "man_netgully" (
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
+"pol_id" character varying(16),
+CONSTRAINT man_netgully_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_chamber" (
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
+"pol_id" character varying(16),
+"total_volume" numeric(12,3),
+"total_height" numeric(12,3),
+"total_length" numeric(12,3),
+"total_width" numeric(12,3),
+"chamber_name" varchar(255),
+CONSTRAINT man_chamber_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_storage" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
+"pol_id" character varying(16),
+"total_volume" numeric(12,3),
+"util_volume" numeric(12,3),
+"min_height" numeric(12,3),
+"total_height" numeric(12,3),
+"total_length" numeric(12,3),
+"total_width" numeric(12,3),
+"storage_name" varchar(255),
 CONSTRAINT man_storage_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "man_outfall" (
+CREATE TABLE "man_wwtp" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
-CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
+"pol_id" character varying(16),
+"wwtp_name" varchar(255),
+CONSTRAINT man_wwtp_pkey PRIMARY KEY (node_id)
 );
-
 
 
 CREATE TABLE "man_conduit" (
@@ -664,7 +798,33 @@ CREATE TABLE "man_conduit" (
 CONSTRAINT man_conduit_pkey PRIMARY KEY (arc_id)
 );
 
+CREATE TABLE "man_siphon" (
+"arc_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
+"security_bar" bool,
+"steps" bool,
+"siphon_name" varchar(255),
+CONSTRAINT man_siphon_pkey PRIMARY KEY (arc_id)
+);
 
+
+CREATE TABLE "man_waccel" (
+"arc_id" varchar(16) NOT NULL,
+"add_info" varchar(255),
+"sander_length" numeric(12,3),
+"sander_depth" numeric(12,3),
+"security_bar" bool,
+"steps" bool,
+"prot_surface" bool,
+"waccel_name" varchar(255),
+CONSTRAINT man_waccel_pkey PRIMARY KEY (arc_id)
+);
+
+CREATE TABLE "man_varc"(
+"arc_id" character varying(16) NOT NULL,
+"add_info" character varying(255),
+CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
+);
 
 -- ----------------------------------
 -- Table: Element
@@ -686,6 +846,7 @@ CREATE TABLE "element" (
 "rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(20) ,
+"workcat_id_end" varchar(255)  ,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
