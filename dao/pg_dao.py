@@ -41,7 +41,6 @@ class PgDao():
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()     
         except Exception as e:
-            print "get_rows: {0}".format(e)
             self.last_error = e               
             self.rollback()             
         finally:
@@ -56,7 +55,6 @@ class PgDao():
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
         except Exception as e:
-            print "get_row: {0}".format(e)
             self.last_error = e               
             self.rollback()             
         finally:
@@ -93,8 +91,7 @@ class PgDao():
             self.cursor.execute(sql) 
             if autocommit:
                 self.commit()
-        except Exception as e:
-            print "execute_sql: {0}".format(e)   
+        except Exception as e: 
             self.last_error = e               
             status = False
             self.rollback() 

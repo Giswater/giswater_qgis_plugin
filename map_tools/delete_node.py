@@ -43,6 +43,7 @@ class DeleteNodeMapTool(ParentMapTool):
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
 
+
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
@@ -73,6 +74,7 @@ class DeleteNodeMapTool(ParentMapTool):
                     self.vertexMarker.show()
 
                     break
+                
 
     def canvasReleaseEvent(self, event):
 
@@ -112,11 +114,11 @@ class DeleteNodeMapTool(ParentMapTool):
 
                 # Execute SQL function and show result to the user
                 function_name = "gw_fct_delete_node"
-                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+                sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
                 status = self.controller.execute_sql(sql)
                 if status:
                     message = "Node deleted successfully"
-                    self.controller.show_warning(message, context_name='ui_message' )  
+                    self.controller.show_info(message, context_name='ui_message')  
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refresh()
