@@ -157,18 +157,16 @@ CREATE TABLE "plan_value_ps_priority" (
 );
 
 
--- Used to show economic data
-CREATE TABLE "plan_selector_economic" (
+-- Used to filter features by planning issues
+CREATE TABLE "plan_selector_state" (
   "id" character varying(16) NOT NULL,
-  "observ" character varying(254),
-  CONSTRAINT plan_selector_economic_pkey PRIMARY KEY (id)
+  CONSTRAINT plan_selector_state_pkey PRIMARY KEY (id)
 );
 
 
--- Used to show a defined range of psector features on map composer
+-- Used to filter show a defined range of psector features on map composer
 CREATE TABLE "plan_selector_psector" (
   "id" character varying(16) NOT NULL,
-  "observ" character varying(254),
   CONSTRAINT plan_selector_psector_pkey PRIMARY KEY (id)
 );
 

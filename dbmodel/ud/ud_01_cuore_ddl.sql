@@ -748,6 +748,12 @@ CREATE TABLE "value_yesno" (
 );
 
 
+-- Used to filter features by management issues
+CREATE TABLE "man_selector_state" (
+  "id" character varying(16) NOT NULL,
+  CONSTRAINT man_selector_state_pkey PRIMARY KEY (id)
+);
+
 
 ----------------
 -- SPATIAL INDEX

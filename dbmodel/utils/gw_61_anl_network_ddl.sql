@@ -59,9 +59,9 @@ CONSTRAINT anl_arc_no_startend_node_pkey PRIMARY KEY (arc_id)
 );
 
 
-CREATE TABLE "anl_state"(
-id character varying(16),
-CONSTRAINT anl_state_pkey PRIMARY KEY (id)
+CREATE TABLE "anl_selector_state" (
+  "id" character varying(16) NOT NULL,
+  CONSTRAINT man_selector_state_pkey PRIMARY KEY (id)
 );
 
 

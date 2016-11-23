@@ -247,7 +247,7 @@ v_plan_ml_arc.cost_unit,
 
 FROM v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
-	JOIN plan_selector_economic ON (((v_plan_ml_arc."state")::text = (plan_selector_economic.id)::text));
+	JOIN plan_selector_state ON (((v_plan_ml_arc."state")::text = (plan_selector_state.id)::text));
 
 
 
@@ -284,7 +284,7 @@ v_plan_ml_arc.the_geom
 
 FROM v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
-	JOIN plan_selector_economic ON (((v_plan_ml_arc."state")::text = (plan_selector_economic.id)::text));
+	JOIN plan_selector_state ON (((v_plan_ml_arc."state")::text = (plan_selector_state.id)::text));
 
 
 
@@ -307,7 +307,7 @@ node.the_geom
 
 FROM (v_node node
 LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
-JOIN plan_selector_economic ON (((node."state")::text = (plan_selector_economic.id)::text));
+JOIN plan_selector_state ON (((node."state")::text = (plan_selector_state.id)::text));
 
 
 

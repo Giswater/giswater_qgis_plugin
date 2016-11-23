@@ -8,28 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP VIEW IF EXISTS v_anl_arc CASCADE;
-CREATE VIEW v_anl_arc AS 
-SELECT
-FROM arc
-JOIN anl_state
-;
-
-DROP VIEW IF EXISTS v_anl_node CASCADE;
-CREATE VIEW v_anl_node AS 
-SELECT
-FROM node
-JOIN anl_state
-;
-
-DROP VIEW IF EXISTS v_anl_connec CASCADE;
-CREATE VIEW v_anl_connec AS 
-SELECT
-FROM connec
-JOIN anl_state
-;
-
-
 DROP VIEW IF EXISTS v_audit_functions CASCADE;
 CREATE VIEW v_audit_functions AS 
 SELECT tstamp, audit_cat_error.id, audit_cat_error.error_message, audit_cat_error.hint_message, audit_cat_error.log_level, audit_cat_error.show_user, user_name, addr, debug_info

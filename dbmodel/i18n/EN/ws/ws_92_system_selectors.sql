@@ -14,14 +14,23 @@ INSERT INTO inp_selector_state VALUES ('ON_SERVICE');
 
 
 -- ----------------------------
--- Records of plan_selector_economic
+-- Records of plan_selector_state
 -- ----------------------------
-INSERT INTO plan_selector_economic VALUES ('ON_SERVICE');
-INSERT INTO plan_selector_economic VALUES ('RECONSTRUCT');
-INSERT INTO plan_selector_economic VALUES ('REPLACE');
-INSERT INTO plan_selector_economic VALUES ('PLANIFIED');
+INSERT INTO plan_selector_state VALUES ('ON_SERVICE');
+INSERT INTO plan_selector_state VALUES ('RECONSTRUCT');
+INSERT INTO plan_selector_state VALUES ('REPLACE');
+INSERT INTO plan_selector_state VALUES ('PLANIFIED');
 
 
+-- ----------------------------
+-- Records of man_selector_state
+-- ----------------------------
+INSERT INTO "man_selector_state" VALUES ('ON_SERVICE');
+
+-- ----------------------------
+-- Records of anl_selector_state
+-- ----------------------------
+INSERT INTO "anl_selector_state" VALUES ('ON_SERVICE');
 
 -- ----------------------------
 -- Default values of valve selection

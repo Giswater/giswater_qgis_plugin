@@ -14,12 +14,23 @@ INSERT INTO inp_selector_state VALUES ('EN_SERVICIO');
 
 
 -- ----------------------------
--- Records of plan_selector_economic
+-- Records of plan_selector_state
 -- ----------------------------
-INSERT INTO plan_selector_economic VALUES ('EN_SERVICIO');
-INSERT INTO plan_selector_economic VALUES ('RECONSTRUIR');
-INSERT INTO plan_selector_economic VALUES ('SUBSTITUIR');
-INSERT INTO plan_selector_economic VALUES ('PLANIFICADO');
+INSERT INTO plan_selector_state VALUES ('EN_SERVICIO');
+INSERT INTO plan_selector_state VALUES ('RECONSTRUIR');
+INSERT INTO plan_selector_state VALUES ('SUBSTITUIR');
+INSERT INTO plan_selector_state VALUES ('PLANIFICADO');
+
+-- ----------------------------
+-- Records of man_selector_state
+-- ----------------------------
+INSERT INTO "man_selector_state" VALUES ('EN_SERVICIO');
+
+
+-- ----------------------------
+-- Records of anl_selector_state
+-- ----------------------------
+INSERT INTO "anl_selector_state" VALUES ('EN_SERVICIO');
 
 
 

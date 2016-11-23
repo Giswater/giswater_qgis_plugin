@@ -20,11 +20,22 @@ INSERT INTO "inp_selector_state" VALUES ('EN_SERVEI');
 INSERT INTO "inp_selector_hydrology" VALUES ('CH_PER_DEFECTE');
 
 
+-- ----------------------------
+-- Records of plan_selector_state
+-- ----------------------------
+INSERT INTO "plan_selector_state" VALUES ('EN_SERVEI');
+INSERT INTO "plan_selector_state" VALUES ('RECONSTRUIR');
+INSERT INTO "plan_selector_state" VALUES ('SUBSTITUIR');
+INSERT INTO "plan_selector_state" VALUES ('PLANIFICAT');
+
 
 -- ----------------------------
--- Records of plan_selector_economic
+-- Records of man_selector_state
 -- ----------------------------
-INSERT INTO "plan_selector_economic" VALUES ('EN_SERVEI');
-INSERT INTO "plan_selector_economic" VALUES ('RECONSTRUIR');
-INSERT INTO "plan_selector_economic" VALUES ('SUBSTITUIR');
-INSERT INTO "plan_selector_economic" VALUES ('PLANIFICAT');
+INSERT INTO "man_selector_state" VALUES ('EN_SERVEI');
+
+
+-- ----------------------------
+-- Records of anl_selector_state
+-- ----------------------------
+INSERT INTO "anl_selector_state" VALUES ('EN_SERVEI');
