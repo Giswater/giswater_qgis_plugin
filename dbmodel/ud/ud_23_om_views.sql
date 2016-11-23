@@ -10,8 +10,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS v_ui_om_visit_event_x_gully CASCADE;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_event_x_gully AS 
 SELECT
-om_visit_event.id,
-om_visit.id,
+om_visit_event.id as event_id,
+om_visit.id as visit_id,
 om_visit.startdate,
 om_visit.enddate,
 om_visit.user_name,
@@ -29,5 +29,5 @@ FROM om_visit_event
 JOIN om_visit ON om_visit.id = om_visit_event.visit_id
 JOIN om_visit_x_gully ON om_visit_x_gully.visit_id=om_visit.id
 JOIN om_visit_parameter ON om_visit_parameter.id=om_visit_event.parameter_id
-JOIN gully ON gully.gully_id = mo_visit_x_gully.gully_id
+JOIN gully ON gully.gully_id = om_visit_x_gully.gully_id
 ORDER BY gully_id;

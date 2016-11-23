@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
+/*
 DROP VIEW IF EXISTS v_rtc_hydrometer CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 SELECT
@@ -120,3 +120,4 @@ CREATE OR REPLACE VIEW v_inp_dwf_flow AS
    JOIN inp_selector_state ON node.state::text = inp_selector_state.id::text
    JOIN v_rtc_hydrometer_arc ON ¿?¿?¿?
    JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::text = v_rtc_hydrometer_x_arc.hydrometer_id::text
+*/

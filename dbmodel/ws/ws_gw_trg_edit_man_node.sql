@@ -4,11 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 */
 
 
--- Function: "SCHEMA NAME".gw_trg_edit_man_node()
+-- Function: "SCHEMA_NAME".gw_trg_edit_man_node()
 
--- DROP FUNCTION "SCHEMA NAME".gw_trg_edit_man_node();
+-- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node();
 
-CREATE OR REPLACE FUNCTION "SCHEMA NAME".gw_trg_edit_man_node()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -336,35 +336,35 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION "SCHEMA NAME".gw_trg_edit_man_node()
+ALTER FUNCTION "SCHEMA_NAME".gw_trg_edit_man_node()
   OWNER TO postgres;
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_hydrant ON "SCHEMA NAME".v_edit_man_hydrant;
-CREATE TRIGGER gw_trg_edit_man_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_hydrant FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_hydrant');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_hydrant ON "SCHEMA_NAME".v_edit_man_hydrant;
+CREATE TRIGGER gw_trg_edit_man_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_hydrant FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_hydrant');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_pump ON "SCHEMA NAME".v_edit_man_pump;
-CREATE TRIGGER gw_trg_edit_man_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_pump FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_pump');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_pump ON "SCHEMA_NAME".v_edit_man_pump;
+CREATE TRIGGER gw_trg_edit_man_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pump FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_pump');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_manhole ON "SCHEMA NAME".v_edit_man_manhole;
-CREATE TRIGGER gw_trg_edit_man_manhole INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_manhole FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_manhole');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_manhole ON "SCHEMA_NAME".v_edit_man_manhole;
+CREATE TRIGGER gw_trg_edit_man_manhole INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_manhole FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_manhole');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_source ON "SCHEMA NAME".v_edit_man_source;
-CREATE TRIGGER gw_trg_edit_man_source INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_source FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_source');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_source ON "SCHEMA_NAME".v_edit_man_source;
+CREATE TRIGGER gw_trg_edit_man_source INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_source FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_source');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_meter ON "SCHEMA NAME".v_edit_man_meter;
-CREATE TRIGGER gw_trg_edit_man_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_meter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_meter');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_meter ON "SCHEMA_NAME".v_edit_man_meter;
+CREATE TRIGGER gw_trg_edit_man_meter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_meter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_meter');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_tank ON "SCHEMA NAME".v_edit_man_tank;
-CREATE TRIGGER gw_trg_edit_man_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_tank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_tank');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_tank ON "SCHEMA_NAME".v_edit_man_tank;
+CREATE TRIGGER gw_trg_edit_man_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_tank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_tank');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_junction ON "SCHEMA NAME".v_edit_man_junction;
-CREATE TRIGGER gw_trg_edit_man_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_junction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_junction');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_junction ON "SCHEMA_NAME".v_edit_man_junction;
+CREATE TRIGGER gw_trg_edit_man_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_junction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_junction');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_waterwell ON "SCHEMA NAME".v_edit_man_waterwell;
-CREATE TRIGGER gw_trg_edit_man_waterwell INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_waterwell FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_waterwell');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_waterwell ON "SCHEMA_NAME".v_edit_man_waterwell;
+CREATE TRIGGER gw_trg_edit_man_waterwell INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_waterwell FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_waterwell');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_reduction ON "SCHEMA NAME".v_edit_man_reduction;
-CREATE TRIGGER gw_trg_edit_man_reduction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_reduction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_reduction');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_reduction ON "SCHEMA_NAME".v_edit_man_reduction;
+CREATE TRIGGER gw_trg_edit_man_reduction INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_reduction FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_reduction');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_valve ON "SCHEMA NAME".v_edit_man_valve;
-CREATE TRIGGER gw_trg_edit_man_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_node('man_valve');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_valve ON "SCHEMA_NAME".v_edit_man_valve;
+CREATE TRIGGER gw_trg_edit_man_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_valve');

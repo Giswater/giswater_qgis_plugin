@@ -753,7 +753,6 @@ CREATE OR REPLACE VIEW v_edit_man_netgully_pol AS
    FROM node
      JOIN man_netgully ON man_netgully.node_id::text = node.node_id::text
      JOIN polygon ON polygon.pol_id::text = man_netgully.pol_id::text;	 
-	 DROP VIEW v_edit_man_netgully_pol;	 
 
 
 

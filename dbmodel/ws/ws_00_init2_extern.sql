@@ -28,13 +28,14 @@ CREATE TABLE "ext_streetaxis" (
 CONSTRAINT ext_streetaxis_pkey PRIMARY KEY (id)
 );
 
+
 -- Postnumber
 CREATE TABLE "ext_postnumber"(
   id character varying(16) NOT NULL,
   streetaxis character varying(16),
   postnumber character varying(16),
   urban_properties_id character varying(16),
-  the_geom geometry(Point,25831),
+  the_geom geometry(Point,SRID_VALUE),
   CONSTRAINT ext_postnumber_pkey PRIMARY KEY (id)
   );
 
@@ -43,7 +44,7 @@ CREATE TABLE "ext_postnumber"(
 
 
 CREATE TABLE "ext_urban_propierties" (
-"id" integer (16) NOT NULL,
+"id" integer NOT NULL,
 "code" varchar(30),
 "streetaxis" varchar(16),
 "postnumber" varchar(16),
@@ -205,7 +206,7 @@ CONSTRAINT ext_cat_hydrometer_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE ext_hydrometer category(
+CREATE TABLE ext_hydrometer_category(
 "id" character varying(16) NOT NULL,
 "observ" character varying(100),
 CONSTRAINT ext_hydrometer_category_pkey PRIMARY KEY (id)
@@ -223,7 +224,8 @@ CREATE TABLE ext_rtc_hydrometer(
 "id_number" text,
 "cat_hydrometer_id" text,
 "instalation_date" date,
-identif
+"hydrometer_number" text,
+"identif" text,
 CONSTRAINT ext_rtc_hydrometer_id_pkey PRIMARY KEY (hydrometer_id)
 );
 

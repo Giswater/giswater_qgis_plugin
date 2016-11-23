@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION SCHEMA_NAME.gw_fct_node2arc(character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_node2arc(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc(node_id_arg character varying)
   RETURNS smallint AS
 $BODY$

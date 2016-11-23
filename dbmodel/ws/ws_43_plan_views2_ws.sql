@@ -90,6 +90,42 @@ FROM (cat_node
 JOIN v_price_compost ON (((cat_node."cost")::text = (v_price_compost.id)::text)));
 
 
+
+DROP VIEW IF EXISTS "v_price_x_node" CASCADE;
+CREATE OR REPLACE VIEW v_price_x_node AS 
+ SELECT 
+ node.node_id, 
+    node.nodecat_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price,
+        CASE
+            WHEN v_price_x_catnode.cost_unit::text = 'u'::text THEN NULL::numeric
+            ELSE 
+            CASE
+                WHEN (node.depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
+                ELSE node.depth / 2::numeric
+            END
+        END::numeric(12,2) AS calculated_depth, 
+
+        CASE
+            WHEN v_price_x_catnode.cost_unit::text = 'u'::text THEN v_price_x_catnode.cost
+            ELSE 
+            CASE
+                WHEN (node.depth * 1::numeric) = 0::numeric THEN v_price_x_catnode.estimated_depth
+                ELSE (node.depth / 2::numeric)::numeric(12,2)
+            END * v_price_x_catnode.cost
+        END::numeric(12,2) AS budget
+
+   FROM v_node node
+   LEFT JOIN v_price_x_catnode ON node.nodecat_id::text = v_price_x_catnode.id::text
+   JOIN cat_node on cat_node.id=node.nodecat_id
+   JOIN v_price_compost ON v_price_compost.id=cat_node.cost;
+
+
+
+
+
 DROP VIEW IF EXISTS "v_plan_ml_arc" CASCADE;
 CREATE VIEW "v_plan_ml_arc" AS 
 SELECT 

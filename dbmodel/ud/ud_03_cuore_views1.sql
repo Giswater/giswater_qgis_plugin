@@ -63,7 +63,7 @@ DROP VIEW IF EXISTS v_arc_x_node1 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node1 AS 
 SELECT arc.arc_id, arc.node_1, node.top_elev AS top_elev1, node.ymax AS ymax1, node.top_elev - node.ymax AS elev1, arc.y1, node.ymax - arc.y1 AS z1, cat_arc.geom1, arc.y1 - cat_arc.geom1 AS r1 
 FROM v_arc arc 
-	JOIN node v_node ON arc.node_1::text = node.node_id::text
+	JOIN v_node node ON arc.node_1::text = node.node_id::text
 	JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 	

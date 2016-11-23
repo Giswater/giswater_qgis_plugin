@@ -11,12 +11,24 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Records of cat_mat_arc
 -- ----------------------------
-INSERT INTO cat_mat_arc VALUES ('N/I', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_mat_arc VALUES ('PVC', 'PVC', 150.0000, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
-INSERT INTO cat_mat_arc VALUES ('FD', 'Iron', 120.0000, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
-INSERT INTO cat_mat_arc VALUES ('FC', 'Fiberconcret', 150.0000, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
-INSERT INTO cat_mat_arc VALUES ('PE-HD', 'PE high density', 140.0000, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
-INSERT INTO cat_mat_arc VALUES ('PE-LD', 'PE low density', 130.0000, 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
+INSERT INTO cat_mat_arc VALUES ('N/I', NULL, NULL, NULL, NULL);
+INSERT INTO cat_mat_arc VALUES ('PVC', 'PVC', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
+INSERT INTO cat_mat_arc VALUES ('FD', 'Iron', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
+INSERT INTO cat_mat_arc VALUES ('FC', 'Fiberconcret', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
+INSERT INTO cat_mat_arc VALUES ('PE-HD', 'PE high density', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
+INSERT INTO cat_mat_arc VALUES ('PE-LD', 'PE low density', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg');
+
+
+
+-- ----------------------------
+-- Records of inp_cat_mat_roughness
+-- ----------------------------
+INSERT INTO inp_cat_mat_roughness VALUES (10001,'N/I', 'New', 0, 0, 100, '');
+INSERT INTO inp_cat_mat_roughness VALUES (20001,'PVC', 'New', 150, 0, 100, '');
+INSERT INTO inp_cat_mat_roughness VALUES (30001,'FD', 'New', 120, 0, 100, '');
+INSERT INTO inp_cat_mat_roughness VALUES (40001,'FC', 'New', 150, 0, 100, '');
+INSERT INTO inp_cat_mat_roughness VALUES (50001,'PE-HD', 'New', 140, 0, 100, '');
+INSERT INTO inp_cat_mat_roughness VALUES (60001,'PE-LD', 'New', 130, 0, 100, '');
 
 
 
@@ -116,8 +128,8 @@ INSERT INTO cat_node VALUES ('TDN200-160 PN16', 'T', 'FD', '16 atm', '200-160-16
 -- ----------------------------
 INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'DOMESTIC', 'PVC', '16 atm', '25 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
 INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'DOMESTIC', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC32-PN16-TRA', 'TRADE', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', 'INDUSTRIAL', 'PVC', '16 atm', '50 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC32-PN16-TRA', 'DOMESTIC', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', 'DOMESTIC', 'PVC', '16 atm', '50 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
 
 
 -- ----------------------------

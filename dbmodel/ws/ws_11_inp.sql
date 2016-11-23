@@ -162,7 +162,12 @@ CREATE TABLE temp_node
   rotation numeric(6,3),
   link character varying(512),
   verified character varying(16),
-"the_geom" public.geometry (POINT, SRID_VALUE),
+  the_geom public.geometry (POINT, SRID_VALUE),
+  undelete boolean,
+  workcat_id_end character varying(255),
+  label_x character varying(30),
+  label_y character varying(30),
+  label_rotation numeric(6,3),
   CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
 )
 ;
@@ -197,7 +202,12 @@ CREATE TABLE temp_arc
   rotation numeric(6,3),
   link character varying(512),
   verified character varying(16),
- "the_geom" public.geometry (LINESTRING, SRID_VALUE),
+  the_geom public.geometry (LINESTRING, SRID_VALUE),
+  undelete boolean,
+  workcat_id_end character varying(255),
+  label_x character varying(30),
+  label_y character varying(30),
+  label_rotation numeric(6,3),
   CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id));
 
 
@@ -221,13 +231,15 @@ CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 CREATE TABLE "inp_cat_mat_roughness" (
   id serial NOT NULL,
   matcat_id character varying(30) NOT NULL,
-  period_type character varying(30),
+  period_id character varying(30),
   init_age integer,
   end_age integer,
   roughness numeric(12,4),
   descript text,
   CONSTRAINT inp_cat_mat_roughness_pkey PRIMARY KEY (id)
-)
+);
+
+
 
 CREATE TABLE "inp_giswater_config" (
 "id" varchar(16) NOT NULL,

@@ -663,6 +663,19 @@ CREATE TABLE "gully" (
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
 
+
+CREATE TABLE "point" (
+"point_id" varchar(30)   NOT NULL,
+"point_type" varchar(18),
+"observ" character varying(512),
+"text" text,
+"the_geom" public.geometry (POINT, SRID_VALUE),
+"undelete" boolean,
+CONSTRAINT point_pkey PRIMARY KEY (point_id)
+);
+
+
+
 CREATE TABLE "samplepoint"
 (
   "sample_id" character varying(16) NOT NULL,
@@ -677,7 +690,7 @@ CREATE TABLE "samplepoint"
   "representative" boolean,
   "place_name" character varying(254),
   "origin" character varying(254),
-  "the_geom" geometry(Point,25831),
+  "the_geom" geometry(Point,SRID_VALUE),
   CONSTRAINT samplepoint_pkey PRIMARY KEY (sample_id)
   );
 
@@ -741,7 +754,7 @@ CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 CREATE TABLE "man_outfall" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
-"otufall_name" varchar(255),
+"outfall_name" varchar(255),
 CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
 );
 

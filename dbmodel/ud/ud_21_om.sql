@@ -47,14 +47,14 @@ CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 CREATE TABLE "om_visit_event" (
 "id" serial8 NOT NULL,
 "visit_id" int8 NOT NULL,
-"timestamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
+"tstamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
 "parameter_id" varchar(50)  ,
 "value" text,
 "text" text,
 "position_id" varchar(50),
-"xcoord" double,
-"ycoord" double,
-"azimut" double,
+"xcoord" float,
+"ycoord" float,
+"azimut" float,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
 

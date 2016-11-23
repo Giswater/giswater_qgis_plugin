@@ -25,7 +25,7 @@ SELECT
 node_id,
 the_geom
 FROM node
-JOIN anl_selector_state ON arc.state=anl_selector_state.id
+JOIN anl_selector_state ON node.state=anl_selector_state.id
 ;
 
 DROP VIEW IF EXISTS v_anl_connec CASCADE;
@@ -34,7 +34,7 @@ SELECT
 connec_id,
 the_geom
 FROM connec
-JOIN anl_selector_state ON arc.state=anl_selector_state.id
+JOIN anl_selector_state ON connec.state=anl_selector_state.id
 ;
 
 

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA NAME".gw_trg_edit_man_arc() RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc() RETURNS trigger AS
 $BODY$
 DECLARE 
     inp_table varchar;
@@ -204,15 +204,15 @@ $BODY$
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_conduit ON "SCHEMA NAME".v_edit_man_conduit;
-CREATE TRIGGER gw_trg_edit_man_conduit INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_conduit FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_arc('man_conduit');     
+DROP TRIGGER IF EXISTS gw_trg_edit_man_conduit ON "SCHEMA_NAME".v_edit_man_conduit;
+CREATE TRIGGER gw_trg_edit_man_conduit INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_conduit FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('man_conduit');     
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_siphon ON "SCHEMA NAME".v_edit_man_siphon;
-CREATE TRIGGER gw_trg_edit_man_siphon INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_siphon FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_arc('man_siphon');   
+DROP TRIGGER IF EXISTS gw_trg_edit_man_siphon ON "SCHEMA_NAME".v_edit_man_siphon;
+CREATE TRIGGER gw_trg_edit_man_siphon INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_siphon FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('man_siphon');   
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_waccel ON "SCHEMA NAME".v_edit_man_waccel;
-CREATE TRIGGER gw_trg_edit_man_waccel INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_waccel FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_arc('man_waccel'); 
+DROP TRIGGER IF EXISTS gw_trg_edit_man_waccel ON "SCHEMA_NAME".v_edit_man_waccel;
+CREATE TRIGGER gw_trg_edit_man_waccel INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_waccel FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('man_waccel'); 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_varc ON "SCHEMA NAME".v_edit_man_varc;
-CREATE TRIGGER gw_trg_edit_man_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA NAME".v_edit_man_varc FOR EACH ROW EXECUTE PROCEDURE "SCHEMA NAME".gw_trg_edit_man_arc('man_varc'); 
+DROP TRIGGER IF EXISTS gw_trg_edit_man_varc ON "SCHEMA_NAME".v_edit_man_varc;
+CREATE TRIGGER gw_trg_edit_man_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_varc FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('man_varc'); 
       

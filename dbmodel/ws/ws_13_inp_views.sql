@@ -331,7 +331,7 @@ CREATE OR REPLACE VIEW v_inp_pipe AS
 	END AS diameter, 
 	CASE
 		WHEN custom_roughness IS NOT NULL THEN custom_roughness
-		ELSE cat_mat_roughness.roughness
+		ELSE inp_cat_mat_roughness.roughness
 	END AS roughness,  
     inp_pipe.minorloss, 
     inp_pipe.status
@@ -341,8 +341,8 @@ CREATE OR REPLACE VIEW v_inp_pipe AS
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
-   JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text 
-   where (now()::date - builtdate)/365 >= cat_mat_roughness.init_age and (now()::date - builtdate)/365 < cat_mat_roughness.end_age 
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text 
+   where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age 
 UNION 
     SELECT 
     arc.arc_id, 
@@ -356,7 +356,7 @@ UNION
     arc.sector_id, 
     arc.state, 
     cat_arc.dint AS diameter, 
-    cat_mat_roughness.roughness, 
+    inp_cat_mat_roughness.roughness, 
     inp_shortpipe.minorloss, 
     inp_shortpipe.status
     FROM v_inp_arc arc
@@ -365,7 +365,7 @@ UNION
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
-   JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
 
 
 
@@ -413,7 +413,7 @@ FROM ((arc JOIN rpt_arc ON (((rpt_arc.arc_id)::text = (arc.arc_id)::text))) JOIN
 
 DROP VIEW IF EXISTS "v_rpt_energy_usage" CASCADE;
 CREATE VIEW "v_rpt_energy_usage" AS 
-SELECT rpt_energy_usage.id, rpt_energy_usage.result_id, rpt_energy_usage.node_id, rpt_energy_usage.usage_fact, rpt_energy_usage.avg_effic, rpt_energy_usage.kwhr_mgal, rpt_energy_usage.avg_kw, rpt_energy_usage.peak_kw, rpt_energy_usage.cost_day 
+SELECT rpt_energy_usage.id, rpt_energy_usage.result_id, rpt_energy_usage.nodarc_id, rpt_energy_usage.usage_fact, rpt_energy_usage.avg_effic, rpt_energy_usage.kwhr_mgal, rpt_energy_usage.avg_kw, rpt_energy_usage.peak_kw, rpt_energy_usage.cost_day 
 FROM (rpt_selector_result JOIN rpt_energy_usage ON (((rpt_selector_result.result_id)::text = (rpt_energy_usage.result_id)::text)));
 
 
@@ -442,14 +442,14 @@ FROM ((temp_arc arc JOIN rpt_arc ON (((rpt_arc.arc_id)::text = (arc.arc_id)::tex
 
 DROP VIEW IF EXISTS "v_rpt_comp_energy_usage" CASCADE;
 CREATE VIEW "v_rpt_comp_energy_usage" AS 
-SELECT rpt_energy_usage.id, rpt_energy_usage.result_id, rpt_energy_usage.node_id, rpt_energy_usage.usage_fact, rpt_energy_usage.avg_effic, rpt_energy_usage.kwhr_mgal, rpt_energy_usage.avg_kw, rpt_energy_usage.peak_kw, rpt_energy_usage.cost_day 
+SELECT rpt_energy_usage.id, rpt_energy_usage.result_id, rpt_energy_usage.nodarc_id, rpt_energy_usage.usage_fact, rpt_energy_usage.avg_effic, rpt_energy_usage.kwhr_mgal, rpt_energy_usage.avg_kw, rpt_energy_usage.peak_kw, rpt_energy_usage.cost_day 
 FROM (rpt_selector_compare JOIN rpt_energy_usage ON (((rpt_selector_compare.result_id)::text = (rpt_energy_usage.result_id)::text)));
 
 
 DROP VIEW IF EXISTS "v_rpt_comp_hydraulic_status" CASCADE;
 CREATE VIEW "v_rpt_comp_hydraulic_status" AS 
 SELECT rpt_hydraulic_status.id, rpt_hydraulic_status.result_id, rpt_hydraulic_status."time", rpt_hydraulic_status.text 
-FROM (rpt_hydraulic_status JOIN rpt_selector_compare ON (((rpt_selector_compare.result_id)::text = (rpt_hydraulic_.result_id)::text)));
+FROM (rpt_hydraulic_status JOIN rpt_selector_compare ON (((rpt_selector_compare.result_id)::text = (rpt_hydraulic_status.result_id)::text)));
 
 
 DROP VIEW IF EXISTS "v_rpt_comp_node" CASCADE;

@@ -32,7 +32,6 @@ connec.code as urban_propierties_code,
     ext_rtc_hydrometer.cat_hydrometer_id,
     ext_rtc_hydrometer.hydrometer_number,
     ext_rtc_hydrometer.identif,
-
     ext_cat_hydrometer.id,
     ext_cat_hydrometer.madeby,
     ext_cat_hydrometer.class,
@@ -63,9 +62,9 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS
             ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
         END AS lps_avg
    FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::integer = ext_rtc_hydrometer.hydrometer_id
+     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id= ext_rtc_hydrometer.hydrometer_id
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::integer = ext_rtc_hydrometer.hydrometer_id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id= ext_rtc_hydrometer.hydrometer_id
      JOIN connec ON connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
      JOIN rtc_options ON rtc_options.period_id::text = ext_cat_period.id::text;
 

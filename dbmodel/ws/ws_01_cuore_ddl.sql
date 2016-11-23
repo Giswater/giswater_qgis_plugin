@@ -134,6 +134,15 @@ CONSTRAINT element_type_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "connec_type" (
+"id" varchar(50) NOT NULL,
+"type" character varying(18) NOT NULL,
+"man_table" character varying(18) NOT NULL,
+"event_table" varchar(18)   NOT NULL,
+CONSTRAINT connec_type_pkey PRIMARY KEY (id)
+);
+
+
 CREATE TABLE "point_type" (
 "id" varchar(18)   NOT NULL,
 "text" text,
@@ -345,17 +354,6 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "connec_type" (
-"id" varchar(50) NOT NULL,
-"type" character varying(18) NOT NULL,
-"epa_default" character varying(18),
-"man_table" character varying(18) NOT NULL,
-"epa_table" character varying(18),
-"event_table" character varying(18) NOT NULL,
-CONSTRAINT connec_type_pkey PRIMARY KEY (id)
-);
-
-
 
 -- ----------------------------
 -- Table: GIS features
@@ -553,7 +551,7 @@ CREATE TABLE "pond"(
 "code_comercial" integer,
 "orto2005" integer,
 "date_production" date,
-"the_geom" geometry(Point,25831),
+"the_geom" geometry(Point,SRID_VALUE),
   CONSTRAINT man_pond_pkey PRIMARY KEY (pond_id)
 );
 
@@ -564,7 +562,7 @@ CREATE TABLE "pool"(
   "code_comercial" integer,
   "orto2005" integer,
   "date_production" date,
-  "the_geom" geometry(Point,25831),
+  "the_geom" geometry(Point,SRID_VALUE),
   CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
   );
   
@@ -585,7 +583,7 @@ CREATE TABLE "pool"(
   "cabinet" character varying(150),
   "dma_id2" character varying(30),
   "observations" character varying(254),
-  "the_geom" geometry(Point,25831),
+  "the_geom" geometry(Point,SRID_VALUE),
   CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 );
 
@@ -740,7 +738,7 @@ CREATE TABLE "man_tap"(
 "shutvalve_type" character varying(100),
 "shutvalve_diam" numeric(12,3),
 "shutvalve_number" character varying(100),
-"drain_diam2" numeric(12,3),
+"drain_diam" numeric(12,3),
 "drain_exit" character varying(100),
 "drain_gully" character varying(100),
 "drain_distance" numeric(12,3),

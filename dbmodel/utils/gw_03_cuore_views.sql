@@ -25,7 +25,7 @@ SELECT
 node_id,
 the_geom
 FROM node
-JOIN man_selector_state ON arc.state=man_selector_state.id
+JOIN man_selector_state ON node.state=man_selector_state.id
 ;
 
 DROP VIEW IF EXISTS v_man_connec CASCADE;
@@ -34,7 +34,7 @@ SELECT
 connec_id,
 the_geom
 FROM connec
-JOIN man_selector_state ON arc.state=man_selector_state.id
+JOIN man_selector_state ON connec.state=man_selector_state.id
 ;
 
 

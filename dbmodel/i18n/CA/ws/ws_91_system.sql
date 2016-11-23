@@ -46,6 +46,13 @@ INSERT INTO arc_type VALUES ('TUBERIA','PIPE','PIPE', 'man_pipe', 'inp_pipe', 'e
 
 
 -- ----------------------------
+-- Records of connec_type system table
+-- ----------------------------
+INSERT INTO connec_type VALUES ('DOMESTIC', 'DOMESTIC', 'man_wjoin', 'event_x_connec);
+
+
+
+-- ----------------------------
 -- Records of element type system table
 -- ----------------------------
 INSERT INTO element_type VALUES ('REGISTRE', 'event_x_element');

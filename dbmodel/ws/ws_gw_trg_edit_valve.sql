@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_valve() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_anl_valve() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     v_sql varchar;
 
@@ -47,6 +47,6 @@ END;
 $$;
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_valve ON "SCHEMA_NAME".v_edit_valve;
-CREATE TRIGGER gw_trg_edit_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_valve();
+DROP TRIGGER IF EXISTS gw_trg_edit_anl_valve ON "SCHEMA_NAME".v_edit_anl_valve;
+CREATE TRIGGER gw_trg_edit_anl_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_anl_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_anl_valve();
 
