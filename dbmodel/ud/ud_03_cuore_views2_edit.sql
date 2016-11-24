@@ -1018,7 +1018,7 @@ ALTER TABLE v_edit_man_conduit
 
 
 
-DROP VIEW v_edit_man_siphon;
+DROP VIEW IF EXISTS v_edit_man_siphon CASCADE;
 
 CREATE OR REPLACE VIEW v_edit_man_siphon AS 
  SELECT arc.arc_id,
