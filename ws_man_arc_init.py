@@ -1,15 +1,11 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
 
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
@@ -32,18 +28,10 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    # Manage visibility    
-    ''' 
-    feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)    
-    feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id").setVisible(False) 
-    '''
     # Manage 'connecat_id'
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
-    
-    # Manage 'connec_type'
-    cat_arctype_id = utils_giswater.getWidgetText("cat_arctype_id")    
-    
+
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
@@ -83,7 +71,7 @@ class ManArcDialog(ParentDialog):
         self.load_data()
         
         # Set layer in editing mode
-        self.layer.startEditing()
+        # self.layer.startEditing()
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)

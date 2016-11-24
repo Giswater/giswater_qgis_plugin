@@ -1,15 +1,12 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+
 from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
 from PyQt4.QtGui import QAction, QActionGroup, QIcon   
 
@@ -431,7 +428,7 @@ class Giswater(QObject):
 
         if self.dao is None:
             return
-        print("test balalalalla")    
+ 
         # Hide all toolbars
         self.hide_toolbars()
                     

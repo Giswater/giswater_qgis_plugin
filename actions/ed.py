@@ -1,5 +1,15 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
+
 from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit
+from qgis.gui import QgsMessageBar
+from qgis.core import QgsExpression
 
 import os
 import sys
@@ -180,7 +190,6 @@ class Ed():
             aux = row[i]
             row[i] = str(aux[0])
             
-        print("date")
         self.get_date()
         model.setStringList(row)
         self.completer.setModel(model)
@@ -201,12 +210,7 @@ class Ed():
         
         date_from=self.date_document_from.date() 
         date_to=self.date_document_to.date() 
-        print("date")
-        x=self.date_document_from.dateTime().toString('yyyyMMdd  HH:mm:ss')
-        print x
-        print (date_from)
-        print (date_to)
-        '''
+      
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
 
@@ -214,7 +218,7 @@ class Ed():
             message="Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
-        '''
+     
         
     def ed_add_el_autocomplete(self):    
         ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
@@ -356,8 +360,6 @@ class Ed():
     def ed_add_to_feature(self, table_name, value_id):   
         ''' Add document or element to selected features '''
         
-        print("schema name")
-        print(self.schema_name)
         # Initialize variables                    
         table_arc = self.schema_name+'."'+self.table_arc+'"'
         table_node = self.schema_name+'."'+self.table_node+'"'
@@ -380,51 +382,35 @@ class Ed():
         table_hydrant = self.schema_name+'."'+self.table_hydrant+'"'
         table_valve = self.schema_name+'."'+self.table_valve+'"'
         table_manhole = self.schema_name+'."'+self.table_manhole+'"'
-        
-        print table_wjoin 
+
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
-        print ("layer_source")
-        print (layer_source)
-        
+
         #uri_table = layer_source['table']
         uri_table = layer_source[1]
-        print("uri table")
-        print uri_table
                 
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return
         
         field_id= None
-        '''
-        print("---table_gully----")
-        print(table_gully)
-        print("---uri_table----")
-        print(uri_table)
-        '''
+
         if table_arc in uri_table:  
-            print("enter")
             elem_type = "arc"
             field_id = "arc_id"
         if table_node in uri_table: 
-            print("enter") 
             elem_type = "node"
             field_id = "node_id"
         if table_connec in uri_table: 
-            print("enter") 
             elem_type = "connec"
             field_id = "connec_id"
         if table_gully in uri_table:  
-            print("enter")
             elem_type = "gully"
             field_id = "gully_id"
-            
-            
+                 
         if table_wjoin in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
-            print("enter")
         if table_tap in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
@@ -434,8 +420,7 @@ class Ed():
         if table_fountain in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
-            
-        
+             
         if table_tank in uri_table:  
             elem_type = "node"
             field_id = "node_id"
@@ -467,9 +452,6 @@ class Ed():
             elem_type = "node"
             field_id = "node_id"
         
-        print ("field_id")
-        print (field_id)
-        
         # Get selected features
         features = self.layer.selectedFeatures()
         for feature in features:
@@ -477,7 +459,6 @@ class Ed():
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
             self.dao.execute_sql(sql) 
-        
                           
         
     def ed_add_file_accept(self): 

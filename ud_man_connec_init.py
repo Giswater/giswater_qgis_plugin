@@ -1,15 +1,11 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
 
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
@@ -32,18 +28,10 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    # Manage visibility    
-    ''' 
-    feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)    
-    feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id").setVisible(False) 
-    '''
     # Manage 'connecat_id'
     connecat_id = utils_giswater.getWidgetText("connecat_id") 
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
-    
-    # Manage 'connec_type'
-    cat_connectype_id = utils_giswater.getWidgetText("cat_connectype_id")    
-    
+      
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
@@ -87,7 +75,7 @@ class ManConnecDialog(ParentDialog):
         self.load_data()
         
         # Set layer in editing mode
-        self.layer.startEditing()
+        #self.layer.startEditing()
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -114,7 +102,6 @@ class ManConnecDialog(ParentDialog):
         # Configuration of table event | connec
         self.set_configuration(self.tbl_event_connec, table_event_connec)
         
-  
         
         # Fill tab hydrometer | hydrometer
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)

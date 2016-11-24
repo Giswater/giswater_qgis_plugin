@@ -1,15 +1,11 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
 
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
@@ -68,42 +64,7 @@ class ParentDialog(object):
              
         self.schema_name = self.settings.value("db/schema_name")           
         self.dao = self.controller.dao
-  
-        # Initialize variables            
-        self.table_wjoin = self.schema_name+'."v_edit_man_wjoin"' 
-        self.table_tap = self.schema_name+'."v_edit_man_tap"'
-        self.table_greentap = self.schema_name+'."v_edit_man_greentap"'
-        self.table_fountain = self.schema_name+'."v_edit_man_fountain"'
-        
-        self.table_tank = self.schema_name+'."v_edit_man_tank"'
-        self.table_pump = self.schema_name+'."v_edit_man_pump"'
-        self.table_source = self.schema_name+'."v_edit_man_source"'
-        self.table_meter = self.schema_name+'."v_edit_man_meter"'
-        self.table_junction = self.schema_name+'."v_edit_man_junction"'
-        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
-        self.table_reduction = self.schema_name+'."v_edit_man_reduction"'
-        self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
-        self.table_valve = self.schema_name+'."v_edit_man_valve"'
-        self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
-        
-        self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
-        self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'
-        self.table_netgully = self.schema_name+'."v_edit_man_netgully"'
-        self.table_netgully_pol = self.schema_name+'."v_edit_man_netgully_pol"'
-        self.table_netinit = self.schema_name+'."v_edit_man_netinit"'
-        self.table_wjump = self.schema_name+'."v_edit_man_wjump"'
-        self.table_wwtp = self.schema_name+'."v_edit_man_wwtp"'
-        self.table_wwtp_pol = self.schema_name+'."v_edit_man_wwtp_pol"'
-        self.table_storage = self.schema_name+'."v_edit_man_storage"'
-        self.table_storage_pol = self.schema_name+'."v_edit_man_storage_pol"'
-        self.table_outfall = self.schema_name+'."v_edit_man_outfall"'
-        
-        self.table_varc = self.schema_name+'."v_edit_man_varc"'
-        self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
-        self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
-        self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
-   
-            
+
             
     def translate_form(self, context_name):
         ''' Translate widgets of the form to current language '''
@@ -252,8 +213,6 @@ class ParentDialog(object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value("id")
-            print("******id******")
-            print(id_)
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
         inf_text = inf_text[:-2]
@@ -263,8 +222,6 @@ class ParentDialog(object):
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
             self.dao.execute_sql(sql)
-            print("sql")
-            print sql
             widget.model().select()
  
          
@@ -283,9 +240,6 @@ class ParentDialog(object):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value("hydrometer_id")
-            print("id************")
-            print(id_)
-            print("id************")
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
         inf_text = inf_text[:-2]
@@ -298,15 +252,10 @@ class ParentDialog(object):
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE hydrometer_id IN ("+list_id+")"
             self.dao.execute_sql(sql)
-            print("sql")
-            print sql
-            
-            
+
             sql = "DELETE FROM "+self.schema_name+"."+table_name2 
             sql+= " WHERE hydrometer_id IN ("+list_id+")"
             self.dao.execute_sql(sql)
-            print("sql")
-            print sql
             
             widget.model().select()
             
@@ -635,6 +584,8 @@ class ParentDialog(object):
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
         
+        print("test")
+        '''
         # Get widgets  
         self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
         self.date_el_from = self.dialog.findChild(QDateEdit, "date_el_from")
@@ -646,7 +597,7 @@ class ParentDialog(object):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-        
+        '''
         
     def set_filter_hydrometer(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
@@ -668,103 +619,5 @@ class ParentDialog(object):
         widget.model().setFilter(expr)
         widget.model().select() 
         
-        
-    def set_tabs_visibility(self):
-        ''' Hide some tabs '''     
-        
-        # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
-        if uri_table is None:
-            self.controller.show_warning("Error getting table name from selected layer")
-            return
-        
-        if uri_table == self.table_wjoin :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-        
-        if uri_table == self.table_tap :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(0)
 
-        if uri_table == self.table_greentap :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0)
-
-        if uri_table == self.table_fountain :
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0) 
-            
-           
-        
-        if uri_table == self.table_tank :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 0):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_pump :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 1):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_source :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 2):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_meter :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 3):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_junction :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 4):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_waterwell :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 5):
-                    self.tab_main.removeTab(i) 
-                    
-        if uri_table == self.table_reduction :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 6):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_hydrant :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 7):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_valve :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 8):
-                    self.tab_main.removeTab(i) 
-        if uri_table == self.table_manhole :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 5):
-                    self.tab_main.removeTab(i) 
-                    
-        if uri_table == self.table_varc :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(0)
-            
-        if uri_table == self.table_siphon :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0) 
-            
-        print uri_table
-        print("test")
-        if uri_table == self.table_conduit :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            
-        if uri_table == self.table_waccel :
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0)
-        
-        
-        
-        
     

@@ -1,15 +1,11 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
 
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
@@ -34,18 +30,10 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    # Manage visibility    
-    ''' 
-    feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)    
-    feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id").setVisible(False) 
-    '''
     # Manage 'connecat_id'
     connecat_id = utils_giswater.getWidgetText("connecat_id") 
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
-    
-    # Manage 'connec_type'
-    #cat_connectype_id = utils_giswater.getWidgetText("cat_connectype_id")    
-    
+
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
@@ -68,6 +56,12 @@ class ManConnecDialog(ParentDialog):
         table_event_connec = "v_ui_event_x_connec"
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
+        
+        # Initialize variables            
+        self.table_wjoin = self.schema_name+'."v_edit_man_wjoin"' 
+        self.table_tap = self.schema_name+'."v_edit_man_tap"'
+        self.table_greentap = self.schema_name+'."v_edit_man_greentap"'
+        self.table_fountain = self.schema_name+'."v_edit_man_fountain"'
               
         # Define class variables
         self.field_id = "connec_id"        
@@ -92,7 +86,7 @@ class ManConnecDialog(ParentDialog):
         self.load_data()
         
         # Set layer in editing mode
-        self.layer.startEditing()
+        #self.layer.startEditing()
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -123,7 +117,7 @@ class ManConnecDialog(ParentDialog):
         
         # Configuration of table hydrometer | hydrometer
         self.set_configuration(self.tbl_hydrometer, table_hydrometer)
-        
+       
         # Fill tab hydrometer | hydrometer value
         self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name+"."+table_hydrometer_value, self.filter)
         
@@ -133,7 +127,35 @@ class ManConnecDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
-        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records, self.tbl_hydrometer, table_hydrometer))               
+        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer, table_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
 
 
+    def set_tabs_visibility(self):
+        ''' Hide some tabs '''   
+        
+        # Get schema and table name of selected layer       
+        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        if uri_table is None:
+            self.controller.show_warning("Error getting table name from selected layer")
+            return
+        
+        if uri_table == self.table_wjoin :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+        
+        if uri_table == self.table_tap :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(0)
+
+        if uri_table == self.table_greentap :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0)
+
+        if uri_table == self.table_fountain :
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0) 

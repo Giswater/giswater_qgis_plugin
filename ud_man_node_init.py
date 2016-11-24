@@ -1,15 +1,11 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
 
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
@@ -32,17 +28,9 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    # Manage visibility    
-    ''' 
-    feature_dialog.dialog.findChild(QComboBox, "connecat_id").setVisible(False)    
-    feature_dialog.dialog.findChild(QComboBox, "cat_connectype_id").setVisible(False) 
-    '''
     # Manage 'connecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
-    utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
-    
-    # Manage 'connec_type'
-    node_type = utils_giswater.getWidgetText("node_type")    
+    utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
     
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
@@ -66,6 +54,21 @@ class ManNodeDialog(ParentDialog):
         table_event_connec = "v_ui_event_x_node"
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"    
+        
+        self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
+        self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'
+        self.table_netgully = self.schema_name+'."v_edit_man_netgully"'
+        self.table_netgully_pol = self.schema_name+'."v_edit_man_netgully_pol"'
+        self.table_netinit = self.schema_name+'."v_edit_man_netinit"'
+        self.table_wjump = self.schema_name+'."v_edit_man_wjump"'
+        self.table_wwtp = self.schema_name+'."v_edit_man_wwtp"'
+        self.table_junction = self.schema_name+'."v_edit_man_junction"'
+        self.table_wwtp_pol = self.schema_name+'."v_edit_man_wwtp_pol"'
+        self.table_storage = self.schema_name+'."v_edit_man_storage"'
+        self.table_storage_pol = self.schema_name+'."v_edit_man_storage_pol"'
+        self.table_outfall = self.schema_name+'."v_edit_man_outfall"'
+        self.table_manhole = self.schema_name+'."v_edit_man_manhole"'
+        self.table_valve = self.schema_name+'."v_edit_man_valvel"'
               
         # Define class variables
         self.field_id = "node_id"        
@@ -88,11 +91,13 @@ class ManNodeDialog(ParentDialog):
         self.load_data()
         
         # Set layer in editing mode
-        self.layer.startEditing()
+        # self.layer.startEditing()
+        
+        # Manage tab visibility
+        self.set_tabs_visibility()  
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-        
         
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
@@ -111,7 +116,6 @@ class ManNodeDialog(ParentDialog):
         
         # Configuration of table event | node
         self.set_configuration(self.tbl_event_connec, table_event_connec)
-        
         '''
         # Fill tab scada | scada
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
@@ -124,17 +128,77 @@ class ManNodeDialog(ParentDialog):
         
         # Configuration of table scada | scada value
         self.set_configuration(self.tbl_scada_value, table_scada_value)
-        '''
-        
+
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-  
-  
-  
-  
-  
+        '''
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
+        
+
+    def set_tabs_visibility(self):
+        ''' Hide some tabs ''' 
+          
+        # Get schema and table name of selected layer       
+        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        if uri_table is None:
+            self.controller.show_warning("Error getting table name from selected layer")
+            return
+        
+        if (uri_table == self.table_chamber) | (uri_table == self.table_chamber_pol) :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 0):
+                    self.tab_main.removeTab(i) 
+                    
+        if uri_table == self.table_junction :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 1):
+                    self.tab_main.removeTab(i) 
+                    
+        if uri_table == self.table_manhole :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 2):
+                    self.tab_main.removeTab(i) 
+                    
+        if (uri_table == self.table_netgully) | (uri_table == self.table_netgully_pol) :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 3):
+                    self.tab_main.removeTab(i) 
+                    
+        if uri_table == self.table_netinit :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 4):
+                    self.tab_main.removeTab(i) 
+                    
+        if uri_table == self.table_outfall :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 5):
+                    self.tab_main.removeTab(i) 
+                    
+        if (uri_table == self.table_storage) | (uri_table == self.table_storage_pol) :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 6):
+                    self.tab_main.removeTab(i) 
+                                           
+        if uri_table == self.table_valve :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 7):
+                    self.tab_main.removeTab(i)                       
+                                        
+        if uri_table == self.table_wjump :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 8):
+                    self.tab_main.removeTab(i) 
+                    
+        if (uri_table == self.table_wwtp) | (uri_table == self.table_wwtp_pol) :
+            for i in xrange(13,-1,-1):
+                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 9):
+                    self.tab_main.removeTab(i) 
+                    
+        
+        
+        
+        
         
      
