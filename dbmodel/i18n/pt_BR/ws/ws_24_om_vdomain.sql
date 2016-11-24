@@ -7,16 +7,17 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
--- Records of event event_type table
+-- Records of event om_visit_parameter_type table
 -- ----------------------------
 INSERT INTO om_visit_parameter_type VALUES ('INSPECCIO', '');
 INSERT INTO om_visit_parameter_type VALUES ('REPARACIO', '');
 INSERT INTO om_visit_parameter_type VALUES ('RECONSTRUIR', '');
 INSERT INTO om_visit_parameter_type VALUES ('ALTRES', '');
+INSERT INTO "om_visit_parameter_type" VALUES ('FOTOGRAFIA', '');
 
 
 -- ----------------------------
--- Records of event event_parameter table
+-- Records of event om_visit_parameter table
 -- ----------------------------
 INSERT INTO om_visit_parameter VALUES ('insp_node_p1','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 1');
 INSERT INTO om_visit_parameter VALUES ('insp_arc_p1','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 1');
@@ -29,6 +30,7 @@ INSERT INTO om_visit_parameter VALUES ('insp_arc_p3','INSPECCIO','ARC', 'TEXT', 
 INSERT INTO om_visit_parameter VALUES ('insp_element_p3','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 3');
 INSERT INTO om_visit_parameter VALUES ('insp_connec_p1','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio de l''escomesa parametre 1');
 INSERT INTO om_visit_parameter VALUES ('insp_connec_p2','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio de l''escomesa parametre 2');
+INSERT INTO "om_visit_parameter" VALUES ('png','FOTOGRAFIA','TOTS', '', '');
 
 -- ----------------------------
 -- Records of event om_visit_value_position table

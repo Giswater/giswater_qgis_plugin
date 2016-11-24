@@ -12,6 +12,8 @@ INSERT INTO "om_visit_parameter_type" VALUES ('INSPECCION', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('REPARACION', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('RECONSTRUCCION', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('OTROS', '');
+INSERT INTO "om_visit_parameter_type" VALUES ('FOTOGRAFIA', '');
+
 
 
 -- ----------------------------
@@ -31,6 +33,8 @@ INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p2','INSPECCION','CONEXION
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECCION','CONEXION', 'TEXTO', 'Inspeccion del sumidero parametro 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECCION','CONEXION', 'TEXTO', 'Inspeccion del sumidero parametro 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECCION','CONEXION', 'TEXTO', 'Inspeccion del sumidero parametro 3');
+INSERT INTO "om_visit_parameter" VALUES ('png','FOTOGRAFIA','TOTS', '', '');
+
 
 
 -- ----------------------------

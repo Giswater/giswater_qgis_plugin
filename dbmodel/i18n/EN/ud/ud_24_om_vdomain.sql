@@ -12,6 +12,7 @@ INSERT INTO "om_visit_parameter_type" VALUES ('INSPECTION', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('REPAIR', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('RECONSTRUCT', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('OTHER', '');
+INSERT INTO "om_visit_parameter_type" VALUES ('PICTURE', '');
 
 
 -- ----------------------------
@@ -31,6 +32,7 @@ INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p2','INSPECTION','CONNEC',
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECTION','CONNEC', 'TEXT', 'Inspection gully parameter 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECTION','CONNEC', 'TEXT', 'Inspection gully parameter 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECTION','CONNEC', 'TEXT', 'Inspection gully parameter 3');
+INSERT INTO "om_visit_parameter" VALUES ('png','PICTURE','ALL', '', '');
 
 
 -- ----------------------------

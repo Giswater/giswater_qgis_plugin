@@ -12,7 +12,7 @@ INSERT INTO "om_visit_parameter_type" VALUES ('INSPECCIO', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('REPARACIO', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('RECONSTRUCCIO', '');
 INSERT INTO "om_visit_parameter_type" VALUES ('ALTRES', '');
-
+INSERT INTO "om_visit_parameter_type" VALUES ('FOTOGRAFIA', '');
 
 -- ----------------------------
 -- Records of event om_visit_parameter table
@@ -31,6 +31,8 @@ INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p2','INSPECCIO','CONNEXIO'
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio del embornal parametre 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio del embornal parametre 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio del embornal parametre 3');
+INSERT INTO "om_visit_parameter" VALUES ('png','FOTOGRAFIA','TOTS', '', '');
+
 
 
 -- ----------------------------

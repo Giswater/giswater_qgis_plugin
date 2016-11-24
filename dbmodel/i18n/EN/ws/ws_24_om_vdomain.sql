@@ -13,6 +13,8 @@ INSERT INTO om_visit_parameter_type VALUES ('INSPECTION', '');
 INSERT INTO om_visit_parameter_type VALUES ('REPAIR', '');
 INSERT INTO om_visit_parameter_type VALUES ('RECONSTRUCT', '');
 INSERT INTO om_visit_parameter_type VALUES ('OTHER', '');
+INSERT INTO om_visit_parameter_type VALUES ('PICTURE', '');
+
 
 
 -- ----------------------------
@@ -29,6 +31,8 @@ INSERT INTO om_visit_parameter VALUES ('insp_arc_p3','INSPECTION','ARC', 'TEXT',
 INSERT INTO om_visit_parameter VALUES ('insp_element_p3','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 3');
 INSERT INTO om_visit_parameter VALUES ('insp_connec_p1','INSPECTION','CONNEC', 'TEXT', 'Inspection connec parameter 1');
 INSERT INTO om_visit_parameter VALUES ('insp_connec_p2','INSPECTION','CONNEC', 'TEXT', 'Inspection connec parameter 2');
+INSERT INTO "om_visit_parameter" VALUES ('png','PICTURE','ALL', '', '');
+
 
 -- ----------------------------
 -- Records of event om_visit_value_position table
