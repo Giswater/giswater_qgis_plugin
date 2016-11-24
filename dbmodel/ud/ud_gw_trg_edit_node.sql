@@ -80,10 +80,11 @@ BEGIN
         
         -- FEATURE INSERT
 
-        INSERT INTO node VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.sander, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
-                                NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.est_top_elev, NEW.est_ymax, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end, 
-                                NEW.undelete, NEW.label_x,NEW.label_y, NEW.label_rotation);
+        INSERT INTO node (node_id, top_elev, ymax, sander, node_type, nodecat_id, epa_type, sector_id, "state", annotation, "observ", "comment",dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
+					buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_top_elev, est_ymax, rotation, link, verified, the_geom, workcat_id_end,undelete, label_x,label_y, label_rotation)
+					VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.sander, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
+                    NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.adress_01, NEW.adress_02, 
+					NEW.adress_03, NEW.descript, NEW.est_top_elev, NEW.est_ymax, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end,NEW.undelete, NEW.label_x,NEW.label_y, NEW.label_rotation);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
