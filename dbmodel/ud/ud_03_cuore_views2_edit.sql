@@ -299,7 +299,7 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
     node.location_type AS junction_location_type,
     node.workcat_id AS junction_workcat_id,
     node.buildercat_id AS junction_buildercat_id,
-    node.builtdate AS junction_builderdate,
+    node.builtdate AS junction_builtdate,
     node.ownercat_id AS junction_ownercat_id,
     node.adress_01 AS junction_adress_01,
     node.adress_02 AS junction_adress_02,
@@ -343,7 +343,7 @@ CREATE OR REPLACE VIEW v_edit_man_outfall AS
     node.location_type AS outfall_location_type,
     node.workcat_id AS outfall_workcat_id,
     node.buildercat_id AS outfall_buildercat_id,
-    node.builtdate AS outfall_builderdate,
+    node.builtdate AS outfall_builtdate,
     node.ownercat_id AS outfall_ownercat_id,
     node.adress_01 AS outfall_adress_01,
     node.adress_02 AS outfall_adress_02,
@@ -388,7 +388,7 @@ CREATE OR REPLACE VIEW v_edit_man_storage AS
     node.location_type AS storage_location_type,
     node.workcat_id AS storage_workcat_id,
     node.buildercat_id AS storage_buildercat_id,
-    node.builtdate AS storage_builderdate,
+    node.builtdate AS storage_builtdate,
     node.ownercat_id AS storage_ownercat_id,
     node.adress_01 AS storage_adress_01,
     node.adress_02 AS storage_adress_02,
@@ -442,7 +442,7 @@ CREATE OR REPLACE VIEW v_edit_man_storage_pol AS
     node.location_type AS storage_location_type,
     node.workcat_id AS storage_workcat_id,
     node.buildercat_id AS storage_buildercat_id,
-    node.builtdate AS storage_builderdate,
+    node.builtdate AS storage_builtdate,
     node.ownercat_id AS storage_ownercat_id,
     node.adress_01 AS storage_adress_01,
     node.adress_02 AS storage_adress_02,
@@ -495,7 +495,7 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
     node.location_type AS valve_location_type,
     node.workcat_id AS valve_workcat_id,
     node.buildercat_id AS valve_buildercat_id,
-    node.builtdate AS valve_builderdate,
+    node.builtdate AS valve_builtdate,
     node.ownercat_id AS valve_ownercat_id,
     node.adress_01 AS valve_adress_01,
     node.adress_02 AS valve_adress_02,
@@ -540,7 +540,7 @@ CREATE OR REPLACE VIEW v_edit_man_netinit AS
     node.location_type AS netinit_location_type,
     node.workcat_id AS netinit_workcat_id,
     node.buildercat_id AS netinit_buildercat_id,
-    node.builtdate AS netinit_builderdate,
+    node.builtdate AS netinit_builtdate,
     node.ownercat_id AS netinit_ownercat_id,
     node.adress_01 AS netinit_adress_01,
     node.adress_02 AS netinit_adress_02,
@@ -588,7 +588,7 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
     node.location_type AS manhole_location_type,
     node.workcat_id AS manhole_workcat_id,
     node.buildercat_id AS manhole_buildercat_id,
-    node.builtdate AS manhole_builderdate,
+    node.builtdate AS manhole_builtdate,
     node.ownercat_id AS manhole_ownercat_id,
     node.adress_01 AS manhole_adress_01,
     node.adress_02 AS manhole_adress_02,
@@ -633,7 +633,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjump AS
     node.location_type AS wjump_location_type,
     node.workcat_id AS wjump_workcat_id,
     node.buildercat_id AS wjump_buildercat_id,
-    node.builtdate AS wjump_builderdate,
+    node.builtdate AS wjump_builtdate,
     node.ownercat_id AS wjump_ownercat_id,
     node.adress_01 AS wjump_adress_01,
     node.adress_02 AS wjump_adress_02,
@@ -686,7 +686,7 @@ CREATE OR REPLACE VIEW v_edit_man_netgully AS
     node.location_type AS netgully_location_type,
     node.workcat_id AS netgully_workcat_id,
     node.buildercat_id AS netgully_buildercat_id,
-    node.builtdate AS netgully_builderdate,
+    node.builtdate AS netgully_builtdate,
     node.ownercat_id AS netgully_ownercat_id,
     node.adress_01 AS netgully_adress_01,
     node.adress_02 AS netgully_adress_02,
@@ -732,7 +732,7 @@ CREATE OR REPLACE VIEW v_edit_man_netgully_pol AS
     node.location_type AS netgully_location_type,
     node.workcat_id AS netgully_workcat_id,
     node.buildercat_id AS netgully_buildercat_id,
-    node.builtdate AS netgully_builderdate,
+    node.builtdate AS netgully_builtdate,
     node.ownercat_id AS netgully_ownercat_id,
     node.adress_01 AS netgully_adress_01,
     node.adress_02 AS netgully_adress_02,
@@ -777,7 +777,7 @@ CREATE OR REPLACE VIEW v_edit_man_chamber AS
     node.location_type AS chamber_location_type,
     node.workcat_id AS chamber_workcat_id,
     node.buildercat_id AS chamber_buildercat_id,
-    node.builtdate AS chamber_builderdate,
+    node.builtdate AS chamber_builtdate,
     node.ownercat_id AS chamber_ownercat_id,
     node.adress_01 AS chamber_adress_01,
     node.adress_02 AS chamber_adress_02,
@@ -828,7 +828,7 @@ CREATE OR REPLACE VIEW v_edit_man_chamber_pol AS
     node.location_type AS chamber_location_type,
     node.workcat_id AS chamber_workcat_id,
     node.buildercat_id AS chamber_buildercat_id,
-    node.builtdate AS chamber_builderdate,
+    node.builtdate AS chamber_builtdate,
     node.ownercat_id AS chamber_ownercat_id,
     node.adress_01 AS chamber_adress_01,
     node.adress_02 AS chamber_adress_02,
@@ -878,7 +878,7 @@ CREATE OR REPLACE VIEW v_edit_man_wwtp AS
     node.location_type AS wwtp_location_type,
     node.workcat_id AS wwtp_workcat_id,
     node.buildercat_id AS wwtp_buildercat_id,
-    node.builtdate AS wwtp_builderdate,
+    node.builtdate AS wwtp_builtdate,
     node.ownercat_id AS wwtp_ownercat_id,
     node.adress_01 AS wwtp_adress_01,
     node.adress_02 AS wwtp_adress_02,
@@ -926,7 +926,7 @@ CREATE OR REPLACE VIEW v_edit_man_wwtp_pol AS
     node.location_type AS wwtp_location_type,
     node.workcat_id AS wwtp_workcat_id,
     node.buildercat_id AS wwtp_buildercat_id,
-    node.builtdate AS wwtp_builderdate,
+    node.builtdate AS wwtp_builtdate,
     node.ownercat_id AS wwtp_ownercat_id,
     node.adress_01 AS wwtp_adress_01,
     node.adress_02 AS wwtp_adress_02,
@@ -1011,9 +1011,15 @@ CREATE OR REPLACE VIEW v_edit_man_conduit AS
      LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
      JOIN man_conduit ON man_conduit.arc_id::text = arc.arc_id::text;
 
+ALTER TABLE v_edit_man_conduit
+  OWNER TO postgres;
 
 
-DROP VIEW IF EXISTS v_edit_man_siphon CASCADE;
+
+
+
+DROP VIEW v_edit_man_siphon;
+
 CREATE OR REPLACE VIEW v_edit_man_siphon AS 
  SELECT arc.arc_id,
     arc.node_1 AS siphon_node_1,
