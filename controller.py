@@ -289,24 +289,28 @@ class DaoController():
     def get_layer_source(self, layer):
         ''' Get database, schema and table or view name of selected layer '''
 
-        # Initialize dictionary
-        layer_source = {'db': None, 'schema': None, 'table': None}
+        # Initialize variables
+        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'username': None}
         
-        # Get database name
+        # Get database name, host and port
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini_db = uri.find('dbname=')
-        pos_end_db = uri.find(' host=')
-        if pos_ini_db <> -1 and pos_end_db <> -1:
-            uri_db = uri[pos_ini_db + 8:pos_end_db - 1]    
-            layer_source['db'] = uri_db       
+        pos_ini_host = uri.find(' host=')
+        pos_ini_port = uri.find(' port=')
+        if pos_ini_db <> -1 and pos_ini_host <> -1:
+            uri_db = uri[pos_ini_db + 8:pos_ini_host - 1]
+            layer_source['db'] = uri_db     
+        if pos_ini_host <> -1 and pos_ini_port <> -1:
+            uri_host = uri[pos_ini_host + 6:pos_ini_port]     
+            layer_source['host'] = uri_host       
          
         # Get schema and table or view name     
-        pos_ini = uri.find('table=')
+        pos_ini_table = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
-        if pos_ini <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini + 6:pos_end_schema]
-            uri_table = uri[pos_ini + 6:pos_fi + 1]
+        if pos_ini_table <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini_table + 6:pos_end_schema]
+            uri_table = uri[pos_end_schema + 2:pos_fi]
             layer_source['schema'] = uri_schema            
             layer_source['table'] = uri_table            
 
