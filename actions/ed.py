@@ -61,8 +61,25 @@ class Ed():
         self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_hydrant')
         self.table_valve = self.settings.value('db/table_valve', 'v_edit_valve')
         self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_manhole')
-  
-                  
+        
+        self.table_varc = self.settings.value('db/table_varc', 'v_edit_varc')  
+        self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_siphon')
+        self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_conduit')      
+        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_waccel') 
+        
+        self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_chamber') 
+        self.table_chamber_pol = self.settings.value('db/table_chamber', 'v_edit_chamber_pol') 
+        self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_netgully') 
+        self.table_netgully_pol = self.settings.value('db/table_netgully_pol', 'v_edit_netgully_pol')
+        self.table_netinit = self.settings.value('db/table_netinit', 'v_edit_netinit')     
+        self.table_wjump = self.settings.value('db/table_wjump', 'v_edit_wjump')  
+        self.table_wwtp = self.settings.value('db/table_wwtp', 'v_edit_wwtp') 
+        self.table_wwtp_pol = self.settings.value('db/table_wwtp_pol', 'v_edit_wwtp_pol')
+        self.table_storage = self.settings.value('db/table_storage', 'v_edit_storage')
+        self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_storage_pol')  
+        self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_outfall')   
+        
+               
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
@@ -144,10 +161,7 @@ class Ed():
         # Show information message    
         message = "Executing... "+aux
         self.controller.show_info(message, context_name='ui_message')
-                                            
-    
-         
-        
+                                              
                           
     def ed_add_element(self):
         ''' Button 33. Add element '''
@@ -190,7 +204,7 @@ class Ed():
             aux = row[i]
             row[i] = str(aux[0])
             
-        self.get_date()
+        #self.get_date()
         model.setStringList(row)
         self.completer.setModel(model)
         
@@ -213,12 +227,12 @@ class Ed():
       
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
-
+        
         else :
             message="Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
-     
+
         
     def ed_add_el_autocomplete(self):    
         ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
@@ -382,13 +396,30 @@ class Ed():
         table_hydrant = self.schema_name+'."'+self.table_hydrant+'"'
         table_valve = self.schema_name+'."'+self.table_valve+'"'
         table_manhole = self.schema_name+'."'+self.table_manhole+'"'
+        
+        table_chamber = self.schema_name+'."'+self.table_chamber+'"'
+        table_chamber_pol = self.schema_name+'."'+self.table_chamber_pol+'"'
+        table_netgully = self.schema_name+'."'+self.table_netgully+'"'
+        table_netgully_pol = self.schema_name+'."'+self.table_netgully_pol+'"'
+        table_netinit = self.schema_name+'."'+self.table_netinit+'"'
+        table_wjump = self.schema_name+'."'+self.table_wjump+'"'
+        table_wwtp = self.schema_name+'."'+self.table_wwtp+'"'
+        table_wwtp_pol = self.schema_name+'."'+self.table_wwtp_pol+'"'
+        table_storage = self.schema_name+'."'+self.table_storage+'"'
+        table_storage_pol = self.schema_name+'."'+self.table_storage_pol+'"'
+        table_outfall = self.schema_name+'."'+self.table_outfall+'"'
+        
+        table_varc = self.schema_name+'."'+self.table_varc+'"'
+        table_siphon = self.schema_name+'."'+self.table_siphon+'"'
+        table_conduit = self.schema_name+'."'+self.table_conduit+'"'
+        table_waccel = self.schema_name+'."'+self.table_waccel+'"'
 
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
-
+  
         #uri_table = layer_source['table']
         uri_table = layer_source[1]
-                
+     
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return
@@ -451,7 +482,55 @@ class Ed():
         if table_manhole in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        
+            
+        if table_chamber in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_chamber_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_netgully in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_netgully_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_netinit in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_wjump in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_wwtp in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_wwtp_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_storage in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_storage_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if table_outfall in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+            
+            
+        if table_varc in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+        if table_siphon in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+        if table_conduit in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+        if table_waccel in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+
         # Get selected features
         features = self.layer.selectedFeatures()
         for feature in features:

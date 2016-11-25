@@ -50,7 +50,6 @@ class ManArcDialog(ParentDialog):
       
         table_element = "v_ui_element_x_arc" 
         table_document = "v_ui_doc_x_arc"   
-        table_event_element = "v_ui_event_x_element_x_arc" 
         table_event_arc = "v_ui_event_x_arc"
         
         self.table_varc = self.schema_name+'."v_edit_man_varc"'
@@ -69,7 +68,6 @@ class ManArcDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
-        self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
         self.tbl_event_arc = self.dialog.findChild(QTableView, "tbl_event_arc")  
               
         # Load data from related tables
@@ -92,12 +90,6 @@ class ManArcDialog(ParentDialog):
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-  
-        # Fill tab event | element
-        self.fill_tbl_event(self.tbl_event_element, self.schema_name+"."+table_event_element, self.filter)
-        
-        # Configuration of table event | element
-        self.set_configuration(self.tbl_event_element, table_event_element)
         
         # Fill tab event | arc
         self.fill_tbl_event(self.tbl_event_arc, self.schema_name+"."+table_event_arc, self.filter)

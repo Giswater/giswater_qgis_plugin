@@ -50,7 +50,6 @@ class ManConnecDialog(ParentDialog):
       
         table_element = "v_ui_element_x_connec" 
         table_document = "v_ui_doc_x_connec"
-        table_event_element = "v_ui_event_x_element_x_connec" 
         table_event_connec = "v_ui_event_x_connec"
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
@@ -88,21 +87,13 @@ class ManConnecDialog(ParentDialog):
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-
-        
-        # Fill tab event | element
-        self.fill_tbl_event(self.tbl_event_element, self.schema_name+"."+table_event_element, self.filter)
-        
-        # Configuration of table event | element
-        self.set_configuration(self.tbl_event_element, table_event_element)
         
         # Fill tab event | connec
         self.fill_tbl_event(self.tbl_event_connec, self.schema_name+"."+table_event_connec, self.filter)
         
         # Configuration of table event | connec
         self.set_configuration(self.tbl_event_connec, table_event_connec)
-        
-        
+              
         # Fill tab hydrometer | hydrometer
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
         

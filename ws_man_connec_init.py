@@ -8,9 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
-
 from qgis.core import QgsVectorLayer
-
 from functools import partial
 
 import utils_giswater
@@ -52,7 +50,6 @@ class ManConnecDialog(ParentDialog):
       
         table_element = "v_ui_element_x_connec" 
         table_document = "v_ui_doc_x_connec" 
-        table_event_element = "v_ui_event_x_element_x_connec" 
         table_event_connec = "v_ui_event_x_connec"
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
@@ -78,7 +75,7 @@ class ManConnecDialog(ParentDialog):
         self.tbl_event_connec = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
-        
+
         # Manage tab visibility
         self.set_tabs_visibility()  
               
@@ -100,12 +97,6 @@ class ManConnecDialog(ParentDialog):
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
         
-        # Fill tab event | element
-        self.fill_tbl_event(self.tbl_event_element, self.schema_name+"."+table_event_element, self.filter)
-        
-        # Configuration of table event | element
-        self.set_configuration(self.tbl_event_element, table_event_element)
-        
         # Fill tab event | connec
         self.fill_tbl_event(self.tbl_event_connec, self.schema_name+"."+table_event_connec, self.filter)
         
@@ -116,13 +107,13 @@ class ManConnecDialog(ParentDialog):
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
         
         # Configuration of table hydrometer | hydrometer
-        self.set_configuration(self.tbl_hydrometer, table_hydrometer)
+        #self.set_configuration(self.tbl_hydrometer, table_hydrometer)
        
         # Fill tab hydrometer | hydrometer value
         self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name+"."+table_hydrometer_value, self.filter)
-        
+
         # Configuration of table hydrometer | hydrometer value
-        self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
+        #self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
  
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            

@@ -50,7 +50,6 @@ class ManNodeDialog(ParentDialog):
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
-        table_event_element = "v_ui_event_x_element_x_node" 
         table_event_connec = "v_ui_event_x_node"
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"    
@@ -105,18 +104,12 @@ class ManNodeDialog(ParentDialog):
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
-        # Fill tab event | element
-        self.fill_tbl_event(self.tbl_event_element, self.schema_name+"."+table_event_element, self.filter)
-        
-        # Configuration of table event | element
-        self.set_configuration(self.tbl_event_element, table_event_element)
-        
         # Fill tab event | node
         self.fill_tbl_event(self.tbl_event_connec, self.schema_name+"."+table_event_connec, self.filter)
         
         # Configuration of table event | node
         self.set_configuration(self.tbl_event_connec, table_event_connec)
-        '''
+        
         # Fill tab scada | scada
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
         
@@ -131,7 +124,7 @@ class ManNodeDialog(ParentDialog):
 
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-        '''
+        
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
