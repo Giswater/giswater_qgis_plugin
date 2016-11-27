@@ -48,7 +48,7 @@ JOIN  connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id;
 
 
 
-
+DROP VIEW IF EXISTS v_rtc_hydrometer_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS 
  SELECT ext_rtc_hydrometer.hydrometer_id,
     ext_cat_period.id AS period_id,
@@ -67,7 +67,6 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_period AS
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id= ext_rtc_hydrometer.hydrometer_id
      JOIN connec ON connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
      JOIN rtc_options ON rtc_options.period_id::text = ext_cat_period.id::text;
-
 
 
 DROP VIEW IF EXISTS v_rtc_dma_hydrometer_period CASCADE;
@@ -97,6 +96,20 @@ CREATE OR REPLACE VIEW v_rtc_dma_parameter_period AS
     ext_rtc_scada_dma_period.m3_max / ext_rtc_scada_dma_period.m3_avg AS cmax
    FROM v_rtc_dma_hydrometer_period
   JOIN ext_rtc_scada_dma_period ON ext_rtc_scada_dma_period.cat_period_id::text = v_rtc_dma_hydrometer_period.period_id::text;
+
+
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
+SELECT
+rtc_hydrometer_x_connec.hydrometer_id,
+rtc_hydrometer_x_connec.connec_id,
+arc.arc_id,
+arc.node_1,
+arc.node_2
+FROM rtc_hydrometer_x_connec
+JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+JOIN arc ON arc.arc_id::text = v_edit_connec.arc_id;
+
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
@@ -131,19 +144,6 @@ UNION
 
 
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
-CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
-SELECT
-rtc_hydrometer_x_connec.hydrometer_id,
-rtc_hydrometer_x_connec.connec_id,
-arc.arc_id,
-arc.node_1,
-arc.node_2
-FROM rtc_hydrometer_x_connec
-JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-JOIN arc ON arc.arc_id::text = v_edit_connec.arc_id;
-
-
 DROP VIEW IF EXISTS v_inp_dwf_flow CASCADE;
 CREATE OR REPLACE VIEW v_inp_dwf_flow AS 
  SELECT node.node_id, 
@@ -160,10 +160,9 @@ CREATE OR REPLACE VIEW v_inp_dwf_flow AS
    FROM inp_selector_sector
    JOIN v_node node ON node.sector_id::text = inp_selector_sector.sector_id::text
    JOIN inp_dwf ON inp_dwf.node_id::text = node.node_id::text
-   JOIN inp_selector_state ON node.state::text = inp_selector_state.id::text
+   JOIN inp_selector_state ON node.state::text = inp_selector_state.id::text;
  --  JOIN v_rtc_hydrometer_arc ON
  --  JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::text = v_rtc_hydrometer_x_arc.hydrometer_id::text
-
 
 
 

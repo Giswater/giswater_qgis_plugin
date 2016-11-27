@@ -708,14 +708,14 @@ CREATE TABLE "man_netinit" (
 "mwidth" numeric(12,3),
 "add_info" varchar(255),
 "netinit_name" varchar(255),
-CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
+CONSTRAINT man_netinit_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_junction" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
-CONSTRAINT man_netinit_pkey PRIMARY KEY (node_id)
+CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
 );
 
 
