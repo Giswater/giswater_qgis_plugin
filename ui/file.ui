@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>483</width>
-    <height>227</height>
+    <height>241</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QLineEdit" name="doc_id">
    <property name="geometry">
     <rect>
-     <x>15</x>
-     <y>20</y>
-     <width>201</width>
+     <x>79</x>
+     <y>24</y>
+     <width>161</width>
      <height>20</height>
     </rect>
    </property>
@@ -30,8 +30,8 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>140</y>
-     <width>90</width>
+     <y>122</y>
+     <width>55</width>
      <height>22</height>
     </rect>
    </property>
@@ -63,7 +63,7 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>54</y>
+     <y>172</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -73,8 +73,8 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>95</y>
-     <width>90</width>
+     <y>71</y>
+     <width>59</width>
      <height>22</height>
     </rect>
    </property>
@@ -106,7 +106,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>190</y>
+     <y>204</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -119,8 +119,8 @@
    <property name="geometry">
     <rect>
      <x>16</x>
-     <y>54</y>
-     <width>90</width>
+     <y>172</y>
+     <width>59</width>
      <height>22</height>
     </rect>
    </property>
@@ -152,9 +152,9 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>95</y>
+     <y>71</y>
      <width>391</width>
-     <height>26</height>
+     <height>43</height>
     </rect>
    </property>
   </widget>
@@ -162,7 +162,7 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>140</y>
+     <y>122</y>
      <width>391</width>
      <height>41</height>
     </rect>
@@ -172,7 +172,7 @@
    <property name="geometry">
     <rect>
      <x>395</x>
-     <y>190</y>
+     <y>204</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -184,9 +184,9 @@
   <widget class="QComboBox" name="doc_type">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>20</y>
-     <width>221</width>
+     <x>322</x>
+     <y>24</y>
+     <width>147</width>
      <height>20</height>
     </rect>
    </property>
@@ -195,6 +195,72 @@
      <string>doc_type</string>
     </property>
    </item>
+  </widget>
+  <widget class="QLabel" name="label_observ_2">
+   <property name="geometry">
+    <rect>
+     <x>16</x>
+     <y>20</y>
+     <width>59</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="text">
+    <string>Doc id:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_observ_3">
+   <property name="geometry">
+    <rect>
+     <x>258</x>
+     <y>20</y>
+     <width>59</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="text">
+    <string>Doc type:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
   </widget>
  </widget>
  <resources/>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>411</height>
+    <width>560</width>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QLabel" name="label_owner">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>100</y>
+     <x>280</x>
+     <y>156</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -49,8 +49,8 @@
   <widget class="QDateTimeEdit" name="builtdate">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>100</y>
+     <x>110</x>
+     <y>124</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -98,8 +98,8 @@
   <widget class="QLabel" name="label_builtdate">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>100</y>
+     <x>10</x>
+     <y>124</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -157,7 +157,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>130</y>
+     <y>124</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -223,7 +223,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>70</y>
+     <y>94</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -233,7 +233,7 @@
    <property name="geometry">
     <rect>
      <x>380</x>
-     <y>70</y>
+     <y>94</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -288,8 +288,8 @@
   <widget class="QComboBox" name="workcat_id_end">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>190</y>
+     <x>380</x>
+     <y>186</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -299,7 +299,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>70</y>
+     <y>94</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -332,7 +332,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>154</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -364,8 +364,8 @@
   <widget class="QLabel" name="label_rotation">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>360</y>
+     <x>150</x>
+     <y>358</y>
      <width>46</width>
      <height>13</height>
     </rect>
@@ -377,8 +377,8 @@
   <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>380</y>
+     <x>150</x>
+     <y>378</y>
      <width>76</width>
      <height>20</height>
     </rect>
@@ -390,8 +390,8 @@
   <widget class="QLabel" name="label_workcat_id_end">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>190</y>
+     <x>280</x>
+     <y>186</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -470,7 +470,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
+     <y>94</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -502,8 +502,8 @@
   <widget class="QComboBox" name="ownercat_id">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>100</y>
+     <x>380</x>
+     <y>156</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -546,7 +546,7 @@
    <property name="geometry">
     <rect>
      <x>380</x>
-     <y>130</y>
+     <y>124</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -618,7 +618,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>160</y>
+     <y>184</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -651,7 +651,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>130</y>
+     <y>154</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -661,7 +661,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>160</y>
+     <y>184</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -670,8 +670,8 @@
   <widget class="QComboBox" name="verified_2">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>380</y>
+     <x>10</x>
+     <y>378</y>
      <width>119</width>
      <height>20</height>
     </rect>
@@ -680,8 +680,8 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>360</y>
+     <x>10</x>
+     <y>358</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -711,6 +711,32 @@
    </property>
    <property name="margin">
     <number>3</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_accept">
+   <property name="geometry">
+    <rect>
+     <x>379</x>
+     <y>402</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ok</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_cancel">
+   <property name="geometry">
+    <rect>
+     <x>464</x>
+     <y>402</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
    </property>
   </widget>
  </widget>
