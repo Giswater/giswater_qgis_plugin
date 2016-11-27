@@ -202,12 +202,15 @@ class Mg():
     def get_settings_value(self, settings, parameter):
         ''' Utility function that fix problem with network units in Windows '''
         
-        file_aux = settings.value(parameter)
-        unit = file_aux[:1]
-        if unit != '\\' and file_aux[1] != ':':
-            path = file_aux[1:]
-            file_aux = unit+":"+path
-        
+        file_aux = ""
+        try:
+            file_aux = settings.value(parameter)
+            unit = file_aux[:1]
+            if unit != '\\' and file_aux[1] != ':':
+                path = file_aux[1:]
+                file_aux = unit+":"+path
+        except IndexError:
+            pass   
         return file_aux
             
                     
