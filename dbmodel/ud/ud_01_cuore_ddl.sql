@@ -676,12 +676,12 @@ CONSTRAINT point_pkey PRIMARY KEY (point_id)
 
 
 
-CREATE TABLE "samplepoint"
-(
+CREATE TABLE "samplepoint"(
   "sample_id" character varying(16) NOT NULL,
   "state" character varying(150),
   "featurecat_id" character varying(50),
-  "feature_id2" character varying(15),
+  "feature_id" character varying(16),
+  "feature_id2" character varying(16),
   "rotation" numeric(12,3),
   "code_lab" integer,
   "element_type" character varying(150),

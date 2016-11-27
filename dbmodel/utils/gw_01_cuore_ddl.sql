@@ -40,6 +40,8 @@ CREATE TABLE "config" (
 "connec_duplicated_tolerance" float,
 "audit_function_control" boolean,
 "arc_searchnodes_control" boolean,
+"insert_double_geometry" boolean,
+"buffer_value" double precision,
 CONSTRAINT "config_pkey" PRIMARY KEY ("id"),
 CONSTRAINT "config_check" CHECK(id = '1')
 );
