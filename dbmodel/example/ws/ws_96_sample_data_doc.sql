@@ -5,6 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 
 -- INSERT INTO cat_tag VALUES ('NO TAG', NULL);
 INSERT INTO cat_tag VALUES ('PRIORITY NORMAL', NULL);
