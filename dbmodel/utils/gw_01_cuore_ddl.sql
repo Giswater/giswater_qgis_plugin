@@ -112,7 +112,7 @@ CONSTRAINT "config_py_tables_pkey" PRIMARY KEY ("id")
 
 CREATE TABLE "config_param_int" (
 "id" varchar (50) NOT NULL,
-"value" int4 NOT NULL
+"value" int4 NOT NULL,
 "context" varchar (50),
 "from_version" varchar (50), 
 "to_version" varchar (50), 
@@ -122,7 +122,7 @@ CONSTRAINT "config_param_int_pkey" PRIMARY KEY ("id")
 
 CREATE TABLE "config_param_text" (
 "id" varchar (50) NOT NULL,
-"value" text NOT NULL
+"value" text NOT NULL,
 "context" varchar (50),
 "from_version" varchar (50), 
 "to_version" varchar (50), 
@@ -132,7 +132,7 @@ CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
 
 CREATE TABLE "config_param_float" (
 "id" varchar (50) NOT NULL,
-"value" double precision NOT NULL
+"value" double precision NOT NULL,
 "context" varchar (50),
 "from_version" varchar (50), 
 "to_version" varchar (50), 
@@ -142,7 +142,7 @@ CONSTRAINT "config_param_float_pkey" PRIMARY KEY ("id")
 
 CREATE TABLE "config_param_bool" (
 "id" varchar (50) NOT NULL,
-"value" boolean NOT NULL
+"value" boolean NOT NULL,
 "context" varchar (50),
 "from_version" varchar (50), 
 "to_version" varchar (50), 
