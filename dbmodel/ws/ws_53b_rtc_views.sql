@@ -113,7 +113,6 @@ JOIN arc ON arc.arc_id::text = v_edit_connec.arc_id;
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
-
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
  SELECT v_rtc_hydrometer_x_arc.node_1 AS node_id,
     v_rtc_hydrometer_period.dma_id,

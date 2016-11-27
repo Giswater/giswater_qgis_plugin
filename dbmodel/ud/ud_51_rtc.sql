@@ -36,14 +36,46 @@ CREATE TABLE rtc_hydrometer_x_connec (
 
 
 
+CREATE TABLE rtc_scada_node (
+  scada_id character varying(16) NOT NULL,
+  node_id character varying(16),
+  CONSTRAINT rtc_scada_node_pkey PRIMARY KEY (scada_id)
+);
+
+
+
+CREATE TABLE rtc_scada_x_dma (
+  id serial NOT NULL,
+  scada_id character varying(16) NOT NULL,
+  dma_id character varying(16),
+  flow_sign int2,
+  CONSTRAINT rtc_scada_dma_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE rtc_scada_x_sector (
+  id serial NOT NULL,
+  scada_id character varying(16) NOT NULL,
+  sector_id character varying(16),
+  flow_sign int2,
+  CONSTRAINT rtc_scada_sector_pkey PRIMARY KEY (scada_id)
+);
+
+
+
+
+
+
 -- ----------------------------
 -- Value domain
 -- --------------------------
+
+CREATE TABLE rtc_value_opti_coef (
+  id character varying(16) NOT NULL,
+    CONSTRAINT rtc_value_opti_coef_pkey PRIMARY KEY (id)
+);
 
 CREATE TABLE rtc_value_opti_status (
   id character varying(16) NOT NULL,
     CONSTRAINT rtc_value_opti_status_pkey PRIMARY KEY (id)
 );
-
-
-
