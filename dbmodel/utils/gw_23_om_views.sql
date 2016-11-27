@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP VIEW IF EXISTS v_ui_om_visit_event_x_node CASCADE;
-CREATE OR REPLACE VIEW v_ui_om_visit_x_event_x_node AS 
+DROP VIEW IF EXISTS v_ui_om_visit_x_node CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visit_x_node AS 
 SELECT
 om_visit_event.id as event_id,
 om_visit.id as visit_id,
@@ -33,8 +33,8 @@ JOIN node ON node.node_id = om_visit_x_node.node_id
 ORDER BY node_id;
 
 
-DROP VIEW IF EXISTS v_ui_om_visit_event_x_arc CASCADE;
-CREATE OR REPLACE VIEW v_ui_om_visit_x_event_x_arc AS 
+DROP VIEW IF EXISTS v_ui_om_visit_x_arc CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS 
 SELECT
 om_visit_event.id as event_id,
 om_visit.id as visit_id,
@@ -59,8 +59,8 @@ JOIN arc ON arc.arc_id = om_visit_x_arc.arc_id
 ORDER BY arc_id;
 
 
-DROP VIEW IF EXISTS v_ui_om_visit_event_x_connec CASCADE;
-CREATE OR REPLACE VIEW v_ui_om_visit_x_event_x_connec AS 
+DROP VIEW IF EXISTS v_ui_om_visit_x_connec CASCADE;
+CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS 
 SELECT
 om_visit_event.id as event_id,
 om_visit.id as visit_id,
