@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings   
-from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox
+from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
 
 import subprocess
+from functools import partial
 
 from dao.pg_dao import PgDao
 
@@ -60,6 +61,7 @@ class DaoController():
                 
     
     def set_database_connection(self):
+        ''' Sets database connnection '''
         
         # Initialize variables
         self.dao = None 
@@ -130,16 +132,39 @@ class DaoController():
         
             
     def show_info(self, text, duration=5, context_name=None):
-        ''' Show message to the user.
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        ''' Show info to the user '''
         self.show_message(text, 0, duration, context_name)
         
         
     def show_warning(self, text, duration=5, context_name=None):
-        ''' Show message to the user.
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        ''' Show warning to the user '''
         self.show_message(text, 1, duration, context_name)
      
+     
+    def show_warning_detail(self, text, detail_text, context_name=None):
+        ''' Show warning message with a button to show more details '''  
+        inf_text = "Press 'Show Me' button to get more details..."
+        widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
+        button = QPushButton(widget)
+        button.setText(self.tr("Show Me"))
+        button.pressed.connect(partial(self.show_details, detail_text, self.tr('Warning details')))
+        widget.layout().addWidget(button)
+        self.iface.messageBar().pushWidget(widget, 1)        
+    
+    
+    def show_details(self, detail_text, title=None, inf_text=None):
+        ''' Shows a message box with detail information '''
+        self.iface.messageBar().clearWidgets()        
+        msg_box = QMessageBox()
+        msg_box.setText(detail_text)
+        if title is not None:
+            msg_box.setWindowTitle(title);        
+        if inf_text is not None:
+            msg_box.setInformativeText(inf_text);        
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.setDefaultButton(QMessageBox.Ok)        
+        msg_box.exec_()                      
+               
      
     def ask_question(self, text, title=None, inf_text=None, context_name=None):
         ''' Ask question to the user '''   
@@ -157,22 +182,21 @@ class DaoController():
             return True
         elif ret == QMessageBox.Discard:
             return False      
-                                                    
-            
+                                                      
+               
     def get_row(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.get_row(sql)
         self.dao.commit()        
         if result is None:
-            self.show_message(self.log_codes[-1], 2)   
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
             return False
         elif result != 0:
             if search_audit:
-                # Get last record from audit tables (searching for a possible error)
                 return self.get_error_from_audit()
-          
-        return True  
+            
+        return True
     
     
     def get_rows(self, sql):
@@ -180,7 +204,7 @@ class DaoController():
         
         rows = self.dao.get_rows(sql)      
         if rows is None:
-            self.show_warning(str(self.dao.last_error))   
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))   
             return False
 
         return rows  
@@ -190,15 +214,14 @@ class DaoController():
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
-        if not result:         
-            self.show_message(self.log_codes[-1], 2)   
+        if not result:
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
             return False
         else:
             if search_audit:
-                # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()    
+                return self.get_error_from_audit()
 
-        return True
+        return True            
     
     
     def get_error_from_audit(self):
@@ -266,24 +289,28 @@ class DaoController():
     def get_layer_source(self, layer):
         ''' Get database, schema and table or view name of selected layer '''
 
-        # Initialize dictionary
-        layer_source = {'db': None, 'schema': None, 'table': None}
+        # Initialize variables
+        layer_source = {'db': None, 'schema': None, 'table': None, 'host': None, 'username': None}
         
-        # Get database name
+        # Get database name, host and port
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini_db = uri.find('dbname=')
-        pos_end_db = uri.find(' host=')
-        if pos_ini_db <> -1 and pos_end_db <> -1:
-            uri_db = uri[pos_ini_db + 8:pos_end_db - 1]    
-            layer_source['db'] = uri_db       
+        pos_ini_host = uri.find(' host=')
+        pos_ini_port = uri.find(' port=')
+        if pos_ini_db <> -1 and pos_ini_host <> -1:
+            uri_db = uri[pos_ini_db + 8:pos_ini_host - 1]
+            layer_source['db'] = uri_db     
+        if pos_ini_host <> -1 and pos_ini_port <> -1:
+            uri_host = uri[pos_ini_host + 6:pos_ini_port]     
+            layer_source['host'] = uri_host       
          
         # Get schema and table or view name     
-        pos_ini = uri.find('table=')
+        pos_ini_table = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
-        if pos_ini <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini + 6:pos_end_schema]
-            uri_table = uri[pos_ini + 6:pos_fi + 1]
+        if pos_ini_table <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini_table + 6:pos_end_schema]
+            uri_table = uri[pos_end_schema + 2:pos_fi]
             layer_source['schema'] = uri_schema            
             layer_source['table'] = uri_table            
 

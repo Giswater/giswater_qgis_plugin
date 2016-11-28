@@ -85,13 +85,17 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"  
             self.controller.execute_sql(sql) 
             
+        if self.dlg.check_topology_repair.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_arc_topology();"  
+            self.controller.execute_sql(sql) 
+            
         if self.dlg.check_node_sink.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
             self.controller.execute_sql(sql) 
          
         # Show message and close the dialog    
-        message = "Selected functions have been executed"
-        self.controller.show_info(message, context_name='ui_message' ) 
+        #message = "Selected functions have been executed"
+        #self.controller.show_info(message, context_name='ui_message') 
         self.close_dialog()         
             
         # Refresh map canvas
@@ -408,13 +412,13 @@ class Mg():
         # Delete previous values
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql= "DELETE FROM "+self.schema_name+".rpt_selector_result" 
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         sql= "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         sql= "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         sql= "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
@@ -540,7 +544,7 @@ class Mg():
         if self.value_combo3 != 'null':
             sql+= ", nodecat_id='"+self.value_combo3+"'"
         sql+= " WHERE node_id ='"+self.node_id+"'"
-        self.dao.execute_sql(sql)
+        self.controller.execute_sql(sql)
         
         # Show message to the user
         message = "Node type has been update!"
@@ -636,6 +640,6 @@ class Mg():
                         sql+= column_name+" = '"+str(value)+"', "           
             
             sql = sql[:-2]
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
                         
                 

@@ -226,14 +226,14 @@ class NodeDialog(ParentDialog):
             sql = " UPDATE " + self.schema_name + ".man_tank SET"
             sql += " vmax = " + str(vmax) + ", area = " + str(area)
             sql += " WHERE node_id = '" + self.id + "';"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
             total = self.dao.get_rowcount()
             # Perform an INSERT if any record has been updated
             # TODO: If trigger was working correctly this wouldn't be necessary!
             if total == 0:
                 sql = "INSERT INTO " + self.schema_name + ".man_tank (node_id, vmax, area) VALUES"
                 sql += " ('" + self.id + "', " + str(vmax) + ", " + str(area) + ");"
-                self.dao.execute_sql(sql)
+                self.controller.execute_sql(sql)
 
 
     def save_tab_analysis(self):
@@ -250,7 +250,7 @@ class NodeDialog(ParentDialog):
                 sql += self.fields_junction[i] + " = " + str(values[i]) + ", "
             sql = sql[:-2]
             sql += " WHERE node_id = '" + self.id + "'"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
 
         if self.epa_type == 'TANK':
             values = []
@@ -262,7 +262,7 @@ class NodeDialog(ParentDialog):
                 sql += self.fields_tank[i] + " = " + str(values[i]) + ", "
             sql = sql[:-2]
             sql += " WHERE node_id = '" + self.id + "'"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
 
 
     def fill_node_type_id(self):

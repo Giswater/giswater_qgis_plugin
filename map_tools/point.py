@@ -38,7 +38,6 @@ class PointMapTool(QgsMapTool):
             wsoftware = self.search_project_type()
             if wsoftware == 'ws':  
                 sql+= " INNER JOIN "+self.schema_name+".cat_node ON cat_node.nodetype_id = node_type.id"
-                
             sql+= " WHERE node_type.type = '"+self.elem_type_type+"'"
             sql+= " ORDER BY node_type.id ASC"
             sql+= " LIMIT 1"
@@ -56,7 +55,7 @@ class PointMapTool(QgsMapTool):
                 row = self.dao.get_row(sql)
                 self.dao.commit()
                 if row is None:
-                    self.controller.show_warning(str(self.dao.last_error), 50)  
+                    self.controller.show_warning_detail(self.tr("Error inserting point"), str(self.dao.last_error))
                     return False
                 else:
                     last_id = row[0]
@@ -68,6 +67,7 @@ class PointMapTool(QgsMapTool):
                 elif wsoftware == 'ud':                
                     message = "Any record found in table 'node_type' related with selected 'node_type.type'"
                     self.controller.show_info(message, context_name='ui_message')
+    
     
     def search_project_type(self):
         ''' Search in table 'version' project type of current QGIS project '''
