@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>10</number>
+    <number>14</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -95,8 +95,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1661,8 +1661,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2933,8 +2933,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4331,8 +4331,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5596,15 +5596,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_45">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -6180,7 +6180,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Mlength:</string>
+        <string>Length:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -6293,7 +6293,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Mwidth:</string>
+        <string>Width:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -6332,7 +6332,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Mheight:</string>
+        <string>Height:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -7114,8 +7114,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -8454,8 +8454,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -10133,8 +10133,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -11398,15 +11398,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_53">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -12054,7 +12054,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Mheight:</string>
+        <string>Height:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -12112,7 +12112,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Mlength:</string>
+        <string>Length:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -12206,7 +12206,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Mwidth:</string>
+        <string>Width:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -13197,8 +13197,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -14530,7 +14530,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="delete_row_info">
+    <widget class="QPushButton" name="btn_element_delete">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -15184,6 +15184,21 @@
        </property>
       </widget>
      </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Costs</string>
+    </attribute>
+    <widget class="QTableView" name="tbl_masterplan">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>46</y>
+       <width>550</width>
+       <height>385</height>
+      </rect>
+     </property>
     </widget>
    </widget>
   </widget>

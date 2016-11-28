@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>618</width>
+    <width>603</width>
     <height>592</height>
    </rect>
   </property>
@@ -48,7 +48,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>10</number>
+    <number>14</number>
    </property>
    <widget class="QWidget" name="tab_67">
     <attribute name="title">
@@ -1248,8 +1248,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1481,8 +1481,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3610,8 +3610,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3837,8 +3837,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5435,8 +5435,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -6196,8 +6196,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7794,8 +7794,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -9585,8 +9585,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -12124,8 +12124,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -12768,8 +12768,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -13522,7 +13522,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="delete_row_info">
+    <widget class="QPushButton" name="btn_element_delete">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -14184,6 +14184,21 @@
        </property>
       </widget>
      </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_13">
+    <attribute name="title">
+     <string>Costs</string>
+    </attribute>
+    <widget class="QTableView" name="tbl_masterplan">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>46</y>
+       <width>550</width>
+       <height>385</height>
+      </rect>
+     </property>
     </widget>
    </widget>
   </widget>
