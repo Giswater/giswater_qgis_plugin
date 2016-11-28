@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QTextEdit   #@UnresolvedImport
 
 import inspect
 
@@ -51,8 +51,13 @@ def getText(widget):
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)          
     if widget:
-        if widget.text():
-            elem_text = widget.text()
+        if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
+            text = widget.text()
+        elif type(widget) is QTextEdit:
+            text = widget.toPlainText()    
+            print text                
+        if text:
+            elem_text = text
         else:
             elem_text = "null"
     else:
@@ -68,7 +73,7 @@ def setText(widget, text):
         return    
     
     value = unicode(text)
-    if type(widget) is QLineEdit: 
+    if type(widget) is QLineEdit or type(widget) is QTextEdit: 
         if value == 'None':    
             value = ""        
         widget.setText(value)       
@@ -101,10 +106,8 @@ def getWidgetText(widget, add_quote=False):
     if not widget:
         return None   
     text = None
-    if type(widget) is QLineEdit:
-        text = getText(widget)
-    elif type(widget) is QDoubleSpinBox:
-        text = getText(widget)        
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox:
+        text = getText(widget)    
     elif type(widget) is QComboBox:
         text = getSelectedItem(widget)
     if add_quote and text <> "null":

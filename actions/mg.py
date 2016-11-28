@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox
 
 import os
@@ -14,6 +14,7 @@ from ..ui.config import Config                                  # @UnresolvedImp
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
 from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
+from ..ui.file_manager import FileManager                       # @UnresolvedImport
 
 
 class Mg():
@@ -110,13 +111,13 @@ class Mg():
         self.controller.check_action(True, 21)
                 
         # Get CSV file path from settings file 
-        self.file_path = self.controller.plugin_settings_value('csv_file')        
-        if self.file_path is None:             
-            self.file_path = self.plugin_dir+"/test.csv"        
+        self.file_csv = self.controller.plugin_settings_value('file_csv')        
+        if self.file_csv is None:             
+            self.file_csv = self.plugin_dir+"/test.csv"        
         
         # Create dialog
         self.dlg = TableWizard()
-        self.dlg.txt_file_path.setText(self.file_path)  
+        self.dlg.txt_file_path.setText(self.file_csv)  
         
         # Fill combo 'table' 
         self.mg_table_wizard_get_tables()          
@@ -151,18 +152,18 @@ class Mg():
     def mg_table_wizard_select_file(self):
 
         # Set default value if necessary
-        if self.file_path == '': 
-            self.file_path = self.plugin_dir
+        if self.file_csv == '': 
+            self.file_csv = self.plugin_dir
             
         # Get directory of that file
-        folder_path = os.path.dirname(self.file_path)
+        folder_path = os.path.dirname(self.file_csv)
         os.chdir(folder_path)
         msg = "Select CSV file"
-        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.csv')
-        self.dlg.txt_file_path.setText(self.file_path)     
+        self.file_csv = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.csv')
+        self.dlg.txt_file_path.setText(self.file_csv)     
 
         # Save CSV file path into settings
-        self.controller.plugin_settings_set_value('csv_file', self.file_path)    
+        self.controller.plugin_settings_set_value('file_csv', self.file_csv)    
         
         
     def mg_table_wizard_import_csv(self):
@@ -178,14 +179,14 @@ class Mg():
         header_status = self.dlg.chk_header.checkState()             
         
         # Get CSV file. Check if file exists
-        self.file_path = self.dlg.txt_file_path.toPlainText()
-        if not os.path.exists(self.file_path):
-            message = "Selected file not found: "+self.file_path
+        self.file_csv = self.dlg.txt_file_path.toPlainText()
+        if not os.path.exists(self.file_csv):
+            message = "Selected file not found: "+self.file_csv
             self.controller.show_warning(message, context_name='ui_message')
             return False      
               
         # Open CSV file for read and copy into database
-        rf = open(self.file_path)
+        rf = open(self.file_csv)
         sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
         if (header_status == Qt.Checked):
             sql+= " HEADER"
@@ -200,7 +201,130 @@ class Mg():
             self.dao.commit()
             message = "Selected CSV has been imported successfully"
             self.controller.show_info(message, context_name='ui_message')
+
+
+    def get_settings_value(self, settings, parameter):
+        ''' Utility function that fix problem with network units in Windows '''
+        
+        file_aux = ""
+        try:
+            file_aux = settings.value(parameter)
+            unit = file_aux[:1]
+            if unit != '\\' and file_aux[1] != ':':
+                path = file_aux[1:]
+                file_aux = unit+":"+path
+        except IndexError:
+            pass   
+        return file_aux
             
+                    
+    def mg_go2epa(self):
+        ''' Button 23. Open form to set INP, RPT and project '''
+
+        # Initialize variables
+        self.file_inp = None
+        self.file_rpt = None  
+        self.project_name = None    
+
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 23) 
+        
+        # Get giswater properties file
+        users_home = os.path.expanduser("~")
+        filename = "giswater_2.0.properties"        
+        java_properties_path = users_home+os.sep+"giswater"+os.sep+"config"+os.sep+filename
+        if not os.path.exists(java_properties_path):
+            msg = "Giswater properties file not found: "+str(java_properties_path)
+            self.controller.show_warning(msg)
+            return False      
+          
+        # Get last GSW file from giswater properties file
+        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
+        java_settings.setIniCodec(sys.getfilesystemencoding())          
+        file_gsw = self.get_settings_value(java_settings, 'FILE_GSW')
+        
+        # Check if that file exists
+        if not os.path.exists(file_gsw):
+            msg = "Last GSW file not found: "+str(file_gsw)
+            self.controller.show_warning(msg)
+            return False
+        
+        # Get INP, RPT file path and project name from GSW file
+        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
+        self.file_inp = self.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = self.get_settings_value(self.gsw_settings, 'FILE_RPT')                
+        self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
+                
+        # Create dialog
+        self.dlg = FileManager()
+        utils_giswater.setDialog(self.dlg)        
+
+        # Set widgets
+        self.dlg.txt_file_inp.setText(self.file_inp)
+        self.dlg.txt_file_rpt.setText(self.file_rpt)
+        self.dlg.txt_result_name.setText(self.project_name)  
+        
+        # Set signals
+        self.dlg.btn_file_inp.clicked.connect(self.mg_go2epa_select_file_inp)
+        self.dlg.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
+        self.dlg.btn_accept.clicked.connect(self.mg_go2epa_accept)
+              
+        # Manage i18n of the form and open it
+        self.controller.translate_form(self.dlg, 'file_manager')  
+        self.dlg.exec_()          
+        
+        
+    def mg_go2epa_select_file_inp(self):
+
+        # Set default value if necessary
+        if self.file_inp is None or self.file_inp == '': 
+            self.file_inp = self.plugin_dir
+            
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_inp)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)
+        os.chdir(folder_path)
+        msg = self.controller.tr("Select INP file")
+        self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
+        self.dlg.txt_file_inp.setText(self.file_inp)     
+
+
+    def mg_go2epa_select_file_rpt(self):
+
+        # Set default value if necessary
+        if self.file_rpt is None or self.file_rpt == '': 
+            self.file_rpt = self.plugin_dir
+            
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_rpt)
+        if not os.path.exists(folder_path):
+            folder_path = os.path.dirname(__file__)        
+        os.chdir(folder_path)
+        msg = self.controller.tr("Select RPT file")
+        self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
+        self.dlg.txt_file_rpt.setText(self.file_rpt)     
+
+        
+    def mg_go2epa_accept(self):
+        ''' Save INP, RPT and result name into GSW file '''
+        
+        # Get widgets values
+        self.file_inp = utils_giswater.getWidgetText('txt_file_inp')
+        self.file_rpt = utils_giswater.getWidgetText('txt_file_rpt')
+        self.project_name = utils_giswater.getWidgetText('txt_result_name')
+        
+        # Save INP, RPT and result name into GSW file
+        self.gsw_settings.setValue('FILE_INP', self.file_inp)
+        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
+        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
+                
+        # Show message and close form
+#         message = "Values has been updated"
+#         self.controller.show_info(message, context_name='ui_message') 
+        self.close_dialog(self.dlg)    
+                
                     
     def mg_go2epa_express(self):
         ''' Button 24. Open giswater in silent mode
