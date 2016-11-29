@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>593</width>
+    <width>594</width>
     <height>622</height>
    </rect>
   </property>
@@ -100,8 +100,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>407</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1200,8 +1200,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1752,8 +1752,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>407</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2852,8 +2852,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3404,8 +3404,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4504,8 +4504,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4682,8 +4682,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>380</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5237,8 +5237,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>380</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -6337,8 +6337,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -6680,8 +6680,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7509,21 +7509,6 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="page_event_hydrant_3">
-      <attribute name="title">
-       <string>Element</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_event_element">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>530</width>
-         <height>300</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
     </widget>
     <widget class="QComboBox" name="event_id">
      <property name="geometry">
@@ -7738,15 +7723,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_8">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>380</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7789,7 +7774,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_elev1_28">
+      <widget class="QLineEdit" name="m3">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -7874,7 +7859,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_elev1_6">
+      <widget class="QLabel" name="label_trenchlining">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -7896,7 +7881,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Trenchilinning:</string>
+        <string>Trenchlining:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -7924,7 +7909,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_18">
+      <widget class="QLabel" name="label_excavation">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -7998,7 +7983,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLineEdit" name="m3trench_cost">
+      <widget class="QLineEdit" name="m2trenchl_cost">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -8011,7 +7996,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_node_11">
+      <widget class="QLineEdit" name="unit">
        <property name="geometry">
         <rect>
          <x>330</x>
@@ -8027,7 +8012,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_elev1_24">
+      <widget class="QLineEdit" name="m2_2">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -8056,7 +8041,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="trench_cost">
+      <widget class="QLineEdit" name="trenchl_cost">
        <property name="geometry">
         <rect>
          <x>450</x>
@@ -8169,7 +8154,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="m3_3">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -8235,7 +8220,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_elev1_9">
+      <widget class="QLabel" name="label_pavement">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -8285,7 +8270,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_y1_5">
+      <widget class="QLabel" name="label_filling">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -8359,7 +8344,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_elev1_7">
+      <widget class="QLabel" name="label_excess">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -8396,7 +8381,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_y1_15">
+      <widget class="QLineEdit" name="m2">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -8507,7 +8492,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_node_18">
+      <widget class="QLineEdit" name="m3_2">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -8573,7 +8558,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_elev1_39">
+      <widget class="QLineEdit" name="m3_4">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -8665,7 +8650,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLineEdit" name="varc_elev1_33">
+      <widget class="QLineEdit" name="m3_5">
        <property name="geometry">
         <rect>
          <x>210</x>
@@ -8691,7 +8676,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>m</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -8747,7 +8732,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_element_3">
+      <widget class="QLabel" name="label_soil">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -8864,7 +8849,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="m2mltrench">
+      <widget class="QLineEdit" name="m2mltrenchl_2">
        <property name="geometry">
         <rect>
          <x>330</x>
@@ -8915,12 +8900,12 @@
          <x>272</x>
          <y>6</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -8959,24 +8944,24 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>G:/secciones_Giswater/seccio_giswater_ud_2.png</pixmap>
+        <pixmap>seccio_giswater_ud.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLineEdit" name="thikness">
+      <widget class="QLineEdit" name="thickness">
        <property name="geometry">
         <rect>
          <x>368</x>
          <y>14</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9008,12 +8993,12 @@
          <x>214</x>
          <y>140</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9039,18 +9024,18 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="yparam">
+      <widget class="QLineEdit" name="y_param">
        <property name="geometry">
         <rect>
          <x>448</x>
          <y>124</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9082,12 +9067,12 @@
          <x>480</x>
          <y>200</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9119,12 +9104,12 @@
          <x>480</x>
          <y>285</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9150,18 +9135,18 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="m3trench_cost_8">
+      <widget class="QLineEdit" name="m2trenchl_cost_2">
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>362</y>
+         <y>358</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9191,14 +9176,14 @@
        <property name="geometry">
         <rect>
          <x>388</x>
-         <y>362</y>
+         <y>358</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9228,9 +9213,9 @@
        <property name="geometry">
         <rect>
          <x>152</x>
-         <y>362</y>
+         <y>358</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
@@ -9264,15 +9249,15 @@
       <widget class="QLineEdit" name="z2">
        <property name="geometry">
         <rect>
-         <x>425</x>
+         <x>422</x>
          <y>202</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9301,15 +9286,15 @@
       <widget class="QLineEdit" name="z1">
        <property name="geometry">
         <rect>
-         <x>425</x>
+         <x>424</x>
          <y>310</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9341,12 +9326,12 @@
          <x>434</x>
          <y>252</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9378,12 +9363,12 @@
          <x>44</x>
          <y>256</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9415,12 +9400,12 @@
          <x>44</x>
          <y>126</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9452,12 +9437,12 @@
          <x>86</x>
          <y>200</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9489,12 +9474,12 @@
          <x>344</x>
          <y>220</y>
          <width>41</width>
-         <height>13</height>
+         <height>15</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
          <kerning>true</kerning>
         </font>
        </property>
@@ -9522,12 +9507,12 @@
       </widget>
       <zorder>label</zorder>
       <zorder>m2mltrenchl</zorder>
-      <zorder>thikness</zorder>
+      <zorder>thickness</zorder>
       <zorder>calculed_y</zorder>
-      <zorder>yparam</zorder>
+      <zorder>y_param</zorder>
       <zorder>bulk_2</zorder>
       <zorder>bulk_3</zorder>
-      <zorder>m3trench_cost_8</zorder>
+      <zorder>m2trenchl_cost_2</zorder>
       <zorder>b</zorder>
       <zorder>b_2</zorder>
       <zorder>z2</zorder>
@@ -9543,8 +9528,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>380</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -9925,7 +9910,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="../../../../../../../Users/Usuari/Desktop/dibujos.qrc"/>
+  <include location="../../../../Users/Usuari/Desktop/dibujos.qrc"/>
  </resources>
  <connections/>
 </ui>

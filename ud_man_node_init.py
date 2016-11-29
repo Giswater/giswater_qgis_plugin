@@ -50,9 +50,11 @@ class ManNodeDialog(ParentDialog):
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
-        table_event_connec = "v_ui_event_x_node"
+        table_event_node = "v_ui_om_visit_x_node"
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"    
+        
+        table_price_node = "tbl_price_node"
         
         self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
         self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'
@@ -81,10 +83,10 @@ class ManNodeDialog(ParentDialog):
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
-        self.tbl_event_connec = self.dialog.findChild(QTableView, "tbl_event_node") 
+        self.tbl_event_node = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
-
+        self.tbl_price_node = self.dialog.findChild(QTableView, "tbl_masterplan")
               
         # Load data from related tables
         self.load_data()
@@ -105,10 +107,10 @@ class ManNodeDialog(ParentDialog):
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         
         # Fill tab event | node
-        self.fill_tbl_event(self.tbl_event_connec, self.schema_name+"."+table_event_connec, self.filter)
+        self.fill_tbl_event(self.tbl_event_node, self.schema_name+"."+table_event_node, self.filter)
         
         # Configuration of table event | node
-        self.set_configuration(self.tbl_event_connec, table_event_connec)
+        self.set_configuration(self.tbl_event_node, table_event_node)
         
         # Fill tab scada | scada
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
@@ -124,6 +126,9 @@ class ManNodeDialog(ParentDialog):
 
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
+        
+        # Fill tab costs
+        self.fill_table(self.tbl_price_node, self.schema_name+"."+table_price_node, self.filter)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
