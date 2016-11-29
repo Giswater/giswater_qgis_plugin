@@ -29,29 +29,29 @@ BEGIN
         -- grate Catalog ID
         IF (NEW.gratecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_grate) = 0) THEN
-                RETURN audit_function(152,780);
+                RETURN audit_function(152,850);
 			END IF;
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,780); 
+                RETURN audit_function(115,850); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,780); 
+                RETURN audit_function(120,850); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,780); 
+                RETURN audit_function(125,850); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,780); 
+                RETURN audit_function(130,850); 
             END IF;
         END IF;
         
@@ -69,7 +69,7 @@ BEGIN
         END IF;    
 
 
-		PERFORM audit_function (1,780);
+		PERFORM audit_function (1,850);
         RETURN NEW;
 
 
@@ -98,14 +98,14 @@ BEGIN
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom, workcat_id_end=NEW.workcat_id_end, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id WHERE gully_id = OLD.gully_id;
         END IF;  
                 
-		PERFORM audit_function (2,780);
+		PERFORM audit_function (2,850);
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
-		PERFORM audit_function (3,780);
+		PERFORM audit_function (3,850);
         RETURN NULL;
    
     END IF;

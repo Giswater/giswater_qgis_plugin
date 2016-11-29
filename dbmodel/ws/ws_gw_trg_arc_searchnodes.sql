@@ -33,7 +33,7 @@ BEGIN
     
         -- Control of same node initial and final
         IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-            RETURN audit_function (180,120);
+            RETURN audit_function (180,330);
         
         ELSE
             -- Update coordinates
@@ -91,7 +91,7 @@ BEGIN
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
         RETURN audit_function (182,330);
     ELSE
-        RETURN audit_function (182,120);
+        RETURN audit_function (182,330);
     END IF;
 
 END; 
