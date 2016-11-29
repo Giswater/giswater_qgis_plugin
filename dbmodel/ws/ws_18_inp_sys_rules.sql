@@ -7,5 +7,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE OR REPLACE RULE insert_inp_cat_mat_roughness AS ON INSERT TO test_ws_rc1.cat_mat_arc
+CREATE OR REPLACE RULE insert_inp_cat_mat_roughness AS ON INSERT TO SCHEMA_NAME.cat_mat_arc
 DO ALSO INSERT INTO "SCHEMA_NAME"."inp_cat_mat_roughness" (matcat_id) values (new.id);
