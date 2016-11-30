@@ -54,7 +54,7 @@ class ManNodeDialog(ParentDialog):
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"    
         
-        table_price_node = "tbl_price_node"
+        table_price_node = "v_price_x_node"
         
         self.table_chamber = self.schema_name+'."v_edit_man_chamber"'
         self.table_chamber_pol = self.schema_name+'."v_edit_man_chamber_pol"'

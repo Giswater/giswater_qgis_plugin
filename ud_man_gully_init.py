@@ -50,7 +50,7 @@ class ManGullyDialog(ParentDialog):
       
         table_element = "v_ui_element_x_gully" 
         table_document = "v_ui_doc_x_gully"   
-        table_event_gully = "v_ui_event_x_gully"
+        table_event_gully = "v_ui_om_visit_x_gully"
 
               
         # Define class variables

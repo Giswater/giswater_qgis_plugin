@@ -50,7 +50,7 @@ class ManConnecDialog(ParentDialog):
       
         table_element = "v_ui_element_x_connec" 
         table_document = "v_ui_doc_x_connec" 
-        table_event_connec = "v_ui_event_x_connec"
+        table_event_connec = "v_ui_om_visit_x_connec"
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
         
@@ -107,13 +107,13 @@ class ManConnecDialog(ParentDialog):
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
         
         # Configuration of table hydrometer | hydrometer
-        #self.set_configuration(self.tbl_hydrometer, table_hydrometer)
+        self.set_configuration(self.tbl_hydrometer, table_hydrometer)
        
         # Fill tab hydrometer | hydrometer value
         self.fill_tbl_hydrometer(self.tbl_hydrometer_value, self.schema_name+"."+table_hydrometer_value, self.filter)
 
         # Configuration of table hydrometer | hydrometer value
-        #self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
+        self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
  
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            

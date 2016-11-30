@@ -31,7 +31,7 @@ def init_config():
     # Manage 'connecat_id'
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
-
+    
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
@@ -51,7 +51,15 @@ class ManArcDialog(ParentDialog):
         table_element = "v_ui_element_x_arc" 
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
-              
+
+        table_price_arc = "v_price_x_arc"
+        
+        self.table_varc = self.schema_name+'."v_edit_man_varc"'
+        self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
+        self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
+        self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
+        
+
         # Define class variables
         self.field_id = "arc_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
@@ -64,12 +72,16 @@ class ManArcDialog(ParentDialog):
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event_arc = self.dialog.findChild(QTableView, "tbl_event_arc")  
-              
+        self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
+        
         # Load data from related tables
         self.load_data()
         
         # Set layer in editing mode
         # self.layer.startEditing()
+        
+        # Manage tab visibility
+        self.set_tabs_visibility()  
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
@@ -82,22 +94,55 @@ class ManArcDialog(ParentDialog):
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-        '''
+        
         # Fill tab event | arc
         self.fill_tbl_event(self.tbl_event_arc, self.schema_name+"."+table_event_arc, self.filter)
         
         # Configuration of table event | arc
         self.set_configuration(self.tbl_event_arc, table_event_arc)
-        '''
-
+  
         # Fill tab costs 
         self.fill_costs()
+        
+        # Fill tab costs | Prices
+        self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))       
         
-    
+
+    def set_tabs_visibility(self):
+        ''' Hide some tabs ''' 
+          
+        # Get schema and table name of selected layer       
+        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
+        if uri_table is None:
+            self.controller.show_warning("Error getting table name from selected layer")
+            return
+        
+        if uri_table == self.table_varc :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(0)
+            
+        if uri_table == self.table_siphon :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0) 
+            
+        if uri_table == self.table_conduit :
+            self.tab_main.removeTab(3)
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+            
+        if uri_table == self.table_waccel :
+            self.tab_main.removeTab(2)
+            self.tab_main.removeTab(1)
+            self.tab_main.removeTab(0)
+         
+       
+         
     def fill_costs(self):
         ''' Fill tab costs '''
         
@@ -147,10 +192,12 @@ class ManArcDialog(ParentDialog):
         self.m3mlfill_2 = self.dialog.findChild(QLineEdit, "m3mlfill_2")
         self.m3mlexc_2 = self.dialog.findChild(QLineEdit, "m3mlexc_2")
         self.m3mlexcess_2 = self.dialog.findChild(QLineEdit, "m3mlexcess_2")
-        self.m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl")
+        self.m2mltrenchl_2 = self.dialog.findChild(QLineEdit, "m2mltrenchl_2")
         self.m2trenchl_cost_2 = self.dialog.findChild(QLineEdit, "m2trenchl_cost_2")
         self.calculed_y = self.dialog.findChild(QLineEdit, "calculed_y")  
         self.thickness = self.dialog.findChild(QLineEdit, "thickness")
+        self.m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl")
+        
         
         # Get values from database        
         sql = "SELECT *"
@@ -159,7 +206,6 @@ class ManArcDialog(ParentDialog):
         row = self.dao.get_row(sql)
         
         self.arc_cost.setText(str(row['arc_cost']))      
-        self.cost_unit.setText(str(row['cost_unit'])) 
         self.arc_cost_2.setText(str(row['arc_cost'])) 
         self.m2bottom_cost.setText(str(row['m2bottom_cost'])) 
         self.m3protec_cost.setText(str(row['m3protec_cost'])) 
@@ -168,7 +214,7 @@ class ManArcDialog(ParentDialog):
         self.m3fill_cost.setText(str(row['m3fill_cost'])) 
         self.m3mlexcess.setText(str(row['m3mlexcess'])) 
         self.m2trenchl_cost.setText(str(row['m2trenchl_cost'])) 
-        self.m2mltrenchl.setText(str(row['m2mltrenchl'])) 
+        self.m2mltrenchl_2.setText(str(row['m2mltrenchl'])) 
         self.m3mlprotec.setText(str(row['m3mlprotec'])) 
         self.m3mlexc.setText(str(row['m3mlexc'])) 
         self.m3mlfill.setText(str(row['m3mlfill'])) 
@@ -179,14 +225,16 @@ class ManArcDialog(ParentDialog):
         self.excess_cost.setText(str(row['excess_cost'])) 
         self.trenchl_cost.setText(str(row['trenchl_cost'])) 
         self.pav_cost.setText(str(row['pav_cost']))   
-        self.cost.setText(str(row['cost']))   
+        self.cost.setText(str(row['cost']))  
+        self.m2pavement_cost.setText(str(row['m2pav_cost']))  
+        self.m2mlpavement.setText(str(row['m2mlpav']))  
         
         self.z1.setText(str(row['z1']))
         self.z2.setText(str(row['z2']))
         self.bulk.setText(str(row['bulk']))
         self.bulk_2.setText(str(row['bulk']))
         self.bulk_3.setText(str(row['bulk']))
-        self.geom1.setText(str(row['geom1']))
+        #self.geom1.setText(str(row['geom1']))
         self.b.setText(str(row['b']))
         self.b_2.setText(str(row['b']))
         self.y_param.setText(str(row['y_param']))
@@ -194,9 +242,10 @@ class ManArcDialog(ParentDialog):
         self.m3mlexc_2.setText(str(row['m3mlexc']))
         self.m3mlexcess_2.setText(str(row['m3mlexcess']))
         self.m2mltrenchl.setText(str(row['m2mltrenchl']))
-        self.thickness.setText(str(row['thickness']))
+        #self.thickness.setText(str(row['thickness']))
         self.m2trenchl_cost_2.setText(str(row['m2trenchl_cost']))
-        self.calculed_y.setText(str(row['calculed_y'])) 
+        #self.calculed_y.setText(str(row['calculed_y'])) 
+        self.m2mltrenchl.setText(str(row['m2mltrenchl']))
 
 
         # Get values from database        
@@ -209,4 +258,3 @@ class ManArcDialog(ParentDialog):
         self.budget.setText(str(row['budget'])) 
         
     
-         

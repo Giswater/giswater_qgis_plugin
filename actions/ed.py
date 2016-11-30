@@ -46,38 +46,38 @@ class Ed():
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
         self.table_version = self.settings.value('db/table_version', 'version') 
         
-        self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_wjoin')
-        self.table_tap = self.settings.value('db/table_tap', 'v_edit_tap')
-        self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_greentap')
-        self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_fountain')
+        self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
+        self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
+        self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_man_greentap')
+        self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_man_fountain')
         
-        self.table_tank = self.settings.value('db/table_tank', 'v_edit_tank')
-        self.table_pump = self.settings.value('db/table_pump', 'v_edit_pump')
-        self.table_source = self.settings.value('db/table_source', 'v_edit_source')
-        self.table_meter = self.settings.value('db/table_meter', 'v_edit_meter')
-        self.table_junction = self.settings.value('db/table_junction', 'v_edit_junction')
-        self.table_waterwell = self.settings.value('db/table_waterwell', 'v_edit_waterwell')
-        self.table_reduction = self.settings.value('db/table_reduction', 'v_edit_reduction')
-        self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_hydrant')
-        self.table_valve = self.settings.value('db/table_valve', 'v_edit_valve')
-        self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_manhole')
+        self.table_tank = self.settings.value('db/table_tank', 'v_edit_man_tank')
+        self.table_pump = self.settings.value('db/table_pump', 'v_edit_man_pump')
+        self.table_source = self.settings.value('db/table_source', 'v_edit_man_source')
+        self.table_meter = self.settings.value('db/table_meter', 'v_edit_man_meter')
+        self.table_junction = self.settings.value('db/table_junction', 'v_edit_man_junction')
+        self.table_waterwell = self.settings.value('db/table_waterwell', 'v_edit_man_waterwell')
+        self.table_reduction = self.settings.value('db/table_reduction', 'v_edit_man_reduction')
+        self.table_hydrant = self.settings.value('db/table_hydrant', 'v_edit_man_hydrant')
+        self.table_valve = self.settings.value('db/table_valve', 'v_edit_man_valve')
+        self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_man_manhole')
         
-        self.table_varc = self.settings.value('db/table_varc', 'v_edit_varc')  
-        self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_siphon')
-        self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_conduit')      
-        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_waccel') 
+        self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')  
+        self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
+        self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')      
+        self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel') 
         
-        self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_chamber') 
-        self.table_chamber_pol = self.settings.value('db/table_chamber', 'v_edit_chamber_pol') 
-        self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_netgully') 
-        self.table_netgully_pol = self.settings.value('db/table_netgully_pol', 'v_edit_netgully_pol')
-        self.table_netinit = self.settings.value('db/table_netinit', 'v_edit_netinit')     
-        self.table_wjump = self.settings.value('db/table_wjump', 'v_edit_wjump')  
-        self.table_wwtp = self.settings.value('db/table_wwtp', 'v_edit_wwtp') 
-        self.table_wwtp_pol = self.settings.value('db/table_wwtp_pol', 'v_edit_wwtp_pol')
-        self.table_storage = self.settings.value('db/table_storage', 'v_edit_storage')
-        self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_storage_pol')  
-        self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_outfall')   
+        self.table_chamber = self.settings.value('db/table_chamber', 'v_edit_man_chamber') 
+        self.table_chamber_pol = self.settings.value('db/table_chamber', 'v_edit_man_chamber_pol') 
+        self.table_netgully = self.settings.value('db/table_netgully', 'v_edit_man_netgully') 
+        self.table_netgully_pol = self.settings.value('db/table_netgully_pol', 'v_edit_man_netgully_pol')
+        self.table_netinit = self.settings.value('db/table_netinit', 'v_edit_man_netinit')     
+        self.table_wjump = self.settings.value('db/table_wjump', 'v_edit_man_wjump')  
+        self.table_wwtp = self.settings.value('db/table_wwtp', 'v_edit_man_wwtp') 
+        self.table_wwtp_pol = self.settings.value('db/table_wwtp_pol', 'v_edit_man_wwtp_pol')
+        self.table_storage = self.settings.value('db/table_storage', 'v_edit_man_storage')
+        self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')  
+        self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')   
         
                
     def close_dialog(self, dlg=None): 
@@ -184,14 +184,15 @@ class Ed():
             return
             
         # Fill combo boxes
+        
         self.populate_combo("elementcat_id", "cat_element")
         self.populate_combo("state", "value_state")
         self.populate_combo("location_type", "man_type_location")
         self.populate_combo("workcat_id", "cat_work")
         self.populate_combo("buildercat_id", "cat_builder")
-        #self.populate_combo("elementcat_id", "cat_element")
         self.populate_combo("ownercat_id", "cat_owner")
         self.populate_combo("verified", "value_verified")
+        self.populate_combo("workcat_id_end", "cat_work")
         
         # Adding auto-completion to a QLineEdit
         self.edit = self.dlg.findChild(QLineEdit, "element_id")
@@ -259,6 +260,7 @@ class Ed():
         # Get values from dialog
         element_id = utils_giswater.getWidgetText("element_id")
         elementcat_id = utils_giswater.getWidgetText("elementcat_id")  
+        workcat_id_end = utils_giswater.getWidgetText("workcat_id_end") 
         state = utils_giswater.getWidgetText("state")   
         annotation = utils_giswater.getWidgetText("annotation")
         observ = utils_giswater.getWidgetText("observ")
@@ -279,7 +281,7 @@ class Ed():
             if answer:
                 sql = "UPDATE "+self.schema_name+".element"
                 sql+= " SET element_id = '"+element_id+"', elementcat_id= '"+elementcat_id+"',state = '"+state+"', location_type = '"+location_type+"'"
-                sql+= ", workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
+                sql+= ", workcat_id_end= '"+workcat_id_end+"', workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
                 sql+= ", rotation= '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ= '"+observ+"',link = '"+link+"', verified = '"+verified+"'"
                 sql+= " WHERE element_id = '"+element_id+"'" 
                 self.dao.execute_sql(sql)  
@@ -287,10 +289,10 @@ class Ed():
                 self.close_dialog(self.dlg)
         else:
             sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
-            sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified) "
+            sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified,workcat_id_end) "
             sql+= " VALUES ('"+element_id+"', '"+elementcat_id+"', '"+state+"', '"+location_type+"', '"
             sql+= workcat_id+"', '"+buildercat_id+"', '"+ownercat_id+"', '"+rotation+"', '"+comment+"', '"
-            sql+= annotation+"','"+observ+"','"+link+"','"+verified+"')"
+            sql+= annotation+"','"+observ+"','"+link+"','"+verified+"','"+workcat_id_end+"')"
             status = self.controller.execute_sql(sql) 
             if not status:
                 message = "Error inserting element in table, you need to review data"
@@ -380,6 +382,10 @@ class Ed():
         table_connec = self.schema_name+'."'+self.table_connec+'"'
         table_gully = self.schema_name+'."'+self.table_gully+'"'
         
+        table_man_arc = self.schema_name+'."v_edit_man_arc"'
+        table_man_node = self.schema_name+'."v_edit_man_node"'
+        table_man_connec = self.schema_name+'."v_edit_man_connec"'
+        table_man_gully = self.schema_name+'."v_edit_man_gully"'
         
         table_wjoin = self.schema_name+'."'+self.table_wjoin+'"'
         table_tap = self.schema_name+'."'+self.table_tap+'"'
@@ -416,10 +422,11 @@ class Ed():
 
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
-  
+
+        print (layer_source)
         #uri_table = layer_source['table']
         uri_table = layer_source[1]
-     
+
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
             return
@@ -436,6 +443,19 @@ class Ed():
             elem_type = "connec"
             field_id = "connec_id"
         if table_gully in uri_table:  
+            elem_type = "gully"
+            field_id = "gully_id"  
+            
+        if table_man_arc in uri_table:  
+            elem_type = "arc"
+            field_id = "arc_id"
+        if table_man_node in uri_table: 
+            elem_type = "node"
+            field_id = "node_id"
+        if table_man_connec in uri_table: 
+            elem_type = "connec"
+            field_id = "connec_id"
+        if table_man_gully in uri_table:  
             elem_type = "gully"
             field_id = "gully_id"
                  
@@ -531,12 +551,14 @@ class Ed():
             elem_type = "arc"
             field_id = "arc_id"
 
+        
         # Get selected features
         features = self.layer.selectedFeatures()
         for feature in features:
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
+            print sql
             self.dao.execute_sql(sql) 
                           
         

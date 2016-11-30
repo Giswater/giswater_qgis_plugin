@@ -50,6 +50,7 @@ class ManNodeDialog(ParentDialog):
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
+        table_costs = "v_price_x_node"
         
         # Initialize variables               
         self.table_tank = self.schema_name+'."v_edit_man_tank"'
@@ -74,6 +75,7 @@ class ManNodeDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
+        self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")  
         
         # Manage tab visibility
         self.set_tabs_visibility()  
@@ -95,6 +97,12 @@ class ManNodeDialog(ParentDialog):
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
+        
+        # Fill the table Costs
+        self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
+        
+        # Configuration of table Costs
+        self.set_configuration(self.tbl_costs, table_element) 
   
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            

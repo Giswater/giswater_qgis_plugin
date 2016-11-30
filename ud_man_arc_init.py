@@ -52,7 +52,7 @@ class ManArcDialog(ParentDialog):
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
 
-        table_price_arc = "tbl_price_arc"
+        table_price_arc = "v_price_x_arc"
         
         self.table_varc = self.schema_name+'."v_edit_man_varc"'
         self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
@@ -60,7 +60,6 @@ class ManArcDialog(ParentDialog):
         self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
         
 
-        
         # Define class variables
         self.field_id = "arc_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
@@ -109,8 +108,8 @@ class ManArcDialog(ParentDialog):
         self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
         
         # Set signals          
-        #self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        #self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))       
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))       
         
 
     def set_tabs_visibility(self):
@@ -146,7 +145,7 @@ class ManArcDialog(ParentDialog):
          
     def fill_costs(self):
         ''' Fill tab costs '''
-        
+
         # Get arc_id
         widget_arc = self.dialog.findChild(QLineEdit, "arc_id")          
         self.arc_id = widget_arc.text()
@@ -225,7 +224,9 @@ class ManArcDialog(ParentDialog):
         self.excess_cost.setText(str(row['excess_cost'])) 
         self.trenchl_cost.setText(str(row['trenchl_cost'])) 
         self.pav_cost.setText(str(row['pav_cost']))   
-        self.cost.setText(str(row['cost']))   
+        self.cost.setText(str(row['cost']))  
+        self.m2pavement_cost.setText(str(row['m2pav_cost']))  
+        self.m2mlpavement.setText(str(row['m2mlpav']))  
         
         self.z1.setText(str(row['z1']))
         self.z2.setText(str(row['z2']))
