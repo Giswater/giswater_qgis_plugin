@@ -172,7 +172,7 @@ INSERT INTO "inp_value_catarc" VALUES ('SEMICIRCULAR');
 INSERT INTO "inp_value_catarc" VALUES ('IRREGULAR');
 INSERT INTO "inp_value_catarc" VALUES ('CUSTOM');
 INSERT INTO "inp_value_catarc" VALUES ('DUMMY');
- 
+INSERT INTO "inp_value_catarc" VALUES ('FORCE_MAIN'); 
 
 
 -- ----------------------------

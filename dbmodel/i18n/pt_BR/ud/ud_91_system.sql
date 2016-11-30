@@ -36,7 +36,7 @@ INSERT INTO "node_type" VALUES ('DESGUAS','OUTFALL','OUTFALL', 'man_outfall', 'i
 -- ----------------------------
 
 INSERT INTO "arc_type" VALUES ('CONDUCTE','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('BOMBA','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
+INSERT INTO "arc_type" VALUES ('BOMBA','CONDUIT', 'FORCE_MAIN', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('SIFO','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('RAPID','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
 INSERT INTO "arc_type" VALUES ('VIRTUAL','VIRTUAL', 'OUTLET', 'man_virtual', 'inp_outlet', 'event_x_virtual' );
