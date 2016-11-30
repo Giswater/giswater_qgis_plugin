@@ -624,7 +624,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>170</y>
+       <y>194</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -660,7 +660,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>200</y>
+       <y>224</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -695,8 +695,8 @@
     <widget class="QCheckBox" name="audit_function_control">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>200</y>
+       <x>270</x>
+       <y>224</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -708,14 +708,79 @@
     <widget class="QCheckBox" name="nodetype_change_enabled">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>170</y>
+       <x>270</x>
+       <y>194</y>
        <width>20</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_double_geometry_enabled">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>162</y>
+       <width>231</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Double geometry enabled</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="insert_double_geometry">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>162</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="buffer_value">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>162</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
      </property>
     </widget>
    </widget>
@@ -1854,7 +1919,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_nodeinsert_arcendpoint_3">
+    <widget class="QLabel" name="label_view_state_filters">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1890,7 +1955,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="btn_management">
      <property name="geometry">
       <rect>
        <x>24</x>
@@ -1903,7 +1968,7 @@
       <string>Management</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="btn_analysis">
      <property name="geometry">
       <rect>
        <x>170</x>
@@ -1916,7 +1981,7 @@
       <string>Analysis</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="btn_planning">
      <property name="geometry">
       <rect>
        <x>314</x>
@@ -1929,11 +1994,11 @@
       <string>Planning</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_nodeinsert_arcendpoint_4">
+    <widget class="QLabel" name="label_om_visit_absolute_path">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>120</y>
+       <y>108</y>
        <width>151</width>
        <height>22</height>
       </rect>
@@ -1950,7 +2015,7 @@
       <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>Om visit absolute path:</string>
+      <string>Om visit absolute path/url:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -1965,51 +2030,25 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="ppoint_layer_2">
+    <widget class="QLineEdit" name="om_visit_absolute_path">
      <property name="geometry">
       <rect>
-       <x>122</x>
-       <y>148</y>
-       <width>317</width>
-       <height>21</height>
+       <x>24</x>
+       <y>136</y>
+       <width>415</width>
+       <height>43</height>
       </rect>
      </property>
      <property name="text">
       <string/>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_file_inp">
-     <property name="geometry">
-      <rect>
-       <x>28</x>
-       <y>148</y>
-       <width>71</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>...</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_file_inp_2">
-     <property name="geometry">
-      <rect>
-       <x>28</x>
-       <y>208</y>
-       <width>71</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>...</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_nodeinsert_arcendpoint_5">
+    <widget class="QLabel" name="label_doc_absolute_path">
      <property name="geometry">
       <rect>
        <x>22</x>
-       <y>184</y>
-       <width>115</width>
+       <y>188</y>
+       <width>149</width>
        <height>22</height>
       </rect>
      </property>
@@ -2025,7 +2064,7 @@
       <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>Doc absolute path:</string>
+      <string>Doc absolute path/url:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -2040,13 +2079,13 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="ppoint_layer_3">
+    <widget class="QLineEdit" name="doc_absolute_path">
      <property name="geometry">
       <rect>
-       <x>124</x>
-       <y>210</y>
-       <width>317</width>
-       <height>21</height>
+       <x>26</x>
+       <y>214</y>
+       <width>415</width>
+       <height>45</height>
       </rect>
      </property>
      <property name="text">
