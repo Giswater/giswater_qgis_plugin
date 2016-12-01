@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommandLinkButton
+from qgis.gui import QgsMessageBar
+
 
 import os
 import sys
@@ -14,7 +16,9 @@ from ..ui.config import Config                                  # @UnresolvedImp
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
 from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
-
+from ..ui.multi_selector import Multi_selector  
+                                # @UnresolvedImport
+from functools import partial
 
 class Mg():
    
@@ -337,10 +341,10 @@ class Mg():
             message = "More than one feature selected. Only the first one will be processed!"
             self.controller.show_info(message, context_name='ui_message' ) 
             
+                    
         # Get selected features (nodes)           
         features = layer.selectedFeatures()
         feature = features[0]
-        
         # Get node_id form current node
         self.node_id = feature.attribute('node_id')
 
@@ -440,6 +444,37 @@ class Mg():
         self.dlg.btn_accept.pressed.connect(self.mg_config_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
+        self.dlg.btn_management.pressed.connect(self.multi_selector_management)
+        self.dlg.btn_analysis.pressed.connect(self.multi_selector_analysis)
+        self.dlg.btn_planning.pressed.connect(self.multi_selector_planning)
+        
+        #self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
+        #self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
+        
+        self.om_visit_absolute_path = self.dlg.findChild(QCommandLinkButton, "om_visit_absolute_path")
+        self.doc_absolute_path = self.dlg.findChild(QCommandLinkButton, "doc_absolute_path")
+ 
+        
+        
+        # Get om_visit_absolute_path and doc_absolute_path from config_param_text
+        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+        sql +=" WHERE id = 'om_visit_absolute_path'"
+        row = self.dao.get_row(sql)
+        print (row)
+        path = str(row['value'])
+        self.om_visit_absolute_path.setText(path)
+        self.om_visit_absolute_path.clicked.connect(partial(self.geth_path, path))   
+        
+        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+        sql +=" WHERE id = 'doc_absolute_path'"
+        row = self.dao.get_row(sql)
+        print (row)
+        
+        path = str(row['value'])
+        self.doc_absolute_path.setText(path)
+        self.doc_absolute_path.clicked.connect(partial(self.geth_path, path))
+        
+
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
@@ -449,6 +484,7 @@ class Mg():
         self.generic_columns = self.mg_config_get_data('config')    
         self.search_plus_columns = self.mg_config_get_data('config_search_plus')    
         self.raster_columns = self.mg_config_get_data('config_extract_raster_value')    
+        
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'config')               
@@ -514,4 +550,88 @@ class Mg():
             sql = sql[:-2]
             self.dao.execute_sql(sql)
                         
-                
+    
+    
+    def multi_selector_management(self):  
+        print("test")  
+        
+        # Create the dialog and signals
+        self.dlg_multi = Multi_selector()
+        utils_giswater.setDialog(self.dlg_multi)
+        
+        #self.dlg.btn_accept.pressed.connect(self.)
+        self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
+        
+        self.dlg_multi.btn_insert.pressed.connect(self.insert)
+        self.dlg_multi.btn_delete.pressed.connect(self.delete)
+        
+        # Manage i18n of the form and open it
+        self.controller.translate_form(self.dlg_multi, 'config')               
+        self.dlg_multi.exec_()
+        
+        
+    def multi_selector_analysis(self):  
+        print("test") 
+
+        # Create the dialog and signals
+        self.dlg_multi = Multi_selector()
+        utils_giswater.setDialog(self.dlg_multi)
+        
+        #self.dlg.btn_accept.pressed.connect(self.)
+        self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
+        
+        self.dlg_multi.btn_insert.pressed.connect(self.insert)
+        self.dlg_multi.btn_delete.pressed.connect(self.delete)
+        
+        # Manage i18n of the form and open it
+        self.controller.translate_form(self.dlg_multi, 'config')               
+        self.dlg_multi.exec_()
+
+        
+    def multi_selector_planning(self):  
+        print("test")
+
+        # Create the dialog and signals
+        self.dlg_multi = Multi_selector()
+        utils_giswater.setDialog(self.dlg_multi)
+        
+        self.dlg_multi.btn_insert.pressed.connect(self.insert)
+        self.dlg_multi.btn_delete.pressed.connect(self.delete)
+        
+        #self.dlg.btn_accept.pressed.connect(self.)
+        self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi) 
+
+        # Manage i18n of the form and open it
+        self.controller.translate_form(self.dlg_multi, 'config')               
+        self.dlg_multi.exec_()     
+        
+        
+    def insert(self):
+        print "insert"
+        
+    def delete(self):
+        print "delete"
+        
+    def close_dialog_multi(self, dlg=None): 
+        ''' Close dialog '''
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg_multi
+        try:
+            dlg.close()
+        except AttributeError:
+            pass   
+        
+        
+    def geth_path(self, path):
+        ''' Get value from selected LineEdit ("PATH")
+        Open the document''' 
+        print("path")
+        
+        # Check if file exist
+        if not os.path.exists(path):
+            message = "File doesn't exist!"
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
+        else:
+            # Open the document
+            os.startfile(path)     
+        
