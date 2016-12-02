@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommandLinkButton
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommandLinkButton, QTableView, QMenu
 from qgis.gui import QgsMessageBar
+from PyQt4.QtSql import QSqlTableModel
+
 
 
 import os
@@ -444,9 +446,13 @@ class Mg():
         self.dlg.btn_accept.pressed.connect(self.mg_config_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
-        self.dlg.btn_management.pressed.connect(self.multi_selector_management)
-        self.dlg.btn_analysis.pressed.connect(self.multi_selector_analysis)
-        self.dlg.btn_planning.pressed.connect(self.multi_selector_planning)
+        self.table_man_selector = "man_selector_state"
+        self.table_anl_selector = "anl_selector_state"
+        self.table_plan_selector = "plan_selector_state"
+  
+        self.dlg.btn_management.pressed.connect(partial(self.multi_selector,self.table_man_selector)) 
+        self.dlg.btn_analysis.pressed.connect(partial(self.multi_selector,self.table_anl_selector)) 
+        self.dlg.btn_planning.pressed.connect(partial(self.multi_selector,self.table_plan_selector)) 
         
         #self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         #self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
@@ -550,68 +556,98 @@ class Mg():
             sql = sql[:-2]
             self.dao.execute_sql(sql)
                         
-    
-    
-    def multi_selector_management(self):  
-        print("test")  
+       
+    def multi_selector(self,table):  
+        ''' Execute form multi_selector ''' 
         
         # Create the dialog and signals
         self.dlg_multi = Multi_selector()
         utils_giswater.setDialog(self.dlg_multi)
         
+        self.tbl = self.dlg_multi.findChild(QTableView, "tbl") 
+        #table = "man_selector_state"
         #self.dlg.btn_accept.pressed.connect(self.)
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
+           
+        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
+        self.menu=QMenu()
+        self.dlg_multi.btn_insert.setMenu(self.menu)
         
-        self.dlg_multi.btn_insert.pressed.connect(self.insert)
-        self.dlg_multi.btn_delete.pressed.connect(self.delete)
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
+        
+        #self.tbl = self.dlg_multi.findChild(QTableView, "tbl")    
+        #self.table = "man_selector_state"
+        self.fill_table(self.tbl, self.schema_name+"."+table)
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_multi, 'config')               
         self.dlg_multi.exec_()
         
         
-    def multi_selector_analysis(self):  
-        print("test") 
+        
+    def fill_insert_menu(self,table):
+        ''' Insert menu on QPushButton->QMenu''' 
+        
+        self.menu.clear()
+        #menuItem1=menu.addAction('Menu Item1')
+        #self.menu.addAction('Item1')
+        sql = "SELECT id FROM "+self.schema_name+".value_state"
+        sql+= " ORDER BY id"
+        rows = self.dao.get_rows(sql) 
+        # Fill menu
+        for row in rows:       
+            elem = row[0]
+            print(elem)
+            # If not exist in table _selector_state isert to menu
+            # Check if we already have data with selected id
+            sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
+            row = self.dao.get_row(sql)  
+            print row
+            if row == None:
+                self.menu.addAction(elem,partial(self.insert, elem,table))
+        
+        #self.menu.activated.connect(self.insert)
+        
+                 
+    def insert(self,id_action,table):
+        ''' On action(select value from menu) execute SQL '''
 
-        # Create the dialog and signals
-        self.dlg_multi = Multi_selector()
-        utils_giswater.setDialog(self.dlg_multi)
+        # Insert value into database
+        sql = "INSERT INTO "+self.schema_name+"."+table+" (id) "
+        sql+= " VALUES ('"+id_action+"')"
+        self.controller.execute_sql(sql)   
         
-        #self.dlg.btn_accept.pressed.connect(self.)
-        self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
+     
+        self.fill_table(self.tbl, self.schema_name+"."+table)
+    
         
-        self.dlg_multi.btn_insert.pressed.connect(self.insert)
-        self.dlg_multi.btn_delete.pressed.connect(self.delete)
-        
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg_multi, 'config')               
-        self.dlg_multi.exec_()
+    def delete_records(self, widget, table_name):
+        ''' Delete selected elements of the table '''
 
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
         
-    def multi_selector_planning(self):  
-        print("test")
-
-        # Create the dialog and signals
-        self.dlg_multi = Multi_selector()
-        utils_giswater.setDialog(self.dlg_multi)
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("id")
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            sql = "DELETE FROM "+self.schema_name+"."+table_name 
+            sql+= " WHERE id IN ("+list_id+")"
+            self.dao.execute_sql(sql)
+            widget.model().select()
         
-        self.dlg_multi.btn_insert.pressed.connect(self.insert)
-        self.dlg_multi.btn_delete.pressed.connect(self.delete)
-        
-        #self.dlg.btn_accept.pressed.connect(self.)
-        self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi) 
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg_multi, 'config')               
-        self.dlg_multi.exec_()     
-        
-        
-    def insert(self):
-        print "insert"
-        
-    def delete(self):
-        print "delete"
-        
+    
     def close_dialog_multi(self, dlg=None): 
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
@@ -634,4 +670,23 @@ class Mg():
         else:
             # Open the document
             os.startfile(path)     
+     
+     
+            
+    def fill_table(self, widget, table_name): 
+        ''' Set a model with selected filter.
+        Attach that model to selected table '''
+        
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
+        model.select()         
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())      
+
+        # Attach model to table view
+        widget.setModel(model)    
         
