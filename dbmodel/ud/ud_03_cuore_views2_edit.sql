@@ -1011,9 +1011,6 @@ CREATE OR REPLACE VIEW v_edit_man_conduit AS
      LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
      JOIN man_conduit ON man_conduit.arc_id::text = arc.arc_id::text;
 
-ALTER TABLE v_edit_man_conduit
-  OWNER TO postgres;
-
 
 
 
@@ -1357,10 +1354,10 @@ cat_grate.svg AS "cat_svg",
 gully.rotation,
 gully.link,
 gully.verified,
-gully.the_geom_pol AS "the_geom"
+gully.the_geom_pol AS "the_geom",
 gully.workcat_id_end,
 gully.featurecat_id,
-gully.feature_id,
+gully.feature_id
 FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
 WHERE gully.the_geom_pol is not null;
 

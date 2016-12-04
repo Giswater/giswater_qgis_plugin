@@ -12,18 +12,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO "node_type" VALUES ('VIRTUAL NODE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_junction');
-INSERT INTO "node_type" VALUES ('REGISTER','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('RECT_MANHOLE','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('CIRC_MANHOLE','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('SECTION CHANGE','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('HIGH POINT','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('JUMP','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('SANDBOX','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('WEIR','JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction','event_x_junction');
-INSERT INTO "node_type" VALUES ('SEWER STORAGE','STORAGE', 'STORAGE', 'man_storage', 'inp_storage','event_x_storage');
-INSERT INTO "node_type" VALUES ('OWERFLOWS STORAGE','STORAGE', 'STORAGE', 'man_storage', 'inp_storage','event_x_storage');
-INSERT INTO "node_type" VALUES ('OUTFALL','OUTFALL','OUTFALL', 'man_outfall', 'inp_outfall', 'event_x_outfall');
+INSERT INTO node_type VALUES ('CHAMBER', 'CHAMBER', 'JUNCTION', 'man_chamber', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CIRC_MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('HIGH POINT', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('REGISTER', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('SECTION CHANGE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VIRTUAL NODE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('WEIR', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('JUMP', 'WJUMP', 'JUNCTION', 'man_wjump', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('RECT_MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('SANDBOX', 'NETINIT', 'JUNCTION', 'man_netinit', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('WWTP', 'WWTP', 'JUNCTION', 'man_wwtp', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('SEWER STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('OWERFLOWS STORAGE', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('OUTFALL', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully', 'inp_junction', 'om_visit_x_node');
 
 
 
@@ -31,11 +35,11 @@ INSERT INTO "node_type" VALUES ('OUTFALL','OUTFALL','OUTFALL', 'man_outfall', 'i
 -- Records of arc type system table
 -- ----------------------------
 
-INSERT INTO "arc_type" VALUES ('CONDUIT','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('PUMP PIPE','CONDUIT', 'FORCE_MAIN', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('SIPHON','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('RAPID','CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'event_x_conduit' );
-INSERT INTO "arc_type" VALUES ('VIRTUAL','CONDUIT', 'OUTLET', 'man_virtual', 'inp_outlet', 'event_x_virtual' );
+INSERT INTO arc_type VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('PUMP PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('SIPHON', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('RAPID', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('VIRTUAL', 'CONDUIT', 'OUTLET', 'man_virtual', 'inp_outlet', 'om_visit_x_arc');
 
 
 
