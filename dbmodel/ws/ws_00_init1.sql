@@ -22,38 +22,64 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE EXTENSION IF NOT EXISTS tablefunc;
 
 
--- Catalog of table
+
+CREATE SEQUENCE  db_cat_table_seq
+    START WITH 1
+    INCREMENT BY 10
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE SEQUENCE  db_cat_view_seq
+    START WITH 1
+    INCREMENT BY 10
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+CREATE SEQUENCE  db_cat_columns_seq
+    START WITH 1
+    INCREMENT BY 10
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+
+-- Catalog of tables
 DROP TABLE IF EXISTS db_cat_table CASCADE; 
 CREATE TABLE db_cat_table (
-    id int4 PRIMARY KEY,
+    id int4 PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.db_cat_table_seq'::regclass),
     name text NOT NULL,
-    project_type text,
+	project_type text,
     context text,
-    db_cat_clientlayer_id int4,
-    description text
+	db_cat_clientlayer_id int4,
+	description text
 );
 
 
 -- Catalog of views
 DROP TABLE IF EXISTS db_cat_view CASCADE; 
 CREATE TABLE db_cat_view (
-    id int4 PRIMARY KEY,
+    id int4 PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.db_cat_view_seq'::regclass),
     name text NOT NULL,
     project_type text,
     context text,
-    db_cat_clientlayer_id int4,
-    description text
+	db_cat_clientlayer_id int4,
+	description text
 );
 
 
 -- Catalog of columns
 DROP TABLE IF EXISTS db_cat_columns CASCADE; 
 CREATE TABLE db_cat_columns (
-    id int4 PRIMARY KEY,
-    db_cat_table_id int4 NOT NULL,
+    id int4 PRIMARY KEY DEFAULT nextval('SCHEMA_NAME.db_cat_columns_seq'::regclass),
+	db_cat_table_id int4 NOT NULL,
     column_name text NOT NULL,
-    column_type text,
-    description text
+	column_type text,
+	description text
 );
 
 
