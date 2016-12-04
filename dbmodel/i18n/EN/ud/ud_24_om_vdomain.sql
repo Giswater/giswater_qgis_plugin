@@ -20,18 +20,15 @@ INSERT INTO "om_visit_parameter_type" VALUES ('PICTURE', '');
 -- ----------------------------
 INSERT INTO "om_visit_parameter" VALUES ('insp_node_p1','INSPECTION','NODE', 'TEXT', 'Inspection node parameter 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_arc_p1','INSPECTION','ARC', 'TEXT', 'Inspection arc parameter 1');
-INSERT INTO "om_visit_parameter" VALUES ('insp_element_p1','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_node_p2','INSPECTION','NODE', 'TEXT', 'Inspection node parameter 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_arc_p2','INSPECTION','ARC', 'TEXT', 'Inspection arc parameter 2');
-INSERT INTO "om_visit_parameter" VALUES ('insp_element_p2','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_node_p3','INSPECTION','NODE', 'TEXT', 'Inspection node parameter 3');
 INSERT INTO "om_visit_parameter" VALUES ('insp_arc_p3','INSPECTION','ARC', 'TEXT', 'Inspection arc parameter 3');
-INSERT INTO "om_visit_parameter" VALUES ('insp_element_p3','INSPECTION','ELEMENT', 'TEXT', 'Inspection element parameter 3');
 INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p1','INSPECTION','CONNEC', 'TEXT', 'Inspection connec parameter 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p2','INSPECTION','CONNEC', 'TEXT', 'Inspection connec parameter 2');
-INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECTION','CONNEC', 'TEXT', 'Inspection gully parameter 1');
-INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECTION','CONNEC', 'TEXT', 'Inspection gully parameter 2');
-INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECTION','CONNEC', 'TEXT', 'Inspection gully parameter 3');
+INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECTION','GULLY', 'TEXT', 'Inspection gully parameter 1');
+INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECTION','GULLY', 'TEXT', 'Inspection gully parameter 2');
+INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECTION','GULLY', 'TEXT', 'Inspection gully parameter 3');
 INSERT INTO "om_visit_parameter" VALUES ('png','PICTURE','ALL', '', '');
 
 

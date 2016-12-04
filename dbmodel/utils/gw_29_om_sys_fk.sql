@@ -11,7 +11,7 @@ ALTER TABLE "om_visit_event" ADD FOREIGN KEY ("visit_id") REFERENCES "om_visit" 
 ALTER TABLE "om_visit_event" ADD FOREIGN KEY ("parameter_id") REFERENCES "om_visit_parameter" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_event" ADD FOREIGN KEY ("position_id") REFERENCES "om_visit_value_position" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "om_visit_parameter" ADD FOREIGN KEY ("parameter_type") REFERENCES "om_visit_parameter_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "om_visit_parameter" ADD FOREIGN KEY ("parameter_type") REFERENCES "om_visit_parameter_type" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "om_visit_x_node" ADD FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_x_node" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

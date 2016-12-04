@@ -19,18 +19,15 @@ INSERT INTO "om_visit_parameter_type" VALUES ('FOTOGRAFIA', '');
 -- ----------------------------
 INSERT INTO "om_visit_parameter" VALUES ('insp_node_p1','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_arc_p1','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 1');
-INSERT INTO "om_visit_parameter" VALUES ('insp_element_p1','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_node_p2','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_arc_p2','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 2');
-INSERT INTO "om_visit_parameter" VALUES ('insp_element_p2','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 2');
 INSERT INTO "om_visit_parameter" VALUES ('insp_node_p3','INSPECCIO','NODE', 'TEXT', 'Inspeccio del node parametre 3');
 INSERT INTO "om_visit_parameter" VALUES ('insp_arc_p3','INSPECCIO','ARC', 'TEXT', 'Inspeccio del arc parametre 3');
-INSERT INTO "om_visit_parameter" VALUES ('insp_element_p3','INSPECCIO','ELEMENT', 'TEXT', 'Inspeccio del element parametre 3');
 INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p1','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio de la escomesa parametre 1');
 INSERT INTO "om_visit_parameter" VALUES ('insp_connec_p2','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio de la escomesa parametre 2');
-INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio del embornal parametre 1');
-INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio del embornal parametre 2');
-INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECCIO','CONNEXIO', 'TEXT', 'Inspeccio del embornal parametre 3');
+INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p1','INSPECCIO','EMBORNAL', 'TEXT', 'Inspeccio del embornal parametre 1');
+INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p2','INSPECCIO','EMBORNAL', 'TEXT', 'Inspeccio del embornal parametre 2');
+INSERT INTO "om_visit_parameter" VALUES ('insp_gully_p3','INSPECCIO','EMBORNAL', 'TEXT', 'Inspeccio del embornal parametre 3');
 INSERT INTO "om_visit_parameter" VALUES ('png','FOTOGRAFIA','TOTS', '', '');
 
 
