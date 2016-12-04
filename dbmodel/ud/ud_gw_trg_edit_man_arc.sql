@@ -15,6 +15,7 @@ DECLARE
     new_man_table varchar;
     old_man_table varchar;
     v_sql varchar;
+    v_sql2 varchar;
 
 BEGIN
 
@@ -179,8 +180,8 @@ BEGIN
 		IF new_man_table IS NOT NULL THEN
 			v_sql:= 'DELETE FROM '||old_man_table||' WHERE arc_id= '||quote_literal(OLD.arc_id);
 			EXECUTE v_sql;
-			v_sql:= 'INSERT INTO '||new_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
-			EXECUTE v_sql;
+			v_sql2:= 'INSERT INTO '||new_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
+			EXECUTE v_sql2;
 		END IF;
 	END IF;
     

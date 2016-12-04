@@ -20,6 +20,7 @@ DECLARE
     new_man_table varchar;
     old_man_table varchar;
     v_sql varchar;
+    v_sql2 varchar;
     old_nodetype varchar;
     new_nodetype varchar;
 	rec Record;
@@ -371,8 +372,8 @@ BEGIN
 			IF new_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||old_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
 				EXECUTE v_sql;
-				v_sql:= 'INSERT INTO '||new_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
-				EXECUTE v_sql;
+				v_sql2:= 'INSERT INTO '||new_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
+				EXECUTE v_sql2;
 			END IF;
 		END IF;
 
@@ -621,8 +622,13 @@ BEGIN
 	
     ELSIF TG_OP = 'DELETE' THEN
 
-	IF man_table ='man_storage_pol' OR man_table ='man_sumidero_pol' THEN
-		DELETE FROM polygon WHERE pol_id = OLD.pol_id;
+	IF man_table ='man_storage' OR man_table ='man_chamber' OR man_table ='man_wwtp' OR man_table ='man_netgully' THEN
+		IF OLD.pol_id IS NOT NULL THEN
+			DELETE FROM polygon WHERE pol_id = OLD.pol_id;
+			DELETE FROM node WHERE node_id = OLD.node_id;
+		ELSE
+			DELETE FROM node WHERE node_id = OLD.node_id;
+		END IF;
 	ELSE
 		DELETE FROM node WHERE node_id = OLD.node_id;
 	END IF;

@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec()
 $BODY$
 DECLARE 
     v_sql varchar;
+    v_sql2 varchar;
 	man_table varchar;
 
 BEGIN
@@ -110,11 +111,18 @@ BEGIN
 	
 	ELSIF TG_OP = 'UPDATE' THEN
 
-       -- UPDATE dma/sector
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
-        END IF;
+
+    -- UPDATE management values
+		IF (NEW.connec_type <> OLD.connec_type) THEN 
+			new_man_table:= (SELECT connec_type.man_table FROM connec_type WHERE connec_type.id = NEW.connec_type);
+			old_man_table:= (SELECT connec_type.man_table FROM connec_type WHERE connec_type.id = OLD.connec_type);
+			IF new_man_table IS NOT NULL THEN
+				v_sql:= 'DELETE FROM '||old_man_table||' WHERE connec_id= '||quote_literal(OLD.connec_id);
+				EXECUTE v_sql;
+				v_sql2:= 'INSERT INTO '||new_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
+				EXECUTE v_sql2;
+			END IF;
+		END IF;
 
             
 		-- MANAGEMENT UPDATE	
