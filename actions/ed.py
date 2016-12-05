@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit
+from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit, QFileDialog, QPushButton
 from qgis.gui import QgsMessageBar
 from qgis.core import QgsExpression
 
@@ -321,6 +321,9 @@ class Ed():
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
+        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(self.open_file_dialog)
+        
+        
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')               
         
@@ -352,6 +355,16 @@ class Ed():
         
         # Open the dialog
         self.dlg.exec_()
+        
+        
+    def open_file_dialog(self):
+        ''' Open File Dialog '''
+        
+        #fileName = QFileDialog.ShowDirsOnly
+        dialog = QFileDialog()
+        dialog.open()
+        #dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.getOpenFileName(self,"Open Image", "C:/Users/Public/Desktop", "Image Files (*.png *.jpg *.bmp)");
         
         
     def ed_add_file_autocomplete(self): 

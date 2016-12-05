@@ -162,8 +162,6 @@ class ParentDialog(object):
         self.save_tab_log()
         self.save_tab_rtc()       
                 
-
-    ''' Slot functions '''           
                
     def save(self):
         ''' Save feature '''
@@ -259,8 +257,7 @@ class ParentDialog(object):
             
             widget.model().select()
             
-            
-            
+                   
     def insert_records (self):
         ''' Insert value  Hydrometer | Hydrometer'''
         
@@ -308,7 +305,6 @@ class ParentDialog(object):
             sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
             self.dao.execute_sql(sql) 
         
-    
             # Refresh table in Qtableview
             # Fill tab Hydrometer
             table_hydrometer = "v_rtc_hydrometer"
@@ -520,6 +516,9 @@ class ParentDialog(object):
     def fill_tbl_event(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
         
+        table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
+        table_name_event_id = self.schema_name+'."om_visit_parameter"'
+        
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
@@ -535,18 +534,28 @@ class ParentDialog(object):
     
 
         # Fill ComboBox event_id
-        sql = "SELECT DISTINCT(event_id)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY event_id"
+        #sql = "SELECT DISTINCT(event_id)"
+        sql = "SELECT DISTINCT(id)"
+        sql+= " FROM "+table_name_event_id
+        #sql+= " ORDER BY event_id"
+        sql+= " ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
+        
 
         # Fill ComboBox event_type
-        sql = "SELECT DISTINCT(event_type)"
-        sql+= " FROM "+table_name
-        sql+= " ORDER BY event_type"
+        #sql = "SELECT DISTINCT(event_type)"
+        sql = "SELECT DISTINCT(id)"
+        sql+= " FROM "+table_name_event_type
+        #sql+= " ORDER BY event_type"
+        sql+= " ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
+        
+        print("data fil table") 
+        print table_name 
+        print filter_
+        print widget
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)    
@@ -555,6 +564,7 @@ class ParentDialog(object):
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
+        '''
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
         date_to = self.date_event_to.date().toString('yyyyMMdd') 
@@ -578,14 +588,38 @@ class ParentDialog(object):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()  
+        '''
+        # Get selected dates
+        date_from = self.date_event_from.date().toString('yyyyMMdd') 
+        date_to = self.date_event_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message, context_name='ui_message')                   
+            return
         
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr += " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        
+        # Get selected values in Comboboxes        
+        event_type_value = utils_giswater.getWidgetText("event_type")
+        if event_type_value != 'null': 
+            expr+= " AND event_type = '"+event_type_value+"'"
+        event_id = utils_giswater.getWidgetText("event_id")
+        if event_id != 'null': 
+            expr+= " AND event_id = '"+event_id+"'"
+        print("expr")
+        print expr
+  
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select() 
 
+        
         
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
-        
-        print("test")
-        '''
+
         # Get widgets  
         self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
         self.date_el_from = self.dialog.findChild(QDateEdit, "date_el_from")
@@ -597,12 +631,11 @@ class ParentDialog(object):
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
-        '''
+        
         
     def set_filter_hydrometer(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
 
-        
         # Get selected dates
         date_from = self.date_el_from.date().toString('yyyyMMdd') 
         date_to = self.date_el_to.date().toString('yyyyMMdd') 
@@ -619,5 +652,33 @@ class ParentDialog(object):
         widget.model().setFilter(expr)
         widget.model().select() 
         
-
-    
+        
+        
+    def set_filter_event(self, widget):
+        ''' !Get values selected by the user and sets a new filter for its table model '''
+   
+        # Get selected dates
+        date_from = self.date_event_from.date().toString('yyyyMMdd') 
+        date_to = self.date_event_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message, context_name='ui_message')                   
+            return
+        
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr += " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        
+        # Get selected values in Comboboxes        
+        event_type_value = utils_giswater.getWidgetText("event_type")
+        if event_type_value != 'null': 
+            expr+= " AND event_type = '"+event_type_value+"'"
+        event_id = utils_giswater.getWidgetText("event_id")
+        if event_id != 'null': 
+            expr+= " AND event_id = '"+event_id+"'"
+        print("expr")
+        print expr
+  
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select() 
