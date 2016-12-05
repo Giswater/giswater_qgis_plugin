@@ -82,45 +82,48 @@ INSERT INTO cat_arc VALUES ('FC160-PN10', 'PIPE', 'FC', '10 atm', '160 mm', 150.
 -- ----------------------------
 -- Records of cat_node
 -- ----------------------------
-INSERT INTO cat_node VALUES ('SHUTOFFVALVEDN160 PN16', 'SHUTOFF VALVE', 'FD', '16 atm', '160 mm', 148.00000, '160 mm', 'Shutoff valve 160 mm', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('SHUTOFFVALVEDN110 PN16', 'SHUTOFF VALVE', 'FD', '16 atm', '110 mm', 100.00000, '110 mm', 'Shutoff valve 110 mm', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('SHUTOFFVALVEDN63 PN16', 'SHUTOFF VALVE', 'FD', '16 atm', '63 mm', 55.00000, '63 mm', 'Shutoff valve 63 mm', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('JUNCTION DN63', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '63 mm', 'Juntion 63mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('JUNCTION DN110', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '110 mm', 'Juntion 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('JUNCTION DN160', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '160 mm', 'Juntion 160mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('JUNCTION DN200', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '200 mm', 'Juntion 200mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('OUTFALL VALVE-01', 'OUTFALL VALVE', 'FD', '16 atm', NULL, NULL, NULL, 'Outfall valve ', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('PRESSUREMETERDN63 PN16', 'PRESSURE METER', 'FD', '16 atm', '63 mm', NULL, '63 mm', 'Pressure meter 63 mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pressuremeter.svg', NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('PRESSUREMETERDN110 PN16', 'PRESSURE METER', 'FD', '16 atm', '110 mm', NULL, '110 mm', 'Pressure meter 110 mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pressuremeter.svg', NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CHK-VALVE100-PN10', 'CHECK VALVE', 'FD', '10 atm', '100 mm', 95.00000, 'Check valve', 'Check valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('HYDRANT 1X110-2X63', 'HYDRANT', 'FD', '16 atm', '110 mm', NULL, '110-63 mm', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'hydrant_1x110_2x63.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN160-110 PN16', 'T', 'FD', '16 atm', '110-160-160 mm', NULL, '110-160-160 mm', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('GREENVALVEDN63 PN16', 'GREEN VALVE', 'FD', '16 atm', '63 mm', NULL, '63 mm', 'Green valve 63mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'greenvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('GREENVALVEDN110 PN16', 'GREEN VALVE', 'FD', '16 atm', '110 mm', NULL, '110 mm', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'greenvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('GREENVALVEDN50 PN16', 'GREEN VALVE', 'FD', '16 atm', '50 mm', NULL, '50 mm', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'greenvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('PRV-VALVE200-PN6/16', 'PR-REDUC.VALVE', 'FD', '6-16 atm', '200 mm', 186.00000, '200 mm', 'Pressure reduction valve', 'c:\\users\users\catalog.jpg', 'http://url.info', 'prv.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CHK-VALVE200-PN10', 'CHECK VALVE', 'FD', '10 atm', '200 mm', 186.00000, 'Check valve', 'Check valve 200mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CHK-VALVE300-PN10', 'CHECK VALVE', 'FD', '10 atm', '300 mm', 186.00000, 'Check valve', 'Check valve 300mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('AIR VALVE DN50', 'AIR VALVE', 'FD', '16 atm', '50 mm', NULL, '50 mm', 'Air valve 50mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'airvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN63-63 PN16', 'T', 'PVC', '16 atm', '63-63-63 mm', NULL, '63-63-63 mm', 'PVC T', NULL, NULL, 't_equal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN110-110 PN16', 'T', 'FD', '16 atm', '110-110-110 mm', NULL, '110-110-110 mm', 'FD T', 'c:\\users\users\catalog.pdf', 'http://url.info', 't_equal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('PUMP-01', 'PUMP STATION', 'FD', '16 atm', '110 mm', 100.00000, '110 mm', 'Pump station', 'c:\\users\users\catalog.jpg', 'http://url.info', 'pump.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('PRV-VALVE150-PN6/16', 'PR-REDUC.VALVE', 'FD', '6-16 atm', '150 mm', 148.00000, '150 mm', 'Pressure reduction valve', 'c:\\users\users\catalog.jpg', 'http://url.info', 'prv.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('FLOWMETER-02', 'FLOW METER', 'FD', '16 atm', '110 mm', 100.00000, 'FM 110 mm', 'Flow meter 110 mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'flowmeter.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN160-160 PN16', 'T', 'FD', '16 atm', '160-160-160 mm', NULL, '160-160-160 mm', 'FD T', NULL, NULL, 't_equal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CURVE30DN110 PVCPN16', 'CURVE', 'PVC', '16 atm', '100 mm', NULL, '110ext x 100 int', 'PVC curve', 'c:\\users\users\catalog.pdf', 'http://url.info', 'curve30.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN160-110-63 PN16', 'T', 'FD', '16 atm', '160-110-63 mm', NULL, '160-110-63 m', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CURVE45DN110 PVCPN16', 'CURVE', 'PVC', '16 atm', '100 mm', NULL, '110ext x 100 int', 'PVC curve', 'c:\\users\users\catalog.pdf', 'http://url.info', 'curve45.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('ENDLINE', 'ENDLINE', 'PVC', '16 atm', NULL, NULL, NULL, 'End line', NULL, NULL, 'endline.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('FILTER-01', 'FILTER', 'FD', '16 atm', '200 mm', 186.00000, 'F 200 mm', 'Filter 200 mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'filter.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('FLOWMETER-01', 'FLOW METER', 'FD', '16 atm', '200 mm', 186.00000, 'FM 200 mm', 'Flow meter 200 mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'flowmeter.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('CHK-VALVE63-PN10', 'CHECK VALVE', 'FD', '10 atm', '63 mm', 55.00000, 'Check valve', 'Check valve 63mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('PRV-VALVE100-PN6/16', 'PR-REDUC.VALVE', 'FD', '6-16 atm', '100 mm', 86.00000, '100 mm', 'Pressure reduction valve', 'c:\\users\users\catalog.jpg', 'http://url.info', 'prv.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TANK_01', 'TANK', 'FD', NULL, NULL, NULL, '30x10x3 m', 'Tank', 'c:\\users\users\catalog.pdf', 'http://url.info', 'tank.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('HYDRANT 1X110', 'HYDRANT', 'FD', '16 atm', '110 mm', NULL, '110ext x 100 int', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'hydrant_1x110.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN110-63 PN16', 'T', 'PVC', '16 atm', '110-110-63 mm', NULL, '110-110-63 mm', 'PVC T', 'c:\\users\users\catalog.pdf', 'http://url.info', 't_noequal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN160-63 PN16', 'T', 'FD', '16 atm', '160-160-63 mm', NULL, '160-160-63 mm', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL);
-INSERT INTO cat_node VALUES ('TDN200-160 PN16', 'T', 'FD', '16 atm', '200-160-160 mm', NULL, '200-160-160 mm', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('SHUTOFFVALVEDN160 PN16', 'SHUTOFF VALVE', 'FD', '16 atm', '160 mm', 148.00000, '160 mm', 'Shutoff valve 160 mm', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('SHUTOFFVALVEDN110 PN16', 'SHUTOFF VALVE', 'FD', '16 atm', '110 mm', 100.00000, '110 mm', 'Shutoff valve 110 mm', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('SHUTOFFVALVEDN63 PN16', 'SHUTOFF VALVE', 'FD', '16 atm', '63 mm', 55.00000, '63 mm', 'Shutoff valve 63 mm', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('JUNCTION DN63', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '63 mm', 'Juntion 63mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('JUNCTION DN110', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '110 mm', 'Juntion 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('JUNCTION DN160', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '160 mm', 'Juntion 160mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('JUNCTION DN200', 'JUNCTION', 'FD', '16 atm', NULL, NULL, '200 mm', 'Juntion 200mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('OUTFALL VALVE-01', 'OUTFALL VALVE', 'FD', '16 atm', NULL, NULL, NULL, 'Outfall valve ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('PRESSUREMETERDN63 PN16', 'PRESSURE METER', 'FD', '16 atm', '63 mm', NULL, '63 mm', 'Pressure meter 63 mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pressuremeter.svg', NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('PRESSUREMETERDN110 PN16', 'PRESSURE METER', 'FD', '16 atm', '110 mm', NULL, '110 mm', 'Pressure meter 110 mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'c:\\users\users\catalog.jpg', 'pressuremeter.svg', NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('CHK-VALVE100-PN10', 'CHECK VALVE', 'FD', '10 atm', '100 mm', 95.00000, 'Check valve', 'Check valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('HYDRANT 1X110-2X63', 'HYDRANT', 'FD', '16 atm', '110 mm', NULL, '110-63 mm', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'hydrant_1x110_2x63.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN160-110 PN16', 'T', 'FD', '16 atm', '110-160-160 mm', NULL, '110-160-160 mm', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('GREENVALVEDN63 PN16', 'GREEN VALVE', 'FD', '16 atm', '63 mm', NULL, '63 mm', 'Green valve 63mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'greenvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('GREENVALVEDN110 PN16', 'GREEN VALVE', 'FD', '16 atm', '110 mm', NULL, '110 mm', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'greenvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('GREENVALVEDN50 PN16', 'GREEN VALVE', 'FD', '16 atm', '50 mm', NULL, '50 mm', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'greenvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('PRV-VALVE200-PN6/16', 'PR-REDUC.VALVE', 'FD', '6-16 atm', '200 mm', 186.00000, '200 mm', 'Pressure reduction valve', 'c:\\users\users\catalog.jpg', 'http://url.info', 'prv.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('CHK-VALVE200-PN10', 'CHECK VALVE', 'FD', '10 atm', '200 mm', 186.00000, 'Check valve', 'Check valve 200mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('CHK-VALVE300-PN10', 'CHECK VALVE', 'FD', '10 atm', '300 mm', 186.00000, 'Check valve', 'Check valve 300mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('AIR VALVE DN50', 'AIR VALVE', 'FD', '16 atm', '50 mm', NULL, '50 mm', 'Air valve 50mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'airvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN63-63 PN16', 'T', 'PVC', '16 atm', '63-63-63 mm', NULL, '63-63-63 mm', 'PVC T', NULL, NULL, 't_equal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN110-110 PN16', 'T', 'FD', '16 atm', '110-110-110 mm', NULL, '110-110-110 mm', 'FD T', 'c:\\users\users\catalog.pdf', 'http://url.info', 't_equal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('PUMP-01', 'PUMP STATION', 'FD', '16 atm', '110 mm', 100.00000, '110 mm', 'Pump station', 'c:\\users\users\catalog.jpg', 'http://url.info', 'pump.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('PRV-VALVE150-PN6/16', 'PR-REDUC.VALVE', 'FD', '6-16 atm', '150 mm', 148.00000, '150 mm', 'Pressure reduction valve', 'c:\\users\users\catalog.jpg', 'http://url.info', 'prv.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('FLOWMETER-02', 'FLOW METER', 'FD', '16 atm', '110 mm', 100.00000, 'FM 110 mm', 'Flow meter 110 mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'flowmeter.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN160-160 PN16', 'T', 'FD', '16 atm', '160-160-160 mm', NULL, '160-160-160 mm', 'FD T', NULL, NULL, 't_equal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('CURVE30DN110 PVCPN16', 'CURVE', 'PVC', '16 atm', '100 mm', NULL, '110ext x 100 int', 'PVC curve', 'c:\\users\users\catalog.pdf', 'http://url.info', 'curve30.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN160-110-63 PN16', 'T', 'FD', '16 atm', '160-110-63 mm', NULL, '160-110-63 m', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('CURVE45DN110 PVCPN16', 'CURVE', 'PVC', '16 atm', '100 mm', NULL, '110ext x 100 int', 'PVC curve', 'c:\\users\users\catalog.pdf', 'http://url.info', 'curve45.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('ENDLINE', 'ENDLINE', 'PVC', '16 atm', NULL, NULL, NULL, 'End line', NULL, NULL, 'endline.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('FILTER-01', 'FILTER', 'FD', '16 atm', '200 mm', 186.00000, 'F 200 mm', 'Filter 200 mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'filter.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('FLOWMETER-01', 'FLOW METER', 'FD', '16 atm', '200 mm', 186.00000, 'FM 200 mm', 'Flow meter 200 mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'flowmeter.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('CHK-VALVE63-PN10', 'CHECK VALVE', 'FD', '10 atm', '63 mm', 55.00000, 'Check valve', 'Check valve 63mm', 'c:\\users\users\catalog.jpg', 'http://url.info', 'chkvalve.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('PRV-VALVE100-PN6/16', 'PR-REDUC.VALVE', 'FD', '6-16 atm', '100 mm', 86.00000, '100 mm', 'Pressure reduction valve', 'c:\\users\users\catalog.jpg', 'http://url.info', 'prv.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TANK_01', 'TANK', 'FD', NULL, NULL, NULL, '30x10x3 m', 'Tank', 'c:\\users\users\catalog.pdf', 'http://url.info', 'tank.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('HYDRANT 1X110', 'HYDRANT', 'FD', '16 atm', '110 mm', NULL, '110ext x 100 int', 'Green valve 110mm', 'c:\\users\users\catalog.pdf', 'http://url.info', 'hydrant_1x110.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN110-63 PN16', 'T', 'PVC', '16 atm', '110-110-63 mm', NULL, '110-110-63 mm', 'PVC T', 'c:\\users\users\catalog.pdf', 'http://url.info', 't_noequal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN160-63 PN16', 'T', 'FD', '16 atm', '160-160-63 mm', NULL, '160-160-63 mm', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN200-160 PN16', 'T', 'FD', '16 atm', '200-160-160 mm', NULL, '200-160-160 mm', 'FD T', NULL, NULL, 't_noequal.svg', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('WATERWELL-01', 'WATERWELL', 'FD', NULL, NULL, NULL, NULL, 'Waterwell', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('TDN63-63-110 PN16', 'T', 'PVC', '16 atm', '63-63-110 mm', NULL, '63-63-110 mm', 'PVC T', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO cat_node VALUES ('SOURCE-01', 'SOURCE', NULL, NULL, NULL, NULL, NULL, 'Source', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 -- ----------------------------
@@ -130,6 +133,9 @@ INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'DOMESTIC', 'PVC', '16 atm', '2
 INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'DOMESTIC', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
 INSERT INTO cat_connec VALUES ('PVC32-PN16-TRA', 'DOMESTIC', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
 INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', 'DOMESTIC', 'PVC', '16 atm', '50 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC63-PN16-FOU', 'FOUNTAIN', 'PVC', '16 atm', '63 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC25-PN16-TAP', 'TAP', 'PVC', '16 atm', '25 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC50-PN16-GRE', 'GREEN_TAP', 'PVC', '16 atm', '50 mm', NULL, 'PVC connec ', NULL, NULL, NULL, NULL);
 
 
 -- ----------------------------
