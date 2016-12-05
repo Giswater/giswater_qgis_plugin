@@ -109,6 +109,8 @@ CREATE TABLE "config_py_tables" (
 "plugin_version" varchar (20), 
 "hidden" boolean,
 "observ" varchar(50),
+"db_schema" boolean,
+"qgis_project" boolean,
 CONSTRAINT "config_py_tables_pkey" PRIMARY KEY ("id")
 );
 
