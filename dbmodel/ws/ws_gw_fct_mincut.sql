@@ -45,7 +45,7 @@ BEGIN
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM arc WHERE arc_id = element_id_arg;
 
             -- Check extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_edit_valve WHERE node_id = node_1_aux AND (acessibility = TRUE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_1_aux AND (acessibility = TRUE) AND (broken  = FALSE);
             IF controlValue = 1 THEN
 
                 -- Select public.geometry
@@ -63,7 +63,7 @@ BEGIN
 
 
             -- Check other extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_edit_valve WHERE node_id = node_2_aux AND (acessibility = FALSE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_2_aux AND (acessibility = FALSE) AND (broken  = FALSE);
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed

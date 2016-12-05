@@ -74,7 +74,7 @@ JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (an
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_connec";
-CREATE OR REPLACE VIEW "v_anl_mincut_result_restult_connec" AS 
+CREATE OR REPLACE VIEW "v_anl_mincut_result_connec" AS 
 SELECT
 anl_mincut_result_connec.id,
 anl_mincut_result_connec.mincut_result_cat_id,
@@ -147,7 +147,7 @@ JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_connec_compare";
-CREATE OR REPLACE VIEW "v_anl_mincut_result_restult_connec_compare" AS 
+CREATE OR REPLACE VIEW "v_anl_mincut_result_connec_compare" AS 
 SELECT
 anl_mincut_result_connec.id,
 anl_mincut_result_connec.mincut_result_cat_id,

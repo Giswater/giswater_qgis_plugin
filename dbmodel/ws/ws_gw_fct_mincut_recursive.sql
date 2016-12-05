@@ -23,7 +23,7 @@ BEGIN
     SELECT the_geom INTO node_aux FROM node WHERE node_id = node_id_arg;
 
     -- Check node being a valve
-    SELECT node_id INTO exists_id FROM v_edit_valve WHERE node_id = node_id_arg AND (acessibility = TRUE) AND (broken  = FALSE);
+    SELECT node_id INTO exists_id FROM v_edit_anl_valve WHERE node_id = node_id_arg AND (acessibility = TRUE) AND (broken  = FALSE);
     IF FOUND THEN
 
         -- Check if the node is already computed
