@@ -38,7 +38,7 @@ INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_
 INSERT INTO node_type VALUES ('WATERWELL', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction,', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
-
+INSERT INTO node_type VALUES ('SOURCE', 'JUNCTION', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
 
 -- ----------------------------
 -- Records of arc type system table

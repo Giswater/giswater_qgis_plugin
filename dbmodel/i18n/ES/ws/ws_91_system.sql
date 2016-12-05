@@ -43,6 +43,7 @@ INSERT INTO node_type VALUES ('ESTACION DE BOMBAMIENTO','PUMP', 'PUMP', 'man_pum
 INSERT INTO node_type VALUES ('FILTRO','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe','om_visit_x_node');
 INSERT INTO node_type VALUES ('CAUDALIMETRO','MEASURE INSTRUMENT', 'PIPE', 'man_meter', 'inp_pipe', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('POZO', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CAPTACION', 'JUNCTION', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
 
 -- ----------------------------
 -- Records of arc type system table
