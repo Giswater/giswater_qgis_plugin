@@ -16,51 +16,53 @@ INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,fals
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
-INSERT INTO node_type VALUES ('CURVA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('REDUCCION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('LUVE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('ADAPTACION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('UNION','JUNCTION','JUNCTION', 'man_junction',  'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('LINEA_DE_FONDO','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('X','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('T','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('GRIFO','JUNCTION', 'JUNCTION', 'man_junction',  'inp_junction,', 'event_x_node');
-INSERT INTO node_type VALUES ('TANQUE','TANK', 'TANK', 'man_tank', 'inp_tank', 'event_x_node');
-INSERT INTO node_type VALUES ('HIDRANTE','HYDRANT','JUNCTION', 'man_hydrant', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('VALVULA VERDE','VALVE','JUNCTION', 'man_valve', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('VALVULA DE AIRE','VALVE','JUNCTION', 'man_valve', 'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('VALVULA DE DESAGUE','VALVE', 'JUNCTION', 'man_valve',  'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('MESURADOR DE PRESSION','MEASURE INSTRUMENT', 'JUNCTION', 'man_meter',  'inp_junction', 'event_x_node');
-INSERT INTO node_type VALUES ('VALVULA DE CIERRE','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 'event_x_node');
-INSERT INTO node_type VALUES ('VALVULA DE RETENCION','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 'event_x_node');
-INSERT INTO node_type VALUES ('PR-REDUC.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
-INSERT INTO node_type VALUES ('PR-SUSTA.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
-INSERT INTO node_type VALUES ('PR-BREAK.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
-INSERT INTO node_type VALUES ('FL-CONTR.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
-INSERT INTO node_type VALUES ('VALVULA DE MARIPOSA','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
-INSERT INTO node_type VALUES ('GEN-PURP.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'event_x_node');
-INSERT INTO node_type VALUES ('ESTACION DE BOMBAMIENTO','PUMP', 'PUMP', 'man_pump', 'inp_pump', 'event_x_node');
-INSERT INTO node_type VALUES ('FILTRO','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe','event_x_node');
-INSERT INTO node_type VALUES ('CAUDALIMETRO','MEASURE INSTRUMENT', 'PIPE', 'man_meter', 'inp_pipe', 'event_x_node');
-
+INSERT INTO node_type VALUES ('CURVA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('REDUCCION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('LUVE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('ADAPTACION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('UNION','JUNCTION','JUNCTION', 'man_junction',  'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('LINEA_DE_FONDO','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('X','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('T','JUNCTION', 'JUNCTION','man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('GRIFO','JUNCTION', 'JUNCTION', 'man_junction',  'inp_junction,', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('TANQUE','TANK', 'TANK', 'man_tank', 'inp_tank', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('HIDRANTE','HYDRANT','JUNCTION', 'man_hydrant', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVULA VERDE','VALVE','JUNCTION', 'man_valve', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVULA DE AIRE','VALVE','JUNCTION', 'man_valve', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVULA DE DESAGUE','VALVE', 'JUNCTION', 'man_valve',  'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('MESURADOR DE PRESSION','MEASURE INSTRUMENT', 'JUNCTION', 'man_meter',  'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVULA DE CIERRE','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVULA DE RETENCION','VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('PR-REDUC.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('PR-SUSTA.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('PR-BREAK.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('FL-CONTR.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VALVULA DE MARIPOSA','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('GEN-PURP.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('ESTACION DE BOMBAMIENTO','PUMP', 'PUMP', 'man_pump', 'inp_pump', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('FILTRO','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe','om_visit_x_node');
+INSERT INTO node_type VALUES ('CAUDALIMETRO','MEASURE INSTRUMENT', 'PIPE', 'man_meter', 'inp_pipe', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('POZO', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
 
 -- ----------------------------
 -- Records of arc type system table
 -- ----------------------------
-INSERT INTO arc_type VALUES ('TUBO','PIPE','PIPE', 'man_pipe', 'inp_pipe', 'event_x_arc');
+INSERT INTO arc_type VALUES ('TUBO','PIPE','PIPE', 'man_pipe', 'inp_pipe', 'om_visit_x_arc');
 
 
 -- ----------------------------
 -- Records of connec_type system table
 -- ----------------------------
 INSERT INTO connec_type VALUES ('DOMESTICO', 'DOMESTIC', 'man_wjoin', 'event_x_connec');
-
+INSERT INTO connec_type VALUES ('BOCA_DE_RIEGO', 'BOCA_DE_RIEGO', 'man_greentap', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('FUENTE_ORNAMENTAL', 'FUENTE_ORNAMENTAL', 'man_fountain', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('FUENTE_PUBLICA', 'FUENTE_PUBLICA', 'man_tap', 'om_visit_x_connec');
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO element_type VALUES ('REGISTRO', 'event_x_element');
-INSERT INTO element_type VALUES ('POZO', 'event_x_element');
-INSERT INTO element_type VALUES ('TAPA', 'event_x_element');
-INSERT INTO element_type VALUES ('PASO', 'event_x_element');
+INSERT INTO element_type VALUES ('REGISTRO',NULL);
+INSERT INTO element_type VALUES ('POZO', NULL);
+INSERT INTO element_type VALUES ('TAPA', NULL);
+INSERT INTO element_type VALUES ('PASO', NULL);
 
 
