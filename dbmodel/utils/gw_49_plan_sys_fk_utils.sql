@@ -5,47 +5,72 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+ALTER TABLE "cat_arc" DROP CONSTRAINT IF EXISTS "cat_arc_cost_unit_fkey";
 ALTER TABLE "cat_arc" ADD FOREIGN KEY ("cost_unit") REFERENCES "price_value_unit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_arc" DROP CONSTRAINT IF EXISTS "cat_arc_cost_fkey";
 ALTER TABLE "cat_arc" ADD FOREIGN KEY ("cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_arc" DROP CONSTRAINT IF EXISTS "cat_arc_m2bottom_cost_fkey";
 ALTER TABLE "cat_arc" ADD FOREIGN KEY ("m2bottom_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_arc" DROP CONSTRAINT IF EXISTS "cat_arc_m3protec_cost_fkey";
 ALTER TABLE "cat_arc" ADD FOREIGN KEY ("m3protec_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
+ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_cost_unit_fkey";
 ALTER TABLE "cat_node" ADD FOREIGN KEY ("cost_unit") REFERENCES "price_value_unit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_node" DROP CONSTRAINT IF EXISTS "cat_node_cost_fkey";
 ALTER TABLE "cat_node" ADD FOREIGN KEY ("cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3exc_cost_fkey";
 ALTER TABLE "cat_soil" ADD FOREIGN KEY ("m3exc_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3fill_cost_fkey";
 ALTER TABLE "cat_soil" ADD FOREIGN KEY ("m3fill_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m3excess_cost_fkey";
 ALTER TABLE "cat_soil" ADD FOREIGN KEY ("m3excess_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "cat_soil" DROP CONSTRAINT IF EXISTS "cat_soil_m2trenchl_cost_fkey";
 ALTER TABLE "cat_soil" ADD FOREIGN KEY ("m2trenchl_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE "cat_pavement" DROP CONSTRAINT IF EXISTS "cat_pavement_m2_cost_fkey";
 ALTER TABLE "cat_pavement" ADD FOREIGN KEY ("m2_cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_arc_id_fkey";
 ALTER TABLE "plan_arc_x_psector" ADD FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_arc_x_psector" DROP CONSTRAINT IF EXISTS "plan_arc_x_psector_psector_id_fkey";
 ALTER TABLE "plan_arc_x_psector" ADD FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_node_id_fkey";
 ALTER TABLE "plan_node_x_psector" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_node_x_psector" DROP CONSTRAINT IF EXISTS "plan_node_x_psector_psector_id_fkey";
 ALTER TABLE "plan_node_x_psector" ADD FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "plan_other_x_psector" DROP CONSTRAINT IF EXISTS "plan_other_x_psector_price_id_fkey";
 ALTER TABLE "plan_other_x_psector" ADD FOREIGN KEY ("price_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_other_x_psector" DROP CONSTRAINT IF EXISTS "plan_other_x_psector_psector_id_fkey";
 ALTER TABLE "plan_other_x_psector" ADD FOREIGN KEY ("psector_id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE "plan_psector" DROP CONSTRAINT IF EXISTS "plan_psector_sector_id_fkey";
 ALTER TABLE "plan_psector" ADD FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+ALTER TABLE "plan_arc_x_pavement" DROP CONSTRAINT IF EXISTS "plan_arc_x_pavement_arc_id_fkey";
 ALTER TABLE "plan_arc_x_pavement" ADD FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "plan_arc_x_pavement" DROP CONSTRAINT IF EXISTS "plan_arc_x_pavement_pavcat_id_fkey";
 ALTER TABLE "plan_arc_x_pavement" ADD FOREIGN KEY ("pavcat_id") REFERENCES "cat_pavement" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
+ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value_compost_id_fkey";
 ALTER TABLE "price_compost_value" ADD FOREIGN KEY ("compost_id") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value_simple_id_fkey";
 ALTER TABLE "price_compost_value" ADD FOREIGN KEY ("simple_id") REFERENCES "price_simple" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "price_compost" DROP CONSTRAINT IF EXISTS "price_compost_unit_fkey";
 ALTER TABLE "price_compost" ADD FOREIGN KEY ("unit") REFERENCES "price_value_unit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "price_simple" DROP CONSTRAINT IF EXISTS "price_simple_unit_fkey";
 ALTER TABLE "price_simple" ADD FOREIGN KEY ("unit") REFERENCES "price_value_unit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "plan_selector_psector" DROP CONSTRAINT IF EXISTS "plan_selector_psector_id_fkey";
 ALTER TABLE "plan_selector_psector" ADD FOREIGN KEY ("id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "plan_selector_state" ADD FOREIGN KEY ("id") REFERENCES value_state (id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "plan_selector_state" DROP CONSTRAINT IF EXISTS "plan_selector_state_id_fkey";
+ALTER TABLE "plan_selector_state" ADD FOREIGN KEY ("id") REFERENCES "value_state" ("id") ON UPDATE CASCADE ON DELETE CASCADE;

@@ -5,9 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+ALTER TABLE "audit_function_actions" DROP CONSTRAINT IF EXISTS "audit_function_actions_audit_cat_error_id_fkey";
 ALTER TABLE audit_function_actions ADD FOREIGN KEY ("audit_cat_error_id") 
 REFERENCES audit_cat_error ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE "audit_function_actions" DROP CONSTRAINT IF EXISTS "audit_function_actions_audit_cat_function_id_fkey";
 ALTER TABLE audit_function_actions ADD FOREIGN KEY ("audit_cat_function_id") 
 REFERENCES audit_cat_function ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
