@@ -6,5 +6,5 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+ALTER TABLE "anl_selector_state" DROP CONSTRAINT IF EXISTS "anl_selector_state_id_fkey";
 ALTER TABLE "anl_selector_state" ADD FOREIGN KEY ("id") REFERENCES "value_state" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
