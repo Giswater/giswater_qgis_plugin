@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Sequence structure
 -- ----------------------------
 
-CREATE SEQUENCE "inp_backdrop_id_seq"
+CREATE SEQUENCE "inp_backdrop_id_seq" 
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
