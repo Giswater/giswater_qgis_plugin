@@ -79,10 +79,3 @@ CREATE TABLE "om_visit_x_connec" (
 "connec_id" varchar (16),
 CONSTRAINT om_visit_x_connec_pkey PRIMARY KEY (id)
 );
-
-CREATE TABLE "om_visit_x_gully" (
-"id" serial8 NOT NULL,
-"visit_id" int8,
-"gully_id" varchar (16),
-CONSTRAINT om_visit_x_gully_pkey PRIMARY KEY (id)
-);
