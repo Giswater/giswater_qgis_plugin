@@ -20,6 +20,9 @@ import sys
 import utils_giswater
 from controller import DaoController
 
+import urlparse
+import webbrowser
+
 from ui.add_sum import Add_sum          # @UnresolvedImport
         
         
@@ -274,14 +277,13 @@ class ParentDialog(object):
         
     def btn_accept(self):
         ''' Save new value oh hydrometer'''
-
-        
+  
         # Get widget text - hydtometer_id
         widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
         self.hydro_id = widget_hydro.text()
     
         
-        # get connec_id       
+        # Get connec_id       
         widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
         self.connec_id = widget_connec.text()
 
@@ -316,8 +318,7 @@ class ParentDialog(object):
     def btn_close(self):
         ''' Close form without saving '''
         self.dlg_sum.close()
-       
-        
+          
         
     def open_selected_document(self):
         ''' Get value from selected cell ("PATH")
@@ -329,13 +330,29 @@ class ParentDialog(object):
             # Get data from address in memory (pointer)
             self.path = self.tbl_document.selectedIndexes()[0].data()
             # Check if file exist
-            if not os.path.exists(self.path):
-                message = "File not found!"
-                self.controller.show_warning(message, context_name='ui_message')
-               
-            else:
-                # Open the document
-                os.startfile(self.path)                      
+            '''
+            fileExtension = os.path.splitext(self.path)
+            print fileExtension
+            #token = urllib.parse.urlparse(url)
+            '''
+            # Parse a URL into components
+            url=urlparse.urlsplit(self.path)
+            print url
+            print url.scheme
+            
+            # Check if path is URL
+            if url.scheme=="http":
+                # If path is URL open URL in browser
+                webbrowser.open(self.path) 
+            else: 
+                # If its not URL ,check if file exist
+                if not os.path.exists(self.path):
+                    message = "File not found!"
+                    self.controller.show_warning(message, context_name='ui_message')
+                   
+                else:
+                    # Open the document
+                    os.startfile(self.path)                      
 
 
     def set_filter_table(self, widget):
@@ -431,8 +448,7 @@ class ParentDialog(object):
 
     def fill_tbl_document(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
-        
-        
+
         # Get widgets
         doc_user = self.dialog.findChild(QComboBox, "doc_user")
         doc_type = self.dialog.findChild(QComboBox, "doc_type")
@@ -446,7 +462,9 @@ class ParentDialog(object):
         doc_tag.activated.connect(partial(self.set_filter_table, widget))
         self.date_document_to.dateChanged.connect(partial(self.set_filter_table, widget))
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table, widget))
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        #self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        
+
 
         # Fill ComboBox tagcat_id
         sql = "SELECT DISTINCT(tagcat_id)"
@@ -627,7 +645,7 @@ class ParentDialog(object):
         # Set signals
         self.date_el_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
         self.date_el_from.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
-        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        #self.tbl_document.doubleClicked.connect(self.open_selected_document)
 
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)
@@ -652,33 +670,4 @@ class ParentDialog(object):
         widget.model().setFilter(expr)
         widget.model().select() 
         
-        
-        
-    def set_filter_event(self, widget):
-        ''' !Get values selected by the user and sets a new filter for its table model '''
-   
-        # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd') 
-        date_to = self.date_event_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
-            return
-        
-        # Set filter
-        expr = self.field_id+" = '"+self.id+"'"
-        expr += " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
-        # Get selected values in Comboboxes        
-        event_type_value = utils_giswater.getWidgetText("event_type")
-        if event_type_value != 'null': 
-            expr+= " AND event_type = '"+event_type_value+"'"
-        event_id = utils_giswater.getWidgetText("event_id")
-        if event_id != 'null': 
-            expr+= " AND event_id = '"+event_id+"'"
-        print("expr")
-        print expr
-  
-        # Refresh model with selected filter
-        widget.model().setFilter(expr)
-        widget.model().select() 
+    

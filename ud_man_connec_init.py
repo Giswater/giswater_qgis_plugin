@@ -14,6 +14,7 @@ from functools import partial
 import utils_giswater
 from parent_init import ParentDialog
 from ui.add_sum import Add_sum          # @UnresolvedImport
+from PyQt4.Qt import QDialogButtonBox
 
 
 def formOpen(dialog, layer, feature):
@@ -33,7 +34,8 @@ def init_config():
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
       
     # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QDialogButtonBox, "buttonBox").accepted.connect(feature_dialog.save)   
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "buttonBox").accepted.connect(feature_dialog.save)        
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
 
      
@@ -84,6 +86,7 @@ class ManConnecDialog(ParentDialog):
         
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)

@@ -513,9 +513,6 @@ class Mg():
         
         self.om_visit_absolute_path = utils_giswater.getWidgetText("om_visit_absolute_path")
         self.doc_absolute_path = utils_giswater.getWidgetText("doc_absolute_path")  
-       
-        print self.om_visit_absolute_path 
-        print self.doc_absolute_path 
         
         sql = "UPDATE "+self.schema_name+".config_param_text "
         sql+= " SET value = '"+self.om_visit_absolute_path+"'"
@@ -657,21 +654,33 @@ class Mg():
         except AttributeError:
             pass   
         
-        
-    def geth_path(self, path):
-        ''' Get value from selected LineEdit ("PATH")
+    
+     
+    def geth_path(self):
+        ''' Get value from selected cell "PATH"
         Open the document''' 
-        print("path")
+        print ("lalala")
+        '''
+        # Check if clicked value is from the column "PATH"
+        position_column = self.tbl_document.currentIndex().column()
+        if position_column == 4 :      
+            # Get data from address in memory (pointer)
+            self.path=self.tbl_document.selectedIndexes()[0].data()
+            print(self.path)  
+            fileExtension = os.path.splitext(self.path)
+            print fileExtension
+            # Check if file exist
+            if not os.path.exists(self.path):
+                message="File doesn't exist!"
+                self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
+                
+            else :
+                # Open the document
+                os.startfile(self.path)     
+        else :
+            return
+        '''
         
-        # Check if file exist
-        if not os.path.exists(path):
-            message = "File doesn't exist!"
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
-        else:
-            # Open the document
-            os.startfile(path)     
-     
-     
             
     def fill_table(self, widget, table_name): 
         ''' Set a model with selected filter.

@@ -2,16 +2,28 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>600</height>
+    <height>626</height>
    </rect>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
   </property>
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
@@ -23,7 +35,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -46,8 +58,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -810,8 +822,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1047,8 +1059,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1581,8 +1593,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1937,7 +1949,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="date_scada_to">
+    <widget class="QDateEdit" name="date_el_to">
      <property name="geometry">
       <rect>
        <x>153</x>
@@ -1993,7 +2005,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="date_scada_from">
+    <widget class="QDateEdit" name="date_el_from">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -2284,21 +2296,6 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="page_event_element">
-      <attribute name="title">
-       <string>Element</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_event_element">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>530</width>
-         <height>300</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
     </widget>
     <widget class="QLabel" name="label_event_id">
      <property name="geometry">
@@ -2500,7 +2497,7 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QComboBox" name="connec_type">
+  <widget class="QComboBox" name="connecat_id">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -2863,6 +2860,19 @@
    </property>
    <property name="margin">
     <number>3</number>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>590</y>
+     <width>156</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
  </widget>
