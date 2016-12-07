@@ -68,8 +68,9 @@ VALUES (int_new_hydrometer,int_real_hydrometer,int_old_hydrometer,now());
 -- INSERT NEW HYDROMETER (AND CONNEC IF NOT EXISTS)
 
 FOR rec_hydrometer IN SELECT 
-connec_id,
-category_type,
+connec.connec_id,
+connec.category_type,
+connec.state,
 connec.the_geom as c_the_geom,
 ext_rtc_hydrometer.code,
 ext_hydrometer_category.observ,
@@ -82,23 +83,33 @@ JOIN ext_urban_propierties ON ext_urban_propierties.iptu=ext_rtc_hydrometer.code
 JOIN ext_hydrometer_category ON ext_hydrometer_category.id=ext_rtc_hydrometer.hydrometer_category::text
 WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer)
 LOOP
+    -- new connec
     IF rec_hydrometer.connec_id IS NULL THEN
-
         text_sector:= (SELECT sector_id FROM sector WHERE ST_DWithin(rec_hydrometer.v_the_geom.the_geom, sector.the_geom,0.001) LIMIT 1);
-        text_dma:= (SELECT dma_id FROM dma WHERE ST_DWithin(rec_hydrometer.v_the_geom.the_geom, sector.the_geom,0.001) LIMIT 1);
-        	
+        text_dma:= (SELECT dma_id FROM dma WHERE ST_DWithin(rec_hydrometer.v_the_geom.the_geom, sector.the_geom,0.001) LIMIT 1);     	
         INSERT INTO connec (connec_id, sector_id, dma_id, category_type, to_review, the_geom) 
         VALUES (rec_hydrometer.code, text_sector, text_dma, rec_hydrometer.observ, 'A VERIFICAR', st_centroid (rec_hydrometer.v_the_geom));
+        INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
+	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
     END IF;
-
-    UPDATE connec SET state='EM_SERVIÇO' WHERE connec_id=id_last;
-    INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
-    INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
-
-    IF rec_hydrometer.observ <> rec_hydrometer.category_type THEN
-        UPDATE connec SET category_type='MISTA' WHERE connec_id=rec_hydrometer.connec_id;
+        
+    -- existing connec but desactivated
+    IF rec_hydrometer.state='DESATIVADO' THEN
+	UPDATE connec SET state='EM_SERVIÇO' WHERE connec_id=rec_hydrometer.connec_id;
+	UPDATE connec SET category_type=rec_hydrometer.observ WHERE connec_id=rec_hydrometer.connec_id;
+	INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
+	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
     END IF;
-
+    
+    -- existing connec
+    IF rec_hydrometer.state='EM_SERVIÇO' THEN
+	IF rec_hydrometer.observ <> rec_hydrometer.category_type THEN
+		UPDATE connec SET category_type='MISTA' WHERE connec_id=rec_hydrometer.connec_id;
+	END IF;
+	INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
+	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
+    END IF;
+    	
 END LOOP;
 
 

@@ -129,7 +129,7 @@ CONSTRAINT node_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "element_type" (
 "id" varchar(18)   NOT NULL,
-"event_table" varchar(18)   NOT NULL,
+"event_table" varchar(18),
 CONSTRAINT element_type_pkey PRIMARY KEY (id)
 );
 
@@ -529,6 +529,7 @@ CREATE TABLE "point" (
 "point_type" varchar(18),
 "observ" character varying(512),
 "text" text,
+"link" text,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
 CONSTRAINT point_pkey PRIMARY KEY (point_id)

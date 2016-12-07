@@ -525,7 +525,6 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 CREATE TABLE "polygon" (
 "pol_id" varchar(16)   NOT NULL,
-"node_id" varchar(16)  ,
 "text" varchar(254)  ,
 "the_geom" public.geometry (POLYGON, SRID_VALUE),
 "undelete" boolean,

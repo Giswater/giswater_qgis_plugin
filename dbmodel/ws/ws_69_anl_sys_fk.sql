@@ -30,7 +30,6 @@ ALTER TABLE "anl_mincut_result_connec" ADD FOREIGN KEY ("connec_id") REFERENCES 
 ALTER TABLE "anl_mincut_result_valve" DROP CONSTRAINT IF EXISTS "anl_mincut_result_valve_valve_id_fkey";
 ALTER TABLE "anl_mincut_result_valve" ADD FOREIGN KEY ("valve_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_mincut_result_hydrometer" DROP CONSTRAINT IF EXISTS "anl_mincut_result_hydrometer_hydrometer_id_fkey";
-ALTER TABLE "anl_mincut_result_hydrometer" ADD FOREIGN KEY ("hydrometer_id") REFERENCES "ext_rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "anl_mincut_result_polygon" DROP CONSTRAINT IF EXISTS "anl_mincut_result_polygon_mincut_result_cat_id_fkey";
 ALTER TABLE "anl_mincut_result_polygon" ADD FOREIGN KEY ("mincut_result_cat_id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
