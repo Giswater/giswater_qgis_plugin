@@ -68,9 +68,6 @@ BEGIN
 
                 arc_geom := ST_MakeLine(pointArray2);
 
-                -- Cascade bug
-                DELETE FROM event_x_node WHERE node_id = node_id_arg;
-                DELETE FROM event_x_arc WHERE arc_id = myRecord1.arc_id OR arc_id = myRecord2.arc_id;
 
                 -- Select longest
                 IF ST_Length(myRecord1.the_geom) > ST_Length(myRecord2.the_geom) THEN

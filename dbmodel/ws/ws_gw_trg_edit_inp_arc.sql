@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
    
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_arc() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_arc()  RETURNS trigger AS $BODY$
 DECLARE 
     arc_table varchar;
     man_table varchar;
@@ -30,7 +30,7 @@ BEGIN
         WHERE arc_id = OLD.arc_id;
 
         IF arc_table = 'inp_pipe' THEN   
-            UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status WHERE arc_id=OLD.arc_id;
+            UPDATE inp_pipe SET arc_id=NEW.arc_id, minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint WHERE arc_id=OLD.arc_id;
         END IF;
 
         PERFORM audit_function(2,360); 
@@ -43,7 +43,9 @@ BEGIN
     END IF;
     
 END;
-$$;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_inp_arc_pipe ON "SCHEMA_NAME".v_edit_inp_pipe;

@@ -60,7 +60,8 @@ DROP VIEW IF EXISTS v_edit_inp_conduit CASCADE;
 CREATE VIEW v_edit_inp_conduit AS
 SELECT 
 arc.arc_id, arc.y1, arc.y2, arc.arccat_id, cat_arc.matcat_id AS "cat_matcat_id", cat_arc.shape AS "cat_shape",arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.est_y1, arc.est_y2, arc.verified, arc.the_geom,
-inp_conduit.barrels, inp_conduit.culvert, inp_conduit.kentry, inp_conduit.kexit, inp_conduit.kavg, inp_conduit.flap, inp_conduit.q0, inp_conduit.qmax, inp_conduit.seepage
+inp_conduit.barrels, inp_conduit.culvert, inp_conduit.kentry, inp_conduit.kexit, inp_conduit.kavg, 
+inp_conduit.flap, inp_conduit.q0, inp_conduit.qmax, inp_conduit.seepage, inp_conduit.custom_n
 FROM ((arc
 JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
 JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text)));

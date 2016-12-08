@@ -23,12 +23,10 @@ INSERT INTO cat_mat_arc VALUES ('PE-LD', 'PE low density', 'c:\\users\users\cata
 -- ----------------------------
 -- Records of inp_cat_mat_roughness
 -- ----------------------------
-INSERT INTO inp_cat_mat_roughness VALUES (10001,'N/I', 'New', 0, 0, 100, '');
-INSERT INTO inp_cat_mat_roughness VALUES (20001,'PVC', 'New', 150, 0, 100, '');
-INSERT INTO inp_cat_mat_roughness VALUES (30001,'FD', 'New', 120, 0, 100, '');
-INSERT INTO inp_cat_mat_roughness VALUES (40001,'FC', 'New', 150, 0, 100, '');
-INSERT INTO inp_cat_mat_roughness VALUES (50001,'PE-HD', 'New', 140, 0, 100, '');
-INSERT INTO inp_cat_mat_roughness VALUES (60001,'PE-LD', 'New', 130, 0, 100, '');
+UPDATE inp_cat_mat_roughness SET period_id='ALL';
+UPDATE inp_cat_mat_roughness SET init_age=0;
+UPDATE inp_cat_mat_roughness SET end_age=150;
+UPDATE inp_cat_mat_roughness SET roughness=100;
 
 
 

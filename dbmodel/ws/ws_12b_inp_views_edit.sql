@@ -67,7 +67,8 @@ JOIN inp_shortpipe ON (((inp_shortpipe.node_id)::text = (node.node_id)::text)));
 DROP VIEW IF EXISTS "v_edit_inp_pipe" CASCADE;
 CREATE VIEW "v_edit_inp_pipe" AS 
 SELECT 
-arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, arc.rotation, arc.link, arc.verified, arc.the_geom,
-inp_pipe.minorloss, inp_pipe.status
+arc.arc_id, arc.arccat_id, arc.sector_id, arc."state", arc.annotation, arc.observ, arc.comment, arc.dma_id, arc.custom_length, 
+arc.rotation, arc.link, arc.verified, arc.the_geom,
+inp_pipe.minorloss, inp_pipe.status, inp_pipe.custom_roughness, inp_pipe.custom_dint
 FROM (arc 
 JOIN inp_pipe ON (((inp_pipe.arc_id)::text = (arc.arc_id)::text)));

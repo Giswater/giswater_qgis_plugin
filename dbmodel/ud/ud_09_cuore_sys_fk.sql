@@ -51,9 +51,6 @@ ALTER TABLE "arc" ADD FOREIGN KEY ("state") REFERENCES "value_state" ("id") ON D
 ALTER TABLE "arc" DROP CONSTRAINT IF EXISTS "arc_verified_fkey";
 ALTER TABLE "arc" ADD FOREIGN KEY ("verified") REFERENCES "value_verified" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "polygon" DROP CONSTRAINT IF EXISTS "polygon_node_id_fkey";
-ALTER TABLE "polygon" ADD FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
 ALTER TABLE "cat_element" DROP CONSTRAINT IF EXISTS "cat_element_elementtype_id_fkey";
 ALTER TABLE "cat_element" ADD FOREIGN KEY ("elementtype_id") REFERENCES "element_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "cat_element" DROP CONSTRAINT IF EXISTS "cat_element_matcat_id_fkey";

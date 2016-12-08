@@ -34,7 +34,7 @@ BEGIN
         WHERE arc_id = OLD.arc_id;
 
         IF (epa_type = 'CONDUIT') THEN 
-            UPDATE inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage WHERE arc_id=OLD.arc_id;
+            UPDATE inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage, custom_n=NEW.custom_n WHERE arc_id=OLD.arc_id;
         ELSIF (epa_type = 'PUMP') THEN 
             UPDATE inp_pump SET arc_id=NEW.arc_id,curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff WHERE arc_id=OLD.arc_id;
         ELSIF (epa_type = 'ORIFICE') THEN 

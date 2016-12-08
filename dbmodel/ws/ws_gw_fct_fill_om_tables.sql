@@ -15,7 +15,6 @@ $BODY$DECLARE
  rec_connec   record;
  rec_parameter record;
  id_last   bigint;
- rec_gully   record;
 
 
 BEGIN
@@ -30,7 +29,7 @@ BEGIN
     DELETE FROM om_visit_x_arc;
     DELETE FROM om_visit_x_node;
     DELETE FROM om_visit_x_connec;
-    DELETE FROM om_visit_x_gully;
+
     
       
 
@@ -58,31 +57,7 @@ BEGIN
             
         END LOOP;
 
-        --gully
-        FOR rec_gully IN SELECT * FROM gully
-        LOOP
-
-            --Insert visit
-            INSERT INTO om_visit (startdate, enddate, user_name) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user') RETURNING id INTO id_last;
-            INSERT INTO om_visit_x_gully (visit_id, gully_id) VALUES(id_last, rec_gully.gully_id);
-
-            --Insert event 'inspection'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature = 'GULLY' or feature = 'ALL')
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(rec_gully.the_geom)::numeric(12,3), st_y(rec_gully.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-
-            --Insert event 'picture'
-            FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
-            LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture_text', 'demo_picture.png',null
-                ,st_x(rec_gully.the_geom)::numeric(12,3), st_y(rec_gully.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
-            END LOOP;
-            
-        END LOOP;
-
-
+  
 
         --node
         FOR rec_node IN SELECT * FROM node
