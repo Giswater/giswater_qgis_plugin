@@ -41,11 +41,20 @@ BEGIN
 		NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
 	END IF;
 
+    IF (NEW.node_type IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
+                RETURN audit_function(105,430);  
+            END IF;
+            NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
+        END IF;
+
+
         -- Node Catalog ID
         IF (NEW.nodecat_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,430);  
-            END IF;      
+            END IF;
+            NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)
         END IF;
 
      -- Sector ID

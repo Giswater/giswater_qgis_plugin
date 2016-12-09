@@ -23,6 +23,7 @@ DECLARE
     v_sql2 varchar;
     old_nodetype varchar;
     new_nodetype varchar;
+    man_table_2 varchar;
 	rec Record;
 
 
@@ -30,7 +31,8 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     man_table:= TG_ARGV[0];
-	
+    man_table_2:=man_table;
+
 	--Get data from config table
 	SELECT * INTO rec FROM config;	
 	
@@ -45,10 +47,10 @@ BEGIN
       
         -- Node type
         IF (NEW.node_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
+            IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
                 RETURN audit_function(105,830);  
             END IF;
-            NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
+            NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
         END IF;
 
          -- Epa type

@@ -12,23 +12,23 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 
 
-ALTER VIEW v_edit_inp_junction ALTER y0 SET DEFAULT 0;
-ALTER VIEW v_edit_inp_junction ALTER ysur SET DEFAULT 0;
-ALTER VIEW v_edit_inp_junction ALTER apond SET DEFAULT 0;
+ALTER TABLE inp_junction ALTER y0 SET DEFAULT 0;
+ALTER TABLE inp_junction ALTER ysur SET DEFAULT 0;
+ALTER TABLE inp_junction ALTER apond SET DEFAULT 0;
 
 
-ALTER VIEW v_edit_inp_divider ALTER y0 SET DEFAULT 0;
-ALTER VIEW v_edit_inp_divider ALTER ysur SET DEFAULT 0;
-ALTER VIEW v_edit_inp_divider ALTER apond SET DEFAULT 0;
+ALTER TABLE inp_divider ALTER y0 SET DEFAULT 0;
+ALTER TABLE inp_divider ALTER ysur SET DEFAULT 0;
+ALTER TABLE inp_divider ALTER apond SET DEFAULT 0;
 
 
-ALTER VIEW v_edit_inp_outfall ALTER outfall_type SET DEFAULT 'NORMAL';
-ALTER VIEW v_edit_inp_outfall ALTER ymax SET DEFAULT 0;
+ALTER TABLE inp_outfall ALTER outfall_type SET DEFAULT 'NORMAL';
+ALTER TABLE inp_outfall ALTER ymax SET DEFAULT 0;
 
 
-ALTER VIEW v_edit_inp_storage ALTER y0 SET DEFAULT 0;
-ALTER VIEW v_edit_inp_storage ALTER ysur SET DEFAULT 0;
-ALTER VIEW v_edit_inp_storage ALTER apond SET DEFAULT 0;
+ALTER TABLE inp_storage ALTER y0 SET DEFAULT 0;
+ALTER TABLE inp_storage ALTER ysur SET DEFAULT 0;
+ALTER TABLE inp_storage ALTER apond SET DEFAULT 0;
 
 
 
@@ -36,30 +36,30 @@ ALTER VIEW v_edit_inp_storage ALTER apond SET DEFAULT 0;
 -- Default values of arc editing views
 -- ----------------------------
 
-ALTER VIEW v_edit_inp_conduit ALTER y1 SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER y2 SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER barrels SET DEFAULT 1;
-ALTER VIEW v_edit_inp_conduit ALTER kentry SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER kexit SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER kavg SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER flap SET DEFAULT 'NO';
-ALTER VIEW v_edit_inp_conduit ALTER q0 SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER qmax SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER seepage SET DEFAULT 0;
-ALTER VIEW v_edit_inp_conduit ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW v_edit_inp_conduit ALTER verified SET DEFAULT 'TO REVIEW';
+ALTER TABLE inp_conduit ALTER y1 SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER y2 SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER barrels SET DEFAULT 1;
+ALTER TABLE inp_conduit ALTER kentry SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER kexit SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER kavg SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER flap SET DEFAULT 'NO';
+ALTER TABLE inp_conduit ALTER q0 SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER qmax SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER seepage SET DEFAULT 0;
+ALTER TABLE inp_conduit ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE inp_conduit ALTER verified SET DEFAULT 'TO REVIEW';
 
-ALTER VIEW v_edit_inp_orifice ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW v_edit_inp_orifice ALTER verified SET DEFAULT 'TO REVIEW';
+ALTER TABLE inp_orifice ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE inp_orifice ALTER verified SET DEFAULT 'TO REVIEW';
 
-ALTER VIEW v_edit_inp_pump ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW v_edit_inp_pump ALTER verified SET DEFAULT 'TO REVIEW';
+ALTER TABLE inp_pump ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE inp_pump ALTER verified SET DEFAULT 'TO REVIEW';
 
-ALTER VIEW v_edit_inp_outlet ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW v_edit_inp_outlet ALTER verified SET DEFAULT 'TO REVIEW';
+ALTER TABLE inp_outlet ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE inp_outlet ALTER verified SET DEFAULT 'TO REVIEW';
 
-ALTER VIEW v_edit_inp_weir ALTER state SET DEFAULT 'ON_SERVICE';
-ALTER VIEW v_edit_inp_weir ALTER verified SET DEFAULT 'TO REVIEW';
+ALTER TABLE inp_weir ALTER state SET DEFAULT 'ON_SERVICE';
+ALTER TABLE inp_weir ALTER verified SET DEFAULT 'TO REVIEW';
 
 
 

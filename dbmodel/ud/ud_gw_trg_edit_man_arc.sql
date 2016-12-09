@@ -16,14 +16,15 @@ DECLARE
     old_man_table varchar;
     v_sql varchar;
     v_sql2 varchar;
+    man_table_2 varchar;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     man_table:= TG_ARGV[0];
-	
-    IF TG_OP = 'INSERT' THEN
-      
+	man_table_2:=man_table;
+
+    IF TG_OP = 'INSERT' THEN   
 		-- Arc ID
         IF (NEW.arc_id IS NULL) THEN
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
@@ -34,7 +35,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM arc_type) = 0) THEN
                 RETURN audit_function(140,840);  
             END IF;
-            NEW.arc_type:= (SELECT id FROM arc_type LIMIT 1);     
+            NEW.arc_type:= (SELECT id FROM arc_type WHERE arc_type.man_table=man_table_2 LIMIT 1);   
         END IF;
 
          -- Epa type
