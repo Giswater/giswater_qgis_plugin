@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>14</number>
+    <number>12</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -14530,7 +14530,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_element_delete">
+    <widget class="QPushButton" name="delete_row_info">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -14814,21 +14814,6 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="page_event_element">
-      <attribute name="title">
-       <string>Element</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_event_element">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>530</width>
-         <height>300</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
     </widget>
     <widget class="QDateEdit" name="date_event_to">
      <property name="geometry">
@@ -15033,7 +15018,7 @@
     <attribute name="title">
      <string>Scada</string>
     </attribute>
-    <widget class="QDateEdit" name="date_scada_from">
+    <widget class="QDateEdit" name="date_el_from">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -15086,7 +15071,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="date_scada_to">
+    <widget class="QDateEdit" name="date_el_to">
      <property name="geometry">
       <rect>
        <x>153</x>
@@ -15158,7 +15143,7 @@
       <attribute name="title">
        <string>Scada</string>
       </attribute>
-      <widget class="QTableView" name="tbl_event_node_2">
+      <widget class="QTableView" name="tbl_scada">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -15173,7 +15158,7 @@
       <attribute name="title">
        <string>Scada values</string>
       </attribute>
-      <widget class="QTableView" name="tbl_event_element_2">
+      <widget class="QTableView" name="tbl_scada_value">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -15254,7 +15239,7 @@
   <widget class="QLabel" name="label_dma">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>190</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -15290,53 +15275,17 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>560</y>
      <width>119</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_presszone">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>540</y>
-     <width>90</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>Pressure zone:</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -15372,7 +15321,7 @@
   <widget class="QComboBox" name="dma_id">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>190</x>
      <y>560</y>
      <width>121</width>
      <height>20</height>
@@ -15386,16 +15335,6 @@
    </property>
    <property name="frame">
     <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="presszonecat_id">
-   <property name="geometry">
-    <rect>
-     <x>274</x>
-     <y>560</y>
-     <width>123</width>
-     <height>20</height>
-    </rect>
    </property>
   </widget>
   <widget class="QComboBox" name="sector_id">

@@ -81,10 +81,11 @@ class ManGullyDialog(ParentDialog):
         
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
-                
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-      
+        
         # Fill tab event 
         self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_gully, self.filter)
         

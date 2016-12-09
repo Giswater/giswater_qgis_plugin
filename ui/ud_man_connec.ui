@@ -58,8 +58,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -822,8 +822,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1059,8 +1059,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1593,8 +1593,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2539,42 +2539,6 @@
     <string>connec_id</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_presszone">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>540</y>
-     <width>90</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>Pressure zone:</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
@@ -2591,7 +2555,7 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -2627,7 +2591,7 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>560</y>
      <width>119</width>
      <height>20</height>
@@ -2670,16 +2634,6 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="presszonecat_id">
-   <property name="geometry">
-    <rect>
-     <x>274</x>
-     <y>560</y>
-     <width>123</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QComboBox" name="sector_id">
    <property name="geometry">
     <rect>
@@ -2702,7 +2656,7 @@
   <widget class="QComboBox" name="dma_id">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>190</x>
      <y>560</y>
      <width>121</width>
      <height>20</height>
@@ -2721,7 +2675,7 @@
   <widget class="QLabel" name="label_dma">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>190</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>

@@ -91,6 +91,7 @@ class ManArcDialog(ParentDialog):
         
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
@@ -104,8 +105,12 @@ class ManArcDialog(ParentDialog):
         # Fill tab costs 
         self.fill_costs()
         
+        
         # Fill tab costs | Prices
         self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
+        
+        # Configuration of table costs | Prices
+        self.set_configuration(self.tbl_price_arc, table_document)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            

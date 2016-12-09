@@ -7,13 +7,14 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
 from ui.add_sum import Add_sum          # @UnresolvedImport
+#from PyQt4.Qt import QDialogButtonBox
 
 
 def formOpen(dialog, layer, feature):
@@ -33,10 +34,12 @@ def init_config():
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
     
     # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
+    #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)
+    
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
 
-     
+
 class ManArcDialog(ParentDialog):   
     
     def __init__(self, dialog, layer, feature):
@@ -91,6 +94,7 @@ class ManArcDialog(ParentDialog):
         
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
         
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
@@ -163,7 +167,7 @@ class ManArcDialog(ParentDialog):
         self.m3excess_cost = self.dialog.findChild(QLineEdit, "m3excess_cost")
         self.m2trenchl_cost = self.dialog.findChild(QLineEdit, "m2trenchl_cost")
         self.m2pavement_cost = self.dialog.findChild(QLineEdit, "m2pavement_cost")
-        self.m2mlbase = self.dialog.findChild(QLineEdit, "m2mlbase")
+        self.m2mlbottom = self.dialog.findChild(QLineEdit, "m2mlbottom")
         self.m3mlprotec = self.dialog.findChild(QLineEdit, "m3mlprotec")
         self.m3mlexc = self.dialog.findChild(QLineEdit, "m3mlexc")
         self.m3mlfill = self.dialog.findChild(QLineEdit, "m3mlfill")
@@ -207,6 +211,7 @@ class ManArcDialog(ParentDialog):
         self.cost_unit.setText(str(row['cost_unit'])) 
         self.arc_cost_2.setText(str(row['arc_cost'])) 
         self.m2bottom_cost.setText(str(row['m2bottom_cost'])) 
+        self.m2mlbottom.setText(str(row['m2mlbottom'])) 
         self.m3protec_cost.setText(str(row['m3protec_cost'])) 
         self.m3exc_cost.setText(str(row['m3exc_cost'])) 
         self.m3excess_cost.setText(str(row['m3excess_cost'])) 

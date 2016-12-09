@@ -13,6 +13,7 @@ from qgis.core import QgsExpression
 
 import os
 import sys
+import webbrowser
   
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -322,6 +323,7 @@ class Ed():
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
         self.dlg.findChild(QPushButton, "path_doc").clicked.connect(self.open_file_dialog)
+        self.dlg.findChild(QPushButton, "path_url").clicked.connect(self.open_web_browser)
         
         
         # Manage i18n of the form
@@ -361,12 +363,24 @@ class Ed():
         ''' Open File Dialog '''
         
         #fileName = QFileDialog.ShowDirsOnly
-        dialog = QFileDialog()
-        dialog.open()
+        file_dialog = QFileDialog()
+        #file_dialog.open()
         #dialog.setFileMode(QFileDialog.AnyFile)
-        dialog.getOpenFileName(self,"Open Image", "C:/Users/Public/Desktop", "Image Files (*.png *.jpg *.bmp)");
+        file_dialog.getOpenFileName();
+        #file_dialog.exec_()
+
+      
+    def open_web_browser(self):
+        ''' Display url using the default browser '''
         
+        url = utils_giswater.getWidgetText("path") 
+        if url == 'NULL' :
+            url = 'www.giswater.org'
+            webbrowser.open(url)
+        else :
+            webbrowser.open(url)
         
+  
     def ed_add_file_autocomplete(self): 
         ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
 
@@ -436,7 +450,6 @@ class Ed():
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
 
-        print (layer_source)
         #uri_table = layer_source['table']
         uri_table = layer_source[1]
 
@@ -571,7 +584,6 @@ class Ed():
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
-            print sql
             self.dao.execute_sql(sql) 
                           
         

@@ -234,10 +234,6 @@ class Mg():
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
         
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 25)
-                
         # Create the dialog and signals
         self.dlg = ResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
@@ -290,10 +286,6 @@ class Mg():
 
     def mg_flow_exit(self):
         ''' Button 27. Valve analytics ''' 
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 27)        
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
@@ -311,10 +303,6 @@ class Mg():
         Combo to select new cat_node.id
         TODO: Trigger 'gw_trg_edit_node' has to be disabled temporarily 
         '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 28)        
         
         # Check if at least one node is checked          
         layer = self.iface.activeLayer()  
@@ -419,10 +407,6 @@ class Mg():
     def mg_config(self):                
         ''' Button 99 - Open a dialog showing data from table "config" 
         User can changge its values '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 99)        
         
         # Create the dialog and signals
         self.dlg = Config()
@@ -449,7 +433,6 @@ class Mg():
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
         row = self.dao.get_row(sql)
-        print (row)
         path = str(row['value'])
         self.om_visit_absolute_path.setText(path)
         #self.om_visit_absolute_path.clicked.connect(partial(self.geth_path, path))   
@@ -457,7 +440,6 @@ class Mg():
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        print (row)
         
         path = str(row['value'])
         self.doc_absolute_path.setText(path)
@@ -594,12 +576,10 @@ class Mg():
         # Fill menu
         for row in rows:       
             elem = row[0]
-            print(elem)
             # If not exist in table _selector_state isert to menu
             # Check if we already have data with selected id
             sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
             row = self.dao.get_row(sql)  
-            print row
             if row == None:
                 self.menu.addAction(elem,partial(self.insert, elem,table))
         
@@ -644,6 +624,7 @@ class Mg():
             self.dao.execute_sql(sql)
             widget.model().select()
         
+        
     
     def close_dialog_multi(self, dlg=None): 
         ''' Close dialog '''
@@ -654,32 +635,6 @@ class Mg():
         except AttributeError:
             pass   
         
-    
-     
-    def geth_path(self):
-        ''' Get value from selected cell "PATH"
-        Open the document''' 
-        print ("lalala")
-        '''
-        # Check if clicked value is from the column "PATH"
-        position_column = self.tbl_document.currentIndex().column()
-        if position_column == 4 :      
-            # Get data from address in memory (pointer)
-            self.path=self.tbl_document.selectedIndexes()[0].data()
-            print(self.path)  
-            fileExtension = os.path.splitext(self.path)
-            print fileExtension
-            # Check if file exist
-            if not os.path.exists(self.path):
-                message="File doesn't exist!"
-                self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
-                
-            else :
-                # Open the document
-                os.startfile(self.path)     
-        else :
-            return
-        '''
         
             
     def fill_table(self, widget, table_name): 

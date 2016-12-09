@@ -95,7 +95,7 @@ class SnappingConfigManager():
 
     def snapToConnec(self):
         ''' Set snapping to Connec '''
-        QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
+        QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.node_id(), True, 2, 2, 1.0, False)
 
 
     def snapToLayer(self, Layer):
@@ -124,3 +124,92 @@ class SnappingConfigManager():
         ''' Function to restore user configuration '''
         self.applySnappingOptions(self.previousSnapping)
 
+
+    def set_layer(self):
+        
+        self.layer = self.iface.activeLayer()
+        
+        if self.layer == table_arc:  
+            self.layer_value = layer_arc
+        if self.layer == table_node : 
+            self.layer_value = layer_node
+        if self.layer == table_connec : 
+            self.layer_value = layer_connec
+        if self.layer == table_gully :  
+            self.layer_value = layer_gully
+            
+        if self.layer == table_man_arc :  
+            self.layer_value = layer_man_arc
+        if self.layer == table_man_node : 
+            self.layer_value = layer_man_node
+        if self.layer == table_man_connec : 
+            self.layer_value = layer_man_connec
+        if self.layer == table_man_gully :  
+            self.layer_value = layer_gully
+                 
+        if self.layer == table_wjoin :  
+            self.layer_value = layer_connec
+        if self.layer == table_tap :  
+            self.layer_value = layer_connec
+        if self.layer == table_greentap:  
+            self.layer_value = layer_connec
+        if self.layer == table_fountain :  
+            self.layer_value = layer_connec
+             
+        if self.layer == table_tank :  
+            self.layer_value = layer_node
+        if self.layer == table_pump :  
+            self.layer_value = layer_node  
+        if self.layer == table_source :  
+            self.layer_value = layer_node   
+        if self.layer == table_meter :  
+            self.layer_value = layer_node
+        if self.layer == table_junction :  
+            self.layer_value = layer_node
+        if self.layer == table_waterwell :  
+            self.layer_value = layer_node
+        if self.layer == table_reduction:  
+            self.layer_value = layer_node
+        if self.layer == table_hydrant :  
+            self.layer_value = layer_node
+        if self.layer == table_valve :  
+            self.layer_value = layer_node
+        if self.layer == table_manhole :  
+            self.layer_value = layer_node
+            
+        if self.layer == table_chamber:  
+            self.layer_value = layer_node
+        if self.layer == table_chamber_pol :  
+            self.layer_value = layer_node
+        if self.layer == table_netgully :  
+            self.layer_value = layer_node
+        if self.layer == table_netgully_pol :  
+            self.layer_value = layer_node
+        if self.layer == table_netinit :  
+            self.layer_value = layer_node
+        if self.layer == table_wjump :  
+            self.layer_value = layer_node
+        if self.layer == table_wwtp :  
+            self.layer_value = layer_node
+        if self.layer == table_wwtp_pol :  
+            self.layer_value = layer_node
+        if self.layer == table_storage :  
+            self.layer_value = layer_node
+        if self.layer == table_storage_pol :  
+            self.layer_value = layer_node
+        if self.layer == table_outfall :  
+            self.layer_value = layer_node
+            
+            
+        if self.layer == table_varc :  
+            self.layer_value = layer_arc
+        if self.layer == table_siphon :  
+            self.layer_value = layer_arc
+        if self.layer == table_conduit :  
+            self.layer_value = layer_arc
+        if self.layer == table_waccel:  
+            self.layer_value = layer_arc
+        
+        
+        
+        

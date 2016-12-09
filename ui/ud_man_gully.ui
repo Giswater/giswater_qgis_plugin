@@ -53,7 +53,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1320,7 +1320,7 @@
       <string>Unlink element</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_element_delete_2">
+    <widget class="QPushButton" name="delete_row_info">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -1401,7 +1401,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_doc_delete_2">
+    <widget class="QPushButton" name="btn_doc_delete">
      <property name="geometry">
       <rect>
        <x>460</x>
@@ -1577,16 +1577,6 @@
     <attribute name="title">
      <string>Event</string>
     </attribute>
-    <widget class="QTableWidget" name="tbl_event">
-     <property name="geometry">
-      <rect>
-       <x>12</x>
-       <y>120</y>
-       <width>550</width>
-       <height>311</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_event_tag">
      <property name="geometry">
       <rect>
@@ -1709,7 +1699,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="event_tag">
+    <widget class="QComboBox" name="event_id">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -1796,6 +1786,16 @@
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="QTableView" name="tbl_event">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>551</width>
+       <height>311</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -1924,7 +1924,7 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -1957,56 +1957,10 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="presszonecat_id">
-   <property name="geometry">
-    <rect>
-     <x>274</x>
-     <y>560</y>
-     <width>123</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_presszone">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>540</y>
-     <width>90</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>Pressure zone:</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
   <widget class="QComboBox" name="dma_id">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>180</x>
      <y>560</y>
      <width>121</width>
      <height>20</height>
@@ -2044,7 +1998,7 @@
   <widget class="QLabel" name="label_dma_id">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>180</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -2080,7 +2034,7 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>560</y>
      <width>119</width>
      <height>20</height>

@@ -105,6 +105,10 @@ class ManNodeDialog(ParentDialog):
         
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
+        self.tbl_document.doubleClicked.connect(self.open_selected_document)
+        
+        # Configuration of Document table
+        self.set_configuration(self.tbl_document, table_element)    
         
         # Fill tab event | node
         self.fill_tbl_event(self.tbl_event_node, self.schema_name+"."+table_event_node, self.filter)
@@ -124,8 +128,6 @@ class ManNodeDialog(ParentDialog):
         # Configuration of table scada | scada value
         self.set_configuration(self.tbl_scada_value, table_scada_value)
 
-        # Configuration of table Document
-        self.set_configuration(self.tbl_document, table_document)
         
         # Fill tab costs
         self.fill_table(self.tbl_price_node, self.schema_name+"."+table_price_node, self.filter)
