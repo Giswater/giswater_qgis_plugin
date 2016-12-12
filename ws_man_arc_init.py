@@ -262,4 +262,53 @@ class ManArcDialog(ParentDialog):
         self.length.setText(str(row['length'])) 
         self.budget.setText(str(row['budget'])) 
         
+        
+        # Get arccat_id and soilcat_id from v_plan_cost_arc
+        sql = "SELECT arccat_id FROM "+self.schema_name+".v_plan_cost_arc WHERE arc_id = '"+self.arc_id+"'" 
+        row = self.dao.get_row(sql)
+        arccat_id = row[0]
+
+        sql = "SELECT soilcat_id FROM "+self.schema_name+".v_plan_cost_arc WHERE arc_id = '"+self.arc_id+"'" 
+        row = self.dao.get_row(sql)
+        soilcat_id = row[0]
+
+        
+        # Fill QLineEdit -> Arccat
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND catalog_id = '"+arccat_id+"'" 
+        rows = self.dao.get_rows(sql)
+        
+        arc_element_value = rows[0]
+        arc_bottom_value = rows[1]
+        arc_protection_value = rows[2]
+        
+        arc_element = self.dialog.findChild(QLineEdit, "arc_element")
+        arc_bottom = self.dialog.findChild(QLineEdit, "arc_bottom")
+        arc_protection = self.dialog.findChild(QLineEdit, "arc_protection")
+        
+        arc_element.setText(str(arc_element_value[0]))
+        arc_bottom.setText(str(arc_bottom_value[0]))
+        arc_protection.setText(str(arc_protection_value[0]))
+        
+        
+        # Fill QLineEdit -> Soilcat
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND catalog_id = '"+soilcat_id+"'" 
+        rows = self.dao.get_rows(sql)
+        
+        soil_excavation_value = rows[0]
+        soil_filling_value = rows[1]
+        soil_excess_value = rows[2]
+        soil_trenchlining_value = rows[3]
+        
+        soil_excavation = self.dialog.findChild(QLineEdit, "soil_excavation")
+        soil_filling = self.dialog.findChild(QLineEdit, "soil_filling")
+        soil_excess = self.dialog.findChild(QLineEdit, "soil_excess")
+        soil_trenchlining = self.dialog.findChild(QLineEdit, "soil_trenchlining")
+        
+        soil_excavation.setText(str(soil_excavation_value[0]))
+        soil_filling.setText(str(soil_filling_value[0]))
+        soil_excess.setText(str(soil_excess_value[0]))
+        soil_trenchlining.setText(str(soil_trenchlining_value[0]))
+        
+        
+        
     

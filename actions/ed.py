@@ -362,19 +362,35 @@ class Ed():
     def open_file_dialog(self):
         ''' Open File Dialog '''
         
-        #fileName = QFileDialog.ShowDirsOnly
-        file_dialog = QFileDialog()
-        #file_dialog.open()
-        #dialog.setFileMode(QFileDialog.AnyFile)
-        file_dialog.getOpenFileName();
-        #file_dialog.exec_()
+        
+        # Set default value from QLine
+        self.file_path = utils_giswater.getWidgetText("path")
+    
+        # Check if file exists
+        if not os.path.exists(self.file_path):
+            message = "File path doesn't exist"
+            self.controller.show_warning(message, 10, context_name='ui_message')
+        else:
+            # Set default value if necessary
+            if self.file_path == 'null': 
+                self.file_path = self.plugin_dir
+                
+            # Get directory of that file
+            folder_path = os.path.dirname(self.file_path)
+            os.chdir(folder_path)
+            msg = "Select file"
+            self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
+            # Set text to QLineEdit
+            self.dlg.path.setText(self.file_path)     
 
+
+        
       
     def open_web_browser(self):
         ''' Display url using the default browser '''
         
         url = utils_giswater.getWidgetText("path") 
-        if url == 'NULL' :
+        if url == 'null' :
             url = 'www.giswater.org'
             webbrowser.open(url)
         else :
