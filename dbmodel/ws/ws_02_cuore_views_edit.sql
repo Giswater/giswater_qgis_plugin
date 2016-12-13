@@ -572,5 +572,49 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
      LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
      JOIN man_waterwell ON node.node_id::text = man_waterwell.node_id::text;
 
-	 
-	
+
+
+DROP VIEW IF EXISTS v_edit_man_filter CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_filter AS 
+ SELECT node.node_id,
+    node.elevation AS filter_elevation,
+    node.depth AS filter_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS filter_state,
+    node.annotation AS filter_annotation,
+    node.observ AS filter_observ,
+    node.comment AS filter_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS filter_soilcat_id,
+    node.category_type AS filter_category_type,
+    node.fluid_type AS filter_fluid_type,
+    node.location_type AS filter_location_type,
+    node.workcat_id AS filter_workcat_id,
+    node.workcat_id_end AS filter_workcat_id_end,
+    node.buildercat_id AS filter_buildercat_id,
+    node.builtdate AS filter_builtdate,
+    node.ownercat_id AS filter_ownercat_id,
+    node.adress_01 AS filter_adress_01,
+    node.adress_02 AS filter_adress_02,
+    node.adress_03 AS filter_adress_03,
+    node.descript AS filter_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS filter_rotation,
+    node.label_x AS filter_label_x,
+    node.label_y AS filter_label_y,
+    node.label_rotation AS filter_label_rotation,
+    node.link AS filter_link,
+    node.verified,
+    node.the_geom,
+    node.undelete
+   FROM node
+     LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+     LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
+     JOIN man_filter ON node.node_id::text = man_filter.node_id::text;

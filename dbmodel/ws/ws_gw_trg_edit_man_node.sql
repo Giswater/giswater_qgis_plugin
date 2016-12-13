@@ -16,6 +16,7 @@ DECLARE
     v_sql varchar;
     v_sql2 varchar;
     man_table varchar;
+	man_table_2 varchar;
     new_man_table varchar;
     old_man_table varchar;
     old_nodetype varchar;
@@ -54,7 +55,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,430);  
             END IF;
-            NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)
+            NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2);
         END IF;
 
      -- Sector ID
@@ -157,6 +158,14 @@ BEGIN
 		NEW.dma_id, NEW.waterwell_soilcat_id, NEW.waterwell_category_type, NEW.waterwell_fluid_type, NEW.waterwell_location_type, NEW.waterwell_workcat_id, NEW.waterwell_buildercat_id, NEW.waterwell_builtdate,
 		NEW.waterwell_ownercat_id, NEW.waterwell_adress_01, NEW.waterwell_adress_02, NEW.waterwell_adress_03, NEW.waterwell_descript, NEW.waterwell_rotation, NEW.waterwell_link, NEW.verified, NEW.the_geom,
 		NEW.waterwell_workcat_id_end, NEW.undelete,NEW.waterwell_label_x,NEW.waterwell_label_y,NEW.waterwell_label_rotation);
+	
+	ELSIF man_table='man_filter' THEN
+		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
+		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation)
+		VALUES (NEW.node_id, NEW.filter_elevation, NEW.filter_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.filter_state, NEW.filter_annotation, NEW.filter_observ, 
+		NEW.filter_comment, NEW.dma_id, NEW.filter_soilcat_id, NEW.filter_category_type, NEW.filter_fluid_type, NEW.filter_location_type, NEW.filter_workcat_id, NEW.filter_buildercat_id, 
+		NEW.filter_builtdate,NEW.filter_ownercat_id, NEW.filter_adress_01, NEW.filter_adress_02, NEW.filter_adress_03, NEW.filter_descript, NEW.filter_rotation, NEW.filter_link, NEW.verified, 
+		NEW.the_geom,NEW.filter_workcat_id_end, NEW.undelete,NEW.filter_label_x,NEW.filter_label_y,NEW.filter_label_rotation);
 		
 	END IF;
 
@@ -221,7 +230,10 @@ BEGIN
 		VALUES (NEW.node_id, NEW.valve_type, NEW.valve_opened, NEW.valve_acessibility, NEW.valve_broken, NEW.valve_mincut_anl, NEW.valve_hydraulic_anl, NEW.valve_burried, NEW.valve_irrigation_indicator,
 		NEW.valve_pression_entry, NEW.valve_pression_exit, NEW.valve_depth_valveshaft, NEW.valve_regulator_situation, NEW.valve_regulator_location, NEW.valve_regulator_observ, NEW.valve_lin_meters, 
 		NEW.valve_exit_type, NEW.valve_exit_code, NEW.valve_valve, NEW.valve_valve_diam, NEW.valve_drive_type,NEW.valve_location);
-          
+    
+	ELSIF man_table='man_filter' THEN
+		INSERT INTO man_filter (node_id) VALUES(NEW.node_id);	
+		
 	END IF;
         /*IF man_table IS NOT NULL THEN        
             EXECUTE v_sql;
@@ -494,3 +506,6 @@ CREATE TRIGGER gw_trg_edit_man_reduction INSTEAD OF INSERT OR DELETE OR UPDATE O
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_valve ON "SCHEMA_NAME".v_edit_man_valve;
 CREATE TRIGGER gw_trg_edit_man_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_valve FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_valve');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_man_filter ON "SCHEMA_NAME".v_edit_man_filter;
+CREATE TRIGGER gw_trg_edit_man_filter INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_filter FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_filter');
