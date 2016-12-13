@@ -263,7 +263,7 @@ class Giswater(QObject):
         # UD toolbar   
         if self.toolbar_ud_enabled:        
             self.ag_ud = QActionGroup(parent)
-            for elem in self.list_actions_ws:
+            for elem in self.list_actions_ud:
                 self.add_action(elem, self.toolbar_ud, self.ag_ud)            
                 
         # WS toolbar 
