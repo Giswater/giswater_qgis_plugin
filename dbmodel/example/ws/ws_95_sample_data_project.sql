@@ -1463,7 +1463,6 @@ INSERT INTO man_junction VALUES ('1074', NULL);
 INSERT INTO man_junction VALUES ('1075', NULL);
 INSERT INTO man_junction VALUES ('1076', NULL);
 INSERT INTO man_junction VALUES ('1077', NULL);
-INSERT INTO man_junction VALUES ('1081', NULL);
 INSERT INTO man_junction VALUES ('1003', NULL);
 
 
