@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommandLinkButton, QTableView, QMenu
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommandLinkButton, QTableView, QMenu, QPushButton
 from qgis.gui import QgsMessageBar
 from PyQt4.QtSql import QSqlTableModel
 
@@ -8,6 +8,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
+import webbrowser
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -427,23 +428,31 @@ class Mg():
         
         #self.om_visit_absolute_path = self.dlg.findChild(QCommandLinkButton, "om_visit_absolute_path")
         #self.doc_absolute_path = self.dlg.findChild(QCommandLinkButton, "doc_absolute_path")
- 
-
+        
+        self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
+        self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
+        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
+        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
+        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
+        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
+        
+        
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
         row = self.dao.get_row(sql)
-        path = str(row['value'])
-        self.om_visit_absolute_path.setText(path)
-        #self.om_visit_absolute_path.clicked.connect(partial(self.geth_path, path))   
+        if row :
+            path = str(row['value'])
+            self.om_visit_absolute_path.setText(path)
+            #self.om_visit_absolute_path.clicked.connect(partial(self.geth_path, path))   
         
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        
-        path = str(row['value'])
-        self.doc_absolute_path.setText(path)
-        #self.doc_absolute_path.clicked.connect(partial(self.geth_path, path))
+        if row : 
+            path = str(row['value'])
+            self.doc_absolute_path.setText(path)
+            #self.doc_absolute_path.clicked.connect(partial(self.geth_path, path))
         
 
         # Set values from widgets of type QComboBox
@@ -462,6 +471,45 @@ class Mg():
         self.dlg.exec_()        
     
     
+    def open_file_dialog(self, widget):
+        ''' Open File Dialog '''
+        
+        
+        # Set default value from QLine
+        self.file_path = utils_giswater.getWidgetText(widget)
+    
+        # Check if file exists
+        if not os.path.exists(self.file_path):
+            message = "File path doesn't exist"
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            self.file_path = self.plugin_dir
+        #else:
+        # Set default value if necessary
+        elif self.file_path == 'null': 
+            self.file_path = self.plugin_dir
+                
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_path)
+        os.chdir(folder_path)
+        msg = "Select file"
+        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
+        # Set text to QLineEdit
+        widget.setText(self.file_path)     
+
+
+        
+      
+    def open_web_browser(self, widget):
+        ''' Display url using the default browser '''
+        
+        url = utils_giswater.getWidgetText(widget) 
+        if url == 'null' :
+            url = 'www.giswater.org'
+            webbrowser.open(url)
+        else :
+            webbrowser.open(url)
+            
+            
     def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''
         

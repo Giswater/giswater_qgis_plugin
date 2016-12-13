@@ -39,21 +39,15 @@ class Giswater(QObject):
         '''
         super(Giswater, self).__init__()
         
-        # Initialize instance attributes
+        # Save reference to the QGIS interface
         self.iface = iface
         self.legend = iface.legendInterface()    
-        self.dao = None
-        self.actions = {}
-        self.search_plus = None
-        self.map_tools = {}
-        self.srid = None
             
-        # Initialize plugin directory
+        # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
         self.plugin_name = os.path.basename(self.plugin_dir)   
-        self.icon_folder = self.plugin_dir+'/icons/'        
 
-        # Initialize locale
+        # initialize locale
         locale = QSettings().value('locale/userLocale')
         locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
         if os.path.exists(locale_path):
@@ -61,38 +55,42 @@ class Giswater(QObject):
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
          
-        # Check if config file exists    
+        # Load local settings of the plugin
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
-        if not os.path.exists(setting_file):
-            message = "Config file not found at: "+setting_file
-            self.iface.messageBar().pushMessage("", message, 1, 20) 
-            return  
-          
-        # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())    
-
-        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
-        self.qgis_settings = QSettings()
-        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())    
+        
+        # Declare instance attributes
+        self.icon_folder = self.plugin_dir+'/icons/'        
+        self.actions = {}
+        self.map_tools = {}
+        self.search_plus = None
+        self.srid = None
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
-        self.controller.set_qgis_settings(self.qgis_settings)
+        
+        # Check if config file exists    
+        if not os.path.exists(setting_file):
+            msg = "Config file not found at: "+setting_file
+            self.controller.show_message(msg, 1, 100) 
+            return    
+        
+        # Check connection status   
         connection_status = self.controller.set_database_connection()
+        self.dao = self.controller.dao        
         if not connection_status:
             msg = self.controller.last_error  
             self.controller.show_message(msg, 1, 100) 
             return 
         
-        self.dao = self.controller.dao
-                
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
+  
         
                
     def set_signals(self): 
@@ -105,32 +103,7 @@ class Giswater(QObject):
         if self.controller:
             return self.controller.tr(message)      
         
-    
-    def manage_action(self, index_action, function_name):  
         
-        if function_name is not None:
-            try:
-                action = self.actions[index_action]                
-                # Management toolbar actions
-                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
-                    callback_function = getattr(self.mg, function_name)  
-                    action.triggered.connect(callback_function)
-                # Edit toolbar actions
-                elif int(index_action) in (32, 33, 34, 36):                       
-                    callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)                    
-                # Generic function
-                else:        
-                    water_soft = function_name[:2] 
-                    callback_function = getattr(self, water_soft+'_generic')  
-                    action.triggered.connect(partial(callback_function, function_name))
-            except AttributeError, e:
-                action.setEnabled(False)                
-                self.controller.show_warning(str(e))
-        else:
-            action.setEnabled(False)  
-                  
-          
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
         if parent is None:
@@ -158,9 +131,27 @@ class Giswater(QObject):
         else:
             self.actions[text] = action
                                      
-        action.setCheckable(is_checkable)   
-                                           
-        self.manage_action(index_action, function_name)
+        if function_name is not None:
+            try:
+                action.setCheckable(is_checkable) 
+                # Management toolbar actions
+                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
+                    callback_function = getattr(self.mg, function_name)  
+                    action.triggered.connect(callback_function)
+                # Edit toolbar actions
+                elif int(index_action) in (32, 33, 34, 36):    
+                    callback_function = getattr(self.ed, function_name)  
+                    action.triggered.connect(callback_function)                    
+                # Generic function
+                else:        
+                    water_soft = function_name[:2] 
+                    callback_function = getattr(self, water_soft+'_generic')  
+                    action.triggered.connect(partial(callback_function, function_name))
+            except AttributeError:
+                #print index_action+". Callback function not found: "+function_name
+                action.setEnabled(False)                
+        else:
+            action.setEnabled(False)
             
         return action
           
@@ -172,36 +163,41 @@ class Giswater(QObject):
         action = None
         text_action = self.tr(index_action+'_text')
         function_name = self.settings.value('actions/'+str(index_action)+'_function')
-        
         if function_name:
-            
             map_tool = None
-            if int(index_action) not in (27, 99):
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-            else:
-                # 27 and 99 should be not checkable
-                action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
-                            
             if int(index_action) in (3, 5, 13):
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) in (1, 2, 4, 10, 11, 12, 14, 15, 8, 29):
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             elif int(index_action) == 16:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)
             elif int(index_action) == 17:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 18:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
             elif int(index_action) == 26:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 57:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) in (27, 99):
+                # 27 should be not checkeable
+                action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
+            else:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
 
-            # If this action has an associated map tool, add this to dictionary of available map_tools
             if map_tool:
                 self.map_tools[function_name] = map_tool
         
@@ -223,6 +219,11 @@ class Giswater(QObject):
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully')    
         self.table_version = self.settings.value('db/table_version', 'version') 
+        
+        self.table_man_arc = self.settings.value('db/table_arc', 'v_edit_man_arc')        
+        self.table_man_node = self.settings.value('db/table_node', 'v_edit_man_node')   
+        self.table_man_connec = self.settings.value('db/table_connec', 'v_edit_man_connec')  
+        self.table_man_gully = self.settings.value('db/table_gully', 'v_edit_man_gully')   
         
         # Tables connec
         self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
@@ -284,36 +285,44 @@ class Giswater(QObject):
             self.toolbar_ed_name = self.tr('toolbar_ed_name')
             self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
-        
-        # Set an action list for every toolbar    
-        self.list_actions_ud = ['01','02','04','05']
-        self.list_actions_ws = ['10','11','12','14','15','08','29','13']
-        self.list_actions_mg = ['16','28','17','18','19','20','21','22','23','24','25','26','27','99','56','57']
-        self.list_actions_ed = ['30','31','32','33','34','35','36']
                 
         # UD toolbar   
         if self.toolbar_ud_enabled:        
-            self.ag_ud = QActionGroup(parent)
-            for elem in self.list_actions_ws:
-                self.add_action(elem, self.toolbar_ud, self.ag_ud)            
+            self.ag_ud = QActionGroup(parent);
+            self.add_action('01', self.toolbar_ud, self.ag_ud)   
+            self.add_action('02', self.toolbar_ud, self.ag_ud)   
+            self.add_action('04', self.toolbar_ud, self.ag_ud)   
+            self.add_action('05', self.toolbar_ud, self.ag_ud)   
+            #self.add_action('03', self.toolbar_ud, self.ag_ud)   
                 
         # WS toolbar 
         if self.toolbar_ws_enabled:  
-            self.ag_ws = QActionGroup(parent)
-            for elem in self.list_actions_ws:
-                self.add_action(elem, self.toolbar_ws, self.ag_ws)
+            self.ag_ws = QActionGroup(parent);
+            self.add_action('10', self.toolbar_ws, self.ag_ws)
+            self.add_action('11', self.toolbar_ws, self.ag_ws)
+            self.add_action('12', self.toolbar_ws, self.ag_ws)
+            self.add_action('14', self.toolbar_ws, self.ag_ws)
+            self.add_action('15', self.toolbar_ws, self.ag_ws)
+            self.add_action('08', self.toolbar_ws, self.ag_ws)
+            self.add_action('29', self.toolbar_ws, self.ag_ws)
+            self.add_action('13', self.toolbar_ws, self.ag_ws)
                 
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
-            self.ag_mg = QActionGroup(parent)
-            for elem in self.list_actions_mg:
-                self.add_action(elem, self.toolbar_mg, self.ag_mg)
+            self.ag_mg = QActionGroup(parent);
+            self.add_action('16', self.toolbar_mg, self.ag_mg)
+            self.add_action('28', self.toolbar_mg, self.ag_mg)            
+            for i in range(17,28):
+                self.add_action(str(i), self.toolbar_mg, self.ag_mg)
+            self.add_action('99', self.toolbar_mg, self.ag_mg)
+            self.add_action('56', self.toolbar_mg, self.ag_mg)
+            self.add_action('57', self.toolbar_mg, self.ag_mg)
                     
         # EDIT toolbar 
         if self.toolbar_ed_enabled:      
             self.ag_ed = QActionGroup(parent);
-            for elem in self.list_actions_ed:
-                self.add_action(elem, self.toolbar_ed, self.ag_ed)                   
+            for i in range(30,37):
+                self.add_action(str(i), self.toolbar_ed, self.ag_ed)                   
          
         # Disable and hide all toolbars
         self.enable_actions(False)
@@ -357,17 +366,17 @@ class Giswater(QObject):
     ''' Slots '''             
 
     def enable_actions(self, enable=True, start=1, stop=36):
-        ''' Utility to enable/disable all actions '''
+        ''' Utility to enable all actions '''
         for i in range(start, stop+1):
             self.enable_action(enable, i)              
 
 
     def enable_action(self, enable=True, index=1):
-        ''' Enable/Disable selected action '''
+        ''' Enable selected action '''
         key = str(index).zfill(2)
         if key in self.actions:
             action = self.actions[key]
-            action.setEnabled(enable)            
+            action.setEnabled(enable)                   
 
 
     def hide_toolbars(self):
@@ -423,9 +432,9 @@ class Giswater(QObject):
             pass                  
 
                                 
-    def project_read(self): 
+    #def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
-
+        '''
         if self.dao is None:
             return
  
@@ -443,6 +452,11 @@ class Giswater(QObject):
         self.layer_connec = None
         self.layer_gully = None
         self.layer_version = None
+        
+        self.layer_man_arc = None
+        self.layer_man_node = None
+        self.layer_man_connec = None
+        self.layer_man_gully = None
         
         self.layer_wjoin = None
         self.layer_page = None
@@ -494,6 +508,16 @@ class Giswater(QObject):
                     self.layer_gully = cur_layer
                 if self.table_version in uri_table:  
                     self.layer_version = cur_layer 
+                    
+                if self.table_man_arc in uri_table:  
+                    self.layer_man_arc = cur_layer
+                if self.table_man_node in uri_table:  
+                    self.layer_man_node = cur_layer
+                if self.table_man_connec in uri_table:  
+                    self.layer_man_connec = cur_layer
+                if self.table_man_gully in uri_table:  
+                    self.layer_man_gully = cur_layer
+                    
                     
                 # Connec
                 if self.table_wjoin in uri_table:  
@@ -569,15 +593,14 @@ class Giswater(QObject):
                  
         # Get schema name from table 'version'
         # Check if really exists
-        layer_source = self.controller.get_layer_source(self.layer_version)  
-        self.schema_name = layer_source['schema']
+        (self.schema_name, uri_table) = self.controller.get_layer_source(self.layer_version)  
         schema_name = self.schema_name.replace('"', '')
         if self.schema_name is None or not self.dao.check_schema(schema_name):
             self.controller.show_warning("Schema not found: "+self.schema_name)            
             return
         
         # Set schema_name in controller and in config file
-        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
+        self.settings.setValue("db/schema_name", self.schema_name)    
         self.controller.set_schema_name(self.schema_name)    
         
         # Cache error message with log_code = -1 (uncatched error)
@@ -595,8 +618,8 @@ class Giswater(QObject):
                                          
         # Set layer custom UI form and init function   
         if self.layer_arc is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                     
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_arc_init.py')                     
             self.layer_arc.editFormConfig().setUiForm(file_ui) 
             self.layer_arc.editFormConfig().setInitCodeSource(1)
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
@@ -611,24 +634,55 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitFunction('formOpen')                         
                                     
         if self.layer_connec is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_connec_init.py')       
             self.layer_connec.editFormConfig().setUiForm(file_ui) 
             self.layer_connec.editFormConfig().setInitCodeSource(1)
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           
             self.layer_connec.editFormConfig().setInitFunction('formOpen')   
-        
 
-        
         if self.layer_gully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
             self.layer_gully.editFormConfig().setUiForm(file_ui) 
             self.layer_gully.editFormConfig().setInitCodeSource(1)
             self.layer_gully.editFormConfig().setInitFilePath(file_init)           
             self.layer_gully.editFormConfig().setInitFunction('formOpen') 
             
             
+        if self.layer_man_arc is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                     
+            self.layer_man_arc.editFormConfig().setUiForm(file_ui) 
+            self.layer_man_arc.editFormConfig().setInitCodeSource(1)
+            self.layer_man_arc.editFormConfig().setInitFilePath(file_init)           
+            self.layer_man_arc.editFormConfig().setInitFunction('formOpen') 
+         
+        if self.layer_man_node is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')       
+            self.layer_man_node.editFormConfig().setUiForm(file_ui) 
+            self.layer_man_node.editFormConfig().setInitCodeSource(1)
+            self.layer_man_node.editFormConfig().setInitFilePath(file_init)           
+            self.layer_man_node.editFormConfig().setInitFunction('formOpen')                         
+                                    
+        if self.layer_man_connec is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
+            self.layer_man_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_man_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_man_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_man_connec.editFormConfig().setInitFunction('formOpen')   
+        
+        if self.layer_man_gully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
+            self.layer_man_gully.editFormConfig().setUiForm(file_ui) 
+            self.layer_man_gully.editFormConfig().setInitCodeSource(1)
+            self.layer_man_gully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_man_gully.editFormConfig().setInitFunction('formOpen') 
+            
+        
         if self.layer_wjoin is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
@@ -910,6 +964,215 @@ class Giswater(QObject):
         map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
         map_tool.set_controller(self.controller)
         map_tool.set_config_action(self.actions['99'])
+        
+        # Create SearchPlus object
+        try:
+            if self.search_plus is None:
+                self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
+                self.search_plus.remove_memory_layers() 
+            self.ed.search_plus = self.search_plus             
+            status = self.search_plus.populate_dialog()
+            self.actions['32'].setVisible(status) 
+            self.actions['32'].setEnabled(status) 
+            self.actions['32'].setCheckable(False) 
+        except KeyError as e:
+            self.controller.show_warning("Error setting searchplus button: "+str(e))
+            self.actions['32'].setVisible(False)                     
+            pass   
+        except RuntimeError as e:
+            self.controller.show_warning("Error setting searchplus button: "+str(e))
+            self.actions['32'].setVisible(False)                     
+        
+        self.custom_enable_actions()
+        '''
+        
+    def project_read(self): 
+        ''' Function executed when a user opens a QGIS project (*.qgs) '''
+        
+        if self.dao is None:
+            return
+                
+        # Hide all toolbars
+        self.hide_toolbars()
+                    
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return    
+        
+        # Initialize variables
+        self.layer_arc = None
+
+        self.layer_node = None
+        self.layer_node_man = [None for i in range(11)]
+
+        self.layer_connec = None
+        self.layer_connec_man = [None for i in range(5)]
+
+        self.layer_gully = None
+        self.layer_version = None
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            if uri_table is not None:
+                if self.table_arc in uri_table:
+                    self.layer_arc = cur_layer
+
+                if self.table_node in uri_table:
+                    self.layer_node = cur_layer
+                if 'v_edit_man_hydrant' in uri_table:
+                    self.layer_node_man[0] = cur_layer
+                if 'v_edit_man_junction' in uri_table:
+                    self.layer_node_man[1] = cur_layer
+                if 'v_edit_man_manhole' in uri_table:
+                    self.layer_node_man[2] = cur_layer
+                if 'v_edit_man_meter' in uri_table:
+                    self.layer_node_man[3] = cur_layer
+                if 'v_edit_man_node' in uri_table:
+                    self.layer_node_man[4] = cur_layer
+                if 'v_edit_man_pump' in uri_table:
+                    self.layer_node_man[5] = cur_layer
+                if 'v_edit_man_reduction' in uri_table:
+                    self.layer_node_man[6] = cur_layer
+                if 'v_edit_man_source' in uri_table:
+                    self.layer_node_man[7] = cur_layer
+                if 'v_edit_man_tank' in uri_table:
+                    self.layer_node_man[8] = cur_layer
+                if 'v_edit_man_valve' in uri_table:
+                    self.layer_node_man[9] = cur_layer
+                if 'v_edit_man_waterwell' in uri_table:
+                    self.layer_node_man[10] = cur_layer
+
+
+                if self.table_connec in uri_table:
+                    self.layer_connec = cur_layer
+                if 'v_edit_man_connec' in uri_table:
+                    self.layer_connec_man[0] = cur_layer
+                if 'v_edit_man_fountain' in uri_table:
+                    self.layer_connec_man[1] = cur_layer
+                if 'v_edit_man_greentap' in uri_table:
+                    self.layer_connec_man[2] = cur_layer
+                if 'v_edit_man_tap' in uri_table:
+                    self.layer_connec_man[3] = cur_layer
+                if 'v_edit_man_wjoin' in uri_table:
+                    self.layer_connec_man[4] = cur_layer
+
+                if self.table_gully in uri_table:
+                    self.layer_gully = cur_layer
+                if self.table_version in uri_table:
+                    self.layer_version = cur_layer
+
+        # Check if table 'version' exists
+        if self.layer_version is None:
+            self.controller.show_warning("Layer version not found")
+            return
+                 
+        # Get schema name from table 'version'
+        # Check if really exists
+        (self.schema_name, uri_table) = self.controller.get_layer_source(self.layer_version)  
+        schema_name = self.schema_name.replace('"', '')
+        if self.schema_name is None or not self.dao.check_schema(schema_name):
+            self.controller.show_warning("Schema not found: "+self.schema_name)            
+            return
+        
+        # Set schema_name in controller and in config file
+        self.settings.setValue("db/schema_name", self.schema_name)    
+        self.controller.set_schema_name(self.schema_name)    
+        
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)        
+        
+        # Set SRID from table node
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
+        row = self.dao.get_row(sql)
+        if row:
+            self.srid = row[0]   
+            self.settings.setValue("db/srid", self.srid)                           
+        
+        # Search project type in table 'version'
+        self.search_project_type()
+                                         
+        # Set layer custom UI form and init function   
+        if self.layer_arc is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_arc_init.py')                     
+            self.layer_arc.editFormConfig().setUiForm(file_ui) 
+            self.layer_arc.editFormConfig().setInitCodeSource(1)
+            self.layer_arc.editFormConfig().setInitFilePath(file_init)           
+            self.layer_arc.editFormConfig().setInitFunction('formOpen') 
+         
+        if self.layer_node is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_node_init.py')       
+            self.layer_node.editFormConfig().setUiForm(file_ui) 
+            self.layer_node.editFormConfig().setInitCodeSource(1)
+            self.layer_node.editFormConfig().setInitFilePath(file_init)           
+            self.layer_node.editFormConfig().setInitFunction('formOpen')
+
+            for i in range(11):
+                if self.layer_node_man[i] is not None:
+                    self.layer_node_man[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_node_man[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_node_man[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_node_man[i].editFormConfig().setInitFunction('formOpen')
+
+        if self.layer_connec is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_connec_init.py')       
+            self.layer_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')
+
+            for i in range(5):
+                if self.layer_connec_man[i] is not None:
+                    self.layer_connec_man[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_connec_man[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_connec_man[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_connec_man[i].editFormConfig().setInitFunction('formOpen')
+
+        if self.layer_gully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
+            self.layer_connec.editFormConfig().setUiForm(file_ui) 
+            self.layer_connec.editFormConfig().setInitCodeSource(1)
+            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
+            self.layer_connec.editFormConfig().setInitFunction('formOpen')                       
+
+                      
+        # Manage current layer selected     
+        self.current_layer_changed(self.iface.activeLayer())   
+        
+        # Set objects for map tools classes
+        map_tool = self.map_tools['mg_move_node']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        
+        map_tool = self.map_tools['mg_delete_node']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        
+        map_tool = self.map_tools['mg_mincut']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_flow_trace']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_flow_exit']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_connec_tool']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+
+        map_tool = self.map_tools['mg_extract_raster_value']
+        map_tool.set_layers(self.layer_arc, self.layer_connec, self.layer_node)
+        map_tool.set_controller(self.controller)
+        map_tool.set_config_action(self.actions['99'])
 
         # Create SearchPlus object
         try:
@@ -930,7 +1193,6 @@ class Giswater(QObject):
             self.actions['32'].setVisible(False)                     
         
         self.custom_enable_actions()
-            
                                 
     def current_layer_changed(self, layer):
         ''' Manage new layer selected '''
@@ -1053,15 +1315,19 @@ class Giswater(QObject):
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 36)
-                                 
-
+                
+                    
     def ws_generic(self, function_name):   
         ''' Water supply generic callback function '''
         
         try:
-            self.controller.check_actions(False)
+            # Get sender (selected action) and map tool associated 
+            sender = self.sender()                            
             map_tool = self.map_tools[function_name]
-            self.iface.mapCanvas().setMapTool(map_tool)             
+            if sender.isChecked():
+                self.iface.mapCanvas().setMapTool(map_tool)     
+            else:
+                self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
@@ -1072,9 +1338,13 @@ class Giswater(QObject):
         ''' Urban drainage generic callback function '''
         
         try:        
-            self.controller.check_actions(False)
+            # Get sender (selected action) and map tool associated 
+            sender = self.sender()            
             map_tool = self.map_tools[function_name]
-            self.iface.mapCanvas().setMapTool(map_tool)     
+            if sender.isChecked():
+                self.iface.mapCanvas().setMapTool(map_tool)  
+            else:
+                self.iface.mapCanvas().unsetMapTool(map_tool)
         except AttributeError as e:
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
@@ -1084,9 +1354,8 @@ class Giswater(QObject):
     def mg_generic(self, function_name):   
         ''' Management generic callback function '''
         
-        try:   
+        try:        
             if function_name in self.map_tools:          
-                self.controller.check_actions(False)                        
                 map_tool = self.map_tools[function_name]
                 if not (map_tool == self.iface.mapCanvas().mapTool()):
                     self.iface.mapCanvas().setMapTool(map_tool)
@@ -1097,3 +1366,8 @@ class Giswater(QObject):
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))              
 
+
+
+
+    
+        

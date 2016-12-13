@@ -64,7 +64,12 @@ class DeleteNodeMapTool(ParentMapTool):
 
             # Check Arc or Node
             for snapPoint in result:
-
+                '''
+                x = self.node_group_result(snapPoint.layer)
+                print"if truth"
+                print x
+                if x == 1:
+                '''
                 if snapPoint.layer.name() == self.layer_node.name():
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
@@ -95,8 +100,16 @@ class DeleteNodeMapTool(ParentMapTool):
 
                 # Check Arc or Node
                 for snapPoint in result:
-
+                    # in function we call snapPoint.layer.name () function return 0
+                    # if boolean 
+                    #x= self.group_node(snapPoint.layer)
+                    '''
+                    x = self.node_group_result(snapPoint.layer)
+                    print x
+                    if x == 1:
+                    '''
                     if snapPoint.layer.name() == self.layer_node.name():
+ 
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)
 
@@ -157,7 +170,7 @@ class DeleteNodeMapTool(ParentMapTool):
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be removed"
             self.controller.show_warning(message, context_name='ui_message')
-               
+        #self.layer_node = self.iface.activeLayer()     
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
@@ -179,3 +192,62 @@ class DeleteNodeMapTool(ParentMapTool):
         # Removehighlight
         self.h = None
 
+
+
+
+
+
+    def node_group(self):                   
+
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return 
+        
+        # Initialize variables
+        self.layer_node = None
+        self.layer_node_man = [None for i in range(11)]
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            if uri_table is not None:
+
+              
+                if 'v_edit_man_hydrant' in uri_table:
+                    self.layer_node_man[0] = cur_layer
+                if 'v_edit_man_junction' in uri_table:
+                    self.layer_node_man[1] = cur_layer
+                if 'v_edit_man_manhole' in uri_table:
+                    self.layer_node_man[2] = cur_layer
+                if 'v_edit_man_meter' in uri_table:
+                    self.layer_node_man[3] = cur_layer
+                if 'v_edit_man_node' in uri_table:
+                    self.layer_node_man[4] = cur_layer
+                if 'v_edit_man_pump' in uri_table:
+                    self.layer_node_man[5] = cur_layer
+                if 'v_edit_man_reduction' in uri_table:
+                    self.layer_node_man[6] = cur_layer
+                if 'v_edit_man_source' in uri_table:
+                    self.layer_node_man[7] = cur_layer
+                if 'v_edit_man_tank' in uri_table:
+                    self.layer_node_man[8] = cur_layer
+                if 'v_edit_man_valve' in uri_table:
+                    self.layer_node_man[9] = cur_layer
+                if 'v_edit_man_waterwell' in uri_table:
+                    self.layer_node_man[10] = cur_layer
+                
+                
+    
+    def node_group_result(self,x):
+        #self.layer = self.iface.activeLayer()  
+        #if self.layer in self.layer_node_man :
+        if x in self.layer_node_man :
+            print "layer is in groupe node"
+            print self.layer
+            print self.layer.name() 
+            #return self.layer
+            return 1
+        else:
+            print "layer is not in groupe node"
+            return 0

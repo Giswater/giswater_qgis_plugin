@@ -14,6 +14,7 @@ from qgis.core import QgsExpression
 import os
 import sys
 import webbrowser
+from functools import partial
   
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -216,6 +217,7 @@ class Ed():
         # Open the dialog
         self.dlg.exec_()    
         
+        
     def get_date(self):
         ''' Get date_from and date_to from ComboBoxes
         Filter the table related on selected value
@@ -322,9 +324,11 @@ class Ed():
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
-        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(self.open_file_dialog)
-        self.dlg.findChild(QPushButton, "path_url").clicked.connect(self.open_web_browser)
-        
+        #self.dlg.findChild(QPushButton, "path_doc").clicked.connect(self.open_file_dialog)
+        #self.dlg.findChild(QPushButton, "path_url").clicked.connect(self.open_web_browser)
+        self.path = self.dlg.findChild(QLineEdit, "path")
+        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser,self.path))
+        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog,self.path))
         
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')               
@@ -359,37 +363,38 @@ class Ed():
         self.dlg.exec_()
         
         
-    def open_file_dialog(self):
+    def open_file_dialog(self,widget):
         ''' Open File Dialog '''
         
         
         # Set default value from QLine
-        self.file_path = utils_giswater.getWidgetText("path")
+        self.file_path = utils_giswater.getWidgetText(widget)
     
         # Check if file exists
         if not os.path.exists(self.file_path):
             message = "File path doesn't exist"
             self.controller.show_warning(message, 10, context_name='ui_message')
-        else:
-            # Set default value if necessary
-            if self.file_path == 'null': 
-                self.file_path = self.plugin_dir
+            self.file_path = self.plugin_dir
+        #else:
+        # Set default value if necessary
+        elif self.file_path == 'null': 
+            self.file_path = self.plugin_dir
                 
-            # Get directory of that file
-            folder_path = os.path.dirname(self.file_path)
-            os.chdir(folder_path)
-            msg = "Select file"
-            self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
-            # Set text to QLineEdit
-            self.dlg.path.setText(self.file_path)     
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_path)
+        os.chdir(folder_path)
+        msg = "Select file"
+        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
+        # Set text to QLineEdit
+        widget.setText(self.file_path)     
 
 
         
       
-    def open_web_browser(self):
+    def open_web_browser(self, widget):
         ''' Display url using the default browser '''
         
-        url = utils_giswater.getWidgetText("path") 
+        url = utils_giswater.getWidgetText(widget) 
         if url == 'null' :
             url = 'www.giswater.org'
             webbrowser.open(url)
