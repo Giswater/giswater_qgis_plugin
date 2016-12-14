@@ -50,7 +50,13 @@ class MoveNodeMapTool(ParentMapTool):
         mFillColor = QColor(255, 0, 0);
         self.rubberBand.setColor(mFillColor)
         self.rubberBand.setWidth(3)           
-        self.reset()        
+        self.reset()     
+        
+        ################################
+        #--------------------------------
+        self.layer_node=self.set_node_layer()
+        #--------------------------------
+        ##################################   
 
 
     def reset(self):
@@ -281,4 +287,68 @@ class MoveNodeMapTool(ParentMapTool):
         elif event.button() == Qt.RightButton:
             self.reset()
                    
+    
+    
+    def set_node_layer(self):
+        print "*********CONNEC -function test SET group--------------"
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return 
         
+        self.layer_node = None
+        # Initialize variables
+        self.layer_node_man = [None for i in range(18)]
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)
+            if uri_table is not None:
+           
+                if 'v_edit_man_hydrant' in uri_table:
+                    self.layer_node_man[0] = cur_layer
+                if 'v_edit_man_junction' in uri_table:
+                    self.layer_node_man[1] = cur_layer
+                if 'v_edit_man_manhole' in uri_table:
+                    self.layer_node_man[2] = cur_layer
+                if 'v_edit_man_meter' in uri_table:
+                    self.layer_node_man[3] = cur_layer
+                if 'v_edit_man_node' in uri_table:
+                    self.layer_node_man[4] = cur_layer
+                if 'v_edit_man_pump' in uri_table:
+                    self.layer_node_man[5] = cur_layer
+                if 'v_edit_man_reduction' in uri_table:
+                    self.layer_node_man[6] = cur_layer
+                if 'v_edit_man_source' in uri_table:
+                    self.layer_node_man[7] = cur_layer
+                if 'v_edit_man_tank' in uri_table:
+                    self.layer_node_man[8] = cur_layer
+                if 'v_edit_man_valve' in uri_table:
+                    self.layer_node_man[9] = cur_layer
+                if 'v_edit_man_waterwell' in uri_table:
+                    self.layer_node_man[10] = cur_layer 
+                    
+                    
+                if 'v_edit_man_chamber' in uri_table:
+                    self.layer_node_man[11] = cur_layer 
+                if 'v_edit_man_netgully' in uri_table:
+                    self.layer_node_man[12] = cur_layer
+                if 'v_edit_man_netinit' in uri_table:
+                    self.layer_node_man[13] = cur_layer 
+                if 'v_edit_man_wjump' in uri_table:
+                    self.layer_node_man[14] = cur_layer 
+                if 'v_edit_man_wwtp' in uri_table:
+                    self.layer_node_man[15] = cur_layer 
+                if 'v_edit_man_outfall' in uri_table:
+                    self.layer_node_man[16] = cur_layer 
+                if 'v_edit_man_storage' in uri_table:
+                    self.layer_node_man[17] = cur_layer
+                    
+        '''            
+        if self.iface.activeLayer() in self.layer_node_man:
+            print "IS IN THE TABLE"
+        '''   
+        self.layer_node=self.iface.activeLayer() 
+        # if (self.layer_node)<-(VALUE OF SNAPPED LAYER) in self.layer_node_man:
+        if self.layer_node in self.layer_node_man:
+            print "IS IN THE TABLE"
+            return self.layer_node

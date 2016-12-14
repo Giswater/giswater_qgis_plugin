@@ -43,11 +43,11 @@ class DeleteNodeMapTool(ParentMapTool):
         self.vertexMarker.setIconSize(12)
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
-
+        
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
-
+        
         # Hide highlight
         self.vertexMarker.hide()
 
@@ -64,24 +64,26 @@ class DeleteNodeMapTool(ParentMapTool):
 
             # Check Arc or Node
             for snapPoint in result:
-                '''
-                x = self.node_group_result(snapPoint.layer)
-                print"if truth"
-                print x
-                if x == 1:
-                '''
-                if snapPoint.layer.name() == self.layer_node.name():
-                    # Get the point
-                    point = QgsPoint(result[0].snappedVertex)
 
-                    # Add marker
-                    self.vertexMarker.setCenter(point)
-                    self.vertexMarker.show()
+                self.layer_node= self.iface.activeLayer().name()
 
-                    break
+                self.layer_node=self.iface.activeLayer().name()
+                exist = self.check_group_node(snapPoint.layer)
+                   
+                if exist : 
+                    if snapPoint.layer.name() == self.layer_node:
+                        # Get the point
+    
+                        point = QgsPoint(result[0].snappedVertex)
+    
+                        # Add marker
+                        self.vertexMarker.setCenter(point)
+                        self.vertexMarker.show()
+    
+                        break
 
     def canvasReleaseEvent(self, event):
-
+        
         # With left click the digitizing is finished
         if event.button() == Qt.LeftButton:
 
@@ -103,20 +105,23 @@ class DeleteNodeMapTool(ParentMapTool):
                     # in function we call snapPoint.layer.name () function return 0
                     # if boolean 
                     #x= self.group_node(snapPoint.layer)
-                    '''
-                    x = self.node_group_result(snapPoint.layer)
-                    print x
-                    if x == 1:
-                    '''
-                    if snapPoint.layer.name() == self.layer_node.name():
- 
-                        # Get the point
-                        point = QgsPoint(result[0].snappedVertex)
-
-                        snappFeat = next(
-                            result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-
-                        break
+                    
+                    self.layer_node=self.iface.activeLayer().name()
+                    exist = self.check_group_node(snapPoint.layer)
+                    print"*******EXIST*********"
+                    print self.layer_node
+                    print exist
+                    print snapPoint.layer.name()
+                    if exist : 
+                        if snapPoint.layer.name() == self.layer_node:
+                            print "RAAAAAAAAAAAAAAAAAAAAAADI"
+                            # Get the point
+                            point = QgsPoint(result[0].snappedVertex)
+    
+                            snappFeat = next(
+                                result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+    
+                            break
 
             if snappFeat is not None:
 
@@ -127,6 +132,7 @@ class DeleteNodeMapTool(ParentMapTool):
                 
                 
                 if node_type == "POU":
+                    print "test3"
                     inf_text= "text"
                     answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
                     table_name = '"v_ui_doc_x_node'
@@ -159,7 +165,8 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Clear snapping
         self.snapperManager.clearSnapping()
-
+        
+        print"test activate"
         # Set snapping to node
         self.snapperManager.snapToNode()
 
@@ -170,8 +177,8 @@ class DeleteNodeMapTool(ParentMapTool):
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be removed"
             self.controller.show_warning(message, context_name='ui_message')
-        #self.layer_node = self.iface.activeLayer()     
-        # Control current layer (due to QGIS bug in snapping system)
+        self.layer_node = self.iface.activeLayer()     
+        # Control current layer (due to self.iface.activeLayer()QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
                 self.canvas.setCurrentLayer(self.layer_node)
@@ -192,28 +199,24 @@ class DeleteNodeMapTool(ParentMapTool):
         # Removehighlight
         self.h = None
 
-
-
-
-
-
-    def node_group(self):                   
-
-        # Check if we have any layer loaded
+                
+    
+        
+        
+    def check_group_node(self,layer_snap):
+        print "*********function test if group--------------"
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
             return 
         
         # Initialize variables
-        self.layer_node = None
-        self.layer_node_man = [None for i in range(11)]
+        self.layer_node_man = [None for i in range(18)]
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)
             if uri_table is not None:
-
-              
+           
                 if 'v_edit_man_hydrant' in uri_table:
                     self.layer_node_man[0] = cur_layer
                 if 'v_edit_man_junction' in uri_table:
@@ -235,19 +238,33 @@ class DeleteNodeMapTool(ParentMapTool):
                 if 'v_edit_man_valve' in uri_table:
                     self.layer_node_man[9] = cur_layer
                 if 'v_edit_man_waterwell' in uri_table:
-                    self.layer_node_man[10] = cur_layer
-                
-                
-    
-    def node_group_result(self,x):
-        #self.layer = self.iface.activeLayer()  
-        #if self.layer in self.layer_node_man :
-        if x in self.layer_node_man :
-            print "layer is in groupe node"
-            print self.layer
-            print self.layer.name() 
-            #return self.layer
+                    self.layer_node_man[10] = cur_layer 
+                    
+                    
+                if 'v_edit_man_chamber' in uri_table:
+                    self.layer_node_man[11] = cur_layer 
+                if 'v_edit_man_netgully' in uri_table:
+                    self.layer_node_man[12] = cur_layer
+                if 'v_edit_man_netinit' in uri_table:
+                    self.layer_node_man[13] = cur_layer 
+                if 'v_edit_man_wjump' in uri_table:
+                    self.layer_node_man[14] = cur_layer 
+                if 'v_edit_man_wwtp' in uri_table:
+                    self.layer_node_man[15] = cur_layer 
+                if 'v_edit_man_outfall' in uri_table:
+                    self.layer_node_man[16] = cur_layer 
+                if 'v_edit_man_storage' in uri_table:
+                    self.layer_node_man[17] = cur_layer  
+           
+                    
+        '''            
+        if self.iface.activeLayer() in self.layer_node_man:
+            print "IS IN THE TABLE"
+        '''   
+        print "from function"
+        print layer_snap
+        print self.layer_node_man
+        print self.layer_node_man[15].name()
+        if layer_snap in self.layer_node_man:
+            print "IS IN THE TABLE"
             return 1
-        else:
-            print "layer is not in groupe node"
-            return 0

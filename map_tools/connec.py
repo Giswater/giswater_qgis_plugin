@@ -56,7 +56,11 @@ class ConnecMapTool(ParentMapTool):
         # Select rectangle
         self.selectRect = QRect()
 
-
+        ################################
+        #--------------------------------
+        self.set_connec_layer()
+        #--------------------------------
+        
     def reset(self):
         ''' Clear selected features '''
         
@@ -101,7 +105,7 @@ class ConnecMapTool(ParentMapTool):
 
                 # Check Arc or Node
                 for snapPoint in result:
-
+                    
                     if snapPoint.layer == self.layer_connec:
 
                         # Get the point
@@ -131,6 +135,7 @@ class ConnecMapTool(ParentMapTool):
             eventPoint = QPoint(x, y)
 
             # Node layer
+
             layer = self.layer_connec
 
             # Not dragging, just simple selection
@@ -199,6 +204,7 @@ class ConnecMapTool(ParentMapTool):
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
             self.controller.show_info(message, context_name='ui_message' )  
+            
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
@@ -227,6 +233,7 @@ class ConnecMapTool(ParentMapTool):
         ''' Link selected connec to the pipe '''
 
         # Get selected features (from layer 'connec')
+
         aux = "{"
         layer = self.layer_connec
         if layer.selectedFeatureCount() == 0:
@@ -297,3 +304,43 @@ class ConnecMapTool(ParentMapTool):
         # Old cursor
         QApplication.restoreOverrideCursor()
 
+    
+    
+    def set_connec_layer(self):
+        print "*********CONNEC -function test SET group--------------"
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return 
+        
+        self.layer_connec = None
+        # Initialize variables
+        self.layer_node_man = [None for i in range(18)]
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)
+            if uri_table is not None:
+           
+                if self.table_connec in uri_table:
+                    self.layer_connec = cur_layer
+                if 'v_edit_man_connec' in uri_table:
+                    self.layer_connec_man[0] = cur_layer
+                if 'v_edit_man_fountain' in uri_table:
+                    self.layer_connec_man[1] = cur_layer
+                if 'v_edit_man_greentap' in uri_table:
+                    self.layer_connec_man[2] = cur_layer
+                if 'v_edit_man_tap' in uri_table:
+                    self.layer_connec_man[3] = cur_layer
+                if 'v_edit_man_wjoin' in uri_table:
+                    self.layer_connec_man[4] = cur_layer
+           
+                    
+        '''            
+        if self.iface.activeLayer() in self.layer_node_man:
+            print "IS IN THE TABLE"
+        '''   
+        self.layer_connec=self.iface.activeLayer() 
+        if self.layer_connec in self.layer_connec_man:
+            print "IS IN THE TABLE"
+            return self.layer_connec
+            
