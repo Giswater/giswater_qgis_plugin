@@ -4,7 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 CREATE OR REPLACE FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data()
   RETURNS void AS
 $BODY$
@@ -53,7 +52,7 @@ SELECT count(*) INTO int_new_hydrometer FROM ext_rtc_hydrometer
 WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer);
 
 SELECT count(*) INTO int_real_hydrometer FROM ext_rtc_hydrometer
-JOIN ext_urban_propierties ON ext_urban_propierties.iptu=ext_rtc_hydrometer.code
+JOIN ext_urban_propierties ON ext_urban_propierties.code=ext_rtc_hydrometer.code
 WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer);
 
 SELECT count(*) INTO int_old_hydrometer FROM rtc_hydrometer
@@ -74,12 +73,12 @@ connec.state,
 connec.the_geom as c_the_geom,
 ext_rtc_hydrometer.code,
 ext_hydrometer_category.observ,
-hydrometer_id,
+hydrometer_id::integer,
 hydrometer_category,
 ext_urban_propierties.the_geom as v_the_geom
 FROM ext_rtc_hydrometer 
 JOIN connec ON connec.connec_id = ext_rtc_hydrometer.code 
-JOIN ext_urban_propierties ON ext_urban_propierties.iptu=ext_rtc_hydrometer.code
+JOIN ext_urban_propierties ON ext_urban_propierties.code=ext_rtc_hydrometer.code
 JOIN ext_hydrometer_category ON ext_hydrometer_category.id=ext_rtc_hydrometer.hydrometer_category::text
 WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer)
 LOOP
@@ -106,8 +105,8 @@ LOOP
 	IF rec_hydrometer.observ <> rec_hydrometer.category_type THEN
 		UPDATE connec SET category_type='MISTA' WHERE connec_id=rec_hydrometer.connec_id;
 	END IF;
-	INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
-	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
+	INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id::varchar(16));
+	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id::varchar(16), rec_hydrometer.connec_id);
     END IF;
     	
 END LOOP;
@@ -121,8 +120,8 @@ FOR rec_hydrometer IN SELECT * FROM rtc_hydrometer
 WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM ext_rtc_hydrometer)
 LOOP
 
-    DELETE FROM rtc_hydrometer WHERE hydrometer_id=rec_hydrometer.hydrometer_id;
-    DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id=rec_hydrometer.hydrometer_id RETURNING connec_id INTO id_last;
+    DELETE FROM rtc_hydrometer WHERE hydrometer_id::integer=rec_hydrometer.hydrometer_id::integer;
+    DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id::integer=rec_hydrometer.hydrometer_id::integer RETURNING connec_id INTO id_last;
 
     IF id_last NOT IN (SELECT connec_id FROM rtc_hydrometer_x_connec) THEN
         UPDATE connec SET state='DESATIVADO' WHERE connec_id=id_last;
@@ -152,3 +151,9 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ALTER FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data()
+  OWNER TO gisadmin;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO public;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO gisadmin;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_supereditor;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_editor_saa;

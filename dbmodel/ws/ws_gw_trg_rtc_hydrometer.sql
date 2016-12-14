@@ -17,7 +17,7 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
         
-        IF NEW.hydrometer_id IN (SELECT hydrometer_id from ext_rtc_hydrometer) THEN
+        IF NEW.hydrometer_id IN (SELECT hydrometer_id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         ELSE
             RAISE EXCEPTION 'INSERT IS NOT ALLOWED. THERE IS NOT HYDROMETER_ID ON....';
@@ -29,7 +29,7 @@ BEGIN
         
     ELSIF TG_OP = 'DELETE' THEN
         
-        IF OLD.hydrometer_id NOT IN (SELECT hydrometer_id from ext_rtc_hydrometer) THEN
+        IF OLD.hydrometer_id NOT IN (SELECT hydrometer_id::varchar(16) from ext_rtc_hydrometer) THEN
             RETURN NEW;
         ELSE
             RAISE EXCEPTION 'DELETE IS NOT ALLOWED. THERE IS HYDROMETER_ID ON....';

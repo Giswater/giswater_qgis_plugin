@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 -- GISWATER MODIFIED
 
+DROP VIEW if exists gw_saa.v_rtc_hydrometer;
 CREATE OR REPLACE VIEW gw_saa.v_rtc_hydrometer AS 
  SELECT rtc_hydrometer.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
