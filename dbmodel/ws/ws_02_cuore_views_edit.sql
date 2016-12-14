@@ -120,6 +120,57 @@ LEFT JOIN connec ON (((connec.connec_id)::text = (link.connec_id)::text))
 );
 
 
+
+
+DROP VIEW IF EXISTS v_edit_man_pipe CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_pipe AS
+SELECT 
+arc.arc_id,
+arc.node_1,
+arc.node_2,
+arc.arccat_id, 
+cat_arc.arctype_id AS "cat_arctype_id",
+cat_arc.matcat_id AS "cat_matcat_id",
+cat_arc.pnom AS "cat_pnom",
+cat_arc.dnom AS "cat_dnom",
+st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+arc.epa_type,
+arc.sector_id, 
+arc."state", 
+arc.annotation, 
+arc.observ, 
+arc."comment",
+arc.custom_length,
+arc.dma_id,
+dma.presszonecat_id,
+arc.soilcat_id,
+arc.category_type,
+arc.fluid_type,
+arc.location_type,
+arc.workcat_id,
+arc.buildercat_id,
+arc.builtdate,
+arc.ownercat_id,
+arc.adress_01,
+arc.adress_02,
+arc.adress_03,
+arc.descript,
+cat_arc.svg AS "cat_svg",
+arc.rotation,
+arc.link,
+arc.verified,
+arc.the_geom,
+arc.workcat_id_end,
+arc.undelete,
+arc.label_x,
+arc.label_y,
+arc.label_rotation
+FROM ("SCHEMA_NAME".arc 
+LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text)));
+
+
+
 DROP VIEW IF EXISTS v_edit_man_hydrant CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_hydrant AS 
  SELECT node.node_id,
