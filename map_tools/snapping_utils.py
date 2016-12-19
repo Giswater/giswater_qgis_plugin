@@ -30,7 +30,11 @@ class SnappingConfigManager():
         self.canvas = self.iface.mapCanvas()
         self.layer_arc = None        
         self.layer_connec = None        
-        self.layer_node = None                
+        self.layer_node = None    
+            
+        self.layer_arc_man = None        
+        self.layer_connec_man = None        
+        self.layer_node_man = None         
 
         # Snapper
         self.snapper = QgsMapCanvasSnapper(self.canvas)
@@ -38,10 +42,10 @@ class SnappingConfigManager():
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 
 
-    def set_layers(self, layer_arc, layer_connec, layer_node):
-        self.layer_arc = layer_arc
-        self.layer_connec = layer_connec
-        self.layer_node = layer_node        
+    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
+        self.layer_arc_man = layer_arc_man
+        self.layer_connec_man = layer_connec_man
+        self.layer_node_man = layer_node_man      
 
 
     def getSnappingOptions(self):
@@ -79,24 +83,34 @@ class SnappingConfigManager():
         for layer in layers:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, 0, 0, 1, False)
 
-        QgsProject.instance().blockSignals(False)
+        QgsProject.instance().blockSignals(True)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
     def snapToArc(self):
         ''' Set snapping to Arc '''
-        QgsProject.instance().setSnapSettingsForLayer(self.layer_arc.id(), True, 2, 2, 1.0, False)
+        
+        for layer in self.layer_arc_man:
+            print layer 
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
 
 
     def snapToNode(self):
         ''' Set snapping to Node '''
-        QgsProject.instance().setSnapSettingsForLayer(self.layer_node.id(), True, 0, 2, 1.0, False)
 
+        for layer in self.layer_node_man:
+            print layer 
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
+        
 
     def snapToConnec(self):
         ''' Set snapping to Connec '''
-        QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.node_id(), True, 2, 2, 1.0, False)
-
+        
+        
+        for layer in self.layer_connec_man:
+            print layer 
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+        
 
     def snapToLayer(self, Layer):
         ''' Set snapping to Layer '''
@@ -125,91 +139,24 @@ class SnappingConfigManager():
         self.applySnappingOptions(self.previousSnapping)
 
 
-    def set_layer(self):
+
+    def check_node_group(self, snapped_layer):
+        ''' Check if snapped layer is in the node_group''' 
         
-        self.layer = self.iface.activeLayer()
-        
-        if self.layer == table_arc:  
-            self.layer_value = layer_arc
-        if self.layer == table_node : 
-            self.layer_value = layer_node
-        if self.layer == table_connec : 
-            self.layer_value = layer_connec
-        if self.layer == table_gully :  
-            self.layer_value = layer_gully
-            
-        if self.layer == table_man_arc :  
-            self.layer_value = layer_man_arc
-        if self.layer == table_man_node : 
-            self.layer_value = layer_man_node
-        if self.layer == table_man_connec : 
-            self.layer_value = layer_man_connec
-        if self.layer == table_man_gully :  
-            self.layer_value = layer_gully
-                 
-        if self.layer == table_wjoin :  
-            self.layer_value = layer_connec
-        if self.layer == table_tap :  
-            self.layer_value = layer_connec
-        if self.layer == table_greentap:  
-            self.layer_value = layer_connec
-        if self.layer == table_fountain :  
-            self.layer_value = layer_connec
-             
-        if self.layer == table_tank :  
-            self.layer_value = layer_node
-        if self.layer == table_pump :  
-            self.layer_value = layer_node  
-        if self.layer == table_source :  
-            self.layer_value = layer_node   
-        if self.layer == table_meter :  
-            self.layer_value = layer_node
-        if self.layer == table_junction :  
-            self.layer_value = layer_node
-        if self.layer == table_waterwell :  
-            self.layer_value = layer_node
-        if self.layer == table_reduction:  
-            self.layer_value = layer_node
-        if self.layer == table_hydrant :  
-            self.layer_value = layer_node
-        if self.layer == table_valve :  
-            self.layer_value = layer_node
-        if self.layer == table_manhole :  
-            self.layer_value = layer_node
-            
-        if self.layer == table_chamber:  
-            self.layer_value = layer_node
-        if self.layer == table_chamber_pol :  
-            self.layer_value = layer_node
-        if self.layer == table_netgully :  
-            self.layer_value = layer_node
-        if self.layer == table_netgully_pol :  
-            self.layer_value = layer_node
-        if self.layer == table_netinit :  
-            self.layer_value = layer_node
-        if self.layer == table_wjump :  
-            self.layer_value = layer_node
-        if self.layer == table_wwtp :  
-            self.layer_value = layer_node
-        if self.layer == table_wwtp_pol :  
-            self.layer_value = layer_node
-        if self.layer == table_storage :  
-            self.layer_value = layer_node
-        if self.layer == table_storage_pol :  
-            self.layer_value = layer_node
-        if self.layer == table_outfall :  
-            self.layer_value = layer_node
-            
-            
-        if self.layer == table_varc :  
-            self.layer_value = layer_arc
-        if self.layer == table_siphon :  
-            self.layer_value = layer_arc
-        if self.layer == table_conduit :  
-            self.layer_value = layer_arc
-        if self.layer == table_waccel:  
-            self.layer_value = layer_arc
+        if snapped_layer in self.layer_node_man:
+            return 1
         
         
         
+    def check_connec_group(self, snapped_layer):
+        ''' Check if snapped layer is in the node_group''' 
         
+        if snapped_layer in self.layer_connec_man:
+            return 1
+        
+        
+    def check_arc_group(self, snapped_layer):
+        ''' Check if snapped layer is in the node_group''' 
+        
+        if snapped_layer in self.layer_arc_man:
+            return 1

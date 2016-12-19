@@ -56,18 +56,20 @@ class ConnecMapTool(ParentMapTool):
         # Select rectangle
         self.selectRect = QRect()
 
-        ################################
-        #--------------------------------
-        self.set_connec_layer()
-        #--------------------------------
-        
+
     def reset(self):
         ''' Clear selected features '''
         
+        '''
         layer = self.layer_connec
         if layer is not None:
             layer.removeSelection()
+        '''
 
+        for layer in self.layer_connec_man:
+            if layer is not None:
+                layer.removeSelection()
+            
         # Graphic elements
         self.rubberBand.reset()
 
@@ -106,7 +108,9 @@ class ConnecMapTool(ParentMapTool):
                 # Check Arc or Node
                 for snapPoint in result:
                     
-                    if snapPoint.layer == self.layer_connec:
+                    exist=self.snapperManager.check_connec_group(snapPoint.layer)
+                    if exist:
+                    #if snapPoint.layer == self.layer_connec:
 
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)
@@ -135,7 +139,6 @@ class ConnecMapTool(ParentMapTool):
             eventPoint = QPoint(x, y)
 
             # Node layer
-
             layer = self.layer_connec
 
             # Not dragging, just simple selection
@@ -144,18 +147,19 @@ class ConnecMapTool(ParentMapTool):
                 # Snap to node
                 (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
-                # That's the snapped point
-                if result <> [] and (result[0].layer.name() == self.layer_connec.name()):
-                    
-                    point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                    layer.removeSelection()
-                    layer.select([result[0].snappedAtGeometry])
-
-                    # Create link
-                    self.link_connec()
-
-                    # Hide highlight
-                    self.vertexMarker.hide()
+                for layer in self.layer_connec_man:
+                    # That's the snapped point
+                    #if result <> [] and (result[0].layer.name() == self.layer_connec.name()):
+                    if result <> [] and (result[0].layer.name() == layer.name()):
+                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                        layer.removeSelection()
+                        layer.select([result[0].snappedAtGeometry])
+    
+                        # Create link
+                        self.link_connec()
+    
+                        # Hide highlight
+                        self.vertexMarker.hide()
 
             else:
 
@@ -204,14 +208,15 @@ class ConnecMapTool(ParentMapTool):
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
             self.controller.show_info(message, context_name='ui_message' )  
-            
 
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(self.layer_connec)
+                for layer in self.layer_connec_man:
+                    self.canvas.setCurrentLayer(layer)
         except:
-            self.canvas.setCurrentLayer(self.layer_connec)
+            for layer in self.layer_connec_man:
+                self.canvas.setCurrentLayer(layer)
 
 
     def deactivate(self):
@@ -233,28 +238,30 @@ class ConnecMapTool(ParentMapTool):
         ''' Link selected connec to the pipe '''
 
         # Get selected features (from layer 'connec')
-
         aux = "{"
-        layer = self.layer_connec
-        if layer.selectedFeatureCount() == 0:
-            message = "You have to select at least one feature!"
-            self.controller.show_warning(message, context_name='ui_message')
-               
-            return
-        features = layer.selectedFeatures()
-        for feature in features:
-            connec_id = feature.attribute('connec_id')
-            aux += str(connec_id) + ", "
-        connec_array = aux[:-2] + "}"
+        #layer = self.layer_connec
+        for layer in self.layer_connec_man:
 
-        # Execute function
-        function_name = "gw_fct_connect_to_network"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
-        self.controller.execute_sql(sql)
-
-        # Refresh map canvas
-        self.rubberBand.reset()
-        self.iface.mapCanvas().refresh()
+            if layer.selectedFeatureCount() == 0:
+                message = "You have to select at least one feature!"
+                self.controller.show_warning(message, context_name='ui_message')
+                   
+                return
+                
+            features = layer.selectedFeatures()
+            for feature in features:
+                connec_id = feature.attribute('connec_id')
+                aux += str(connec_id) + ", "
+            connec_array = aux[:-2] + "}"
+    
+            # Execute function
+            function_name = "gw_fct_connect_to_network"
+            sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
+            self.controller.execute_sql(sql)
+    
+            # Refresh map canvas
+            self.rubberBand.reset()
+            self.iface.mapCanvas().refresh()
 
 
     def set_rubber_band(self):
@@ -292,55 +299,18 @@ class ConnecMapTool(ParentMapTool):
         elif modifiers == Qt.ShiftModifier:
             behaviour = QgsVectorLayer.RemoveFromSelection
 
+        
         if self.layer_connec is None:
             return
 
         # Change cursor
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
-        # Selection
-        self.layer_connec.selectByRect(selectGeometry, behaviour)
+        for layer in self.layer_connec_man:
+                    
+            # Selection
+            layer.selectByRect(selectGeometry, behaviour)
 
         # Old cursor
         QApplication.restoreOverrideCursor()
 
-    
-    
-    def set_connec_layer(self):
-        print "*********CONNEC -function test SET group--------------"
-        layers = self.iface.legendInterface().layers()
-        if len(layers) == 0:
-            return 
-        
-        self.layer_connec = None
-        # Initialize variables
-        self.layer_node_man = [None for i in range(18)]
-
-        # Iterate over all layers to get the ones specified in 'db' config section
-        for cur_layer in layers:
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)
-            if uri_table is not None:
-           
-                if self.table_connec in uri_table:
-                    self.layer_connec = cur_layer
-                if 'v_edit_man_connec' in uri_table:
-                    self.layer_connec_man[0] = cur_layer
-                if 'v_edit_man_fountain' in uri_table:
-                    self.layer_connec_man[1] = cur_layer
-                if 'v_edit_man_greentap' in uri_table:
-                    self.layer_connec_man[2] = cur_layer
-                if 'v_edit_man_tap' in uri_table:
-                    self.layer_connec_man[3] = cur_layer
-                if 'v_edit_man_wjoin' in uri_table:
-                    self.layer_connec_man[4] = cur_layer
-           
-                    
-        '''            
-        if self.iface.activeLayer() in self.layer_node_man:
-            print "IS IN THE TABLE"
-        '''   
-        self.layer_connec=self.iface.activeLayer() 
-        if self.layer_connec in self.layer_connec_man:
-            print "IS IN THE TABLE"
-            return self.layer_connec
-            

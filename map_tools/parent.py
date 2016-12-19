@@ -38,7 +38,12 @@ class ParentMapTool(QgsMapTool):
         self.index_action = index_action
         self.layer_arc = None        
         self.layer_connec = None        
-        self.layer_node = None        
+        self.layer_node = None   
+        
+        self.layer_arc_man = None        
+        self.layer_connec_man = None        
+        self.layer_node_man = None 
+            
         self.schema_name = None        
         self.controller = None        
         self.dao = None 
@@ -59,13 +64,13 @@ class ParentMapTool(QgsMapTool):
         self.stdCursor = self.parent().cursor()        
 
 
-    def set_layers(self, layer_arc, layer_connec, layer_node):
+    def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
         ''' Sets layers involved in Map Tools functions
             Sets Snapper Manager '''
-        self.layer_arc = layer_arc
-        self.layer_connec = layer_connec
-        self.layer_node = layer_node
-        self.snapperManager.set_layers(layer_arc, layer_connec, layer_node)
+        self.layer_arc_man = layer_arc_man
+        self.layer_connec_man = layer_connec_man
+        self.layer_node_man = layer_node_man
+        self.snapperManager.set_layers(layer_arc_man, layer_connec_man, layer_node_man)
 
 
     def set_controller(self, controller):

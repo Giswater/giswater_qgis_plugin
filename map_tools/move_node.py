@@ -35,7 +35,6 @@ class MoveNodeMapTool(ParentMapTool):
         
         # Call ParentMapTool constructor     
         super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
-        self.controller = controller
         self.srid = srid  
 
         # Vertex marker
@@ -50,13 +49,7 @@ class MoveNodeMapTool(ParentMapTool):
         mFillColor = QColor(255, 0, 0);
         self.rubberBand.setColor(mFillColor)
         self.rubberBand.setWidth(3)           
-        self.reset()     
-        
-        ################################
-        #--------------------------------
-        self.layer_node=self.set_node_layer()
-        #--------------------------------
-        ##################################   
+        self.reset()        
 
 
     def reset(self):
@@ -74,9 +67,9 @@ class MoveNodeMapTool(ParentMapTool):
         ''' Move selected node to the current point '''  
            
         if self.srid is None:
-            self.srid = self.controller.plugin_settings_value('srid')  
+            self.srid = self.settings.value('db/srid')  
         if self.schema_name is None:
-            self.schema_name = self.controller.plugin_settings_value('schema_name')               
+            self.schema_name = self.settings.value('db/schema_name')               
                    
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
@@ -136,9 +129,11 @@ class MoveNodeMapTool(ParentMapTool):
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(self.layer_node)
+                for layer in self.layer_node_man:
+                    self.canvas.setCurrentLayer(layer)
         except:
-            self.canvas.setCurrentLayer(self.layer_node)
+            for layer in self.layer_node_man:
+                self.canvas.setCurrentLayer(self.layer_node)
 
 
     def deactivate(self):
@@ -180,24 +175,31 @@ class MoveNodeMapTool(ParentMapTool):
 
             # Snap to node
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
-            
+            print "*************"
+            print result
+
             # That's the snapped point
-            if result <> [] and (result[0].layer.name() == self.layer_node.name()):
-
-                point = QgsPoint(result[0].snappedVertex)
-
-                # Add marker    
-                self.vertexMarker.setColor(QColor(0, 255, 0))
-                self.vertexMarker.setCenter(point)
-                self.vertexMarker.show()
-                
-                # Set a new point to go on with
-                #self.appendPoint(point)
-                self.rubberBand.movePoint(point)
-
-            else:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
-                self.rubberBand.movePoint(point)
+            for i in result:
+                exist=self.snapperManager.check_node_group(i.layer)
+                print exist 
+                print "++++++++++++"
+                if result <> [] and exist:
+                #if result <> [] and (result[0].layer.name() == self.layer_node.name()):
+    
+                    point = QgsPoint(result[0].snappedVertex)
+    
+                    # Add marker    
+                    self.vertexMarker.setColor(QColor(0, 255, 0))
+                    self.vertexMarker.setCenter(point)
+                    self.vertexMarker.show()
+                    
+                    # Set a new point to go on with
+                    #self.appendPoint(point)
+                    self.rubberBand.movePoint(point)
+    
+                else:
+                    point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(),  x, y)
+                    self.rubberBand.movePoint(point)
 
         else:
                 
@@ -205,8 +207,10 @@ class MoveNodeMapTool(ParentMapTool):
             result = []
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             
+            exist=self.snapperManager.check_arc_group(result[0].layer)
+            if result <> [] and exist:
             # That's the snapped point
-            if (result <> []) and (result[0].layer.name() == self.layer_arc.name()) and (result[0].snappedVertexNr == -1):
+            #if (result <> []) and (result[0].layer.name() == self.layer_arc.name()) and (result[0].snappedVertexNr == -1):
             
                 point = QgsPoint(result[0].snappedVertex)
 
@@ -241,15 +245,22 @@ class MoveNodeMapTool(ParentMapTool):
 
             # Node layer
             layer = self.canvas.currentLayer()
-
+            print "laaayer"
+            print layer
+            print layer.selectedFeatureCount()
             # Select node or arc
             if layer.selectedFeatureCount() == 0:
 
                 # Snap to node
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
-            
+                
+                exist=self.snapperManager.check_node_group(result[0].layer)
+                print (exist)
+                print result 
+                 
+                if result <> [] and exist:
                 # That's the snapped point
-                if result <> [] and (result[0].layer.name() == self.layer_node.name()):
+                #if result <> [] and (result[0].layer.name() == self.layer_node.name()):
             
                     point = QgsPoint(result[0].snappedVertex)
 
@@ -265,9 +276,14 @@ class MoveNodeMapTool(ParentMapTool):
                 
                 # Snap to arc
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
-            
+                
+                exist=self.snapperManager.check_arc_group(result[0].layer)
+                print (exist)
+                print result 
+                 
+                if result <> [] and exist:
                 # That's the snapped point
-                if (result <> []) and (result[0].layer.name() == self.layer_arc.name()):
+                #if (result <> []) and (result[0].layer.name() == self.layer_arc.name()):
             
                     point = QgsPoint(result[0].snappedVertex)
                     
@@ -287,68 +303,4 @@ class MoveNodeMapTool(ParentMapTool):
         elif event.button() == Qt.RightButton:
             self.reset()
                    
-    
-    
-    def set_node_layer(self):
-        print "*********CONNEC -function test SET group--------------"
-        layers = self.iface.legendInterface().layers()
-        if len(layers) == 0:
-            return 
         
-        self.layer_node = None
-        # Initialize variables
-        self.layer_node_man = [None for i in range(18)]
-
-        # Iterate over all layers to get the ones specified in 'db' config section
-        for cur_layer in layers:
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)
-            if uri_table is not None:
-           
-                if 'v_edit_man_hydrant' in uri_table:
-                    self.layer_node_man[0] = cur_layer
-                if 'v_edit_man_junction' in uri_table:
-                    self.layer_node_man[1] = cur_layer
-                if 'v_edit_man_manhole' in uri_table:
-                    self.layer_node_man[2] = cur_layer
-                if 'v_edit_man_meter' in uri_table:
-                    self.layer_node_man[3] = cur_layer
-                if 'v_edit_man_node' in uri_table:
-                    self.layer_node_man[4] = cur_layer
-                if 'v_edit_man_pump' in uri_table:
-                    self.layer_node_man[5] = cur_layer
-                if 'v_edit_man_reduction' in uri_table:
-                    self.layer_node_man[6] = cur_layer
-                if 'v_edit_man_source' in uri_table:
-                    self.layer_node_man[7] = cur_layer
-                if 'v_edit_man_tank' in uri_table:
-                    self.layer_node_man[8] = cur_layer
-                if 'v_edit_man_valve' in uri_table:
-                    self.layer_node_man[9] = cur_layer
-                if 'v_edit_man_waterwell' in uri_table:
-                    self.layer_node_man[10] = cur_layer 
-                    
-                    
-                if 'v_edit_man_chamber' in uri_table:
-                    self.layer_node_man[11] = cur_layer 
-                if 'v_edit_man_netgully' in uri_table:
-                    self.layer_node_man[12] = cur_layer
-                if 'v_edit_man_netinit' in uri_table:
-                    self.layer_node_man[13] = cur_layer 
-                if 'v_edit_man_wjump' in uri_table:
-                    self.layer_node_man[14] = cur_layer 
-                if 'v_edit_man_wwtp' in uri_table:
-                    self.layer_node_man[15] = cur_layer 
-                if 'v_edit_man_outfall' in uri_table:
-                    self.layer_node_man[16] = cur_layer 
-                if 'v_edit_man_storage' in uri_table:
-                    self.layer_node_man[17] = cur_layer
-                    
-        '''            
-        if self.iface.activeLayer() in self.layer_node_man:
-            print "IS IN THE TABLE"
-        '''   
-        self.layer_node=self.iface.activeLayer() 
-        # if (self.layer_node)<-(VALUE OF SNAPPED LAYER) in self.layer_node_man:
-        if self.layer_node in self.layer_node_man:
-            print "IS IN THE TABLE"
-            return self.layer_node
