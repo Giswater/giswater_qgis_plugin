@@ -5,10 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-   
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_gully()
-  RETURNS trigger AS
-$BODY$
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_gully()  RETURNS trigger AS $BODY$
 DECLARE 
     v_sql varchar;
 	gully_geometry varchar;
@@ -60,12 +58,12 @@ BEGIN
         INSERT INTO gully VALUES (NEW.gully_id, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
 								NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, null, NEW.workcat_id_end,NEW.undelete,NEW.featurecat_id, NEW.feature_id);
+                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, null, NEW.undelete, NEW.workcat_id_end, NEW.featurecat_id, NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation);
 
         ELSIF gully_geometry = 'pgully' THEN
         INSERT INTO gully VALUES (NEW.gully_id, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, null, NEW.the_geom,NEW.workcat_id_end,NEW.undelete,NEW.featurecat_id, NEW.feature_id);
+                                NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, null, NEW.the_geom, NEW.undelete, NEW.workcat_id_end, NEW.featurecat_id, NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation);
         END IF;    
 
 
@@ -88,14 +86,16 @@ BEGIN
 			SET gully_id=NEW.gully_id, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, arccat_id=NEW.arccat_id, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id WHERE gully_id = OLD.gully_id;
+            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation
+WHERE gully_id = OLD.gully_id;
 
         ELSIF gully_geometry = 'pgully' THEN
 			UPDATE gully 
 			SET gully_id=NEW.gully_id, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, arccat_id=NEW.arccat_id, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom, workcat_id_end=NEW.workcat_id_end, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id WHERE gully_id = OLD.gully_id;
+            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom, workcat_id_end=NEW.workcat_id_end, undelete=NEW.undelete, featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation
+WHERE gully_id = OLD.gully_id;
         END IF;  
                 
 		PERFORM audit_function (2,850);
@@ -114,6 +114,8 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
 
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_gully ON "SCHEMA_NAME".v_edit_man_gully;
