@@ -44,7 +44,7 @@ INSERT INTO price_simple VALUES ('GFB1L425', 'm', 'GFB1L425', NULL, 63.4800, NUL
 
 INSERT INTO price_compost VALUES ('A_PRE_PE_DN20', 'm', 'Polyethylene pipe designation PE 100, nominal diameter 200mm', 'Polyethylene pipe designation PE 100, nominal diameter 200mm, nominal pressure of 10 bar, SDR series 17, UNE-EN 12201-2, welded and placed at the bottom of the trench.', NULL);
 INSERT INTO price_compost VALUES ('A_WEIR_60', 'm', 'Weir formation.', 'Weir formation.', 0.0000);
-INSERT INTO price_compost VALUES ('S_NULL', 'm3', NULL, NULL, 0.0000);
+INSERT INTO price_compost VALUES ('S_NULL', 'm3', 'Filling conduit material', 'Filling conduit material', 0.0000);
 INSERT INTO price_compost VALUES ('P_ASPHALT-10', 'm2', 'Pavement of continuous hot bituminous mix 10cm thick', 'Pavement of continuous hot bituminous mix 10cm thick (6+4), including the base of artificial ballast to 95% of PM, primer and adhesion.', NULL);
 INSERT INTO price_compost VALUES ('P_CONCRETE-20', 'm2', 'Concrete pavement HM-30/P/20/I+E, 20cm thick', 'Concrete pavement HM-30/P/20/I+E, 20cm thick, scattered from the truck, and extended vibratge mechanic, mechanical swirling, including the base of artificial ballast to 95% of PM.', NULL);
 INSERT INTO price_compost VALUES ('P_SLAB-4P', 'm2', 'Slab pavement 20x20x4 cm', 'Slab pavement 20x20x4 cm, 1st class, higher price, with sand support of 3cm, hammered on mixed mortar 1:0.5:4, made on site with cement mix 165 and concrete.', NULL);

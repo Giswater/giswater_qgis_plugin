@@ -51,7 +51,7 @@ CREATE OR REPLACE VIEW gw_saa.ext_streetaxis AS
     eixos_de_logradouros.geom AS the_geom,
     eixos_de_logradouros.codigo_rua AS code_street,
     concat(vw_daecom_endereco.tipologr, ' ', vw_daecom_endereco.logr) AS name
-   FROM sc_mbc_ct.eixos_de_logradouros
+   FROM sc_mbc.eixos_de_logradouros
      LEFT JOIN vw_daecom_endereco ON vw_daecom_endereco.cod_rua::text = eixos_de_logradouros.codigo_rua::text;
 
 
@@ -74,5 +74,5 @@ CREATE OR REPLACE VIEW gw_saa.ext_urban_propierties AS
     lote.cod_rua,
     lote."Categoria",
     lote."Nome"
-   FROM sc_mbc_ct.lote;
+   FROM sc_mbc.lote;
 
