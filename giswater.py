@@ -1011,7 +1011,7 @@ class Giswater(QObject):
         self.layer_node_man = [None for i in range(9)]
 
         self.layer_connec = None
-        self.layer_connec_man = [None for i in range(5)]
+        self.layer_connec_man = [None for i in range(6)]
 
         self.layer_gully = None
         self.layer_version = None
@@ -1058,7 +1058,8 @@ class Giswater(QObject):
                     self.layer_connec_man[3] = cur_layer
                 if 'v_edit_man_wjoin' in uri_table:
                     self.layer_connec_man[4] = cur_layer
-                    
+                if 'v_edit_connec' in uri_table:
+                    self.layer_connec_man[5] = cur_layer
                 
                 if self.table_arc in uri_table:
                     self.layer_arc = cur_layer
@@ -1159,10 +1160,10 @@ class Giswater(QObject):
         if self.layer_gully is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
-            self.layer_connec.editFormConfig().setUiForm(file_ui) 
-            self.layer_connec.editFormConfig().setInitCodeSource(1)
-            self.layer_connec.editFormConfig().setInitFilePath(file_init)           
-            self.layer_connec.editFormConfig().setInitFunction('formOpen')                       
+            self.layer_gully.editFormConfig().setUiForm(file_ui) 
+            self.layer_gully.editFormConfig().setInitCodeSource(1)
+            self.layer_gully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_gully.editFormConfig().setInitFunction('formOpen')                       
 
             
         # Manage current layer selected     
@@ -1391,7 +1392,6 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))              
-
 
 
 

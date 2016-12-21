@@ -147,19 +147,25 @@ class ConnecMapTool(ParentMapTool):
                 # Snap to node
                 (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
-                for layer in self.layer_connec_man:
+                if result <> []:
+                    for layer in self.layer_connec_man:
                     # That's the snapped point
                     #if result <> [] and (result[0].layer.name() == self.layer_connec.name()):
-                    if result <> [] and (result[0].layer.name() == layer.name()):
-                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                        layer.removeSelection()
-                        layer.select([result[0].snappedAtGeometry])
-    
-                        # Create link
-                        self.link_connec()
-    
-                        # Hide highlight
-                        self.vertexMarker.hide()
+
+                        exist=self.snapperManager.check_connec_group(result[0].layer)
+                    #if result <> [] and (result[0].layer == layer):
+                        if exist:
+                            print exist
+                            print layer
+                            point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                            layer.removeSelection()
+                            layer.select([result[0].snappedAtGeometry])
+        
+                            # Create link
+                            self.link_connec()
+        
+                            # Hide highlight
+                            self.vertexMarker.hide()
 
             else:
 
