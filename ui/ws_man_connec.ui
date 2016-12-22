@@ -144,7 +144,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>7</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -172,8 +172,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3368,8 +3368,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4879,8 +4879,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7423,8 +7423,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7674,7 +7674,7 @@
     <attribute name="title">
      <string>Hydrometer</string>
     </attribute>
-    <widget class="QDateEdit" name="date_dae_from">
+    <widget class="QDateEdit" name="date_el_from">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -7694,7 +7694,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QDateEdit" name="date_dae_to">
+    <widget class="QDateEdit" name="date_el_to">
      <property name="geometry">
       <rect>
        <x>153</x>
@@ -8116,28 +8116,13 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_event_feature_3">
       <attribute name="title">
        <string>Connec</string>
       </attribute>
       <widget class="QTableView" name="tbl_event_connec">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>530</width>
-         <height>300</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="page_event_hydrant_3">
-      <attribute name="title">
-       <string>Element</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_event_element">
        <property name="geometry">
         <rect>
          <x>10</x>

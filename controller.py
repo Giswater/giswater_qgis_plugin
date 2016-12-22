@@ -266,5 +266,20 @@ class DaoController():
             uri_table = uri[pos_ini + 6:pos_fi + 1]
 
         return uri_schema, uri_table                                 
-        
+      
+      
+    def get_layer_source_table_name(self, layer):
+        ''' Get table or view name of selected layer '''
+
+        uri_schema = None
+        uri_table = None
+        uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.rfind('.')
+        pos_fi = uri.find('" ')
+        if pos_ini <> -1 and pos_fi <> -1:
+            uri_schema = uri[pos_ini + 6:pos_end_schema]
+            uri_table = uri[pos_end_schema+2:pos_fi ]
+
+        return uri_table    
     

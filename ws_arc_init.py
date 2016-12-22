@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
 
-from functools import partial
-
 import utils_giswater
 from parent_init import ParentDialog
 
@@ -84,6 +82,9 @@ class ArcDialog(ParentDialog):
       
         # Load data from related tables
         self.load_data()
+        
+        # Set layer in editing mode
+        self.layer.startEditing()
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)

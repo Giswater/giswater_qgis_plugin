@@ -43,3 +43,4 @@ sdist/
 develop-eggs/
 .installed.cfg
 i18n/lrelease.exe
+ui/ws_man_node_.ui

@@ -54,17 +54,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QTableWidget" name="tbl_scada">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>65</y>
-     <width>211</width>
-     <height>156</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_accept_2">
+  <widget class="QPushButton" name="btn_delete">
    <property name="geometry">
     <rect>
      <x>144</x>
@@ -77,7 +67,7 @@
     <string>Delete</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept_3">
+  <widget class="QPushButton" name="btn_insert">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -88,6 +78,16 @@
    </property>
    <property name="text">
     <string>Insert</string>
+   </property>
+  </widget>
+  <widget class="QTableView" name="tbl">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>65</y>
+     <width>211</width>
+     <height>171</height>
+    </rect>
    </property>
   </widget>
  </widget>

@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
 
 from functools import partial
 
@@ -35,7 +35,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
      
 class ManNodeDialog(ParentDialog):   
     
@@ -136,7 +136,21 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
         
-
+        '''
+        self.layer = self.iface.activeLayer()
+        print "node layer namee seleceted"
+        print self.layer.name()
+        
+        self.node_group()
+        print "from array"
+        
+        print self.layer_node_man[1].name()
+        '''
+        print "result node group "
+        self.node_group()
+        self.node_group_result()
+    
+        
     def set_tabs_visibility(self):
         ''' Hide some tabs ''' 
           
@@ -198,7 +212,57 @@ class ManNodeDialog(ParentDialog):
                     
         
         
+      
+    def node_group(self):
         
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return 
         
-        
-     
+        # Initialize variables
+        self.layer_node = None
+        self.layer_node_man = [None for i in range(11)]
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            if uri_table is not None:
+
+              
+                if 'v_edit_man_hydrant' in uri_table:
+                    self.layer_node_man[0] = cur_layer
+                if 'v_edit_man_junction' in uri_table:
+                    self.layer_node_man[1] = cur_layer
+                if 'v_edit_man_manhole' in uri_table:
+                    self.layer_node_man[2] = cur_layer
+                if 'v_edit_man_meter' in uri_table:
+                    self.layer_node_man[3] = cur_layer
+                if 'v_edit_man_node' in uri_table:
+                    self.layer_node_man[4] = cur_layer
+                if 'v_edit_man_pump' in uri_table:
+                    self.layer_node_man[5] = cur_layer
+                if 'v_edit_man_reduction' in uri_table:
+                    self.layer_node_man[6] = cur_layer
+                if 'v_edit_man_source' in uri_table:
+                    self.layer_node_man[7] = cur_layer
+                if 'v_edit_man_tank' in uri_table:
+                    self.layer_node_man[8] = cur_layer
+                if 'v_edit_man_valve' in uri_table:
+                    self.layer_node_man[9] = cur_layer
+                if 'v_edit_man_waterwell' in uri_table:
+                    self.layer_node_man[10] = cur_layer
+                
+                
+    
+    def node_group_result(self):
+        self.layer = self.iface.activeLayer()  
+        if self.layer in self.layer_node_man :
+            print "layer is in groupe node"
+            print self.layer
+            print self.layer.name() 
+            return self.layer
+            
+        else:
+            print "layer is not in groupe node"
+            return 0

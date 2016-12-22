@@ -1,4 +1,16 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ *                                                                         *
+ *   This file is part of Giswater 2.0                                     *                                 *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
+
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox   #@UnresolvedImport
 
@@ -16,15 +28,14 @@ def fillComboBox(widget, rows, allow_nulls=True):
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
     if allow_nulls:
-        widget.addItem('') 
-    if rows is not None:
-        for row in rows:       
-            elem = row[0]
-            if isinstance(elem, int) or isinstance(elem, float):
-                widget.addItem(str(elem))
-            else:
-                widget.addItem(elem)
-
+        widget.addItem('')     
+    for row in rows:       
+        elem = row[0]
+        if isinstance(elem, int) or isinstance(elem, float):
+            widget.addItem(str(elem))
+        else:
+            widget.addItem(elem)
+        
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
@@ -76,13 +87,6 @@ def setText(widget, text):
         if value == 'None':    
             value = 0        
         widget.setValue(float(value))     
-        
-
-def getWidget(widget):
-    
-    if type(widget) is str:
-        widget = _dialog.findChild(QWidget, widget)    
-    return widget        
           
 
 def getWidgetType(widget):

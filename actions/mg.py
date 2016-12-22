@@ -426,11 +426,10 @@ class Mg():
         self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         
-        #self.om_visit_absolute_path = self.dlg.findChild(QCommandLinkButton, "om_visit_absolute_path")
-        #self.doc_absolute_path = self.dlg.findChild(QCommandLinkButton, "doc_absolute_path")
         
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
+        
         self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
         self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
@@ -508,6 +507,7 @@ class Mg():
             webbrowser.open(url)
         else :
             webbrowser.open(url)
+            
             
             
     def mg_config_get_data(self, tablename):                

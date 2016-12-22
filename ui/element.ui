@@ -667,7 +667,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="verified_2">
+  <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
      <x>10</x>

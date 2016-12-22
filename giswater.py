@@ -28,6 +28,7 @@ from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
 
 
+
 class Giswater(QObject):
    
     def __init__(self, iface):
@@ -90,6 +91,8 @@ class Giswater(QObject):
         
         # Define signals
         self.set_signals()
+        
+    
   
         
                
@@ -98,7 +101,7 @@ class Giswater(QObject):
         self.iface.projectRead.connect(self.project_read)                
         self.legend.currentLayerChanged.connect(self.current_layer_changed)       
         
-                   
+  
     def tr(self, message):
         if self.controller:
             return self.controller.tr(message)      
@@ -170,6 +173,7 @@ class Giswater(QObject):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) in (1, 2, 4, 10, 11, 12, 14, 15, 8, 29):
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                print self.srid
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             elif int(index_action) == 16:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
@@ -997,9 +1001,7 @@ class Giswater(QObject):
                     
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
-        print "layrs from set layers"
-        print len(layers)
-        
+
         if len(layers) == 0:
             return    
         
@@ -1011,75 +1013,78 @@ class Giswater(QObject):
         self.layer_node_man = [None for i in range(9)]
 
         self.layer_connec = None
-        self.layer_connec_man = [None for i in range(6)]
+        self.layer_connec_man = [None for i in range(1)]
 
         self.layer_gully = None
         self.layer_version = None
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
+            uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
             if uri_table is not None:
                 if self.table_arc in uri_table:
                     self.layer_arc = cur_layer
 
-                if self.table_node in uri_table:
+                if self.table_node == uri_table:
                     self.layer_node = cur_layer
-                if 'v_edit_man_chamber' in uri_table:
+                if 'v_edit_man_chamber' == uri_table:
                     self.layer_node_man[0] = cur_layer
-                if 'v_edit_man_manhole' in uri_table:
+                if 'v_edit_man_manhole' == uri_table:
                     self.layer_node_man[1] = cur_layer
-                if 'v_edit_man_netgully' in uri_table:
+                if 'v_edit_man_netgully' == uri_table:
                     self.layer_node_man[2] = cur_layer
-                if 'v_edit_man_netinit' in uri_table:
+                if 'v_edit_man_netinit' == uri_table:
                     self.layer_node_man[3] = cur_layer
-                if 'v_edit_man_wjump' in uri_table:
+                if 'v_edit_man_wjump' == uri_table:
                     self.layer_node_man[4] = cur_layer
-                if 'v_edit_man_wwtp' in uri_table:
+                if 'v_edit_man_wwtp' == uri_table:
                     self.layer_node_man[5] = cur_layer
-                if 'v_edit_man_junction' in uri_table:
+                if 'v_edit_man_junction' == uri_table:
                     self.layer_node_man[6] = cur_layer
-                if 'v_edit_man_outfall' in uri_table:
+                if 'v_edit_man_outfall' == uri_table:
                     self.layer_node_man[7] = cur_layer
-                if 'v_edit_man_valve' in uri_table:
+                if 'v_edit_man_valve' == uri_table:
                     self.layer_node_man[8] = cur_layer
     
 
 
-                if self.table_connec in uri_table:
+                if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
-                if 'v_edit_man_connec' in uri_table:
+                '''
+                if 'v_edit_man_connec' == uri_table:
                     self.layer_connec_man[0] = cur_layer
-                if 'v_edit_man_fountain' in uri_table:
+                if 'v_edit_man_fountain' == uri_table:
                     self.layer_connec_man[1] = cur_layer
-                if 'v_edit_man_greentap' in uri_table:
+                if 'v_edit_man_greentap' == uri_table:
                     self.layer_connec_man[2] = cur_layer
-                if 'v_edit_man_tap' in uri_table:
+                if 'v_edit_man_tap' == uri_table:
                     self.layer_connec_man[3] = cur_layer
-                if 'v_edit_man_wjoin' in uri_table:
+                if 'v_edit_man_wjoin' == uri_table:
                     self.layer_connec_man[4] = cur_layer
-                if 'v_edit_connec' in uri_table:
-                    self.layer_connec_man[5] = cur_layer
+                '''
+                if 'v_edit_man_connec' == uri_table or 'v_edit_connec' == uri_table:
+                    self.layer_connec_man[0] = cur_layer
+                    
                 
-                if self.table_arc in uri_table:
+                if self.table_arc == uri_table:
                     self.layer_arc = cur_layer
-                if 'v_edit_man_conduit' in uri_table:
+                if 'v_edit_man_conduit' == uri_table:
                     self.layer_arc_man[0] = cur_layer
-                if 'v_edit_man_siphon' in uri_table:
+                if 'v_edit_man_siphon' == uri_table:
                     self.layer_arc_man[1] = cur_layer
-                if 'v_edit_man_varc' in uri_table:
+                if 'v_edit_man_varc' == uri_table:
                     self.layer_arc_man[2] = cur_layer
-                if 'v_edit_man_waccel' in uri_table:
+                if 'v_edit_man_waccel' == uri_table:
                     self.layer_arc_man[3] = cur_layer
 
                     
                 
 
-                if self.table_gully in uri_table:
+                if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
-                if self.table_version in uri_table:
+                if self.table_version == uri_table:
                     self.layer_version = cur_layer
-
+                    
         # Check if table 'version' exists
         if self.layer_version is None:
             self.controller.show_warning("Layer version not found")
@@ -1100,8 +1105,9 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
+        
         # Set SRID from table node
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.controller.get_layer_source_table_name(self.layer_node_man[1])+"', 'the_geom');"
         row = self.dao.get_row(sql)
         if row:
             self.srid = row[0]   
@@ -1150,7 +1156,7 @@ class Giswater(QObject):
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           
             self.layer_connec.editFormConfig().setInitFunction('formOpen')
 
-            for i in range(5):
+            for i in range(1):
                 if self.layer_connec_man[i] is not None:
                     self.layer_connec_man[i].editFormConfig().setUiForm(file_ui)
                     self.layer_connec_man[i].editFormConfig().setInitCodeSource(1)

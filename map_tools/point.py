@@ -26,10 +26,11 @@ class PointMapTool(QgsMapTool):
         ''' Insert a new node in the selected coordinates '''
         
         if self.srid is None:
-            self.srid = self.controller.plugin_settings_value('srid')  
+            self.srid = self.settings.value('db/srid')  
         if self.schema_name is None:
-            self.schema_name = self.controller.plugin_settings_value('schema_name')  
+            self.schema_name = self.settings.value('db/schema_name')  
             
+        
         if self.elem_type_type is not None: 
             
             # Get elem_type_id and epa_default from selected elem_type_type (get only first record)
@@ -96,6 +97,9 @@ class PointMapTool(QgsMapTool):
         
         # Insert new node into selected point. Open its feature form
         last_id = self.insert_node(self.point.x(), self.point.y())
+        
+        self.iface.mapCanvas().refresh()
+        '''
         if last_id != -1:
             filter_expr = "node_id = '"+str(last_id)+"'"    
             expr = QgsExpression(filter_expr)
@@ -107,5 +111,5 @@ class PointMapTool(QgsMapTool):
         else:   
             message = "Error inserting node"
             self.controller.show_warning(message, context_name='ui_message')   
-        
+        '''
         

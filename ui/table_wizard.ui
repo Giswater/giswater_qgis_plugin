@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Import CSV into Database</string>
+   <string>Dialog</string>
   </property>
   <property name="modal">
    <bool>true</bool>

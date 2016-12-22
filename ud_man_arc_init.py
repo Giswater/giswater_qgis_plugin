@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox,  QTextEdit,QPlainTextEdit
 
 from functools import partial
 
@@ -151,7 +151,7 @@ class ManArcDialog(ParentDialog):
          
     def fill_costs(self):
         ''' Fill tab costs '''
-
+        
         # Get arc_id
         widget_arc = self.dialog.findChild(QLineEdit, "arc_id")          
         self.arc_id = widget_arc.text()

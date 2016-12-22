@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>503</width>
-    <height>429</height>
+    <width>509</width>
+    <height>366</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>390</y>
+     <y>330</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>415</x>
-     <y>390</y>
+     <y>330</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -45,11 +45,11 @@
      <x>20</x>
      <y>20</y>
      <width>471</width>
-     <height>351</height>
+     <height>301</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -624,7 +624,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>194</y>
+       <y>200</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -660,7 +660,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>224</y>
+       <y>230</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -696,7 +696,7 @@
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>224</y>
+       <y>230</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -709,7 +709,7 @@
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>194</y>
+       <y>200</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -718,11 +718,40 @@
       <string/>
      </property>
     </widget>
+    <widget class="QCheckBox" name="insert_double_geometry">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>170</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="buffer_value">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>170</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
     <widget class="QLabel" name="label_double_geometry_enabled">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>162</y>
+       <y>170</y>
        <width>231</width>
        <height>22</height>
       </rect>
@@ -754,35 +783,6 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QCheckBox" name="insert_double_geometry">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>162</y>
-       <width>20</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="buffer_value">
-     <property name="geometry">
-      <rect>
-       <x>320</x>
-       <y>162</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="decimals">
-      <number>3</number>
-     </property>
-     <property name="singleStep">
-      <double>0.010000000000000</double>
-     </property>
-    </widget>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -807,7 +807,7 @@
       <widget class="QLabel" name="label_node2arc_22">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>10</x>
          <y>80</y>
          <width>151</width>
          <height>22</height>
@@ -879,7 +879,7 @@
       <widget class="QLabel" name="label_node2arc_21">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>10</x>
          <y>50</y>
          <width>151</width>
          <height>22</height>
@@ -1905,240 +1905,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_5">
-    <attribute name="title">
-     <string>Other</string>
-    </attribute>
-    <widget class="QComboBox" name="nodeinsert_catalog_vdefault_2">
-     <property name="geometry">
-      <rect>
-       <x>516</x>
-       <y>84</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_view_state_filters">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>26</y>
-       <width>231</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>View state filters:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_management">
-     <property name="geometry">
-      <rect>
-       <x>24</x>
-       <y>64</y>
-       <width>125</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Management</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_analysis">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>64</y>
-       <width>123</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Analysis</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_planning">
-     <property name="geometry">
-      <rect>
-       <x>314</x>
-       <y>64</y>
-       <width>125</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Planning</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_om_visit_absolute_path">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>108</y>
-       <width>151</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Om visit absolute path/url:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_doc_absolute_path">
-     <property name="geometry">
-      <rect>
-       <x>22</x>
-       <y>210</y>
-       <width>149</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Doc absolute path/url:</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="doc_absolute_path">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>240</y>
-       <width>431</width>
-       <height>41</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="om_visit_absolute_path">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>140</y>
-       <width>431</width>
-       <height>41</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QPushButton" name="om_path_url">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>230</y>
-     <width>35</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>web</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="om_path_doc">
-   <property name="geometry">
-    <rect>
-     <x>400</x>
-     <y>230</y>
-     <width>33</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>...</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="doc_path_url">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>330</y>
-     <width>35</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>web</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="doc_path_doc">
-   <property name="geometry">
-    <rect>
-     <x>400</x>
-     <y>330</y>
-     <width>33</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>...</string>
-   </property>
   </widget>
  </widget>
  <resources/>

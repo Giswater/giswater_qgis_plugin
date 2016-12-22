@@ -402,7 +402,8 @@ class ExtractRasterValue(ParentMapTool):
                 self.rasterLayer = cur_layer
 
             layer_source = self.controller.get_layer_source(cur_layer)
-            uri_table = layer_source['table']
+            print layer_source
+            uri_table = layer_source[1]
             if uri_table is not None:
                 if self.table_vector in uri_table:
                     self.vectorLayer = cur_layer

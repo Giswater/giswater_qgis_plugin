@@ -24,6 +24,8 @@ import urlparse
 import webbrowser
 
 from ui.add_sum import Add_sum          # @UnresolvedImport
+from matplotlib import widgets
+from PyQt4.Qt import QTableView
         
         
 class ParentDialog(object):   
@@ -329,17 +331,10 @@ class ParentDialog(object):
         if position_column == 4:      
             # Get data from address in memory (pointer)
             self.path = self.tbl_document.selectedIndexes()[0].data()
-            # Check if file exist
-            '''
-            fileExtension = os.path.splitext(self.path)
-            print fileExtension
-            #token = urllib.parse.urlparse(url)
-            '''
+
             # Parse a URL into components
             url=urlparse.urlsplit(self.path)
-            print url
-            print url.scheme
-            
+
             # Check if path is URL
             if url.scheme=="http":
                 # If path is URL open URL in browser
@@ -528,9 +523,9 @@ class ParentDialog(object):
 
     def fill_table(self, widget, table_name, filter_): 
         ''' Fill info tab of node '''
-        self.set_model_to_table(widget, table_name, filter_)          
+        self.set_model_to_table(widget, table_name, filter_)     
         
-        
+             
     def fill_tbl_event(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
         
@@ -570,11 +565,6 @@ class ParentDialog(object):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
         
-        print("data fil table") 
-        print table_name 
-        print filter_
-        print widget
-
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)    
         
@@ -626,14 +616,11 @@ class ParentDialog(object):
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
             expr+= " AND event_id = '"+event_id+"'"
-        print("expr")
-        print expr
-  
+
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
-
-        
+       
         
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
@@ -669,5 +656,9 @@ class ParentDialog(object):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
+        
+        
+    
+
         
     

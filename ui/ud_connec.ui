@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -2090,7 +2090,7 @@
     <string>rotation</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="connecat_id">
+  <widget class="QComboBox" name="comboBox_21">
    <property name="geometry">
     <rect>
      <x>120</x>

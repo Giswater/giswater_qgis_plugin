@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsMapLayer, QgsFeatureRequest
+from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsMapLayer, QgsFeatureRequest, QgsProject
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
@@ -75,17 +75,20 @@ class MoveNodeMapTool(ParentMapTool):
         the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
+        print sql
         status = self.controller.execute_sql(sql) 
         if status:
             # Execute SQL function and show result to the user
             function_name = "gw_fct_node2arc"
             sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
+            print sql
             self.controller.execute_sql(sql)
         else:
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message, context_name='ui_message')
             
         # Refresh map canvas
+        print "refresh"
         self.canvas.currentLayer().triggerRepaint()  
 
                 
@@ -106,7 +109,7 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Set snapping to node
         self.snapperManager.snapToNode()
-        self.snapperManager.snapToArc()
+        #self.snapperManager.snapToArc()
 
         # Change pointer
         cursor = QCursor()
@@ -147,6 +150,8 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Recover cursor
         self.canvas.setCursor(self.stdCursor)
+        
+        QgsProject.instance().blockSignals(False)
 
         try:
             self.rubberBand.reset(QGis.Line)
@@ -170,7 +175,7 @@ class MoveNodeMapTool(ParentMapTool):
         if layer is None:
             return
 
-
+        
         # Select node or arc
         if layer.selectedFeatureCount() == 0:
 
@@ -256,12 +261,14 @@ class MoveNodeMapTool(ParentMapTool):
                         point = QgsPoint(result[0].snappedVertex)
     
                         layer.select([result[0].snappedAtGeometry])
+                       
             
                         # Hide highlight
                         self.vertexMarker.hide()
                         
                         # Set a new point to go on with
                         self.rubberBand.addPoint(point)
+                        self.snapperManager.snapToArc()
 
             else:
                 

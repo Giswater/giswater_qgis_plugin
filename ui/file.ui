@@ -262,7 +262,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept_2">
+  <widget class="QPushButton" name="path_doc">
    <property name="geometry">
     <rect>
      <x>396</x>
@@ -275,7 +275,7 @@
     <string>...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_cancel_2">
+  <widget class="QPushButton" name="path_url">
    <property name="geometry">
     <rect>
      <x>436</x>

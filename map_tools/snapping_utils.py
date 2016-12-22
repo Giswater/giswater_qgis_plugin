@@ -73,7 +73,7 @@ class SnappingConfigManager():
 
 
     def clearSnapping(self):
-        ''' Function that collects all the snapping options and put it in an array '''
+        ''' Removing snap '''
 
         # We loop through all the layers in the project
         QgsProject.instance().blockSignals(True)  # we don't want to refresh the snapping UI
@@ -83,34 +83,44 @@ class SnappingConfigManager():
         for layer in layers:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, 0, 0, 1, False)
 
-        QgsProject.instance().blockSignals(True)
+        #QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
     def snapToArc(self):
         ''' Set snapping to Arc '''
-        
+        QgsProject.instance().blockSignals(True)
         for layer in self.layer_arc_man:
-            print layer 
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
+        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
+    def setUnsnapToArc(self):
+        ''' Unset snapping to Arc '''
+        #QgsProject.instance().blockSignals(True)
+        for layer in self.layer_arc_man:
+            QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, 2, 2, 1.0, False)
+        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snapSettingsChanged.emit()  # update the gui
+        
+        
     def snapToNode(self):
         ''' Set snapping to Node '''
-
+        QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:
-            print layer 
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
-        
+        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
     def snapToConnec(self):
         ''' Set snapping to Connec '''
-        
-        
+        QgsProject.instance().blockSignals(True)
+        #QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
         for layer in self.layer_connec_man:
-            print layer 
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
-        
+        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
     def snapToLayer(self, Layer):
         ''' Set snapping to Layer '''
@@ -129,7 +139,7 @@ class SnappingConfigManager():
                                                           int(snpOpts['snapType']), int(snpOpts['unitType']),
                                                           float(snpOpts['tolerance']), int(snpOpts['avoidInt']))
 
-        QgsProject.instance().blockSignals(False)
+#        QgsProject.instance().blockSignals(False)
         # Update the gui        
         QgsProject.instance().snapSettingsChanged.emit()  
 
@@ -137,7 +147,7 @@ class SnappingConfigManager():
     def recoverSnappingOptions(self):
         ''' Function to restore user configuration '''
         self.applySnappingOptions(self.previousSnapping)
-
+        
 
 
     def check_node_group(self, snapped_layer):

@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer, QgsProject
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
 from PyQt4.QtGui import QColor
@@ -69,24 +69,22 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             # Check Arc or Node
             for snapPoint in result:
 
-                if snapPoint.layer.name() == self.layer_node.name():
+                exist = self.snapperManager.check_node_group(snapPoint.layer)
+                if exist:
                     
                     # Get the point
-                    point = QgsPoint(result[0].snappedVertex)
+                    point = QgsPoint(snapPoint.snappedVertex)
 
                     # Add marker
                     self.vertexMarker.setCenter(point)
                     self.vertexMarker.show()
 
                     # Data for function
-                    self.current_layer = result[0].layer
-                    self.snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                    self.current_layer = snapPoint.layer
+                    self.snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
 
                     # Change symbol
-                    if snapPoint.layer.name() == self.layer_node.name():
-                        self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-                    else:
-                        self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)
+                    self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
                     break
 
@@ -95,16 +93,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         ''' With left click the digitizing is finished '''
         if event.button() == Qt.LeftButton and self.current_layer is not None:
 
-            # Get selected layer type: 'node'
-            if self.current_layer.name() == self.layer_node.name():
-                elem_type = 'node'
-            else:
-                message = "Current layer not valid"
-                self.controller.show_warning(message, context_name='ui_message')
-                return
-
             feature = self.snappFeat
-            elem_id = feature.attribute(elem_type+'_id')
+            elem_id = feature.attribute('node_id')
 
             # Execute SQL function
             if self.index_action == '56':
@@ -118,10 +108,10 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 result = self.controller.execute_sql(sql)
                 print sql
 
-            if result:
+            #if result:
                 # Get 'arc' and 'node' list and select them
-                self.mg_flow_trace_select_features(self.layer_arc, 'arc')
-                self.mg_flow_trace_select_features(self.layer_node, 'node')
+                #self.mg_flow_trace_select_features(self.layer_arc, 'arc')
+                #self.mg_flow_trace_select_features(self.layer_node, 'node')
 
             # Refresh map canvas
             self.iface.mapCanvas().refresh()
@@ -186,9 +176,11 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         # Control current layer (due to QGIS bug in snapping system)
         try:
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(self.layer_node)
+                for layer_node in self.layer_node_man:
+                    self.canvas.setCurrentLayer(layer_node)
         except:
-            self.canvas.setCurrentLayer(self.layer_node)
+            for layer_node in self.layer_node_man:
+                self.canvas.setCurrentLayer(layer_node)
 
 
     def deactivate(self):
@@ -204,5 +196,8 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
         # Remove highlight
         self.h = None
+        
+        # Activate form signals
+        QgsProject.instance().blockSignals(False)
         
         
