@@ -384,7 +384,8 @@ class Ed():
         folder_path = os.path.dirname(self.file_path)
         os.chdir(folder_path)
         msg = "Select file"
-        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
+        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
+        #self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
         # Set text to QLineEdit
         widget.setText(self.file_path)     
 

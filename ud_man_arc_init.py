@@ -15,7 +15,7 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.add_sum import Add_sum          # @UnresolvedImport
 from _sqlite3 import Row
-#from PyQt4.Qt import QDialogButtonBox
+from PyQt4.Qt import QDialogButtonBox
 
 
 def formOpen(dialog, layer, feature):

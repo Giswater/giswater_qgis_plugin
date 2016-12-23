@@ -347,7 +347,46 @@ class ParentDialog(object):
                    
                 else:
                     # Open the document
-                    os.startfile(self.path)                      
+                    os.startfile(self.path)   
+                    
+    def open_selected_document_from_table(self):
+
+        ''' Delete selected elements of the table '''
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
+        table_document = "v_ui_doc_x_arc"
+        # Get selected rows
+        selected_list = self.tbl_document.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+        
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = self.tbl_document.model().record(row).value("path")
+            inf_text+= str(id_)+", "
+        inf_text = inf_text[:-2]
+        print inf_text 
+        self.path = inf_text 
+
+        # Parse a URL into components
+        url=urlparse.urlsplit(self.path)
+
+            # Check if path is URL
+        if url.scheme=="http":
+            # If path is URL open URL in browser
+            webbrowser.open(self.path) 
+        else: 
+            # If its not URL ,check if file exist
+            if not os.path.exists(self.path):
+                message = "File not found!"
+                self.controller.show_warning(message, context_name='ui_message')
+                   
+            else:
+                # Open the document
+                os.startfile(self.path)                       
 
 
     def set_filter_table(self, widget):
@@ -496,6 +535,10 @@ class ParentDialog(object):
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
 
+           
+        self.btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
+        self.btn_open_path.clicked.connect(self.open_selected_document_from_table) 
+        
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
         doc_tag.activated.connect(partial(self.set_filter_table_man, widget))
@@ -572,31 +615,8 @@ class ParentDialog(object):
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
-        '''
-        # Get selected dates
-        date_from = self.date_event_from.date().toString('yyyyMMdd') 
-        date_to = self.date_event_to.date().toString('yyyyMMdd') 
-        if (date_from > date_to):
-            message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
-            return
         
-        # Set filter
-        expr = self.field_id+" = '"+self.id+"'"
-        expr+= " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
-        
-        # Get selected values in Comboboxes        
-        event_type_value = utils_giswater.getWidgetText("event_type")
-        if event_type_value != 'null': 
-            expr+= " AND event_type = '"+event_type_value+"'"
-        event_id_value = utils_giswater.getWidgetText("event_id")
-        if event_id_value != 'null': 
-            expr+= " AND event_id = '"+event_id_value+"'"
-  
-        # Refresh model with selected filter
-        widget.model().setFilter(expr)
-        widget.model().select()  
-        '''
+
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
         date_to = self.date_event_to.date().toString('yyyyMMdd') 
