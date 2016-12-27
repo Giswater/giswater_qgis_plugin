@@ -1329,6 +1329,7 @@ gully.rotation,
 gully.link,
 gully.verified,
 gully.the_geom,
+gully.undelete,
 gully.workcat_id_end,
 gully.featurecat_id,
 gully.feature_id,
@@ -1377,10 +1378,12 @@ gully.rotation,
 gully.link,
 gully.verified,
 gully.the_geom_pol AS "the_geom",
+gully.undelete,
 gully.workcat_id_end,
 gully.featurecat_id,
-gully.feature_id
+gully.feature_id,
+gully.label_x,
+gully.label_y,
+gully.label_rotation
 FROM (gully LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text)))
 WHERE gully.the_geom_pol is not null;
-
-
