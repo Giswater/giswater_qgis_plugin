@@ -53,7 +53,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -69,15 +69,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_5">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -513,7 +513,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>SWMM type:</string>
+        <string>Cat grate type:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1087,8 +1087,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
