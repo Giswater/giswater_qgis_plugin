@@ -14,9 +14,7 @@ om_visit_event.id as event_id,
 om_visit.id as visit_id,
 om_visit.startdate,
 om_visit.enddate,
-om_visit.user_name,
 om_visit_x_gully.gully_id,
-om_visit_event.tstamp,
 om_visit_event.parameter_id,
 om_visit_parameter.parameter_type,
 om_visit_event.value,
@@ -24,7 +22,9 @@ om_visit_event.text,
 om_visit_event.position_id,
 om_visit_event.xcoord,
 om_visit_event.ycoord,
-om_visit_event.azimut
+om_visit_event.azimut,
+om_visit_event.tstamp
+om_visit.user_name
 FROM om_visit_event
 JOIN om_visit ON om_visit.id = om_visit_event.visit_id
 JOIN om_visit_x_gully ON om_visit_x_gully.visit_id=om_visit.id

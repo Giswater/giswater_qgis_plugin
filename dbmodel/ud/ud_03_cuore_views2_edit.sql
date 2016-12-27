@@ -273,7 +273,7 @@ cat_grate.svg AS "cat_svg",
 gully.rotation,
 gully.link,
 gully.verified,
-gully.the_geom_pol AS "the_geom"
+gully.the_geom_pol AS "the_geom",
 gully.undelete,
 gully.workcat_id_end,
 gully.featurecat_id,

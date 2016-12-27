@@ -68,7 +68,6 @@ ALTER VIEW v_edit_inp_weir ALTER verified SET DEFAULT 'TO REVIEW';
 -- ----------------------------
 -- Default values of hydrologics
 -- ----------------------------
-INSERT INTO "cat_hydrology" VALUES ('HC_DEFAULT', 'CURVE_NUMBER', 'Default value of infiltration');
 ALTER TABLE subcatchment ALTER COLUMN hydrology_id SET DEFAULT 'HC_DEFAULT';
 
 
@@ -85,18 +84,7 @@ ALTER TABLE subcatchment ALTER COLUMN zero SET DEFAULT 25;
 ALTER TABLE subcatchment ALTER COLUMN rted SET DEFAULT 100;
 
 
--- ----------------------------
--- Records of inp_options
--- ----------------------------
- 
-INSERT INTO "inp_options" VALUES ('CMS', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '05:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:02', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null, '0','0','5','5');
 
-
--- ----------------------------
--- Records of inp_report
--- ----------------------------
- 
-INSERT INTO "inp_report" VALUES ('YES', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'ALL');
 
 
 

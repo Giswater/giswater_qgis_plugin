@@ -22,6 +22,9 @@ INSERT INTO config_extract_raster_value VALUES ('1', 'topo', '1', 'v_edit_node',
 
 INSERT INTO config_search_plus VALUES ('1', 'point', 'point_type', 'text', 'ext_urban_propierties', 'complement', 'placement', 'postnumber', 'ext_streetaxis', 'id', 'name', 'v_edit_connec', 'streetaxis_id', 'postnumber', 'v_edit_connec', 'connec_id', 'v_rtc_hydrometer', 'hydrometer_id', 'connec_id');
 
+INSERT INTO config_param_text VALUES ('custom_giswater_folder', 'c:/',null,null,null,null);
+INSERT INTO config_param_text VALUES ('doc_absolute_path', 'c:/',null,null,null,null);
+INSERT INTO config_param_text VALUES ('om_visit_absolute_path', 'c:/',null,null,null,null);
 
 INSERT INTO config_ui_forms VALUES (340, NULL, 'v_rtc_hydrometer', 'instalation_date', false, NULL, 11);
 INSERT INTO config_ui_forms VALUES (341, NULL, 'v_rtc_hydrometer', 'flow', false, NULL, 12);
