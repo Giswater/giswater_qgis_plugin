@@ -208,6 +208,8 @@ class ManArcDialog(ParentDialog):
         sql+= " FROM "+self.schema_name+".v_plan_cost_arc" 
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
+		
+
         
         self.arc_cost.setText(str(row['arc_cost']))      
         self.cost_unit.setText(str(row['cost_unit'])) 
@@ -276,7 +278,7 @@ class ManArcDialog(ParentDialog):
         # Fill QLineEdit -> Arccat
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND catalog_id = '"+arccat_id+"'" 
         rows = self.dao.get_rows(sql)
-        
+
         arc_element_value = rows[0]
         arc_bottom_value = rows[1]
         arc_protection_value = rows[2]
@@ -284,10 +286,10 @@ class ManArcDialog(ParentDialog):
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
         arc_bottom = self.dialog.findChild(QLineEdit, "arc_bottom")
         arc_protection = self.dialog.findChild(QLineEdit, "arc_protection")
-        
-        arc_element.setText(str(arc_element_value[0]))
-        arc_bottom.setText(str(arc_bottom_value[0]))
-        arc_protection.setText(str(arc_protection_value[0]))
+
+        arc_element.setText(arc_element_value[0])
+        arc_bottom.setText(arc_bottom_value[0])
+        arc_protection.setText(arc_protection_value[0])
         
         
         # Fill QLineEdit -> Soilcat
@@ -304,9 +306,9 @@ class ManArcDialog(ParentDialog):
         soil_excess = self.dialog.findChild(QLineEdit, "soil_excess")
         soil_trenchlining = self.dialog.findChild(QLineEdit, "soil_trenchlining")
         
-        soil_excavation.setText(str(soil_excavation_value[0]))
-        soil_filling.setText(str(soil_filling_value[0]))
-        soil_excess.setText(str(soil_excess_value[0]))
-        soil_trenchlining.setText(str(soil_trenchlining_value[0]))
+        soil_excavation.setText(soil_excavation_value[0])
+        soil_filling.setText(soil_filling_value[0])
+        soil_excess.setText(soil_excess_value[0])
+        soil_trenchlining.setText(soil_trenchlining_value[0])
         
         
