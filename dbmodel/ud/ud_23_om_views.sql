@@ -23,7 +23,7 @@ om_visit_event.position_id,
 om_visit_event.xcoord,
 om_visit_event.ycoord,
 om_visit_event.azimut,
-om_visit_event.tstamp
+om_visit_event.tstamp,
 om_visit.user_name
 FROM om_visit_event
 JOIN om_visit ON om_visit.id = om_visit_event.visit_id

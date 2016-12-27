@@ -10,40 +10,15 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_arc_x_node
 -- ----------------------------
 
-
-
-  
-DROP VIEW IF EXISTS v_ui_element_x_node CASCADE;
-CREATE OR REPLACE VIEW v_ui_element_x_node AS 
+DROP VIEW IF EXISTS v_man_gully CASCADE;
+CREATE VIEW v_man_gully AS 
 SELECT
-element_x_node.id,
-element_x_node.node_id,
-element.elementcat_id,
-element_x_node.element_id,
-element.state,
-element.observ,
-element.comment,
-element.builtdate,
-element.enddate
-FROM element_x_node
-JOIN element ON element.element_id::text = element_x_node.element_id::text;
+gully_id,
+the_geom
+FROM gully
+JOIN man_selector_state ON gully.state=man_selector_state.id
+;
 
-
-
-DROP VIEW IF EXISTS v_ui_element_x_connec CASCADE;
-CREATE OR REPLACE VIEW v_ui_element_x_connec AS
-SELECT
-element_x_connec.id,
-element_x_connec.connec_id,
-element.elementcat_id,
-element_x_connec.element_id,
-element.state,
-element.observ,
-element.comment,
-element.builtdate,
-element.enddate
-FROM element_x_connec
-JOIN element ON element.element_id::text = element_x_connec.element_id::text;
 
 
 DROP VIEW IF EXISTS v_ui_element_x_gully CASCADE;
@@ -51,8 +26,8 @@ CREATE OR REPLACE VIEW v_ui_element_x_gully AS
 SELECT
 element_x_gully.id,
 element_x_gully.gully_id,
-element.elementcat_id,
 element_x_gully.element_id,
+element.elementcat_id,
 element.state,
 element.observ,
 element.comment,
@@ -60,23 +35,6 @@ element.builtdate,
 element.enddate
 FROM element_x_gully
 JOIN element ON element.element_id::text = element_x_gully.element_id::text;
-
-
-
-DROP VIEW IF EXISTS v_ui_element_x_arc CASCADE;
-CREATE OR REPLACE VIEW v_ui_element_x_arc AS
-SELECT
-element_x_arc.id,
-element_x_arc.arc_id,
-element.elementcat_id,
-element_x_arc.element_id,
-element.state,
-element.observ,
-element.comment,
-element.builtdate,
-element.enddate
-FROM element_x_arc
-JOIN element ON element.element_id::text = element_x_arc.element_id::text;
 
 
 
