@@ -56,7 +56,7 @@ class ManArcDialog(ParentDialog):
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
 
-        table_price_arc = "v_price_x_arc"
+        #table_price_arc = "v_price_x_arc"
         
         self.table_varc = self.schema_name+'."v_edit_man_varc"'
         self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
@@ -110,7 +110,7 @@ class ManArcDialog(ParentDialog):
         self.fill_costs()
         
         # Fill tab costs | Prices
-        self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
+        # self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
