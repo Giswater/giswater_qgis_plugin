@@ -32,9 +32,13 @@ class SnappingConfigManager():
         self.layer_connec = None        
         self.layer_node = None    
             
-        self.layer_arc_man = None        
-        self.layer_connec_man = None        
-        self.layer_node_man = None         
+        self.layer_arc_man_WS = None        
+        self.layer_connec_man_WS = None        
+        self.layer_node_man_WS = None   
+        
+        self.layer_arc_man_UD = None        
+        self.layer_connec_man_UD = None        
+        self.layer_node_man_UD = None       
 
         # Snapper
         self.snapper = QgsMapCanvasSnapper(self.canvas)
@@ -107,12 +111,14 @@ class SnappingConfigManager():
         
     def snapToNode(self):
         ''' Set snapping to Node '''
+        print self.layer_node_man
+        
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
         #QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
-
+        
     def snapToConnec(self):
         ''' Set snapping to Connec '''
         QgsProject.instance().blockSignals(True)

@@ -24,6 +24,7 @@ from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
 from map_tools.parent import ParentMapTool
+import time
 
 
 class MoveNodeMapTool(ParentMapTool):
@@ -169,7 +170,7 @@ class MoveNodeMapTool(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
         eventPoint = QPoint(x,y)
-
+        
         # Node layer
         layer = self.canvas.currentLayer()
         if layer is None:

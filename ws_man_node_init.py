@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QDialogButtonBox, QTabWidget, QLineEdit, QDialogButtonBox
 
 from functools import partial
 
@@ -35,7 +35,9 @@ def init_config():
     # Manage 'connecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
-
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    
      
 class ManNodeDialog(ParentDialog):   
     
@@ -52,6 +54,10 @@ class ManNodeDialog(ParentDialog):
         table_document = "v_ui_doc_x_node"   
         table_costs = "v_price_x_node"
         
+        table_event_node = "v_ui_om_visit_x_node"
+        table_scada = "v_rtc_scada"    
+        table_scada_value = "v_rtc_scada_value"
+        
         # Initialize variables               
         self.table_tank = self.schema_name+'."v_edit_man_tank"'
         self.table_pump = self.schema_name+'."v_edit_man_pump"'
@@ -63,6 +69,7 @@ class ManNodeDialog(ParentDialog):
         self.table_hydrant = self.schema_name+'."v_edit_man_hydrant"'
         self.table_valve = self.schema_name+'."v_edit_man_valve"'
         self.table_waterwell = self.schema_name+'."v_edit_man_waterwell"'
+        self.table_filter = self.schema_name+'."v_edit_man_filter"'
               
         # Define class variables
         self.field_id = "node_id"        
@@ -73,8 +80,11 @@ class ManNodeDialog(ParentDialog):
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")   
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
+        self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
+        self.tbl_event_node = self.dialog.findChild(QTableView, "tbl_event_node") 
+        self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
+        self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")  
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")  
         
         # Manage tab visibility
@@ -99,6 +109,24 @@ class ManNodeDialog(ParentDialog):
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
         
+        # Fill tab event | node
+        self.fill_tbl_event(self.tbl_event_node, self.schema_name+"."+table_event_node, self.filter)
+        
+        # Configuration of table event | node
+        self.set_configuration(self.tbl_event_node, table_event_node)
+        
+        # Fill tab scada | scada
+        self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
+        
+        # Configuration of table scada | scada
+        self.set_configuration(self.tbl_scada, table_scada)
+        
+        # Fill tab scada |scada value
+        self.fill_tbl_hydrometer(self.tbl_scada_value, self.schema_name+"."+table_scada_value, self.filter)
+        
+        # Configuration of table scada | scada value
+        self.set_configuration(self.tbl_scada_value, table_scada_value)
+        
         # Fill the table Costs
         self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
         
@@ -108,8 +136,8 @@ class ManNodeDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
-        
-      
+
+    
     def set_tabs_visibility(self):
         ''' Hide some tabs '''   
         
@@ -120,44 +148,47 @@ class ManNodeDialog(ParentDialog):
             return
 
         if uri_table == self.table_tank :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 0):
+            for i in xrange(11,-1,-1):
+                if (i != 0):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_pump :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 1):
+            for i in xrange(11,-1,-1):
+                if (i != 1):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_source :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 2):
+            for i in xrange(11,-1,-1):
+                if (i != 2):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_meter :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 3):
+            for i in xrange(11,-1,-1):
+                if (i != 3):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_junction :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 4):
+            for i in xrange(11,-1,-1):
+                if (i != 4):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_waterwell :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 5):
+            for i in xrange(11,-1,-1):
+                if (i != 5):
                     self.tab_main.removeTab(i) 
                     
         if uri_table == self.table_reduction :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 6):
+            for i in xrange(11,-1,-1):
+                if (i != 6):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_hydrant :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 7):
+            for i in xrange(11,-1,-1):
+                if (i != 7):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_valve :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 8):
+            for i in xrange(11,-1,-1):
+                if (i != 8):
                     self.tab_main.removeTab(i) 
         if uri_table == self.table_manhole :
-            for i in xrange(13,-1,-1):
-                if (i != 11) & (i != 10) & (i != 5):
+            for i in xrange(11,-1,-1):
+                if (i != 9):
                     self.tab_main.removeTab(i) 
-                    
+        if uri_table == self.table_filter :
+            for i in xrange(11,-1,-1):
+                if (i != 10):
+                    self.tab_main.removeTab(i) 

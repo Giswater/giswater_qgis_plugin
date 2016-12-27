@@ -56,7 +56,7 @@ class ManArcDialog(ParentDialog):
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
 
-        #table_price_arc = "v_price_x_arc"
+    
         
         self.table_varc = self.schema_name+'."v_edit_man_varc"'
         self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
@@ -76,7 +76,7 @@ class ManArcDialog(ParentDialog):
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event_arc = self.dialog.findChild(QTableView, "tbl_event_arc")  
-        self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
+
         
         # Load data from related tables
         self.load_data()
@@ -108,9 +108,7 @@ class ManArcDialog(ParentDialog):
   
         # Fill tab costs 
         self.fill_costs()
-        
-        # Fill tab costs | Prices
-        # self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
+       
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
@@ -208,51 +206,49 @@ class ManArcDialog(ParentDialog):
         sql+= " FROM "+self.schema_name+".v_plan_cost_arc" 
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
-		
-
         
-        self.arc_cost.setText(str(row['arc_cost']))      
-        self.cost_unit.setText(str(row['cost_unit'])) 
-        self.arc_cost_2.setText(str(row['arc_cost'])) 
-        self.m2bottom_cost.setText(str(row['m2bottom_cost'])) 
-        self.m2mlbottom.setText(str(row['m2mlbottom'])) 
-        self.m3protec_cost.setText(str(row['m3protec_cost'])) 
-        self.m3exc_cost.setText(str(row['m3exc_cost'])) 
-        self.m3excess_cost.setText(str(row['m3excess_cost'])) 
-        self.m3fill_cost.setText(str(row['m3fill_cost'])) 
-        self.m3mlexcess.setText(str(row['m3mlexcess'])) 
-        self.m2trenchl_cost.setText(str(row['m2trenchl_cost'])) 
-        self.m2mltrenchl.setText(str(row['m2mltrenchl'])) 
-        self.m3mlprotec.setText(str(row['m3mlprotec'])) 
-        self.m3mlexc.setText(str(row['m3mlexc'])) 
-        self.m3mlfill.setText(str(row['m3mlfill'])) 
-        self.base_cost.setText(str(row['base_cost'])) 
-        self.protec_cost.setText(str(row['protec_cost'])) 
-        self.exc_cost.setText(str(row['exc_cost'])) 
-        self.fill_cost.setText(str(row['fill_cost'])) 
-        self.excess_cost.setText(str(row['excess_cost'])) 
-        self.trenchl_cost.setText(str(row['trenchl_cost'])) 
-        self.pav_cost.setText(str(row['pav_cost']))   
-        self.cost.setText(str(row['cost']))  
-        self.m2pavement_cost.setText(str(row['m2pav_cost']))  
-        self.m2mlpavement.setText(str(row['m2mlpav']))  
+        self.arc_cost.setText(row['arc_cost'])     
+        self.cost_unit.setText(row['cost_unit'])
+        self.arc_cost_2.setText(row['arc_cost'])
+        self.m2bottom_cost.setText(row['m2bottom_cost'])
+        self.m2mlbottom.setText(row['m2mlbottom']) 
+        self.m3protec_cost.setText(row['m3protec_cost']) 
+        self.m3exc_cost.setText(row['m3exc_cost']) 
+        self.m3excess_cost.setText(row['m3excess_cost']) 
+        self.m3fill_cost.setText(row['m3fill_cost']) 
+        self.m3mlexcess.setText(row['m3mlexcess']) 
+        self.m2trenchl_cost.setText(row['m2trenchl_cost']) 
+        self.m2mltrenchl.setText(row['m2mltrenchl']) 
+        self.m3mlprotec.setText(row['m3mlprotec']) 
+        self.m3mlexc.setText(row['m3mlexc']) 
+        self.m3mlfill.setText(row['m3mlfill']) 
+        self.base_cost.setText(row['base_cost']) 
+        self.protec_cost.setText(row['protec_cost']) 
+        self.exc_cost.setText(row['exc_cost']) 
+        self.fill_cost.setText(row['fill_cost']) 
+        self.excess_cost.setText(row['excess_cost']) 
+        self.trenchl_cost.setText(row['trenchl_cost']) 
+        self.pav_cost.setText(row['pav_cost'])   
+        self.cost.setText(row['cost'])  
+        self.m2pavement_cost.setText(row['m2pav_cost'])  
+        self.m2mlpavement.setText(row['m2mlpav'])  
         
-        self.z1.setText(str(row['z1']))
-        self.z2.setText(str(row['z2']))
-        self.bulk.setText(str(row['bulk']))
-        self.bulk_2.setText(str(row['bulk']))
-        self.bulk_3.setText(str(row['bulk']))
-        self.geom1.setText(str(row['geom1']))
-        self.b.setText(str(row['b']))
-        self.b_2.setText(str(row['b']))
-        self.y_param.setText(str(row['y_param']))
-        self.m3mlfill_2.setText(str(row['m3mlfill']))
-        self.m3mlexc_2.setText(str(row['m3mlexc']))
-        self.m3mlexcess_2.setText(str(row['m3mlexcess']))
-        self.m2mltrenchl.setText(str(row['m2mltrenchl']))
-        self.thickness.setText(str(row['thickness']))
-        #self.m2trenchl_cost_2.setText(str(row['m2trenchl_cost']))
-        self.calculed_y.setText(str(row['calculed_y'])) 
+        self.z1.setText(row['z1'])
+        self.z2.setText(row['z2'])
+        self.bulk.setText(row['bulk'])
+        self.bulk_2.setText(row['bulk'])
+        self.bulk_3.setText(row['bulk'])
+        self.geom1.setText(row['geom1'])
+        self.b.setText(row['b'])
+        self.b_2.setText(row['b'])
+        self.y_param.setText(row['y_param'])
+        self.m3mlfill_2.setText(row['m3mlfill'])
+        self.m3mlexc_2.setText(row['m3mlexc'])
+        self.m3mlexcess_2.setText(row['m3mlexcess'])
+        self.m2mltrenchl.setText(row['m2mltrenchl'])
+        self.thickness.setText(row['thickness'])
+        #self.m2trenchl_cost_2.setText(row['m2trenchl_cost'])
+        self.calculed_y.setText(row['calculed_y']) 
 
 
         # Get values from database        
@@ -261,8 +257,8 @@ class ManArcDialog(ParentDialog):
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
         
-        self.length.setText(str(row['length'])) 
-        self.budget.setText(str(row['budget'])) 
+        self.length.setText(row['length'])
+        self.budget.setText(row['budget'])
         
 
         # Get arccat_id and soilcat_id from v_plan_cost_arc
@@ -278,7 +274,7 @@ class ManArcDialog(ParentDialog):
         # Fill QLineEdit -> Arccat
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND catalog_id = '"+arccat_id+"'" 
         rows = self.dao.get_rows(sql)
-
+        
         arc_element_value = rows[0]
         arc_bottom_value = rows[1]
         arc_protection_value = rows[2]
@@ -286,7 +282,7 @@ class ManArcDialog(ParentDialog):
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
         arc_bottom = self.dialog.findChild(QLineEdit, "arc_bottom")
         arc_protection = self.dialog.findChild(QLineEdit, "arc_protection")
-
+        
         arc_element.setText(arc_element_value[0])
         arc_bottom.setText(arc_bottom_value[0])
         arc_protection.setText(arc_protection_value[0])
@@ -306,9 +302,9 @@ class ManArcDialog(ParentDialog):
         soil_excess = self.dialog.findChild(QLineEdit, "soil_excess")
         soil_trenchlining = self.dialog.findChild(QLineEdit, "soil_trenchlining")
         
-        soil_excavation.setText(soil_excavation_value[0])
-        soil_filling.setText(soil_filling_value[0])
-        soil_excess.setText(soil_excess_value[0])
-        soil_trenchlining.setText(soil_trenchlining_value[0])
+        soil_excavation.setText(str(soil_excavation_value[0]))
+        soil_filling.setText(str(soil_filling_value[0]))
+        soil_excess.setText(str(soil_excess_value[0]))
+        soil_trenchlining.setText(str(soil_trenchlining_value[0]))
         
         

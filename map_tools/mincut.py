@@ -69,8 +69,10 @@ class MincutMapTool(ParentMapTool):
 
             # Check Arc or Node
             for snapPoint in result:
-
-                if snapPoint.layer.name() == self.layer_node.name() or snapPoint.layer.name() == self.layer_arc.name():
+                exist_node=self.snapperManager.check_node_group(snapPoint.layer)
+                exist_arc=self.snapperManager.check_node_group(snapPoint.layer)
+                if exist_node or exist_arc:
+                #if snapPoint.layer.name() == self.layer_node.name() or snapPoint.layer.name() == self.layer_arc.name():
                     
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
@@ -84,7 +86,9 @@ class MincutMapTool(ParentMapTool):
                     self.snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
 
                     # Change symbol
-                    if snapPoint.layer.name() == self.layer_node.name():
+                    exist_node=self.snapperManager.check_node_group(snapPoint.layer)
+                    if exist_node:
+                    #if snapPoint.layer.name() == self.layer_node.name():
                         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)
                     else:
                         self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)
@@ -98,9 +102,12 @@ class MincutMapTool(ParentMapTool):
         if event.button() == Qt.LeftButton and self.current_layer is not None:
 
             # Get selected layer type: 'arc' or 'node'
-            if self.current_layer.name() == self.layer_arc.name():
+    
+            if self.snapperManager.check_arc_group(self.current_layer):
+            #if self.current_layer.name() == self.layer_arc.name():
                 elem_type = 'arc'
-            elif self.current_layer.name() == self.layer_node.name():
+            elif self.snapperManager.check_arc_group(self.current_layer):
+            #elif self.current_layer.name() == self.layer_node.name():
                 elem_type = 'node'
             else:
                 message = "Current layer not valid"
@@ -117,8 +124,10 @@ class MincutMapTool(ParentMapTool):
             print sql
             if result:
                 # Get 'arc' and 'node' list and select them
-                self.mg_flow_trace_select_features(self.layer_arc, 'arc')
-                self.mg_flow_trace_select_features(self.layer_node, 'node')
+                for layer_arc in self.layer_arc_man:
+                    self.mg_flow_trace_select_features(layer_arc, 'arc')
+                for layer_node in self.layer_arc_man:
+                    self.mg_flow_trace_select_features(layer_node, 'node')
 
             # Refresh map canvas
             self.iface.mapCanvas().refresh()
@@ -175,10 +184,13 @@ class MincutMapTool(ParentMapTool):
             self.controller.show_info(message, context_name='ui_message' )  
         # Control current layer (due to QGIS bug in snapping system)
         try:
+            
             if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(self.layer_arc)
+                for layer_arc in self.layer_arc_man:
+                    self.canvas.setCurrentLayer(layer_arc)
         except:
-            self.canvas.setCurrentLayer(self.layer_arc)
+            for layer_arc in self.layer_arc_man:
+                self.canvas.setCurrentLayer(layer_arc)
 
 
     def deactivate(self):

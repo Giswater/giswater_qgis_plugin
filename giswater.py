@@ -221,7 +221,8 @@ class Giswater(QObject):
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')  
-        self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully')    
+        self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
+        self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_pgully')   
         self.table_version = self.settings.value('db/table_version', 'version') 
         
         self.table_man_arc = self.settings.value('db/table_arc', 'v_edit_man_arc')        
@@ -258,7 +259,8 @@ class Giswater(QObject):
         self.table_storage = self.settings.value('db/table_storage', 'v_edit_man_storage')
         self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')
         self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')
-
+        
+        self.table_filter =  self.settings.value('db/table_filter', 'v_edit_man_filter')
       
         # Tables arc
         self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')
@@ -266,7 +268,9 @@ class Giswater(QObject):
         self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')
         self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
         
-  
+        self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
+        self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
+        
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
         parent = self.iface.mainWindow()
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
@@ -454,82 +458,117 @@ class Giswater(QObject):
         
         # Initialize variables
         self.layer_arc = None
-        self.layer_arc_man = [None for i in range(4)]
+        self.layer_arc_man_UD = [None for i in range(4)]
+        self.layer_arc_man_WS = [None for i in range(1)]
 
         self.layer_node = None
-        self.layer_node_man = [None for i in range(9)]
+        self.layer_node_man_UD = [None for i in range(9)]
+        self.layer_node_man_WS = [None for i in range(11)]
 
         self.layer_connec = None
-        self.layer_connec_man = [None for i in range(1)]
+        self.layer_connec_man_UD = [None for i in range(1)]
+        self.layer_connec_man_WS = [None for i in range(4)]
 
         self.layer_gully = None
+        self.layer_pgully = None
+        
         self.layer_version = None
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
             if uri_table is not None:
+                
                 if self.table_arc in uri_table:
                     self.layer_arc = cur_layer
 
                 if self.table_node == uri_table:
                     self.layer_node = cur_layer
+  
                 if 'v_edit_man_chamber' == uri_table:
-                    self.layer_node_man[0] = cur_layer
+                    self.layer_node_man_UD[0] = cur_layer
                 if 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man[1] = cur_layer
+                    self.layer_node_man_UD[1] = cur_layer
                 if 'v_edit_man_netgully' == uri_table:
-                    self.layer_node_man[2] = cur_layer
+                    self.layer_node_man_UD[2] = cur_layer
                 if 'v_edit_man_netinit' == uri_table:
-                    self.layer_node_man[3] = cur_layer
+                    self.layer_node_man_UD[3] = cur_layer
                 if 'v_edit_man_wjump' == uri_table:
-                    self.layer_node_man[4] = cur_layer
+                    self.layer_node_man_UD[4] = cur_layer
                 if 'v_edit_man_wwtp' == uri_table:
-                    self.layer_node_man[5] = cur_layer
+                    self.layer_node_man_UD[5] = cur_layer
                 if 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man[6] = cur_layer
+                    self.layer_node_man_UD[6] = cur_layer
                 if 'v_edit_man_outfall' == uri_table:
-                    self.layer_node_man[7] = cur_layer
+                    self.layer_node_man_UD[7] = cur_layer
                 if 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man[8] = cur_layer
+                    self.layer_node_man_UD[8] = cur_layer
+                      
+                # Node group from WS project
+                if 'v_edit_man_source' == uri_table:
+                    self.layer_node_man_WS[0] = cur_layer
+                if 'v_edit_man_pump' == uri_table:
+                    self.layer_node_man_WS[1] = cur_layer
+                if 'v_edit_man_meter' == uri_table:
+                    self.layer_node_man_WS[2] = cur_layer
+                if 'v_edit_man_tank' == uri_table:
+                    self.layer_node_man_WS[3] = cur_layer
+                if 'v_edit_man_hydrant' == uri_table:
+                    self.layer_node_man_WS[4] = cur_layer
+                if 'v_edit_man_waterwell' == uri_table:
+                    self.layer_node_man_WS[5] = cur_layer
+                if 'v_edit_man_manhole' == uri_table:
+                    self.layer_node_man_WS[6] = cur_layer
+                if 'v_edit_man_reduction' == uri_table:
+                    self.layer_node_man_WS[7] = cur_layer
+                if 'v_edit_man_junction' == uri_table:
+                    self.layer_node_man_WS[8] = cur_layer
+                if 'v_edit_man_valve' == uri_table:
+                    self.layer_node_man_WS[9] = cur_layer
+                if 'v_edit_man_filter' == uri_table:
+                    self.layer_node_man_WS[10] = cur_layer
     
 
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
-                '''
-                if 'v_edit_man_connec' == uri_table:
-                    self.layer_connec_man[0] = cur_layer
-                if 'v_edit_man_fountain' == uri_table:
-                    self.layer_connec_man[1] = cur_layer
-                if 'v_edit_man_greentap' == uri_table:
-                    self.layer_connec_man[2] = cur_layer
-                if 'v_edit_man_tap' == uri_table:
-                    self.layer_connec_man[3] = cur_layer
-                if 'v_edit_man_wjoin' == uri_table:
-                    self.layer_connec_man[4] = cur_layer
+                
+                if 'v_edit_man_connec' == uri_table or 'v_edit_connec' == uri_table:
+                    self.layer_connec_man_UD[0] = cur_layer
                 '''
                 if 'v_edit_man_connec' == uri_table or 'v_edit_connec' == uri_table:
-                    self.layer_connec_man[0] = cur_layer
+                    self.layer_connec_man_WS[0] = cur_layer
+                '''
+                if 'v_edit_man_greentap' == uri_table :
+                    self.layer_connec_man_WS[0] = cur_layer
+                if 'v_edit_man_wjoin' == uri_table :
+                    self.layer_connec_man_WS[1] = cur_layer
+                if 'v_edit_man_fountain' == uri_table :
+                    self.layer_connec_man_WS[2] = cur_layer
+                if 'v_edit_man_tap' == uri_table :
+                    self.layer_connec_man_WS[3] = cur_layer
                     
                 
                 if self.table_arc == uri_table:
                     self.layer_arc = cur_layer
                 if 'v_edit_man_conduit' == uri_table:
-                    self.layer_arc_man[0] = cur_layer
+                    self.layer_arc_man_UD[0] = cur_layer
                 if 'v_edit_man_siphon' == uri_table:
-                    self.layer_arc_man[1] = cur_layer
+                    self.layer_arc_man_UD[1] = cur_layer
                 if 'v_edit_man_varc' == uri_table:
-                    self.layer_arc_man[2] = cur_layer
+                    self.layer_arc_man_UD[2] = cur_layer
                 if 'v_edit_man_waccel' == uri_table:
-                    self.layer_arc_man[3] = cur_layer
-
+                    self.layer_arc_man_UD[3] = cur_layer
                     
-                
+                if 'v_edit_man_pipe' == uri_table:
+                    self.layer_arc_man_WS[0] = cur_layer
+
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
                     
+                if self.table_pgully == uri_table:
+                    self.layer_pgully = cur_layer
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
@@ -556,11 +595,13 @@ class Giswater(QObject):
         
         
         # Set SRID from table node
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.controller.get_layer_source_table_name(self.layer_node_man[1])+"', 'the_geom');"
-        row = self.dao.get_row(sql)
-        if row:
-            self.srid = row[0]   
-            self.settings.setValue("db/srid", self.srid)                           
+        #self.mg.project_type 
+        #sql = "SELECT Find_SRID('"+schema_name+"', '"+self.controller.get_layer_source_table_name(self.layer_node_man[1])+"', 'the_geom');"
+        #row = self.dao.get_row(sql)
+        #if row:
+        #self.srid = row[0]   
+        self.srid = 25831
+        self.settings.setValue("db/srid", self.srid)                           
         
         # Search project type in table 'version'
         self.search_project_type()
@@ -574,12 +615,20 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
             
-            for i in range(11):
-                if self.layer_arc_man[i] is not None:
-                    self.layer_arc_man[i].editFormConfig().setUiForm(file_ui)
-                    self.layer_arc_man[i].editFormConfig().setInitCodeSource(1)
-                    self.layer_arc_man[i].editFormConfig().setInitFilePath(file_init)
-                    self.layer_arc_man[i].editFormConfig().setInitFunction('formOpen')
+            for i in range(4):
+                if self.layer_arc_man_UD[i] is not None:
+                    self.layer_arc_man_UD[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_arc_man_UD[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_arc_man_UD[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_arc_man_UD[i].editFormConfig().setInitFunction('formOpen')
+                    
+            for i in range(1):
+                if self.layer_arc_man_WS[i] is not None:
+                    self.layer_arc_man_WS[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_arc_man_WS[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_arc_man_WS[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_arc_man_WS[i].editFormConfig().setInitFunction('formOpen')
+         
          
         if self.layer_node is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_node.ui')
@@ -589,12 +638,20 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')
 
+            for i in range(9):
+                if self.layer_node_man_UD[i] is not None:
+                    self.layer_node_man_UD[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_node_man_UD[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_node_man_UD[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_node_man_UD[i].editFormConfig().setInitFunction('formOpen')
+                    
+                    
             for i in range(11):
-                if self.layer_node_man[i] is not None:
-                    self.layer_node_man[i].editFormConfig().setUiForm(file_ui)
-                    self.layer_node_man[i].editFormConfig().setInitCodeSource(1)
-                    self.layer_node_man[i].editFormConfig().setInitFilePath(file_init)
-                    self.layer_node_man[i].editFormConfig().setInitFunction('formOpen')
+                if self.layer_node_man_WS[i] is not None:
+                    self.layer_node_man_WS[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_node_man_WS[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_node_man_WS[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_node_man_WS[i].editFormConfig().setInitFunction('formOpen')
         
         
         if self.layer_connec is not None and self.load_custom_forms:       
@@ -606,19 +663,37 @@ class Giswater(QObject):
             self.layer_connec.editFormConfig().setInitFunction('formOpen')
 
             for i in range(1):
-                if self.layer_connec_man[i] is not None:
-                    self.layer_connec_man[i].editFormConfig().setUiForm(file_ui)
-                    self.layer_connec_man[i].editFormConfig().setInitCodeSource(1)
-                    self.layer_connec_man[i].editFormConfig().setInitFilePath(file_init)
-                    self.layer_connec_man[i].editFormConfig().setInitFunction('formOpen')
-
+                if self.layer_connec_man_UD[i] is not None:
+                    self.layer_connec_man_UD[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_connec_man_UD[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_connec_man_UD[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_connec_man_UD[i].editFormConfig().setInitFunction('formOpen')
+            
+            for i in range(4):
+                if self.layer_connec_man_WS[i] is not None:
+                    self.layer_connec_man_WS[i].editFormConfig().setUiForm(file_ui)
+                    self.layer_connec_man_WS[i].editFormConfig().setInitCodeSource(1)
+                    self.layer_connec_man_WS[i].editFormConfig().setInitFilePath(file_init)
+                    self.layer_connec_man_WS[i].editFormConfig().setInitFunction('formOpen')
+                    
+                    
+                    
         if self.layer_gully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
             self.layer_gully.editFormConfig().setUiForm(file_ui) 
             self.layer_gully.editFormConfig().setInitCodeSource(1)
             self.layer_gully.editFormConfig().setInitFilePath(file_init)           
-            self.layer_gully.editFormConfig().setInitFunction('formOpen')                       
+            self.layer_gully.editFormConfig().setInitFunction('formOpen')   
+        
+        
+        if self.layer_pgully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_pgully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_pgully_init.py')       
+            self.layer_pgully.editFormConfig().setUiForm(file_ui) 
+            self.layer_pgully.editFormConfig().setInitCodeSource(1)
+            self.layer_pgully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_pgully.editFormConfig().setInitFunction('formOpen')                       
 
             
         # Manage current layer selected     
@@ -626,33 +701,68 @@ class Giswater(QObject):
         
         # Set objects for map tools classes
         map_tool = self.map_tools['mg_move_node']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else :
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+        
         
         map_tool = self.map_tools['mg_delete_node']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
 
         
         map_tool = self.map_tools['mg_mincut']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+
 
         map_tool = self.map_tools['mg_flow_trace']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+            
 
         map_tool = self.map_tools['mg_flow_exit']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+
 
         map_tool = self.map_tools['mg_connec_tool']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else: 
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+
 
         map_tool = self.map_tools['mg_extract_raster_value']
-        map_tool.set_layers(self.layer_arc_man, self.layer_connec_man, self.layer_node_man)
-        map_tool.set_controller(self.controller)
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+        
+        
         map_tool.set_config_action(self.actions['99'])
 
         # Create SearchPlus object
@@ -702,6 +812,8 @@ class Giswater(QObject):
                 setting_name = 'buttons_connec' 
             elif self.table_gully in uri_table:  
                 setting_name = 'buttons_gully' 
+            elif self.table_pgully in uri_table:  
+                setting_name = 'buttons_gully' 
                 
             elif self.table_wjoin in uri_table:  
                 setting_name = 'buttons_connec'
@@ -711,7 +823,10 @@ class Giswater(QObject):
                 setting_name = 'buttons_connec'
             elif self.table_fountain in uri_table:  
                 setting_name = 'buttons_connec'
-            
+            elif self.table_tap in uri_table:  
+                setting_name = 'buttons_connec'
+                
+                
             
             elif self.table_tank in uri_table:  
                 setting_name = 'buttons_node' 
@@ -733,6 +848,8 @@ class Giswater(QObject):
                 setting_name = 'buttons_node' 
             elif self.table_manhole in uri_table:  
                 setting_name = 'buttons_node'   
+            elif self.table_filter in uri_table:  
+                setting_name = 'buttons_node'
             
             elif self.table_chamber in uri_table:  
                 setting_name = 'buttons_node' 
@@ -765,7 +882,9 @@ class Giswater(QObject):
             elif self.table_conduit in uri_table:  
                 setting_name = 'buttons_arc'   
             elif self.table_waccel in uri_table:  
-                setting_name = 'buttons_arc'      
+                setting_name = 'buttons_arc'     
+            elif self.table_pipe in uri_table:  
+                setting_name = 'buttons_arc'       
             
             
             

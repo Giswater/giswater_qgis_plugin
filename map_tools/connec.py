@@ -198,6 +198,7 @@ class ConnecMapTool(ParentMapTool):
         # Set snapping to arc and node
         self.snapperManager.snapToConnec()
 
+
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
@@ -239,26 +240,25 @@ class ConnecMapTool(ParentMapTool):
         
         for layer in self.layer_connec_man:
         #layer = self.layer_connec
-            if layer.selectedFeatureCount() == 0:
-                message = "You have to select at least one feature!"
-                self.controller.show_warning(message, context_name='ui_message')
-                   
-                return
+            if layer.selectedFeatureCount() > 0:
+                #message = "You have to select at least one feature!"
+                #self.controller.show_warning(message, context_name='ui_message')
+            
+
+                features = layer.selectedFeatures()
+                for feature in features:
+                    connec_id = feature.attribute('connec_id')
+                    aux += str(connec_id) + ", "
+                connec_array = aux[:-2] + "}"
         
-        features = layer.selectedFeatures()
-        for feature in features:
-            connec_id = feature.attribute('connec_id')
-            aux += str(connec_id) + ", "
-        connec_array = aux[:-2] + "}"
-
-        # Execute function
-        function_name = "gw_fct_connect_to_network"
-        sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
-        self.controller.execute_sql(sql)
-
-        # Refresh map canvas
-        self.rubberBand.reset()
-        self.iface.mapCanvas().refresh()
+                # Execute function
+                function_name = "gw_fct_connect_to_network"
+                sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
+                self.controller.execute_sql(sql)
+        
+                # Refresh map canvas
+                self.rubberBand.reset()
+                self.iface.mapCanvas().refresh()
 
 
     def set_rubber_band(self):

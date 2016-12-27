@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QComboBox, QDateEdit, QDialogButtonBox, QPushButton, QTableView, QTabWidget, QLineEdit
 from qgis.core import QgsVectorLayer
 from functools import partial
 
@@ -35,7 +35,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
      
 class ManConnecDialog(ParentDialog):   
     
@@ -70,8 +70,7 @@ class ManConnecDialog(ParentDialog):
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")   
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_connec") 
-        self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event_connec = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
@@ -115,12 +114,13 @@ class ManConnecDialog(ParentDialog):
 
         # Configuration of table hydrometer | hydrometer value
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
- 
+        
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer, table_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
+
 
 
     def set_tabs_visibility(self):

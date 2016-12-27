@@ -191,7 +191,9 @@ class ParentDialog(object):
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
         model.setFilter(filter_)
+
         model.select()         
+        
 
         # Check for errors
         if model.lastError().isValid():

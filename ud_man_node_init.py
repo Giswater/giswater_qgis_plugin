@@ -137,18 +137,10 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
         
         '''
-        self.layer = self.iface.activeLayer()
-        print "node layer namee seleceted"
-        print self.layer.name()
-        
-        self.node_group()
-        print "from array"
-        
-        print self.layer_node_man[1].name()
-        '''
         print "result node group "
         self.node_group()
         self.node_group_result()
+        '''
     
         
     def set_tabs_visibility(self):
@@ -212,7 +204,7 @@ class ManNodeDialog(ParentDialog):
                     
         
         
-      
+    ''' 
     def node_group(self):
         
         # Check if we have any layer loaded
@@ -266,3 +258,5 @@ class ManNodeDialog(ParentDialog):
         else:
             print "layer is not in groupe node"
             return 0
+            
+    '''

@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
 
 from functools import partial
 
@@ -35,7 +35,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)
      
 class ManArcDialog(ParentDialog):   
     
@@ -52,7 +52,7 @@ class ManArcDialog(ParentDialog):
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
 
-        # table_price_arc = "v_price_x_arc"
+ 
         
         self.table_varc = self.schema_name+'."v_edit_man_varc"'
         self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
@@ -105,12 +105,6 @@ class ManArcDialog(ParentDialog):
         # Fill tab costs 
         self.fill_costs()
         
-        
-        # Fill tab costs | Prices
-        self.fill_table(self.tbl_price_arc, self.schema_name+"."+table_price_arc, self.filter)
-        
-        # Configuration of table costs | Prices
-        # self.set_configuration(self.tbl_price_arc, table_document)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
@@ -219,7 +213,7 @@ class ManArcDialog(ParentDialog):
         self.m3fill_cost.setText(str(row['m3fill_cost'])) 
         self.m3mlexcess.setText(str(row['m3mlexcess'])) 
         self.m2trenchl_cost.setText(str(row['m2trenchl_cost'])) 
-        self.m2mltrenchl_2.setText(str(row['m2mltrenchl'])) 
+        #self.m2mltrenchl_2.setText(str(row['m2mltrenchl'])) 
         self.m3mlprotec.setText(str(row['m3mlprotec'])) 
         self.m3mlexc.setText(str(row['m3mlexc'])) 
         self.m3mlfill.setText(str(row['m3mlfill'])) 
@@ -248,7 +242,7 @@ class ManArcDialog(ParentDialog):
         self.m3mlexcess_2.setText(str(row['m3mlexcess']))
         self.m2mltrenchl.setText(str(row['m2mltrenchl']))
         #self.thickness.setText(str(row['thickness']))
-        self.m2trenchl_cost_2.setText(str(row['m2trenchl_cost']))
+        #self.m2trenchl_cost_2.setText(str(row['m2trenchl_cost']))
         #self.calculed_y.setText(str(row['calculed_y'])) 
         self.m2mltrenchl.setText(str(row['m2mltrenchl']))
 
