@@ -614,7 +614,7 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitCodeSource(1)
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
-            
+            print file_ui 
             for i in range(4):
                 if self.layer_arc_man_UD[i] is not None:
                     self.layer_arc_man_UD[i].editFormConfig().setUiForm(file_ui)

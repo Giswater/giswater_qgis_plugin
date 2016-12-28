@@ -10,6 +10,9 @@ import os
 import sys
 import webbrowser
 
+
+
+
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater    
@@ -492,11 +495,14 @@ class Mg():
         os.chdir(folder_path)
         msg = "Select file"
         self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
+
+        # Separate path to components
+        abs_path = os.path.split(self.file_path)
+
         # Set text to QLineEdit
-        widget.setText(self.file_path)     
+        widget.setText(abs_path[0]+'/')     
 
-
-        
+   
       
     def open_web_browser(self, widget):
         ''' Display url using the default browser '''

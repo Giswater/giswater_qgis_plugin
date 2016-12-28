@@ -8,12 +8,13 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
-
+from PyQt4.QtCore import Qt
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
 from ui.add_sum import Add_sum          # @UnresolvedImport
+from PyQt4.Qt import left
 
 
 def formOpen(dialog, layer, feature):
@@ -280,8 +281,11 @@ class ManArcDialog(ParentDialog):
         arc_protection = self.dialog.findChild(QLineEdit, "arc_protection")
         
         arc_element.setText(str(arc_element_value[0]))
+        arc_element.setAlignment(Qt.AlignJustify)
         arc_bottom.setText(str(arc_bottom_value[0]))
+        arc_bottom.setAlignment(Qt.AlignJustify)
         arc_protection.setText(str(arc_protection_value[0]))
+        arc_protection.setAlignment(Qt.AlignJustify)
         
         
         # Fill QLineEdit -> Soilcat
@@ -299,9 +303,13 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining = self.dialog.findChild(QLineEdit, "soil_trenchlining")
         
         soil_excavation.setText(str(soil_excavation_value[0]))
+        soil_excavation.setAlignment(Qt.AlignJustify)
         soil_filling.setText(str(soil_filling_value[0]))
+        soil_filling.setAlignment(Qt.AlignJustify)
         soil_excess.setText(str(soil_excess_value[0]))
+        soil_excess.setAlignment(Qt.AlignJustify)
         soil_trenchlining.setText(str(soil_trenchlining_value[0]))
+        soil_trenchlining.setAlignment(Qt.AlignJustify)
         
         
         

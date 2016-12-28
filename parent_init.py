@@ -373,22 +373,34 @@ class ParentDialog(object):
         print inf_text 
         self.path = inf_text 
 
+        sql = "SELECT value"
+        sql+= " FROM "+self.schema_name+".config_param_text"
+        sql+= " WHERE id = 'doc_absolute_path'"
+        print sql
+        rows = self.controller.get_rows(sql)
+        print rows
+        # Full path= path + value from row
+        self.full_path =self.path
+        print "full path"
+        print self.full_path
+        
+        
         # Parse a URL into components
-        url=urlparse.urlsplit(self.path)
+        url=urlparse.urlsplit(self.full_path)
 
-            # Check if path is URL
+        # Check if path is URL
         if url.scheme=="http":
             # If path is URL open URL in browser
-            webbrowser.open(self.path) 
+            webbrowser.open(self.full_path) 
         else: 
             # If its not URL ,check if file exist
-            if not os.path.exists(self.path):
+            if not os.path.exists(self.full_path):
                 message = "File not found!"
                 self.controller.show_warning(message, context_name='ui_message')
                    
             else:
                 # Open the document
-                os.startfile(self.path)                       
+                os.startfile(self.full_path)                       
 
 
     def set_filter_table(self, widget):
@@ -682,5 +694,55 @@ class ParentDialog(object):
         
     
 
+    def open_selected_document_from_table_event(self):
+
+        ''' Delete selected elements of the table '''
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event")
+        table_event = "v_ui_event_x_arc"
+        # Get selected rows
+        selected_list = self.tbl_event.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+        
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = self.tbl_event.model().record(row).value("path")
+            inf_text+= str(id_)+", "
+        inf_text = inf_text[:-2]
+        print inf_text 
+        self.path = inf_text 
+
+        sql = "SELECT value"
+        sql+= " FROM "+self.schema_name+".config_param_text"
+        sql+= " WHERE id = 'om_visit_absolute_path'"
+        print sql
+        rows = self.controller.get_rows(sql)
+        print rows
+        # Full path= path + value from row
+        self.full_path =self.path
+        print "full path"
+        print self.full_path
+        
+        
+        # Parse a URL into components
+        url=urlparse.urlsplit(self.full_path)
+
+        # Check if path is URL
+        if url.scheme=="http":
+            # If path is URL open URL in browser
+            webbrowser.open(self.full_path) 
+        else: 
+            # If its not URL ,check if file exist
+            if not os.path.exists(self.full_path):
+                message = "File not found!"
+                self.controller.show_warning(message, context_name='ui_message')
+                   
+            else:
+                # Open the document
+                os.startfile(self.full_path)    
         
     
