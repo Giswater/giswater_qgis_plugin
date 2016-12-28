@@ -38,25 +38,7 @@ ALTER TABLE inp_pattern ALTER COLUMN factor_24 SET DEFAULT 1;
 
 
 
--- ----------------------------
--- Records of inp_options
--- ----------------------------
- 
-INSERT INTO "inp_options" VALUES ('LPS', 'H-W', '', '1', '1', '40', '0.001', 'CONTINUE', '2', '10', '0', '', '1', '0.5', 'NONE', '1', '0.01', '', '40');
- 
 
--- ----------------------------
--- Records of inp_report
--- ----------------------------
- 
-INSERT INTO "inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES', 'YES');
- 
-
--- ----------------------------
--- Records of inp_times
--- ----------------------------
- 
-INSERT INTO "inp_times" VALUES ('24', '1:00', '0:06', '0:06', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 
 
 
