@@ -53,7 +53,7 @@ BEGIN
         INSERT INTO connec VALUES (NEW.connec_id, NEW.top_elev, NEW."ymax", NEW.connecat_id, NEW.sector_id, NEW.code, NEW.n_hydrometer,NEW.demand,NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, 
-				NEW.undelete, NEW.workcat_id_end,NEW.y1,NEW.y2,NEW.featurecat_id,NEW.feature_id,NEW.private_connecat_id, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.accessibility, NEW.diagonal );
+                                NEW.workcat_id_end,NEW.y1,NEW.y2,NEW.undelete,NEW.featurecat_id,NEW.feature_id,NEW.private_connecat_id, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.accessibility, NEW.diagonal );
               
         PERFORM audit_function (1,860);
         RETURN NEW;
