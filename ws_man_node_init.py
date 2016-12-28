@@ -35,8 +35,8 @@ def init_config():
     # Manage 'connecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    # feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    
     
      
 class ManNodeDialog(ParentDialog):   
