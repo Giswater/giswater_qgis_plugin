@@ -456,8 +456,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1984,7 +1984,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_8">
       <property name="geometry">
@@ -3537,14 +3537,14 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>560</width>
+        <height>407</height>
        </rect>
       </property>
       <attribute name="label">
        <string>Measurements</string>
       </attribute>
-      <widget class="QLineEdit" name="m2mltrenchl__2">
+      <widget class="QLineEdit" name="m2mltrenchl_2">
        <property name="geometry">
         <rect>
          <x>288</x>
@@ -4149,7 +4149,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>seccio_giswater_ws.png</pixmap>
+        <pixmap>ws_section.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -4264,7 +4264,7 @@
        </property>
       </widget>
       <zorder>image</zorder>
-      <zorder>m2mltrenchl__2</zorder>
+      <zorder>m2mltrenchl_2</zorder>
       <zorder>thickness</zorder>
       <zorder>calculed_y</zorder>
       <zorder>y_param</zorder>

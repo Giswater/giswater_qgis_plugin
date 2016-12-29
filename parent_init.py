@@ -350,12 +350,48 @@ class ParentDialog(object):
                 else:
                     # Open the document
                     os.startfile(self.path)   
+    
+    
+    def open_selected_document_event(self):
+        ''' Get value from selected cell ("PATH")
+        Open the document ''' 
+        
+        # Check if clicked value is from the column "PATH"
+        position_column = self.tbl_event.currentIndex().column()
+        if position_column == 9:      
+            # Get data from address in memory (pointer)
+            self.path = self.tbl_event.selectedIndexes()[0].data()
+
+            sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+            sql +=" WHERE id = 'om_visit_absolute_path'"
+            row = self.dao.get_row(sql)
+            # Full path= path + value from row
+            self.full_path =row[0]+self.path
+            print self.full_path
+            
+            # Parse a URL into components
+            url=urlparse.urlsplit(self.full_path)
+
+            # Check if path is URL
+            if url.scheme=="http":
+                # If path is URL open URL in browser
+                webbrowser.open(self.full_path) 
+            else: 
+                # If its not URL ,check if file exist
+                if not os.path.exists(self.full_path):
+                    message = "File not found!"
+                    self.controller.show_warning(message, context_name='ui_message')
+                   
+                else:
+                    # Open the document
+                    os.startfile(self.path)   
+                           
                     
     def open_selected_document_from_table(self):
-
-        ''' Delete selected elements of the table '''
+        ''' Button -Open document from table document'''
+        
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
-        table_document = "v_ui_doc_x_arc"
+        #table_document = "v_ui_doc_x_arc"
         # Get selected rows
         selected_list = self.tbl_document.selectionModel().selectedRows()    
         if len(selected_list) == 0:
@@ -373,18 +409,12 @@ class ParentDialog(object):
         print inf_text 
         self.path = inf_text 
 
-        sql = "SELECT value"
-        sql+= " FROM "+self.schema_name+".config_param_text"
-        sql+= " WHERE id = 'doc_absolute_path'"
-        print sql
-        rows = self.controller.get_rows(sql)
-        print rows
+        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+        sql +=" WHERE id = 'doc_absolute_path'"
+        row = self.dao.get_row(sql)
         # Full path= path + value from row
-        self.full_path =self.path
-        print "full path"
-        print self.full_path
-        
-        
+        self.full_path =row[0]+self.path
+       
         # Parse a URL into components
         url=urlparse.urlsplit(self.full_path)
 
@@ -400,7 +430,13 @@ class ParentDialog(object):
                    
             else:
                 # Open the document
-                os.startfile(self.full_path)                       
+                os.startfile(self.full_path)    
+                
+                
+    
+                          
+                   
+
 
 
     def set_filter_table(self, widget):
@@ -511,8 +547,6 @@ class ParentDialog(object):
         self.date_document_to.dateChanged.connect(partial(self.set_filter_table, widget))
         self.date_document_from.dateChanged.connect(partial(self.set_filter_table, widget))
         #self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
-
 
         # Fill ComboBox tagcat_id
         sql = "SELECT DISTINCT(tagcat_id)"
@@ -594,7 +628,7 @@ class ParentDialog(object):
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
-
+        
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -629,7 +663,6 @@ class ParentDialog(object):
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
-        
 
         # Get selected dates
         date_from = self.date_event_from.date().toString('yyyyMMdd') 
@@ -692,57 +725,3 @@ class ParentDialog(object):
         widget.model().select() 
         
         
-    
-
-    def open_selected_document_from_table_event(self):
-
-        ''' Delete selected elements of the table '''
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event")
-        table_event = "v_ui_event_x_arc"
-        # Get selected rows
-        selected_list = self.tbl_event.selectionModel().selectedRows()    
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
-            return
-        
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = self.tbl_event.model().record(row).value("path")
-            inf_text+= str(id_)+", "
-        inf_text = inf_text[:-2]
-        print inf_text 
-        self.path = inf_text 
-
-        sql = "SELECT value"
-        sql+= " FROM "+self.schema_name+".config_param_text"
-        sql+= " WHERE id = 'om_visit_absolute_path'"
-        print sql
-        rows = self.controller.get_rows(sql)
-        print rows
-        # Full path= path + value from row
-        self.full_path =self.path
-        print "full path"
-        print self.full_path
-        
-        
-        # Parse a URL into components
-        url=urlparse.urlsplit(self.full_path)
-
-        # Check if path is URL
-        if url.scheme=="http":
-            # If path is URL open URL in browser
-            webbrowser.open(self.full_path) 
-        else: 
-            # If its not URL ,check if file exist
-            if not os.path.exists(self.full_path):
-                message = "File not found!"
-                self.controller.show_warning(message, context_name='ui_message')
-                   
-            else:
-                # Open the document
-                os.startfile(self.full_path)    
-        
-    

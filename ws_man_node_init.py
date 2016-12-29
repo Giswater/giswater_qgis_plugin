@@ -35,8 +35,8 @@ def init_config():
     # Manage 'connecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
-    # feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
-    
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
     
      
 class ManNodeDialog(ParentDialog):   
@@ -82,7 +82,7 @@ class ManNodeDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
-        self.tbl_event_node = self.dialog.findChild(QTableView, "tbl_event_node") 
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")  
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")  
@@ -98,7 +98,7 @@ class ManNodeDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-        
+
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
         
@@ -110,10 +110,11 @@ class ManNodeDialog(ParentDialog):
         self.set_configuration(self.tbl_document, table_document)
         
         # Fill tab event | node
-        self.fill_tbl_event(self.tbl_event_node, self.schema_name+"."+table_event_node, self.filter)
+        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         
         # Configuration of table event | node
-        self.set_configuration(self.tbl_event_node, table_event_node)
+        self.set_configuration(self.tbl_event, table_event_node)
         
         # Fill tab scada | scada
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)

@@ -75,7 +75,7 @@ class ManGullyDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-           
+        
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
         
@@ -88,6 +88,7 @@ class ManGullyDialog(ParentDialog):
         
         # Fill tab event 
         self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_gully, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         
         # Configuration of table event
         self.set_configuration(self.tbl_event, table_event_gully)

@@ -614,14 +614,20 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitCodeSource(1)
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
-            print file_ui 
+            
+        if self.layer_arc_man_UD is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                     
             for i in range(4):
                 if self.layer_arc_man_UD[i] is not None:
                     self.layer_arc_man_UD[i].editFormConfig().setUiForm(file_ui)
                     self.layer_arc_man_UD[i].editFormConfig().setInitCodeSource(1)
                     self.layer_arc_man_UD[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_arc_man_UD[i].editFormConfig().setInitFunction('formOpen')
-                    
+                
+        if self.layer_arc_man_WS is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                         
             for i in range(1):
                 if self.layer_arc_man_WS[i] is not None:
                     self.layer_arc_man_WS[i].editFormConfig().setUiForm(file_ui)
@@ -638,6 +644,9 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')
 
+        if self.layer_node_man_UD is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')       
             for i in range(9):
                 if self.layer_node_man_UD[i] is not None:
                     self.layer_node_man_UD[i].editFormConfig().setUiForm(file_ui)
@@ -645,7 +654,9 @@ class Giswater(QObject):
                     self.layer_node_man_UD[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_node_man_UD[i].editFormConfig().setInitFunction('formOpen')
                     
-                    
+        if self.layer_node_man_WS is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')            
             for i in range(11):
                 if self.layer_node_man_WS[i] is not None:
                     self.layer_node_man_WS[i].editFormConfig().setUiForm(file_ui)
@@ -662,13 +673,19 @@ class Giswater(QObject):
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           
             self.layer_connec.editFormConfig().setInitFunction('formOpen')
 
+        if self.layer_connec_man_UD is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
             for i in range(1):
                 if self.layer_connec_man_UD[i] is not None:
                     self.layer_connec_man_UD[i].editFormConfig().setUiForm(file_ui)
                     self.layer_connec_man_UD[i].editFormConfig().setInitCodeSource(1)
                     self.layer_connec_man_UD[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_connec_man_UD[i].editFormConfig().setInitFunction('formOpen')
-            
+        
+        if self.layer_connec_man_WS is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
             for i in range(4):
                 if self.layer_connec_man_WS[i] is not None:
                     self.layer_connec_man_WS[i].editFormConfig().setUiForm(file_ui)
@@ -676,8 +693,7 @@ class Giswater(QObject):
                     self.layer_connec_man_WS[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_connec_man_WS[i].editFormConfig().setInitFunction('formOpen')
                     
-                    
-                    
+               
         if self.layer_gully is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       

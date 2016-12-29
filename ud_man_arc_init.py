@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox,  QTextEdit,QPlainTextEdit
+from PyQt4.QtGui import Qt, QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox,  QTextEdit,QPlainTextEdit
 
 from functools import partial
 
@@ -35,8 +35,9 @@ def init_config():
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
     
     # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)
+    
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
 
 
@@ -74,7 +75,7 @@ class ManArcDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
-        self.tbl_event_arc = self.dialog.findChild(QTableView, "tbl_event_arc")  
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
 
         
         # Load data from related tables
@@ -100,10 +101,10 @@ class ManArcDialog(ParentDialog):
         self.set_configuration(self.tbl_document, table_document)
         
         # Fill tab event | arc
-        self.fill_tbl_event(self.tbl_event_arc, self.schema_name+"."+table_event_arc, self.filter)
-        
+        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_arc, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         # Configuration of table event | arc
-        self.set_configuration(self.tbl_event_arc, table_event_arc)
+        self.set_configuration(self.tbl_event, table_event_arc)
   
         # Fill tab costs 
         self.fill_costs()
@@ -156,49 +157,53 @@ class ManArcDialog(ParentDialog):
         self.length = self.dialog.findChild(QLineEdit, "length")
         self.budget = self.dialog.findChild(QLineEdit, "budget")
         
-        self.arc_cost = self.dialog.findChild(QLineEdit, "arc_cost")
-        self.cost_unit = self.dialog.findChild(QLineEdit, "cost_unit")
-        self.arc_cost_2 = self.dialog.findChild(QLineEdit, "arc_cost_2")
-        self.m2bottom_cost = self.dialog.findChild(QLineEdit, "m2bottom_cost")
-        self.m3protec_cost = self.dialog.findChild(QLineEdit, "m3protec_cost")
-        self.m3exc_cost = self.dialog.findChild(QLineEdit, "m3exc_cost")
-        self.m3fill_cost = self.dialog.findChild(QLineEdit, "m3fill_cost")
-        self.m3excess_cost = self.dialog.findChild(QLineEdit, "m3excess_cost")
-        self.m2trenchl_cost = self.dialog.findChild(QLineEdit, "m2trenchl_cost")
-        self.m2pavement_cost = self.dialog.findChild(QLineEdit, "m2pavement_cost")
-        self.m2mlbottom = self.dialog.findChild(QLineEdit, "m2mlbottom")
-        self.m3mlprotec = self.dialog.findChild(QLineEdit, "m3mlprotec")
-        self.m3mlexc = self.dialog.findChild(QLineEdit, "m3mlexc")
-        self.m3mlfill = self.dialog.findChild(QLineEdit, "m3mlfill")
-        self.m3mlexcess = self.dialog.findChild(QLineEdit, "m3mlexcess")
-        self.m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl_2")
-        self.m2mlpavement = self.dialog.findChild(QLineEdit, "m2mlpavement")
-        self.base_cost = self.dialog.findChild(QLineEdit, "base_cost")
-        self.protec_cost = self.dialog.findChild(QLineEdit, "protec_cost")
-        self.exc_cost = self.dialog.findChild(QLineEdit, "exc_cost")
-        self.fill_cost = self.dialog.findChild(QLineEdit, "fill_cost")
-        self.excess_cost = self.dialog.findChild(QLineEdit, "excess_cost")
-        self.trenchl_cost = self.dialog.findChild(QLineEdit, "trenchl_cost")
-        self.pav_cost = self.dialog.findChild(QLineEdit, "pav_cost")   
-        self.cost = self.dialog.findChild(QLineEdit, "cost")     
+        arc_cost = self.dialog.findChild(QLineEdit, "arc_cost")
+        cost_unit = self.dialog.findChild(QLineEdit, "cost_unit")
+        arc_cost_2 = self.dialog.findChild(QLineEdit, "arc_cost_2")
+        m2mlbottom = self.dialog.findChild(QLineEdit, "m2mlbottom")
+        m2bottom_cost = self.dialog.findChild(QLineEdit, "m2bottom_cost")
+        m3protec_cost = self.dialog.findChild(QLineEdit, "m3protec_cost")
+        m3exc_cost = self.dialog.findChild(QLineEdit, "m3exc_cost")
+        m3fill_cost = self.dialog.findChild(QLineEdit, "m3fill_cost")
+        m3excess_cost = self.dialog.findChild(QLineEdit, "m3excess_cost")
+        m2trenchl_cost = self.dialog.findChild(QLineEdit, "m2trenchl_cost")
+        m2pavement_cost = self.dialog.findChild(QLineEdit, "m2pavement_cost")
+        m2mlbase = self.dialog.findChild(QLineEdit, "m2mlbase")
+        m3mlprotec = self.dialog.findChild(QLineEdit, "m3mlprotec")
+        m3mlexc = self.dialog.findChild(QLineEdit, "m3mlexc")
+        m3mlfill = self.dialog.findChild(QLineEdit, "m3mlfill")
+        m3mlexcess = self.dialog.findChild(QLineEdit, "m3mlexcess")
+        m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl_2")
+        m2mlpavement = self.dialog.findChild(QLineEdit, "m2mlpavement")
+        base_cost = self.dialog.findChild(QLineEdit, "base_cost")
+        protec_cost = self.dialog.findChild(QLineEdit, "protec_cost")
+        exc_cost = self.dialog.findChild(QLineEdit, "exc_cost")
+        fill_cost = self.dialog.findChild(QLineEdit, "fill_cost")
+        excess_cost = self.dialog.findChild(QLineEdit, "excess_cost")
+        trenchl_cost = self.dialog.findChild(QLineEdit, "trenchl_cost")
+        pav_cost = self.dialog.findChild(QLineEdit, "pav_cost")   
+        cost = self.dialog.findChild(QLineEdit, "cost")     
         
         
-        self.z1 = self.dialog.findChild(QLineEdit, "z1")
-        self.z2 = self.dialog.findChild(QLineEdit, "z2")
-        self.bulk = self.dialog.findChild(QLineEdit, "bulk")
-        self.bulk_2 = self.dialog.findChild(QLineEdit, "bulk_2")
-        self.bulk_3 = self.dialog.findChild(QLineEdit, "bulk_3")
-        self.geom1 = self.dialog.findChild(QLineEdit, "geom1")
-        self.b = self.dialog.findChild(QLineEdit, "b")
-        self.b_2 = self.dialog.findChild(QLineEdit, "b_2")
-        self.y_param = self.dialog.findChild(QLineEdit, "y_param")
-        self.m3mlfill_2 = self.dialog.findChild(QLineEdit, "m3mlfill_2")
-        self.m3mlexc_2 = self.dialog.findChild(QLineEdit, "m3mlexc_2")
-        self.m3mlexcess_2 = self.dialog.findChild(QLineEdit, "m3mlexcess_2")
-        self.m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl")
-        self.m2trenchl_cost_2 = self.dialog.findChild(QLineEdit, "m2trenchl_cost_2")
-        self.calculed_y = self.dialog.findChild(QLineEdit, "calculed_y")  
-        self.thickness = self.dialog.findChild(QLineEdit, "thickness")
+        z1 = self.dialog.findChild(QLineEdit, "z1")
+        z2 = self.dialog.findChild(QLineEdit, "z2")
+        bulk = self.dialog.findChild(QLineEdit, "bulk")
+        bulk_2 = self.dialog.findChild(QLineEdit, "bulk_2")
+        bulk_3 = self.dialog.findChild(QLineEdit, "bulk_3")
+        geom1 = self.dialog.findChild(QLineEdit, "geom1")
+        b = self.dialog.findChild(QLineEdit, "b")
+        b_2 = self.dialog.findChild(QLineEdit, "b_2")
+        y_param = self.dialog.findChild(QLineEdit, "y_param")
+        m3mlfill_2 = self.dialog.findChild(QLineEdit, "m3mlfill_2")
+        m3mlexc_2 = self.dialog.findChild(QLineEdit, "m3mlexc_2")
+        m3mlexcess_2 = self.dialog.findChild(QLineEdit, "m3mlexcess_2")
+        m2mltrenchl_2 = self.dialog.findChild(QLineEdit, "m2mltrenchl_2")
+        m2trenchl_cost_2 = self.dialog.findChild(QLineEdit, "m2trenchl_cost_2")
+        calculed_y = self.dialog.findChild(QLineEdit, "calculed_y")  
+        thickness = self.dialog.findChild(QLineEdit, "thickness")
+        m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl")
+        width = self.dialog.findChild(QLineEdit, "width")
+        
         
         # Get values from database        
         sql = "SELECT *"
@@ -206,48 +211,49 @@ class ManArcDialog(ParentDialog):
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
         
-        self.arc_cost.setText(row['arc_cost'])     
-        self.cost_unit.setText(row['cost_unit'])
-        self.arc_cost_2.setText(row['arc_cost'])
-        self.m2bottom_cost.setText(row['m2bottom_cost'])
-        self.m2mlbottom.setText(row['m2mlbottom']) 
-        self.m3protec_cost.setText(row['m3protec_cost']) 
-        self.m3exc_cost.setText(row['m3exc_cost']) 
-        self.m3excess_cost.setText(row['m3excess_cost']) 
-        self.m3fill_cost.setText(row['m3fill_cost']) 
-        self.m3mlexcess.setText(row['m3mlexcess']) 
-        self.m2trenchl_cost.setText(row['m2trenchl_cost']) 
-        self.m2mltrenchl.setText(row['m2mltrenchl']) 
-        self.m3mlprotec.setText(row['m3mlprotec']) 
-        self.m3mlexc.setText(row['m3mlexc']) 
-        self.m3mlfill.setText(row['m3mlfill']) 
-        self.base_cost.setText(row['base_cost']) 
-        self.protec_cost.setText(row['protec_cost']) 
-        self.exc_cost.setText(row['exc_cost']) 
-        self.fill_cost.setText(row['fill_cost']) 
-        self.excess_cost.setText(row['excess_cost']) 
-        self.trenchl_cost.setText(row['trenchl_cost']) 
-        self.pav_cost.setText(row['pav_cost'])   
-        self.cost.setText(row['cost'])  
-        self.m2pavement_cost.setText(row['m2pav_cost'])  
-        self.m2mlpavement.setText(row['m2mlpav'])  
+        arc_cost.setText(str(row['arc_cost']))
+        m2mlbottom.setText(str(row['m2mlbottom']))    
+        arc_cost_2.setText(str(row['arc_cost'])) 
+        m2bottom_cost.setText(str(row['m2bottom_cost'])) 
+        m3protec_cost.setText(str(row['m3protec_cost'])) 
+        m3exc_cost.setText(str(row['m3exc_cost'])) 
+        m3excess_cost.setText(str(row['m3excess_cost'])) 
+        m3fill_cost.setText(str(row['m3fill_cost'])) 
+        m3mlexcess.setText(str(row['m3mlexcess'])) 
+        m2trenchl_cost.setText(str(row['m2trenchl_cost'])) 
+        m2mltrenchl_2.setText(str(row['m2mltrenchl'])) 
+        m3mlprotec.setText(str(row['m3mlprotec'])) 
+        m3mlexc.setText(str(row['m3mlexc'])) 
+        m3mlfill.setText(str(row['m3mlfill'])) 
+        base_cost.setText(str(row['base_cost'])) 
+        protec_cost.setText(str(row['protec_cost'])) 
+        exc_cost.setText(str(row['exc_cost'])) 
+        fill_cost.setText(str(row['fill_cost'])) 
+        excess_cost.setText(str(row['excess_cost'])) 
+        trenchl_cost.setText(str(row['trenchl_cost'])) 
+        pav_cost.setText(str(row['pav_cost']))   
+        cost.setText(str(row['cost']))  
+        m2pavement_cost.setText(str(row['m2pav_cost']))  
+        m2mlpavement.setText(str(row['m2mlpav']))  
         
-        self.z1.setText(row['z1'])
-        self.z2.setText(row['z2'])
-        self.bulk.setText(row['bulk'])
-        self.bulk_2.setText(row['bulk'])
-        self.bulk_3.setText(row['bulk'])
-        self.geom1.setText(row['geom1'])
-        self.b.setText(row['b'])
-        self.b_2.setText(row['b'])
-        self.y_param.setText(row['y_param'])
-        self.m3mlfill_2.setText(row['m3mlfill'])
-        self.m3mlexc_2.setText(row['m3mlexc'])
-        self.m3mlexcess_2.setText(row['m3mlexcess'])
-        self.m2mltrenchl.setText(row['m2mltrenchl'])
-        self.thickness.setText(row['thickness'])
-        #self.m2trenchl_cost_2.setText(row['m2trenchl_cost'])
-        self.calculed_y.setText(row['calculed_y']) 
+        z1.setText(str(row['z1']))
+        z2.setText(str(row['z2']))
+        bulk.setText(str(row['bulk']))
+        bulk_2.setText(str(row['bulk']))
+        bulk_3.setText(str(row['bulk']))
+        #geom1.setText(str(row['geom1']))
+        b.setText(str(row['b']))
+        b_2.setText(str(row['b']))
+        y_param.setText(str(row['y_param']))
+        m3mlfill_2.setText(str(row['m3mlfill']))
+        m3mlexc_2.setText(str(row['m3mlexc']))
+        m3mlexcess_2.setText(str(row['m3mlexcess']))
+        m2mltrenchl_2.setText(str(row['m2mltrenchl']))
+        thickness.setText(str(row['thickness']))
+        #m2trenchl_cost_2.setText(str(row['m2trenchl_cost']))
+        #calculed_y.setText(str(row['calculed_y'])) 
+        m2mltrenchl.setText(str(row['m2mltrenchl']))
+        width.setText(str(row['width']))
 
 
         # Get values from database        
@@ -256,54 +262,70 @@ class ManArcDialog(ParentDialog):
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
         
-        self.length.setText(row['length'])
-        self.budget.setText(row['budget'])
+        self.length.setText(str(row['length'])) 
+        self.budget.setText(str(row['budget'])) 
         
-
+        
         # Get arccat_id and soilcat_id from v_plan_cost_arc
         sql = "SELECT arccat_id FROM "+self.schema_name+".v_plan_cost_arc WHERE arc_id = '"+self.arc_id+"'" 
         row = self.dao.get_row(sql)
         arccat_id = row[0]
 
-        sql = "SELECT soilcat_id FROM "+self.schema_name+".v_plan_cost_arc WHERE arc_id = '"+self.arc_id+"'" 
+        # Fill QLineEdit 
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'element'" 
         row = self.dao.get_row(sql)
-        soilcat_id = row[0]
+        element = row[0]
 
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm2bottom'" 
+        row = self.dao.get_row(sql)
+        m2bottom = row[0]
         
-        # Fill QLineEdit -> Arccat
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND catalog_id = '"+arccat_id+"'" 
-        rows = self.dao.get_rows(sql)
-        
-        arc_element_value = rows[0]
-        arc_bottom_value = rows[1]
-        arc_protection_value = rows[2]
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm3protec'" 
+        row = self.dao.get_row(sql)
+        m3protec = row[0]
         
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
         arc_bottom = self.dialog.findChild(QLineEdit, "arc_bottom")
         arc_protection = self.dialog.findChild(QLineEdit, "arc_protection")
         
-        arc_element.setText(arc_element_value[0])
-        arc_bottom.setText(arc_bottom_value[0])
-        arc_protection.setText(arc_protection_value[0])
+        arc_element.setText(element)
+        arc_element.setAlignment(Qt.AlignJustify)
+        arc_bottom.setText(m2bottom)
+        arc_bottom.setAlignment(Qt.AlignJustify)
+        arc_protection.setText(m3protec)
+        arc_protection.setAlignment(Qt.AlignJustify)
         
         
         # Fill QLineEdit -> Soilcat
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND catalog_id = '"+soilcat_id+"'" 
-        rows = self.dao.get_rows(sql)
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3exc'" 
+        row = self.dao.get_row(sql)
+        m3exc = row[0]
         
-        soil_excavation_value = rows[0]
-        soil_filling_value = rows[1]
-        soil_excess_value = rows[2]
-        soil_trenchlining_value = rows[3]
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3fill'" 
+        row = self.dao.get_row(sql)
+        m3fill = row[0]
+        
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3excess'" 
+        row = self.dao.get_row(sql)
+        m3excess = row[0]
+        
+        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm2trenchl'" 
+        row = self.dao.get_row(sql)
+        m2trenchl = row[0]
         
         soil_excavation = self.dialog.findChild(QLineEdit, "soil_excavation")
         soil_filling = self.dialog.findChild(QLineEdit, "soil_filling")
         soil_excess = self.dialog.findChild(QLineEdit, "soil_excess")
         soil_trenchlining = self.dialog.findChild(QLineEdit, "soil_trenchlining")
         
-        soil_excavation.setText(str(soil_excavation_value[0]))
-        soil_filling.setText(str(soil_filling_value[0]))
-        soil_excess.setText(str(soil_excess_value[0]))
-        soil_trenchlining.setText(str(soil_trenchlining_value[0]))
+        soil_excavation.setText(m3exc)
+        soil_excavation.setAlignment(Qt.AlignJustify)
+        soil_filling.setText(m3fill)
+        soil_filling.setAlignment(Qt.AlignJustify)
+        soil_excess.setText(m3excess)
+        soil_excess.setAlignment(Qt.AlignJustify)
+        soil_trenchlining.setText(m2trenchl)
+        soil_trenchlining.setAlignment(Qt.AlignJustify)
+        
         
         

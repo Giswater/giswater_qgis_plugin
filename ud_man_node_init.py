@@ -35,7 +35,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
      
 class ManNodeDialog(ParentDialog):   
     
@@ -83,7 +83,7 @@ class ManNodeDialog(ParentDialog):
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
         self.tbl_event_element = self.dialog.findChild(QTableView, "tbl_event_element") 
-        self.tbl_event_node = self.dialog.findChild(QTableView, "tbl_event_node") 
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_price_node = self.dialog.findChild(QTableView, "tbl_masterplan")
@@ -99,7 +99,7 @@ class ManNodeDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-        
+       
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
         
@@ -111,10 +111,11 @@ class ManNodeDialog(ParentDialog):
         self.set_configuration(self.tbl_document, table_element)    
         
         # Fill tab event | node
-        self.fill_tbl_event(self.tbl_event_node, self.schema_name+"."+table_event_node, self.filter)
+        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_node, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         
         # Configuration of table event | node
-        self.set_configuration(self.tbl_event_node, table_event_node)
+        self.set_configuration(self.tbl_event, table_event_node)
         
         # Fill tab scada | scada
         self.fill_tbl_hydrometer(self.tbl_scada, self.schema_name+"."+table_scada, self.filter)
@@ -153,110 +154,53 @@ class ManNodeDialog(ParentDialog):
             return
         
         if (uri_table == self.table_chamber) | (uri_table == self.table_chamber_pol) :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 0):
+            for i in xrange(10,-1,-1):
+                if (i != 0):
                     self.tab_main.removeTab(i) 
                     
         if uri_table == self.table_junction :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 1):
+            for i in xrange(10,-1,-1):
+                if (i != 1):
                     self.tab_main.removeTab(i) 
                     
         if uri_table == self.table_manhole :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 2):
+            for i in xrange(10,-1,-1):
+                if (i != 2):
                     self.tab_main.removeTab(i) 
                     
         if (uri_table == self.table_netgully) | (uri_table == self.table_netgully_pol) :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 3):
+            for i in xrange(10,-1,-1):
+                if (i != 3):
                     self.tab_main.removeTab(i) 
                     
         if uri_table == self.table_netinit :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 4):
+            for i in xrange(10,-1,-1):
+                if (i != 4):
                     self.tab_main.removeTab(i) 
                     
         if uri_table == self.table_outfall :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 5):
+            for i in xrange(10,-1,-1):
+                if (i != 5):
                     self.tab_main.removeTab(i) 
                     
         if (uri_table == self.table_storage) | (uri_table == self.table_storage_pol) :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 6):
+            for i in xrange(10,-1,-1):
+                if (i != 6):
                     self.tab_main.removeTab(i) 
                                            
         if uri_table == self.table_valve :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 7):
+            for i in xrange(10,-1,-1):
+                if (i != 7):
                     self.tab_main.removeTab(i)                       
                                         
         if uri_table == self.table_wjump :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 8):
+            for i in xrange(10,-1,-1):
+                if (i != 8):
                     self.tab_main.removeTab(i) 
                     
         if (uri_table == self.table_wwtp) | (uri_table == self.table_wwtp_pol) :
-            for i in xrange(13,-1,-1):
-                if (i != 13) & (i != 12) & (i != 11) & (i != 10) & (i != 9):
+            for i in xrange(10,-1,-1):
+                if (i != 9):
                     self.tab_main.removeTab(i) 
                     
-        
-        
-    ''' 
-    def node_group(self):
-        
-        # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
-        if len(layers) == 0:
-            return 
-        
-        # Initialize variables
-        self.layer_node = None
-        self.layer_node_man = [None for i in range(11)]
-
-        # Iterate over all layers to get the ones specified in 'db' config section
-        for cur_layer in layers:
-            (uri_schema, uri_table) = self.controller.get_layer_source(cur_layer)   #@UnusedVariable
-            if uri_table is not None:
-
-              
-                if 'v_edit_man_hydrant' in uri_table:
-                    self.layer_node_man[0] = cur_layer
-                if 'v_edit_man_junction' in uri_table:
-                    self.layer_node_man[1] = cur_layer
-                if 'v_edit_man_manhole' in uri_table:
-                    self.layer_node_man[2] = cur_layer
-                if 'v_edit_man_meter' in uri_table:
-                    self.layer_node_man[3] = cur_layer
-                if 'v_edit_man_node' in uri_table:
-                    self.layer_node_man[4] = cur_layer
-                if 'v_edit_man_pump' in uri_table:
-                    self.layer_node_man[5] = cur_layer
-                if 'v_edit_man_reduction' in uri_table:
-                    self.layer_node_man[6] = cur_layer
-                if 'v_edit_man_source' in uri_table:
-                    self.layer_node_man[7] = cur_layer
-                if 'v_edit_man_tank' in uri_table:
-                    self.layer_node_man[8] = cur_layer
-                if 'v_edit_man_valve' in uri_table:
-                    self.layer_node_man[9] = cur_layer
-                if 'v_edit_man_waterwell' in uri_table:
-                    self.layer_node_man[10] = cur_layer
-                
-                
-    
-    def node_group_result(self):
-        self.layer = self.iface.activeLayer()  
-        if self.layer in self.layer_node_man :
-            print "layer is in groupe node"
-            print self.layer
-            print self.layer.name() 
-            return self.layer
-            
-        else:
-            print "layer is not in groupe node"
-            return 0
-            
-    '''
+     

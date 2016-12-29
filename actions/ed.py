@@ -599,7 +599,6 @@ class Ed():
             elem_type = "arc"
             field_id = "arc_id"
 
-        
         # Get selected features
         features = self.layer.selectedFeatures()
         for feature in features:

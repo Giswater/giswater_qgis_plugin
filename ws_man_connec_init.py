@@ -35,7 +35,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
      
 class ManConnecDialog(ParentDialog):   
     
@@ -71,7 +71,7 @@ class ManConnecDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_info")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
-        self.tbl_event_connec = self.dialog.findChild(QTableView, "tbl_event_connec") 
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_connec") 
         self.tbl_hydrometer = self.dialog.findChild(QTableView, "tbl_hydrometer") 
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
 
@@ -98,10 +98,10 @@ class ManConnecDialog(ParentDialog):
         self.set_configuration(self.tbl_document, table_document)
         
         # Fill tab event | connec
-        self.fill_tbl_event(self.tbl_event_connec, self.schema_name+"."+table_event_connec, self.filter)
-        
+        self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_connec, self.filter)
+        self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
         # Configuration of table event | connec
-        self.set_configuration(self.tbl_event_connec, table_event_connec)
+        self.set_configuration(self.tbl_event, table_event_connec)
         
         # Fill tab hydrometer | hydrometer
         self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
