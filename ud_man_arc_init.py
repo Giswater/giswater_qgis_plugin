@@ -7,8 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import Qt, QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox,  QTextEdit,QPlainTextEdit
-
+from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox,  QTextEdit,QPlainTextEdit
+from PyQt4.QtCore import Qt
 from functools import partial
 
 import utils_giswater
@@ -184,12 +184,16 @@ class ManArcDialog(ParentDialog):
         pav_cost = self.dialog.findChild(QLineEdit, "pav_cost")   
         cost = self.dialog.findChild(QLineEdit, "cost")     
         
+        rec_y = self.dialog.findChild(QLineEdit, "rec_y")
+        total_y = self.dialog.findChild(QLineEdit, "total_y") 
+        
+        m2mlpav = self.dialog.findChild(QLineEdit, "m2mlpav") 
+        m2mlbottom_2 = self.dialog.findChild(QLineEdit, "m2mlbottom_2")    
+        
         
         z1 = self.dialog.findChild(QLineEdit, "z1")
         z2 = self.dialog.findChild(QLineEdit, "z2")
         bulk = self.dialog.findChild(QLineEdit, "bulk")
-        bulk_2 = self.dialog.findChild(QLineEdit, "bulk_2")
-        bulk_3 = self.dialog.findChild(QLineEdit, "bulk_3")
         geom1 = self.dialog.findChild(QLineEdit, "geom1")
         b = self.dialog.findChild(QLineEdit, "b")
         b_2 = self.dialog.findChild(QLineEdit, "b_2")
@@ -210,6 +214,7 @@ class ManArcDialog(ParentDialog):
         sql+= " FROM "+self.schema_name+".v_plan_cost_arc" 
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
+        
         
         arc_cost.setText(str(row['arc_cost']))
         m2mlbottom.setText(str(row['m2mlbottom']))    
@@ -236,11 +241,16 @@ class ManArcDialog(ParentDialog):
         m2pavement_cost.setText(str(row['m2pav_cost']))  
         m2mlpavement.setText(str(row['m2mlpav']))  
         
+        rec_y.setText(str(row['rec_y']))
+        total_y.setText(str(row['total_y']))
+        m2mlpav.setText(str(row['m2mlpav']))
+        m2mlbottom_2.setText(str(row['m2mlbottom']))
+        geom1.setText(str(row['geom1']))
+
+
         z1.setText(str(row['z1']))
         z2.setText(str(row['z2']))
         bulk.setText(str(row['bulk']))
-        bulk_2.setText(str(row['bulk']))
-        bulk_3.setText(str(row['bulk']))
         #geom1.setText(str(row['geom1']))
         b.setText(str(row['b']))
         b_2.setText(str(row['b']))

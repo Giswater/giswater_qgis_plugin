@@ -2829,7 +2829,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QDialogButtonBox" name="buttonBox">
+  <widget class="QDialogButtonBox" name="ok">
    <property name="geometry">
     <rect>
      <x>430</x>

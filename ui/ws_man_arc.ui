@@ -456,8 +456,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1991,8 +1991,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>560</width>
+        <height>407</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3618,7 +3618,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="calculed_y">
+      <widget class="QLineEdit" name="total_y">
        <property name="geometry">
         <rect>
          <x>468</x>
@@ -3640,7 +3640,7 @@
         <string/>
        </property>
        <property name="text">
-        <string>calculed_y+thikness</string>
+        <string>total_y</string>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -3649,7 +3649,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>19</number>
+        <number>7</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -4099,26 +4099,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="image">
-       <property name="geometry">
-        <rect>
-         <x>-100</x>
-         <y>-56</y>
-         <width>575</width>
-         <height>429</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>ws_section.png</pixmap>
-       </property>
-       <property name="scaledContents">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="rec">
+      <widget class="QLineEdit" name="rec_y">
        <property name="geometry">
         <rect>
          <x>418</x>
@@ -4140,7 +4121,7 @@
         <string/>
        </property>
        <property name="text">
-        <string>calculed_y-2*bulk-geom1-z1-z2</string>
+        <string>rec_y</string>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -4149,7 +4130,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>29</number>
+        <number>5</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -4225,25 +4206,6 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <zorder>image</zorder>
-      <zorder>m2mltrenchl_2</zorder>
-      <zorder>thickness</zorder>
-      <zorder>calculed_y</zorder>
-      <zorder>y_param</zorder>
-      <zorder>m2mlbottom_2</zorder>
-      <zorder>width</zorder>
-      <zorder>b</zorder>
-      <zorder>b_2</zorder>
-      <zorder>z2</zorder>
-      <zorder>z1</zorder>
-      <zorder>geom1</zorder>
-      <zorder>m3mlexcess_2</zorder>
-      <zorder>m3mlfill_2</zorder>
-      <zorder>m3mlexc_2</zorder>
-      <zorder>bulk</zorder>
-      <zorder>rec</zorder>
-      <zorder>label_date_event_to_2</zorder>
-      <zorder>m2mlpav</zorder>
      </widget>
     </widget>
    </widget>
