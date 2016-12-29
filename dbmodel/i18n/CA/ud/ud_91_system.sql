@@ -43,9 +43,15 @@ INSERT INTO arc_type VALUES ('FICTICI', 'VARC', 'OUTLET', 'man_varc', 'inp_outle
 
 
 -- ----------------------------
+-- Records of connec_type
+-- ----------------------------
+INSERT INTO connec_type VALUES ('ESCOMESA', 'CONNEC', 'man_connec' ,'om_visit_x_connec');
+
+
+-- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO "element_type" VALUES ('TAPA', 'event_x_cover');
-INSERT INTO "element_type" VALUES ('PAS', 'event_x_step');
-INSERT INTO "element_type" VALUES ('BOMBA', 'event_x_pump');
-INSERT INTO "element_type" VALUES ('PORTA', 'event_x_gate');
+INSERT INTO "element_type" VALUES ('TAPA', 'COVER');
+INSERT INTO "element_type" VALUES ('PATE', 'STEP');
+INSERT INTO "element_type" VALUES ('BOMBA', 'PUMP');
+INSERT INTO "element_type" VALUES ('COMPORTA', 'GATE');

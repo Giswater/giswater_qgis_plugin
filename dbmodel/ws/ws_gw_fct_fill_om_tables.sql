@@ -51,7 +51,7 @@ BEGIN
             --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture_text', 'demo_picture.png',null
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
                 ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             
@@ -77,7 +77,7 @@ BEGIN
             --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture_text', 'demo_picture.png',null
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             
@@ -103,7 +103,7 @@ BEGIN
 	    --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture_text', 'demo_picture.png',null
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
                 ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             

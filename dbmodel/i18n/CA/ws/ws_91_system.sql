@@ -49,17 +49,16 @@ INSERT INTO arc_type VALUES ('TUBERIA','PIPE','PIPE', 'man_pipe', 'inp_pipe', 'o
 -- ----------------------------
 -- Records of connec_type system table
 -- ----------------------------
-INSERT INTO connec_type VALUES ('DOMESTIC', 'DOMESTIC', 'man_wjoin', 'om_visit_x_connec');
-INSERT INTO connec_type VALUES ('BOCA_DE_REG', 'BOCA_DE_REG', 'man_greentap', 'om_visit_x_connec');
-INSERT INTO connec_type VALUES ('FONT_ORNAMENTAL', 'FONT_ORNAMENTAL', 'man_fountain', 'om_visit_x_connec');
-INSERT INTO connec_type VALUES ('FONT_PUBLICA', 'FONT_PUBLICA', 'man_tap', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('ESCOMESA', 'WJOIN', 'man_wjoin', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('BOCA_DE_REG', 'GREEN TAP', 'man_greentap', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('FONT_ORNAMENTAL', 'FOUNTAIN', 'man_fountain', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('FONT_PUBLICA', 'TAP', 'man_tap', 'om_visit_x_connec');
 
 
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO element_type VALUES ('REGISTRE', NULL);
-INSERT INTO element_type VALUES ('POU', NULL);
-INSERT INTO element_type VALUES ('TAPA', NULL);
-INSERT INTO element_type VALUES ('PAS', NULL);
-
+INSERT INTO element_type VALUES ('REGISTRE', 'REGISTER');
+INSERT INTO element_type VALUES ('POU', 'MANHOLE');
+INSERT INTO element_type VALUES ('TAPA', 'COVER');
+INSERT INTO element_type VALUES ('PATE', 'STEP');

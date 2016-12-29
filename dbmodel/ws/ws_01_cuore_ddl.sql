@@ -129,7 +129,7 @@ CONSTRAINT node_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "element_type" (
 "id" varchar(18)   NOT NULL,
-"event_table" varchar(18),
+"type" varchar(18),
 CONSTRAINT element_type_pkey PRIMARY KEY (id)
 );
 

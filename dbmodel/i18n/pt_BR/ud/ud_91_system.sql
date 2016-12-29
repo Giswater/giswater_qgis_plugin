@@ -42,11 +42,16 @@ INSERT INTO arc_type VALUES ('WACCEL', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_c
 INSERT INTO arc_type VALUES ('VARC', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', 'om_visit_x_arc');
 
 
+-- ----------------------------
+-- Records of connec_type
+-- ----------------------------
+INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec' ,'om_visit_x_connec');
+
 
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO "element_type" VALUES ('COVER', 'event_x_cover');
-INSERT INTO "element_type" VALUES ('STEP', 'event_x_step');
-INSERT INTO "element_type" VALUES ('PUMP', 'event_x_pump');
-INSERT INTO "element_type" VALUES ('GATE', 'event_x_gate');
+INSERT INTO "element_type" VALUES ('COVER', 'COVER');
+INSERT INTO "element_type" VALUES ('STEP', 'STEP');
+INSERT INTO "element_type" VALUES ('PUMP', 'PUMP');
+INSERT INTO "element_type" VALUES ('GATE', 'GATE');

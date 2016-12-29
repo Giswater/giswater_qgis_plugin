@@ -33,14 +33,6 @@ INSERT INTO "value_yesno" VALUES ('YES');
 
 
 -- ----------------------------
--- Records of connec_type
--- ----------------------------
-INSERT INTO connec_type VALUES ('DOMESTIC', NULL);
-INSERT INTO connec_type VALUES ('TRADE', NULL);
-INSERT INTO connec_type VALUES ('INDUSTRIAL', NULL);
-
-
--- ----------------------------
 -- Records of man_type_category
 -- ----------------------------
 INSERT INTO "man_type_category" VALUES ('NO CATEGORY DATA', null);

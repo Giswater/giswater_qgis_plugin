@@ -49,8 +49,8 @@ INSERT INTO arc_type VALUES ('PIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe', 'om
 -- ----------------------------
 -- Records of connec_type system table
 -- ----------------------------
-INSERT INTO connec_type VALUES ('GREEN_TAP', 'GREEN_TAP', 'man_greentap', 'om_visit_x_connec');
-INSERT INTO connec_type VALUES ('DOMESTIC', 'DOMESTIC', 'man_wjoin', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('GREEN_TAP', 'GREEN TAP', 'man_greentap', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('WJOIN', 'WJOIN', 'man_wjoin', 'om_visit_x_connec');
 INSERT INTO connec_type VALUES ('FOUNTAIN', 'FOUNTAIN', 'man_fountain', 'om_visit_x_connec');
 INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap', 'om_visit_x_connec');
 
@@ -58,8 +58,8 @@ INSERT INTO connec_type VALUES ('TAP', 'TAP', 'man_tap', 'om_visit_x_connec');
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO element_type VALUES ('REGISTER', NULL);
-INSERT INTO element_type VALUES ('MANHOLE', NULL);
-INSERT INTO element_type VALUES ('COVER', NULL);
-INSERT INTO element_type VALUES ('STEP', NULL);
+INSERT INTO element_type VALUES ('REGISTER', 'REGISTER');
+INSERT INTO element_type VALUES ('MANHOLE', 'MANHOLE');
+INSERT INTO element_type VALUES ('COVER', 'COVER');
+INSERT INTO element_type VALUES ('STEP', 'STEP');
 

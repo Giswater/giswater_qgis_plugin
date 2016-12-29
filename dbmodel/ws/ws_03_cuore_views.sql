@@ -100,7 +100,7 @@ CREATE OR REPLACE VIEW v_value_cat_node AS
  cat_node.nodetype_id,
  node_type.type
    FROM cat_node
-     JOIN node_type ON node_type.id = nodetype_id
+     JOIN node_type ON node_type.id = nodetype_id;
 
 
 CREATE OR REPLACE VIEW mataro_ws_demo.v_value_cat_connec AS 

@@ -160,9 +160,18 @@ CREATE TABLE "node_type" (
 CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE "connec_type" (
+"id" varchar(18) NOT NULL,
+"type" varchar(30),
+"man_table" varchar(30),
+"event_table" varchar(30),
+CONSTRAINT connec_type_pkey PRIMARY KEY (id)
+);
+
+
 CREATE TABLE "element_type" (
 "id" varchar(18)   NOT NULL,
-"event_table" varchar(18)   NOT NULL,
+"type" varchar(18)   NOT NULL,
 CONSTRAINT element_type_pkey PRIMARY KEY (id)
 );
 
@@ -404,11 +413,6 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "connec_type" (
-"id" varchar(18) NOT NULL,
-"observ" varchar(50),
-CONSTRAINT connec_type_pkey PRIMARY KEY (id)
-);
 
 
 -- ----------------------------
@@ -588,6 +592,7 @@ CREATE TABLE "connec" (
 "label_rotation" numeric(6,3),
 "accessibility" boolean,
 "diagonal" character varying(50),
+"connec_type" character varying(30),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 

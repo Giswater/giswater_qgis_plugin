@@ -54,16 +54,16 @@ INSERT INTO arc_type VALUES ('TUBO','PIPE','PIPE', 'man_pipe', 'inp_pipe', 'om_v
 -- ----------------------------
 -- Records of connec_type system table
 -- ----------------------------
-INSERT INTO connec_type VALUES ('DOMESTICO', 'DOMESTIC', 'man_wjoin', 'event_x_connec');
-INSERT INTO connec_type VALUES ('BOCA_DE_RIEGO', 'BOCA_DE_RIEGO', 'man_greentap', 'om_visit_x_connec');
-INSERT INTO connec_type VALUES ('FUENTE_ORNAMENTAL', 'FUENTE_ORNAMENTAL', 'man_fountain', 'om_visit_x_connec');
-INSERT INTO connec_type VALUES ('FUENTE_PUBLICA', 'FUENTE_PUBLICA', 'man_tap', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('ACOMETIDA', 'WJOIN', 'man_wjoin', 'event_x_connec');
+INSERT INTO connec_type VALUES ('BOCA_DE_RIEGO', 'GREEN TAP', 'man_greentap', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('FUENTE_ORNAMENTAL', 'FOUNTAIN', 'man_fountain', 'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('FUENTE_PUBLICA', 'TAP', 'man_tap', 'om_visit_x_connec');
 -- ----------------------------
 -- Records of element type system table
 -- ----------------------------
-INSERT INTO element_type VALUES ('REGISTRO',NULL);
-INSERT INTO element_type VALUES ('POZO', NULL);
-INSERT INTO element_type VALUES ('TAPA', NULL);
-INSERT INTO element_type VALUES ('PASO', NULL);
+INSERT INTO element_type VALUES ('REGISTRO','REGISTER');
+INSERT INTO element_type VALUES ('POZO', 'MANHOLE');
+INSERT INTO element_type VALUES ('TAPA', 'COVER');
+INSERT INTO element_type VALUES ('PATE', 'STEP');
 
 
