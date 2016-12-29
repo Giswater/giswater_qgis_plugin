@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
+    <width>601</width>
     <height>655</height>
    </rect>
   </property>
@@ -1984,7 +1984,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_8">
       <property name="geometry">
@@ -3547,7 +3547,7 @@
       <widget class="QLineEdit" name="m2mltrenchl_2">
        <property name="geometry">
         <rect>
-         <x>82</x>
+         <x>92</x>
          <y>304</y>
          <width>41</width>
          <height>15</height>
@@ -3621,9 +3621,9 @@
       <widget class="QLineEdit" name="total_y">
        <property name="geometry">
         <rect>
-         <x>468</x>
-         <y>188</y>
-         <width>101</width>
+         <x>498</x>
+         <y>184</y>
+         <width>53</width>
          <height>15</height>
         </rect>
        </property>
@@ -3640,7 +3640,7 @@
         <string/>
        </property>
        <property name="text">
-        <string>total_y</string>
+        <string/>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -3649,7 +3649,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>7</number>
+        <number>0</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -3695,8 +3695,8 @@
       <widget class="QLineEdit" name="m2mlbottom_2">
        <property name="geometry">
         <rect>
-         <x>250</x>
-         <y>392</y>
+         <x>244</x>
+         <y>386</y>
          <width>63</width>
          <height>16</height>
         </rect>
@@ -3714,7 +3714,7 @@
         <string/>
        </property>
        <property name="text">
-        <string>m2mlbottom</string>
+        <string/>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -3723,7 +3723,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>10</number>
+        <number>0</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -3954,7 +3954,7 @@
       <widget class="QLineEdit" name="m3mlexcess_2">
        <property name="geometry">
         <rect>
-         <x>82</x>
+         <x>92</x>
          <y>282</y>
          <width>41</width>
          <height>15</height>
@@ -3991,7 +3991,7 @@
       <widget class="QLineEdit" name="m3mlfill_2">
        <property name="geometry">
         <rect>
-         <x>82</x>
+         <x>92</x>
          <y>262</y>
          <width>41</width>
          <height>15</height>
@@ -4028,7 +4028,7 @@
       <widget class="QLineEdit" name="m3mlexc_2">
        <property name="geometry">
         <rect>
-         <x>82</x>
+         <x>92</x>
          <y>240</y>
          <width>41</width>
          <height>15</height>
@@ -4065,7 +4065,7 @@
       <widget class="QLineEdit" name="bulk">
        <property name="geometry">
         <rect>
-         <x>82</x>
+         <x>92</x>
          <y>206</y>
          <width>41</width>
          <height>15</height>
@@ -4102,9 +4102,9 @@
       <widget class="QLineEdit" name="rec_y">
        <property name="geometry">
         <rect>
-         <x>418</x>
+         <x>496</x>
          <y>124</y>
-         <width>139</width>
+         <width>55</width>
          <height>16</height>
         </rect>
        </property>
@@ -4121,7 +4121,7 @@
         <string/>
        </property>
        <property name="text">
-        <string>rec_y</string>
+        <string/>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -4130,43 +4130,10 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_date_event_to_2">
-       <property name="geometry">
-        <rect>
-         <x>4</x>
-         <y>0</y>
-         <width>157</width>
-         <height>33</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>Dissapeared: bulk_2, bulk_3</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="margin">
-        <number>3</number>
        </property>
       </widget>
       <widget class="QLineEdit" name="m2mlpav">
@@ -4191,7 +4158,7 @@
         <string/>
        </property>
        <property name="text">
-        <string>m2mlpav</string>
+        <string/>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -4200,10 +4167,175 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>7</number>
+        <number>0</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>300</y>
+         <width>87</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>% Trenchlinning:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>73</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>m3/ml Excess:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_4">
+       <property name="geometry">
+        <rect>
+         <x>18</x>
+         <y>258</y>
+         <width>73</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>m3/ml Filling:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_5">
+       <property name="geometry">
+        <rect>
+         <x>14</x>
+         <y>236</y>
+         <width>73</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>m3/ml Excav:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_6">
+       <property name="geometry">
+        <rect>
+         <x>54</x>
+         <y>202</y>
+         <width>39</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>bulk:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
        </property>
       </widget>
      </widget>
@@ -4224,6 +4356,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

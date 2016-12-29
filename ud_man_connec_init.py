@@ -28,6 +28,10 @@ def formOpen(dialog, layer, feature):
 
     
 def init_config():
+
+    # Manage 'connec_type'
+    connec_type = utils_giswater.getWidgetText("connec_type") 
+    utils_giswater.setSelectedItem("connec_type", connec_type)
      
     # Manage 'connecat_id'
     connecat_id = utils_giswater.getWidgetText("connecat_id") 

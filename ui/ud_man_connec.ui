@@ -35,7 +35,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -58,8 +58,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2520,25 +2520,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="cat_connectype_id">
-   <property name="geometry">
-    <rect>
-     <x>100</x>
-     <y>30</y>
-     <width>161</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>cat_connec.type</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="connec_id">
    <property name="geometry">
     <rect>
@@ -2840,6 +2821,16 @@
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="connec_type">
+   <property name="geometry">
+    <rect>
+     <x>106</x>
+     <y>30</y>
+     <width>151</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

@@ -27,6 +27,10 @@ def formOpen(dialog, layer, feature):
 
     
 def init_config():
+
+    # Manage 'connec_type'
+    connec_type = utils_giswater.getWidgetText("connec_type") 
+    utils_giswater.setSelectedItem("connec_type", connec_type)
      
     # Manage 'connecat_id'
     connecat_id = utils_giswater.getWidgetText("connecat_id") 
@@ -35,7 +39,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
      
 class ManConnecDialog(ParentDialog):   
     

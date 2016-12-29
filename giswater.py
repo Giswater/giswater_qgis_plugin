@@ -26,6 +26,7 @@ from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
 from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
+from qgis.core import QgsExpressionContextUtils
 
 
 
@@ -46,7 +47,11 @@ class Giswater(QObject):
             
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
-        self.plugin_name = os.path.basename(self.plugin_dir)   
+        self.plugin_name = os.path.basename(self.plugin_dir)
+
+		# initialize svg giswater directory
+        self.svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
+        QgsExpressionContextUtils.setProjectVariable('svg_path',self.svg_plugin_dir)   
 
         # initialize locale
         locale = QSettings().value('locale/userLocale')

@@ -29,14 +29,14 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    # Manage 'connecat_id'
+    # Manage 'arccat_id'
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
     
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)
      
 class ManArcDialog(ParentDialog):   
     
@@ -212,6 +212,7 @@ class ManArcDialog(ParentDialog):
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
 
+        cost_unit.setText(str(row['cost_unit']))
         arc_cost.setText(str(row['arc_cost']))
         m2mlbottom.setText(str(row['m2mlbottom']))    
         arc_cost_2.setText(str(row['arc_cost'])) 
