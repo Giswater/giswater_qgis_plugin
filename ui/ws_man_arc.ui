@@ -456,8 +456,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1991,8 +1991,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>407</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3547,8 +3547,8 @@
       <widget class="QLineEdit" name="m2mltrenchl_2">
        <property name="geometry">
         <rect>
-         <x>288</x>
-         <y>6</y>
+         <x>82</x>
+         <y>304</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3584,8 +3584,8 @@
       <widget class="QLineEdit" name="thickness">
        <property name="geometry">
         <rect>
-         <x>382</x>
-         <y>6</y>
+         <x>450</x>
+         <y>48</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3621,9 +3621,9 @@
       <widget class="QLineEdit" name="calculed_y">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>134</y>
-         <width>41</width>
+         <x>468</x>
+         <y>188</y>
+         <width>101</width>
          <height>15</height>
         </rect>
        </property>
@@ -3640,7 +3640,7 @@
         <string/>
        </property>
        <property name="text">
-        <string/>
+        <string>calculed_y+thikness</string>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -3649,7 +3649,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>0</number>
+        <number>19</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -3658,8 +3658,8 @@
       <widget class="QLineEdit" name="y_param">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>122</y>
+         <x>56</x>
+         <y>128</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3692,13 +3692,13 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="bulk_2">
+      <widget class="QLineEdit" name="m2mlbottom_2">
        <property name="geometry">
         <rect>
-         <x>508</x>
-         <y>198</y>
-         <width>41</width>
-         <height>15</height>
+         <x>250</x>
+         <y>392</y>
+         <width>63</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -3714,7 +3714,7 @@
         <string/>
        </property>
        <property name="text">
-        <string/>
+        <string>m2mlbottom</string>
        </property>
        <property name="frame">
         <bool>true</bool>
@@ -3723,44 +3723,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
        <property name="cursorPosition">
-        <number>0</number>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="bulk_3">
-       <property name="geometry">
-        <rect>
-         <x>510</x>
-         <y>283</y>
-         <width>41</width>
-         <height>15</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>7</pointsize>
-         <kerning>true</kerning>
-        </font>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="inputMask">
-        <string/>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="frame">
-        <bool>true</bool>
-       </property>
-       <property name="echoMode">
-        <enum>QLineEdit::Normal</enum>
-       </property>
-       <property name="cursorPosition">
-        <number>0</number>
+        <number>10</number>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -3769,8 +3732,8 @@
       <widget class="QLineEdit" name="width">
        <property name="geometry">
         <rect>
-         <x>280</x>
-         <y>360</y>
+         <x>254</x>
+         <y>350</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3806,8 +3769,8 @@
       <widget class="QLineEdit" name="b">
        <property name="geometry">
         <rect>
-         <x>406</x>
-         <y>360</y>
+         <x>380</x>
+         <y>350</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3843,8 +3806,8 @@
       <widget class="QLineEdit" name="b_2">
        <property name="geometry">
         <rect>
-         <x>152</x>
-         <y>360</y>
+         <x>128</x>
+         <y>350</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3880,8 +3843,8 @@
       <widget class="QLineEdit" name="z2">
        <property name="geometry">
         <rect>
-         <x>442</x>
-         <y>198</y>
+         <x>450</x>
+         <y>212</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3917,8 +3880,8 @@
       <widget class="QLineEdit" name="z1">
        <property name="geometry">
         <rect>
-         <x>442</x>
-         <y>310</y>
+         <x>452</x>
+         <y>320</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3954,8 +3917,8 @@
       <widget class="QLineEdit" name="geom1">
        <property name="geometry">
         <rect>
-         <x>454</x>
-         <y>250</y>
+         <x>452</x>
+         <y>264</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3991,8 +3954,8 @@
       <widget class="QLineEdit" name="m3mlexcess_2">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>254</y>
+         <x>82</x>
+         <y>282</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -4028,8 +3991,8 @@
       <widget class="QLineEdit" name="m3mlfill_2">
        <property name="geometry">
         <rect>
-         <x>32</x>
-         <y>136</y>
+         <x>82</x>
+         <y>262</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -4065,8 +4028,8 @@
       <widget class="QLineEdit" name="m3mlexc_2">
        <property name="geometry">
         <rect>
-         <x>76</x>
-         <y>214</y>
+         <x>82</x>
+         <y>240</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -4102,8 +4065,8 @@
       <widget class="QLineEdit" name="bulk">
        <property name="geometry">
         <rect>
-         <x>356</x>
-         <y>218</y>
+         <x>82</x>
+         <y>206</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -4139,10 +4102,10 @@
       <widget class="QLabel" name="image">
        <property name="geometry">
         <rect>
-         <x>18</x>
-         <y>-6</y>
-         <width>507</width>
-         <height>399</height>
+         <x>-100</x>
+         <y>-56</y>
+         <width>575</width>
+         <height>429</height>
         </rect>
        </property>
        <property name="text">
@@ -4155,22 +4118,56 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLabel" name="label_doc_to_4">
+      <widget class="QLineEdit" name="rec">
        <property name="geometry">
         <rect>
-         <x>36</x>
-         <y>120</y>
-         <width>41</width>
+         <x>418</x>
+         <y>124</y>
+         <width>139</width>
          <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>7</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="inputMask">
+        <string/>
+       </property>
+       <property name="text">
+        <string>calculed_y-2*bulk-geom1-z1-z2</string>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Normal</enum>
+       </property>
+       <property name="cursorPosition">
+        <number>29</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_2">
+       <property name="geometry">
+        <rect>
+         <x>4</x>
+         <y>0</y>
+         <width>157</width>
+         <height>33</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <pointsize>8</pointsize>
         </font>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -4179,7 +4176,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <property name="text">
-        <string>m3/m:</string>
+        <string>Dissapeared: bulk_2, bulk_3</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -4191,76 +4188,41 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_doc_to_5">
+      <widget class="QLineEdit" name="m2mlpav">
        <property name="geometry">
         <rect>
-         <x>34</x>
-         <y>238</y>
-         <width>41</width>
+         <x>254</x>
+         <y>18</y>
+         <width>51</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>8</pointsize>
+         <pointsize>7</pointsize>
+         <kerning>true</kerning>
         </font>
        </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>m3/m:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
+       <property name="autoFillBackground">
         <bool>false</bool>
        </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_doc_to_6">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>198</y>
-         <width>41</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+       <property name="inputMask">
+        <string/>
        </property>
        <property name="text">
-        <string>m3/m:</string>
+        <string>m2mlpav</string>
        </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
+       <property name="frame">
+        <bool>true</bool>
        </property>
-       <property name="scaledContents">
-        <bool>false</bool>
+       <property name="echoMode">
+        <enum>QLineEdit::Normal</enum>
        </property>
-       <property name="margin">
-        <number>3</number>
+       <property name="cursorPosition">
+        <number>7</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
       <zorder>image</zorder>
@@ -4268,8 +4230,7 @@
       <zorder>thickness</zorder>
       <zorder>calculed_y</zorder>
       <zorder>y_param</zorder>
-      <zorder>bulk_2</zorder>
-      <zorder>bulk_3</zorder>
+      <zorder>m2mlbottom_2</zorder>
       <zorder>width</zorder>
       <zorder>b</zorder>
       <zorder>b_2</zorder>
@@ -4280,9 +4241,9 @@
       <zorder>m3mlfill_2</zorder>
       <zorder>m3mlexc_2</zorder>
       <zorder>bulk</zorder>
-      <zorder>label_doc_to_4</zorder>
-      <zorder>label_doc_to_5</zorder>
-      <zorder>label_doc_to_6</zorder>
+      <zorder>rec</zorder>
+      <zorder>label_date_event_to_2</zorder>
+      <zorder>m2mlpav</zorder>
      </widget>
     </widget>
    </widget>
