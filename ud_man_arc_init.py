@@ -35,9 +35,8 @@ def init_config():
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
     
     # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)
-    
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)  
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
 
 

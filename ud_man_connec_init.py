@@ -34,10 +34,9 @@ def init_config():
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
       
     # Set button signals      
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").accepted.connect(feature_dialog.save)   
     #feature_dialog.dialog.findChild(QDialogButtonBox, "buttonBox").accepted.connect(feature_dialog.save)        
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").accepted.connect(feature_dialog.save)   
      
 class ManConnecDialog(ParentDialog):   
     
