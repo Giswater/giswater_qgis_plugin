@@ -456,8 +456,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1984,7 +1984,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_8">
       <property name="geometry">
@@ -3547,8 +3547,8 @@
       <widget class="QLineEdit" name="m2mltrenchl_2">
        <property name="geometry">
         <rect>
-         <x>92</x>
-         <y>304</y>
+         <x>106</x>
+         <y>308</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3622,9 +3622,9 @@
        <property name="geometry">
         <rect>
          <x>498</x>
-         <y>184</y>
-         <width>53</width>
-         <height>15</height>
+         <y>172</y>
+         <width>43</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -3658,8 +3658,8 @@
       <widget class="QLineEdit" name="y_param">
        <property name="geometry">
         <rect>
-         <x>56</x>
-         <y>128</y>
+         <x>76</x>
+         <y>120</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3695,9 +3695,9 @@
       <widget class="QLineEdit" name="m2mlbottom_2">
        <property name="geometry">
         <rect>
-         <x>244</x>
-         <y>386</y>
-         <width>63</width>
+         <x>258</x>
+         <y>372</y>
+         <width>49</width>
          <height>16</height>
         </rect>
        </property>
@@ -3732,10 +3732,10 @@
       <widget class="QLineEdit" name="width">
        <property name="geometry">
         <rect>
-         <x>254</x>
-         <y>350</y>
-         <width>41</width>
-         <height>15</height>
+         <x>258</x>
+         <y>346</y>
+         <width>49</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -3769,8 +3769,8 @@
       <widget class="QLineEdit" name="b">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>350</y>
+         <x>384</x>
+         <y>346</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3806,8 +3806,8 @@
       <widget class="QLineEdit" name="b_2">
        <property name="geometry">
         <rect>
-         <x>128</x>
-         <y>350</y>
+         <x>146</x>
+         <y>346</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3844,7 +3844,7 @@
        <property name="geometry">
         <rect>
          <x>450</x>
-         <y>212</y>
+         <y>198</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3881,7 +3881,7 @@
        <property name="geometry">
         <rect>
          <x>452</x>
-         <y>320</y>
+         <y>302</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3914,11 +3914,11 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLineEdit" name="geom1">
+      <widget class="QLineEdit" name="dext">
        <property name="geometry">
         <rect>
          <x>452</x>
-         <y>264</y>
+         <y>250</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3954,8 +3954,8 @@
       <widget class="QLineEdit" name="m3mlexcess_2">
        <property name="geometry">
         <rect>
-         <x>92</x>
-         <y>282</y>
+         <x>106</x>
+         <y>286</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -3991,8 +3991,8 @@
       <widget class="QLineEdit" name="m3mlfill_2">
        <property name="geometry">
         <rect>
-         <x>92</x>
-         <y>262</y>
+         <x>106</x>
+         <y>266</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -4028,8 +4028,8 @@
       <widget class="QLineEdit" name="m3mlexc_2">
        <property name="geometry">
         <rect>
-         <x>92</x>
-         <y>240</y>
+         <x>106</x>
+         <y>244</y>
          <width>41</width>
          <height>15</height>
         </rect>
@@ -4102,9 +4102,9 @@
       <widget class="QLineEdit" name="rec_y">
        <property name="geometry">
         <rect>
-         <x>496</x>
+         <x>448</x>
          <y>124</y>
-         <width>55</width>
+         <width>41</width>
          <height>16</height>
         </rect>
        </property>
@@ -4139,8 +4139,8 @@
       <widget class="QLineEdit" name="m2mlpav">
        <property name="geometry">
         <rect>
-         <x>254</x>
-         <y>18</y>
+         <x>258</x>
+         <y>4</y>
          <width>51</width>
          <height>16</height>
         </rect>
@@ -4176,8 +4176,8 @@
       <widget class="QLabel" name="label_date_event_to_2">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>300</y>
+         <x>14</x>
+         <y>304</y>
          <width>87</width>
          <height>22</height>
         </rect>
@@ -4185,6 +4185,7 @@
        <property name="font">
         <font>
          <pointsize>8</pointsize>
+         <italic>true</italic>
         </font>
        </property>
        <property name="frameShape">
@@ -4209,8 +4210,8 @@
       <widget class="QLabel" name="label_date_event_to_3">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>280</y>
+         <x>24</x>
+         <y>284</y>
          <width>73</width>
          <height>22</height>
         </rect>
@@ -4218,6 +4219,7 @@
        <property name="font">
         <font>
          <pointsize>8</pointsize>
+         <italic>true</italic>
         </font>
        </property>
        <property name="frameShape">
@@ -4242,8 +4244,8 @@
       <widget class="QLabel" name="label_date_event_to_4">
        <property name="geometry">
         <rect>
-         <x>18</x>
-         <y>258</y>
+         <x>32</x>
+         <y>262</y>
          <width>73</width>
          <height>22</height>
         </rect>
@@ -4251,6 +4253,7 @@
        <property name="font">
         <font>
          <pointsize>8</pointsize>
+         <italic>true</italic>
         </font>
        </property>
        <property name="frameShape">
@@ -4275,8 +4278,8 @@
       <widget class="QLabel" name="label_date_event_to_5">
        <property name="geometry">
         <rect>
-         <x>14</x>
-         <y>236</y>
+         <x>28</x>
+         <y>240</y>
          <width>73</width>
          <height>22</height>
         </rect>
@@ -4284,6 +4287,7 @@
        <property name="font">
         <font>
          <pointsize>8</pointsize>
+         <italic>true</italic>
         </font>
        </property>
        <property name="frameShape">
@@ -4338,6 +4342,256 @@
         <number>3</number>
        </property>
       </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>6</y>
+         <width>403</width>
+         <height>379</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>ws_section.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_8">
+       <property name="geometry">
+        <rect>
+         <x>26</x>
+         <y>178</y>
+         <width>73</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>Con. area:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_9">
+       <property name="geometry">
+        <rect>
+         <x>24</x>
+         <y>116</y>
+         <width>53</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>y_param:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="area">
+       <property name="geometry">
+        <rect>
+         <x>92</x>
+         <y>182</y>
+         <width>41</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>7</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="inputMask">
+        <string/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Normal</enum>
+       </property>
+       <property name="cursorPosition">
+        <number>0</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_11">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>326</y>
+         <width>17</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>b</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_12">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>328</y>
+         <width>17</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>b</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_date_event_to_10">
+       <property name="geometry">
+        <rect>
+         <x>266</x>
+         <y>326</y>
+         <width>53</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>width</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <zorder>label</zorder>
+      <zorder>m2mltrenchl_2</zorder>
+      <zorder>thickness</zorder>
+      <zorder>total_y</zorder>
+      <zorder>y_param</zorder>
+      <zorder>m2mlbottom_2</zorder>
+      <zorder>width</zorder>
+      <zorder>b</zorder>
+      <zorder>b_2</zorder>
+      <zorder>z2</zorder>
+      <zorder>z1</zorder>
+      <zorder>dext</zorder>
+      <zorder>m3mlexcess_2</zorder>
+      <zorder>m3mlfill_2</zorder>
+      <zorder>m3mlexc_2</zorder>
+      <zorder>bulk</zorder>
+      <zorder>rec_y</zorder>
+      <zorder>m2mlpav</zorder>
+      <zorder>label_date_event_to_2</zorder>
+      <zorder>label_date_event_to_3</zorder>
+      <zorder>label_date_event_to_4</zorder>
+      <zorder>label_date_event_to_5</zorder>
+      <zorder>label_date_event_to_6</zorder>
+      <zorder>label_date_event_to_8</zorder>
+      <zorder>label_date_event_to_9</zorder>
+      <zorder>area</zorder>
+      <zorder>label_date_event_to_11</zorder>
+      <zorder>label_date_event_to_12</zorder>
+      <zorder>label_date_event_to_10</zorder>
      </widget>
     </widget>
    </widget>
