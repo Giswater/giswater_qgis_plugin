@@ -16,6 +16,7 @@ DECLARE
 	man_table varchar;
 	new_man_table varchar;
 	old_man_table varchar;
+    connec_id_seq int8;
 
 BEGIN
 
@@ -27,6 +28,8 @@ BEGIN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
+            SELECT max(connec_id) INTO connec_id_seq FROM node WHERE connec_id ~ '^\d+$';
+            PERFORM setval('connec_id_seq',connec_id_seq,true);
             NEW.connec_id:= (SELECT nextval('connec_seq'));
         END IF;
 

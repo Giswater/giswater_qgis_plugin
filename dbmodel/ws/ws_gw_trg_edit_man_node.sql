@@ -21,6 +21,7 @@ DECLARE
     old_man_table varchar;
     old_nodetype varchar;
     new_nodetype varchar;
+    node_id_seq int8;
 
 BEGIN
 
@@ -34,6 +35,8 @@ BEGIN
     
     -- Node ID
 	IF (NEW.node_id IS NULL) THEN
+        SELECT max(node_id) INTO node_id_seq FROM node WHERE node_id ~ '^\d+$';
+        PERFORM setval('node_id_seq',node_id_seq,true);
 		NEW.node_id:= (SELECT nextval('node_id_seq'));
 	END IF;
 
