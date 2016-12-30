@@ -38,6 +38,13 @@ INSERT INTO config_ui_forms VALUES (3898, NULL, 'v_ui_element_x_connec', NULL, t
 INSERT INTO config_ui_forms VALUES (3900, NULL, 'v_ui_element_x_connec', NULL, NULL, 150, 6, NULL);
 INSERT INTO config_ui_forms VALUES (3902, NULL, 'v_ui_element_x_connec', NULL, NULL, 150, 7, NULL);
 INSERT INTO config_ui_forms VALUES (3904, NULL, 'v_ui_element_x_connec', NULL, true, 100, 8, NULL);
+INSERT INTO config_ui_forms VALUES (72110, NULL, 'v_price_x_node', NULL, NULL, NULL, 1, NULL);
+INSERT INTO config_ui_forms VALUES (72130, NULL, 'v_price_x_node', NULL, true, 30, 3, NULL);
+INSERT INTO config_ui_forms VALUES (72120, NULL, 'v_price_x_node', NULL, false, 120, 2, NULL);
+INSERT INTO config_ui_forms VALUES (72140, NULL, 'v_price_x_node', NULL, true, 300, 4, NULL);
+INSERT INTO config_ui_forms VALUES (72160, NULL, 'v_price_x_node', NULL, true, 50, 6, 'depth');
+INSERT INTO config_ui_forms VALUES (72150, NULL, 'v_price_x_node', NULL, true, 60, 5, NULL);
+INSERT INTO config_ui_forms VALUES (72170, NULL, 'v_price_x_node', NULL, true, 61, 7, NULL);
 INSERT INTO config_ui_forms VALUES (13200, NULL, 'v_ui_om_visit_x_arc', NULL, NULL, NULL, 12, NULL);
 INSERT INTO config_ui_forms VALUES (14200, NULL, 'v_ui_om_visit_x_arc', NULL, NULL, NULL, 13, NULL);
 INSERT INTO config_ui_forms VALUES (16000, NULL, 'v_ui_om_visit_x_arc', NULL, NULL, NULL, 15, NULL);
