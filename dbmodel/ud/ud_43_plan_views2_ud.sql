@@ -239,7 +239,8 @@ v_plan_ml_arc.area,
 v_plan_ml_arc.y_param,
 (v_plan_mlcost_arc.calculed_y+v_plan_ml_arc.thickness)::numeric(12,2) as total_y,
 (v_plan_mlcost_arc.calculed_y-2*v_plan_ml_arc.bulk-v_plan_ml_arc.z1-v_plan_ml_arc.z2-v_plan_ml_arc.geom1)::numeric(12,2) as rec_y,
-
+(v_plan_ml_arc.geom1+2*v_plan_ml_arc.bulk)::numeric(12,2) as geom1_ext,
+v_plan_ml_arc.bulk as bulk_bottom,
 
 v_plan_mlcost_arc.calculed_y,
 v_plan_mlcost_arc.m3mlexc,

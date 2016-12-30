@@ -243,6 +243,7 @@ v_plan_ml_arc.area,
 v_plan_ml_arc.y_param,
 (v_plan_mlcost_arc.calculed_depth+v_plan_ml_arc.thickness)::numeric(12,2) as total_y,
 (v_plan_mlcost_arc.calculed_depth-2*v_plan_ml_arc.bulk-v_plan_ml_arc.z1-v_plan_ml_arc.z2-v_plan_ml_arc.dint)::numeric(12,2) as rec_y,
+(v_plan_ml_arc.dint+2*v_plan_ml_arc.bulk)::numeric(12,2) as dext,
 
 v_plan_mlcost_arc.calculed_depth,
 v_plan_mlcost_arc.m3mlexc,
