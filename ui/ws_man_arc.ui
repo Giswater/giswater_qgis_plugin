@@ -13,38 +13,12 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLineEdit" name="arc_id">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>115</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QComboBox" name="arccat_id">
    <property name="geometry">
     <rect>
-     <x>288</x>
+     <x>148</x>
      <y>30</y>
-     <width>145</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="cat_arctype_id">
-   <property name="geometry">
-    <rect>
-     <x>142</x>
-     <y>30</y>
-     <width>131</width>
+     <width>155</width>
      <height>20</height>
     </rect>
    </property>
@@ -98,22 +72,22 @@
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>512</x>
      <y>586</y>
-     <width>51</width>
+     <width>73</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Block</string>
+    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>394</x>
      <y>586</y>
-     <width>119</width>
+     <width>107</width>
      <height>20</height>
     </rect>
    </property>
@@ -269,7 +243,7 @@
     <rect>
      <x>274</x>
      <y>586</y>
-     <width>123</width>
+     <width>109</width>
      <height>20</height>
     </rect>
    </property>
@@ -313,7 +287,7 @@
   <widget class="QLabel" name="label_arc_type">
    <property name="geometry">
     <rect>
-     <x>142</x>
+     <x>314</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -349,7 +323,7 @@
   <widget class="QLabel" name="label_arccat_id">
    <property name="geometry">
     <rect>
-     <x>288</x>
+     <x>148</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -367,7 +341,7 @@
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>Arc id:</string>
+    <string>Arc catalog:</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -433,11 +407,11 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>Feature</string>
+     <string>Pipe</string>
     </attribute>
     <widget class="QToolBox" name="toolBox_2">
      <property name="geometry">
@@ -449,15 +423,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>560</width>
+        <height>366</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1741,7 +1715,7 @@
    </widget>
    <widget class="QWidget" name="event">
     <attribute name="title">
-     <string>Event</string>
+     <string>O&amp;&amp;M</string>
     </attribute>
     <widget class="QTabWidget" name="tab_event">
      <property name="geometry">
@@ -1792,7 +1766,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event:</string>
+      <string>Parameter:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -1917,7 +1891,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event type:</string>
+      <string>Parameter type:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -1972,7 +1946,7 @@
    </widget>
    <widget class="QWidget" name="costs">
     <attribute name="title">
-     <string>Costs</string>
+     <string>Cost</string>
     </attribute>
     <widget class="QToolBox" name="toolBox_7">
      <property name="geometry">
@@ -1991,8 +1965,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>407</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4607,6 +4581,26 @@
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="arc_id">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>30</y>
+     <width>123</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="cat_arctype_id">
+   <property name="geometry">
+    <rect>
+     <x>314</x>
+     <y>30</y>
+     <width>123</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

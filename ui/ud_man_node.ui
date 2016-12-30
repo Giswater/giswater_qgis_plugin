@@ -16,9 +16,9 @@
   <widget class="QComboBox" name="node_type">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>114</x>
      <y>30</y>
-     <width>121</width>
+     <width>125</width>
      <height>20</height>
     </rect>
    </property>
@@ -31,20 +31,20 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>71</width>
+     <width>95</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>node_id</string>
+    <string/>
    </property>
   </widget>
   <widget class="QComboBox" name="epa_type">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>440</x>
      <y>30</y>
-     <width>121</width>
+     <width>137</width>
      <height>20</height>
     </rect>
    </property>
@@ -55,9 +55,9 @@
   <widget class="QComboBox" name="nodecat_id">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>250</x>
      <y>30</y>
-     <width>141</width>
+     <width>179</width>
      <height>20</height>
     </rect>
    </property>
@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -95,8 +95,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -606,8 +606,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -900,8 +900,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1434,8 +1434,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1661,8 +1661,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4331,8 +4331,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5596,15 +5596,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_45">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7114,8 +7114,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -8454,8 +8454,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -10133,8 +10133,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -11398,15 +11398,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_53">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -14798,7 +14798,7 @@
    </widget>
    <widget class="QWidget" name="tab_19">
     <attribute name="title">
-     <string>Event</string>
+     <string>O&amp;&amp;M</string>
     </attribute>
     <widget class="QTabWidget" name="tab_event">
      <property name="geometry">
@@ -14853,7 +14853,7 @@
       <rect>
        <x>296</x>
        <y>10</y>
-       <width>81</width>
+       <width>93</width>
        <height>22</height>
       </rect>
      </property>
@@ -14872,7 +14872,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event type:</string>
+      <string>Parameter type:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -14935,7 +14935,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event:</string>
+      <string>Parameter:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -15186,16 +15186,150 @@
    </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>Costs</string>
+     <string>Cost</string>
     </attribute>
     <widget class="QTableView" name="tbl_masterplan">
      <property name="geometry">
       <rect>
-       <x>12</x>
+       <x>31</x>
        <y>46</y>
-       <width>550</width>
-       <height>385</height>
+       <width>521</width>
+       <height>51</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>32</x>
+       <y>22</y>
+       <width>46</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Cost:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>36</x>
+       <y>148</y>
+       <width>46</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Detail:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>174</y>
+       <width>501</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Nodecat_id: Node catalog of the element</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>196</y>
+       <width>501</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Unit: Units of measurement (meter or unit). If meter is used calculated depth is needed</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>216</y>
+       <width>501</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Descript: Text about the price used for node</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>236</y>
+       <width>501</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Price: Amount of the price used</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>256</y>
+       <width>501</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Depth: Depth of the element. Only is used to calculate the budget if units is meter.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>276</y>
+       <width>501</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Budget: Total cost of node. If unit of measurement used is u (unit) the total budget is same as price</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
    </widget>
@@ -15239,20 +15373,20 @@
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>516</x>
      <y>560</y>
-     <width>51</width>
+     <width>77</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Block</string>
+    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_dma">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>154</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -15288,7 +15422,7 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>294</x>
      <y>560</y>
      <width>119</width>
      <height>20</height>
@@ -15298,7 +15432,7 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>294</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -15334,7 +15468,7 @@
   <widget class="QComboBox" name="dma_id">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>150</x>
      <y>560</y>
      <width>121</width>
      <height>20</height>
@@ -15372,7 +15506,7 @@
   <widget class="QLabel" name="label_nodecat_id">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>250</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -15408,7 +15542,7 @@
   <widget class="QLabel" name="label_epa_type">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>442</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -15480,7 +15614,7 @@
   <widget class="QLabel" name="label_node_type">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>112</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -15516,8 +15650,8 @@
   <widget class="QLabel" name="label_node_id_2">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>10</y>
+     <x>430</x>
+     <y>540</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -15552,14 +15686,14 @@
   <widget class="QLineEdit" name="node_id_2">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>30</y>
-     <width>71</width>
+     <x>430</x>
+     <y>560</y>
+     <width>73</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>pol_id</string>
+    <string/>
    </property>
   </widget>
   <widget class="QDialogButtonBox" name="ok">

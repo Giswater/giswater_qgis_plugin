@@ -16,14 +16,14 @@
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>512</x>
      <y>560</y>
-     <width>51</width>
+     <width>77</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Block</string>
+    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_meter_label_x_9">
@@ -67,36 +67,15 @@
     <rect>
      <x>274</x>
      <y>560</y>
-     <width>123</width>
+     <width>107</width>
      <height>20</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="connec_id">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>connec_id</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>392</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -1953,7 +1932,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
@@ -4122,7 +4101,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_13">
       <property name="geometry">
@@ -5633,7 +5612,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_5">
       <property name="geometry">
@@ -8117,7 +8096,7 @@
    </widget>
    <widget class="QWidget" name="page_event">
     <attribute name="title">
-     <string>Event</string>
+     <string>O&amp;&amp;M</string>
     </attribute>
     <widget class="QTabWidget" name="tab_event">
      <property name="geometry">
@@ -8168,7 +8147,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event:</string>
+      <string>Parameter:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -8293,7 +8272,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event type:</string>
+      <string>Parameter type:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -8369,9 +8348,9 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>392</x>
      <y>560</y>
-     <width>119</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -8379,9 +8358,9 @@
   <widget class="QComboBox" name="connec_type">
    <property name="geometry">
     <rect>
-     <x>103</x>
+     <x>124</x>
      <y>30</y>
-     <width>161</width>
+     <width>139</width>
      <height>20</height>
     </rect>
    </property>
@@ -8430,9 +8409,9 @@
   <widget class="QComboBox" name="connecat_id">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>274</x>
      <y>30</y>
-     <width>161</width>
+     <width>181</width>
      <height>20</height>
     </rect>
    </property>
@@ -8497,28 +8476,6 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="arc_id">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>474</x>
-     <y>30</y>
-     <width>111</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>false</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string>arc_id</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_connec_id">
    <property name="geometry">
     <rect>
@@ -8558,7 +8515,7 @@
   <widget class="QLabel" name="label_connec_id_2">
    <property name="geometry">
     <rect>
-     <x>103</x>
+     <x>124</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -8594,7 +8551,7 @@
   <widget class="QLabel" name="label_connec_id_3">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>274</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -8630,8 +8587,8 @@
   <widget class="QLabel" name="label_connec_id_4">
    <property name="geometry">
     <rect>
-     <x>474</x>
-     <y>10</y>
+     <x>464</x>
+     <y>12</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -8674,6 +8631,26 @@
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="connec_id">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>30</y>
+     <width>107</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="arc_id">
+   <property name="geometry">
+    <rect>
+     <x>464</x>
+     <y>30</y>
+     <width>107</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

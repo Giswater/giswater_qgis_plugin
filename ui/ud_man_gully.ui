@@ -18,30 +18,20 @@
     <rect>
      <x>290</x>
      <y>30</y>
-     <width>111</width>
+     <width>149</width>
      <height>20</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>arccat_id</string>
-    </property>
-   </item>
   </widget>
   <widget class="QComboBox" name="gratecat_id">
    <property name="geometry">
     <rect>
-     <x>103</x>
+     <x>114</x>
      <y>30</y>
      <width>161</width>
      <height>20</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>gratecat_id</string>
-    </property>
-   </item>
   </widget>
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
@@ -57,7 +47,7 @@
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>Feature</string>
+     <string>Gully</string>
     </attribute>
     <widget class="QToolBox" name="toolBox_3">
      <property name="geometry">
@@ -1588,7 +1578,7 @@
    </widget>
    <widget class="QWidget" name="tab_10">
     <attribute name="title">
-     <string>Event</string>
+     <string>O&amp;&amp;M</string>
     </attribute>
     <widget class="QLabel" name="label_event_tag">
      <property name="geometry">
@@ -1611,7 +1601,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Tag:</string>
+      <string>Parameter:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -1757,7 +1747,7 @@
       <rect>
        <x>296</x>
        <y>10</y>
-       <width>61</width>
+       <width>93</width>
        <height>22</height>
       </rect>
      </property>
@@ -1776,7 +1766,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Type:</string>
+      <string>Parameter type:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -1818,12 +1808,12 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>71</width>
+     <width>93</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>gully_id</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label_arcat_id">
@@ -1865,7 +1855,7 @@
   <widget class="QLabel" name="label_gratecat_id">
    <property name="geometry">
     <rect>
-     <x>103</x>
+     <x>114</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -1919,7 +1909,7 @@
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>Connec id:</string>
+    <string>Gully id:</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -1937,7 +1927,7 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>292</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -1973,9 +1963,9 @@
   <widget class="QComboBox" name="dma_id">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>146</x>
      <y>560</y>
-     <width>121</width>
+     <width>127</width>
      <height>20</height>
     </rect>
    </property>
@@ -2011,7 +2001,7 @@
   <widget class="QLabel" name="label_dma_id">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>146</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -2047,7 +2037,7 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>292</x>
      <y>560</y>
      <width>119</width>
      <height>20</height>
@@ -2093,20 +2083,20 @@
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
-     <x>540</x>
-     <y>560</y>
-     <width>51</width>
+     <x>512</x>
+     <y>562</y>
+     <width>81</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Block</string>
+    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="siphon">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>520</x>
      <y>30</y>
      <width>70</width>
      <height>17</height>
@@ -2119,7 +2109,7 @@
   <widget class="QCheckBox" name="groove">
    <property name="geometry">
     <rect>
-     <x>430</x>
+     <x>456</x>
      <y>30</y>
      <width>70</width>
      <height>17</height>

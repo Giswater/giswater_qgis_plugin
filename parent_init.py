@@ -368,11 +368,10 @@ class ParentDialog(object):
             row = self.dao.get_row(sql)
             # Full path= path + value from row
             self.full_path =row[0]+self.path
-            print self.full_path
             
             # Parse a URL into components
             url=urlparse.urlsplit(self.full_path)
-
+        
             # Check if path is URL
             if url.scheme=="http":
                 # If path is URL open URL in browser
@@ -385,7 +384,9 @@ class ParentDialog(object):
                    
                 else:
                     # Open the document
-                    os.startfile(self.path)   
+                    os.startfile(self.full_path)  
+        else:
+            print "file opened"            
                            
                     
     def open_selected_document_from_table(self):

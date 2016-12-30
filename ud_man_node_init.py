@@ -39,7 +39,7 @@ def init_config():
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
      
 class ManNodeDialog(ParentDialog):   
     
@@ -132,10 +132,12 @@ class ManNodeDialog(ParentDialog):
         
         # Configuration of table scada | scada value
         self.set_configuration(self.tbl_scada_value, table_scada_value)
-
         
         # Fill tab costs
         self.fill_table(self.tbl_price_node, self.schema_name+"."+table_price_node, self.filter)
+
+        # Configuration of table cost
+        self.set_configuration(self.tbl_price_node, table_price_node)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            

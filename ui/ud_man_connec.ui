@@ -35,7 +35,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -2331,7 +2331,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event:</string>
+      <string>Parameter:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -2456,7 +2456,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>Event type:</string>
+      <string>Parameter type:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -2513,7 +2513,7 @@
   <widget class="QComboBox" name="connecat_id">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>296</x>
      <y>30</y>
      <width>151</width>
      <height>20</height>
@@ -2525,31 +2525,31 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>71</width>
+     <width>113</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>connec_id</string>
+    <string/>
    </property>
   </widget>
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>512</x>
      <y>560</y>
-     <width>51</width>
+     <width>73</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Block</string>
+    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>302</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -2585,7 +2585,7 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>302</x>
      <y>560</y>
      <width>119</width>
      <height>20</height>
@@ -2650,7 +2650,7 @@
   <widget class="QComboBox" name="dma_id">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>160</x>
      <y>560</y>
      <width>121</width>
      <height>20</height>
@@ -2669,7 +2669,7 @@
   <widget class="QLabel" name="label_dma">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>160</x>
      <y>540</y>
      <width>90</width>
      <height>22</height>
@@ -2705,7 +2705,7 @@
   <widget class="QLabel" name="label_connec_type">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>134</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -2777,7 +2777,7 @@
   <widget class="QLabel" name="label_connec_type_2">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>296</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -2826,7 +2826,7 @@
   <widget class="QComboBox" name="connec_type">
    <property name="geometry">
     <rect>
-     <x>106</x>
+     <x>134</x>
      <y>30</y>
      <width>151</width>
      <height>20</height>
