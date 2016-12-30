@@ -89,7 +89,7 @@ SELECT
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'element'::text
+ 'element'::text AS identif
    FROM arc
    JOIN cat_arc ON cat_arc.id::text = arc.arccat_id
    JOIN v_price_compost ON cat_arc.cost::text = v_price_compost.id::text
@@ -101,7 +101,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm2bottom'::text
+ 'm2bottom'::text AS identif
    FROM arc
    JOIN cat_arc ON cat_arc.id::text = arc.arccat_id
    JOIN v_price_compost ON cat_arc.m2bottom_cost::text = v_price_compost.id::text
@@ -113,7 +113,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3protec'::text
+ 'm3protec'::text AS identif
    FROM arc
    JOIN cat_arc ON cat_arc.id::text = arc.arccat_id
    JOIN v_price_compost ON cat_arc.m3protec_cost::text = v_price_compost.id::text
@@ -125,7 +125,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3exc'::text
+ 'm3exc'::text AS identif
    FROM arc
    JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
    JOIN v_price_compost ON cat_soil.m3exc_cost::text = v_price_compost.id::text
@@ -137,7 +137,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3fill'::text
+ 'm3fill'::text AS identif
    FROM arc
    JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
    JOIN v_price_compost ON cat_soil.m3fill_cost::text = v_price_compost.id::text
@@ -149,7 +149,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3excess'::text
+ 'm3excess'::text AS identif
    FROM arc
    JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
    JOIN v_price_compost ON cat_soil.m3excess_cost::text = v_price_compost.id::text
@@ -161,7 +161,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm2trenchl'::text 
+ 'm2trenchl'::text AS identif
    FROM arc
    JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
    JOIN v_price_compost ON cat_soil.m2trenchl_cost::text = v_price_compost.id::text
@@ -173,7 +173,7 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'pavement'::text as identif
+ 'pavement'::text AS identif
    FROM arc
    JOIN plan_arc_x_pavement ON plan_arc_x_pavement.arc_id=arc.arc_id
    JOIN cat_pavement ON cat_pavement.id::text = plan_arc_x_pavement.pavcat_id

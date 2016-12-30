@@ -258,7 +258,7 @@ v_plan_mlcost_arc.m2pav_cost::numeric(12,2),
 v_plan_mlcost_arc.m3protec_cost::numeric(12,2),
 v_plan_mlcost_arc.m3fill_cost::numeric(12,2),
 v_plan_mlcost_arc.m3excess_cost::numeric(12,2),
-v_plan_ml_arc.cost_unit::numeric(12,2),
+v_plan_ml_arc.cost_unit,
 
 (CASE WHEN (v_plan_ml_arc.cost_unit='u'::text) THEN NULL ELSE
 (v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost) END)::numeric(12,3) 	AS pav_cost,
