@@ -230,10 +230,13 @@ class Giswater(QObject):
         self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_pgully')   
         self.table_version = self.settings.value('db/table_version', 'version') 
         
-        self.table_man_arc = self.settings.value('db/table_arc', 'v_edit_man_arc')        
-        self.table_man_node = self.settings.value('db/table_node', 'v_edit_man_node')   
-        self.table_man_connec = self.settings.value('db/table_connec', 'v_edit_man_connec')  
-        self.table_man_gully = self.settings.value('db/table_gully', 'v_edit_man_gully')   
+        #self.table_man_arc = self.settings.value('db/table_arc', 'v_edit_man_arc')        
+        #self.table_man_node = self.settings.value('db/table_node', 'v_edit_man_node')   
+
+        self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
+        self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
+        self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
+ 
         
         # Tables connec
         self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
@@ -467,7 +470,7 @@ class Giswater(QObject):
         self.layer_arc_man_WS = [None for i in range(1)]
 
         self.layer_node = None
-        self.layer_node_man_UD = [None for i in range(9)]
+        self.layer_node_man_UD = [None for i in range(10)]
         self.layer_node_man_WS = [None for i in range(11)]
 
         self.layer_connec = None
@@ -476,6 +479,9 @@ class Giswater(QObject):
 
         self.layer_gully = None
         self.layer_pgully = None
+
+        self.layer_man_gully = None
+        self.layer_man_pgully = None
         
         self.layer_version = None
 
@@ -508,6 +514,8 @@ class Giswater(QObject):
                     self.layer_node_man_UD[7] = cur_layer
                 if 'v_edit_man_valve' == uri_table:
                     self.layer_node_man_UD[8] = cur_layer
+                if 'v_edit_man_storage' == uri_table:
+                    self.layer_node_man_UD[9] = cur_layer
                       
                 # Node group from WS project
                 if 'v_edit_man_source' == uri_table:
@@ -574,6 +582,12 @@ class Giswater(QObject):
                     
                 if self.table_pgully == uri_table:
                     self.layer_pgully = cur_layer
+
+                if self.table_man_gully == uri_table:
+                    self.layer_man_gully = cur_layer
+                    
+                if self.table_man_pgully == uri_table:
+                    self.layer_man_pgully = cur_layer
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
@@ -652,7 +666,7 @@ class Giswater(QObject):
         if self.layer_node_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')       
-            for i in range(9):
+            for i in range(10):
                 if self.layer_node_man_UD[i] is not None:
                     self.layer_node_man_UD[i].editFormConfig().setUiForm(file_ui)
                     self.layer_node_man_UD[i].editFormConfig().setInitCodeSource(1)
@@ -700,8 +714,8 @@ class Giswater(QObject):
                     
                
         if self.layer_gully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_gully_init.py')       
             self.layer_gully.editFormConfig().setUiForm(file_ui) 
             self.layer_gully.editFormConfig().setInitCodeSource(1)
             self.layer_gully.editFormConfig().setInitFilePath(file_init)           
@@ -709,12 +723,30 @@ class Giswater(QObject):
         
         
         if self.layer_pgully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_pgully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_pgully_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_pgully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_pgully_init.py')       
             self.layer_pgully.editFormConfig().setUiForm(file_ui) 
             self.layer_pgully.editFormConfig().setInitCodeSource(1)
             self.layer_pgully.editFormConfig().setInitFilePath(file_init)           
-            self.layer_pgully.editFormConfig().setInitFunction('formOpen')                       
+            self.layer_pgully.editFormConfig().setInitFunction('formOpen')     
+
+
+        if self.layer_man_gully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
+            self.layer_man_gully.editFormConfig().setUiForm(file_ui) 
+            self.layer_man_gully.editFormConfig().setInitCodeSource(1)
+            self.layer_man_gully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_man_gully.editFormConfig().setInitFunction('formOpen')   
+        
+        
+        if self.layer_man_pgully is not None and self.load_custom_forms:       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_pgully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_pgully_init.py')       
+            self.layer_man_pgully.editFormConfig().setUiForm(file_ui) 
+            self.layer_man_pgully.editFormConfig().setInitCodeSource(1)
+            self.layer_man_pgully.editFormConfig().setInitFilePath(file_init)           
+            self.layer_man_pgully.editFormConfig().setInitFunction('formOpen')                    
 
             
         # Manage current layer selected     
