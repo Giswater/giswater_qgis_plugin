@@ -33,7 +33,7 @@ def init_config():
     utils_giswater.setSelectedItem("gratecat_id", gratecat_id) 
 
     # Manage 'arccat_id'
-    connecat_id = utils_giswater.getWidgetText("arccat_id") 
+    arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)    
     
     # Set button signals      
