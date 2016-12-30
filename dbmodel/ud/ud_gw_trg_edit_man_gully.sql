@@ -10,6 +10,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_gully()  RETURNS trigger 
 DECLARE 
     v_sql varchar;
 	gully_geometry varchar;
+    gully_id_seq int8;
+
 
 BEGIN
 
@@ -21,6 +23,8 @@ BEGIN
 
         -- gully ID
         IF (NEW.gully_id IS NULL) THEN
+            SELECT max(gully_id) INTO gully_id_seq FROM node WHERE gully_id ~ '^\d+$';
+            PERFORM setval('gully_id_seq',gully_id_seq,true);
             NEW.gully_id:= (SELECT nextval('gully_seq'));
         END IF;
 
@@ -56,20 +60,18 @@ BEGIN
         -- FEATURE INSERT
         IF gully_geometry = 'gully' THEN
         INSERT INTO gully (gully_id, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", rotation,dma_id, 
-					soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, link, verified, the_geom, the_geom_pol,
-					workcat_id_end,undelete,featurecat_id, feature_id,label_x, label_y,label_rotation)
+					soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, link, verified, the_geom,					workcat_id_end,undelete,featurecat_id, feature_id,label_x, label_y,label_rotation)
 					VALUES (NEW.gully_id, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
 					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                    NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, null,NEW.workcat_id_end,NEW.undelete,NEW.featurecat_id,
+                    NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end,NEW.undelete,NEW.featurecat_id,
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation);
 
         ELSIF gully_geometry = 'pgully' THEN
         INSERT INTO gully (gully_id, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, siphon, arc_id,sector_id, "state", annotation, "observ", "comment", rotation,
-                    dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, link, verified, the_geom, 
-					the_geom,workcat_id_end,undelete,featurecat_id, feature_id,label_x, label_y,label_rotation)
+                    dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, link, verified, the_geom_pol, workcat_id_end,undelete,featurecat_id, feature_id,label_x, label_y,label_rotation)
 					VALUES (NEW.gully_id, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
 					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                    NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, null, NEW.the_geom,NEW.workcat_id_end,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
+                    NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
 					NEW.label_x, NEW.label_y,NEW.label_rotation);
         END IF;    
 

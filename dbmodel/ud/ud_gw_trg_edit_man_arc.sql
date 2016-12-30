@@ -17,6 +17,7 @@ DECLARE
     v_sql varchar;
     v_sql2 varchar;
     man_table_2 varchar;
+    arc_id_seq int8;
 
 BEGIN
 
@@ -27,6 +28,8 @@ BEGIN
     IF TG_OP = 'INSERT' THEN   
 		-- Arc ID
         IF (NEW.arc_id IS NULL) THEN
+            SELECT max(arc_id) INTO arc_id_seq FROM arc WHERE arc_id ~ '^\d+$';
+            PERFORM setval('arc_id_seq',arc_id_seq,true);
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
         END IF;
 
