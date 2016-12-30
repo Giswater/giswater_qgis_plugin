@@ -40,7 +40,7 @@ def init_config():
     
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+    feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
 
 
@@ -111,7 +111,6 @@ class ManArcDialog(ParentDialog):
   
         # Fill tab costs 
         self.fill_costs()
-       
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
@@ -148,8 +147,8 @@ class ManArcDialog(ParentDialog):
             self.tab_main.removeTab(1)
             self.tab_main.removeTab(0)
          
-       
-         
+    
+    
     def fill_costs(self):
         ''' Fill tab costs '''
         
@@ -197,7 +196,7 @@ class ManArcDialog(ParentDialog):
         z1 = self.dialog.findChild(QLineEdit, "z1")
         z2 = self.dialog.findChild(QLineEdit, "z2")
         bulk = self.dialog.findChild(QLineEdit, "bulk")
-        geom1 = self.dialog.findChild(QLineEdit, "geom1")
+        #geom1 = self.dialog.findChild(QLineEdit, "geom1")
         b = self.dialog.findChild(QLineEdit, "b")
         b_2 = self.dialog.findChild(QLineEdit, "b_2")
         y_param = self.dialog.findChild(QLineEdit, "y_param")
@@ -212,12 +211,71 @@ class ManArcDialog(ParentDialog):
         width = self.dialog.findChild(QLineEdit, "width")
         
         
+        geom1_ext = self.dialog.findChild(QLineEdit, "geom1")
+        area = self.dialog.findChild(QLineEdit, "area")
+        bulk_bottom = self.dialog.findChild(QLineEdit, "bulk_bottom")
+        
+        geom1_ext.setText('None')
+        area.setText('None')
+        bulk_bottom.setText('None')
+        
+        cost_unit.setText('None')
+        arc_cost.setText('None')
+        m2mlbottom.setText('None')    
+        arc_cost_2.setText('None') 
+        m2bottom_cost.setText('None')  
+        m3protec_cost.setText('None') 
+        m3exc_cost.setText('None') 
+        m3excess_cost.setText('None')  
+        m3fill_cost.setText('None') 
+        m3mlexcess.setText('None') 
+        m2trenchl_cost.setText('None')  
+        m2mltrenchl_2.setText('None') 
+        m3mlprotec.setText('None')  
+        m3mlexc.setText('None') 
+        m3mlfill.setText('None') 
+        base_cost.setText('None') 
+        protec_cost.setText('None') 
+        exc_cost.setText('None')  
+        fill_cost.setText('None') 
+        excess_cost.setText('None') 
+        trenchl_cost.setText('None') 
+        pav_cost.setText('None')  
+        cost.setText('None')  
+        m2pavement_cost.setText('None') 
+        m2mlpavement.setText('None') 
+        
+        rec_y.setText('None') 
+        total_y.setText('None') 
+        m2mlpav.setText('None') 
+        m2mlbottom_2.setText('None') 
+        #geom1.setText('None') 
+
+
+        z1.setText('None') 
+        z2.setText('None') 
+        bulk.setText('None') 
+        #geom1.setText('None') 
+        b.setText('None') 
+        b_2.setText('None') 
+        y_param.setText('None') 
+        m3mlfill_2.setText('None') 
+        m3mlexc_2.setText('None') 
+        m3mlexcess_2.setText('None') 
+        m2mltrenchl_2.setText('None') 
+        thickness.setText('None') 
+        #m2trenchl_cost_2.setText('None') 
+        #calculed_y.setText('None') 
+        m2mltrenchl.setText('None') 
+        width.setText('None') 
+        
         # Get values from database        
         sql = "SELECT *"
         sql+= " FROM "+self.schema_name+".v_plan_cost_arc" 
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
-
+        if row is None:
+            return
         
         cost_unit.setText(str(row['cost_unit']))
         arc_cost.setText(str(row['arc_cost']))
@@ -249,7 +307,9 @@ class ManArcDialog(ParentDialog):
         total_y.setText(str(row['total_y']))
         m2mlpav.setText(str(row['m2mlpav']))
         m2mlbottom_2.setText(str(row['m2mlbottom']))
-        geom1.setText(str(row['geom1']))
+        geom1_ext.setText(str(row['geom1_ext']))
+        area.setText(str(row['area']))
+        bulk_bottom.setText(str(row['bulk_bottom']))
 
 
         z1.setText(str(row['z1']))
@@ -281,26 +341,37 @@ class ManArcDialog(ParentDialog):
         
         
         # Get arccat_id and soilcat_id from v_plan_cost_arc
+        arccat_id = None
         sql = "SELECT arccat_id FROM "+self.schema_name+".v_plan_cost_arc WHERE arc_id = '"+self.arc_id+"'" 
         row = self.dao.get_row(sql)
         arccat_id = row[0]
 
         # Fill QLineEdit 
+        element = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'element'" 
         row = self.dao.get_row(sql)
-        element = row[0]
+        if row != None:
+            element = row[0]
 
+        m2bottom = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm2bottom'" 
         row = self.dao.get_row(sql)
-        m2bottom = row[0]
+        if row != None:
+            m2bottom = row[0]
         
+        m3protec = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm3protec'" 
         row = self.dao.get_row(sql)
-        m3protec = row[0]
+        if row != None:
+            m3protec = row[0]
         
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
         arc_bottom = self.dialog.findChild(QLineEdit, "arc_bottom")
         arc_protection = self.dialog.findChild(QLineEdit, "arc_protection")
+        
+        arc_element.setText('None')
+        arc_bottom.setText('None')
+        arc_protection.setText('None')
         
         arc_element.setText(element)
         arc_element.setAlignment(Qt.AlignJustify)
@@ -311,26 +382,39 @@ class ManArcDialog(ParentDialog):
         
         
         # Fill QLineEdit -> Soilcat
+        m3exc = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3exc'" 
         row = self.dao.get_row(sql)
-        m3exc = row[0]
+        if row != None:
+            m3exc = row[0]
         
+        m3fill = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3fill'" 
         row = self.dao.get_row(sql)
-        m3fill = row[0]
+        if row != None:
+            m3fill = row[0]
         
+        m3excess = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3excess'" 
         row = self.dao.get_row(sql)
-        m3excess = row[0]
+        if row != None:
+            m3excess = row[0]
         
+        m2trenchl = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm2trenchl'" 
         row = self.dao.get_row(sql)
-        m2trenchl = row[0]
+        if row != None:
+            m2trenchl = row[0]
         
         soil_excavation = self.dialog.findChild(QLineEdit, "soil_excavation")
         soil_filling = self.dialog.findChild(QLineEdit, "soil_filling")
         soil_excess = self.dialog.findChild(QLineEdit, "soil_excess")
         soil_trenchlining = self.dialog.findChild(QLineEdit, "soil_trenchlining")
+        
+        soil_excavation.setText('None')
+        soil_filling.setText('None')
+        soil_excess.setText('None')
+        soil_trenchlining.setText('None')
         
         soil_excavation.setText(m3exc)
         soil_excavation.setAlignment(Qt.AlignJustify)
@@ -340,6 +424,4 @@ class ManArcDialog(ParentDialog):
         soil_excess.setAlignment(Qt.AlignJustify)
         soil_trenchlining.setText(m2trenchl)
         soil_trenchlining.setAlignment(Qt.AlignJustify)
-        
-        
         

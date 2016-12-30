@@ -612,14 +612,11 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
-        
+
         # Set SRID from table node
-        #self.mg.project_type 
-        #sql = "SELECT Find_SRID('"+schema_name+"', '"+self.controller.get_layer_source_table_name(self.layer_node_man[1])+"', 'the_geom');"
-        #row = self.dao.get_row(sql)
-        #if row:
-        #self.srid = row[0]   
-        self.srid = 25831
+        sql = "SELECT epsg FROM "+self.schema_name+".version order by date desc limit 1" 
+        row = self.dao.get_row(sql)
+        self.srid = row[0]
         self.settings.setValue("db/srid", self.srid)                           
         
         # Search project type in table 'version'
@@ -723,8 +720,8 @@ class Giswater(QObject):
         
         
         if self.layer_pgully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_pgully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_pgully_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
             self.layer_pgully.editFormConfig().setUiForm(file_ui) 
             self.layer_pgully.editFormConfig().setInitCodeSource(1)
             self.layer_pgully.editFormConfig().setInitFilePath(file_init)           
@@ -741,8 +738,8 @@ class Giswater(QObject):
         
         
         if self.layer_man_pgully is not None and self.load_custom_forms:       
-            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_pgully.ui')
-            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_pgully_init.py')       
+            file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_gully.ui')
+            file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_gully_init.py')       
             self.layer_man_pgully.editFormConfig().setUiForm(file_ui) 
             self.layer_man_pgully.editFormConfig().setInitCodeSource(1)
             self.layer_man_pgully.editFormConfig().setInitFilePath(file_init)           

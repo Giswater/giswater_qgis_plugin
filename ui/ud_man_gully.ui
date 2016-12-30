@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>597</width>
-    <height>590</height>
+    <height>619</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,8 +76,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -553,8 +553,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2127,6 +2127,19 @@
    </property>
    <property name="text">
     <string>Groove</string>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="ok">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>590</y>
+     <width>156</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
  </widget>
