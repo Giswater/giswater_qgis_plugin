@@ -23,8 +23,8 @@ BEGIN
 
         -- gully ID
         IF (NEW.gully_id IS NULL) THEN
-            SELECT max(gully_id) INTO gully_id_seq FROM node WHERE gully_id ~ '^\d+$';
-            PERFORM setval('gully_id_seq',gully_id_seq,true);
+            SELECT max(gully_id::integer) INTO gully_id_seq FROM gully WHERE gully_id ~ '^\d+$';
+            PERFORM setval('gully_seq',gully_id_seq,true);
             NEW.gully_id:= (SELECT nextval('gully_seq'));
         END IF;
 

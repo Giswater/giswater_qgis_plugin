@@ -20,8 +20,8 @@ BEGIN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
-            SELECT max(connec_id) INTO connec_id_seq FROM node WHERE connec_id ~ '^\d+$';
-            PERFORM setval('connec_id_seq',connec_id_seq,true);
+            SELECT max(connec_id::integer) INTO connec_id_seq FROM connec WHERE connec_id ~ '^\d+$';
+            PERFORM setval('connec_seq',connec_id_seq,true);
             NEW.connec_id:= (SELECT nextval('connec_seq'));
         END IF;
 
