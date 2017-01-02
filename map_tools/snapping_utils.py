@@ -32,14 +32,6 @@ class SnappingConfigManager():
         self.layer_connec = None        
         self.layer_node = None    
             
-        self.layer_arc_man_WS = None        
-        self.layer_connec_man_WS = None        
-        self.layer_node_man_WS = None   
-        
-        self.layer_arc_man_UD = None        
-        self.layer_connec_man_UD = None        
-        self.layer_node_man_UD = None       
-
         # Snapper
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         proj = QgsProject.instance()

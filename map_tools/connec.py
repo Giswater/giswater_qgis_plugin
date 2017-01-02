@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle
+from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QGis
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt
 from PyQt4.QtGui import QApplication, QColor
@@ -132,9 +132,6 @@ class ConnecMapTool(ParentMapTool):
             y = event.pos().y()
             eventPoint = QPoint(x, y)
 
-            # Node layer
-            layer = self.layer_connec
-
             # Not dragging, just simple selection
             if not self.dragging:
 
@@ -142,10 +139,10 @@ class ConnecMapTool(ParentMapTool):
                 (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
                 # That's the snapped point
-                #if result <> [] and (result[0].layer.name() == self.layer_connec.name()):
                 if result <> [] :
                     exist=self.snapperManager.check_connec_group(result[0].layer)
-                    if exist : 
+
+                    if exist :
                         point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                         #layer.removeSelection()
                         #layer.select([result[0].snappedAtGeometry])
@@ -285,26 +282,34 @@ class ConnecMapTool(ParentMapTool):
 
     def select_multiple_features(self, selectGeometry):
 
-        # Default choice
-        behaviour = QgsVectorLayer.SetSelection
-
-        # Modifiers
-        modifiers = QApplication.keyboardModifiers()
-
-        if modifiers == Qt.ControlModifier:
-            behaviour = QgsVectorLayer.AddToSelection
-        elif modifiers == Qt.ShiftModifier:
-            behaviour = QgsVectorLayer.RemoveFromSelection
-        '''
-        if self.layer_connec is None:
+        print "Hola"
+        if self.layer_connec_man is None:
             return
 
         # Change cursor
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
-        # Selection
-        self.layer_connec.selectByRect(selectGeometry, behaviour)
+        if QGis.QGIS_VERSION_INT >= 21600:
+
+            # Default choice
+            behaviour = QgsVectorLayer.SetSelection
+
+            # Modifiers
+            modifiers = QApplication.keyboardModifiers()
+
+            if modifiers == Qt.ControlModifier:
+                behaviour = QgsVectorLayer.AddToSelection
+            elif modifiers == Qt.ShiftModifier:
+                behaviour = QgsVectorLayer.RemoveFromSelection
+
+            # Selection for all connec group layers
+            for layer in self.layer_connec_man:
+                layer.selectByRect(selectGeometry, behaviour)
+
+        else:
+
+            for layer in self.layer_connec_man:
+                layer.select(selectGeometry, False)
 
         # Old cursor
         QApplication.restoreOverrideCursor()
-        '''
