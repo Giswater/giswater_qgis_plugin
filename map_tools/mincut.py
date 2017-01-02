@@ -21,7 +21,7 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
-from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QApplication, QColor
 
 from map_tools.parent import ParentMapTool
 
@@ -69,8 +69,10 @@ class MincutMapTool(ParentMapTool):
 
             # Check Arc or Node
             for snapPoint in result:
-                exist_node=self.snapperManager.check_node_group(snapPoint.layer)
-                exist_arc=self.snapperManager.check_node_group(snapPoint.layer)
+
+                exist_node = self.snapperManager.check_node_group(snapPoint.layer)
+                exist_arc  = self.snapperManager.check_arc_group(snapPoint.layer)
+
                 if exist_node or exist_arc:
                 #if snapPoint.layer.name() == self.layer_node.name() or snapPoint.layer.name() == self.layer_arc.name():
                     
@@ -86,9 +88,7 @@ class MincutMapTool(ParentMapTool):
                     self.snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
 
                     # Change symbol
-                    exist_node=self.snapperManager.check_node_group(snapPoint.layer)
                     if exist_node:
-                    #if snapPoint.layer.name() == self.layer_node.name():
                         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)
                     else:
                         self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)
@@ -104,10 +104,8 @@ class MincutMapTool(ParentMapTool):
             # Get selected layer type: 'arc' or 'node'
     
             if self.snapperManager.check_arc_group(self.current_layer):
-            #if self.current_layer.name() == self.layer_arc.name():
                 elem_type = 'arc'
-            elif self.snapperManager.check_arc_group(self.current_layer):
-            #elif self.current_layer.name() == self.layer_node.name():
+            elif self.snapperManager.check_node_group(self.current_layer):
                 elem_type = 'node'
             else:
                 message = "Current layer not valid"
@@ -120,44 +118,80 @@ class MincutMapTool(ParentMapTool):
             # Execute SQL function
             function_name = "gw_fct_mincut"
             sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"
+
+            # Change cursor
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+
             result = self.controller.execute_sql(sql)
             print sql
+
             if result:
                 # Get 'arc' and 'node' list and select them
-                for layer_arc in self.layer_arc_man:
-                    self.mg_flow_trace_select_features(layer_arc, 'arc')
-                for layer_node in self.layer_arc_man:
-                    self.mg_flow_trace_select_features(layer_node, 'node')
+                self.mg_mincut_select_features()
+
+            # Old cursor
+            QApplication.restoreOverrideCursor()
 
             # Refresh map canvas
             self.iface.mapCanvas().refresh()
 
 
-    def mg_flow_trace_select_features(self, layer, elem_type):
+    def mg_mincut_select_features(self):
 
-        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_"+elem_type+" ORDER BY "+elem_type+"_id"
+        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_arc ORDER BY arc_id"
         rows = self.controller.get_rows(sql)
         if rows:
     
             # Build an expression to select them
-            aux = "\""+elem_type+"_id\" IN ("
+            aux = "\"arc_id\" IN ("
             for elem in rows:
-                aux += elem[0] + ", "
+                aux += "'" + elem[0] + "', "
             aux = aux[:-2] + ")"
-    
+
             # Get a featureIterator from this expression:
             expr = QgsExpression(aux)
             if expr.hasParserError():
                 message = "Expression Error: " + str(expr.parserErrorString())
                 self.controller.show_warning(message, context_name='ui_message')
                 return
-            it = layer.getFeatures(QgsFeatureRequest(expr))
+
+            for layer_arc in self.layer_arc_man:
+
+                it = layer_arc.getFeatures(QgsFeatureRequest(expr))
     
-            # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
-    
-            # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+                # Build a list of feature id's from the previous result
+                id_list = [i.id() for i in it]
+
+                # Select features with these id's
+                layer_arc.setSelectedFeatures(id_list)
+
+        sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_node ORDER BY node_id"
+        rows = self.controller.get_rows(sql)
+        if rows:
+
+            # Build an expression to select them
+            aux = "\"node_id\" IN ("
+            for elem in rows:
+                aux += "'" + elem[0] + "', "
+            aux = aux[:-2] + ")"
+
+            # Get a featureIterator from this expression:
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message, context_name='ui_message')
+                return
+
+            for layer_node in self.layer_node_man:
+
+                it = layer_node.getFeatures(QgsFeatureRequest(expr))
+
+                # Build a list of feature id's from the previous result
+                id_list = [i.id() for i in it]
+
+                # Select features with these id's
+                layer_node.setSelectedFeatures(id_list)
+
 
 
     def activate(self):
