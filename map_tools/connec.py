@@ -282,7 +282,6 @@ class ConnecMapTool(ParentMapTool):
 
     def select_multiple_features(self, selectGeometry):
 
-        print "Hola"
         if self.layer_connec_man is None:
             return
 
