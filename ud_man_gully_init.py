@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QComboBox, QDialogButtonBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
 
 from functools import partial
 
@@ -28,14 +28,18 @@ def formOpen(dialog, layer, feature):
     
 def init_config():
      
-    # Manage 'connecat_id'
+    # Manage 'gratecat_id'
     gratecat_id = utils_giswater.getWidgetText("gratecat_id") 
-    utils_giswater.setSelectedItem("gratecat_id", gratecat_id)    
+    utils_giswater.setSelectedItem("gratecat_id", gratecat_id) 
+
+    # Manage 'arccat_id'
+    arccat_id = utils_giswater.getWidgetText("arccat_id") 
+    utils_giswater.setSelectedItem("arccat_id", arccat_id)    
     
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-
+    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)
      
 class ManGullyDialog(ParentDialog):   
     

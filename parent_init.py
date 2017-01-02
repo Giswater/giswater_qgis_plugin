@@ -358,7 +358,8 @@ class ParentDialog(object):
         
         # Check if clicked value is from the column "PATH"
         position_column = self.tbl_event.currentIndex().column()
-        if position_column == 9:      
+        print position_column
+        if position_column == 7:      
             # Get data from address in memory (pointer)
             self.path = self.tbl_event.selectedIndexes()[0].data()
 
@@ -367,11 +368,10 @@ class ParentDialog(object):
             row = self.dao.get_row(sql)
             # Full path= path + value from row
             self.full_path =row[0]+self.path
-            print self.full_path
             
             # Parse a URL into components
             url=urlparse.urlsplit(self.full_path)
-
+        
             # Check if path is URL
             if url.scheme=="http":
                 # If path is URL open URL in browser
@@ -384,7 +384,9 @@ class ParentDialog(object):
                    
                 else:
                     # Open the document
-                    os.startfile(self.path)   
+                    os.startfile(self.full_path)  
+        else:
+            print "file opened"            
                            
                     
     def open_selected_document_from_table(self):
@@ -623,6 +625,7 @@ class ParentDialog(object):
         table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         
+        print filter_
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
@@ -673,17 +676,19 @@ class ParentDialog(object):
             return
         
         # Set filter
+        
         expr = self.field_id+" = '"+self.id+"'"
-        expr += " AND date >= '"+date_from+"' AND date <= '"+date_to+"'"
+        expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
         
         # Get selected values in Comboboxes        
         event_type_value = utils_giswater.getWidgetText("event_type")
+        print event_type_value
         if event_type_value != 'null': 
-            expr+= " AND event_type = '"+event_type_value+"'"
+            expr+= " AND parameter_type = '"+event_type_value+"'"
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
-            expr+= " AND event_id = '"+event_id+"'"
-
+            expr+= " AND parameter_id = '"+event_id+"'"
+        print expr
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
@@ -725,3 +730,8 @@ class ParentDialog(object):
         widget.model().select() 
         
         
+        
+        
+
+ 
+    
