@@ -215,16 +215,12 @@ class MincutMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select a node or pipe and click on it, the valves minimum cut polygon is computed"
-            self.controller.show_info(message, context_name='ui_message' )  
+            self.controller.show_info(message, context_name='ui_message' )
+
         # Control current layer (due to QGIS bug in snapping system)
-        try:
-            
-            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                for layer_arc in self.layer_arc_man:
-                    self.canvas.setCurrentLayer(layer_arc)
-        except:
-            for layer_arc in self.layer_arc_man:
-                self.canvas.setCurrentLayer(layer_arc)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
+
 
 
     def deactivate(self):

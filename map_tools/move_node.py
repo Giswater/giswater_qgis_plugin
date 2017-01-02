@@ -50,18 +50,21 @@ class MoveNodeMapTool(ParentMapTool):
         mFillColor = QColor(255, 0, 0);
         self.rubberBand.setColor(mFillColor)
         self.rubberBand.setWidth(3)           
-        self.reset()        
+        self.reset()
 
 
     def reset(self):
                 
         # Clear selected features 
-        layer = self.canvas.currentLayer()
-        if layer is not None:
-            layer.removeSelection()     
+        # layer = self.canvas.currentLayer()
+        # if layer is not None:
+        #     layer.removeSelection()
 
         # Graphic elements
         self.rubberBand.reset()
+
+        # Selection
+        self.snappFeat = None
           
             
     def move_node(self, node_id, point):
@@ -110,7 +113,6 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Set snapping to node
         self.snapperManager.snapToNode()
-        #self.snapperManager.snapToArc()
 
         # Change pointer
         cursor = QCursor()
@@ -131,13 +133,8 @@ class MoveNodeMapTool(ParentMapTool):
             self.controller.show_info(message, context_name='ui_message' )
 
         # Control current layer (due to QGIS bug in snapping system)
-        try:
-            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                for layer_node in self.layer_node_man:
-                    self.canvas.setCurrentLayer(layer_node)
-        except:
-            for layer_node in self.layer_node_man:
-                self.canvas.setCurrentLayer(layer_node)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):
@@ -171,21 +168,20 @@ class MoveNodeMapTool(ParentMapTool):
         y = event.pos().y()
         eventPoint = QPoint(x,y)
         
-        # Node layer
-        layer = self.canvas.currentLayer()
-        if layer is None:
-            return
+        # # Node layer
+        # layer = self.canvas.currentLayer()
+        # if layer is None:
+        #     return
 
         
         # Select node or arc
-        if layer.selectedFeatureCount() == 0:
+        if self.snappFeat == None:
 
             # Snap to node
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             if result <> []:
+
                 exist = self.snapperManager.check_node_group(result[0].layer)
-            # That's the snapped point
-            #if result <> [] and (result[0].layer.name() == self.layer_node.name()):
                 if exist:
                     point = QgsPoint(result[0].snappedVertex)
     
@@ -205,11 +201,10 @@ class MoveNodeMapTool(ParentMapTool):
         else:
                 
             # Snap to arc
-            result = []
             (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
             if (result <> []) and (result[0].snappedVertexNr == -1):
-            # That's the snapped point
-            #if (result <> []) and (result[0].layer.name() == self.layer_arc.name()) and (result[0].snappedVertexNr == -1):
+
+                # That's the snapped point
                 exist = self.snapperManager.check_arc_group(result[0].layer)
                 if exist:
                     point = QgsPoint(result[0].snappedVertex)
@@ -220,9 +215,11 @@ class MoveNodeMapTool(ParentMapTool):
                     self.vertexMarker.show()
                     
                     # Select the arc
-                    for layer_arc in self.layer_arc_man:
-                        layer_arc.removeSelection()
-                        layer_arc.select([result[0].snappedAtGeometry])
+                    result[0].layer.removeSelection()
+                    result[0].layer.select([result[0].snappedAtGeometry])
+                    # for layer_arc in self.layer_arc_man:
+                    #     layer_arc.removeSelection()
+                    #     layer_arc.select([result[0].snappedAtGeometry])
     
                     # Bring the rubberband to the cursor i.e. the clicked point
                     self.rubberBand.movePoint(point)
@@ -245,30 +242,32 @@ class MoveNodeMapTool(ParentMapTool):
             eventPoint = QPoint(x,y)
 
             # Node layer
-            layer = self.canvas.currentLayer()
+            # layer = self.canvas.currentLayer()
 
             # Select node or arc
-            if layer.selectedFeatureCount() == 0:
+            if self.snappFeat == None:
 
                 # Snap to node
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
                 
                 if result <> []:
+
                     self.snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                # That's the snapped point
-                #if result <> [] and (result[0].layer.name() == self.layer_node.name()):
+
+                    # That's the snapped point
                     exist = self.snapperManager.check_node_group(result[0].layer)
                     if exist:
                         point = QgsPoint(result[0].snappedVertex)
     
-                        layer.select([result[0].snappedAtGeometry])
-                       
-            
+                        # layer.select([result[0].snappedAtGeometry])
+
                         # Hide highlight
                         self.vertexMarker.hide()
                         
                         # Set a new point to go on with
                         self.rubberBand.addPoint(point)
+
+                        # Add arc snapping
                         self.snapperManager.snapToArc()
 
             else:
@@ -276,30 +275,36 @@ class MoveNodeMapTool(ParentMapTool):
                 # Snap to arc
                 (retval,result) = self.snapper.snapToBackgroundLayers(eventPoint)   #@UnusedVariable
                 if result <> []:
-                # That's the snapped point
-                #if (result <> []) and (result[0].layer.name() == self.layer_arc.name()):
+
+                    # That's the snapped point
                     exist = self.snapperManager.check_arc_group(result[0].layer)
                     if exist:
                         point = QgsPoint(result[0].snappedVertex)
-                        # Get selected feature (at this moment it will have one and only one)           
-                        '''
-                        feature = layer.selectedFeatures()[0]
-                        node_id = feature.attribute('node_id')
-                        '''
+
+                        # Get selected feature (at this moment it will have one and only one)
                         feature = self.snappFeat
                         node_id = feature.attribute('node_id')
 
                         # Move selected node to the released point
-                        self.move_node(node_id, point)       
-                
-                
+                        self.move_node(node_id, point)
               
                     # Rubberband reset
-                    self.reset()                    
+                    self.reset()
+
+                    # No snap to arc
+                    self.snapperManager.unsnapToArc()
                 
                     # Refresh map canvas
                     self.iface.mapCanvas().refresh()               
         
         elif event.button() == Qt.RightButton:
+
+            # Reset rubber band
             self.reset()
+
+            # No snap to arc
+            self.snapperManager.unsnapToArc()
+
+            # Refresh map canvas
+            self.iface.mapCanvas().refresh()
                        

@@ -92,7 +92,7 @@ class SnappingConfigManager():
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
-    def setUnsnapToArc(self):
+    def unsnapToArc(self):
         ''' Unset snapping to Arc '''
         #QgsProject.instance().blockSignals(True)
         for layer in self.layer_arc_man:
@@ -103,7 +103,6 @@ class SnappingConfigManager():
         
     def snapToNode(self):
         ''' Set snapping to Node '''
-        print self.layer_node_man
         
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:

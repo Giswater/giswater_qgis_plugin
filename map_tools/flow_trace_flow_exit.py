@@ -108,16 +108,16 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 result = self.controller.execute_sql(sql)
                 print sql
 
-            #if result:
+            if result:
                 # Get 'arc' and 'node' list and select them
-                #self.mg_flow_trace_select_features(self.layer_arc, 'arc')
-                #self.mg_flow_trace_select_features(self.layer_node, 'node')
+                self.mg_flow_trace_select_features(self.layer_arc_man, 'arc')
+                self.mg_flow_trace_select_features(self.layer_node_man, 'node')
 
             # Refresh map canvas
             self.iface.mapCanvas().refresh()
 
 
-    def mg_flow_trace_select_features(self, layer, elem_type):
+    def mg_flow_trace_select_features(self, layer_group, elem_type):
 
         if self.index_action == '56':
             sql = "SELECT * FROM "+self.schema_name+".anl_flow_trace_"+elem_type+" ORDER BY "+elem_type+"_id"
@@ -130,7 +130,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             # Build an expression to select them
             aux = "\""+elem_type+"_id\" IN ("
             for elem in rows:
-                aux += elem[0] + ", "
+                aux += "'" + elem[0] + "', "
             aux = aux[:-2] + ")"
     
             # Get a featureIterator from this expression:
@@ -139,13 +139,17 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 message = "Expression Error: " + str(expr.parserErrorString())
                 self.controller.show_warning(message, context_name='ui_message')
                 return
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-    
-            # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
     
             # Select features with these id's
-            layer.setSelectedFeatures(id_list)
+            for layer in layer_group:
+
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+
+                # Build a list of feature id's from the previous result
+                id_list = [i.id() for i in it]
+
+                # Select features with these id's
+                layer.setSelectedFeatures(id_list)
 
 
     def activate(self):
@@ -173,14 +177,11 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 message = "Select a node and click on it, the downstream nodes are computed"
 
             self.controller.show_info(message, context_name='ui_message' )
+
         # Control current layer (due to QGIS bug in snapping system)
-        try:
-            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                for layer_node in self.layer_node_man:
-                    self.canvas.setCurrentLayer(layer_node)
-        except:
-            for layer_node in self.layer_node_man:
-                self.canvas.setCurrentLayer(layer_node)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
+
 
 
     def deactivate(self):

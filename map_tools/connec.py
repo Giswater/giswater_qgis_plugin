@@ -205,13 +205,8 @@ class ConnecMapTool(ParentMapTool):
             self.controller.show_info(message, context_name='ui_message' )  
 
         # Control current layer (due to QGIS bug in snapping system)
-        try:
-            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                for layer_connec in self.layer_connec_man:
-                    self.canvas.setCurrentLayer(layer_connec)
-        except:
-            for layer_connec in self.layer_connec_man:
-                self.canvas.setCurrentLayer(layer_connec)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):

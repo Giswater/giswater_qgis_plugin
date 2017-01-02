@@ -148,14 +148,9 @@ class DeleteNodeMapTool(ParentMapTool):
             self.controller.show_warning(message, context_name='ui_message')
                
         # Control current layer (due to QGIS bug in snapping system)
-        
-        try:
-            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                for layer in self.layer_node_man:
-                    self.canvas.setCurrentLayer(layer)
-        except:
-            for layer in self.layer_node_man:
-                self.canvas.setCurrentLayer(layer)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
+
 
     def deactivate(self):
 
