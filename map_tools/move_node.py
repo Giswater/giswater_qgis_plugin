@@ -76,7 +76,7 @@ class MoveNodeMapTool(ParentMapTool):
             self.schema_name = self.settings.value('db/schema_name')               
                    
         # Update node geometry
-        the_geom = "ST_GeomFromText('POINT("+str(point.x())+" "+str(point.y())+")', "+str(self.srid)+")";
+        the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(self.srid) + ")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
         print sql
@@ -279,7 +279,7 @@ class MoveNodeMapTool(ParentMapTool):
                     # That's the snapped point
                     exist = self.snapperManager.check_arc_group(result[0].layer)
                     if exist:
-                        point = QgsPoint(result[0].snappedVertex)
+                        point = self.toLayerCoordinates(result[0].layer, QgsPoint(result[0].snappedVertex))
 
                         # Get selected feature (at this moment it will have one and only one)
                         feature = self.snappFeat
