@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QgsRaster, QgsFeature, QgsFeatureRequest
+from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QgsRaster, QgsFeature, QgsFeatureRequest, QGis
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt, QCoreApplication
 from PyQt4.QtGui import QApplication, QColor, QAction
@@ -211,11 +211,8 @@ class ExtractRasterValue(ParentMapTool):
             self.controller.show_info(message, context_name='ui_message')  
 
         # Control current layer (due to QGIS bug in snapping system)
-        try:
-            if self.canvas.currentLayer().type() == QgsMapLayer.VectorLayer:
-                self.canvas.setCurrentLayer(self.layer_arc)
-        except:
-            self.canvas.setCurrentLayer(self.layer_arc)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):
@@ -343,25 +340,31 @@ class ExtractRasterValue(ParentMapTool):
 
     def select_multiple_features(self, selectGeometry):
 
-        # Default choice
-        behaviour = QgsVectorLayer.SetSelection
-
-        # Modifiers
-        modifiers = QApplication.keyboardModifiers()
-
-        if modifiers == Qt.ControlModifier:
-            behaviour = QgsVectorLayer.AddToSelection
-        elif modifiers == Qt.ShiftModifier:
-            behaviour = QgsVectorLayer.RemoveFromSelection
-
         if self.vectorLayer is None:
             return
 
         # Change cursor
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
-        # Selection
-        self.vectorLayer.selectByRect(selectGeometry, behaviour)
+        if QGis.QGIS_VERSION_INT >= 21600:
+
+            # Default choice
+            behaviour = QgsVectorLayer.SetSelection
+
+            # Modifiers
+            modifiers = QApplication.keyboardModifiers()
+
+            if modifiers == Qt.ControlModifier:
+                behaviour = QgsVectorLayer.AddToSelection
+            elif modifiers == Qt.ShiftModifier:
+                behaviour = QgsVectorLayer.RemoveFromSelection
+
+            # Selection
+            self.vectorLayer.selectByRect(selectGeometry, behaviour)
+
+        else:
+
+            self.vectorLayer.select(selectGeometry, False)
 
         # Old cursor
         QApplication.restoreOverrideCursor()
