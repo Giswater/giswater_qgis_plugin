@@ -54,6 +54,11 @@ BEGIN
 
         --	New arc_id
         rec_aux2.arc_id := nextval('SCHEMA_NAME.arc_id_seq');
+				
+        -- Check id
+        WHILE EXISTS(SELECT 1 FROM arc WHERE arc_id = rec_aux2.arc_id) LOOP
+                rec_aux2.arc_id := nextval('mataro_ws_demo.arc_id_seq');
+        END LOOP;
 
         --	Check longest
         IF ST_Length(line1) > ST_Length(line2) THEN
