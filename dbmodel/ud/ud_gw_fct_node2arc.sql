@@ -52,6 +52,7 @@ BEGIN
 --  Move valves to arc
     RAISE NOTICE 'Start loop.';
 
+/*
     
     FOR node_id_aux IN (SELECT node_id FROM SCHEMA_NAME.inp_valve UNION SELECT node_id FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id FROM SCHEMA_NAME.inp_pump)
     LOOP
@@ -219,6 +220,8 @@ BEGIN
 
     END LOOP;
 
+*/
+	
     RETURN 1;
 	
 --	RETURN SCHEMA_NAME.audit_function(0,90);
