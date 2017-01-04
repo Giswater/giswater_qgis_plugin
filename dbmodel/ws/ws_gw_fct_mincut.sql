@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut(character varying, character varying);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS
+$BODY$
 DECLARE
     node_1_aux		text;
     node_2_aux		text;
@@ -32,24 +33,24 @@ BEGIN
     IF type_element_arg = 'arc' THEN
 
         -- Check an existing arc
-        SELECT COUNT(*) INTO controlValue FROM arc WHERE arc_id = element_id_arg;
+        SELECT COUNT(*) INTO controlValue FROM v_anl_arc WHERE arc_id = element_id_arg;
         IF controlValue = 1 THEN
 
             -- Select public.geometry
-            SELECT the_geom INTO arc_aux FROM arc WHERE arc_id = element_id_arg;
+            SELECT the_geom INTO arc_aux FROM v_anl_arc WHERE arc_id = element_id_arg;
 
             -- Insert arc id
             INSERT INTO "anl_mincut_arc" VALUES(element_id_arg, arc_aux);
         
             -- Run for extremes node
-            SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM arc WHERE arc_id = element_id_arg;
+            SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_anl_arc WHERE arc_id = element_id_arg;
 
             -- Check extreme being a valve
             SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_1_aux AND (acessibility = TRUE) AND (broken  = FALSE);
             IF controlValue = 1 THEN
 
                 -- Select public.geometry
-                SELECT the_geom INTO node_aux FROM node WHERE node_id = node_1_aux;
+                SELECT the_geom INTO node_aux FROM v_anl_node WHERE node_id = node_1_aux;
 
                 -- Insert valve id
                 INSERT INTO anl_mincut_valve VALUES(node_1_aux, node_aux);
@@ -73,7 +74,7 @@ BEGIN
                 IF NOT FOUND THEN
 
                     -- Select public.geometry
-                    SELECT the_geom INTO node_aux FROM node WHERE node_id = node_2_aux;
+                    SELECT the_geom INTO node_aux FROM v_anl_node WHERE node_id = node_2_aux;
 
                     -- Insert valve id
                     INSERT INTO anl_mincut_valve VALUES(node_2_aux, node_aux);
@@ -96,7 +97,7 @@ BEGIN
     ELSE
 
         -- Check an existing node
-        SELECT COUNT(*) INTO controlValue FROM node WHERE node_id = element_id_arg;
+        SELECT COUNT(*) INTO controlValue FROM v_anl_node WHERE node_id = element_id_arg;
         IF controlValue = 1 THEN
 
             -- Compute the tributary area using DFS
@@ -114,7 +115,7 @@ BEGIN
     polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_arc)), 0.80));
 
     -- Concave hull for not included lines
-    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM arc WHERE arc_id NOT IN (SELECT a.arc_id FROM anl_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 10, 'join=mitre mitre_limit=1.0'));
+    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM v_anl_arc WHERE arc_id NOT IN (SELECT a.arc_id FROM anl_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 1, 'join=mitre mitre_limit=1.0'));
 
     --RAISE EXCEPTION 'Polygon = %', polygon_aux2;
 
@@ -129,10 +130,16 @@ BEGIN
     DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
 
+   UPDATE man_valve set mincut_anl=true;
+   UPDATE man_valve set mincut_anl=false where node_id in(select valve_id from anl_mincut_valve);
+
+   PERFORM gw_fct_valveanalytics();
+    
     -- Insert into result catalog tables
-    PERFORM gw_fct_mincut_result_catalog();
+    -- PERFORM gw_fct_mincut_result_catalog();
 
     RETURN audit_function(0,310);
+
 
 END;
 $BODY$

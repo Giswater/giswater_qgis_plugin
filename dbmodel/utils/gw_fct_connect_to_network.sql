@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_connect_to_network(connec_array varchar[]) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(connec_array character varying[]) RETURNS void AS $BODY$
 DECLARE
     connec_id_aux  varchar;
     arc_geom       public.geometry;
@@ -40,12 +40,12 @@ BEGIN
             -- Improved version for curved lines (not perfect!)
             WITH index_query AS
             (
-                SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM arc ORDER BY the_geom <-> connect_geom LIMIT 10
+                SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM v_man_arc ORDER BY the_geom <-> connect_geom LIMIT 10
             )
             SELECT arc_id INTO arc_id_aux FROM index_query ORDER BY d limit 1;
             
-            -- Get arc geometry
-            SELECT the_geom INTO arc_geom FROM arc WHERE arc_id = arc_id_aux;
+            -- Get v_man_arc geometry
+            SELECT the_geom INTO arc_geom FROM v_man_arc WHERE arc_id = arc_id_aux;
 
             -- Compute link
             IF arc_geom IS NOT NULL THEN

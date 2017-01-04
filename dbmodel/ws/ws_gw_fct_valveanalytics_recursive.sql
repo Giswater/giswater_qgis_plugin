@@ -6,7 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_valveanalytics_recursive(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_valveanalytics_recursive(node_id_arg character varying) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_valveanalytics_recursive(node_id_arg character varying) CREATE OR REPLACE FUNCTION mataro_ws_demo.gw_fct_valveanalytics_recursive(node_id_arg character varying)
+  RETURNS void AS
+$BODY$
 DECLARE
     exists_id      character varying;
     rec_table      record;
@@ -17,16 +19,16 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "mataro_ws_demo", public;
 
-    -- Get node public.geometry
-    SELECT the_geom INTO node_aux FROM node WHERE node_id = node_id_arg;
+    -- Get  v_anl_node public.geometry
+    SELECT the_geom INTO node_aux FROM  v_anl_node WHERE node_id = node_id_arg;
 
-    -- Check node being a valve
-    SELECT node_id INTO exists_id FROM v_edit_valve WHERE node_id = node_id_arg AND (opened = FALSE);
+    -- Check  v_anl_node being a valve
+    SELECT node_id INTO exists_id FROM v_edit_man_valve WHERE node_id = node_id_arg AND (valve_mincut_anl IS FALSE);
     IF FOUND THEN    
 
-        -- Check if the node is already computed
+        -- Check if the  v_anl_node is already computed
         SELECT valve_id INTO exists_id FROM anl_mincut_valve WHERE valve_id = node_id_arg;
 
         -- Compute proceed
@@ -39,7 +41,7 @@ BEGIN
 
     ELSE
 
-        -- Check if the node is already computed
+        -- Check if the  v_anl_node is already computed
         SELECT node_id INTO exists_id FROM anl_mincut_node WHERE node_id = node_id_arg;
 
         -- Compute proceed
@@ -93,4 +95,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

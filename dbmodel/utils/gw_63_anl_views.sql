@@ -14,6 +14,7 @@ SELECT
 arc_id,
 node_1,
 node_2,
+epa_type,
 the_geom
 FROM arc
 JOIN anl_selector_state ON arc.state=anl_selector_state.id
@@ -23,6 +24,7 @@ DROP VIEW IF EXISTS v_anl_node CASCADE;
 CREATE VIEW v_anl_node AS 
 SELECT
 node_id,
+epa_type,
 the_geom
 FROM node
 JOIN anl_selector_state ON node.state=anl_selector_state.id

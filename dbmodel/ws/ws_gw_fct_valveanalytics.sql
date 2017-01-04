@@ -6,7 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_valveanalytics();
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_valveanalytics() RETURNS "pg_catalog"."int4" AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_valveanalytics() RETURNS integer AS
+$BODY$
 DECLARE
     exists_id      text;
     polygon_aux    public.geometry;
@@ -18,7 +19,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "mataro_ws_demo", public;
 
     DELETE FROM "anl_mincut_node";
     DELETE FROM "anl_mincut_arc";
@@ -27,7 +28,7 @@ BEGIN
 
 
     -- Loop for all the inlet nodes
-    FOR rec_table IN SELECT node_id, the_geom FROM node WHERE epa_type = 'TANK' OR epa_type = 'RESERVOIR'
+    FOR rec_table IN SELECT node_id, the_geom FROM  v_anl_node  WHERE epa_type = 'TANK' OR epa_type = 'RESERVOIR'
     LOOP
 
         -- Insert into tables
@@ -40,7 +41,7 @@ BEGIN
 
     -- Switch selection of node
     first_row = TRUE;
-    FOR rec_table IN SELECT node_id, the_geom FROM node WHERE node_id NOT IN (SELECT node_id FROM anl_mincut_node)
+    FOR rec_table IN SELECT node_id, the_geom FROM  v_anl_node  WHERE node_id NOT IN (SELECT node_id FROM anl_mincut_node)
     LOOP
     
         -- Delete old
@@ -54,7 +55,7 @@ BEGIN
 
     -- Switch selection of arc
     first_row = TRUE;
-    FOR rec_table IN SELECT arc_id, the_geom FROM arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_mincut_arc)
+    FOR rec_table IN SELECT arc_id, the_geom FROM  v_anl_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_mincut_arc)
     LOOP
 
         -- Delete old
@@ -71,8 +72,10 @@ BEGIN
     polygon_aux := ST_Multi(ST_ConcaveHull(ST_Collect(ARRAY(SELECT the_geom FROM anl_mincut_arc)), 0.80));
 
     -- Concave hull for not included lines
-    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM arc WHERE arc_id NOT IN (SELECT a.arc_id FROM anl_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 10, 'join=mitre mitre_limit=1.0'));
-    
+    polygon_aux2 := ST_Multi(ST_Buffer(ST_Collect(ARRAY(SELECT the_geom FROM  v_anl_arc WHERE arc_id NOT IN (SELECT a.arc_id FROM anl_mincut_arc AS a) AND ST_Intersects(the_geom, polygon_aux))), 1, 'join=mitre mitre_limit=1.0'));
+
+    --RAISE EXCEPTION 'Polygon = %', polygon_aux2;
+
     -- Substract
     IF polygon_aux2 IS NOT NULL THEN
         polygon_aux := ST_Multi(ST_Difference(polygon_aux, polygon_aux2));
@@ -83,6 +86,9 @@ BEGIN
     -- Insert into polygon table
     DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
+
+    --Insert into result catalog tables
+    PERFORM gw_fct_mincut_result_catalog();
 
     RETURN audit_function(0,320);
 
