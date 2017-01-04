@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ES">
+<TS version="2.0" language="CA">
 
 
 <context>
@@ -79,15 +79,15 @@
     </message>   
     <message>
         <source>16_text</source>
-        <translation>Move unconnected node to split a pipe</translation>
+        <translation>Moure node  partint arc</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Delete node in pipe midpoint</translation>
+        <translation>Esborrar node dins arc</translation>
     </message>      
     <message>
         <source>18_text</source>
-        <translation>Capture raster elevation</translation>
+        <translation>Capturar cota raster</translation>
     </message>      
     <message>
         <source>19_text</source>
@@ -95,11 +95,11 @@
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Connec tool</translation>
+        <translation>Escomeses</translation>
     </message>      
     <message>
         <source>21_text</source>
-        <translation>Import CSV</translation>
+        <translation>Importar CSV</translation>
     </message>      
     <message>
         <source>22_text</source>
@@ -115,23 +115,23 @@
     </message>      
     <message>
         <source>25_text</source>
-        <translation>Result selector</translation>
+        <translation>Selector resultats</translation>
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Arc/Node minimum cut</translation>
+        <translation>Tancament</translation>
     </message>
     <message>
         <source>27_text</source>
-        <translation>Valves configuration analysis</translation>
+        <translation>Ajust de tancament</translation>
     </message>
     <message>
         <source>56_text</source>
-        <translation>Select upstream nodes</translation>
+        <translation>Anàlisis aigües amunt</translation>
     </message>
     <message>
         <source>57_text</source>
-        <translation>Select downstream nodes</translation>
+        <translation>Anàlisis aigües avall</translation>
     </message>
     <message>
         <source>28_text</source>
@@ -147,19 +147,19 @@
     </message> 
     <message>
         <source>32_text</source>
-        <translation>Search plus</translation>
+        <translation>Cercador</translation>
     </message> 
     <message>
         <source>33_text</source>
-        <translation>Add element</translation>
+        <translation>Afegir element</translation>
     </message> 
     <message>
         <source>34_text</source>
-        <translation>Add file</translation>
+        <translation>Afegir fitxer</translation>
     </message> 
     <message>
         <source>35_text</source>
-        <translation>Event</translation>
+        <translation>Afegir event</translation>
     </message>
 	<message>
         <source>36_text</source>
@@ -171,7 +171,7 @@
     </message>    	
 	<message>
         <source>99_text</source>
-        <translation>Project configuration</translation>
+        <translation>Configuració</translation>
     </message>   
     
 	<message>
