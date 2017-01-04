@@ -17,7 +17,7 @@ INSERT INTO node_type VALUES ('AIR VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'in
 INSERT INTO node_type VALUES ('PR-REDUC.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('LUVE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('GREEN VALVE', 'VALVE', 'JUNCTION', 'man_valve', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('FLOW METER', 'MEASURE INSTRUMENT', 'SHORTPIPE', 'man_meter', 'inp_pipe', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('FLOW METER', 'MEASURE INSTRUMENT', 'SHORTPIPE', 'man_meter', 'inp_shortpipe', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('CURVE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('FILTER', 'FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ENDLINE', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
@@ -30,7 +30,7 @@ INSERT INTO node_type VALUES ('JUNCTION', 'JUNCTION', 'JUNCTION', 'man_junction'
 INSERT INTO node_type VALUES ('PRESSURE METER', 'MEASURE INSTRUMENT', 'JUNCTION', 'man_meter', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('PR-SUSTA.VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('SHUTOFF VALVE', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('REDUCTION', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('REDUCTION', 'REDUCTION', 'JUNCTION', 'man_reduction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('PUMP STATION', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('TANK', 'TANK', 'TANK', 'man_tank', 'inp_tank', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('THROTTLE VALVE', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
@@ -38,7 +38,9 @@ INSERT INTO node_type VALUES ('T', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_
 INSERT INTO node_type VALUES ('WATERWELL', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('TAP', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction,', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('X', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('SOURCE', 'JUNCTION', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('SOURCE', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('MANHOLE', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', 'om_visit_x_node');
+
 
 -- ----------------------------
 -- Records of arc type system table

@@ -17,7 +17,7 @@ INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,fals
 -- Records of node type system table
 -- ----------------------------
 INSERT INTO node_type VALUES ('CURVA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('REDUCCION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('REDUCCION','REDUCTION','JUNCTION', 'man_reduction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('LUVE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ADAPTACION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('UNION','JUNCTION','JUNCTION', 'man_junction',  'inp_junction', 'om_visit_x_node');
@@ -41,9 +41,9 @@ INSERT INTO node_type VALUES ('VALVULA DE MARIPOSA','VALVE', 'VALVE', 'man_valve
 INSERT INTO node_type VALUES ('GEN-PURP.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ESTACION DE BOMBAMIENTO','PUMP', 'PUMP', 'man_pump', 'inp_pump', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('FILTRO','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe','om_visit_x_node');
-INSERT INTO node_type VALUES ('CAUDALIMETRO','MEASURE INSTRUMENT', 'PIPE', 'man_meter', 'inp_pipe', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('POZO', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('CAPTACION', 'JUNCTION', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CAUDALIMETRO','MEASURE INSTRUMENT', 'SHORTPIPE', 'man_meter', 'inp_shrtpipe', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('POZO', 'JUNCTION', 'JUNCTION', 'man_manhole', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CAPTACION', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
 
 -- ----------------------------
 -- Records of arc type system table

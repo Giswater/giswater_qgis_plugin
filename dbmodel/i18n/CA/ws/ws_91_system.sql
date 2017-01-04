@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of node type system table
 -- ----------------------------
 INSERT INTO node_type VALUES ('CORBA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('REDUCCIO','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('REDUCCIO','REDUCTION','JUNCTION', 'man_reduction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('LUVE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ADAPTACIO','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('UNIO','JUNCTION','JUNCTION', 'man_junction',  'inp_junction', 'om_visit_x_node');
@@ -36,9 +36,9 @@ INSERT INTO node_type VALUES ('VALVULA PAPALLONA','VALVE', 'VALVE', 'man_valve',
 INSERT INTO node_type VALUES ('GEN-PURP.VALVE','VALVE', 'VALVE', 'man_valve', 'inp_valve', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('EBAP','PUMP', 'PUMP', 'man_pump', 'inp_pump', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('FILTRE','FILTER', 'SHORTPIPE', 'man_filter', 'inp_shortpipe','om_visit_x_node');
-INSERT INTO node_type VALUES ('CABALIMETRE','MEASURE INSTRUMENT', 'PIPE', 'man_meter', 'inp_pipe', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('POU', 'JUNCTION', 'JUNCTION', 'man_waterwell', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('CAPTACIO', 'JUNCTION', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CABALIMETRE','MEASURE INSTRUMENT', 'SHORTPIPE', 'man_meter', 'inp_shortpipe', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('POU', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CAPTACIO', 'SOURCE', 'JUNCTION', 'man_source', 'inp_junction', 'om_visit_x_node');
 
 -- ----------------------------
 -- Records of arc type system table
