@@ -18,19 +18,28 @@ DECLARE
     rec_aux		record;
     rec_aux2	"SCHEMA_NAME".arc;
     intersect_loc	double precision;
+	numArcs	integer;
 
 BEGIN
 
     --	Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    --	Get connec geometry
+	--	Looking for disconnected node
+	/*
+	SELECT count(*) INTO numArcs FROM arc WHERE node_1 = node_id OR node_2 = node_id;
+        IF numArcs > 0 THEN
+            RETURN audit_function(518,90); 
+        END IF;
+	*/
+	
+    --	Get node geometry
     SELECT the_geom INTO node_geom FROM node WHERE node_id = node_id_arg;
 
     --	Get node tolerance from config table
     SELECT node2arc INTO rec_aux FROM config;
-
-    --	Find closest pipe inside tolerance
+	
+	 --	Find closest pipe inside tolerance
     SELECT arc_id, the_geom, epa_type INTO arc_id_aux, arc_geom, epa_type_aux  FROM arc AS a WHERE ST_DWithin(node_geom, a.the_geom, rec_aux.node2arc) ORDER BY ST_Distance(node_geom, a.the_geom) LIMIT 1;
 
 
