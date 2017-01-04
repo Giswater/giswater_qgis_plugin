@@ -58,7 +58,7 @@ BEGIN
 
          -- Epa type
         IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
+			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type LIMIT 1)::text;   
 		END IF;
 
         -- Node Catalog ID

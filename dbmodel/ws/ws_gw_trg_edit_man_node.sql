@@ -27,39 +27,43 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	man_table:= TG_ARGV[0];
+	man_table_2:=man_table;
 
 -- INSERT
 
     -- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
     
+	
     -- Node ID
-	IF (NEW.node_id IS NULL) THEN
-        SELECT max(node_id::integer) INTO node_id_seq FROM node WHERE node_id ~ '^\d+$';
-        PERFORM setval('node_id_seq',node_id_seq,true);
-		NEW.node_id:= (SELECT nextval('node_id_seq'));
-	END IF;
-
-    -- Epa type
-	IF (NEW.epa_type IS NULL) THEN
-		NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
-	END IF;
-
-    IF (NEW.node_type IS NULL) THEN
+		IF (NEW.node_id IS NULL) THEN
+			SELECT max(node_id::integer) INTO node_id_seq FROM node WHERE node_id ~ '^\d+$';
+			PERFORM setval('node_id_seq',node_id_seq,true);
+			NEW.node_id:= (SELECT nextval('node_id_seq'));
+		END IF;
+	
+	-- Node type
+		IF (NEW.node_type IS NULL) THEN
             IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
                 RETURN audit_function(105,430);  
             END IF;
             NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
         END IF;
 
+		
+	-- Epa type
+		IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type LIMIT 1)::text;   
+		END IF;
 
-        -- Node Catalog ID
-        IF (NEW.nodecat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+
+	-- Node Catalog ID
+		IF (NEW.nodecat_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,430);  
-            END IF;
-            NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2);
-        END IF;
+			END IF;
+			NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
+		END IF;
 
      -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
