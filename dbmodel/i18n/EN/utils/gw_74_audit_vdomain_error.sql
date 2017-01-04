@@ -51,6 +51,7 @@ INSERT INTO audit_cat_error VALUES ('200', 'Elev is not an updatable column', 'P
 INSERT INTO audit_cat_error VALUES ('505', 'Node not found','Please check table node', '1', 't', 'ws');
 INSERT INTO audit_cat_error VALUES ('510', 'Pipes has different types', 'It is no possible to delete node', '1', 't', 'ws');
 INSERT INTO audit_cat_error VALUES ('515', 'Node has not 2 arcs', 'It is no possible to delete node', '1', 't', 'ws');
+INSERT INTO audit_cat_error VALUES ('518', 'Node has one or more arcs', 'It is no possible to move node', '1', 't', 'ws');
 INSERT INTO audit_cat_error VALUES ('520', 'Arc not found','Please check table arc', '1', 't', 'ws_fct');
 
 -- Undefined error (audit_cat_error.id = 999)
