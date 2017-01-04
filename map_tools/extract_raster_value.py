@@ -181,8 +181,15 @@ class ExtractRasterValue(ParentMapTool):
 
         elif event.button() == Qt.RightButton:
 
-            # Interpolate values
-            self.raster_interpolate()
+            # Check selected records
+            numberFeatures = self.vectorLayer.selectedFeatureCount()
+            if numberFeatures > 0:
+                answer = self.controller.ask_question("There are " + str(numberFeatures) + " features selected in the '" +
+                            self.vectorLayer.name() + "' layer, do you want to update values on them?", "Interpolate value")
+
+                if answer:
+                    # Interpolate values
+                    self.raster_interpolate()
 
 
     def activate(self):
@@ -351,19 +358,20 @@ class ExtractRasterValue(ParentMapTool):
             # Default choice
             behaviour = QgsVectorLayer.SetSelection
 
-            # Modifiers
-            modifiers = QApplication.keyboardModifiers()
-
-            if modifiers == Qt.ControlModifier:
-                behaviour = QgsVectorLayer.AddToSelection
-            elif modifiers == Qt.ShiftModifier:
-                behaviour = QgsVectorLayer.RemoveFromSelection
+            # # Modifiers
+            # modifiers = QApplication.keyboardModifiers()
+            #
+            # if modifiers == Qt.ControlModifier:
+            #     behaviour = QgsVectorLayer.AddToSelection
+            # elif modifiers == Qt.ShiftModifier:
+            #     behaviour = QgsVectorLayer.RemoveFromSelection
 
             # Selection
             self.vectorLayer.selectByRect(selectGeometry, behaviour)
 
         else:
 
+            self.vectorLayer.removeSelection()
             self.vectorLayer.select(selectGeometry, False)
 
         # Old cursor

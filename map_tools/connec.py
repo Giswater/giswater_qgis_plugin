@@ -174,8 +174,19 @@ class ConnecMapTool(ParentMapTool):
 
         elif event.button() == Qt.RightButton:
 
-            # Create link
-            self.link_connec()
+            # Check selected records
+            numberFeatures = 0
+
+            for layer in self.layer_connec_man:
+                numberFeatures += layer.selectedFeatureCount()
+
+            if numberFeatures > 0:
+                answer = self.controller.ask_question("There are " + str(numberFeatures) + " features selected in the connec group, do you want to update values on them?", "Interpolate value")
+
+                if answer:
+
+                    # Create link
+                    self.link_connec()
 
 
     def activate(self):
@@ -227,15 +238,23 @@ class ConnecMapTool(ParentMapTool):
     def link_connec(self):
         ''' Link selected connec to the pipe '''
 
+
+        # Check features selected
+        numberFeatures = 0
+
+        for layer in self.layer_connec_man:
+            numberFeatures += layer.selectedFeatureCount()
+        if numberFeatures == 0:
+            message = "You have to select at least one feature!"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+
         # Get selected features (from layer 'connec')
         aux = "{"
         
         for layer in self.layer_connec_man:
         #layer = self.layer_connec
             if layer.selectedFeatureCount() > 0:
-                #message = "You have to select at least one feature!"
-                #self.controller.show_warning(message, context_name='ui_message')
-            
 
                 features = layer.selectedFeatures()
                 for feature in features:
@@ -288,13 +307,13 @@ class ConnecMapTool(ParentMapTool):
             # Default choice
             behaviour = QgsVectorLayer.SetSelection
 
-            # Modifiers
-            modifiers = QApplication.keyboardModifiers()
-
-            if modifiers == Qt.ControlModifier:
-                behaviour = QgsVectorLayer.AddToSelection
-            elif modifiers == Qt.ShiftModifier:
-                behaviour = QgsVectorLayer.RemoveFromSelection
+            # # Modifiers
+            # modifiers = QApplication.keyboardModifiers()
+            #
+            # if modifiers == Qt.ControlModifier:
+            #     behaviour = QgsVectorLayer.AddToSelection
+            # elif modifiers == Qt.ShiftModifier:
+            #     behaviour = QgsVectorLayer.RemoveFromSelection
 
             # Selection for all connec group layers
             for layer in self.layer_connec_man:
@@ -303,7 +322,8 @@ class ConnecMapTool(ParentMapTool):
         else:
 
             for layer in self.layer_connec_man:
-                layer.select(selectGeometry, False)
+                layer.removeSelection()
+                layer.select(selectGeometry, True)
 
         # Old cursor
         QApplication.restoreOverrideCursor()
