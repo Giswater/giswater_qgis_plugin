@@ -8,7 +8,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
-from PyQt4.QtGui import QAction, QActionGroup, QIcon   
+from PyQt4.QtGui import QAction, QActionGroup, QIcon
+
 
 import os.path
 import sys  
@@ -437,8 +438,13 @@ class Giswater(QObject):
                     self.actions['57'].setVisible(True)
                     if self.toolbar_ud_enabled:
                         self.toolbar_ud.setVisible(True)                
-            
-            # Set visible MANAGEMENT and EDIT toolbar  
+
+            # if self.mg.project_type != None:
+            #
+            #     # override setting
+            #     QSettings().setValue('/qgis/digitizing/disable_enter_attribute_values_dialog', False)
+
+            # Set visible MANAGEMENT and EDIT toolbar
             if self.toolbar_mg_enabled:         
                 self.toolbar_mg.setVisible(True)
             if self.toolbar_ed_enabled: 

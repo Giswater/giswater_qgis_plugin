@@ -246,9 +246,10 @@ class DaoController():
         ''' Start a minimized external program '''
            
         SW_MINIMIZE = 6
+        SW_HIDE = 0
         info = subprocess.STARTUPINFO()
         info.dwFlags = subprocess.STARTF_USESHOWWINDOW
-        info.wShowWindow = SW_MINIMIZE   
+        info.wShowWindow = SW_HIDE
         subprocess.Popen(program, startupinfo=info)   
         
         
