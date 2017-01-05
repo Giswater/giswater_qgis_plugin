@@ -6,8 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_valveanalytics_recursive(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_valveanalytics_recursive(node_id_arg character varying) CREATE OR REPLACE FUNCTION mataro_ws_demo.gw_fct_valveanalytics_recursive(node_id_arg character varying)
-  RETURNS void AS
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_valveanalytics_recursive(node_id_arg character varying)RETURNS void AS
 $BODY$
 DECLARE
     exists_id      character varying;
