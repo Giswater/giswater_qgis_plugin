@@ -127,13 +127,13 @@ INSERT INTO cat_node VALUES ('SOURCE-01', 'SOURCE', NULL, NULL, NULL, NULL, NULL
 -- ----------------------------
 -- Records of cat_connec
 -- ----------------------------
-INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'DOMESTIC', 'PVC', '16 atm', '25 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', 'DOMESTIC', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC32-PN16-TRA', 'DOMESTIC', 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', 'DOMESTIC', 'PVC', '16 atm', '50 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC63-PN16-FOU', 'FOUNTAIN', 'PVC', '16 atm', '63 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC25-PN16-TAP', 'TAP', 'PVC', '16 atm', '25 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
-INSERT INTO cat_connec VALUES ('PVC50-PN16-GRE', 'GREEN_TAP', 'PVC', '16 atm', '50 mm', NULL, 'PVC connec ', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', NULL, 'PVC', '16 atm', '25 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC32-PN16-DOM', NULL, 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC32-PN16-TRA', NULL, 'PVC', '16 atm', '32 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC50-PN16-IND', NULL, 'PVC', '16 atm', '50 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC63-PN16-FOU', NULL, 'PVC', '16 atm', '63 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC25-PN16-TAP', NULL, 'PVC', '16 atm', '25 mm', NULL, 'PVC connec', NULL, NULL, NULL, NULL);
+INSERT INTO cat_connec VALUES ('PVC50-PN16-GRE', NULL, 'PVC', '16 atm', '50 mm', NULL, 'PVC connec ', NULL, NULL, NULL, NULL);
 
 
 -- ----------------------------
