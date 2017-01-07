@@ -1965,8 +1965,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>407</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3511,8 +3511,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>407</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4316,7 +4316,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_image_ws_shape">
        <property name="geometry">
         <rect>
          <x>120</x>
@@ -4329,7 +4329,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>ws_section.png</pixmap>
+        <pixmap>ws_shape.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -4537,7 +4537,7 @@
         <number>3</number>
        </property>
       </widget>
-      <zorder>label</zorder>
+      <zorder>label_image_ws_shape</zorder>
       <zorder>m2mltrenchl_2</zorder>
       <zorder>thickness</zorder>
       <zorder>total_y</zorder>
