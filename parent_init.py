@@ -358,7 +358,6 @@ class ParentDialog(object):
         
         # Check if clicked value is from the column "PATH"
         position_column = self.tbl_event.currentIndex().column()
-        print position_column
         if position_column == 7:      
             # Get data from address in memory (pointer)
             self.path = self.tbl_event.selectedIndexes()[0].data()
@@ -408,7 +407,6 @@ class ParentDialog(object):
             id_ = self.tbl_document.model().record(row).value("path")
             inf_text+= str(id_)+", "
         inf_text = inf_text[:-2]
-        print inf_text 
         self.path = inf_text 
 
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
@@ -625,7 +623,6 @@ class ParentDialog(object):
         table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         
-        print filter_
         # Get widgets  
         event_type = self.dialog.findChild(QComboBox, "event_type")
         event_id = self.dialog.findChild(QComboBox, "event_id")
@@ -682,13 +679,11 @@ class ParentDialog(object):
         
         # Get selected values in Comboboxes        
         event_type_value = utils_giswater.getWidgetText("event_type")
-        print event_type_value
         if event_type_value != 'null': 
             expr+= " AND parameter_type = '"+event_type_value+"'"
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
             expr+= " AND parameter_id = '"+event_id+"'"
-        print expr
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
@@ -728,6 +723,18 @@ class ParentDialog(object):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
+        
+        
+    def set_tabs_visibility(self,num_el):
+        ''' Hide some tabs '''   
+
+        for i in xrange(num_el,-1,-1):
+            # Get name of selected layer 
+            selected_layer = self.layer.name() 
+            # Get name of current tab
+            tab_text = self.tab_main.tabText(i)
+            if selected_layer != tab_text :
+                self.tab_main.removeTab(i) 
         
         
         

@@ -67,8 +67,6 @@ class ManArcDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
-        print "test"
-        print self.filter
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
@@ -83,7 +81,7 @@ class ManArcDialog(ParentDialog):
         # self.layer.startEditing()
         
         # Manage tab visibility
-        self.set_tabs_visibility()  
+        self.set_tabs_visibility(4)  
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
@@ -112,38 +110,7 @@ class ManArcDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))       
-        
 
-    def set_tabs_visibility(self):
-        ''' Hide some tabs ''' 
-          
-        # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
-        if uri_table is None:
-            self.controller.show_warning("Error getting table name from selected layer")
-            return
-        
-        if uri_table == self.table_varc :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(0)
-            
-        if uri_table == self.table_siphon :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0) 
-            
-        if uri_table == self.table_conduit :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            
-        if uri_table == self.table_waccel :
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0)
-         
-       
    
     def fill_costs(self):
         ''' Fill tab costs '''

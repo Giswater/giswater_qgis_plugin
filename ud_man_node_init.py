@@ -99,7 +99,7 @@ class ManNodeDialog(ParentDialog):
         # self.layer.startEditing()
         
         # Manage tab visibility
-        self.set_tabs_visibility()  
+        self.set_tabs_visibility(9)  
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -144,64 +144,3 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
         
     
-        
-    def set_tabs_visibility(self):
-        ''' Hide some tabs ''' 
-          
-        # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
-        if uri_table is None:
-            self.controller.show_warning("Error getting table name from selected layer")
-            return
-        
-        if (uri_table == self.table_chamber) | (uri_table == self.table_chamber_pol) :
-            for i in xrange(9,-1,-1):
-                if (i != 0):
-                    self.tab_main.removeTab(i) 
-                    
-        if uri_table == self.table_junction :
-            for i in xrange(9,-1,-1):
-                if (i != 1):
-                    self.tab_main.removeTab(i) 
-                    
-        if uri_table == self.table_manhole :
-            for i in xrange(9,-1,-1):
-                if (i != 2):
-                    self.tab_main.removeTab(i) 
-                    
-        if (uri_table == self.table_netgully) | (uri_table == self.table_netgully_pol) :
-            for i in xrange(9,-1,-1):
-                if (i != 3):
-                    self.tab_main.removeTab(i) 
-                    
-        if uri_table == self.table_netinit :
-            for i in xrange(9,-1,-1):
-                if (i != 4):
-                    self.tab_main.removeTab(i) 
-                    
-        if uri_table == self.table_outfall :
-            for i in xrange(9,-1,-1):
-                if (i != 5):
-                    self.tab_main.removeTab(i) 
-                    
-        if (uri_table == self.table_storage) | (uri_table == self.table_storage_pol) :
-            for i in xrange(9,-1,-1):
-                if (i != 6):
-                    self.tab_main.removeTab(i) 
-                                           
-        if uri_table == self.table_valve :
-            for i in xrange(9,-1,-1):
-                if (i != 7):
-                    self.tab_main.removeTab(i)                       
-                                        
-        if uri_table == self.table_wjump :
-            for i in xrange(9,-1,-1):
-                if (i != 8):
-                    self.tab_main.removeTab(i) 
-                    
-        if (uri_table == self.table_wwtp) | (uri_table == self.table_wwtp_pol) :
-            for i in xrange(9,-1,-1):
-                if (i != 9):
-                    self.tab_main.removeTab(i) 
-                    
-     
