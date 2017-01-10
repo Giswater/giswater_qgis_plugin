@@ -97,8 +97,11 @@ class PointMapTool(QgsMapTool):
         
         # Insert new node into selected point. Open its feature form
         last_id = self.insert_node(self.point.x(), self.point.y())
-        
-        self.iface.mapCanvas().refresh()
+
+        self.iface.mapCanvas().refreshAllLayers()
+
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
         '''
         if last_id != -1:
             filter_expr = "node_id = '"+str(last_id)+"'"    

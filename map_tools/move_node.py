@@ -295,7 +295,10 @@ class MoveNodeMapTool(ParentMapTool):
                     self.snapperManager.unsnapToArc()
                 
                     # Refresh map canvas
-                    self.iface.mapCanvas().refresh()               
+                    self.iface.mapCanvas().refreshAllLayers()
+
+                    for layerRefresh in self.iface.mapCanvas().layers():
+                        layerRefresh.triggerRepaint()
         
         elif event.button() == Qt.RightButton:
 
@@ -306,5 +309,8 @@ class MoveNodeMapTool(ParentMapTool):
             self.snapperManager.unsnapToArc()
 
             # Refresh map canvas
-            self.iface.mapCanvas().refresh()
+            self.iface.mapCanvas().refreshAllLayers()
+
+            for layerRefresh in self.iface.mapCanvas().layers():
+                layerRefresh.triggerRepaint()
                        

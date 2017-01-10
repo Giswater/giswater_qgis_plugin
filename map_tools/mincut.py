@@ -133,7 +133,10 @@ class MincutMapTool(ParentMapTool):
             QApplication.restoreOverrideCursor()
 
             # Refresh map canvas
-            self.iface.mapCanvas().refresh()
+            self.iface.mapCanvas().refreshAllLayers()
+
+            for layerRefresh in self.iface.mapCanvas().layers():
+                layerRefresh.triggerRepaint()
 
 
     def mg_mincut_select_features(self):

@@ -320,7 +320,10 @@ class ExtractRasterValue(ParentMapTool):
 
         # Refresh map canvas
         self.rubberBand.reset()
-        self.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refreshAllLayers()
+
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
 
 
     def set_rubber_band(self):

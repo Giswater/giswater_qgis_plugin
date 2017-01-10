@@ -114,7 +114,10 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.mg_flow_trace_select_features(self.layer_node_man, 'node')
 
             # Refresh map canvas
-            self.iface.mapCanvas().refresh()
+            self.iface.mapCanvas().refreshAllLayers()
+
+            for layerRefresh in self.iface.mapCanvas().layers():
+                layerRefresh.triggerRepaint()
 
 
     def mg_flow_trace_select_features(self, layer_group, elem_type):

@@ -123,7 +123,10 @@ class DeleteNodeMapTool(ParentMapTool):
                     self.controller.show_warning(message, context_name='ui_message' )  
 
                 # Refresh map canvas
-                self.iface.mapCanvas().refresh()
+                self.iface.mapCanvas().refreshAllLayers()
+
+                for layerRefresh in self.iface.mapCanvas().layers():
+                    layerRefresh.triggerRepaint()
 
     def activate(self):
 

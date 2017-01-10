@@ -100,7 +100,10 @@ class Mg():
         self.close_dialog()         
             
         # Refresh map canvas
-        self.iface.mapCanvas().refresh()             
+        self.iface.mapCanvas().refreshAllLayers()
+
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
 
 
     def mg_table_wizard(self):

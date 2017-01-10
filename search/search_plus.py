@@ -714,7 +714,11 @@ class SearchPlus(QObject):
         # Add features, commit changes and refresh canvas
         mem_layer.dataProvider().addFeatures(cfeatures)             
         mem_layer.commitChanges()
-        self.iface.mapCanvas().refresh() 
+        self.iface.mapCanvas().refreshAllLayers()
+
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
+
         self.iface.mapCanvas().zoomToSelected(layer)
         
         # Make sure layer is always visible 
