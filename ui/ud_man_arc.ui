@@ -1022,7 +1022,7 @@
        </property>
        <property name="font">
         <font>
-         <italic>true</italic>
+         <italic>false</italic>
         </font>
        </property>
        <property name="text">
@@ -1068,7 +1068,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Geometry length:</string>
+        <string>Gis length:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -7959,8 +7959,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>407</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -9505,8 +9505,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>407</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
