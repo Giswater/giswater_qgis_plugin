@@ -90,9 +90,9 @@ class PointMapTool(QgsMapTool):
 
     def canvasReleaseEvent(self, e):
            
-        # Get clicked point and current layer               
-        self.point = self.toMapCoordinates(e.pos())             
-        layer = self.iface.activeLayer()     
+        # Get clicked point and current layer
+        layer = self.iface.activeLayer()
+        self.point = self.toLayerCoordinates(layer, e.pos())
         
         # Insert new node into selected point. Open its feature form
         last_id = self.insert_node(self.point.x(), self.point.y())
