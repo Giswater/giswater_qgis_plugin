@@ -215,14 +215,19 @@ class ParentDialog(object):
         
         inf_text = ""
         list_id = ""
+        row_index = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value("id")
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
+            row_index += str(row+1)+", "
+            
+        row_index = row_index[:-2]
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", row_index)
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
@@ -242,15 +247,19 @@ class ParentDialog(object):
         
         inf_text = ""
         list_id = ""
+        row_index = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value("hydrometer_id")
             inf_text+= str(id_)+", "
             list_id = list_id+"'"+str(id_)+"', "
+            row_index += str(row+1)+", "
+            
+        row_index = row_index[:-2]
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
 
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", row_index)
         table_name = '"rtc_hydrometer_x_connec"'
         table_name2 = '"rtc_hydrometer"'
         if answer:
@@ -389,7 +398,7 @@ class ParentDialog(object):
                            
                     
     def open_selected_document_from_table(self):
-        ''' Button -Open document from table document'''
+        ''' Button - Open document from table document'''
         
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
         #table_document = "v_ui_doc_x_arc"
@@ -408,36 +417,36 @@ class ParentDialog(object):
             inf_text+= str(id_)+", "
         inf_text = inf_text[:-2]
         self.path = inf_text 
+        
 
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        # Full path= path + value from row
-        self.full_path =row[0]+self.path
-       
-        # Parse a URL into components
-        url=urlparse.urlsplit(self.full_path)
-
-        # Check if path is URL
-        if url.scheme=="http":
-            # If path is URL open URL in browser
-            webbrowser.open(self.full_path) 
-        else: 
-            # If its not URL ,check if file exist
-            if not os.path.exists(self.full_path):
-                message = "File not found!"
-                self.controller.show_warning(message, context_name='ui_message')
-                   
-            else:
-                # Open the document
-                os.startfile(self.full_path)    
-                
-                
+        if row is None:
+            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        else:
+            # Full path= path + value from row
+            self.full_path =row[0]+self.path
+           
+            # Parse a URL into components
+            url=urlparse.urlsplit(self.full_path)
     
-                          
-                   
-
-
+            # Check if path is URL
+            if url.scheme=="http":
+                # If path is URL open URL in browser
+                webbrowser.open(self.full_path) 
+            else: 
+                # If its not URL ,check if file exist
+                if not os.path.exists(self.full_path):
+                    message = "File not found!"
+                    self.controller.show_warning(message, context_name='ui_message')
+                       
+                else:
+                    # Open the document
+                    os.startfile(self.full_path)    
+                
 
     def set_filter_table(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''

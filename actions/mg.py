@@ -291,7 +291,7 @@ class Mg():
         self.close_dialog(self.dlg) 
 
 
-    def mg_flow_exit(self):
+    def mg_analytics(self):
         ''' Button 27. Valve analytics ''' 
                 
         # Execute SQL function  

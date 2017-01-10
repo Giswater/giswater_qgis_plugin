@@ -12,10 +12,11 @@
 """
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget,QPixmap,QImage, QDoubleSpinBox, QCheckBox, QLabel   #@UnresolvedImport
 
 import inspect
-
+import os
+import sys
 
 def setDialog(p_dialog):
     global _dialog
@@ -199,5 +200,23 @@ def setWidgetVisible(widget, visible=True):
         widget = _dialog.findChild(QWidget, widget)    
     if widget:
         widget.setVisible(visible)
+        
+        
+
+def setImage(widget, text):
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)  
+    if not widget:
+        return
+    if type(widget) is QLabel:
+        plugin_dir = os.path.dirname(__file__)    
+        pic_file = os.path.join(plugin_dir, 'ui','ud_shape.png')
+        pixmap = QPixmap(pic_file)
+        widget.setPixmap(pixmap)
+        widget.show()
+
+        
+        
+        
                 
                 

@@ -474,20 +474,20 @@ class Giswater(QObject):
         self.layer_arc = None
         #self.layer_arc_man_UD = [None for i in range(4)]
         #self.layer_arc_man_WS = [None for i in range(1)]
-        self.layer_arc_man_UD = [None]
-        self.layer_arc_man_WS = [None]
+        self.layer_arc_man_UD = []
+        self.layer_arc_man_WS = []
 
         self.layer_node = None
         #self.layer_node_man_UD = [None for i in range(10)]
         #self.layer_node_man_WS = [None for i in range(11)]
-        self.layer_node_man_UD = [None]
-        self.layer_node_man_WS = [None]
+        self.layer_node_man_UD = []
+        self.layer_node_man_WS = []
 
         self.layer_connec = None
         #self.layer_connec_man_UD = [None for i in range(1)]
         #self.layer_connec_man_WS = [None for i in range(4)]
-        self.layer_connec_man_UD = [None]
-        self.layer_connec_man_WS = [None]
+        self.layer_connec_man_UD = []
+        self.layer_connec_man_WS = []
 
         self.layer_gully = None
         self.layer_pgully = None
@@ -528,7 +528,8 @@ class Giswater(QObject):
                     self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_storage' == uri_table:
                     self.layer_node_man_UD.append(cur_layer)
-                      
+                
+                
                 # Node group from WS project
                 if 'v_edit_man_source' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
