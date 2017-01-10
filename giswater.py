@@ -472,16 +472,22 @@ class Giswater(QObject):
         
         # Initialize variables
         self.layer_arc = None
-        self.layer_arc_man_UD = [None for i in range(4)]
-        self.layer_arc_man_WS = [None for i in range(1)]
+        #self.layer_arc_man_UD = [None for i in range(4)]
+        #self.layer_arc_man_WS = [None for i in range(1)]
+        self.layer_arc_man_UD = [None]
+        self.layer_arc_man_WS = [None]
 
         self.layer_node = None
-        self.layer_node_man_UD = [None for i in range(10)]
-        self.layer_node_man_WS = [None for i in range(11)]
+        #self.layer_node_man_UD = [None for i in range(10)]
+        #self.layer_node_man_WS = [None for i in range(11)]
+        self.layer_node_man_UD = [None]
+        self.layer_node_man_WS = [None]
 
         self.layer_connec = None
-        self.layer_connec_man_UD = [None for i in range(1)]
-        self.layer_connec_man_WS = [None for i in range(4)]
+        #self.layer_connec_man_UD = [None for i in range(1)]
+        #self.layer_connec_man_WS = [None for i in range(4)]
+        self.layer_connec_man_UD = [None]
+        self.layer_connec_man_WS = [None]
 
         self.layer_gully = None
         self.layer_pgully = None
@@ -503,49 +509,49 @@ class Giswater(QObject):
                     self.layer_node = cur_layer
   
                 if 'v_edit_man_chamber' == uri_table:
-                    self.layer_node_man_UD[0] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man_UD[1] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_netgully' == uri_table:
-                    self.layer_node_man_UD[2] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_netinit' == uri_table:
-                    self.layer_node_man_UD[3] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_wjump' == uri_table:
-                    self.layer_node_man_UD[4] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_wwtp' == uri_table:
-                    self.layer_node_man_UD[5] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man_UD[6] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_outfall' == uri_table:
-                    self.layer_node_man_UD[7] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man_UD[8] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_storage' == uri_table:
-                    self.layer_node_man_UD[9] = cur_layer
+                    self.layer_node_man_UD.append(cur_layer)
                       
                 # Node group from WS project
                 if 'v_edit_man_source' == uri_table:
-                    self.layer_node_man_WS[0] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_pump' == uri_table:
-                    self.layer_node_man_WS[1] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_meter' == uri_table:
-                    self.layer_node_man_WS[2] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_tank' == uri_table:
-                    self.layer_node_man_WS[3] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_hydrant' == uri_table:
-                    self.layer_node_man_WS[4] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_waterwell' == uri_table:
-                    self.layer_node_man_WS[5] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man_WS[6] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_reduction' == uri_table:
-                    self.layer_node_man_WS[7] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man_WS[8] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man_WS[9] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_filter' == uri_table:
-                    self.layer_node_man_WS[10] = cur_layer
+                    self.layer_node_man_WS.append(cur_layer)
     
 
 
@@ -553,34 +559,34 @@ class Giswater(QObject):
                     self.layer_connec = cur_layer
                 
                 if 'v_edit_man_connec' == uri_table or 'v_edit_connec' == uri_table:
-                    self.layer_connec_man_UD[0] = cur_layer
+                    self.layer_connec_man_UD.append(cur_layer)
                 '''
                 if 'v_edit_man_connec' == uri_table or 'v_edit_connec' == uri_table:
                     self.layer_connec_man_WS[0] = cur_layer
                 '''
                 if 'v_edit_man_greentap' == uri_table :
-                    self.layer_connec_man_WS[0] = cur_layer
+                    self.layer_connec_man_WS.append(cur_layer)
                 if 'v_edit_man_wjoin' == uri_table :
-                    self.layer_connec_man_WS[1] = cur_layer
+                    self.layer_connec_man_WS.append(cur_layer)
                 if 'v_edit_man_fountain' == uri_table :
-                    self.layer_connec_man_WS[2] = cur_layer
+                    self.layer_connec_man_WS.append(cur_layer)
                 if 'v_edit_man_tap' == uri_table :
-                    self.layer_connec_man_WS[3] = cur_layer
+                    self.layer_connec_man_WS.append(cur_layer)
                     
                 
                 if self.table_arc == uri_table:
                     self.layer_arc = cur_layer
                 if 'v_edit_man_conduit' == uri_table:
-                    self.layer_arc_man_UD[0] = cur_layer
+                    self.layer_arc_man_UD.append(cur_layer)
                 if 'v_edit_man_siphon' == uri_table:
-                    self.layer_arc_man_UD[1] = cur_layer
+                    self.layer_arc_man_UD.append(cur_layer)
                 if 'v_edit_man_varc' == uri_table:
-                    self.layer_arc_man_UD[2] = cur_layer
+                    self.layer_arc_man_UD.append(cur_layer)
                 if 'v_edit_man_waccel' == uri_table:
-                    self.layer_arc_man_UD[3] = cur_layer
+                    self.layer_arc_man_UD.append(cur_layer)
                     
                 if 'v_edit_man_pipe' == uri_table:
-                    self.layer_arc_man_WS[0] = cur_layer
+                    self.layer_arc_man_WS.append(cur_layer)
 
 
                 if self.table_gully == uri_table:
@@ -640,7 +646,7 @@ class Giswater(QObject):
         if self.layer_arc_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                     
-            for i in range(4):
+            for i in range(len(self.layer_arc_man_UD)):
                 if self.layer_arc_man_UD[i] is not None:
                     self.layer_arc_man_UD[i].editFormConfig().setUiForm(file_ui)
                     self.layer_arc_man_UD[i].editFormConfig().setInitCodeSource(1)
@@ -650,7 +656,7 @@ class Giswater(QObject):
         if self.layer_arc_man_WS is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_arc_init.py')                         
-            for i in range(1):
+            for i in range(len(self.layer_arc_man_WS)):
                 if self.layer_arc_man_WS[i] is not None:
                     self.layer_arc_man_WS[i].editFormConfig().setUiForm(file_ui)
                     self.layer_arc_man_WS[i].editFormConfig().setInitCodeSource(1)
@@ -669,7 +675,7 @@ class Giswater(QObject):
         if self.layer_node_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')       
-            for i in range(10):
+            for i in range(len(self.layer_node_man_UD)):
                 if self.layer_node_man_UD[i] is not None:
                     self.layer_node_man_UD[i].editFormConfig().setUiForm(file_ui)
                     self.layer_node_man_UD[i].editFormConfig().setInitCodeSource(1)
@@ -679,7 +685,7 @@ class Giswater(QObject):
         if self.layer_node_man_WS is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_node_init.py')            
-            for i in range(11):
+            for i in range(len(self.layer_node_man_WS)):
                 if self.layer_node_man_WS[i] is not None:
                     self.layer_node_man_WS[i].editFormConfig().setUiForm(file_ui)
                     self.layer_node_man_WS[i].editFormConfig().setInitCodeSource(1)
@@ -698,7 +704,7 @@ class Giswater(QObject):
         if self.layer_connec_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
-            for i in range(1):
+            for i in range(len(self.layer_connec_man_UD)):
                 if self.layer_connec_man_UD[i] is not None:
                     self.layer_connec_man_UD[i].editFormConfig().setUiForm(file_ui)
                     self.layer_connec_man_UD[i].editFormConfig().setInitCodeSource(1)
@@ -708,7 +714,7 @@ class Giswater(QObject):
         if self.layer_connec_man_WS is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_man_connec_init.py')       
-            for i in range(4):
+            for i in range(len(self.layer_connec_man_WS)):
                 if self.layer_connec_man_WS[i] is not None:
                     self.layer_connec_man_WS[i].editFormConfig().setUiForm(file_ui)
                     self.layer_connec_man_WS[i].editFormConfig().setInitCodeSource(1)

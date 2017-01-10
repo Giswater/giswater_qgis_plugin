@@ -80,7 +80,7 @@ class ManConnecDialog(ParentDialog):
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
 
         # Manage tab visibility
-        self.set_tabs_visibility()  
+        self.set_tabs_visibility(4)  
               
         # Load data from related tables
         self.load_data()
@@ -125,33 +125,3 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer, table_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
 
-
-
-    def set_tabs_visibility(self):
-        ''' Hide some tabs '''   
-        
-        # Get schema and table name of selected layer       
-        (uri_schema, uri_table) = self.controller.get_layer_source(self.layer)   #@UnusedVariable
-        if uri_table is None:
-            self.controller.show_warning("Error getting table name from selected layer")
-            return
-        
-        if uri_table == self.table_wjoin :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-        
-        if uri_table == self.table_tap :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(0)
-
-        if uri_table == self.table_greentap :
-            self.tab_main.removeTab(3)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0)
-
-        if uri_table == self.table_fountain :
-            self.tab_main.removeTab(2)
-            self.tab_main.removeTab(1)
-            self.tab_main.removeTab(0) 
