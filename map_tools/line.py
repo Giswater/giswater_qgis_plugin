@@ -354,7 +354,10 @@ class LineMapTool(QgsMapTool):
         boolOk = layer.commitChanges()
 
         # Update canvas        
-        self.canvas.refresh()
+        self.iface.mapCanvas().refreshAllLayers()
+
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
  
         # Capture edit exception
         if boolOk:
