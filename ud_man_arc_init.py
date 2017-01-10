@@ -38,8 +38,13 @@ def init_config():
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
     
+	# Manage 'cat_shape'
     conduit_cat_shape = utils_giswater.getWidgetText("conduit_cat_shape") 
     utils_giswater.setImage("label_image_ud_shape", conduit_cat_shape)
+	
+	# Manage 'state'
+    state = utils_giswater.getWidgetText("conduit_state") 
+    utils_giswater.setSelectedItem("conduit_state", state)   
     
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "ok").clicked.connect(feature_dialog.save)

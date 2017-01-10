@@ -32,6 +32,10 @@ def init_config():
     # Manage 'arccat_id'
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
+
+	# Manage 'state'
+    state = utils_giswater.getWidgetText("state") 
+    utils_giswater.setSelectedItem("state", state)   
     
     # Set button signals      
     #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
