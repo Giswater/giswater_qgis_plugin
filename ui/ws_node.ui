@@ -41,7 +41,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>6</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -1306,7 +1306,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="page_analysis_junction">
       <attribute name="title">
@@ -7367,7 +7367,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_event_feature_2">
       <attribute name="title">
@@ -7941,7 +7941,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_event_feature_3">
       <attribute name="title">
@@ -8867,6 +8867,219 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>node_id</tabstop>
+  <tabstop>node_type_dummy</tabstop>
+  <tabstop>nodecat_id_dummy</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>cat_matcat_id</tabstop>
+  <tabstop>cat_dnom</tabstop>
+  <tabstop>cat_pnom</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>elevation</tabstop>
+  <tabstop>depth</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>adress_03</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>man_tank_vmax</tabstop>
+  <tabstop>man_tank_area</tabstop>
+  <tabstop>btn_element_delete</tabstop>
+  <tabstop>tbl_info</tabstop>
+  <tabstop>tab_analysis</tabstop>
+  <tabstop>inp_junction_demand</tabstop>
+  <tabstop>inp_junction_pattern_id</tabstop>
+  <tabstop>result_selection_result_id</tabstop>
+  <tabstop>rpt_elevation</tabstop>
+  <tabstop>rpt_min_demand</tabstop>
+  <tabstop>rpt_min_head</tabstop>
+  <tabstop>rpt_min_pressure</tabstop>
+  <tabstop>rpt_min_quality</tabstop>
+  <tabstop>rpt_elevation_2</tabstop>
+  <tabstop>rpt_max_demand</tabstop>
+  <tabstop>rpt_max_head</tabstop>
+  <tabstop>rpt_max_pressure</tabstop>
+  <tabstop>rpt_max_quality</tabstop>
+  <tabstop>inp_reservoir_head</tabstop>
+  <tabstop>inp_reservoir_pattern_id</tabstop>
+  <tabstop>result_selection_result_id_2</tabstop>
+  <tabstop>rpt_elevation_3</tabstop>
+  <tabstop>rpt_min_demand_2</tabstop>
+  <tabstop>rpt_min_head_2</tabstop>
+  <tabstop>rpt_min_pressure_2</tabstop>
+  <tabstop>rpt_min_quality_2</tabstop>
+  <tabstop>rpt_elevation_4</tabstop>
+  <tabstop>rpt_max_demand_2</tabstop>
+  <tabstop>rpt_max_head_2</tabstop>
+  <tabstop>rpt_max_pressure_2</tabstop>
+  <tabstop>rpt_max_quality_2</tabstop>
+  <tabstop>inp_tank_initlevel</tabstop>
+  <tabstop>inp_tank_minlevel</tabstop>
+  <tabstop>inp_tank_maxlevel</tabstop>
+  <tabstop>inp_tank_diameter</tabstop>
+  <tabstop>inp_tank_minvol</tabstop>
+  <tabstop>inp_tank_curve_id</tabstop>
+  <tabstop>result_selection_result_id_3</tabstop>
+  <tabstop>rpt_elevation_5</tabstop>
+  <tabstop>rpt_min_demand_3</tabstop>
+  <tabstop>rpt_min_head_3</tabstop>
+  <tabstop>rpt_min_pressure_3</tabstop>
+  <tabstop>rpt_min_quality_3</tabstop>
+  <tabstop>rpt_elevation_6</tabstop>
+  <tabstop>rpt_max_demand_3</tabstop>
+  <tabstop>rpt_max_head_3</tabstop>
+  <tabstop>rpt_max_pressure_3</tabstop>
+  <tabstop>rpt_max_quality_3</tabstop>
+  <tabstop>inp_pump_power</tabstop>
+  <tabstop>inp_pump_speed</tabstop>
+  <tabstop>inp_pump_pattern_id</tabstop>
+  <tabstop>inp_pump_status</tabstop>
+  <tabstop>inp_pump_curve_id</tabstop>
+  <tabstop>result_selection_result_id_6</tabstop>
+  <tabstop>v_rpt_nodearcmin_flow_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_vel_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_headloss_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_setting_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_reaction_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_ffactor_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_flow_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_vel_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_headloss_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_setting_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_reaction_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_ffactor_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_elevation_5</tabstop>
+  <tabstop>v_rpt_nodearcmin_elevation_6</tabstop>
+  <tabstop>v_rpt_nodearcmin_head_6</tabstop>
+  <tabstop>v_rpt_nodearcmin_head_5</tabstop>
+  <tabstop>v_rpt_nodearcmin_presure_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_pressure_4</tabstop>
+  <tabstop>v_rpt_nodearcmax_elevation_5</tabstop>
+  <tabstop>v_rpt_nodearcmax_elevation_6</tabstop>
+  <tabstop>v_rpt_nodearcmax_head_5</tabstop>
+  <tabstop>v_rpt_nodearcmax_head_6</tabstop>
+  <tabstop>v_rpt_nodearcmax_presure_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_pressure_4</tabstop>
+  <tabstop>inp_valve_valve_type</tabstop>
+  <tabstop>inp_valve_curve_id</tabstop>
+  <tabstop>inp_valve_status</tabstop>
+  <tabstop>inp_valve_flow</tabstop>
+  <tabstop>inp_valve_minorloss</tabstop>
+  <tabstop>inp_valve_pressure</tabstop>
+  <tabstop>inp_valve_coef_loss</tabstop>
+  <tabstop>result_selection_result_id_5</tabstop>
+  <tabstop>v_rpt_nodearcmin_flow_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_vel_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_headloss_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_setting_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_reaction_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_ffactor_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_flow_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_vel_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_headloss_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_setting_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_reaction_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_ffactor_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_elevation_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_elevation_4</tabstop>
+  <tabstop>v_rpt_nodearcmin_head_4</tabstop>
+  <tabstop>v_rpt_nodearcmin_head_3</tabstop>
+  <tabstop>v_rpt_nodearcmin_presure_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_pressure_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_elevation_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_elevation_4</tabstop>
+  <tabstop>v_rpt_nodearcmax_head_3</tabstop>
+  <tabstop>v_rpt_nodearcmax_head_4</tabstop>
+  <tabstop>v_rpt_nodearcmax_presure_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_pressure_3</tabstop>
+  <tabstop>inp_shortpipe_minorloss</tabstop>
+  <tabstop>inp_shortpipe_to_arc</tabstop>
+  <tabstop>inp_shortpipe_status</tabstop>
+  <tabstop>result_selection_result_id_4</tabstop>
+  <tabstop>v_rpt_nodearcmin_flow</tabstop>
+  <tabstop>v_rpt_nodearcmin_vel</tabstop>
+  <tabstop>v_rpt_nodearcmin_headloss</tabstop>
+  <tabstop>v_rpt_nodearcmin_setting</tabstop>
+  <tabstop>v_rpt_nodearcmin_reaction</tabstop>
+  <tabstop>v_rpt_nodearcmin_ffactor</tabstop>
+  <tabstop>v_rpt_nodearcmax_flow</tabstop>
+  <tabstop>v_rpt_nodearcmax_vel</tabstop>
+  <tabstop>v_rpt_nodearcmax_headloss</tabstop>
+  <tabstop>v_rpt_nodearcmax_setting</tabstop>
+  <tabstop>v_rpt_nodearcmax_reaction</tabstop>
+  <tabstop>v_rpt_nodearcmax_ffactor</tabstop>
+  <tabstop>v_rpt_nodearcmin_elevation_1</tabstop>
+  <tabstop>v_rpt_nodearcmin_elevation_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_head_1</tabstop>
+  <tabstop>v_rpt_nodearcmin_head_2</tabstop>
+  <tabstop>v_rpt_nodearcmin_presure_1</tabstop>
+  <tabstop>v_rpt_nodearcmin_pressure_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_elevation_1</tabstop>
+  <tabstop>v_rpt_nodearcmax_elevation_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_head_1</tabstop>
+  <tabstop>v_rpt_nodearcmax_head_2</tabstop>
+  <tabstop>v_rpt_nodearcmax_presure_1</tabstop>
+  <tabstop>v_rpt_nodearcmax_pressure_2</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_user</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>tab_event</tabstop>
+  <tabstop>date_document_from_3</tabstop>
+  <tabstop>date_document_to_3</tabstop>
+  <tabstop>doc_user_3</tabstop>
+  <tabstop>event_id_3</tabstop>
+  <tabstop>event_type_3</tabstop>
+  <tabstop>tbl_event_node</tabstop>
+  <tabstop>date_document_from_2</tabstop>
+  <tabstop>date_document_to_2</tabstop>
+  <tabstop>doc_user_2</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>tbl_event_element</tabstop>
+  <tabstop>tab_event_2</tabstop>
+  <tabstop>log_node_date_from</tabstop>
+  <tabstop>log_node_date_to</tabstop>
+  <tabstop>log_user_user</tabstop>
+  <tabstop>log_node_event</tabstop>
+  <tabstop>log_node_event_type</tabstop>
+  <tabstop>tbl_log_connec</tabstop>
+  <tabstop>log_element_date_from</tabstop>
+  <tabstop>log_element_date_to</tabstop>
+  <tabstop>log_element_user</tabstop>
+  <tabstop>log_element_event</tabstop>
+  <tabstop>log_element_event_type</tabstop>
+  <tabstop>tbl_log_element</tabstop>
+  <tabstop>date_rtc_from</tabstop>
+  <tabstop>date_rtc_to</tabstop>
+  <tabstop>tbl_rtc</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>nodecat_id</tabstop>
+  <tabstop>node_type</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

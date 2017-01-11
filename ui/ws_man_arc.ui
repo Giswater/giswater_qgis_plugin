@@ -407,7 +407,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -423,7 +423,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
@@ -2077,8 +2077,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>560</width>
+        <height>407</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4716,6 +4716,108 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>arc_id</tabstop>
+  <tabstop>arccat_id</tabstop>
+  <tabstop>cat_arctype_id</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>node_1</tabstop>
+  <tabstop>node_2</tabstop>
+  <tabstop>gis_length</tabstop>
+  <tabstop>custom_length</tabstop>
+  <tabstop>cat_dnom</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>delete_row_info</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_open_path</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>tab_event</tabstop>
+  <tabstop>tbl_event_arc</tabstop>
+  <tabstop>arc_element</tabstop>
+  <tabstop>arc_cost</tabstop>
+  <tabstop>cost_unit</tabstop>
+  <tabstop>arc_cost_2</tabstop>
+  <tabstop>arc_bottom</tabstop>
+  <tabstop>m2bottom_cost</tabstop>
+  <tabstop>m2mlbottom</tabstop>
+  <tabstop>base_cost</tabstop>
+  <tabstop>arc_protection</tabstop>
+  <tabstop>m3protec_cost</tabstop>
+  <tabstop>m3mlprotec</tabstop>
+  <tabstop>protec_cost</tabstop>
+  <tabstop>soil_excavation</tabstop>
+  <tabstop>m3exc_cost</tabstop>
+  <tabstop>m3mlexc</tabstop>
+  <tabstop>exc_cost</tabstop>
+  <tabstop>soil_filling</tabstop>
+  <tabstop>m3fill_cost</tabstop>
+  <tabstop>m3mlfill</tabstop>
+  <tabstop>fill_cost</tabstop>
+  <tabstop>soil_excess</tabstop>
+  <tabstop>m3excess_cost</tabstop>
+  <tabstop>m3mlexcess</tabstop>
+  <tabstop>excess_cost</tabstop>
+  <tabstop>soil_trenchlining</tabstop>
+  <tabstop>m2trenchl_cost</tabstop>
+  <tabstop>m2mltrenchl</tabstop>
+  <tabstop>trenchl_cost</tabstop>
+  <tabstop>m2pavement_cost</tabstop>
+  <tabstop>m2mlpavement</tabstop>
+  <tabstop>pav_cost</tabstop>
+  <tabstop>cost</tabstop>
+  <tabstop>length</tabstop>
+  <tabstop>budget</tabstop>
+  <tabstop>m2mlpav</tabstop>
+  <tabstop>thickness</tabstop>
+  <tabstop>y_param</tabstop>
+  <tabstop>rec_y</tabstop>
+  <tabstop>total_y</tabstop>
+  <tabstop>area</tabstop>
+  <tabstop>z2</tabstop>
+  <tabstop>bulk</tabstop>
+  <tabstop>dext</tabstop>
+  <tabstop>z1</tabstop>
+  <tabstop>m3mlexc_2</tabstop>
+  <tabstop>m3mlfill_2</tabstop>
+  <tabstop>m3mlexcess_2</tabstop>
+  <tabstop>m2mltrenchl_2</tabstop>
+  <tabstop>b_2</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>b</tabstop>
+  <tabstop>m2mlbottom_2</tabstop>
+  <tabstop>ok</tabstop>
+ </tabstops>
  <resources>
   <include location="images.qrc"/>
  </resources>

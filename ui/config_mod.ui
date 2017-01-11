@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>509</width>
-    <height>366</height>
+    <height>371</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -798,7 +798,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -1907,6 +1907,52 @@
    </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>tab_main</tabstop>
+  <tabstop>arc_searchnodes_control</tabstop>
+  <tabstop>arc_searchnodes</tabstop>
+  <tabstop>samenode_init_end_control</tabstop>
+  <tabstop>node_proximity_control</tabstop>
+  <tabstop>node_proximity</tabstop>
+  <tabstop>connec_proximity_control</tabstop>
+  <tabstop>connec_proximity</tabstop>
+  <tabstop>nodeinsert_arcendpoint</tabstop>
+  <tabstop>nodeinsert_catalog_vdefault</tabstop>
+  <tabstop>orphannode_delete</tabstop>
+  <tabstop>node2arc</tabstop>
+  <tabstop>node_duplicated_tolerance</tabstop>
+  <tabstop>connec_duplicated_tolerance</tabstop>
+  <tabstop>vnode_update_tolerance</tabstop>
+  <tabstop>insert_double_geometry</tabstop>
+  <tabstop>buffer_value</tabstop>
+  <tabstop>nodetype_change_enabled</tabstop>
+  <tabstop>audit_function_control</tabstop>
+  <tabstop>tab_search</tabstop>
+  <tabstop>ppoint_layer</tabstop>
+  <tabstop>ppoint_field_zone</tabstop>
+  <tabstop>ppoint_field_number</tabstop>
+  <tabstop>urban_propierties_layer</tabstop>
+  <tabstop>urban_propierties_field_pzone</tabstop>
+  <tabstop>urban_propierties_field_block</tabstop>
+  <tabstop>urban_propierties_field_number</tabstop>
+  <tabstop>portal_layer</tabstop>
+  <tabstop>portal_field_code</tabstop>
+  <tabstop>portal_field_number</tabstop>
+  <tabstop>street_layer</tabstop>
+  <tabstop>street_field_code</tabstop>
+  <tabstop>street_field_name</tabstop>
+  <tabstop>hydrometer_urban_propierties_layer</tabstop>
+  <tabstop>hydrometer_urban_propierties_field_code</tabstop>
+  <tabstop>hydrometer_layer</tabstop>
+  <tabstop>hydrometer_field_code</tabstop>
+  <tabstop>hydrometer_field_urban_propierties_code</tabstop>
+  <tabstop>raster_layer</tabstop>
+  <tabstop>raster_band_value</tabstop>
+  <tabstop>vector_layer</tabstop>
+  <tabstop>vector_field_value</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

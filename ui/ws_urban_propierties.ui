@@ -234,7 +234,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1281,7 +1281,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -1600,6 +1600,46 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>id</tabstop>
+  <tabstop>cat_connectype_id</tabstop>
+  <tabstop>connecat_id</tabstop>
+  <tabstop>connec_id</tabstop>
+  <tabstop>arc_id</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>code_2</tabstop>
+  <tabstop>n_hydrometer_2</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>date_dae_from</tabstop>
+  <tabstop>date_dae_to</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>btn_add_hydrometer</tabstop>
+  <tabstop>btn_delete_hydrometer</tabstop>
+  <tabstop>tbl_dae</tabstop>
+  <tabstop>tbl_dae_2</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

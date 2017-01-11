@@ -209,6 +209,14 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>node_node_type</tabstop>
+  <tabstop>node_type_type_new</tabstop>
+  <tabstop>node_node_type_new</tabstop>
+  <tabstop>node_nodecat_id</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

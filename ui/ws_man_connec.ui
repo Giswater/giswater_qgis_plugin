@@ -123,7 +123,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>7</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -144,15 +144,15 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1932,7 +1932,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
@@ -4101,7 +4101,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_13">
       <property name="geometry">
@@ -5612,7 +5612,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_5">
       <property name="geometry">
@@ -8654,6 +8654,184 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>connec_id</tabstop>
+  <tabstop>connec_type</tabstop>
+  <tabstop>connecat_id</tabstop>
+  <tabstop>arc_id</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>wjoin_elevation</tabstop>
+  <tabstop>wjoin_depth</tabstop>
+  <tabstop>wjoin_state</tabstop>
+  <tabstop>wjoin_ownercat_id</tabstop>
+  <tabstop>wjoin_demand</tabstop>
+  <tabstop>wjoin_code</tabstop>
+  <tabstop>wjoin_n_hydrometer</tabstop>
+  <tabstop>wjoin_workcat_id</tabstop>
+  <tabstop>wjoin_workcat_id_end</tabstop>
+  <tabstop>wjoin_buildercat_id</tabstop>
+  <tabstop>wjoin_builtdate</tabstop>
+  <tabstop>wjoin_streetaxis_id</tabstop>
+  <tabstop>wjoin_streetname</tabstop>
+  <tabstop>wjoin_postnumber</tabstop>
+  <tabstop>wjoin_length</tabstop>
+  <tabstop>wjoin_top_floor</tabstop>
+  <tabstop>wjoin_lead_verified</tabstop>
+  <tabstop>wjoin_lead_facade</tabstop>
+  <tabstop>wjoin_soilcat_id</tabstop>
+  <tabstop>wjoin_category_type</tabstop>
+  <tabstop>wjoin_location_type</tabstop>
+  <tabstop>wjoin_fluid_type</tabstop>
+  <tabstop>wjoin_adress_01</tabstop>
+  <tabstop>tank_adress_02</tabstop>
+  <tabstop>wjoin_annotation</tabstop>
+  <tabstop>wjoin_observ</tabstop>
+  <tabstop>wjoin_comment</tabstop>
+  <tabstop>wjoin_descript</tabstop>
+  <tabstop>wjoin_link</tabstop>
+  <tabstop>wjoin_label_x</tabstop>
+  <tabstop>wjoin_label_y</tabstop>
+  <tabstop>wjoin_label_rotation</tabstop>
+  <tabstop>wjoin_rotation</tabstop>
+  <tabstop>tap_elevation</tabstop>
+  <tabstop>tap_depth</tabstop>
+  <tabstop>tap_state</tabstop>
+  <tabstop>tap_ownercat_id</tabstop>
+  <tabstop>tap_demand</tabstop>
+  <tabstop>tap_code</tabstop>
+  <tabstop>tap_n_hydrometer</tabstop>
+  <tabstop>tap_workcat_id</tabstop>
+  <tabstop>tap_workcat_id_end</tabstop>
+  <tabstop>tap_buildercat_id</tabstop>
+  <tabstop>tap_builtdate</tabstop>
+  <tabstop>tap_streetaxis_id</tabstop>
+  <tabstop>tap_streetname</tabstop>
+  <tabstop>tap_postnumber</tabstop>
+  <tabstop>tap_type</tabstop>
+  <tabstop>tap_connection</tabstop>
+  <tabstop>tap_continous</tabstop>
+  <tabstop>tap_shutvalve_type</tabstop>
+  <tabstop>tap_shutvalve_diameter</tabstop>
+  <tabstop>tap_shutvalve_number</tabstop>
+  <tabstop>tap_drain_diameter</tabstop>
+  <tabstop>tap_drain_exit</tabstop>
+  <tabstop>tap_drain_gully</tabstop>
+  <tabstop>tap_drain_distance</tabstop>
+  <tabstop>tap_arquitect_patrimony</tabstop>
+  <tabstop>tap_communication</tabstop>
+  <tabstop>tap_soilcat_id</tabstop>
+  <tabstop>tap_category_type</tabstop>
+  <tabstop>tap_location_type</tabstop>
+  <tabstop>tap_fluid_type</tabstop>
+  <tabstop>tap_adress_01</tabstop>
+  <tabstop>tap_adress_02</tabstop>
+  <tabstop>tap_annotation</tabstop>
+  <tabstop>tap_observ</tabstop>
+  <tabstop>tap_comment</tabstop>
+  <tabstop>tap_descript</tabstop>
+  <tabstop>tap_link</tabstop>
+  <tabstop>tap_label_x</tabstop>
+  <tabstop>tap_label_y</tabstop>
+  <tabstop>tap_label_rotation</tabstop>
+  <tabstop>tap_rotation</tabstop>
+  <tabstop>greentap_elevation</tabstop>
+  <tabstop>greentap_depth</tabstop>
+  <tabstop>greentap_state</tabstop>
+  <tabstop>greeentap_ownercat_id</tabstop>
+  <tabstop>greentap_demand</tabstop>
+  <tabstop>greentap_code</tabstop>
+  <tabstop>greentap_n_hydrometer</tabstop>
+  <tabstop>greentap_workcat_id</tabstop>
+  <tabstop>greentap_workcat_id_end</tabstop>
+  <tabstop>greentap_buildercat_id</tabstop>
+  <tabstop>greentap_builtdate</tabstop>
+  <tabstop>greentap_streetaxis_id</tabstop>
+  <tabstop>greentap_streetname</tabstop>
+  <tabstop>greentap_postnumber</tabstop>
+  <tabstop>greentap_soilcat_id</tabstop>
+  <tabstop>greentap_category_type</tabstop>
+  <tabstop>greentap_location_type</tabstop>
+  <tabstop>greentap_fluid_type</tabstop>
+  <tabstop>greentap_adress_01</tabstop>
+  <tabstop>greentap_adress_02</tabstop>
+  <tabstop>greentap_annotation</tabstop>
+  <tabstop>greentap_observ</tabstop>
+  <tabstop>greentap_comment</tabstop>
+  <tabstop>greentap_descript</tabstop>
+  <tabstop>greentap_link</tabstop>
+  <tabstop>greentap_label_x</tabstop>
+  <tabstop>greentap_label_y</tabstop>
+  <tabstop>greentap_label_rotation</tabstop>
+  <tabstop>greentap_rotation</tabstop>
+  <tabstop>fountain_elevation</tabstop>
+  <tabstop>fountain_depth</tabstop>
+  <tabstop>fountain_state</tabstop>
+  <tabstop>fountain_ownercat_id</tabstop>
+  <tabstop>fountain_demand</tabstop>
+  <tabstop>fountain_code</tabstop>
+  <tabstop>fountain_n_hydrometer</tabstop>
+  <tabstop>fountain_workcat_id</tabstop>
+  <tabstop>fountain_workcat_id_end</tabstop>
+  <tabstop>fountain_buildercat_id</tabstop>
+  <tabstop>fountain_builtdate</tabstop>
+  <tabstop>fountain_streetaxis_id</tabstop>
+  <tabstop>fountain_streetname</tabstop>
+  <tabstop>fountain_postnumber</tabstop>
+  <tabstop>fountain_vmax</tabstop>
+  <tabstop>fountain_vtotal</tabstop>
+  <tabstop>fountain_container_number</tabstop>
+  <tabstop>fountain_pump_number</tabstop>
+  <tabstop>fountain_power</tabstop>
+  <tabstop>fountain_regulation_tank</tabstop>
+  <tabstop>fountain_name</tabstop>
+  <tabstop>fountain_connection</tabstop>
+  <tabstop>fountain_chlorinator</tabstop>
+  <tabstop>fountain_soilcat_id</tabstop>
+  <tabstop>fountain_category_type</tabstop>
+  <tabstop>fountain_location_type</tabstop>
+  <tabstop>fountain_fluid_type</tabstop>
+  <tabstop>fountain_adress_01</tabstop>
+  <tabstop>fountain_adress_02</tabstop>
+  <tabstop>fountain_annotation</tabstop>
+  <tabstop>fountain_observ</tabstop>
+  <tabstop>fountain_comment</tabstop>
+  <tabstop>fountain_descript</tabstop>
+  <tabstop>fountain_link</tabstop>
+  <tabstop>fountain_label_x</tabstop>
+  <tabstop>fountain_label_y</tabstop>
+  <tabstop>fountain_label_rotation</tabstop>
+  <tabstop>fountain_rotation</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>delete_row_info_2</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>tbl_info</tabstop>
+  <tabstop>date_el_from</tabstop>
+  <tabstop>date_el_to</tabstop>
+  <tabstop>tab_scada</tabstop>
+  <tabstop>btn_add_hydrometer</tabstop>
+  <tabstop>btn_delete_hydrometer</tabstop>
+  <tabstop>tbl_hydrometer</tabstop>
+  <tabstop>tbl_hydrometer_value</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_open_path</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>tab_event</tabstop>
+  <tabstop>tbl_event_connec</tabstop>
+  <tabstop>ok</tabstop>
+  <tabstop>delete_row_doc</tabstop>
+  <tabstop>delete_row_info</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

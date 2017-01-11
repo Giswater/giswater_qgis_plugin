@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -2076,6 +2076,64 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>gully_id</tabstop>
+  <tabstop>gratecat_id</tabstop>
+  <tabstop>cat_grate_type</tabstop>
+  <tabstop>cat_grate_matcat</tabstop>
+  <tabstop>units</tabstop>
+  <tabstop>arccat_id</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>top_elev</tabstop>
+  <tabstop>ymax</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>adress_03</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>groove</tabstop>
+  <tabstop>siphon</tabstop>
+  <tabstop>sandbox</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>btn_element_delete</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_user</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_user</tabstop>
+  <tabstop>event_eventcat_id</tabstop>
+  <tabstop>cat_event_eventtype_id</tabstop>
+  <tabstop>tableWidget_19</tabstop>
+  <tabstop>date_log_from</tabstop>
+  <tabstop>date_log_to</tabstop>
+  <tabstop>log_user</tabstop>
+  <tabstop>log_event_type</tabstop>
+  <tabstop>tbl_log</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

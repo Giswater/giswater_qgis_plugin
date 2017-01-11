@@ -43,7 +43,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -59,7 +59,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_5">
       <property name="geometry">
@@ -2133,6 +2133,60 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>gully_id</tabstop>
+  <tabstop>gratecat_id</tabstop>
+  <tabstop>arccat_id</tabstop>
+  <tabstop>groove</tabstop>
+  <tabstop>siphon</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>top_elev</tabstop>
+  <tabstop>ymax</tabstop>
+  <tabstop>units</tabstop>
+  <tabstop>sandbox</tabstop>
+  <tabstop>cat_grate_type</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>label_x</tabstop>
+  <tabstop>label_y</tabstop>
+  <tabstop>label_rotation</tabstop>
+  <tabstop>rotation_2</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>delete_row_info</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_open_path</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>tbl_event</tabstop>
+  <tabstop>ok</tabstop>
+  <tabstop>btn_element_delete</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

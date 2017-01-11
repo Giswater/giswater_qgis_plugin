@@ -120,6 +120,12 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>rpt_selector_result_id</tabstop>
+  <tabstop>rpt_selector_compare_id</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

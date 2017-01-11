@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>13</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -88,15 +88,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_37">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -606,8 +606,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -900,8 +900,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1654,15 +1654,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_39">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2706,8 +2706,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2926,15 +2926,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_41">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4104,8 +4104,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4324,15 +4324,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_43">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5376,8 +5376,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5596,15 +5596,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_45">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -6887,8 +6887,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7107,7 +7107,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_47">
       <property name="geometry">
@@ -7625,8 +7625,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7693,8 +7693,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -8227,8 +8227,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -8447,15 +8447,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_49">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -9372,8 +9372,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -9906,8 +9906,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -11178,8 +11178,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -11398,15 +11398,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_53">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -12970,8 +12970,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -13190,15 +13190,15 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="page_55">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -14310,8 +14310,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -15150,7 +15150,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_event_node_2">
       <attribute name="title">
@@ -15710,6 +15710,339 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>node_id</tabstop>
+  <tabstop>node_type</tabstop>
+  <tabstop>nodecat_id</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>chamber_top_elev</tabstop>
+  <tabstop>chamber_ymax</tabstop>
+  <tabstop>chamber_elev</tabstop>
+  <tabstop>chamber_sander</tabstop>
+  <tabstop>chamber_est_top_elev</tabstop>
+  <tabstop>chamber_est_ymax</tabstop>
+  <tabstop>chamber_state</tabstop>
+  <tabstop>chamber_ownercat_id</tabstop>
+  <tabstop>chamber_workcat_id</tabstop>
+  <tabstop>chamber_workcat_id_end</tabstop>
+  <tabstop>chamber_buildercat_id</tabstop>
+  <tabstop>chamber_builtdate</tabstop>
+  <tabstop>chamber_name</tabstop>
+  <tabstop>chamber_total_volume</tabstop>
+  <tabstop>chamber_total_height</tabstop>
+  <tabstop>chamber_total_length</tabstop>
+  <tabstop>chamber_total_width</tabstop>
+  <tabstop>chamber_soilcat_id</tabstop>
+  <tabstop>chamber_category_type</tabstop>
+  <tabstop>chamber_location_type</tabstop>
+  <tabstop>chamber_fluid_type</tabstop>
+  <tabstop>chamber_adress_01</tabstop>
+  <tabstop>chamber_adress_02</tabstop>
+  <tabstop>chamber_annotation</tabstop>
+  <tabstop>chamber_observ</tabstop>
+  <tabstop>chamber_comment</tabstop>
+  <tabstop>chamber_descript</tabstop>
+  <tabstop>chamber_link</tabstop>
+  <tabstop>chamber_label_x</tabstop>
+  <tabstop>chamber_label_y</tabstop>
+  <tabstop>label_chamber_rotation</tabstop>
+  <tabstop>chamber_rotation</tabstop>
+  <tabstop>junction_top_elev</tabstop>
+  <tabstop>junction_ymax</tabstop>
+  <tabstop>junction_elev</tabstop>
+  <tabstop>junction_sander</tabstop>
+  <tabstop>junction_est_top_elev</tabstop>
+  <tabstop>junction_est_ymax</tabstop>
+  <tabstop>junction_state</tabstop>
+  <tabstop>junction_ownercat_id</tabstop>
+  <tabstop>junction_workcat_id</tabstop>
+  <tabstop>junction_workcat_id_end</tabstop>
+  <tabstop>junction_buildercat_id</tabstop>
+  <tabstop>junction_builtdate</tabstop>
+  <tabstop>junction_soilcat_id</tabstop>
+  <tabstop>junction_category_type</tabstop>
+  <tabstop>junction_location_type</tabstop>
+  <tabstop>junction_fluid_type</tabstop>
+  <tabstop>junction_adress_01</tabstop>
+  <tabstop>junction_adress_02</tabstop>
+  <tabstop>junction_annotation</tabstop>
+  <tabstop>junction_observ</tabstop>
+  <tabstop>junction_comment</tabstop>
+  <tabstop>junction_descript</tabstop>
+  <tabstop>junction_link</tabstop>
+  <tabstop>junction_label_x</tabstop>
+  <tabstop>junction_label_y</tabstop>
+  <tabstop>label_junction_rotation</tabstop>
+  <tabstop>junction_rotation</tabstop>
+  <tabstop>manhole_top_elev</tabstop>
+  <tabstop>manhole_ymax</tabstop>
+  <tabstop>manhole_elev</tabstop>
+  <tabstop>manhole_sander</tabstop>
+  <tabstop>manhole_est_top_elev</tabstop>
+  <tabstop>manhole_est_ymax</tabstop>
+  <tabstop>manhole_state</tabstop>
+  <tabstop>manhole_ownercat_id</tabstop>
+  <tabstop>manhole_workcat_id</tabstop>
+  <tabstop>manhole_workcat_id_end</tabstop>
+  <tabstop>manhole_buildercat_id</tabstop>
+  <tabstop>manhole_builtdate</tabstop>
+  <tabstop>manhole_sander_length</tabstop>
+  <tabstop>manhole_prot_surface</tabstop>
+  <tabstop>manhole_soilcat_id</tabstop>
+  <tabstop>manhole_category_type</tabstop>
+  <tabstop>manhole_location_type</tabstop>
+  <tabstop>manhole_fluid_type</tabstop>
+  <tabstop>manhole_adress_01</tabstop>
+  <tabstop>manhole_adress_02</tabstop>
+  <tabstop>manhole_annotation</tabstop>
+  <tabstop>manhole_observ</tabstop>
+  <tabstop>manhole_comment</tabstop>
+  <tabstop>manhole_descript</tabstop>
+  <tabstop>manhole_link</tabstop>
+  <tabstop>manhole_label_x</tabstop>
+  <tabstop>manhole_label_y</tabstop>
+  <tabstop>manhole_label_rotation</tabstop>
+  <tabstop>manhole_rotation</tabstop>
+  <tabstop>netgully_top_elev</tabstop>
+  <tabstop>netgully_ymax</tabstop>
+  <tabstop>netgully_elev</tabstop>
+  <tabstop>netgully_sander</tabstop>
+  <tabstop>netgully_est_top_elev</tabstop>
+  <tabstop>netgully_est_ymax</tabstop>
+  <tabstop>netgully_state</tabstop>
+  <tabstop>netgully_ownercat_id</tabstop>
+  <tabstop>netgully_workcat_id</tabstop>
+  <tabstop>netgully_workcat_id_end</tabstop>
+  <tabstop>netgully_buildercat_id</tabstop>
+  <tabstop>netgully_builtdate</tabstop>
+  <tabstop>netgully_soilcat_id</tabstop>
+  <tabstop>netgully_category_type</tabstop>
+  <tabstop>netgully_location_type</tabstop>
+  <tabstop>netgully_fluid_type</tabstop>
+  <tabstop>netgully_adress_01</tabstop>
+  <tabstop>netgully_adress_02</tabstop>
+  <tabstop>netgully_annotatio</tabstop>
+  <tabstop>netgully_observ</tabstop>
+  <tabstop>netgully_comment</tabstop>
+  <tabstop>netgully_descript</tabstop>
+  <tabstop>netgully_link</tabstop>
+  <tabstop>netgully_label_x</tabstop>
+  <tabstop>netgully_label_y</tabstop>
+  <tabstop>netgully_label_rotation</tabstop>
+  <tabstop>netgully_rotation</tabstop>
+  <tabstop>netinit_top_elev</tabstop>
+  <tabstop>netinit_ymax</tabstop>
+  <tabstop>netinit_elev</tabstop>
+  <tabstop>netinit_sander</tabstop>
+  <tabstop>netinit_est_top_elev</tabstop>
+  <tabstop>netinit_est_ymax</tabstop>
+  <tabstop>netinit_state</tabstop>
+  <tabstop>netinit_ownercat_id</tabstop>
+  <tabstop>netinit_workcat_id</tabstop>
+  <tabstop>netinit_workcat_id_end</tabstop>
+  <tabstop>netinit_buildercat_id</tabstop>
+  <tabstop>netinit_builtdate</tabstop>
+  <tabstop>netinit_name</tabstop>
+  <tabstop>netinit_mheight</tabstop>
+  <tabstop>netinit_mlength</tabstop>
+  <tabstop>netinit_mwidth</tabstop>
+  <tabstop>netinit_soilcat_id</tabstop>
+  <tabstop>netinit_category_type</tabstop>
+  <tabstop>netinit_location_type</tabstop>
+  <tabstop>netinit_fluid_type</tabstop>
+  <tabstop>netinit_adress_01</tabstop>
+  <tabstop>netinit_adress_02</tabstop>
+  <tabstop>netinit_annotation</tabstop>
+  <tabstop>netinit_observ</tabstop>
+  <tabstop>netinit_comment</tabstop>
+  <tabstop>netinit_descript</tabstop>
+  <tabstop>netinit_link</tabstop>
+  <tabstop>netinit_label_x</tabstop>
+  <tabstop>netinit_label_y</tabstop>
+  <tabstop>netinit_label_rotation</tabstop>
+  <tabstop>netinit_rotation</tabstop>
+  <tabstop>outfall_top_elev</tabstop>
+  <tabstop>outfall_ymax</tabstop>
+  <tabstop>outfall_elev</tabstop>
+  <tabstop>outfall_sander</tabstop>
+  <tabstop>outfall_est_top_elev</tabstop>
+  <tabstop>outfall_est_ymax</tabstop>
+  <tabstop>outfall_state</tabstop>
+  <tabstop>outfall_ownercat_id</tabstop>
+  <tabstop>outfall_workcat_id</tabstop>
+  <tabstop>outfall_workcat_id_end</tabstop>
+  <tabstop>outfall_buildercat_id</tabstop>
+  <tabstop>outfall_builtdate</tabstop>
+  <tabstop>outfall_name</tabstop>
+  <tabstop>outfall_soilcat_id</tabstop>
+  <tabstop>outfall_category_type</tabstop>
+  <tabstop>outfall_location_type</tabstop>
+  <tabstop>outfall_fluid_type</tabstop>
+  <tabstop>outfall_adress_01</tabstop>
+  <tabstop>outfall_adress_02</tabstop>
+  <tabstop>outfall_annotation</tabstop>
+  <tabstop>outfall_observ</tabstop>
+  <tabstop>outfall_comment</tabstop>
+  <tabstop>outfall_descript</tabstop>
+  <tabstop>outfall_link</tabstop>
+  <tabstop>outfall_label_x</tabstop>
+  <tabstop>outfall_label_y</tabstop>
+  <tabstop>label_outfall_rotation</tabstop>
+  <tabstop>outfall_rotation</tabstop>
+  <tabstop>storage_top_elev</tabstop>
+  <tabstop>storage_ymax</tabstop>
+  <tabstop>storage_elev</tabstop>
+  <tabstop>storage_sander</tabstop>
+  <tabstop>storage_est_top_elev</tabstop>
+  <tabstop>storage_est_ymax</tabstop>
+  <tabstop>storage_state</tabstop>
+  <tabstop>storage_ownercat_id</tabstop>
+  <tabstop>storage_workcat_id</tabstop>
+  <tabstop>storage_workcat_id_end</tabstop>
+  <tabstop>storage_buildercat_id</tabstop>
+  <tabstop>storage_builtdate</tabstop>
+  <tabstop>storage_name</tabstop>
+  <tabstop>storage_total_volume</tabstop>
+  <tabstop>storage_util_volume</tabstop>
+  <tabstop>storage_min_height</tabstop>
+  <tabstop>storage_total_height</tabstop>
+  <tabstop>storage_total_length</tabstop>
+  <tabstop>storage_total_width</tabstop>
+  <tabstop>storage_soilcat_id</tabstop>
+  <tabstop>storage_category_type</tabstop>
+  <tabstop>storage_location_type</tabstop>
+  <tabstop>storage_fluid_type</tabstop>
+  <tabstop>storage_adress_01</tabstop>
+  <tabstop>storage_adress_02</tabstop>
+  <tabstop>storage_annotation</tabstop>
+  <tabstop>storage_observ</tabstop>
+  <tabstop>storage_comment</tabstop>
+  <tabstop>storage_descript</tabstop>
+  <tabstop>storage_link</tabstop>
+  <tabstop>storage_label_x</tabstop>
+  <tabstop>storage_label_y</tabstop>
+  <tabstop>label_storage_rotation</tabstop>
+  <tabstop>storage_rotation</tabstop>
+  <tabstop>valve_top_elev</tabstop>
+  <tabstop>valve_ymax</tabstop>
+  <tabstop>valve_elev</tabstop>
+  <tabstop>valve_sander</tabstop>
+  <tabstop>valve_est_top_elev</tabstop>
+  <tabstop>valve_est_ymax</tabstop>
+  <tabstop>valve_state</tabstop>
+  <tabstop>valve_ownercat_id</tabstop>
+  <tabstop>valve_workcat_id</tabstop>
+  <tabstop>valve_workcat_id_end</tabstop>
+  <tabstop>valve_buildercat_id</tabstop>
+  <tabstop>valve_builtdate</tabstop>
+  <tabstop>valve_soilcat_id</tabstop>
+  <tabstop>valve_category_type</tabstop>
+  <tabstop>valve_location_type</tabstop>
+  <tabstop>valve_fluid_type</tabstop>
+  <tabstop>valve_adress_01</tabstop>
+  <tabstop>valve_adress_02</tabstop>
+  <tabstop>valve_annotation</tabstop>
+  <tabstop>valve_observ</tabstop>
+  <tabstop>valve_comment</tabstop>
+  <tabstop>valve_descript</tabstop>
+  <tabstop>valve_link</tabstop>
+  <tabstop>valve_label_x</tabstop>
+  <tabstop>valve_label_y</tabstop>
+  <tabstop>valve_label_rotation</tabstop>
+  <tabstop>valve_rotation</tabstop>
+  <tabstop>wjump_top_elev</tabstop>
+  <tabstop>wjump_ymax</tabstop>
+  <tabstop>wjump_elev</tabstop>
+  <tabstop>wjump_sander</tabstop>
+  <tabstop>wjump_est_top_elev</tabstop>
+  <tabstop>wjump_est_ymax</tabstop>
+  <tabstop>wjump_state</tabstop>
+  <tabstop>wjump_ownercat_id</tabstop>
+  <tabstop>wjump_workcat_id</tabstop>
+  <tabstop>wjump_workcat_id_end</tabstop>
+  <tabstop>wjump_buildercat_id</tabstop>
+  <tabstop>wjump_builtdate</tabstop>
+  <tabstop>wjump_name</tabstop>
+  <tabstop>wjump_security_bar</tabstop>
+  <tabstop>wjump_steps</tabstop>
+  <tabstop>wjump_prot_surface</tabstop>
+  <tabstop>wjump_sander_length</tabstop>
+  <tabstop>wjump_sander_depth</tabstop>
+  <tabstop>wjump_mheight</tabstop>
+  <tabstop>wjump_length</tabstop>
+  <tabstop>wjump_width</tabstop>
+  <tabstop>wjump_soilcat_id</tabstop>
+  <tabstop>wjump_category_type</tabstop>
+  <tabstop>wjump_location_type</tabstop>
+  <tabstop>wjump_fluid_type</tabstop>
+  <tabstop>wjump_adress_01</tabstop>
+  <tabstop>wjump_adress_02</tabstop>
+  <tabstop>wjump_annotation</tabstop>
+  <tabstop>wjump_observ</tabstop>
+  <tabstop>wjump_comment</tabstop>
+  <tabstop>wjump_descript</tabstop>
+  <tabstop>wjump_link</tabstop>
+  <tabstop>wjump_label_x</tabstop>
+  <tabstop>wjump_label_y</tabstop>
+  <tabstop>label_wjump_rotation</tabstop>
+  <tabstop>wjump_rotation</tabstop>
+  <tabstop>wwtp_top_elev</tabstop>
+  <tabstop>wwtp_ymax</tabstop>
+  <tabstop>wwtp_elev</tabstop>
+  <tabstop>wwtp_sander</tabstop>
+  <tabstop>wwtp_est_top_elev</tabstop>
+  <tabstop>wwtp_est_ymax</tabstop>
+  <tabstop>wwtp_state</tabstop>
+  <tabstop>wwtp_ownercat_id</tabstop>
+  <tabstop>wwtp_workcat_id</tabstop>
+  <tabstop>wwtp_workcat_id_end</tabstop>
+  <tabstop>wwtp_buildercat_id</tabstop>
+  <tabstop>wwtp_builtdate</tabstop>
+  <tabstop>wwtp_name</tabstop>
+  <tabstop>wwtp_soilcat_id</tabstop>
+  <tabstop>wwtp_category_type</tabstop>
+  <tabstop>wwtp_location_type</tabstop>
+  <tabstop>wwtp_fluid_type</tabstop>
+  <tabstop>wwtp_adress01</tabstop>
+  <tabstop>wwtp_adress_02</tabstop>
+  <tabstop>wwtp_annotation</tabstop>
+  <tabstop>wwtp_observ</tabstop>
+  <tabstop>wwtp_comment</tabstop>
+  <tabstop>wwtp_descript</tabstop>
+  <tabstop>wwtp_link</tabstop>
+  <tabstop>wwtp_label_x</tabstop>
+  <tabstop>wwtp_label_y</tabstop>
+  <tabstop>wwtp_label_rotation</tabstop>
+  <tabstop>wwtp_rotation</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>node_id_2</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>delete_row_info</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_open_path</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>tab_event</tabstop>
+  <tabstop>tbl_event_node</tabstop>
+  <tabstop>date_el_from</tabstop>
+  <tabstop>date_el_to</tabstop>
+  <tabstop>tab_scada</tabstop>
+  <tabstop>tbl_scada</tabstop>
+  <tabstop>tbl_scada_value</tabstop>
+  <tabstop>tbl_masterplan</tabstop>
+  <tabstop>ok</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

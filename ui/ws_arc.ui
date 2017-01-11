@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>593</width>
-    <height>603</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,8 +67,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>366</height>
        </rect>
       </property>
       <attribute name="label">
@@ -533,8 +533,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>366</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1974,6 +1974,53 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>arc_id</tabstop>
+  <tabstop>cat_arctype_id</tabstop>
+  <tabstop>arccat_id</tabstop>
+  <tabstop>epa_type</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>node_1</tabstop>
+  <tabstop>node_2</tabstop>
+  <tabstop>custom_length</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>btn_element_delete</tabstop>
+  <tabstop>tbl_info</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>date_event_from</tabstop>
+  <tabstop>date_event_to</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>tab_event</tabstop>
+  <tabstop>tbl_event_arc</tabstop>
+  <tabstop>tbl_event_element</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

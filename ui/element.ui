@@ -740,6 +740,26 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>element_id</tabstop>
+  <tabstop>elementcat_id</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

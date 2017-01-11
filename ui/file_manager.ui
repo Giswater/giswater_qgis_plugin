@@ -255,6 +255,21 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>btn_sector_selection</tabstop>
+  <tabstop>btn_state_selection</tabstop>
+  <tabstop>btn_options</tabstop>
+  <tabstop>btn_times</tabstop>
+  <tabstop>chk_export</tabstop>
+  <tabstop>txt_file_inp</tabstop>
+  <tabstop>btn_file_inp</tabstop>
+  <tabstop>chk_exec</tabstop>
+  <tabstop>txt_file_rpt</tabstop>
+  <tabstop>btn_file_rpt</tabstop>
+  <tabstop>chk_import</tabstop>
+  <tabstop>txt_result_name</tabstop>
+  <tabstop>btn_accept</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

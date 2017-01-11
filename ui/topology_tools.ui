@@ -105,6 +105,15 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>check_node_orphan</tabstop>
+  <tabstop>check_node_duplicated</tabstop>
+  <tabstop>check_connec_duplicated</tabstop>
+  <tabstop>check_arc_same_startend</tabstop>
+  <tabstop>check_node_sink</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

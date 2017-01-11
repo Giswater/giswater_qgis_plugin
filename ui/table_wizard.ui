@@ -148,6 +148,14 @@ p, li { white-space: pre-wrap; }
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>txt_file_path</tabstop>
+  <tabstop>btn_select_file</tabstop>
+  <tabstop>cbo_table</tabstop>
+  <tabstop>cbo_delimiter</tabstop>
+  <tabstop>chk_header</tabstop>
+  <tabstop>btn_import_csv</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

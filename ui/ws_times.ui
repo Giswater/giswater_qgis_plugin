@@ -550,6 +550,18 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>duration</tabstop>
+  <tabstop>quality_timestep</tabstop>
+  <tabstop>pattern_timestep</tabstop>
+  <tabstop>report_timestep</tabstop>
+  <tabstop>start_clocktime</tabstop>
+  <tabstop>hydraulic_timestep</tabstop>
+  <tabstop>rule_timestep</tabstop>
+  <tabstop>pattern_start</tabstop>
+  <tabstop>report_start</tabstop>
+  <tabstop>statistic</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

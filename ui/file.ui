@@ -289,6 +289,17 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>doc_id</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>path</tabstop>
+  <tabstop>tagcat_id</tabstop>
+  <tabstop>path_doc</tabstop>
+  <tabstop>path_url</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

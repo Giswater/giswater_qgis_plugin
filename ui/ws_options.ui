@@ -1134,6 +1134,28 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>units</tabstop>
+  <tabstop>headloss</tabstop>
+  <tabstop>hydraulics</tabstop>
+  <tabstop>quality</tabstop>
+  <tabstop>unbalanced</tabstop>
+  <tabstop>viscosity</tabstop>
+  <tabstop>trials</tabstop>
+  <tabstop>accuracy</tabstop>
+  <tabstop>emitter_exponent</tabstop>
+  <tabstop>checkfreq</tabstop>
+  <tabstop>maxcheck</tabstop>
+  <tabstop>damplimit</tabstop>
+  <tabstop>hydraulics_fname</tabstop>
+  <tabstop>node_id</tabstop>
+  <tabstop>unbalanced_n</tabstop>
+  <tabstop>specific_gravity</tabstop>
+  <tabstop>diffusivity</tabstop>
+  <tabstop>tolerance</tabstop>
+  <tabstop>pattern</tabstop>
+  <tabstop>demand_multiplier</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

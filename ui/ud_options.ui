@@ -1390,6 +1390,31 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>flow_units</tabstop>
+  <tabstop>flow_routing</tabstop>
+  <tabstop>link_offsets</tabstop>
+  <tabstop>allow_ponding</tabstop>
+  <tabstop>skip_steady_state</tabstop>
+  <tabstop>min_slope</tabstop>
+  <tabstop>ignore_rainfall</tabstop>
+  <tabstop>ignore_snowmelt</tabstop>
+  <tabstop>ignore_groundwater</tabstop>
+  <tabstop>ignore_routing</tabstop>
+  <tabstop>ignore_quality</tabstop>
+  <tabstop>force_main_equation</tabstop>
+  <tabstop>normal_flow_limited</tabstop>
+  <tabstop>lengthening_step</tabstop>
+  <tabstop>max_trials</tabstop>
+  <tabstop>sys_flow_tol</tabstop>
+  <tabstop>variable_step</tabstop>
+  <tabstop>inertial_damping</tabstop>
+  <tabstop>min_surfarea</tabstop>
+  <tabstop>head_tolerance</tabstop>
+  <tabstop>lat_flow_tol</tabstop>
+  <tabstop>hydrology_id</tabstop>
+  <tabstop>rg_id</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

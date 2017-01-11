@@ -38,7 +38,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -2094,7 +2094,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_event_feature_2">
       <attribute name="title">
@@ -2576,7 +2576,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -2998,6 +2998,88 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>connec_id</tabstop>
+  <tabstop>cat_connectype_id_dummy</tabstop>
+  <tabstop>connecat_id_dummy</tabstop>
+  <tabstop>arc_id</tabstop>
+  <tabstop>cat_matcat_id</tabstop>
+  <tabstop>cat_dnom</tabstop>
+  <tabstop>cat_pnom</tabstop>
+  <tabstop>tab_main</tabstop>
+  <tabstop>elevation</tabstop>
+  <tabstop>depth</tabstop>
+  <tabstop>sector_id</tabstop>
+  <tabstop>dma_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>soilcat_id</tabstop>
+  <tabstop>category_type</tabstop>
+  <tabstop>fluid_type</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>adress_01</tabstop>
+  <tabstop>adress_02</tabstop>
+  <tabstop>adress_03</tabstop>
+  <tabstop>annotation</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>presszonecat_id</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>demand</tabstop>
+  <tabstop>n_hydrometer</tabstop>
+  <tabstop>code</tabstop>
+  <tabstop>delete_row_info</tabstop>
+  <tabstop>tbl_info</tabstop>
+  <tabstop>date_document_from</tabstop>
+  <tabstop>date_document_to</tabstop>
+  <tabstop>doc_user</tabstop>
+  <tabstop>doc_type</tabstop>
+  <tabstop>doc_tag</tabstop>
+  <tabstop>delete_row_doc</tabstop>
+  <tabstop>tbl_connec</tabstop>
+  <tabstop>tab_event</tabstop>
+  <tabstop>date_document_from_3</tabstop>
+  <tabstop>date_document_to_3</tabstop>
+  <tabstop>doc_user_3</tabstop>
+  <tabstop>event_id_3</tabstop>
+  <tabstop>event_type_3</tabstop>
+  <tabstop>tbl_event_node</tabstop>
+  <tabstop>date_document_from_2</tabstop>
+  <tabstop>date_document_to_2</tabstop>
+  <tabstop>doc_user_2</tabstop>
+  <tabstop>event_id</tabstop>
+  <tabstop>event_type</tabstop>
+  <tabstop>tbl_event_element</tabstop>
+  <tabstop>tab_log_2</tabstop>
+  <tabstop>log_connec_date_from</tabstop>
+  <tabstop>log_connec_date_to</tabstop>
+  <tabstop>log_connec_user</tabstop>
+  <tabstop>log_connec_event</tabstop>
+  <tabstop>tbl_log_connec</tabstop>
+  <tabstop>log_element_date_from</tabstop>
+  <tabstop>log_element_date_to</tabstop>
+  <tabstop>log_element_user</tabstop>
+  <tabstop>log_element_event</tabstop>
+  <tabstop>tbl_log_element</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>date_dae_from</tabstop>
+  <tabstop>date_dae_to</tabstop>
+  <tabstop>btn_add_hydrometer</tabstop>
+  <tabstop>btn_delete_hydrometer</tabstop>
+  <tabstop>tbl_dae</tabstop>
+  <tabstop>tbl_dae_2</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+  <tabstop>cat_connectype_id</tabstop>
+  <tabstop>connecat_id</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

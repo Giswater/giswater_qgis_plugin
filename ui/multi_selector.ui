@@ -91,6 +91,13 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>tbl</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <designerdata>
