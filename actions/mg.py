@@ -86,7 +86,7 @@ class Mg():
             self.controller.execute_sql(sql) 
             
         if self.dlg.check_topology_repair.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_arc_topology();"  
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_topological_consistency();"  
             self.controller.execute_sql(sql) 
             
         if self.dlg.check_node_sink.isChecked():
@@ -99,10 +99,7 @@ class Mg():
         self.close_dialog()         
             
         # Refresh map canvas
-        self.iface.mapCanvas().refreshAllLayers()
-
-        for layerRefresh in self.iface.mapCanvas().layers():
-            layerRefresh.triggerRepaint()
+        self.iface.mapCanvas().refresh()             
 
 
     def mg_table_wizard(self):
@@ -429,7 +426,7 @@ class Mg():
         self.close_dialog(self.dlg) 
 
 
-    def mg_flow_exit(self):
+    def mg_analytics(self):
         ''' Button 27. Valve analytics ''' 
 
         # Uncheck all actions (buttons) except this one
