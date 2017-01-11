@@ -1,7 +1,6 @@
 ﻿-- SUPEREDITOR
 
 --CREATE ROLE rol_supereditor NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-
 --GRANT ALL ON DATABASE "gis" TO "rol_supereditor" ;
 
 GRANT ALL ON SCHEMA "gw_saa" TO "rol_supereditor";
@@ -26,7 +25,6 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA "gw_sdp" TO "rol_supereditor";
 -- EDITOR SAA
 
 --CREATE ROLE rol_editor_saa NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-
 --GRANT ALL ON DATABASE "gis" TO "rol_editor_saa" ;
 
 GRANT ALL ON SCHEMA "gw_saa" TO "rol_editor_saa";
@@ -76,7 +74,6 @@ GRANT ALL ("point_id","point_type","observ","text","the_geom") ON "gw_saa".point
 -- EDITOR SES
 
 --CREATE ROLE rol_editor_ses NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-
 --GRANT ALL ON DATABASE "gis" TO "rol_editor_ses" ;
 
 GRANT ALL ON SCHEMA "gw_ses" TO "rol_editor_ses";
@@ -192,7 +189,6 @@ GRANT ALL ("point_id","point_type","observ","text","the_geom") ON "gw_sdp".point
 
 
 --CREATE ROLE rol_consulta NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-
 --GRANT ALL ON DATABASE "gis" TO "rol_consulta" ;
 
 GRANT ALL ON SCHEMA "gw_saa" TO "rol_consulta";

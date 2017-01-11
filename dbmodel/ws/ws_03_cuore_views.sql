@@ -103,11 +103,11 @@ CREATE OR REPLACE VIEW v_value_cat_node AS
      JOIN node_type ON node_type.id = nodetype_id;
 
 
-CREATE OR REPLACE VIEW mataro_ws_demo.v_value_cat_connec AS 
+CREATE OR REPLACE VIEW v_value_cat_connec AS 
  SELECT cat_connec.id,
     cat_connec.type as connec_type,
     connec_type.type
-   FROM mataro_ws_demo.cat_connec
-     JOIN mataro_ws_demo.connec_type ON connec_type.id::text = cat_connec.type::text;
+   FROM cat_connec
+     JOIN connec_type ON connec_type.id::text = cat_connec.type::text;
 
 
