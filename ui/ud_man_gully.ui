@@ -1580,7 +1580,7 @@
     <attribute name="title">
      <string>O&amp;&amp;M</string>
     </attribute>
-    <widget class="QLabel" name="label_event_tag">
+    <widget class="QLabel" name="label_event_parameter">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -1742,7 +1742,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_event_type">
+    <widget class="QLabel" name="label_event_parameter_type">
      <property name="geometry">
       <rect>
        <x>296</x>

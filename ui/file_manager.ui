@@ -91,7 +91,7 @@
     <string>...</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="chk_export">
+  <widget class="QCheckBox" name="chk_export_inp">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -104,7 +104,7 @@
     <string>Export INP</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="label_inp_file">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -117,7 +117,7 @@
     <string>INP file:</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="chk_exec">
+  <widget class="QCheckBox" name="chk_execute_epa">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -143,7 +143,7 @@
     <string>...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="label_rpt_file">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -156,7 +156,7 @@
     <string>RPT file:</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="chk_import">
+  <widget class="QCheckBox" name="chk_import_results">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -182,7 +182,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
+  <widget class="QLabel" name="label_result_name">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -195,7 +195,7 @@
     <string>Result name:</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QLabel" name="label_preprocessing_options">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -208,7 +208,7 @@
     <string>Preprocessing options</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_5">
+  <widget class="QLabel" name="label_file_manager">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -260,13 +260,13 @@
   <tabstop>btn_state_selection</tabstop>
   <tabstop>btn_options</tabstop>
   <tabstop>btn_times</tabstop>
-  <tabstop>chk_export</tabstop>
+  <tabstop>chk_export_inp</tabstop>
   <tabstop>txt_file_inp</tabstop>
   <tabstop>btn_file_inp</tabstop>
-  <tabstop>chk_exec</tabstop>
+  <tabstop>chk_execute_epa</tabstop>
   <tabstop>txt_file_rpt</tabstop>
   <tabstop>btn_file_rpt</tabstop>
-  <tabstop>chk_import</tabstop>
+  <tabstop>chk_import_results</tabstop>
   <tabstop>txt_result_name</tabstop>
   <tabstop>btn_accept</tabstop>
  </tabstops>

@@ -250,7 +250,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
@@ -545,7 +545,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="label_code_2">
+      <widget class="QLabel" name="label_code">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -578,7 +578,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_n_hydrometer_2">
+      <widget class="QLabel" name="label_n_hydrometer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1199,7 +1199,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_scada_from">
+    <widget class="QLabel" name="label_hydrometer_from">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1235,7 +1235,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_scada_to">
+    <widget class="QLabel" name="label_hydrometer_to">
      <property name="geometry">
       <rect>
        <x>153</x>
@@ -1281,7 +1281,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -1527,7 +1527,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_cat_2">
+  <widget class="QLabel" name="label_connec_id">
    <property name="geometry">
     <rect>
      <x>420</x>
@@ -1563,7 +1563,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_cat_3">
+  <widget class="QLabel" name="label_arc_id">
    <property name="geometry">
     <rect>
      <x>510</x>

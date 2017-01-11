@@ -104,7 +104,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLabel" name="label_orphannode_delete_2">
+    <widget class="QLabel" name="label_orphannode_delete">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -804,7 +804,7 @@
       <attribute name="title">
        <string>Ppoint</string>
       </attribute>
-      <widget class="QLabel" name="label_node2arc_22">
+      <widget class="QLabel" name="label_ppoint_number">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -840,7 +840,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_20">
+      <widget class="QLabel" name="label_ppoint_layer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -876,7 +876,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_21">
+      <widget class="QLabel" name="label_ppoint_pzone">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -956,7 +956,7 @@
       <attribute name="title">
        <string>Urban propierties</string>
       </attribute>
-      <widget class="QLabel" name="label_node2arc_26">
+      <widget class="QLabel" name="label_urban_layer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -992,7 +992,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_27">
+      <widget class="QLabel" name="label_urban_number">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1028,7 +1028,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_28">
+      <widget class="QLabel" name="label_urban_pzone">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1103,7 +1103,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_31">
+      <widget class="QLabel" name="label_urban_block">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1157,7 +1157,7 @@
       <attribute name="title">
        <string>Adress</string>
       </attribute>
-      <widget class="QLabel" name="label_node2arc_11">
+      <widget class="QLabel" name="label_portal_number">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1193,7 +1193,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_6">
+      <widget class="QLabel" name="label_portal_layer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1229,7 +1229,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_10">
+      <widget class="QLabel" name="label_portal_code">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1304,7 +1304,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_5">
+      <widget class="QLabel" name="label_street_name">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1353,7 +1353,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_3">
+      <widget class="QLabel" name="label_street_layer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1402,7 +1402,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_4">
+      <widget class="QLabel" name="label_street_code">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1456,7 +1456,7 @@
       <attribute name="title">
        <string>Hydrometer</string>
       </attribute>
-      <widget class="QLabel" name="label_node2arc_8">
+      <widget class="QLabel" name="label_hydrometer_layer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1492,7 +1492,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_9">
+      <widget class="QLabel" name="label_hydrometer_id_field">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1567,7 +1567,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_29">
+      <widget class="QLabel" name="label_connec_layer">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1603,7 +1603,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_node2arc_30">
+      <widget class="QLabel" name="label_connec_id_field">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1652,7 +1652,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_hydrometer_field_urban_propierties_code">
+      <widget class="QLabel" name="label_hydrometer_connec_id">
        <property name="geometry">
         <rect>
          <x>30</x>

@@ -87,7 +87,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_conduit_est_y1_2">
+  <widget class="QLabel" name="label_general">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -624,7 +624,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_conduit_est_y1_9">
+  <widget class="QLabel" name="label_dynamic_wave">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -1227,7 +1227,7 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label_conduit_est_y1_10">
+  <widget class="QLabel" name="label_hydrology">
    <property name="geometry">
     <rect>
      <x>10</x>

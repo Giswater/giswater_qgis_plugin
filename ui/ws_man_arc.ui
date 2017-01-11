@@ -356,7 +356,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_id">
+  <widget class="QLabel" name="label_epa_type">
    <property name="geometry">
     <rect>
      <x>448</x>
@@ -441,7 +441,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>180</y>
+         <y>176</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -623,7 +623,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>180</y>
+         <y>176</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -853,7 +853,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_arc_custom_length">
+      <widget class="QLabel" name="label_custom_length">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -890,7 +890,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_arc_custom_length_2">
+      <widget class="QLabel" name="label_gis_length">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -945,7 +945,7 @@
         <string/>
        </property>
       </widget>
-      <widget class="QLabel" name="label_arc_custom_length_3">
+      <widget class="QLabel" name="label_dnom">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -967,7 +967,7 @@
         <enum>QFrame::Plain</enum>
        </property>
        <property name="text">
-        <string>Dnom.</string>
+        <string>Dnom:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -1857,7 +1857,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_event_id">
+    <widget class="QLabel" name="label_event_parameter">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -1979,7 +1979,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_event_type">
+    <widget class="QLabel" name="label_event_parameter_type">
      <property name="geometry">
       <rect>
        <x>296</x>
@@ -2100,7 +2100,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_soil">
+      <widget class="QLabel" name="label_cost_soil">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2139,7 +2139,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_23">
+      <widget class="QLabel" name="label_cost_meas_val">
        <property name="geometry">
         <rect>
          <x>440</x>
@@ -2192,7 +2192,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_24">
+      <widget class="QLabel" name="label_cost_euro_7">
        <property name="geometry">
         <rect>
          <x>393</x>
@@ -2284,7 +2284,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_cost">
+      <widget class="QLabel" name="label_cost_total_price">
        <property name="geometry">
         <rect>
          <x>340</x>
@@ -2323,7 +2323,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_15">
+      <widget class="QLabel" name="label_cost_meas">
        <property name="geometry">
         <rect>
          <x>416</x>
@@ -2399,7 +2399,7 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QLabel" name="label_trenchlining">
+      <widget class="QLabel" name="label_cost_trenchlining">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2436,7 +2436,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_18">
+      <widget class="QLabel" name="label_cost_euro_3">
        <property name="geometry">
         <rect>
          <x>392</x>
@@ -2502,7 +2502,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_element_2">
+      <widget class="QLabel" name="label_cost_arc">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2555,7 +2555,7 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QLabel" name="label_bottom">
+      <widget class="QLabel" name="label_cost_bottom">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2679,7 +2679,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_budget">
+      <widget class="QLabel" name="label_cost_budget">
        <property name="geometry">
         <rect>
          <x>340</x>
@@ -2747,7 +2747,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_14">
+      <widget class="QLabel" name="label_cost_total">
        <property name="geometry">
         <rect>
          <x>476</x>
@@ -2784,7 +2784,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_13">
+      <widget class="QLabel" name="label_cost_unit_price">
        <property name="geometry">
         <rect>
          <x>352</x>
@@ -2821,7 +2821,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_protection">
+      <widget class="QLabel" name="label_cost_protection">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2858,7 +2858,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_filling">
+      <widget class="QLabel" name="label_cost_filling">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -2911,7 +2911,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_16">
+      <widget class="QLabel" name="label_cost_euro">
        <property name="geometry">
         <rect>
          <x>394</x>
@@ -2961,7 +2961,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_length">
+      <widget class="QLabel" name="label_cost_length">
        <property name="geometry">
         <rect>
          <x>342</x>
@@ -3016,7 +3016,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_excavation">
+      <widget class="QLabel" name="label_cost_excavation">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -3082,7 +3082,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_21">
+      <widget class="QLabel" name="label_cost_euro_5">
        <property name="geometry">
         <rect>
          <x>392</x>
@@ -3119,7 +3119,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_19">
+      <widget class="QLabel" name="label_cost_euro_4">
        <property name="geometry">
         <rect>
          <x>392</x>
@@ -3208,7 +3208,7 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_22">
+      <widget class="QLabel" name="label_cost_euro_6">
        <property name="geometry">
         <rect>
          <x>392</x>
@@ -3245,7 +3245,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_excess">
+      <widget class="QLabel" name="label_cost_excess">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -3314,7 +3314,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_soil_2">
+      <widget class="QLabel" name="label_cost_pavement">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -3353,7 +3353,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_pavement">
+      <widget class="QLabel" name="label_cost_total_pavement">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -3493,7 +3493,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_element">
+      <widget class="QLabel" name="label_cost_element">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -3530,7 +3530,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_17">
+      <widget class="QLabel" name="label_cost_euro_2">
        <property name="geometry">
         <rect>
          <x>394</x>
@@ -3567,7 +3567,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_varc_node_20">
+      <widget class="QLabel" name="label_cost_description">
        <property name="geometry">
         <rect>
          <x>64</x>
@@ -4259,7 +4259,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_2">
+      <widget class="QLabel" name="label_cost_trench">
        <property name="geometry">
         <rect>
          <x>14</x>
@@ -4293,7 +4293,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_3">
+      <widget class="QLabel" name="label_cost_exc">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -4327,7 +4327,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_4">
+      <widget class="QLabel" name="label_cost_fill">
        <property name="geometry">
         <rect>
          <x>32</x>
@@ -4361,7 +4361,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_5">
+      <widget class="QLabel" name="label_cost_excav">
        <property name="geometry">
         <rect>
          <x>28</x>
@@ -4395,7 +4395,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_6">
+      <widget class="QLabel" name="label_cost_bulk">
        <property name="geometry">
         <rect>
          <x>54</x>
@@ -4447,7 +4447,7 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_8">
+      <widget class="QLabel" name="label_cost_con_area">
        <property name="geometry">
         <rect>
          <x>26</x>
@@ -4480,7 +4480,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_9">
+      <widget class="QLabel" name="label_cost_yparam">
        <property name="geometry">
         <rect>
          <x>24</x>
@@ -4550,7 +4550,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_11">
+      <widget class="QLabel" name="label_b_left">
        <property name="geometry">
         <rect>
          <x>160</x>
@@ -4583,7 +4583,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_12">
+      <widget class="QLabel" name="label_b_right">
        <property name="geometry">
         <rect>
          <x>400</x>
@@ -4616,7 +4616,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_date_event_to_10">
+      <widget class="QLabel" name="label_cost_width">
        <property name="geometry">
         <rect>
          <x>266</x>
@@ -4667,17 +4667,17 @@
       <zorder>bulk</zorder>
       <zorder>rec_y</zorder>
       <zorder>m2mlpav</zorder>
-      <zorder>label_date_event_to_2</zorder>
-      <zorder>label_date_event_to_3</zorder>
-      <zorder>label_date_event_to_4</zorder>
-      <zorder>label_date_event_to_5</zorder>
-      <zorder>label_date_event_to_6</zorder>
-      <zorder>label_date_event_to_8</zorder>
-      <zorder>label_date_event_to_9</zorder>
+      <zorder>label_cost_trench</zorder>
+      <zorder>label_cost_exc</zorder>
+      <zorder>label_cost_fill</zorder>
+      <zorder>label_cost_excav</zorder>
+      <zorder>label_cost_bulk</zorder>
+      <zorder>label_cost_con_area</zorder>
+      <zorder>label_cost_yparam</zorder>
       <zorder>area</zorder>
-      <zorder>label_date_event_to_11</zorder>
-      <zorder>label_date_event_to_12</zorder>
-      <zorder>label_date_event_to_10</zorder>
+      <zorder>label_b_left</zorder>
+      <zorder>label_b_right</zorder>
+      <zorder>label_cost_width</zorder>
      </widget>
     </widget>
    </widget>

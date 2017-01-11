@@ -23,7 +23,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="label_hydrometer_id">
    <property name="geometry">
     <rect>
      <x>10</x>

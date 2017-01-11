@@ -58,8 +58,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -822,8 +822,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -984,7 +984,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QLabel" name="label_connec_type_3">
+      <widget class="QLabel" name="label_private_concat">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1059,8 +1059,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1916,7 +1916,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_scada_to">
+    <widget class="QLabel" name="label_hydrometer_to">
      <property name="geometry">
       <rect>
        <x>153</x>
@@ -1969,7 +1969,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_scada_from">
+    <widget class="QLabel" name="label_hydrometer_from">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -2310,7 +2310,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_event_id">
+    <widget class="QLabel" name="label_event_parameter">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -2432,7 +2432,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_event_event_type">
+    <widget class="QLabel" name="label_event_parameter_type">
      <property name="geometry">
       <rect>
        <x>296</x>
@@ -2774,7 +2774,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_type_2">
+  <widget class="QLabel" name="label_connec_catalog">
    <property name="geometry">
     <rect>
      <x>296</x>

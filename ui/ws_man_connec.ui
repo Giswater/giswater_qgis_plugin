@@ -26,7 +26,7 @@
     <string>Undelete</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_meter_label_x_9">
+  <widget class="QLabel" name="label_presszone">
    <property name="geometry">
     <rect>
      <x>270</x>
@@ -144,7 +144,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -1552,7 +1552,7 @@
         <enum>QLineEdit::Normal</enum>
        </property>
       </widget>
-      <widget class="QLabel" name="label_wjoin_descript_2">
+      <widget class="QLabel" name="label_wjoin_descript">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -8126,7 +8126,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_event_id">
+    <widget class="QLabel" name="label_event_parameter">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -8248,7 +8248,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_event_type">
+    <widget class="QLabel" name="label_event_parameter_type">
      <property name="geometry">
       <rect>
        <x>296</x>
@@ -8370,7 +8370,7 @@
     </font>
    </property>
   </widget>
-  <widget class="QLabel" name="label_meter_label_x_7">
+  <widget class="QLabel" name="label_dma">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -8440,7 +8440,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_meter_label_x_6">
+  <widget class="QLabel" name="label_sector">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -8512,7 +8512,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_id_2">
+  <widget class="QLabel" name="label_connec_type">
    <property name="geometry">
     <rect>
      <x>124</x>
@@ -8548,7 +8548,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_id_3">
+  <widget class="QLabel" name="label_connecat_id">
    <property name="geometry">
     <rect>
      <x>274</x>
@@ -8584,7 +8584,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_connec_id_4">
+  <widget class="QLabel" name="label_arc_id">
    <property name="geometry">
     <rect>
      <x>464</x>
