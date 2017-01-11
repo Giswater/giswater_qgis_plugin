@@ -11,10 +11,21 @@ DECLARE
     arcPoint geometry;
     linkrec record;
     arcrec record;
+	rec record;
+
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+    -- Update vnode
+	SELECT * INTO rec FROM config;
+    SELECT * INTO arcrec FROM arc WHERE ST_DWithin((NEW.the_geom), arc.the_geom, rec.vnode_update_tolerance) ORDER BY ST_Distance(arc.the_geom, (NEW.the_geom)) LIMIT 1;
+     
+    IF arcrec.arc_id IS NOT NULL THEN
+        NEW.arc_id = arcrec.arc_id;
+        NEW.the_geom = ST_ClosestPoint(arcrec.the_geom, NEW.the_geom);
+    END IF;
 
     -- Select links with end on the updated vnode
     FOR linkrec IN SELECT * FROM link WHERE vnode_id = NEW.vnode_id
@@ -26,13 +37,6 @@ BEGIN
 
     END LOOP;
 
-    -- Update vnode
-    SELECT * INTO arcrec FROM arc WHERE ST_DWithin((NEW.the_geom), arc.the_geom, 0.01) ORDER BY ST_Distance(arc.the_geom, (NEW.the_geom)) LIMIT 1;
-     
-    IF arcrec.arc_id IS NOT NULL THEN
-        NEW.arc_id = arcrec.arc_id;
-    END IF;
-
     RETURN NEW;
 
 END;
@@ -40,8 +44,8 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
+
   
 DROP TRIGGER IF EXISTS gw_trg_vnode_update ON "SCHEMA_NAME"."vnode";
 CREATE TRIGGER gw_trg_vnode_update BEFORE UPDATE OF the_geom ON "SCHEMA_NAME"."vnode"
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_vnode_update"();
-

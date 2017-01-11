@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false, true, true, true, 0.001, 0.001, true, true, true, 1);
+INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,0.5,false, true, true, true, 0.001, 0.001, true, true, true, 1);
 
 INSERT INTO config_csv_import VALUES ('inp_pattern', 'Patterns');
 INSERT INTO config_csv_import VALUES ('inp_curve', 'Curve');
