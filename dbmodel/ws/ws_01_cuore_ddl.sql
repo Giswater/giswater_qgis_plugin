@@ -551,7 +551,6 @@ CREATE TABLE "pond"(
 "connec_id" character varying(16),
 "code_comercial" integer,
 "orto2005" integer,
-"date_production" date,
 "the_geom" geometry(Point,SRID_VALUE),
   CONSTRAINT man_pond_pkey PRIMARY KEY (pond_id)
 );
@@ -562,7 +561,6 @@ CREATE TABLE "pool"(
   "connec_id" character varying(16),
   "code_comercial" integer,
   "orto2005" integer,
-  "date_production" date,
   "the_geom" geometry(Point,SRID_VALUE),
   CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
   );
@@ -574,7 +572,6 @@ CREATE TABLE "pool"(
   "rotation" numeric(12,3),
   "code_lab" integer,
   "element_type" character varying(150),
-  "date_production" date,
   "workcat_id" character varying(255),
   "workcat_id_end" character varying(255),
   "street1" character varying(254),
