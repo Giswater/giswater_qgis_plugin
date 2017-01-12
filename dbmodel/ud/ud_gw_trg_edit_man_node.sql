@@ -457,7 +457,7 @@ BEGIN
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.storage_add_info,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
-			total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_storage_name
+			total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_name
 			WHERE node_id=OLD.node_id;
 
 			
@@ -473,13 +473,13 @@ BEGIN
 		
 			IF (NEW.pol_id IS NULL) THEN
 				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.storage_add_info,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
-				total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_storage_name
+				total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 			ELSE
 				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.storage_add_info,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
-				total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_storage_name
+				total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
 				WHERE pol_id=OLD.pol_id;

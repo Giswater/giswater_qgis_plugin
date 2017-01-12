@@ -241,7 +241,7 @@ BEGIN
 			label_x=NEW.varc_label_x,label_y=NEW.varc_label_y, label_rotation=NEW.varc_label_rotation,workcat_id_end=NEW.varc_workcat_id_end
 			WHERE arc_id=OLD.arc_id;		
 			
-			UPDATE man_conduit SET arc_id=NEW.arc_id, add_info=NEW.varc_add_info
+			UPDATE man_varc SET arc_id=NEW.arc_id, add_info=NEW.varc_add_info
 			WHERE arc_id=OLD.arc_id;
 		
 		END IF;
