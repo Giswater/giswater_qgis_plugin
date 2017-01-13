@@ -138,7 +138,7 @@ BEGIN
 			demand=NEW.greentap_demand, "state"=NEW.greentap_state, annotation=NEW.greentap_annotation, observ=NEW.greentap_observ, "comment"=NEW.greentap_comment, rotation=NEW.greentap_rotation,dma_id=NEW.dma_id, 
 			soilcat_id=NEW.greentap_soilcat_id, category_type=NEW.greentap_category_type, fluid_type=NEW.greentap_fluid_type, location_type=NEW.greentap_location_type, workcat_id=NEW.greentap_workcat_id, 
 			buildercat_id=NEW.greentap_buildercat_id, builtdate=NEW.greentap_builtdate,ownercat_id=NEW.greentap_ownercat_id, adress_01=NEW.greentap_adress_01, adress_02=NEW.greentap_adress_02, 
-			adress_03=NEW.greentap_adress_03, streetaxis_id=NEW.greentap_streetname, postnumber=NEW.greentap_postnumber, descript=NEW.greentap_descript, link=NEW.greentap_link, verified=NEW.verified, 
+			adress_03=NEW.greentap_adress_03, streetaxis_id=NEW.greentap_streetaxis_id, postnumber=NEW.greentap_postnumber, descript=NEW.greentap_descript, link=NEW.greentap_link, verified=NEW.verified, 
 			the_geom=NEW.the_geom, workcat_id_end=NEW.greentap_workcat_id_end, label_x=NEW.greentap_label_x,label_y=NEW.greentap_label_y, label_rotation=NEW.greentap_label_rotation
 			WHERE connec_id=OLD.connec_id;
 			
@@ -152,7 +152,7 @@ BEGIN
 			demand=NEW.wjoin_demand, "state"=NEW.wjoin_state, annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, 
 			soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, 
 			buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,ownercat_id=NEW.wjoin_ownercat_id, adress_01=NEW.wjoin_adress_01, adress_02=NEW.wjoin_adress_02, adress_03=NEW.wjoin_adress_03, 
-			streetaxis_id=NEW.wjoin_streetname, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.wjoin_workcat_id_end,
+			streetaxis_id=NEW.wjoin_streetaxis_id, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.wjoin_workcat_id_end,
 			label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, label_rotation=NEW.wjoin_label_rotation
 			WHERE connec_id=OLD.connec_id;
 		
@@ -165,7 +165,7 @@ BEGIN
 			SET connec_id=NEW.connec_id, elevation=NEW.tap_elevation, "depth"=NEW.tap_depth, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, code=NEW.tap_code, n_hydrometer=NEW.tap_n_hydrometer, demand=NEW.tap_demand, 
 			"state"=NEW.tap_state, annotation=NEW.tap_annotation, observ=NEW.tap_observ, "comment"=NEW.tap_comment, rotation=NEW.tap_rotation,dma_id=NEW.dma_id, soilcat_id=NEW.tap_soilcat_id, 
 			category_type=NEW.tap_category_type, fluid_type=NEW.tap_fluid_type, location_type=NEW.tap_location_type, workcat_id=NEW.tap_workcat_id, buildercat_id=NEW.tap_buildercat_id, builtdate=NEW.tap_builtdate,
-			ownercat_id=NEW.tap_ownercat_id, adress_01=NEW.tap_adress_01, adress_02=NEW.tap_adress_02, adress_03=NEW.tap_adress_03, streetaxis_id=NEW.tap_streetname, postnumber=NEW.tap_postnumber, descript=NEW.tap_descript,
+			ownercat_id=NEW.tap_ownercat_id, adress_01=NEW.tap_adress_01, adress_02=NEW.tap_adress_02, adress_03=NEW.tap_adress_03, streetaxis_id=NEW.tap_streetaxis_id, postnumber=NEW.tap_postnumber, descript=NEW.tap_descript,
 			link=NEW.tap_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.tap_workcat_id_end,label_x=NEW.tap_label_x,label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation
 			WHERE connec_id=OLD.connec_id;
 			
@@ -181,7 +181,7 @@ BEGIN
 			demand=NEW.fountain_demand, "state"=NEW.fountain_state, annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id,
 			soilcat_id=NEW.fountain_soilcat_id, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, workcat_id=NEW.fountain_workcat_id,
 			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, adress_01=NEW.fountain_adress_01, adress_02=NEW.fountain_adress_02,
-			adress_03=NEW.fountain_adress_03, streetaxis_id=NEW.fountain_streetname, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, link=NEW.fountain_link, verified=NEW.verified, 
+			adress_03=NEW.fountain_adress_03, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, link=NEW.fountain_link, verified=NEW.verified, 
 			the_geom=NEW.the_geom,workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation
 			WHERE connec_id=OLD.connec_id;
 			
