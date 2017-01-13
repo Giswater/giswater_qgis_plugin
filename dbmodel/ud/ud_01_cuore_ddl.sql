@@ -932,6 +932,34 @@ CREATE TABLE "man_selector_state" (
   CONSTRAINT man_selector_state_pkey PRIMARY KEY (id)
 );
 
+----------------
+-- TABLE: Config Search plus
+----------------
+
+CREATE TABLE "config_search_plus" (
+"id" varchar(18) NOT NULL,
+"ppoint_layer" varchar (30),
+"ppoint_field_zone" varchar (30),
+"ppoint_field_number" varchar (30),
+"urban_propierties_layer" varchar (30),
+"urban_propierties_field_pzone" varchar (30),
+"urban_propierties_field_block" varchar (30),
+"urban_propierties_field_number" varchar (30),
+"street_layer" varchar (30),
+"street_field_code" varchar (30),
+"street_field_name" varchar (30),
+"portal_layer" varchar (30),
+"portal_field_code" varchar (30),
+"portal_field_number" varchar (30),
+"hydrometer_urban_propierties_layer" varchar (30),
+"hydrometer_urban_propierties_field_code" varchar (30),
+"hydrometer_layer" varchar (30),
+"hydrometer_field_code" varchar (30),
+"hydrometer_field_urban_propierties_code" varchar (30),
+CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "config_search_plus_check" CHECK(id = '1')
+);
+
 
 ----------------
 -- SPATIAL INDEX
