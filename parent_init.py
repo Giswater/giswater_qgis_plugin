@@ -13,6 +13,8 @@ from PyQt4.QtCore import QSettings, Qt
 from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QMessageBox, QWidget
 from PyQt4.QtSql import QSqlTableModel
 
+
+
 from functools import partial
 import os.path
 import sys  
@@ -25,7 +27,7 @@ import webbrowser
 
 from ui.add_sum import Add_sum          # @UnresolvedImport
 from matplotlib import widgets
-from PyQt4.Qt import QTableView
+from PyQt4.Qt import QTableView, QDate
         
         
 class ParentDialog(object):   
@@ -207,7 +209,7 @@ class ParentDialog(object):
         ''' Delete selected elements of the table '''
 
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()    
+        selected_list = widget.selectionModel().selectedRows()   
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message, context_name='ui_message' ) 
@@ -218,16 +220,18 @@ class ParentDialog(object):
         row_index = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = widget.model().record(row).value("id")
+            id_ = widget.model().record(row).value("doc_id")
+            if id_ == None:
+                id_ = widget.model().record(row).value("element_id")
             inf_text+= str(id_)+", "
-            list_id = list_id+"'"+str(id_)+"', "
+            list_id = list_id+str(id_)+", "
             row_index += str(row+1)+", "
             
         row_index = row_index[:-2]
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", row_index)
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_id)
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
@@ -591,6 +595,8 @@ class ParentDialog(object):
         doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
+        date = QDate.currentDate();
+        self.date_document_to.setDate(date);
 
            
         self.btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
@@ -637,7 +643,9 @@ class ParentDialog(object):
         event_id = self.dialog.findChild(QComboBox, "event_id")
         self.date_event_to = self.dialog.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
-        
+        date = QDate.currentDate();
+        self.date_event_to.setDate(date);
+
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -704,6 +712,8 @@ class ParentDialog(object):
         # Get widgets  
         self.date_el_to = self.dialog.findChild(QDateEdit, "date_el_to")
         self.date_el_from = self.dialog.findChild(QDateEdit, "date_el_from")
+        date = QDate.currentDate();
+        self.date_el_to.setDate(date);
 
         # Set signals
         self.date_el_to.dateChanged.connect(partial(self.set_filter_hydrometer, widget))
