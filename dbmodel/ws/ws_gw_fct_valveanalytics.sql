@@ -19,7 +19,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "mataro_ws_demo", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     DELETE FROM "anl_mincut_node";
     DELETE FROM "anl_mincut_arc";

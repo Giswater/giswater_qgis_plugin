@@ -66,7 +66,7 @@ BEGIN
 				
         -- Check id
         WHILE EXISTS(SELECT 1 FROM arc WHERE arc_id = rec_aux2.arc_id) LOOP
-                rec_aux2.arc_id := nextval('mataro_ws_demo.arc_id_seq');
+                rec_aux2.arc_id := nextval('SCHEMA_NAME.arc_id_seq');
         END LOOP;
 
         --	Check longest

@@ -18,7 +18,7 @@ DECLARE
 BEGIN
 
     -- Search path
-    SET search_path = "mataro_ws_demo", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Get  v_anl_node public.geometry
     SELECT the_geom INTO node_aux FROM  v_anl_node WHERE node_id = node_id_arg;

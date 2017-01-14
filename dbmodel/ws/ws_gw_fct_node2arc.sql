@@ -9,10 +9,10 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node2arc();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc()  RETURNS integer AS $BODY$
 DECLARE
     
-    record_node mataro_ws_demo.node%ROWTYPE;
-    record_arc1 mataro_ws_demo.arc%ROWTYPE;
-    record_arc2 mataro_ws_demo.arc%ROWTYPE;
-    record_new_arc mataro_ws_demo.arc%ROWTYPE;
+    record_node SCHEMA_NAME.node%ROWTYPE;
+    record_arc1 SCHEMA_NAME.arc%ROWTYPE;
+    record_arc2 SCHEMA_NAME.arc%ROWTYPE;
+    record_new_arc SCHEMA_NAME.arc%ROWTYPE;
     node_diameter double precision;
     valve_arc_geometry geometry;
     valve_arc_node_1_geom geometry;
@@ -27,7 +27,7 @@ DECLARE
 BEGIN
 
 --  Search path
-    SET search_path = "mataro_ws_demo", public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	
     RAISE NOTICE 'Starting node2arc process.';
@@ -48,7 +48,7 @@ BEGIN
     RAISE NOTICE 'Start loop.';
 
     
-    FOR node_id_aux IN (SELECT node_id FROM mataro_ws_demo.inp_valve UNION SELECT node_id FROM mataro_ws_demo.inp_shortpipe UNION SELECT node_id FROM mataro_ws_demo.inp_pump)
+    FOR node_id_aux IN (SELECT node_id FROM SCHEMA_NAME.inp_valve UNION SELECT node_id FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id FROM SCHEMA_NAME.inp_pump)
     LOOP
 	
 --        RAISE NOTICE 'Process valve: %', node_id_aux;
@@ -176,7 +176,7 @@ BEGIN
         --record_new_arc.epa_type := 'VALVE';
         record_new_arc.the_geom := valve_arc_geometry;
 
-	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM mataro_ws_demo.inp_valve UNION SELECT node_id,to_arc FROM mataro_ws_demo.inp_shortpipe UNION SELECT node_id,to_arc FROM mataro_ws_demo.inp_pump) A
+	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM SCHEMA_NAME.inp_valve UNION SELECT node_id,to_arc FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id,to_arc FROM SCHEMA_NAME.inp_pump) A
 					WHERE node_id=node_id_aux;
 
 
@@ -216,7 +216,7 @@ BEGIN
 
     RETURN 1;
 	
---	RETURN mataro_ws_demo.audit_function(0,90);
+--	RETURN SCHEMA_NAME.audit_function(0,90);
 
 		
 END;

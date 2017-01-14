@@ -33,8 +33,8 @@ BEGIN
     RAISE NOTICE 'Starting node2arc process.';
 	
 --  Armonize the NOT DEFINED nodes with arcs
-	UPDATE arc set epa_type='NOT DEFINED' from mataro_ws_demo.node where node.epa_type='NOT DEFINED' and node_1=node_id;
-	UPDATE arc set epa_type='NOT DEFINED' from mataro_ws_demo.node where node.epa_type='NOT DEFINED' and node_2=node_id;
+	UPDATE arc set epa_type='NOT DEFINED' from node where node.epa_type='NOT DEFINED' and node_1=node_id;
+	UPDATE arc set epa_type='NOT DEFINED' from node where node.epa_type='NOT DEFINED' and node_2=node_id;
 	
 	
 --  Empty temp tables
