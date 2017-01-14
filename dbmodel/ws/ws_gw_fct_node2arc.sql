@@ -9,10 +9,10 @@ DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node2arc();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc()  RETURNS integer AS $BODY$
 DECLARE
     
-    record_node SCHEMA_NAME.node%ROWTYPE;
-    record_arc1 SCHEMA_NAME.arc%ROWTYPE;
-    record_arc2 SCHEMA_NAME.arc%ROWTYPE;
-    record_new_arc SCHEMA_NAME.arc%ROWTYPE;
+    record_node mataro_ws_demo.node%ROWTYPE;
+    record_arc1 mataro_ws_demo.arc%ROWTYPE;
+    record_arc2 mataro_ws_demo.arc%ROWTYPE;
+    record_new_arc mataro_ws_demo.arc%ROWTYPE;
     node_diameter double precision;
     valve_arc_geometry geometry;
     valve_arc_node_1_geom geometry;
@@ -21,14 +21,13 @@ DECLARE
     node_id_aux text;
     num_arcs integer;
     shortpipe_record record;
-    loop_record record;
     to_arc_aux text;
     
 
 BEGIN
 
 --  Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "mataro_ws_demo", public;
 
 	
     RAISE NOTICE 'Starting node2arc process.';
@@ -49,11 +48,8 @@ BEGIN
     RAISE NOTICE 'Start loop.';
 
     
-    FOR loop_record IN (SELECT node_id, to_arc FROM SCHEMA_NAME.inp_valve UNION SELECT node_id, to_arc FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id, to_arc FROM SCHEMA_NAME.inp_pump)
+    FOR node_id_aux IN (SELECT node_id FROM mataro_ws_demo.inp_valve UNION SELECT node_id FROM mataro_ws_demo.inp_shortpipe UNION SELECT node_id FROM mataro_ws_demo.inp_pump)
     LOOP
-
-        -- Store node_id in a variable
-	node_id_aux = loop_record.node_id;
 	
 --        RAISE NOTICE 'Process valve: %', node_id_aux;
 
@@ -104,20 +100,9 @@ BEGIN
             -- Two 'node_2' arcs
             IF record_arc1 ISNULL THEN
 
-                -- Define new arc direction
-                IF loop_record.to_arc = (SELECT arc_id FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1) THEN
-
-                    -- Get arcs
-                    SELECT * INTO record_arc2 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                    SELECT * INTO record_arc1 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
-
-                ELSE
-
-                    -- Get arcs
-                    SELECT * INTO record_arc2 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
-                    SELECT * INTO record_arc1 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-
-                END IF;
+                -- Get arcs
+                SELECT * INTO record_arc2 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc1 FROM arc WHERE node_2 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -137,21 +122,9 @@ BEGIN
             -- Two 'node_1' arcs
             ELSIF record_arc2 ISNULL THEN
 
-                -- Define new arc direction
-                IF loop_record.to_arc = (SELECT arc_id FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1) THEN
-
-                    -- Get arcs
-                    SELECT * INTO record_arc1 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-                    SELECT * INTO record_arc2 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
-
-                ELSE
-
-                    -- Get arcs
-                    SELECT * INTO record_arc2 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
-                    SELECT * INTO record_arc1 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
-
-                END IF;
-                
+                -- Get arcs
+                SELECT * INTO record_arc1 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id DESC LIMIT 1;
+                SELECT * INTO record_arc2 FROM arc WHERE node_1 = node_id_aux ORDER BY arc_id ASC LIMIT 1;
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
@@ -173,13 +146,7 @@ BEGIN
 
                 -- Use arc 1 as reference (TODO: Why?)
                 record_new_arc = record_arc1;
-
-                -- Check new arc direction
-                IF loop_record.to_arc = record_arc2.arc_id THEN
-                    record_arc1 = record_arc2;
-                    record_arc2 = record_new_arc;
-                END IF;
-                    
+    
                 -- TODO: Control pipe shorter than 0.5 m!
                 valve_arc_node_1_geom := ST_LineInterpolatePoint(record_arc2.the_geom, 1 - (SELECT node2arc FROM config) / ST_Length(record_arc2.the_geom) / 2);
                 valve_arc_node_2_geom := ST_LineInterpolatePoint(record_arc1.the_geom, (SELECT node2arc FROM config) / ST_Length(record_arc1.the_geom) / 2);
@@ -209,6 +176,23 @@ BEGIN
         --record_new_arc.epa_type := 'VALVE';
         record_new_arc.the_geom := valve_arc_geometry;
 
+	SELECT to_arc INTO to_arc_aux FROM (SELECT node_id,to_arc FROM mataro_ws_demo.inp_valve UNION SELECT node_id,to_arc FROM mataro_ws_demo.inp_shortpipe UNION SELECT node_id,to_arc FROM mataro_ws_demo.inp_pump) A
+					WHERE node_id=node_id_aux;
+
+
+	IF to_arc_aux ='INVERT' THEN
+
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+	
+	ELSIF to_arc_aux ISNULL or to_arc_aux = 'NONE' THEN
+
+		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+		
+	END IF;
+
+
         --Print insert data
         --RAISE NOTICE 'Data: %', record_new_arc;
         
@@ -232,7 +216,7 @@ BEGIN
 
     RETURN 1;
 	
---	RETURN SCHEMA_NAME.audit_function(0,90);
+--	RETURN mataro_ws_demo.audit_function(0,90);
 
 		
 END;

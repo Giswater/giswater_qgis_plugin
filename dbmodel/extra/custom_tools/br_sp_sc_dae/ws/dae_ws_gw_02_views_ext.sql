@@ -15,7 +15,7 @@ CREATE OR REPLACE VIEW gw_saa.ext_hydrometer_category AS
 
 
 CREATE OR REPLACE VIEW gw_saa.ext_cat_hydrometer AS 
- SELECT vw_daecom_hidrometro.cod_hidrometro AS hydrometer_id,
+ SELECT vw_daecom_hidrometro.cod_hidrometro AS id,
     vw_daecom_hidrometro.marca AS madeby,
     vw_daecom_hidrometro.classe AS class,
     vw_daecom_hidrometro.ulmc,
@@ -47,7 +47,7 @@ CREATE OR REPLACE VIEW gw_saa.ext_rtc_hydrometer AS
 
 
 CREATE OR REPLACE VIEW gw_saa.ext_streetaxis AS 
- SELECT DISTINCT eixos_de_logradouros.id,
+ SELECT DISTINCT eixos_de_logradouros.gid as id,
     eixos_de_logradouros.geom AS the_geom,
     eixos_de_logradouros.codigo_rua AS code_street,
     concat(vw_daecom_endereco.tipologr, ' ', vw_daecom_endereco.logr) AS name
@@ -58,21 +58,21 @@ CREATE OR REPLACE VIEW gw_saa.ext_streetaxis AS
 CREATE OR REPLACE VIEW gw_saa.ext_urban_propierties AS 
  SELECT lote.id,
     lote.geom AS the_geom,
-    lote.iptu,
-    lote.bairro,
-    lote.agua_setor,
+    lote.iptu AS code,
+    lote.bairro AS complement,
+    lote.agua_setor AS placement,
     lote.agua_abast,
     lote.esg_bacia,
     lote.esg_subbac,
     lote.drn_bacia,
     lote.drn_subbac,
     lote.intrferenc,
-    lote.link_lote,
+    lote.link_lote AS postnumber,
     lote.zona::text AS zona,
-    lote.quadra::text AS quadra,
+    lote.quadra::text AS square,
     lote.lote::text AS lote,
-    lote.cod_rua,
-    lote."Categoria",
-    lote."Nome"
+    lote.cod_rua AS streetaxis,
+    lote."Categoria" AS observ,
+    lote."Nome" AS text
    FROM sc_mbc.lote;
 
