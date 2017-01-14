@@ -50,6 +50,9 @@ class ArcDialog(ParentDialog):
     
         # Load data from related tables
         #self.load_data()
+		
+        #Set layer in editing mode
+        self.layer.startEditing()		
         
         # Fill the element table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
