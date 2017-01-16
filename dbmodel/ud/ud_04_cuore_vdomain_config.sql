@@ -6,3 +6,4 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+INSERT INTO config_search_plus VALUES ('1', 'v_edit_man_manhole', 'dma_id', 'node_id', 'ext_urban_propierties', 'placement', 'square', 'code', 'ext_streetaxis', 'id', 'name', 'v_edit_man_connec', 'streetaxis_id', 'postnumber', NULL, NULL, NULL, NULL, NULL);
