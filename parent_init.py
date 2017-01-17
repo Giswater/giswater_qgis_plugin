@@ -175,11 +175,13 @@ class ParentDialog(object):
         ''' Save feature '''
         self.save_data()   
         self.dialog.accept()
+        self.layer.commitChanges()
         self.close()     
         
         
     def close(self):
         ''' Close form without saving '''
+        self.layer.rollBack()
         self.dialog.parent().setVisible(False)         
         
         
