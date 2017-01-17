@@ -79,7 +79,7 @@ class SnappingConfigManager():
         for layer in layers:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, 0, 0, 1, False)
 
-        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
@@ -88,7 +88,7 @@ class SnappingConfigManager():
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_arc_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
-        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
 
@@ -107,7 +107,7 @@ class SnappingConfigManager():
         QgsProject.instance().blockSignals(True)
         for layer in self.layer_node_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 0, 2, 1.0, False)
-        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
         
     def snapToConnec(self):
@@ -116,7 +116,7 @@ class SnappingConfigManager():
         #QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
         for layer in self.layer_connec_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
-        #QgsProject.instance().blockSignals(False)
+        QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 
     def snapToLayer(self, Layer):
@@ -136,7 +136,7 @@ class SnappingConfigManager():
                                                           int(snpOpts['snapType']), int(snpOpts['unitType']),
                                                           float(snpOpts['tolerance']), int(snpOpts['avoidInt']))
 
-#        QgsProject.instance().blockSignals(False)
+        QgsProject.instance().blockSignals(False)
         # Update the gui        
         QgsProject.instance().snapSettingsChanged.emit()  
 

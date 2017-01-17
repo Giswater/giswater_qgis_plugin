@@ -73,7 +73,14 @@ class ConnecMapTool(ParentMapTool):
 
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
-        
+
+
+        #Plugin reloader bug, MapTool should be deactivated
+        if not hasattr(Qt, 'LeftButton'):
+            print "Plugin loader bug"
+            self.iface.actionPan().trigger()
+            return
+
         if event.buttons() == Qt.LeftButton:
 
             if not self.dragging:

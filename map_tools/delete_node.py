@@ -53,7 +53,14 @@ class DeleteNodeMapTool(ParentMapTool):
         # Get the click
         x = event.pos().x()
         y = event.pos().y()
-        eventPoint = QPoint(x, y)
+
+        #Plugin reloader bug, MapTool should be deactivated
+        try:
+            eventPoint = QPoint(x, y)
+        except(TypeError, KeyError) as e:
+            print "Plugin loader bug"
+            self.iface.actionPan().trigger()
+            return
 
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable

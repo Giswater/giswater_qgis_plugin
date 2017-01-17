@@ -148,8 +148,6 @@ class MoveNodeMapTool(ParentMapTool):
 
         # Recover cursor
         self.canvas.setCursor(self.stdCursor)
-        
-        QgsProject.instance().blockSignals(False)
 
         try:
             self.rubberBand.reset(QGis.Line)
@@ -159,15 +157,22 @@ class MoveNodeMapTool(ParentMapTool):
 
     def canvasMoveEvent(self, event):
         ''' Mouse movement event '''      
-                        
+
         # Hide highlight
         self.vertexMarker.hide()
             
         # Get the click
         x = event.pos().x()
         y = event.pos().y()
-        eventPoint = QPoint(x,y)
-        
+
+        #Plugin reloader bug, MapTool should be deactivated
+        try:
+            eventPoint = QPoint(x, y)
+        except(TypeError, KeyError) as e:
+            print "Plugin loader bug"
+            self.iface.actionPan().trigger()
+            return
+
         # # Node layer
         # layer = self.canvas.currentLayer()
         # if layer is None:

@@ -83,7 +83,13 @@ class ExtractRasterValue(ParentMapTool):
 
         if self.vectorLayer is None:
             return
-        
+
+        #Plugin reloader bug, MapTool should be deactivated
+        if not hasattr(Qt, 'LeftButton'):
+            print "Plugin loader bug"
+            self.iface.actionPan().trigger()
+            return
+
         if event.buttons() == Qt.LeftButton:
 
             if not self.dragging:
