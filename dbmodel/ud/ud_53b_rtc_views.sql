@@ -152,6 +152,7 @@ CREATE OR REPLACE VIEW v_inp_dwf_flow AS
  --       WHEN (rtc_options.status='OFF' OR rtc_options.status IS NULL) THEN v_rtc_hydrometer_period.lps_avg
  --       ELSE inp_dwf.value
  --   END as value,
+    inp_dwf.value,
     inp_dwf.pat1, 
     inp_dwf.pat2, 
     inp_dwf.pat3, 
