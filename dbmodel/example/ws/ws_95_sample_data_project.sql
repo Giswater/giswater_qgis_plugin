@@ -3232,7 +3232,7 @@ UPDATE node SET node_type = cat_node.nodetype_id FROM cat_node WHERE node.nodeca
 SELECT pg_catalog.setval('"SCHEMA_NAME".element_x_node_seq', 52, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".element_x_connec_seq', 52, true);
 
-
+SELECT pg_catalog.setval('"SCHEMA_NAME".plan_arc_x_pavement_seq', 110, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".inp_pattern_id_seq', 3, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".node_id_seq', 1100, true);
 SELECT pg_catalog.setval('"SCHEMA_NAME".arc_id_seq', 2200, true);
