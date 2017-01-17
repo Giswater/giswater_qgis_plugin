@@ -342,7 +342,7 @@ CREATE OR REPLACE VIEW v_inp_pipe AS
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
    JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text 
-   where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age 
+   where (now()::date - builtdate)/365 BETWEEN init_age and end_age
 UNION 
     SELECT 
     arc.arc_id, 
@@ -365,7 +365,8 @@ UNION
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
-   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text   
+   where (now()::date - builtdate)/365 BETWEEN init_age and end_age;
 
 
 
