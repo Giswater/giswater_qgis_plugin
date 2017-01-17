@@ -530,13 +530,6 @@ JOIN inp_storage ON (((node.node_id)::text = (inp_storage.node_id)::text)))
 JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text))) 
 WHERE ((inp_storage.storage_type)::text = 'TABULAR'::text);
 
-DROP VIEW IF EXISTS "v_inp_dwf_flow" CASCADE;
-CREATE VIEW "v_inp_dwf_flow" AS 
-SELECT node.node_id, 'FLOW'::text AS type_dwf, inp_dwf.value, inp_dwf.pat1, inp_dwf.pat2, inp_dwf.pat3, inp_dwf.pat4, inp_selector_sector.sector_id 
-FROM (((inp_selector_sector 
-JOIN v_node node ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text))) 
-JOIN inp_dwf ON (((inp_dwf.node_id)::text = (node.node_id)::text))) 
-JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)));
 
 DROP VIEW IF EXISTS "v_inp_dwf_load" CASCADE;
 CREATE VIEW "v_inp_dwf_load" AS 
