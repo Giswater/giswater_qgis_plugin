@@ -25,7 +25,7 @@ BEGIN
 
         UPDATE arc 
         SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
-            "observ"=NEW."observ", "comment"=NEW."comment", dma=NEW.dma_id, custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 
+            "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 
              verified=NEW.verified, the_geom=NEW.the_geom 
         WHERE arc_id = OLD.arc_id;
 
