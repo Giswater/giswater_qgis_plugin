@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION gw_fct_admin_owner_tables_views(user_name character varying, privilege character varying, schema_name character varying)
+CREATE OR REPLACE FUNCTION gw_fct_admin_owner_tables_views(user_name character varying, schema_name character varying)
   RETURNS boolean AS
 $BODY$
 DECLARE
