@@ -265,7 +265,7 @@ BEGIN
 			NEW.netinit_ownercat_id,NEW.netinit_adress_01,NEW.netinit_adress_02,NEW.netinit_adress_03,NEW.netinit_descript,NEW.netinit_est_top_elev,NEW.netinit_est_ymax,NEW.netinit_rotation,NEW.netinit_link,
 			NEW.verified,NEW.netinit_workcat_id_end,NEW.undelete,NEW.netinit_label_x,NEW.netinit_label_y,NEW.netinit_label_rotation,NEW.the_geom); 
 
-			INSERT INTO man_netinit (node_id,add_info,mheight,mlength,mwidth,netinit_name) VALUES (NEW.node_id,NEW.add_info,NEW.mheight,NEW.mlength,NEW.mwidth,NEW.netinit_name);	
+			INSERT INTO man_netinit (node_id,add_info,mheight,mlength,mwidth,netinit_name) VALUES (NEW.node_id,NEW.netinit_add_info,NEW.netinit_mheight,NEW.netinit_mlength,NEW.netinit_mwidth,NEW.netinit_name);
 			
 		ELSIF man_table='man_wjump' THEN
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
