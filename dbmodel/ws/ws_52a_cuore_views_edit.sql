@@ -118,6 +118,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
     connec.link AS wjoin_link,
     connec.verified,
     connec.the_geom,
+	connec.undelete,
     man_wjoin.length AS wjoin_length,
     man_wjoin.top_floor AS wjoin_top_floor,
     man_wjoin.lead_verified AS wjoin_lead_verified,
@@ -178,6 +179,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
     connec.link AS tap_link,
     connec.verified,
     connec.the_geom,
+	connec.undelete,
     man_tap.type AS tap_type,
     man_tap.connection AS tap_connection,
     man_tap.continous AS tap_continous,
@@ -246,6 +248,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
     connec.link AS fountain_link,
     connec.verified,
     connec.the_geom,
+	connec.undelete,
     man_fountain.vmax AS fountain_vmax,
     man_fountain.vtotal AS fountain_vtotal,
     man_fountain.container_number AS fountain_container_number,
@@ -310,7 +313,8 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
     connec.label_rotation AS greentap_label_rotation,
     connec.link AS greentap_link,
     connec.verified,
-    connec.the_geom
+    connec.the_geom,
+	connec.undelete
    FROM connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
