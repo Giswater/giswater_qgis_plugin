@@ -131,7 +131,7 @@ SELECT
 arc.arc_id,
 v_arc_x_node.y1,
 v_arc_x_node.y2,
-(CASE WHEN (v_arc_x_node.y1*v_arc_x_node.y2 =0::numeric) THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc_x_node.y1+v_arc_x_node.y2)/2)::numeric(12,2) END) AS mean_y,
+(CASE WHEN (v_arc_x_node.y1*v_arc_x_node.y2)=0::numeric OR (v_arc_x_node.y1*v_arc_x_node.y2) IS NULL THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc_x_node.y1+v_arc_x_node.y2)/2)::numeric(12,2) END) AS mean_y,
 arc.arccat_id,
 v_price_x_catarc.geom1,
 v_price_x_catarc.z1,

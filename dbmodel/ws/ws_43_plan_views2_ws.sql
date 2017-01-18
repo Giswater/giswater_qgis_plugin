@@ -132,7 +132,7 @@ SELECT
 arc.arc_id,
 v_arc_x_node.depth1,
 v_arc_x_node.depth2,
-(CASE WHEN (v_arc_x_node.depth1*v_arc_x_node.depth2 =0::numeric) THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc_x_node.depth1+v_arc_x_node.depth2)/2)::numeric(12,2) END) AS mean_depth,
+(CASE WHEN (v_arc_x_node.depth1*v_arc_x_node.depth2) =0::numeric OR (v_arc_x_node.depth1*v_arc_x_node.depth2) IS NULL THEN v_price_x_catarc.estimated_depth::numeric(12,2) ELSE ((v_arc_x_node.depth1+v_arc_x_node.depth2)/2)::numeric(12,2) END) AS mean_depth,
 arc.arccat_id,
 v_price_x_catarc.dint/1000 AS dint,
 v_price_x_catarc.z1,
