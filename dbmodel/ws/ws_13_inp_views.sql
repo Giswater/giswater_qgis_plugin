@@ -124,6 +124,9 @@ DROP VIEW IF EXISTS "v_inp_times" CASCADE;
 CREATE VIEW "v_inp_times" AS 
 SELECT inp_times.duration, inp_times.hydraulic_timestep AS "hydraulic timestep", inp_times.quality_timestep AS "quality timestep", inp_times.rule_timestep AS "rule timestep", inp_times.pattern_timestep AS "pattern timestep", inp_times.pattern_start AS "pattern start", inp_times.report_timestep AS "report timestep", inp_times.report_start AS "report start", inp_times.start_clocktime AS "start clocktime", inp_times.statistic FROM inp_times;
 
+DROP VIEW IF EXISTS "v_inp_pattern" CASCADE; 
+CREATE OR REPLACE VIEW v_inp_pattern AS 
+ SELECT * FROM inp_pattern ORDER BY 1;
 
 
 -- ------------------------------------------------------------------
