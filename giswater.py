@@ -50,7 +50,7 @@ class Giswater(QObject):
         self.plugin_dir = os.path.dirname(__file__)    
         self.plugin_name = os.path.basename(self.plugin_dir)
 
-		# initialize svg giswater directory
+	    # initialize svg giswater directory
         self.svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
         QgsExpressionContextUtils.setProjectVariable('svg_path',self.svg_plugin_dir)   
 
@@ -97,10 +97,7 @@ class Giswater(QObject):
         
         # Define signals
         self.set_signals()
-        
-    
-  
-        
+ 
                
     def set_signals(self): 
         ''' Define widget and event signals '''
@@ -205,6 +202,7 @@ class Giswater(QObject):
             elif int(index_action) in (27, 99):
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
+            
             else:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
 
@@ -238,7 +236,6 @@ class Giswater(QObject):
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
         self.table_man_pgully = self.settings.value('db/table_man_pgully', 'v_edit_man_pgully') 
  
-        
         # Tables connec
         self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
         self.table_page = self.settings.value('db/table_page', 'v_edit_man_page')
@@ -286,6 +283,8 @@ class Giswater(QObject):
         self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
         self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
+    
+        
         if self.toolbar_ud_enabled:
             self.toolbar_ud_name = self.tr('toolbar_ud_name')
             self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
@@ -303,6 +302,8 @@ class Giswater(QObject):
             self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
+
+
         # UD toolbar   
         if self.toolbar_ud_enabled:        
             self.ag_ud = QActionGroup(parent);
@@ -382,7 +383,7 @@ class Giswater(QObject):
     
     ''' Slots '''             
 
-    def enable_actions(self, enable=True, start=1, stop=36):
+    def enable_actions(self, enable=True, start=1, stop=100):
         ''' Utility to enable all actions '''
         for i in range(start, stop+1):
             self.enable_action(enable, i)              
@@ -554,7 +555,6 @@ class Giswater(QObject):
                 if 'v_edit_man_filter' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
     
-
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
@@ -889,7 +889,6 @@ class Giswater(QObject):
             elif self.table_tap in uri_table:  
                 setting_name = 'buttons_connec'
                 
-                
             
             elif self.table_tank in uri_table:  
                 setting_name = 'buttons_node' 
@@ -973,12 +972,14 @@ class Giswater(QObject):
         ''' Enable selected actions '''
         
         # Enable MG toolbar
+        # Enable from 16 to 27
         self.enable_actions(True, 16, 27)
         self.enable_action(False, 22)        
         self.enable_action(False, 23)        
         
         # Enable ED toolbar
-        self.enable_actions(True, 30, 36)
+        # Enable from 30 to 100
+        self.enable_actions(True, 30, 100)
                 
                     
     def ws_generic(self, function_name):   

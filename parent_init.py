@@ -298,13 +298,11 @@ class ParentDialog(object):
         # Get widget text - hydtometer_id
         widget_hydro = self.dlg_sum.findChild(QLineEdit, "hydrometer_id_new")          
         self.hydro_id = widget_hydro.text()
-    
-        
+
         # Get connec_id       
         widget_connec = self.dialog.findChild(QLineEdit, "connec_id")          
         self.connec_id = widget_connec.text()
 
-        
         # Check if Hydrometer_id already exists
         sql = "SELECT DISTINCT(hydrometer_id) FROM "+self.schema_name+".rtc_hydrometer WHERE hydrometer_id = '"+self.hydro_id+"'" 
         row = self.dao.get_row(sql)
@@ -405,7 +403,6 @@ class ParentDialog(object):
         ''' Button - Open document from table document'''
         
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
-        #table_document = "v_ui_doc_x_arc"
         # Get selected rows
         selected_list = self.tbl_document.selectionModel().selectedRows()    
         if len(selected_list) == 0:
@@ -635,7 +632,7 @@ class ParentDialog(object):
     def fill_tbl_event(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
         
-        table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
+        #table_name_event_type = self.schema_name+'."om_visit_parameter_type"'
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         
         # Get widgets  
@@ -649,34 +646,41 @@ class ParentDialog(object):
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
-        event_id.activated.connect(partial(self.set_filter_table_event, widget))
+        event_id.activated.connect(partial(self.set_filter_table_event2, widget))
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
     
-
+        feature_key = self.controller.get_layer_source_key()
+        if feature_key == 'node_id':
+            feature = 'NODE'
+        if feature_key == 'connec_id':
+            feature = 'CONNEC'
+        if feature_key == 'arc_id':
+            feature = 'ARC'
+        if feature_key == 'gully_id':
+            feature = 'GULLY'
+             
         # Fill ComboBox event_id
-        #sql = "SELECT DISTINCT(event_id)"
         sql = "SELECT DISTINCT(id)"
         sql+= " FROM "+table_name_event_id
-        #sql+= " ORDER BY event_id"
+        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
         sql+= " ORDER BY id"
+        print sql
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
-        
+           
 
         # Fill ComboBox event_type
-        #sql = "SELECT DISTINCT(event_type)"
-        sql = "SELECT DISTINCT(id)"
-        sql+= " FROM "+table_name_event_type
-        #sql+= " ORDER BY event_type"
-        sql+= " ORDER BY id"
+        sql = "SELECT DISTINCT(parameter_type)"
+        sql+= " FROM "+table_name_event_id
+        sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
+        sql+= " ORDER BY parameter_type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_type", rows)
         
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)    
-        
-                 
+                   
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
@@ -689,8 +693,32 @@ class ParentDialog(object):
             self.controller.show_warning(message, context_name='ui_message')                   
             return
         
-        # Set filter
-        
+        # Cascade filter 
+        table_name_event_id = self.schema_name+'."om_visit_parameter"'
+        event_type_value = utils_giswater.getWidgetText("event_type")
+        # Get type of feature
+        feature_key = self.controller.get_layer_source_key()
+        if feature_key == 'node_id':
+            feature = 'NODE'
+        if feature_key == 'connec_id':
+            feature = 'CONNEC'
+        if feature_key == 'arc_id':
+            feature = 'ARC'
+        if feature_key == 'gully_id':
+            feature = 'GULLY'
+
+        # Fill ComboBox event_id
+        sql = "SELECT DISTINCT(id)"
+        sql+= " FROM "+table_name_event_id
+        sql+= " WHERE (feature = '"+feature+"' OR feature = 'ALL')"
+        if event_type_value != 'null':
+            sql+= " AND parameter_type= '"+event_type_value+"'" 
+        sql+= " ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("event_id", rows)
+        # End cascading filter
+            
+        # Set filter to model
         expr = self.field_id+" = '"+self.id+"'"
         expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
         
@@ -705,6 +733,34 @@ class ParentDialog(object):
         widget.model().setFilter(expr)
         widget.model().select() 
        
+        
+    def set_filter_table_event2(self, widget):
+        ''' Get values selected by the user and sets a new filter for its table model '''
+        ''' Cascading filter '''
+        
+        # Get selected dates
+        date_from = self.date_event_from.date().toString('yyyyMMdd') 
+        date_to = self.date_event_to.date().toString('yyyyMMdd') 
+        if (date_from > date_to):
+            message = "Selected date interval is not valid"
+            self.controller.show_warning(message, context_name='ui_message')                   
+            return
+
+        # Set filter
+        expr = self.field_id+" = '"+self.id+"'"
+        expr += " AND tstamp >= '"+date_from+"' AND tstamp <= '"+date_to+"'"
+        
+        # Get selected values in Comboboxes        
+        event_type_value = utils_giswater.getWidgetText("event_type")
+        if event_type_value != 'null': 
+            expr+= " AND parameter_type = '"+event_type_value+"'"
+        event_id = utils_giswater.getWidgetText("event_id")
+        if event_id != 'null': 
+            expr+= " AND parameter_id = '"+event_id+"'"
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select() 
+        
         
     def fill_tbl_hydrometer(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
@@ -755,9 +811,4 @@ class ParentDialog(object):
             if selected_layer != tab_text :
                 self.tab_main.removeTab(i) 
         
-        
-        
-        
-
- 
     
