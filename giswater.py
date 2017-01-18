@@ -17,7 +17,7 @@ from functools import partial
 
 from actions.ed import Ed
 from actions.mg import Mg
-from controller import DaoController
+from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
 from map_tools.move_node import MoveNodeMapTool
@@ -28,6 +28,7 @@ from map_tools.connec import ConnecMapTool
 from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
 from qgis.core import QgsExpressionContextUtils
+from map_tools.valve_analytics import ValveAnalytics
 
 
 
@@ -141,7 +142,8 @@ class Giswater(QObject):
             try:
                 action.setCheckable(is_checkable) 
                 # Management toolbar actions
-                if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
+                #if int(index_action) in (19, 21, 24, 25, 27, 28, 99):
+                if int(index_action) in (19, 21, 24, 25, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -190,6 +192,9 @@ class Giswater(QObject):
             elif int(index_action) == 26:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 27:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
@@ -199,7 +204,8 @@ class Giswater(QObject):
             elif int(index_action) == 57:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) in (27, 99):
+            #elif int(index_action) in (27, 99):
+            elif int(index_action) == 99:
                 # 27 should be not checkeable
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             
@@ -483,6 +489,7 @@ class Giswater(QObject):
         #self.layer_node_man_WS = [None for i in range(11)]
         self.layer_node_man_UD = []
         self.layer_node_man_WS = []
+        self.layer_valve = None
 
         self.layer_connec = None
         #self.layer_connec_man_UD = [None for i in range(1)]
