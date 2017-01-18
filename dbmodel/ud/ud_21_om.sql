@@ -27,6 +27,7 @@ CREATE TABLE "om_visit_parameter" (
 CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
 );
 
+
 CREATE TABLE "om_visit_value_position" (
 "id" varchar(50)   NOT NULL,
 "feature" varchar(30) ,
@@ -40,6 +41,7 @@ CREATE TABLE "om_visit" (
 "startdate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
+"the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );
 
@@ -86,3 +88,6 @@ CREATE TABLE "om_visit_x_gully" (
 "gully_id" varchar (16),
 CONSTRAINT om_visit_x_gully_pkey PRIMARY KEY (id)
 );
+
+
+CREATE INDEX visit_index ON om_visit USING GIST (the_geom);

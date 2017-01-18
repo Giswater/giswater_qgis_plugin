@@ -6,15 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables()
-  RETURNS void AS
-$BODY$DECLARE
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables() RETURNS void AS $BODY$DECLARE
 
  rec_node   record;
- rec_arc   record;
- rec_connec   record;
+ rec_arc    record;
+ rec_connec  record;
  rec_parameter record;
  id_last   bigint;
+ the_geom_last public.geometry;
 
 
 BEGIN
@@ -38,7 +37,7 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (startdate, enddate, user_name) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user') RETURNING id INTO id_last;
+            INSERT INTO om_visit (startdate, enddate, user_name, the_geom) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_connec.the_geom) RETURNING id INTO id_last;
             INSERT INTO om_visit_x_connec (visit_id, connec_id) VALUES(id_last, rec_connec.connec_id);
 
             --Insert event 'inspection'
@@ -64,7 +63,7 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (startdate, enddate, user_name) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user') RETURNING id INTO id_last;
+            INSERT INTO om_visit (startdate, enddate, user_name, the_geom) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', rec_node.the_geom) RETURNING id INTO id_last;
             INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
 
             --Insert event 'inspection'
@@ -90,27 +89,74 @@ BEGIN
         LOOP
 
             --Insert visit
-            INSERT INTO om_visit (startdate, enddate, user_name) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user') RETURNING id INTO id_last;
+            the_geom_last=ST_LineInterpolatePoint(rec_arc.the_geom, RANDOM());
+            INSERT INTO om_visit (startdate, enddate, user_name, the_geom) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', the_geom_last) RETURNING id INTO id_last;
             INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
 
             --Insert event 'inspection'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature = 'ARC' or feature = 'ALL')
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
-                ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
+                ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
 
 	    --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
                 INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
-                ,st_x(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), st_y(ST_Line_Interpolate_Point(rec_arc.the_geom, ROUND(RANDOM())))::numeric(12,3), ROUND(RANDOM()*360));
+                ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             
         END LOOP;
 
+        
+	FOR rec_arc IN SELECT * FROM v_edit_arc join cat_arc on arccat_id=id where dint > 100
+        LOOP
+            --Insert visit
+            the_geom_last=ST_LineInterpolatePoint(rec_arc.the_geom, RANDOM());
+            INSERT INTO om_visit (startdate, enddate, user_name, the_geom) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', the_geom_last) RETURNING id INTO id_last;
+            INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);
+
+            --Insert event 'leak'
+            SELECT * INTO rec_parameter FROM om_visit_parameter WHERE parameter_type='LEAK' limit 1;
+            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, null,null,null
+            ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));     
+
+            
+	END LOOP;
+
+
+	FOR rec_arc IN SELECT * FROM v_edit_arc join cat_arc on arccat_id=id where dint > 140
+        LOOP
+            --Insert visit
+            the_geom_last=ST_LineInterpolatePoint(rec_arc.the_geom, RANDOM());
+            INSERT INTO om_visit (startdate, enddate, user_name, the_geom) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', the_geom_last) RETURNING id INTO id_last;
+            INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);      
+            
+	    SELECT * INTO rec_parameter FROM om_visit_parameter WHERE parameter_type='LEAK' limit 1 offset 1;
+            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, null,null,null
+            ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
+
+	END LOOP;
+
+
+
+	FOR rec_arc IN SELECT * FROM v_edit_arc join cat_arc on arccat_id=id where dint > 170
+        LOOP
+            --Insert visit
+            the_geom_last=ST_LineInterpolatePoint(rec_arc.the_geom, RANDOM());
+            INSERT INTO om_visit (startdate, enddate, user_name, the_geom) VALUES(now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 100)), 'demo_user', the_geom_last) RETURNING id INTO id_last;
+            INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);      
+            
+	    SELECT * INTO rec_parameter FROM om_visit_parameter WHERE parameter_type='LEAK' limit 1 offset 2;
+            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, null,null,null
+            ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
+
+	END LOOP;
+
 
     RETURN;
+
 
         
 END;$BODY$

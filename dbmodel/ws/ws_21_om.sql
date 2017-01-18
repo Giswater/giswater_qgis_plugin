@@ -40,6 +40,7 @@ CREATE TABLE "om_visit" (
 "startdate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
+"the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );
 
@@ -79,3 +80,5 @@ CREATE TABLE "om_visit_x_connec" (
 "connec_id" varchar (16),
 CONSTRAINT om_visit_x_connec_pkey PRIMARY KEY (id)
 );
+
+CREATE INDEX visit_index ON om_visit USING GIST (the_geom);
