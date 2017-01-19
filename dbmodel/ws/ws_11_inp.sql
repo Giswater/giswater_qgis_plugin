@@ -510,7 +510,7 @@ CREATE TABLE "inp_tank" (
 "maxlevel" numeric(12,4),
 "diameter" numeric(12,4),
 "minvol" numeric(12,4),
-"curve_id" int4
+"curve_id" varchar(16)
 );
 
 
