@@ -283,4 +283,20 @@ class DaoController():
             uri_table = uri[pos_end_schema+2:pos_fi ]
 
         return uri_table    
+        
+        
+    def get_layer_source_key(self):
+        ''' Get table or view name of selected layer '''
+
+        uri_schema = None
+        layer = self.iface.activeLayer()  
+        uri = layer.dataProvider().dataSourceUri().lower()
+        pos_ini = uri.find('key=')
+        pos_end_schema = uri.rfind('srid=')
+        #pos_fi = uri.find('" ')
+        #if pos_ini <> -1 and pos_fi <> -1:
+        if pos_ini <> -1:
+            uri_schema = uri[pos_ini + 6:pos_end_schema-3]
+
+        return uri_schema
     
