@@ -124,9 +124,6 @@ DROP VIEW IF EXISTS "v_inp_times" CASCADE;
 CREATE VIEW "v_inp_times" AS 
 SELECT inp_times.duration, inp_times.hydraulic_timestep AS "hydraulic timestep", inp_times.quality_timestep AS "quality timestep", inp_times.rule_timestep AS "rule timestep", inp_times.pattern_timestep AS "pattern timestep", inp_times.pattern_start AS "pattern start", inp_times.report_timestep AS "report timestep", inp_times.report_start AS "report start", inp_times.start_clocktime AS "start clocktime", inp_times.statistic FROM inp_times;
 
-DROP VIEW IF EXISTS "v_inp_pattern" CASCADE; 
-CREATE OR REPLACE VIEW v_inp_pattern AS 
- SELECT * FROM inp_pattern ORDER BY 1;
 
 
 -- ------------------------------------------------------------------
@@ -345,7 +342,7 @@ CREATE OR REPLACE VIEW v_inp_pipe AS
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
    JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text 
-   WHERE ((now()::date - arc.builtdate) / 365) >= inp_cat_mat_roughness.init_age AND ((now()::date - arc.builtdate) / 365) < inp_cat_mat_roughness.end_age;
+   where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age 
 UNION 
     SELECT 
     arc.arc_id, 
@@ -368,8 +365,7 @@ UNION
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
    JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
    JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
-   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text   
-   WHERE ((now()::date - arc.builtdate) / 365) >= inp_cat_mat_roughness.init_age AND ((now()::date - arc.builtdate) / 365) < inp_cat_mat_roughness.end_age;
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
 
 
 
@@ -403,6 +399,115 @@ CREATE OR REPLACE VIEW v_inp_vertice AS
   WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)))
   ORDER BY id;
 
+  
+
+-- ----------------------------
+-- Direct views from tables
+-- ----------------------------
+
+DROP VIEW IF EXISTS "v_inp_project_id" CASCADE;
+CREATE VIEW "v_inp_project_id" AS
+SELECT title,
+author,
+date
+FROM inp_project_id;
+
+
+DROP VIEW IF EXISTS "v_inp_tags" CASCADE;
+CREATE VIEW "v_inp_tags" AS
+SELECT object,
+node_id,
+tag
+FROM inp_tags;
+
+
+DROP VIEW IF EXISTS "v_inp_pattern" CASCADE;
+CREATE VIEW "v_inp_pattern" AS
+SELECT id,
+pattern_id,
+factor_1,
+factor_2,
+factor_3,
+factor_4,
+factor_5,
+factor_6,
+factor_7,
+factor_8,
+factor_9,
+factor_10,
+factor_11,
+factor_12,
+factor_13,
+factor_14,
+factor_15,
+factor_16,
+factor_17,
+factor_18,
+factor_19,
+factor_20,
+factor_21,
+factor_22,
+factor_23,
+factor_24
+FROM inp_pattern;
+
+
+DROP VIEW IF EXISTS "v_inp_controls " CASCADE;
+CREATE VIEW "v_inp_controls " AS
+SELECT id,
+text
+FROM inp_controls;
+
+DROP VIEW IF EXISTS "v_inp_energy_gl"  CASCADE;
+CREATE VIEW "v_inp_energy_gl"  AS
+SELECT id,
+energ_type,
+parameter,
+value
+FROM inp_energy_gl;
+
+
+DROP VIEW IF EXISTS "v_inp_quality"  CASCADE;
+CREATE VIEW "v_inp_quality"  AS
+SELECT node_id,
+initqual
+FROM inp_quality;
+
+
+DROP VIEW IF EXISTS "v_inp_reactions_el" CASCADE;
+CREATE VIEW "v_inp_reactions_el"  AS
+SELECT id,
+parameter,
+arc_id,
+value
+FROM inp_reactions_el;
+
+
+DROP VIEW IF EXISTS "V_inp_reactions_gl" CASCADE;
+CREATE VIEW "V_inp_reactions_gl"  AS
+SELECT id,
+react_type,
+parameter,
+value
+FROM inp_reactions_gl;
+
+DROP VIEW IF EXISTS "v_inp_label" CASCADE;
+CREATE VIEW "v_inp_label"  AS
+SELECT id,
+xcoord,
+ycoord,
+label,
+node_id
+FROM inp_label;
+
+
+DROP VIEW IF EXISTS "v_inp_backdrop" CASCADE;
+CREATE VIEW "v_inp_backdrop"  AS
+SELECT id,
+text
+FROM inp_backdrop;
+  
+  
 
 
 -- ----------------------------
@@ -468,4 +573,3 @@ DROP VIEW IF EXISTS "v_rpt_comp_node" CASCADE;
 CREATE VIEW "v_rpt_comp_node" AS 
 SELECT node.node_id, rpt_selector_compare.result_id, max(rpt_node.elevation) AS elevation, max(rpt_node.demand) AS max_demand, min(rpt_node.demand) AS min_demand, max(rpt_node.head) AS max_head, min(rpt_node.head) AS min_head, max(rpt_node.press) AS max_pressure, min(rpt_node.press) AS min_pressure, max(rpt_node.quality) AS max_quality, min(rpt_node.quality) AS min_quality, node.the_geom 
 FROM ((temp_node node JOIN rpt_node ON (((rpt_node.node_id)::text = (node.node_id)::text))) JOIN rpt_selector_compare ON (((rpt_node.result_id)::text = (rpt_selector_compare.result_id)::text))) GROUP BY node.node_id, rpt_selector_compare.result_id, node.the_geom ORDER BY node.node_id;
-

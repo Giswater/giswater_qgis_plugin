@@ -530,6 +530,13 @@ JOIN inp_storage ON (((node.node_id)::text = (inp_storage.node_id)::text)))
 JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text))) 
 WHERE ((inp_storage.storage_type)::text = 'TABULAR'::text);
 
+DROP VIEW IF EXISTS "v_inp_dwf_flow" CASCADE;
+CREATE VIEW "v_inp_dwf_flow" AS 
+SELECT node.node_id, 'FLOW'::text AS type_dwf, inp_dwf.value, inp_dwf.pat1, inp_dwf.pat2, inp_dwf.pat3, inp_dwf.pat4, inp_selector_sector.sector_id 
+FROM (((inp_selector_sector 
+JOIN v_node node ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text))) 
+JOIN inp_dwf ON (((inp_dwf.node_id)::text = (node.node_id)::text))) 
+JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text)));
 
 DROP VIEW IF EXISTS "v_inp_dwf_load" CASCADE;
 CREATE VIEW "v_inp_dwf_load" AS 
@@ -598,6 +605,126 @@ CREATE OR REPLACE VIEW v_inp_vertice AS
   WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
   ORDER BY nextval('"SCHEMA_NAME".inp_vertice_seq'::regclass);
 
+
+
+-- ----------------------------
+-- Direct views from tables
+-- ----------------------------
+
+DROP VIEW IF EXISTS "v_inp_project_id" CASCADE;
+CREATE VIEW "v_inp_project_id" AS 
+SELECT title,
+author,
+date
+FROM inp_project_id;
+
+DROP VIEW IF EXISTS "v_inp_backdrop" CASCADE;
+CREATE VIEW "v_inp_backdrop" AS 
+SELECT id,
+text
+FROM inp_backdrop; 
+
+
+DROP VIEW IF EXISTS "v_inp_label" CASCADE;
+CREATE VIEW "v_inp_label" AS 
+SELECT label,
+xcoord,
+ycoord,
+anchor,
+font,
+size,
+bold,
+italic 
+FROM inp_label;
+
+
+DROP VIEW IF EXISTS  "v_inp_mapdim" CASCADE;
+CREATE VIEW  "v_inp_mapdim" AS 
+SELECT type_dim,
+x1,
+y1,
+x2,
+y2
+FROM inp_mapdim;
+
+DROP VIEW IF EXISTS  "v_inp_mapunits" CASCADE;
+CREATE VIEW  "v_inp_mapunits" AS 
+SELECT type_units,
+map_type
+FROM inp_mapunits;
+
+
+DROP VIEW IF EXISTS  "v_inp_report" CASCADE;
+CREATE VIEW  "v_inp_report" AS 
+SELECT input,
+continuity,
+flowstats,
+controls,
+subcatchments,
+nodes,
+links
+FROM inp_report;
+
+DROP VIEW IF EXISTS  "v_inp_files" CASCADE;
+CREATE VIEW  "v_inp_files" AS 
+SELECT id,
+actio_type,
+file_type,
+fname
+FROM inp_files;
+
+
+
+DROP VIEW IF EXISTS  "v_inp_aquifer" CASCADE;
+CREATE VIEW  "v_inp_aquifer" AS 
+SELECT aquif_id,
+por,
+wp,
+fc,
+k,
+ks,
+ps,
+uef,
+led,
+gwr,
+be,
+wte,
+umc,
+pattern_id
+FROM inp_aquifer;
+
+
+DROP VIEW IF EXISTS  "v_inp_pollutant" CASCADE;
+CREATE VIEW  "v_inp_pollutant" AS 
+SELECT poll_id,
+units_type,
+crain,
+cgw,
+cii,
+kd,
+sflag,
+copoll_id,
+cofract,
+cdwf
+FROM inp_pollutant;
+
+DROP VIEW IF EXISTS  "v_inp_adjustments" CASCADE;
+CREATE VIEW  "v_inp_adjustments" AS 
+SELECT id,
+adj_type,
+value_1,
+value_2,
+value_3,
+value_4,
+value_5,
+value_6,
+value_7,
+value_8,
+value_9,
+value_10,
+value_11,
+value_12
+FROM inp_adjustments;
 
 
 
@@ -833,4 +960,3 @@ SELECT rpt_subcatchwashoff_sum.id, rpt_subcatchwashoff_sum.result_id, rpt_subcat
 DROP VIEW IF EXISTS "v_rpt_comp_timestep_critelem" CASCADE;
 CREATE VIEW "v_rpt_comp_timestep_critelem" AS 
 SELECT rpt_timestep_critelem.id, rpt_timestep_critelem.result_id, rpt_timestep_critelem.text FROM (rpt_selector_compare JOIN rpt_timestep_critelem ON (((rpt_selector_compare.result_id)::text = (rpt_timestep_critelem.result_id)::text)));
-
