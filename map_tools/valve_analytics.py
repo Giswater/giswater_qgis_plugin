@@ -36,8 +36,6 @@ class ValveAnalytics(ParentMapTool):
         # Call ParentMapTool constructor
         super(ValveAnalytics, self).__init__(iface, settings, action, index_action)
 
-        self.dragging = False
-
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
         self.vertexMarker.setColor(QColor(255, 25, 25))
@@ -53,9 +51,6 @@ class ValveAnalytics(ParentMapTool):
         mBorderColor = QColor(254, 58, 29)
         self.rubberBand.setBorderColor(mBorderColor)
 
-        # Select rectangle
-        self.selectRect = QRect()
-        self.layer_connec_man = self.iface.activeLayer()  
 
 
     def reset(self):
@@ -67,7 +62,6 @@ class ValveAnalytics(ParentMapTool):
 
         # Graphic elements
         self.rubberBand.reset()
-
 
 
     ''' QgsMapTools inherited event functions '''
@@ -82,53 +76,36 @@ class ValveAnalytics(ParentMapTool):
             self.iface.actionPan().trigger()
             return
 
-        if event.buttons() == Qt.LeftButton:
+        # Hide highlight
+        self.vertexMarker.hide()
 
-            if not self.dragging:
-                self.dragging = True
-                self.selectRect.setTopLeft(event.pos())
+        # Get the click
+        x = event.pos().x()
+        y = event.pos().y()
+        eventPoint = QPoint(x, y)
 
-            self.selectRect.setBottomRight(event.pos())
-            self.set_rubber_band()
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
-        else:
+        # That's the snapped point
+        if result <> []:
 
-            # Hide highlight
-            self.vertexMarker.hide()
-
-            # Get the click
-            x = event.pos().x()
-            y = event.pos().y()
-            eventPoint = QPoint(x, y)
-
-            # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
-            # That's the snapped point
-            if result <> []:
-
-                # Check Arc or Node
-                for snapPoint in result:
+            # Check Arc or Node
+            for snapPoint in result:
                     
-                    #exist=self.snapperManager.check_connec_group(snapPoint.layer)
-                    #if exist : 
-                    #if snapPoint.layer == self.layer_connec:
-                    if snapPoint.layer.name() == 'Valve':
+                #exist=self.snapperManager.check_connec_group(snapPoint.layer)
+                #if exist : 
+                #if snapPoint.layer == self.layer_connec:
+                if snapPoint.layer.name() == 'Valve':
 
-                        # Get the point
-                        point = QgsPoint(result[0].snappedVertex)
+                    # Get the point
+                    point = QgsPoint(result[0].snappedVertex)
 
-                        # Add marker
-                        self.vertexMarker.setCenter(point)
-                        self.vertexMarker.show()
+                    # Add marker
+                    self.vertexMarker.setCenter(point)
+                    self.vertexMarker.show()
 
-                        break
-
-
-    def canvasPressEvent(self, event):
-
-        self.selectRect.setRect(0, 0, 0, 0)
-        self.rubberBand.reset()
+                    break
 
 
     def canvasReleaseEvent(self, event):
@@ -141,67 +118,32 @@ class ValveAnalytics(ParentMapTool):
             y = event.pos().y()
             eventPoint = QPoint(x, y)
 
-            # Not dragging, just simple selection
-            if not self.dragging:
+            # Snap to node
+            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
-                # Snap to node
-                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            # That's the snapped point
+            if result <> [] :
+            #exist=self.snapperManager.check_connec_group(result[0].layer)
 
-                # That's the snapped point
-                if result <> [] :
-                    #exist=self.snapperManager.check_connec_group(result[0].layer)
-
-                    #if exist :
-                    if result[0].layer.name() == 'Valve':
-                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                        #layer.removeSelection()
-                        #layer.select([result[0].snappedAtGeometry])
-                        result[0].layer.removeSelection()
-                        result[0].layer.select([result[0].snappedAtGeometry])
+                #if exist :
+                if result[0].layer.name() == 'Valve':
+                    point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                    #layer.removeSelection()
+                    #layer.select([result[0].snappedAtGeometry])
+                    result[0].layer.removeSelection()
+                    result[0].layer.select([result[0].snappedAtGeometry])
     
-                        # Create link
-                        self.mg_analytics()
+                    # Execute SQL
+                    #self.mg_analytics()
     
-                        # Hide highlight
-                        self.vertexMarker.hide()
+                    # Hide highlight
+                    self.vertexMarker.hide()
 
-            else:
-
-                # Set valid values for rectangle's width and height
-                if self.selectRect.width() == 1:
-                    self.selectRect.setLeft( self.selectRect.left() + 1 )
-
-                if self.selectRect.height() == 1:
-                    self.selectRect.setBottom( self.selectRect.bottom() + 1 )
-
-                self.set_rubber_band()
-                selectGeom = self.rubberBand.asGeometry()   #@UnusedVariable
-                self.select_multiple_features(self.selectRectMapCoord)
-                self.dragging = False
-
-                # Create link
-                self.mg_analytics()
 
         elif event.button() == Qt.RightButton:
 
-            # Check selected records
-            numberFeatures = 0
+            self.mg_analytics()
             
-            layer = self.iface.activeLayer() 
-            #for layer in self.layer_connec_man:
-            numberFeatures += layer.selectedFeatureCount()
-
-            
-            if numberFeatures > 0:
-                answer = self.controller.ask_question("There are " + str(numberFeatures) + " features selected in the connec group, do you want to update values on them?", "Interpolate value")
-
-                if answer:
-                    print ("wooorking")    
-                    # Create link
-                    self.mg_analytics()
-            
-         
-
 
     def activate(self):
 
@@ -226,7 +168,7 @@ class ValveAnalytics(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
+            message = "Right click to use current select valve point by clicking"
             self.controller.show_info(message, context_name='ui_message' )  
 
         # Control current layer (due to QGIS bug in snapping system)
@@ -250,19 +192,24 @@ class ValveAnalytics(ParentMapTool):
 
 
     def mg_analytics(self):
-        ''' Button 27. Valve analytics ''' 
+        ''' Button 27. Valve analytics 
+        Execute SQL
+        ''' 
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
-        print self.schema_name
+        
         print function_name
         self.schema_name="mataro_ws_demo"
+        print self.schema_name
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
+        print sql
+        
         result = self.controller.execute_sql(sql)      
         if result:
             message = "Valve analytics executed successfully"
             self.controller.show_info(message, 30, context_name='ui_message')
-
+        
 
     def set_rubber_band(self):
 
@@ -284,41 +231,3 @@ class ValveAnalytics(ParentMapTool):
         self.rubberBand.addPoint(ll, True)
 
         self.selectRectMapCoord =     QgsRectangle(ll, ur)
-
-
-    def select_multiple_features(self, selectGeometry):
-
-        '''
-        if self.layer_connec_man is None:
-            return
-        '''
-
-        # Change cursor
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-
-        if QGis.QGIS_VERSION_INT >= 21600:
-
-            # Default choice
-            behaviour = QgsVectorLayer.SetSelection
-
-            # # Modifiers
-            # modifiers = QApplication.keyboardModifiers()
-            #
-            # if modifiers == Qt.ControlModifier:
-            #     behaviour = QgsVectorLayer.AddToSelection
-            # elif modifiers == Qt.ShiftModifier:
-            #     behaviour = QgsVectorLayer.RemoveFromSelection
-
-            # Selection for all connec group layers
-            layer = self.iface.activeLayer() 
-            #for layer in self.layer_connec_man:
-            layer.selectByRect(selectGeometry, behaviour)
-
-        else:
-            layer = self.iface.activeLayer() 
-            #for layer in self.layer_connec_man:
-            layer.removeSelection()
-            layer.select(selectGeometry, True)
-
-        # Old cursor
-        QApplication.restoreOverrideCursor()
