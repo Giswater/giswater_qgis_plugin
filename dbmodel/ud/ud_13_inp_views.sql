@@ -616,13 +616,15 @@ CREATE VIEW "v_inp_project_id" AS
 SELECT title,
 author,
 date
-FROM inp_project_id;
+FROM inp_project_id
+ORDER BY title;
 
 DROP VIEW IF EXISTS "v_inp_backdrop" CASCADE;
 CREATE VIEW "v_inp_backdrop" AS 
 SELECT id,
 text
-FROM inp_backdrop; 
+FROM inp_backdrop
+ORDER BY id; 
 
 
 DROP VIEW IF EXISTS "v_inp_label" CASCADE;
@@ -635,7 +637,8 @@ font,
 size,
 bold,
 italic 
-FROM inp_label;
+FROM inp_label
+ORDER BY label;
 
 
 DROP VIEW IF EXISTS  "v_inp_mapdim" CASCADE;
@@ -645,13 +648,15 @@ x1,
 y1,
 x2,
 y2
-FROM inp_mapdim;
+FROM inp_mapdim
+ORDER BY type_dim;
 
 DROP VIEW IF EXISTS  "v_inp_mapunits" CASCADE;
 CREATE VIEW  "v_inp_mapunits" AS 
 SELECT type_units,
 map_type
-FROM inp_mapunits;
+FROM inp_mapunits
+ORDER BY type_units;
 
 
 DROP VIEW IF EXISTS  "v_inp_report" CASCADE;
@@ -663,7 +668,8 @@ controls,
 subcatchments,
 nodes,
 links
-FROM inp_report;
+FROM inp_report
+ORDER BY input;
 
 DROP VIEW IF EXISTS  "v_inp_files" CASCADE;
 CREATE VIEW  "v_inp_files" AS 
@@ -671,7 +677,8 @@ SELECT id,
 actio_type,
 file_type,
 fname
-FROM inp_files;
+FROM inp_files
+ORDER BY id;
 
 
 
@@ -691,7 +698,8 @@ be,
 wte,
 umc,
 pattern_id
-FROM inp_aquifer;
+FROM inp_aquifer
+ORDER BY aquif_id;
 
 
 DROP VIEW IF EXISTS  "v_inp_pollutant" CASCADE;
@@ -706,7 +714,8 @@ sflag,
 copoll_id,
 cofract,
 cdwf
-FROM inp_pollutant;
+FROM inp_pollutant
+ORDER BY poll_id;
 
 DROP VIEW IF EXISTS  "v_inp_adjustments" CASCADE;
 CREATE VIEW  "v_inp_adjustments" AS 
@@ -724,7 +733,8 @@ value_9,
 value_10,
 value_11,
 value_12
-FROM inp_adjustments;
+FROM inp_adjustments
+ORDER BY id;
 
 
 

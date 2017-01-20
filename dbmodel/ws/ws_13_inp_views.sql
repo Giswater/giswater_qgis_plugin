@@ -410,7 +410,8 @@ CREATE VIEW "v_inp_project_id" AS
 SELECT title,
 author,
 date
-FROM inp_project_id;
+FROM inp_project_id
+ORDER BY title;
 
 
 DROP VIEW IF EXISTS "v_inp_tags" CASCADE;
@@ -418,7 +419,8 @@ CREATE VIEW "v_inp_tags" AS
 SELECT object,
 node_id,
 tag
-FROM inp_tags;
+FROM inp_tags
+ORDER BY object;
 
 
 DROP VIEW IF EXISTS "v_inp_pattern" CASCADE;
@@ -449,14 +451,16 @@ factor_21,
 factor_22,
 factor_23,
 factor_24
-FROM inp_pattern;
+FROM inp_pattern
+ORDER BY id;
 
 
 DROP VIEW IF EXISTS "v_inp_controls " CASCADE;
 CREATE VIEW "v_inp_controls " AS
 SELECT id,
 text
-FROM inp_controls;
+FROM inp_controls
+ORDER BY id;
 
 DROP VIEW IF EXISTS "v_inp_energy_gl"  CASCADE;
 CREATE VIEW "v_inp_energy_gl"  AS
@@ -464,14 +468,16 @@ SELECT id,
 energ_type,
 parameter,
 value
-FROM inp_energy_gl;
+FROM inp_energy_gl
+ORDER BY id;
 
 
 DROP VIEW IF EXISTS "v_inp_quality"  CASCADE;
 CREATE VIEW "v_inp_quality"  AS
 SELECT node_id,
 initqual
-FROM inp_quality;
+FROM inp_quality
+ORDER BY node_id;
 
 
 DROP VIEW IF EXISTS "v_inp_reactions_el" CASCADE;
@@ -480,7 +486,8 @@ SELECT id,
 parameter,
 arc_id,
 value
-FROM inp_reactions_el;
+FROM inp_reactions_el
+ORDER BY id;
 
 
 DROP VIEW IF EXISTS "V_inp_reactions_gl" CASCADE;
@@ -489,7 +496,8 @@ SELECT id,
 react_type,
 parameter,
 value
-FROM inp_reactions_gl;
+FROM inp_reactions_gl
+ORDER BY id;
 
 DROP VIEW IF EXISTS "v_inp_label" CASCADE;
 CREATE VIEW "v_inp_label"  AS
@@ -498,14 +506,16 @@ xcoord,
 ycoord,
 label,
 node_id
-FROM inp_label;
+FROM inp_label
+ORDER BY id;
 
 
 DROP VIEW IF EXISTS "v_inp_backdrop" CASCADE;
 CREATE VIEW "v_inp_backdrop"  AS
 SELECT id,
 text
-FROM inp_backdrop;
+FROM inp_backdrop
+ORDER BY id;
   
   
 
