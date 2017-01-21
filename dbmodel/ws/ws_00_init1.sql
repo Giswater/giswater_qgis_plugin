@@ -86,11 +86,20 @@ CREATE TABLE db_cat_columns (
 -- Catalog of client layer
 DROP TABLE IF EXISTS db_cat_clientlayer CASCADE; 
 CREATE TABLE db_cat_clientlayer (
-    id int4 PRIMARY KEY,
+    id serial PRIMARY KEY,
     name text NOT NULL,
-    group_level_1 text,
-    group_level_2 text,
-    group_level_3 text,
-    description text
+	group_level_1 varchar (30),
+	group_level_2 varchar (30),
+	group_level_3 varchar (30),
+	group_level_4 varchar (30),
+	description text,
+	db_name varchar (30),
+	stylename varchar (30),
+	stsleqml xml,
+	stylesld xml,
+	useasdefault boolean,
+	project_criticity int2,
+	automatic_reload_layer boolean,	
 );
+
 
