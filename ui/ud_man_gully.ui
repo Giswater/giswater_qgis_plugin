@@ -43,7 +43,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -59,7 +59,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_5">
       <property name="geometry">
@@ -1296,6 +1296,9 @@
        <height>385</height>
       </rect>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QPushButton" name="btn_element_delete">
      <property name="geometry">
@@ -1336,6 +1339,9 @@
        <width>550</width>
        <height>301</height>
       </rect>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QComboBox" name="doc_type">
@@ -1799,6 +1805,9 @@
        <width>551</width>
        <height>311</height>
       </rect>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>

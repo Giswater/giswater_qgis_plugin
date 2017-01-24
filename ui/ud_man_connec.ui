@@ -35,7 +35,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -51,7 +51,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page_5">
       <property name="geometry">
@@ -1812,6 +1812,9 @@
        <height>385</height>
       </rect>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QPushButton" name="btn_element_delete">
      <property name="geometry">
@@ -1857,7 +1860,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -1898,6 +1901,9 @@
          <height>280</height>
         </rect>
        </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_5">
@@ -1912,6 +1918,9 @@
          <width>530</width>
          <height>300</height>
         </rect>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>
@@ -2051,6 +2060,9 @@
        <width>550</width>
        <height>301</height>
       </rect>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_doc_to">
@@ -2280,7 +2292,7 @@
    </widget>
    <widget class="QWidget" name="tab_10">
     <attribute name="title">
-     <string>Event</string>
+     <string>O&amp;&amp;M</string>
     </attribute>
     <widget class="QTabWidget" name="tab_event">
      <property name="geometry">
@@ -2306,6 +2318,9 @@
          <width>530</width>
          <height>300</height>
         </rect>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>

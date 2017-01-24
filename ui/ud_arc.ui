@@ -43,7 +43,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>7</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
@@ -1572,6 +1572,9 @@
        <height>361</height>
       </rect>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QPushButton" name="btn_element_delete">
      <property name="geometry">
@@ -1601,7 +1604,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_10">
       <attribute name="title">
@@ -6223,6 +6226,9 @@
        <height>281</height>
       </rect>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QPushButton" name="btn_doc_delete">
      <property name="geometry">
@@ -6441,6 +6447,9 @@
          <height>231</height>
         </rect>
        </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
       </widget>
       <widget class="QDateEdit" name="date_event_from">
        <property name="geometry">
@@ -6638,6 +6647,9 @@
        <width>761</width>
        <height>281</height>
       </rect>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="Line" name="line_14">
@@ -6855,6 +6867,9 @@
        <height>281</height>
       </rect>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QLabel" name="label_to_4">
      <property name="geometry">
@@ -6918,6 +6933,9 @@
        <width>761</width>
        <height>281</height>
       </rect>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QDateEdit" name="date_iptu_to">
