@@ -27,10 +27,15 @@ from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
 from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
+
+from map_tools.add_element import AddElementMapTool
+
+
 from search.search_plus import SearchPlus
 from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
 
 from xml.dom import minidom
+from map_tools.add_element import AddElementMapTool
 
 
 class Giswater(QObject):
@@ -148,7 +153,8 @@ class Giswater(QObject):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
-                elif int(index_action) in (32, 33, 34, 36):    
+                #elif int(index_action) in (32, 33, 34, 36):  
+                elif int(index_action) in (32,34, 36):   
                     callback_function = getattr(self.ed, function_name)  
                     action.triggered.connect(callback_function)                    
                 # Generic function
@@ -199,6 +205,9 @@ class Giswater(QObject):
             elif int(index_action) == 20:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 33:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                map_tool = AddElementMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
@@ -531,8 +540,6 @@ class Giswater(QObject):
                     self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
                     self.layer_node_man_UD.append(cur_layer)
-                    self.set_fieldRelation(cur_layer)
-                    
                 if 'v_edit_man_outfall' == uri_table:
                     self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
@@ -614,6 +621,9 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
                     
+           
+                
+                    
         # Check if table 'version' exists
         if self.layer_version is None:
             self.controller.show_warning("Layer version not found")
@@ -645,6 +655,7 @@ class Giswater(QObject):
         self.search_project_type()
                                          
         # Set layer custom UI form and init function   
+        # On loading of project set field relations for all layers
         if self.layer_arc is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_arc.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_arc_init.py')                     
@@ -652,6 +663,8 @@ class Giswater(QObject):
             self.layer_arc.editFormConfig().setInitCodeSource(1)
             self.layer_arc.editFormConfig().setInitFilePath(file_init)           
             self.layer_arc.editFormConfig().setInitFunction('formOpen') 
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_arc)
             
         if self.layer_arc_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
@@ -662,6 +675,8 @@ class Giswater(QObject):
                     self.layer_arc_man_UD[i].editFormConfig().setInitCodeSource(1)
                     self.layer_arc_man_UD[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_arc_man_UD[i].editFormConfig().setInitFunction('formOpen')
+                    # On loading of project set field relations for all layers
+                    self.set_fieldRelation(self.layer_arc_man_UD[i])
                 
         if self.layer_arc_man_WS is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_arc.ui')
@@ -672,6 +687,8 @@ class Giswater(QObject):
                     self.layer_arc_man_WS[i].editFormConfig().setInitCodeSource(1)
                     self.layer_arc_man_WS[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_arc_man_WS[i].editFormConfig().setInitFunction('formOpen')
+                    # On loading of project set field relations for all layers
+                    self.set_fieldRelation(self.layer_arc_man_WS[i])
          
          
         if self.layer_node is not None and self.load_custom_forms:       
@@ -681,6 +698,8 @@ class Giswater(QObject):
             self.layer_node.editFormConfig().setInitCodeSource(1)
             self.layer_node.editFormConfig().setInitFilePath(file_init)           
             self.layer_node.editFormConfig().setInitFunction('formOpen')
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_node)
 
         if self.layer_node_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
@@ -691,6 +710,8 @@ class Giswater(QObject):
                     self.layer_node_man_UD[i].editFormConfig().setInitCodeSource(1)
                     self.layer_node_man_UD[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_node_man_UD[i].editFormConfig().setInitFunction('formOpen')
+                    # On loading of project set field relations for all layers
+                    self.set_fieldRelation(self.layer_node_man_UD[i])
                     
         if self.layer_node_man_WS is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_node.ui')
@@ -701,6 +722,8 @@ class Giswater(QObject):
                     self.layer_node_man_WS[i].editFormConfig().setInitCodeSource(1)
                     self.layer_node_man_WS[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_node_man_WS[i].editFormConfig().setInitFunction('formOpen')
+                    # On loading of project set field relations for all layers
+                    self.set_fieldRelation(self.layer_node_man_WS[i])
         
         if self.layer_connec is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_connec.ui')
@@ -709,6 +732,8 @@ class Giswater(QObject):
             self.layer_connec.editFormConfig().setInitCodeSource(1)
             self.layer_connec.editFormConfig().setInitFilePath(file_init)           
             self.layer_connec.editFormConfig().setInitFunction('formOpen')
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_connec)
 
         if self.layer_connec_man_UD is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
@@ -719,6 +744,8 @@ class Giswater(QObject):
                     self.layer_connec_man_UD[i].editFormConfig().setInitCodeSource(1)
                     self.layer_connec_man_UD[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_connec_man_UD[i].editFormConfig().setInitFunction('formOpen')
+                    # On loading of project set field relations for all layers
+                    self.set_fieldRelation(self.layer_connec_man_UD[i])
         
         if self.layer_connec_man_WS is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_man_connec.ui')
@@ -729,6 +756,8 @@ class Giswater(QObject):
                     self.layer_connec_man_WS[i].editFormConfig().setInitCodeSource(1)
                     self.layer_connec_man_WS[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_connec_man_WS[i].editFormConfig().setInitFunction('formOpen')
+                    # On loading of project set field relations for all layers
+                    self.set_fieldRelation(self.layer_connec_man_WS[i])
                     
                
         if self.layer_gully is not None and self.load_custom_forms:       
@@ -738,6 +767,8 @@ class Giswater(QObject):
             self.layer_gully.editFormConfig().setInitCodeSource(1)
             self.layer_gully.editFormConfig().setInitFilePath(file_init)           
             self.layer_gully.editFormConfig().setInitFunction('formOpen')   
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_gully)
         
         
         if self.layer_pgully is not None and self.load_custom_forms:       
@@ -746,7 +777,9 @@ class Giswater(QObject):
             self.layer_pgully.editFormConfig().setUiForm(file_ui) 
             self.layer_pgully.editFormConfig().setInitCodeSource(1)
             self.layer_pgully.editFormConfig().setInitFilePath(file_init)           
-            self.layer_pgully.editFormConfig().setInitFunction('formOpen')     
+            self.layer_pgully.editFormConfig().setInitFunction('formOpen')
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_pgully)     
 
 
         if self.layer_man_gully is not None and self.load_custom_forms:       
@@ -755,7 +788,9 @@ class Giswater(QObject):
             self.layer_man_gully.editFormConfig().setUiForm(file_ui) 
             self.layer_man_gully.editFormConfig().setInitCodeSource(1)
             self.layer_man_gully.editFormConfig().setInitFilePath(file_init)           
-            self.layer_man_gully.editFormConfig().setInitFunction('formOpen')   
+            self.layer_man_gully.editFormConfig().setInitFunction('formOpen')  
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_man_gully)  
         
         
         if self.layer_man_pgully is not None and self.load_custom_forms:       
@@ -764,7 +799,9 @@ class Giswater(QObject):
             self.layer_man_pgully.editFormConfig().setUiForm(file_ui) 
             self.layer_man_pgully.editFormConfig().setInitCodeSource(1)
             self.layer_man_pgully.editFormConfig().setInitFilePath(file_init)           
-            self.layer_man_pgully.editFormConfig().setInitFunction('formOpen')                    
+            self.layer_man_pgully.editFormConfig().setInitFunction('formOpen') 
+            # On loading of project set field relations for all layers
+            self.set_fieldRelation(self.layer_man_pgully)                    
 
             
         # Manage current layer selected     
@@ -834,7 +871,15 @@ class Giswater(QObject):
             map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
             map_tool.set_controller(self.controller)
 
-
+        map_tool = self.map_tools['ed_add_element']
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+            
+        
         map_tool = self.map_tools['mg_extract_raster_value']
         if self.mg.project_type == 'ws':
             map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
@@ -842,7 +887,7 @@ class Giswater(QObject):
         else:
             map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
             map_tool.set_controller(self.controller)
-        
+            
         
         map_tool.set_config_action(self.actions['99'])
 
@@ -1053,17 +1098,21 @@ class Giswater(QObject):
 
     def set_fieldRelation(self,layer_element):
         # Parametrization of path 
-        path = 'C:/Users/tasladmin/.qgis2/python/plugins/giswater/valueRelation.xml'
-        print path
+        #path1 = 'C:/Users/tasladmin/.qgis2/python/plugins/giswater/valueRelationJunction.xml'
+        print layer_element
+        print "test"
+        
+        element = layer_element.name()
+
+        path = os.path.join(self.plugin_dir, 'xml','valueRelation'+element+'.xml')
+
         xmldoc = minidom.parse(path)
         itemlist = xmldoc.getElementsByTagName('edittype')
         index=0
         for s in itemlist:
-            print "index"
-            print index
-            print(s.attributes['name'].value)
-            name = s.attributes['name'].value         
-            print(s.attributes['widgetv2type'].value)
+            #print(s.attributes['name'].value)
+            #name = s.attributes['name'].value         
+            #print(s.attributes['widgetv2type'].value)
             widgetv2type = s.attributes['widgetv2type'].value
             if widgetv2type == 'ValueRelation' :
                 #layer_element.setEditType(11,QgsVectorLayer.ValueRelation)
@@ -1074,8 +1123,8 @@ class Giswater(QObject):
                 layer_element.valueRelation(index).mValue ='value'
                 layer_element.valueRelation(index).mAllowNull = False
                 layer_element.valueRelation(index).mOrderByValue = True
-                            
+                       
             index=index+1
                     
-            print "test"
+
         
