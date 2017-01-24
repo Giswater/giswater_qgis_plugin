@@ -397,8 +397,8 @@ plan_node_x_psector.descript,
 (v_price_x_catnode.cost)::numeric(12,2) AS budget,
 plan_node_x_psector.psector_id,
 node."state",
-plan_node_x_psector.atlas_id,
 node.the_geom
+plan_node_x_psector.atlas_id,
 
 FROM ((node 
 JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
@@ -511,7 +511,8 @@ v_price_compost.id AS price_id,
 v_price_compost.descript,
 v_price_compost.price,
 plan_other_x_psector.measurement,
-(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget
+(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget,
+plan_other_x_psector.atlas_id
 
 FROM (plan_other_x_psector 
 JOIN v_price_compost ON ((((v_price_compost.id)::text = (plan_other_x_psector.price_id)::text))))
