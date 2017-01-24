@@ -1055,7 +1055,7 @@ CREATE OR REPLACE VIEW v_edit_man_siphon AS
     arc.arccat_id,
     cat_arc.matcat_id AS cat_matcat_id,
     cat_arc.shape AS siphon_cat_shape,
-    cat_arc.geom1 AS siphon_cat_geom1
+    cat_arc.geom1 AS siphon_cat_geom1,
 	cat_arc.width AS siphon_cat_width,
     st_length2d(arc.the_geom)::numeric(12,2) AS siphon_gis_length,
     arc.epa_type,
