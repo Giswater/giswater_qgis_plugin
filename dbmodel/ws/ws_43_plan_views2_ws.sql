@@ -567,6 +567,7 @@ DROP VIEW IF EXISTS v_plan_psector CASCADE;
     sum(wtotal.pec::numeric(12,2)) AS pec,
 	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
     sum(wtotal.pca::numeric(12,2)) AS pca,
+	plan_psector.atlas_id,
     wtotal.the_geom
    FROM (         SELECT v_plan_psector_arc.psector_id,
 					v_plan_psector_arc.pem,
@@ -591,8 +592,8 @@ DROP VIEW IF EXISTS v_plan_psector CASCADE;
                     v_plan_psector_other.pca,
                     v_plan_psector_other.the_geom
                    FROM v_plan_psector_other) wtotal	  
-				   
-				GROUP BY wtotal.psector_id, wtotal.the_geom;
+		JOIN plan_psector ON plan_psector.psector_id=wtotal.psector_id		   
+				GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom;
 
 
 				
