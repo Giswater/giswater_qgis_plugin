@@ -117,7 +117,6 @@ class SnappingConfigManager():
         #QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
 
         for layer in self.layer_connec_man:
-            print layer.name()
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
@@ -127,10 +126,10 @@ class SnappingConfigManager():
         ''' Set snapping to Connec '''
         QgsProject.instance().blockSignals(True)
         #QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
-        layer_valve = self.iface.activeLayer() 
-      
-        print "snapping is valve"
-        QgsProject.instance().setSnapSettingsForLayer(layer_valve.id(), True, 2, 2, 1.0, False)
+        
+        for layer in self.layer_node_man:
+            if layer.name() == 'Valve':
+                QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
 

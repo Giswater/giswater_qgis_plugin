@@ -25,11 +25,12 @@ from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
+from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
-from qgis.core import QgsExpressionContextUtils
-from map_tools.valve_analytics import ValveAnalytics
+from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
 
+from xml.dom import minidom
 
 
 class Giswater(QObject):
@@ -530,6 +531,8 @@ class Giswater(QObject):
                     self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
                     self.layer_node_man_UD.append(cur_layer)
+                    self.set_fieldRelation(cur_layer)
+                    
                 if 'v_edit_man_outfall' == uri_table:
                     self.layer_node_man_UD.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
@@ -595,7 +598,6 @@ class Giswater(QObject):
                     
                 if 'v_edit_man_pipe' == uri_table:
                     self.layer_arc_man_WS.append(cur_layer)
-
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
@@ -700,7 +702,6 @@ class Giswater(QObject):
                     self.layer_node_man_WS[i].editFormConfig().setInitFilePath(file_init)
                     self.layer_node_man_WS[i].editFormConfig().setInitFunction('formOpen')
         
-        
         if self.layer_connec is not None and self.load_custom_forms:       
             file_ui = os.path.join(self.plugin_dir, 'ui', self.mg.project_type+'_connec.ui')
             file_init = os.path.join(self.plugin_dir, self.mg.project_type+'_connec_init.py')       
@@ -795,7 +796,17 @@ class Giswater(QObject):
         else:
             map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
             map_tool.set_controller(self.controller)
-
+            
+        
+        map_tool = self.map_tools['mg_analytics']
+        print ("map_tool")
+        if self.mg.project_type == 'ws':
+            map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+            map_tool.set_controller(self.controller)
+        else:
+            map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+            map_tool.set_controller(self.controller)
+        
 
         map_tool = self.map_tools['mg_flow_trace']
         if self.mg.project_type == 'ws':
@@ -1040,5 +1051,31 @@ class Giswater(QObject):
 
 
 
-    
+    def set_fieldRelation(self,layer_element):
+        # Parametrization of path 
+        path = 'C:/Users/tasladmin/.qgis2/python/plugins/giswater/valueRelation.xml'
+        print path
+        xmldoc = minidom.parse(path)
+        itemlist = xmldoc.getElementsByTagName('edittype')
+        index=0
+        for s in itemlist:
+            print "index"
+            print index
+            print(s.attributes['name'].value)
+            name = s.attributes['name'].value         
+            print(s.attributes['widgetv2type'].value)
+            widgetv2type = s.attributes['widgetv2type'].value
+            if widgetv2type == 'ValueRelation' :
+                #layer_element.setEditType(11,QgsVectorLayer.ValueRelation)
+                layer_element.setEditType(index,QgsVectorLayer.ValueRelation)
+                # Parametrization of mLayer- id of layer
+                layer_element.valueRelation(index).mLayer ='v_edit_man_junction20161013122934395'
+                layer_element.valueRelation(index).mKey ='key'
+                layer_element.valueRelation(index).mValue ='value'
+                layer_element.valueRelation(index).mAllowNull = False
+                layer_element.valueRelation(index).mOrderByValue = True
+                            
+            index=index+1
+                    
+            print "test"
         

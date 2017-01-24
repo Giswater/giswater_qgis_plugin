@@ -50,18 +50,26 @@ class ValveAnalytics(ParentMapTool):
         self.rubberBand.setWidth(3)
         mBorderColor = QColor(254, 58, 29)
         self.rubberBand.setBorderColor(mBorderColor)
+        
+        self.reset()
 
 
 
     def reset(self):
         ''' Clear selected features '''
         
+        '''
         layer = self.layer_connec
         if layer is not None:
             layer.removeSelection()
+        '''
 
         # Graphic elements
         self.rubberBand.reset()
+        
+        # Selection
+        self.snappFeat = None
+          
 
 
     ''' QgsMapTools inherited event functions '''
@@ -141,7 +149,7 @@ class ValveAnalytics(ParentMapTool):
 
 
         elif event.button() == Qt.RightButton:
-
+            
             self.mg_analytics()
             
 
@@ -161,7 +169,6 @@ class ValveAnalytics(ParentMapTool):
 
         # Set snapping to arc and node
         self.snapperManager.snapToValve()
-
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -198,17 +205,14 @@ class ValveAnalytics(ParentMapTool):
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
-        
-        print function_name
-        self.schema_name="mataro_ws_demo"
-        print self.schema_name
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
         print sql
-        
-        result = self.controller.execute_sql(sql)      
+  
+        self.controller.show_progressBar()    
         if result:
             message = "Valve analytics executed successfully"
             self.controller.show_info(message, 30, context_name='ui_message')
+            
         
 
     def set_rubber_band(self):

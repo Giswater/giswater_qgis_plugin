@@ -46,3 +46,6 @@ i18n/lrelease.exe
 ui/ws_man_node_.ui
 ui/ud_section.png
 ui/ws_section.png
+dao/controller.py
+icons/100.png
+ui/example.ui
