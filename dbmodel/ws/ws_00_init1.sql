@@ -99,7 +99,7 @@ CREATE TABLE db_cat_clientlayer (
 	stylesld xml,
 	useasdefault boolean,
 	project_criticity int2,
-	automatic_reload_layer boolean,	
+	automatic_reload_layer boolean
 );
 
 
