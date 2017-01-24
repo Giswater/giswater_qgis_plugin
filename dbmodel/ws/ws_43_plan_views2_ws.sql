@@ -344,9 +344,9 @@ node.node_id,
 node.node_type,
 node.depth,
 v_price_x_catnode.cost_unit,
-(CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN NULL ELSE ((CASE WHEN (node.depth*1=0::numeric) THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)END)) END)::numeric(12,2) AS calculated_depth,
+(CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN NULL ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)END)) END)::numeric(12,2) AS calculated_depth,
 v_price_x_catnode.cost,
-(CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.depth*1=0::numeric) THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
+(CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
 node."state",
 node.the_geom
 
@@ -397,8 +397,8 @@ plan_node_x_psector.descript,
 (v_price_x_catnode.cost)::numeric(12,2) AS budget,
 plan_node_x_psector.psector_id,
 node."state",
-plan_node_x_psector.atlas_id,
 node.the_geom
+plan_node_x_psector.atlas_id,
 
 FROM ((node 
 JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
@@ -511,7 +511,8 @@ v_price_compost.id AS price_id,
 v_price_compost.descript,
 v_price_compost.price,
 plan_other_x_psector.measurement,
-(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget
+(plan_other_x_psector.measurement*v_price_compost.price)::numeric(14,2) AS budget,
+plan_other_x_psector.atlas_id
 
 FROM (plan_other_x_psector 
 JOIN v_price_compost ON ((((v_price_compost.id)::text = (plan_other_x_psector.price_id)::text))))
@@ -566,6 +567,7 @@ DROP VIEW IF EXISTS v_plan_psector CASCADE;
     sum(wtotal.pec::numeric(12,2)) AS pec,
 	sum(wtotal.pec_vat::numeric(12,2)) AS pec_vat,
     sum(wtotal.pca::numeric(12,2)) AS pca,
+	plan_psector.atlas_id,
     wtotal.the_geom
    FROM (         SELECT v_plan_psector_arc.psector_id,
 					v_plan_psector_arc.pem,
@@ -590,8 +592,8 @@ DROP VIEW IF EXISTS v_plan_psector CASCADE;
                     v_plan_psector_other.pca,
                     v_plan_psector_other.the_geom
                    FROM v_plan_psector_other) wtotal	  
-				   
-				GROUP BY wtotal.psector_id, wtotal.the_geom;
+		JOIN plan_psector ON plan_psector.psector_id=wtotal.psector_id		   
+				GROUP BY wtotal.psector_id, plan_psector.atlas_id, wtotal.the_geom;
 
 
 				
