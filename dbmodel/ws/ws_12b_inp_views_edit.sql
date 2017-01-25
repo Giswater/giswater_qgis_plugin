@@ -41,7 +41,7 @@ DROP VIEW IF EXISTS "v_edit_inp_pump" CASCADE;
 CREATE VIEW "v_edit_inp_pump" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
-inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.status
+inp_pump.power, inp_pump.curve_id, inp_pump.speed, inp_pump.pattern, inp_pump.to_arc, inp_pump.status
 FROM (node 
 JOIN inp_pump ON (((node.node_id)::text = (inp_pump.node_id)::text)));
 
@@ -50,7 +50,7 @@ DROP VIEW IF EXISTS "v_edit_inp_valve" CASCADE;
 CREATE VIEW "v_edit_inp_valve" AS 
 SELECT 
 node.node_id, node.elevation, node."depth", node.nodecat_id, node.sector_id, node."state", node.annotation, node.observ, node.comment, node.dma_id, node.rotation, node.link, node.verified, node.the_geom,
-inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.status
+inp_valve.valv_type, inp_valve.pressure, inp_valve.flow, inp_valve.coef_loss, inp_valve.curve_id, inp_valve.minorloss, inp_valve.to_arc, inp_valve.status
 FROM (node 
 JOIN inp_valve ON (((node.node_id)::text = (inp_valve.node_id)::text)));
 
