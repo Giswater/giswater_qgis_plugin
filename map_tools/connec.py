@@ -271,7 +271,6 @@ class ConnecMapTool(ParentMapTool):
         
                 # Execute function
                 function_name = "gw_fct_connect_to_network"
-                print self.schema_name
                 sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
                 self.controller.execute_sql(sql)
         

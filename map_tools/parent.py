@@ -62,7 +62,7 @@ class ParentMapTool(QgsMapTool):
 
         # Get default cursor
         self.stdCursor = self.parent().cursor()        
-        
+
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
         ''' Sets layers involved in Map Tools functions
@@ -71,12 +71,9 @@ class ParentMapTool(QgsMapTool):
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
         self.snapperManager.set_layers(layer_arc_man, layer_connec_man, layer_node_man)
-        print "passing parent" 
 
 
     def set_controller(self, controller):
         self.controller = controller
         self.schema_name = controller.schema_name
-        print "passing parent" 
-        
 
