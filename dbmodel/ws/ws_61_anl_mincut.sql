@@ -133,13 +133,17 @@ CONSTRAINT anl_mincut_result_hydrometer_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "anl_mincut_result_selector" (
-id varchar (30),
+"id" serial NOT NULL,
+"result_id" varchar (30),
+"cur_user" text
 CONSTRAINT mincut_result_selector_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "anl_mincut_result_selector_compare" (
-id varchar (30),
+"id" serial NOT NULL,
+"compare_id" varchar (30),
+"cur_user" text
 CONSTRAINT mincut_result_selector_compare_pkey PRIMARY KEY (id)
 );
 
