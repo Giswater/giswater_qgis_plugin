@@ -50,6 +50,20 @@ CREATE SEQUENCE "anl_mincut_result_cat_seq"
     NO MAXVALUE
     CACHE 1;
 
+	
+CREATE SEQUENCE "anl_mincut_result_selector_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+CREATE SEQUENCE "anl_mincut_result_selector_compare_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 CREATE TABLE "anl_mincut_result_cat_type" (
 id varchar(30) NOT NULL,
@@ -133,18 +147,18 @@ CONSTRAINT anl_mincut_result_hydrometer_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "anl_mincut_result_selector" (
-"id" serial NOT NULL,
+"id" varchar (16) NOT NULL DEFAULT nextval('anl_mincut_result_selector_seq'::regclass),
 "result_id" varchar (30),
-"cur_user" text
-CONSTRAINT mincut_result_selector_pkey PRIMARY KEY (id)
+"cur_user" text,
+CONSTRAINT anl_mincut_result_selector_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "anl_mincut_result_selector_compare" (
-"id" serial NOT NULL,
+"id" varchar (16) NOT NULL DEFAULT nextval('anl_mincut_result_selector_compare_seq'::regclass),
 "compare_id" varchar (30),
-"cur_user" text
-CONSTRAINT mincut_result_selector_compare_pkey PRIMARY KEY (id)
+"cur_user" text,
+CONSTRAINT anl_mincut_result_selector_compare_pkey PRIMARY KEY (id)
 );
 
 

@@ -56,7 +56,7 @@ CREATE TABLE db_cat_table (
 	project_type text,
     context text,
 	db_cat_clientlayer_id int4,
-	description text,
+	description text
 	);
 
 
@@ -68,7 +68,7 @@ CREATE TABLE db_cat_view (
     project_type text,
     context text,
 	db_cat_clientlayer_id int4,
-	description text,
+	description text
 	);
 
 
@@ -79,7 +79,7 @@ CREATE TABLE db_cat_columns (
 	db_cat_table_id int4 NOT NULL,
     column_name text NOT NULL,
 	column_type text,
-	description text,
+	description text
 	);
 
 
@@ -100,7 +100,7 @@ CREATE TABLE db_cat_clientlayer (
 	stylesld xml,
 	useasdefault boolean,
 	project_criticity int2,
-	automatic_reload_layer boolean,	
+	automatic_reload_layer boolean
 );
 
 

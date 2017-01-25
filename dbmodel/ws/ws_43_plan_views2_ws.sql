@@ -397,8 +397,8 @@ plan_node_x_psector.descript,
 (v_price_x_catnode.cost)::numeric(12,2) AS budget,
 plan_node_x_psector.psector_id,
 node."state",
-node.the_geom
-plan_node_x_psector.atlas_id,
+node.the_geom,
+plan_node_x_psector.atlas_id
 
 FROM ((node 
 JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
