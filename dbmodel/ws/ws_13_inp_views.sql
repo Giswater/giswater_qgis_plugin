@@ -597,6 +597,48 @@ WHERE ((rpt_node.result_id)::text = (rpt_selector_result.result_id)::text)
 AND rpt_selector_result.cur_user="current_user"()::text
 GROUP BY node.node_id, rpt_selector_result.result_id, node.the_geom ORDER BY node.node_id;
 
+
+DROP VIEW IF EXISTS "v_rpt_arc_all" CASCADE;
+CREATE VIEW "v_rpt_arc_all" AS
+SELECT
+rpt_arc.id,
+arc.arc_id,
+rpt_selector_result.result_id,
+rpt_arc.flow, 
+rpt_arc.vel, 
+rpt_arc.headloss,
+rpt_arc.setting,
+rpt_arc.ffactor, 
+rpt_arc.time::interval, 
+arc.the_geom
+FROM rpt_selector_result, temp_arc arc
+JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+WHERE ((rpt_arc.result_id)::text = (rpt_selector_result.result_id)::text)
+AND rpt_selector_result.cur_user="current_user"()::text
+ORDER BY 9,2;
+
+
+DROP VIEW IF EXISTS "v_rpt_node_all"CASCADE;
+CREATE VIEW "v_rpt_node_all" AS 
+SELECT 
+rpt_node.id,
+node.node_id, 
+rpt_selector_result.result_id,
+rpt_node.elevation, 
+rpt_node.demand, 
+rpt_node.head, 
+rpt_node.press, 
+rpt_node.quality, 
+rpt_node.time::interval,
+node.the_geom 
+FROM rpt_selector_result, temp_node node
+JOIN rpt_node ON ((rpt_node.node_id)::text = (node.node_id)::text)
+WHERE ((rpt_node.result_id)::text = (rpt_selector_result.result_id)::text)
+AND rpt_selector_result.cur_user="current_user"()::text
+ORDER BY 9,2;
+
+
+
 -- ----------------------------
 -- View structure for v_rpt_compare
 -- ----------------------------
@@ -669,4 +711,11 @@ WHERE ((rpt_node.result_id)::text = (rpt_selector_compare.result_id)::text)
 AND rpt_selector_compare.cur_user="current_user"()::text
 GROUP BY node.node_id, rpt_selector_compare.result_id, node.the_geom 
 ORDER BY node.node_id;
+
+
+
+
+
+
+
 
