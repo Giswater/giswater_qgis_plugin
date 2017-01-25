@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
  
 CREATE TABLE "om_visit_parameter_type" (
-"id" varchar(18)   NOT NULL,
+"id" varchar(30)   NOT NULL,
 "observ" varchar(255)   NOT NULL,
 CONSTRAINT om_visit_parameter_type_pkey PRIMARY KEY (id)
 ) ;
@@ -55,7 +55,7 @@ CREATE TABLE "om_visit_event" (
 "position_id" varchar(50),
 "xcoord" float,
 "ycoord" float,
-"azimut" float,
+"compass" float,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
 
