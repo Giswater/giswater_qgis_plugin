@@ -762,11 +762,15 @@ CREATE TABLE "rpt_cat_result" (
 -- ----------------------------
 
 CREATE TABLE "rpt_selector_result" (
-"result_id" varchar(16)   NOT NULL
+"id" serial NOT NULL, 
+"result_id" varchar(16)   NOT NULL,
+"cur_user" text
 );
 
 CREATE TABLE "rpt_selector_compare" (
-"result_id" varchar(16)   NOT NULL
+"id" serial NOT NULL,
+"result_id" varchar(16)   NOT NULL,
+"cur_user" text
 );
 
 CREATE TABLE "inp_selector_sector" (

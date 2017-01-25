@@ -526,32 +526,76 @@ ORDER BY id;
 
 DROP VIEW IF EXISTS "v_rpt_arc" CASCADE; 
 CREATE VIEW "v_rpt_arc" AS 
-SELECT arc.arc_id, rpt_selector_result.result_id, max(rpt_arc.flow) AS max_flow, min(rpt_arc.flow) AS min_flow, max(rpt_arc.vel) AS max_vel, min(rpt_arc.vel) AS min_vel, 
-max(rpt_arc.headloss) AS max_headloss, min(rpt_arc.headloss) AS min_headloss, 
+SELECT arc.arc_id, 
+rpt_selector_result.result_id, 
+max(rpt_arc.flow) AS max_flow, 
+min(rpt_arc.flow) AS min_flow, 
+max(rpt_arc.vel) AS max_vel, 
+min(rpt_arc.vel) AS min_vel, 
+max(rpt_arc.headloss) AS max_headloss, 
+min(rpt_arc.headloss) AS min_headloss, 
 max(rpt_arc.headloss::double precision / (st_length2d(arc.the_geom) * 10::double precision))::numeric(12,2) AS max_uheadloss,
 min(rpt_arc.headloss::double precision / (st_length2d(arc.the_geom) * 10::double precision))::numeric(12,2) AS min_uheadloss,
-max(rpt_arc.setting) AS max_setting, min(rpt_arc.setting) AS min_setting, max(rpt_arc.reaction) AS max_reaction, min(rpt_arc.reaction) AS min_reaction, max(rpt_arc.ffactor) AS max_ffactor, min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom 
-FROM ((temp_arc arc JOIN rpt_arc ON (((rpt_arc.arc_id)::text = (arc.arc_id)::text))) JOIN rpt_selector_result ON (((rpt_arc.result_id)::text = (rpt_selector_result.result_id)::text))) GROUP BY arc.arc_id, rpt_selector_result.result_id, arc.the_geom ORDER BY arc.arc_id;
-
+max(rpt_arc.setting) AS max_setting, 
+min(rpt_arc.setting) AS min_setting, 
+max(rpt_arc.reaction) AS max_reaction, 
+min(rpt_arc.reaction) AS min_reaction, 
+max(rpt_arc.ffactor) AS max_ffactor, 
+min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom 
+FROM rpt_selector_result,temp_arc arc
+JOIN rpt_arc ON ((rpt_arc.arc_id)::text = (arc.arc_id)::text)
+WHERE ((rpt_arc.result_id)::text = (rpt_selector_result.result_id)::text)
+AND rpt_selector_result.cur_user="current_user"()::text
+GROUP BY arc.arc_id, rpt_selector_result.result_id, arc.the_geom 
+ORDER BY arc.arc_id;
 
 DROP VIEW IF EXISTS "v_rpt_energy_usage" CASCADE;
 CREATE VIEW "v_rpt_energy_usage" AS 
-SELECT rpt_energy_usage.id, rpt_energy_usage.result_id, rpt_energy_usage.nodarc_id, rpt_energy_usage.usage_fact, rpt_energy_usage.avg_effic, rpt_energy_usage.kwhr_mgal, rpt_energy_usage.avg_kw, rpt_energy_usage.peak_kw, rpt_energy_usage.cost_day 
-FROM (rpt_selector_result JOIN rpt_energy_usage ON (((rpt_selector_result.result_id)::text = (rpt_energy_usage.result_id)::text)));
-
+SELECT rpt_energy_usage.id, 
+rpt_energy_usage.result_id, 
+rpt_energy_usage.nodarc_id, 
+rpt_energy_usage.usage_fact, 
+rpt_energy_usage.avg_effic, 
+rpt_energy_usage.kwhr_mgal, 
+rpt_energy_usage.avg_kw, 
+rpt_energy_usage.peak_kw, 
+rpt_energy_usage.cost_day 
+FROM rpt_energy_usage,rpt_selector_result 
+WHERE ((rpt_selector_result.result_id)::text = (rpt_energy_usage.result_id)::text)
+AND rpt_selector_result.cur_user="current_user"()::text
+GROUP BY rpt_energy_usage.id,  rpt_selector_result.result_id;
 
 DROP VIEW IF EXISTS "v_rpt_hydraulic_status" CASCADE;
 CREATE VIEW "v_rpt_hydraulic_status" AS 
-SELECT rpt_hydraulic_status.id, rpt_hydraulic_status.result_id, rpt_hydraulic_status."time", rpt_hydraulic_status.text 
-FROM (rpt_hydraulic_status JOIN rpt_selector_result ON (((rpt_selector_result.result_id)::text = (rpt_hydraulic_status.result_id)::text)));
+SELECT rpt_hydraulic_status.id, 
+rpt_hydraulic_status.result_id, 
+rpt_hydraulic_status."time", 
+rpt_hydraulic_status.text 
+FROM rpt_hydraulic_status,rpt_selector_result  
+WHERE ((rpt_selector_result.result_id)::text = (rpt_hydraulic_status.result_id)::text)
+AND rpt_selector_result.cur_user="current_user"()::text
+GROUP BY rpt_hydraulic_status.id, rpt_selector_result.result_id;
 
 
 DROP VIEW IF EXISTS "v_rpt_node" CASCADE;
 CREATE VIEW "v_rpt_node" AS 
-SELECT node.node_id, rpt_selector_result.result_id, max(rpt_node.elevation) AS elevation, max(rpt_node.demand) AS max_demand, min(rpt_node.demand) AS min_demand, max(rpt_node.head) AS max_head, min(rpt_node.head) AS min_head, max(rpt_node.press) AS max_pressure, min(rpt_node.press) AS min_pressure, max(rpt_node.quality) AS max_quality, min(rpt_node.quality) AS min_quality, node.the_geom 
-FROM ((temp_node node JOIN rpt_node ON (((rpt_node.node_id)::text = (node.node_id)::text))) JOIN rpt_selector_result ON (((rpt_node.result_id)::text = (rpt_selector_result.result_id)::text))) GROUP BY node.node_id, rpt_selector_result.result_id, node.the_geom ORDER BY node.node_id;
-
-
+SELECT node.node_id, 
+rpt_selector_result.result_id,
+max(rpt_node.elevation) AS elevation, 
+max(rpt_node.demand) AS max_demand, 
+min(rpt_node.demand) AS min_demand, 
+max(rpt_node.head) AS max_head, 
+min(rpt_node.head) AS min_head, 
+max(rpt_node.press) AS max_pressure, 
+min(rpt_node.press) AS min_pressure, 
+max(rpt_node.quality) AS max_quality, 
+min(rpt_node.quality) AS min_quality, 
+node.the_geom 
+FROM rpt_selector_result, temp_node node
+JOIN rpt_node ON ((rpt_node.node_id)::text = (node.node_id)::text)
+WHERE ((rpt_node.result_id)::text = (rpt_selector_result.result_id)::text)
+AND rpt_selector_result.cur_user="current_user"()::text
+GROUP BY node.node_id, rpt_selector_result.result_id, node.the_geom ORDER BY node.node_id;
 
 -- ----------------------------
 -- View structure for v_rpt_compare
@@ -559,27 +603,70 @@ FROM ((temp_node node JOIN rpt_node ON (((rpt_node.node_id)::text = (node.node_i
 
 DROP VIEW IF EXISTS "v_rpt_comp_arc" CASCADE; 
 CREATE VIEW "v_rpt_comp_arc" AS 
-SELECT arc.arc_id, rpt_selector_compare.result_id, max(rpt_arc.flow) AS max_flow, min(rpt_arc.flow) AS min_flow, max(rpt_arc.vel) AS max_vel, min(rpt_arc.vel) AS min_vel, 
+SELECT arc.arc_id, rpt_selector_compare.result_id, 
+max(rpt_arc.flow) AS max_flow, 
+min(rpt_arc.flow) AS min_flow, 
+max(rpt_arc.vel) AS max_vel, 
+min(rpt_arc.vel) AS min_vel, 
 max(rpt_arc.headloss) AS max_headloss, min(rpt_arc.headloss) AS min_headloss, 
 max(rpt_arc.headloss::double precision / (st_length2d(arc.the_geom) * 10::double precision))::numeric(12,2) AS max_uheadloss,
 min(rpt_arc.headloss::double precision / (st_length2d(arc.the_geom) * 10::double precision))::numeric(12,2) AS min_uheadloss,
-max(rpt_arc.setting) AS max_setting, min(rpt_arc.setting) AS min_setting, max(rpt_arc.reaction) AS max_reaction, min(rpt_arc.reaction) AS min_reaction, max(rpt_arc.ffactor) AS max_ffactor, min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom 
-FROM ((temp_arc arc JOIN rpt_arc ON (((rpt_arc.arc_id)::text = (arc.arc_id)::text))) JOIN rpt_selector_compare ON (((rpt_arc.result_id)::text = (rpt_selector_compare.result_id)::text))) GROUP BY arc.arc_id, rpt_selector_compare.result_id, arc.the_geom ORDER BY arc.arc_id;
+max(rpt_arc.setting) AS max_setting, 
+min(rpt_arc.setting) AS min_setting, 
+max(rpt_arc.reaction) AS max_reaction,
+ min(rpt_arc.reaction) AS min_reaction, 
+max(rpt_arc.ffactor) AS max_ffactor, 
+min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom 
+FROM rpt_selector_compare, temp_arc arc
+JOIN rpt_arc ON ((rpt_arc.arc_id)::text = (arc.arc_id)::text)
+WHERE ((rpt_arc.result_id)::text = (rpt_selector_compare.result_id)::text)
+AND rpt_selector_compare.cur_user="current_user"()::text
+GROUP BY arc.arc_id, rpt_selector_compare.result_id, arc.the_geom 
+ORDER BY arc.arc_id;
 
 
 DROP VIEW IF EXISTS "v_rpt_comp_energy_usage" CASCADE;
 CREATE VIEW "v_rpt_comp_energy_usage" AS 
-SELECT rpt_energy_usage.id, rpt_energy_usage.result_id, rpt_energy_usage.nodarc_id, rpt_energy_usage.usage_fact, rpt_energy_usage.avg_effic, rpt_energy_usage.kwhr_mgal, rpt_energy_usage.avg_kw, rpt_energy_usage.peak_kw, rpt_energy_usage.cost_day 
-FROM (rpt_selector_compare JOIN rpt_energy_usage ON (((rpt_selector_compare.result_id)::text = (rpt_energy_usage.result_id)::text)));
-
+SELECT rpt_energy_usage.id, 
+rpt_energy_usage.result_id, 
+rpt_energy_usage.nodarc_id, 
+rpt_energy_usage.usage_fact, 
+rpt_energy_usage.avg_effic, 
+rpt_energy_usage.kwhr_mgal, 
+rpt_energy_usage.avg_kw, 
+rpt_energy_usage.peak_kw, 
+rpt_energy_usage.cost_day 
+FROM rpt_energy_usage,rpt_selector_compare 
+WHERE ((rpt_selector_compare.result_id)::text = (rpt_energy_usage.result_id)::text)
+AND rpt_selector_compare.cur_user="current_user"()::text;
 
 DROP VIEW IF EXISTS "v_rpt_comp_hydraulic_status" CASCADE;
 CREATE VIEW "v_rpt_comp_hydraulic_status" AS 
-SELECT rpt_hydraulic_status.id, rpt_hydraulic_status.result_id, rpt_hydraulic_status."time", rpt_hydraulic_status.text 
-FROM (rpt_hydraulic_status JOIN rpt_selector_compare ON (((rpt_selector_compare.result_id)::text = (rpt_hydraulic_status.result_id)::text)));
-
+SELECT rpt_hydraulic_status.id, 
+rpt_hydraulic_status.result_id, 
+rpt_hydraulic_status."time", 
+rpt_hydraulic_status.text 
+FROM rpt_hydraulic_status ,rpt_selector_compare
+WHERE ((rpt_selector_compare.result_id)::text = (rpt_hydraulic_status.result_id)::text)
+AND rpt_selector_compare.cur_user="current_user"()::text;
 
 DROP VIEW IF EXISTS "v_rpt_comp_node" CASCADE;
 CREATE VIEW "v_rpt_comp_node" AS 
-SELECT node.node_id, rpt_selector_compare.result_id, max(rpt_node.elevation) AS elevation, max(rpt_node.demand) AS max_demand, min(rpt_node.demand) AS min_demand, max(rpt_node.head) AS max_head, min(rpt_node.head) AS min_head, max(rpt_node.press) AS max_pressure, min(rpt_node.press) AS min_pressure, max(rpt_node.quality) AS max_quality, min(rpt_node.quality) AS min_quality, node.the_geom 
-FROM ((temp_node node JOIN rpt_node ON (((rpt_node.node_id)::text = (node.node_id)::text))) JOIN rpt_selector_compare ON (((rpt_node.result_id)::text = (rpt_selector_compare.result_id)::text))) GROUP BY node.node_id, rpt_selector_compare.result_id, node.the_geom ORDER BY node.node_id;
+SELECT node.node_id, 
+rpt_selector_compare.result_id, 
+max(rpt_node.elevation) AS elevation, 
+max(rpt_node.demand) AS max_demand, 
+min(rpt_node.demand) AS min_demand, 
+max(rpt_node.head) AS max_head, 
+min(rpt_node.head) AS min_head, 
+max(rpt_node.press) AS max_pressure, 
+min(rpt_node.press) AS min_pressure, 
+max(rpt_node.quality) AS max_quality, 
+min(rpt_node.quality) AS min_quality, node.the_geom 
+FROM rpt_selector_compare, temp_node node
+JOIN rpt_node ON ((rpt_node.node_id)::text = (node.node_id)::text)
+WHERE ((rpt_node.result_id)::text = (rpt_selector_compare.result_id)::text)
+AND rpt_selector_compare.cur_user="current_user"()::text
+GROUP BY node.node_id, rpt_selector_compare.result_id, node.the_geom 
+ORDER BY node.node_id;
+

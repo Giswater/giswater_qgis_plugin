@@ -43,9 +43,13 @@ anl_mincut_result_arc.id,
 anl_mincut_result_arc.mincut_result_cat_id,
 anl_mincut_result_arc.arc_id,  
 arc.the_geom 
-FROM ((arc 
-JOIN anl_mincut_result_arc ON (((anl_mincut_result_arc.arc_id)::text = (arc.arc_id)::text))) 
-JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (anl_mincut_result_arc.mincut_result_cat_id)::text)));
+FROM arc, anl_mincut_result_selector
+JOIN anl_mincut_result_arc ON (((anl_mincut_result_arc.arc_id)::text = (arc_id)::text))
+WHERE (((anl_mincut_result_selector.result_id)::text = (anl_mincut_result_arc.mincut_result_cat_id)::text)) 
+AND anl_mincut_result_selector.cur_user="current_user"()::text 
+GROUP BY anl_mincut_result_arc.id, anl_mincut_result_selector.result_id, arc.the_geom
+ORDER BY anl_mincut_result_arc.arc_id;
+
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_node" CASCADE; 
@@ -55,21 +59,25 @@ anl_mincut_result_node.id,
 anl_mincut_result_node.mincut_result_cat_id,
 anl_mincut_result_node.node_id,  
 node.the_geom 
-FROM ((node 
-JOIN anl_mincut_result_node ON (((anl_mincut_result_node.node_id)::text = (node.node_id)::text))) 
-JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (anl_mincut_result_node.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector, node
+JOIN anl_mincut_result_node ON ((anl_mincut_result_node.node_id)::text = (node.node_id)::text)
+WHERE ((anl_mincut_result_selector.result_id)::text = (anl_mincut_result_node.mincut_result_cat_id)::text) 
+AND anl_mincut_result_selector.cur_user="current_user"()::text
+GROUP BY anl_mincut_result_node.id, anl_mincut_result_selector.result_id, node.the_geom
+ORDER BY anl_mincut_result_node.node_id;
 
 
-DROP VIEW IF EXISTS "v_anl_mincut_result_valve" CASCADE; 
+DROP VIEW IF EXISTS "v_anl_mincut_result_valve" CASCADE; -- to do!
 CREATE VIEW "v_anl_mincut_result_valve" AS
 SELECT 
 anl_mincut_result_valve.id,
 anl_mincut_result_valve.mincut_result_cat_id,
 anl_mincut_result_valve.valve_id,  
 node.the_geom 
-FROM ((node 
-JOIN anl_mincut_result_valve ON (((anl_mincut_result_valve.valve_id)::text = (node.node_id)::text))) 
-JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (anl_mincut_result_valve.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector, node
+JOIN anl_mincut_result_valve ON ((anl_mincut_result_valve.valve_id)::text = (node.node_id)::text)
+WHERE  ((anl_mincut_result_selector.id)::text = (anl_mincut_result_valve.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector.cur_user="current_user"()::text;
 
 
 
@@ -80,9 +88,12 @@ anl_mincut_result_connec.id,
 anl_mincut_result_connec.mincut_result_cat_id,
 anl_mincut_result_connec.connec_id,  
 connec.the_geom 
-FROM ((connec 
-JOIN anl_mincut_result_connec ON (((anl_mincut_result_connec.connec_id)::text = (connec.connec_id)::text))) 
-JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (anl_mincut_result_connec.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector, connec
+JOIN anl_mincut_result_connec ON (((anl_mincut_result_connec.connec_id)::text = (connec.connec_id)::text))
+WHERE ((anl_mincut_result_selector.result_id)::text = (anl_mincut_result_connec.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector.cur_user="current_user"()::text
+GROUP BY anl_mincut_result_connec.id, anl_mincut_result_selector.result_id, connec.the_geom
+ORDER BY anl_mincut_result_connec.connec_id;
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_polygon";
@@ -92,8 +103,12 @@ anl_mincut_result_polygon.id,
 anl_mincut_result_polygon.mincut_result_cat_id,
 anl_mincut_result_polygon.polygon_id,  
 anl_mincut_result_polygon.the_geom 
-FROM (anl_mincut_result_polygon
-JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (anl_mincut_result_polygon.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_polygon,anl_mincut_result_selector
+WHERE ((anl_mincut_result_selector.result_id)::text = (anl_mincut_result_polygon.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector.cur_user="current_user"()::text
+GROUP BY anl_mincut_result_polygon.id, anl_mincut_result_selector.result_id, anl_mincut_result_polygon.the_geom
+ORDER BY anl_mincut_result_polygon.polygon_id;
+
 
 
 
@@ -103,8 +118,11 @@ SELECT
 anl_mincut_result_hydrometer.id,
 anl_mincut_result_hydrometer.mincut_result_cat_id,
 anl_mincut_result_hydrometer.hydrometer_id
-FROM anl_mincut_result_hydrometer
-JOIN anl_mincut_result_selector ON (((anl_mincut_result_selector.id)::text = (anl_mincut_result_hydrometer.mincut_result_cat_id)::text));;
+FROM anl_mincut_result_hydrometer,anl_mincut_result_selector
+WHERE ((anl_mincut_result_selector.result_id)::text = (anl_mincut_result_hydrometer.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector.cur_user="current_user"()::text 
+GROUP BY anl_mincut_result_hydrometer.id, anl_mincut_result_selector.result_id
+ORDER BY anl_mincut_result_hydrometer.hydrometer_id;
 
 
 
@@ -116,9 +134,10 @@ anl_mincut_result_arc.id,
 anl_mincut_result_arc.mincut_result_cat_id,
 anl_mincut_result_arc.arc_id,  
 arc.the_geom 
-FROM ((arc 
-JOIN anl_mincut_result_arc ON (((anl_mincut_result_arc.arc_id)::text = (arc.arc_id)::text))) 
-JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_arc.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector_compare, arc
+JOIN anl_mincut_result_arc ON ((anl_mincut_result_arc.arc_id)::text = (arc.arc_id)::text)
+WHERE ((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_arc.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector_compare.cur_user="current_user"()::text;
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_node_compare" CASCADE; 
@@ -128,9 +147,11 @@ anl_mincut_result_node.id,
 anl_mincut_result_node.mincut_result_cat_id,
 anl_mincut_result_node.node_id,  
 node.the_geom 
-FROM ((node 
-JOIN anl_mincut_result_node ON (((anl_mincut_result_node.node_id)::text = (node.node_id)::text))) 
-JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_node.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector_compare, node
+JOIN anl_mincut_result_node ON ((anl_mincut_result_node.node_id)::text = (node.node_id)::text)
+WHERE ((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_node.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector_compare.cur_user="current_user"()::text;
+
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_valve_compare" CASCADE; 
@@ -140,9 +161,10 @@ anl_mincut_result_valve.id,
 anl_mincut_result_valve.mincut_result_cat_id,
 anl_mincut_result_valve.valve_id,  
 node.the_geom 
-FROM ((node 
-JOIN anl_mincut_result_valve ON (((anl_mincut_result_valve.valve_id)::text = (node.node_id)::text))) 
-JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_valve.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector_compare,node
+JOIN anl_mincut_result_valve ON ((anl_mincut_result_valve.valve_id)::text = (node.node_id)::text)
+WHERE ((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_valve.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector_compare.cur_user="current_user"()::text;
 
 
 
@@ -153,9 +175,10 @@ anl_mincut_result_connec.id,
 anl_mincut_result_connec.mincut_result_cat_id,
 anl_mincut_result_connec.connec_id,  
 connec.the_geom 
-FROM ((connec 
-JOIN anl_mincut_result_connec ON (((anl_mincut_result_connec.connec_id)::text = (connec.connec_id)::text))) 
-JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_connec.mincut_result_cat_id)::text)));
+FROM anl_mincut_result_selector_compare, connec
+JOIN anl_mincut_result_connec ON ((anl_mincut_result_connec.connec_id)::text = (connec.connec_id)::text)
+WHERE ((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_connec.mincut_result_cat_id)::text)
+AND anl_mincut_result_selector_compare.cur_user="current_user"()::text;
 
 
 DROP VIEW IF EXISTS "v_anl_mincut_result_polygon_compare";
@@ -165,8 +188,9 @@ anl_mincut_result_polygon.id,
 anl_mincut_result_polygon.mincut_result_cat_id,
 anl_mincut_result_polygon.polygon_id,  
 anl_mincut_result_polygon.the_geom 
-FROM ((anl_mincut_result_polygon
-JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_polygon.mincut_result_cat_id)::text))));
+FROM anl_mincut_result_polygon,anl_mincut_result_selector_compare
+WHERE (anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_polygon.mincut_result_cat_id)::text
+AND anl_mincut_result_selector_compare.cur_user="current_user"()::text;
 
 
 
@@ -176,7 +200,6 @@ SELECT
 anl_mincut_result_hydrometer.id,
 anl_mincut_result_hydrometer.mincut_result_cat_id,
 anl_mincut_result_hydrometer.hydrometer_id
-FROM anl_mincut_result_hydrometer
-JOIN anl_mincut_result_selector_compare ON (((anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_hydrometer.mincut_result_cat_id)::text));;
-
-
+FROM anl_mincut_result_hydrometer, anl_mincut_result_selector_compare
+WHERE (anl_mincut_result_selector_compare.id)::text = (anl_mincut_result_hydrometer.mincut_result_cat_id)::text
+AND anl_mincut_result_selector_compare.cur_user="current_user"()::text;
