@@ -415,7 +415,7 @@ CREATE TABLE "raingage" (
 "rg_id" varchar(16)   NOT NULL,
 "form_type" varchar(12)  ,
 "intvl" varchar(10)  ,
-"scf" numeric(12,4),
+"scf" numeric(12,4)  DEFAULT 1.00,
 "rgage_type" varchar(18)  ,
 "timser_id" varchar(16)  ,
 "fname" varchar(254)  ,
