@@ -36,7 +36,7 @@ INSERT INTO "node_type" VALUES ('DESAGUE','OUTFALL','OUTFALL', 'man_outfall', 'i
 -- ----------------------------
 
 INSERT INTO arc_type VALUES ('CONDUCTO', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
-INSERT INTO arc_type VALUES ('IMPULSION', 'CONDUIT', 'FORCE_MAIN', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('IMPULSION', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
 INSERT INTO arc_type VALUES ('SIFON', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit', 'om_visit_x_arc');
 INSERT INTO arc_type VALUES ('RAPIDO', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit', 'om_visit_x_arc');
 INSERT INTO arc_type VALUES ('FICTICIO', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', 'om_visit_x_arc');
