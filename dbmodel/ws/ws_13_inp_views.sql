@@ -609,7 +609,7 @@ rpt_arc.vel,
 rpt_arc.headloss,
 rpt_arc.setting,
 rpt_arc.ffactor, 
-rpt_arc.time::interval, 
+(now()::date+rpt_arc.time::interval)::text as time,  
 arc.the_geom
 FROM rpt_selector_result, temp_arc arc
 JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
@@ -629,7 +629,7 @@ rpt_node.demand,
 rpt_node.head, 
 rpt_node.press, 
 rpt_node.quality, 
-rpt_node.time::interval,
+(now()::date+rpt_arc.time::interval)::text as time, 
 node.the_geom 
 FROM rpt_selector_result, temp_node node
 JOIN rpt_node ON ((rpt_node.node_id)::text = (node.node_id)::text)
