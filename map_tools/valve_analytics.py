@@ -21,10 +21,14 @@
 from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QGis
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor
+from PyQt4.QtGui import QApplication, QColor, QProgressBar
 
 from map_tools.parent import ParentMapTool
 
+import datetime, time
+
+from multiprocessing import Process
+from threading import Thread
 
 
 class ValveAnalytics(ParentMapTool):
@@ -149,7 +153,16 @@ class ValveAnalytics(ParentMapTool):
 
 
         elif event.button() == Qt.RightButton:
+            '''
+            process1 = Process(target = self.mg_analytics())
+            process1.start()
+            process2 = Process(target = self.show_progressBar())
+            process2.start()
             
+            Thread(target=self.mg_analytics).start()
+            Thread(target=self.show_progressBar).start()
+            
+            '''
             self.mg_analytics()
             
 
@@ -199,21 +212,20 @@ class ValveAnalytics(ParentMapTool):
 
 
     def mg_analytics(self):
-        ''' Button 27. Valve analytics 
-        Execute SQL
-        ''' 
+        ''' Button 27. Valve analytics ''' 
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
-        print sql
-  
-        self.controller.show_progressBar()    
+        
+        #self.show_progressBar()
+
+        result = self.controller.execute_sql(sql)    
+
         if result:
             message = "Valve analytics executed successfully"
             self.controller.show_info(message, 30, context_name='ui_message')
-            
-        
+
 
     def set_rubber_band(self):
 
@@ -235,3 +247,24 @@ class ValveAnalytics(ParentMapTool):
         self.rubberBand.addPoint(ll, True)
 
         self.selectRectMapCoord =     QgsRectangle(ll, ur)
+
+
+    def show_progressBar(self):
+        ''' Show progress bar '''
+        
+        widget = self.iface.messageBar().createMessage("In progress"," Executing SQL . . .")
+        prgBar = QProgressBar()
+        prgBar.setAlignment(Qt.AlignLeft)
+        prgBar.setValue(0)
+        prgBar.setMaximum(100)           
+        widget.layout().addWidget(prgBar)
+        self.iface.messageBar().pushWidget(widget, self.iface.messageBar().INFO)
+        
+        for i in range(1,10):
+            #errCount += 1
+            print i
+            time.sleep(1.1)
+            prgBar.setValue(i*12)
+
+        self.iface.messageBar().clearWidgets()
+        self.iface.mapCanvas().refresh()

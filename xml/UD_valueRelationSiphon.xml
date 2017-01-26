@@ -1,0 +1,769 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="2.14.5-Essen" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="1" maxLabelScale="1e+08" simplifyDrawingTol="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+ <edittypes>
+  <edittype widgetv2type="TextEdit" name="arc_id">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_node_1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_node_2">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_y1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_y2">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_z1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_z2">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_r1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_r2">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_slope">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="arc_type">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression=" &quot;type&quot; ='SIPHON'" UseCompleter="0" fieldEditable="1" Key="id" Layer="arc_type20160405170016831" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="arccat_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="cat_arc20131118220914103" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="cat_matcat_id">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_cat_shape">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_cat_geom1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_gis_length">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="epa_type">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="inp_arc_type20160405170701943" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="sector_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="sector_id" Layer="sector20130820173926621" Value="sector_id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_state">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="value_state20160405165720440" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_annotation">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_observ">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_comment">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_inverted_slope">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_custom_length">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="dma_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="dma_id" Layer="dma20160405165338863" Value="dma_id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_soilcat_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="cat_soil20160405165147913" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_category_type">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="man_type_category20160405165939702" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_fluid_type">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="man_type_fluid20160405165939731" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_location_type">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="man_type_location20160405165939759" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_workcat_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="cat_work20160405165147972" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_buildercat_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="cat_builder20160405165147525" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="DateTime" name="siphon_builtdate">
+   <widgetv2config fieldEditable="1" calendar_popup="0" allow_null="0" display_format="yyyy-MM-dd" field_format="yyyy-MM-dd" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_ownercat_id">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="cat_owner20160405165147885" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_adress_01">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_adress_02">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_adress_03">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_descript">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_cat_svg">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_est_y1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_est_y2">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_rotation">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_link">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="verified">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="value_verified20160405165720381" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_elev1">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_elev2">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="ValueRelation" name="siphon_workcat_id_end">
+   <widgetv2config OrderByValue="0" AllowNull="0" FilterExpression="" UseCompleter="0" fieldEditable="1" Key="id" Layer="cat_work20160405165147972" Value="id" labelOnTop="0" AllowMulti="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="undelete">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_label_x">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_label_y">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_label_rotation">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_add_info">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_security_bar">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_steps">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+  <edittype widgetv2type="TextEdit" name="siphon_name">
+   <widgetv2config IsMultiline="0" fieldEditable="1" UseHtml="0" labelOnTop="0"/>
+  </edittype>
+ </edittypes>
+ <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
+  <symbols>
+   <symbol alpha="1" clip_to_extent="1" type="line" name="0">
+    <layer pass="0" class="SimpleLine" locked="0">
+     <prop k="capstyle" v="square"/>
+     <prop k="customdash" v="5;2"/>
+     <prop k="customdash_map_unit_scale" v="0,0,0,0,0,0"/>
+     <prop k="customdash_unit" v="MM"/>
+     <prop k="draw_inside_polygon" v="0"/>
+     <prop k="joinstyle" v="bevel"/>
+     <prop k="line_color" v="80,19,138,255"/>
+     <prop k="line_style" v="solid"/>
+     <prop k="line_width" v="0.547619"/>
+     <prop k="line_width_unit" v="MM"/>
+     <prop k="offset" v="0"/>
+     <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+     <prop k="offset_unit" v="MM"/>
+     <prop k="use_custom_dash" v="0"/>
+     <prop k="width_dd_active" v="0"/>
+     <prop k="width_dd_expression" v="0.238095*(CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 5000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 5000 THEN 0&#xd;&#xa;END)"/>
+     <prop k="width_dd_field" v=""/>
+     <prop k="width_dd_useexpr" v="1"/>
+     <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
+    </layer>
+    <layer pass="0" class="MarkerLine" locked="0">
+     <prop k="interval" v="3"/>
+     <prop k="interval_map_unit_scale" v="0,0,0,0,0,0"/>
+     <prop k="interval_unit" v="MM"/>
+     <prop k="offset" v="0"/>
+     <prop k="offset_along_line" v="0"/>
+     <prop k="offset_along_line_map_unit_scale" v="0,0,0,0,0,0"/>
+     <prop k="offset_along_line_unit" v="MM"/>
+     <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+     <prop k="offset_unit" v="MM"/>
+     <prop k="placement" v="centralpoint"/>
+     <prop k="rotate" v="1"/>
+     <prop k="width_dd_active" v="1"/>
+     <prop k="width_dd_expression" v="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 5000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 5000 THEN 0&#xd;&#xa;END"/>
+     <prop k="width_dd_field" v=""/>
+     <prop k="width_dd_useexpr" v="1"/>
+     <symbol alpha="1" clip_to_extent="1" type="marker" name="@0@1">
+      <layer pass="0" class="SimpleMarker" locked="0">
+       <prop k="angle" v="0"/>
+       <prop k="color" v="80,19,138,255"/>
+       <prop k="horizontal_anchor_point" v="1"/>
+       <prop k="name" v="filled_arrowhead"/>
+       <prop k="offset" v="0,0"/>
+       <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+       <prop k="offset_unit" v="MM"/>
+       <prop k="outline_color" v="0,0,0,255"/>
+       <prop k="outline_style" v="solid"/>
+       <prop k="outline_width" v="0"/>
+       <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
+       <prop k="outline_width_unit" v="MM"/>
+       <prop k="scale_method" v="diameter"/>
+       <prop k="size" v="2.3"/>
+       <prop k="size_dd_active" v="1"/>
+       <prop k="size_dd_expression" v="CASE &#xd;&#xa;WHEN  @map_scale  &lt;= 5000 THEN 2.0 &#xd;&#xa;WHEN @map_scale  > 5000 THEN 0&#xd;&#xa;END"/>
+       <prop k="size_dd_field" v=""/>
+       <prop k="size_dd_useexpr" v="1"/>
+       <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
+       <prop k="size_unit" v="MM"/>
+       <prop k="vertical_anchor_point" v="1"/>
+      </layer>
+     </symbol>
+    </layer>
+   </symbol>
+  </symbols>
+  <rotation/>
+  <sizescale scalemethod="diameter"/>
+ </renderer-v2>
+ <labeling type="simple"/>
+ <customproperties>
+  <property key="labeling" value="pal"/>
+  <property key="labeling/addDirectionSymbol" value="false"/>
+  <property key="labeling/angleOffset" value="0"/>
+  <property key="labeling/blendMode" value="0"/>
+  <property key="labeling/bufferBlendMode" value="0"/>
+  <property key="labeling/bufferColorA" value="255"/>
+  <property key="labeling/bufferColorB" value="255"/>
+  <property key="labeling/bufferColorG" value="255"/>
+  <property key="labeling/bufferColorR" value="255"/>
+  <property key="labeling/bufferDraw" value="false"/>
+  <property key="labeling/bufferJoinStyle" value="64"/>
+  <property key="labeling/bufferNoFill" value="false"/>
+  <property key="labeling/bufferSize" value="1"/>
+  <property key="labeling/bufferSizeInMapUnits" value="false"/>
+  <property key="labeling/bufferSizeMapUnitMaxScale" value="0"/>
+  <property key="labeling/bufferSizeMapUnitMinScale" value="0"/>
+  <property key="labeling/bufferSizeMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/bufferTransp" value="0"/>
+  <property key="labeling/centroidInside" value="false"/>
+  <property key="labeling/centroidWhole" value="false"/>
+  <property key="labeling/decimals" value="3"/>
+  <property key="labeling/displayAll" value="false"/>
+  <property key="labeling/dist" value="0.8"/>
+  <property key="labeling/distInMapUnits" value="false"/>
+  <property key="labeling/distMapUnitMaxScale" value="0"/>
+  <property key="labeling/distMapUnitMinScale" value="0"/>
+  <property key="labeling/distMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/drawLabels" value="true"/>
+  <property key="labeling/enabled" value="true"/>
+  <property key="labeling/fieldName" value="arccat_id"/>
+  <property key="labeling/fitInPolygonOnly" value="false"/>
+  <property key="labeling/fontBold" value="false"/>
+  <property key="labeling/fontCapitals" value="0"/>
+  <property key="labeling/fontFamily" value="Arial"/>
+  <property key="labeling/fontItalic" value="false"/>
+  <property key="labeling/fontLetterSpacing" value="0"/>
+  <property key="labeling/fontLimitPixelSize" value="false"/>
+  <property key="labeling/fontMaxPixelSize" value="10000"/>
+  <property key="labeling/fontMinPixelSize" value="3"/>
+  <property key="labeling/fontSize" value="2"/>
+  <property key="labeling/fontSizeInMapUnits" value="true"/>
+  <property key="labeling/fontSizeMapUnitMaxScale" value="0"/>
+  <property key="labeling/fontSizeMapUnitMinScale" value="0"/>
+  <property key="labeling/fontSizeMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/fontStrikeout" value="false"/>
+  <property key="labeling/fontUnderline" value="false"/>
+  <property key="labeling/fontWeight" value="75"/>
+  <property key="labeling/fontWordSpacing" value="0"/>
+  <property key="labeling/formatNumbers" value="false"/>
+  <property key="labeling/isExpression" value="false"/>
+  <property key="labeling/labelOffsetInMapUnits" value="true"/>
+  <property key="labeling/labelOffsetMapUnitMaxScale" value="0"/>
+  <property key="labeling/labelOffsetMapUnitMinScale" value="0"/>
+  <property key="labeling/labelOffsetMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/labelPerPart" value="false"/>
+  <property key="labeling/leftDirectionSymbol" value="&lt;"/>
+  <property key="labeling/limitNumLabels" value="false"/>
+  <property key="labeling/maxCurvedCharAngleIn" value="20"/>
+  <property key="labeling/maxCurvedCharAngleOut" value="-20"/>
+  <property key="labeling/maxNumLabels" value="2000"/>
+  <property key="labeling/mergeLines" value="false"/>
+  <property key="labeling/minFeatureSize" value="0"/>
+  <property key="labeling/multilineAlign" value="0"/>
+  <property key="labeling/multilineHeight" value="1"/>
+  <property key="labeling/namedStyle" value="Bold"/>
+  <property key="labeling/obstacle" value="true"/>
+  <property key="labeling/obstacleFactor" value="1"/>
+  <property key="labeling/obstacleType" value="0"/>
+  <property key="labeling/offsetType" value="0"/>
+  <property key="labeling/placeDirectionSymbol" value="0"/>
+  <property key="labeling/placement" value="3"/>
+  <property key="labeling/placementFlags" value="10"/>
+  <property key="labeling/plussign" value="false"/>
+  <property key="labeling/predefinedPositionOrder" value="TR,TL,BR,BL,R,L,TSR,BSR"/>
+  <property key="labeling/preserveRotation" value="true"/>
+  <property key="labeling/previewBkgrdColor" value="#ffffff"/>
+  <property key="labeling/priority" value="5"/>
+  <property key="labeling/quadOffset" value="4"/>
+  <property key="labeling/repeatDistance" value="0"/>
+  <property key="labeling/repeatDistanceMapUnitMaxScale" value="0"/>
+  <property key="labeling/repeatDistanceMapUnitMinScale" value="0"/>
+  <property key="labeling/repeatDistanceMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/repeatDistanceUnit" value="1"/>
+  <property key="labeling/reverseDirectionSymbol" value="false"/>
+  <property key="labeling/rightDirectionSymbol" value=">"/>
+  <property key="labeling/scaleMax" value="10000000"/>
+  <property key="labeling/scaleMin" value="1"/>
+  <property key="labeling/scaleVisibility" value="false"/>
+  <property key="labeling/shadowBlendMode" value="6"/>
+  <property key="labeling/shadowColorB" value="0"/>
+  <property key="labeling/shadowColorG" value="0"/>
+  <property key="labeling/shadowColorR" value="0"/>
+  <property key="labeling/shadowDraw" value="false"/>
+  <property key="labeling/shadowOffsetAngle" value="135"/>
+  <property key="labeling/shadowOffsetDist" value="1"/>
+  <property key="labeling/shadowOffsetGlobal" value="true"/>
+  <property key="labeling/shadowOffsetMapUnitMaxScale" value="0"/>
+  <property key="labeling/shadowOffsetMapUnitMinScale" value="0"/>
+  <property key="labeling/shadowOffsetMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/shadowOffsetUnits" value="1"/>
+  <property key="labeling/shadowRadius" value="1.5"/>
+  <property key="labeling/shadowRadiusAlphaOnly" value="false"/>
+  <property key="labeling/shadowRadiusMapUnitMaxScale" value="0"/>
+  <property key="labeling/shadowRadiusMapUnitMinScale" value="0"/>
+  <property key="labeling/shadowRadiusMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/shadowRadiusUnits" value="1"/>
+  <property key="labeling/shadowScale" value="100"/>
+  <property key="labeling/shadowTransparency" value="30"/>
+  <property key="labeling/shadowUnder" value="0"/>
+  <property key="labeling/shapeBlendMode" value="0"/>
+  <property key="labeling/shapeBorderColorA" value="255"/>
+  <property key="labeling/shapeBorderColorB" value="128"/>
+  <property key="labeling/shapeBorderColorG" value="128"/>
+  <property key="labeling/shapeBorderColorR" value="128"/>
+  <property key="labeling/shapeBorderWidth" value="0"/>
+  <property key="labeling/shapeBorderWidthMapUnitMaxScale" value="0"/>
+  <property key="labeling/shapeBorderWidthMapUnitMinScale" value="0"/>
+  <property key="labeling/shapeBorderWidthMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/shapeBorderWidthUnits" value="1"/>
+  <property key="labeling/shapeDraw" value="false"/>
+  <property key="labeling/shapeFillColorA" value="255"/>
+  <property key="labeling/shapeFillColorB" value="255"/>
+  <property key="labeling/shapeFillColorG" value="255"/>
+  <property key="labeling/shapeFillColorR" value="255"/>
+  <property key="labeling/shapeJoinStyle" value="64"/>
+  <property key="labeling/shapeOffsetMapUnitMaxScale" value="0"/>
+  <property key="labeling/shapeOffsetMapUnitMinScale" value="0"/>
+  <property key="labeling/shapeOffsetMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/shapeOffsetUnits" value="1"/>
+  <property key="labeling/shapeOffsetX" value="0"/>
+  <property key="labeling/shapeOffsetY" value="0"/>
+  <property key="labeling/shapeRadiiMapUnitMaxScale" value="0"/>
+  <property key="labeling/shapeRadiiMapUnitMinScale" value="0"/>
+  <property key="labeling/shapeRadiiMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/shapeRadiiUnits" value="1"/>
+  <property key="labeling/shapeRadiiX" value="0"/>
+  <property key="labeling/shapeRadiiY" value="0"/>
+  <property key="labeling/shapeRotation" value="0"/>
+  <property key="labeling/shapeRotationType" value="0"/>
+  <property key="labeling/shapeSVGFile" value=""/>
+  <property key="labeling/shapeSizeMapUnitMaxScale" value="0"/>
+  <property key="labeling/shapeSizeMapUnitMinScale" value="0"/>
+  <property key="labeling/shapeSizeMapUnitScale" value="0,0,0,0,0,0"/>
+  <property key="labeling/shapeSizeType" value="0"/>
+  <property key="labeling/shapeSizeUnits" value="1"/>
+  <property key="labeling/shapeSizeX" value="0"/>
+  <property key="labeling/shapeSizeY" value="0"/>
+  <property key="labeling/shapeTransparency" value="0"/>
+  <property key="labeling/shapeType" value="0"/>
+  <property key="labeling/substitutions" value="&lt;substitutions/>"/>
+  <property key="labeling/textColorA" value="255"/>
+  <property key="labeling/textColorB" value="0"/>
+  <property key="labeling/textColorG" value="0"/>
+  <property key="labeling/textColorR" value="0"/>
+  <property key="labeling/textTransp" value="0"/>
+  <property key="labeling/upsidedownLabels" value="0"/>
+  <property key="labeling/useSubstitutions" value="false"/>
+  <property key="labeling/wrapChar" value=""/>
+  <property key="labeling/xOffset" value="0"/>
+  <property key="labeling/yOffset" value="0"/>
+  <property key="labeling/zIndex" value="0"/>
+  <property key="variableNames" value="_fields_"/>
+  <property key="variableValues" value=""/>
+ </customproperties>
+ <blendMode>0</blendMode>
+ <featureBlendMode>0</featureBlendMode>
+ <layerTransparency>0</layerTransparency>
+ <displayfield>descript</displayfield>
+ <label>0</label>
+ <labelattributes>
+  <label fieldname="" text="Etiqueta"/>
+  <family fieldname="" name="MS Shell Dlg 2"/>
+  <size fieldname="" units="pt" value="12"/>
+  <bold fieldname="" on="0"/>
+  <italic fieldname="" on="0"/>
+  <underline fieldname="" on="0"/>
+  <strikeout fieldname="" on="0"/>
+  <color fieldname="" red="0" blue="0" green="0"/>
+  <x fieldname=""/>
+  <y fieldname=""/>
+  <offset x="0" y="0" units="pt" yfieldname="" xfieldname=""/>
+  <angle fieldname="" value="0" auto="0"/>
+  <alignment fieldname="" value="center"/>
+  <buffercolor fieldname="" red="255" blue="255" green="255"/>
+  <buffersize fieldname="" units="pt" value="1"/>
+  <bufferenabled fieldname="" on=""/>
+  <multilineenabled fieldname="" on=""/>
+  <selectedonly on=""/>
+ </labelattributes>
+ <SingleCategoryDiagramRenderer diagramType="Pie">
+  <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" sizeType="MM" minScaleDenominator="inf">
+   <fontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+   <attribute field="" color="#000000" label=""/>
+  </DiagramCategory>
+ </SingleCategoryDiagramRenderer>
+ <DiagramLayerSettings yPosColumn="-1" linePlacementFlags="10" placement="2" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
+ <annotationform>../test_1230</annotationform>
+ <aliases>
+  <alias field="arc_id" index="0" name=""/>
+  <alias field="arc_type" index="10" name=""/>
+  <alias field="arccat_id" index="11" name=""/>
+  <alias field="cat_matcat_id" index="12" name=""/>
+  <alias field="dma_id" index="24" name=""/>
+  <alias field="epa_type" index="16" name=""/>
+  <alias field="sector_id" index="17" name=""/>
+  <alias field="undelete" index="46" name=""/>
+  <alias field="verified" index="42" name=""/>
+ </aliases>
+ <excludeAttributesWMS/>
+ <excludeAttributesWFS/>
+ <attributeactions/>
+ <editform>Users/xtorret/.qgis2/python/plugins/giswater/ui/ud_man_arc.ui</editform>
+ <editforminit>formOpen</editforminit>
+ <editforminitcodesource>1</editforminitcodesource>
+ <editforminitfilepath>Users/xtorret/.qgis2/python/plugins/giswater/ud_man_arc_init.py</editforminitfilepath>
+ <editforminitcode><![CDATA[# -*- coding: utf-8 -*-
+"""
+QGIS forms can have a Python function that is called when the form is
+opened.
+
+Use this function to add extra logic to your forms.
+
+Enter the name of the function in the "Python Init function"
+field.
+An example follows:
+"""
+from PyQt4.QtGui import QWidget
+
+def my_form_open(dialog, layer, feature):
+	geom = feature.geometry()
+	control = dialog.findChild(QWidget, "MyLineEdit")
+]]></editforminitcode>
+ <featformsuppress>0</featformsuppress>
+ <editorlayout>uifilelayout</editorlayout>
+ <widgets>
+  <widget name="arc_shape_ok_z1">
+   <config/>
+  </widget>
+  <widget name="arc_shape_ok_z2">
+   <config/>
+  </widget>
+  <widget name="tram_89_angle_rota">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_arc_id">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_arc_type">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_arccat_id">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_carrer">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_carrer2">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_codi_mat">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_conca">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_confirmat">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_cota_1">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_cota_2">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_data_alta">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_data_baixa">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_data_rev">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim1">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim1b">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim2">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim2b">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim3">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim3b">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim4">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dim4b">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_dma_id">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_estat">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_expbaixa">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_expedient">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_funcio">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_id_tram_ad">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_longitud">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_material">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_node_1">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_node_2">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_ns_project">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_obs">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_ordre">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_ot_baixa_p">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_ot_part">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_pendent">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_seccio">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_sectipus">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_sector">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_sector_id">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_subsector">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_x_etiqueta">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_y1">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_y2">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+  <widget name="tram_89_y_etiqueta">
+   <config>
+    <option key="IsMultiline" value="false"/>
+    <option key="UseHtml" value="false"/>
+   </config>
+  </widget>
+ </widgets>
+ <conditionalstyles>
+  <rowstyles/>
+  <fieldstyles/>
+ </conditionalstyles>
+ <layerGeometryType>1</layerGeometryType>
+</qgis>

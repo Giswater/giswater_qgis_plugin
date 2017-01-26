@@ -665,7 +665,6 @@ class ParentDialog(object):
         sql+= " FROM "+table_name_event_id
         sql+= " WHERE feature = '"+feature+"' OR feature = 'ALL'" 
         sql+= " ORDER BY id"
-        print sql
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
            
