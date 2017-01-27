@@ -10,7 +10,7 @@ or (at your option) any later version.
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QMessageBox, QWidget
+from PyQt4.QtGui import QPixmap, QImage, QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QMessageBox, QWidget
 from PyQt4.QtSql import QSqlTableModel
 
 
@@ -809,5 +809,22 @@ class ParentDialog(object):
             tab_text = self.tab_main.tabText(i)
             if selected_layer != tab_text :
                 self.tab_main.removeTab(i) 
+                
+                
+    def setImage(self,widget):
+        # Manage 'cat_shape'
+        arc_id = utils_giswater.getWidgetText("arc_id") 
+        cur_layer = self.iface.activeLayer()  
+        table_name = self.controller.get_layer_source_table_name(cur_layer) 
+        column_name = cur_layer.name().lower()+"_cat_shape"
+        # Get cat_shape value from database       
+        sql = "SELECT "+column_name+"" 
+        sql+= " FROM "+self.schema_name+"."+table_name+""
+        sql+= " WHERE arc_id = '"+arc_id+"'"
+        row = self.dao.get_row(sql)
+        utils_giswater.setImage("label_image_ud_shape", row[0])
+
         
+        
+
     

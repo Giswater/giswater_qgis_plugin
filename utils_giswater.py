@@ -203,14 +203,17 @@ def setWidgetVisible(widget, visible=True):
         
         
 
-def setImage(widget, text):
+def setImage(widget,cat_shape):
+    ''' Set pictures for UD'''
+    
+    element = cat_shape.lower()
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)  
     if not widget:
         return
     if type(widget) is QLabel:
         plugin_dir = os.path.dirname(__file__)    
-        pic_file = os.path.join(plugin_dir, 'ui','ud_shape.png')
+        pic_file = os.path.join(plugin_dir, 'png','ud_section_'+element+'.png') 
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()

@@ -21,7 +21,9 @@
 from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QGis
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor, QProgressBar
+from PyQt4.QtGui import QApplication, QColor, QProgressBar ,QPixmap
+
+from PyQt4.QtGui import QLabel, QWidget
 
 from map_tools.parent import ParentMapTool
 
@@ -29,6 +31,9 @@ import datetime, time
 
 from multiprocessing import Process
 from threading import Thread
+
+import os
+import sys
 
 
 class ValveAnalytics(ParentMapTool):
@@ -98,7 +103,6 @@ class ValveAnalytics(ParentMapTool):
 
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
         # That's the snapped point
         if result <> []:
 
@@ -132,7 +136,6 @@ class ValveAnalytics(ParentMapTool):
 
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-
             # That's the snapped point
             if result <> [] :
             #exist=self.snapperManager.check_connec_group(result[0].layer)
@@ -140,13 +143,10 @@ class ValveAnalytics(ParentMapTool):
                 #if exist :
                 if result[0].layer.name() == 'Valve':
                     point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                    #layer.removeSelection()
-                    #layer.select([result[0].snappedAtGeometry])
-                    result[0].layer.removeSelection()
+                    
+                    #result[0].layer.removeSelection()
                     result[0].layer.select([result[0].snappedAtGeometry])
     
-                    # Execute SQL
-                    #self.mg_analytics()
     
                     # Hide highlight
                     self.vertexMarker.hide()
@@ -163,9 +163,39 @@ class ValveAnalytics(ParentMapTool):
             Thread(target=self.show_progressBar).start()
             
             '''
+
+            #self.show_loader()
             self.mg_analytics()
             
-
+    def show_loader(self):
+        
+        # Create window
+        #app = QApplication(sys.argv)
+        w = QWidget()
+        #w.setWindowTitle("PyQT4 Pixmap @ pythonspot.com ") 
+         
+        # Create widget
+        label = QLabel(w)
+        '''
+        picfile='logo.png'
+        logo = os.getcwd() + '\\' + picfile
+        print logo
+        '''
+        plugin_dir = os.path.dirname(__file__)    
+        pic_file = os.path.join(plugin_dir, 'png','loader.gif') 
+        #if os.path.isfile(pic_file):
+        pixmap = QPixmap(pic_file)
+        label.setPixmap(pixmap)
+        #w.resize(pixmap.width(),pixmap.height())
+         
+        # Draw window
+        w.show()
+        #app.exec_()
+        '''
+        else:
+            print "I expected to find a png picture called logo.png in "+ os.getcwd() 
+        '''
+    
     def activate(self):
 
         # Check button

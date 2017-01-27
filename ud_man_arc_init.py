@@ -38,9 +38,7 @@ def init_config():
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
     
-	# Manage 'cat_shape'
-    conduit_cat_shape = utils_giswater.getWidgetText("conduit_cat_shape") 
-    utils_giswater.setImage("label_image_ud_shape", conduit_cat_shape)
+
 	
 	# Manage 'state'
     state = utils_giswater.getWidgetText("conduit_state") 
@@ -124,6 +122,10 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))       
         
+        # Manage 'cat_shape'
+        self.setImage("label_image_ud_shape")
+    
+    
     
     def fill_costs(self):
         ''' Fill tab costs '''
