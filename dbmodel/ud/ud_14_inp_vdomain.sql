@@ -188,7 +188,7 @@ INSERT INTO "inp_value_catarc" VALUES ('IRREGULAR');
 INSERT INTO "inp_value_catarc" VALUES ('CUSTOM');
 INSERT INTO "inp_value_catarc" VALUES ('DUMMY');
 INSERT INTO "inp_value_catarc" VALUES ('FORCE_MAIN'); 
-INSERT INTO "inp_value_catarc" VALUES ('VIRTUAL); 
+INSERT INTO "inp_value_catarc" VALUES ('VIRTUAL'); 
 
 -- ----------------------------
 -- Records of inp_value_buildup

@@ -43,14 +43,14 @@ BEGIN
             --Insert event 'inspection'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature = 'CONNEC' or feature = 'ALL')
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
                 ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
 
             --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
                 ,st_x(rec_connec.the_geom)::numeric(12,3), st_y(rec_connec.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             
@@ -69,14 +69,14 @@ BEGIN
             --Insert event 'inspection'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature = 'NODE' or feature = 'ALL')
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
 
             --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
                 ,st_x(rec_node.the_geom)::numeric(12,3), st_y(rec_node.the_geom)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             
@@ -96,14 +96,14 @@ BEGIN
             --Insert event 'inspection'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='INSPECTION' AND (feature = 'ARC' or feature = 'ALL')
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id,'demo value','demo text','bottom'
                 ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
 
 	    --Insert event 'picture'
             FOR rec_parameter IN SELECT * FROM om_visit_parameter WHERE parameter_type='PICTURE'
             LOOP
-                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
+                INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, 'demo_picture.png', 'demo_picture_text',null
                 ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
             END LOOP;
             
@@ -119,7 +119,7 @@ BEGIN
 
             --Insert event 'leak'
             SELECT * INTO rec_parameter FROM om_visit_parameter WHERE parameter_type='LEAK' limit 1;
-            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, null,null,null
+            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, null,null,null
             ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));     
 
             
@@ -134,7 +134,7 @@ BEGIN
             INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);      
             
 	    SELECT * INTO rec_parameter FROM om_visit_parameter WHERE parameter_type='LEAK' limit 1 offset 1;
-            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, null,null,null
+            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, null,null,null
             ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
 
 	END LOOP;
@@ -149,7 +149,7 @@ BEGIN
             INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES(id_last::int8, rec_arc.arc_id);      
             
 	    SELECT * INTO rec_parameter FROM om_visit_parameter WHERE parameter_type='LEAK' limit 1 offset 2;
-            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, azimut) VALUES(id_last, now(), rec_parameter.id, null,null,null
+            INSERT INTO om_visit_event (visit_id, tstamp, parameter_id, value, text, position_id, xcoord, ycoord, compass) VALUES(id_last, now(), rec_parameter.id, null,null,null
             ,st_x(the_geom_last)::numeric(12,3), st_y(the_geom_last)::numeric(12,3), ROUND(RANDOM()*360));
 
 	END LOOP;
