@@ -7119,7 +7119,7 @@
     <string>rotation</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="geometry_lenngth">
+  <widget class="QLineEdit" name="gis_length">
    <property name="geometry">
     <rect>
      <x>120</x>
