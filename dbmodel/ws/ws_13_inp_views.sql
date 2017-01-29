@@ -629,7 +629,7 @@ rpt_node.demand,
 rpt_node.head, 
 rpt_node.press, 
 rpt_node.quality, 
-(now()::date+rpt_arc.time::interval)::text as time, 
+(now()::date+rpt_node.time::interval)::text as time, 
 node.the_geom 
 FROM rpt_selector_result, temp_node node
 JOIN rpt_node ON ((rpt_node.node_id)::text = (node.node_id)::text)
