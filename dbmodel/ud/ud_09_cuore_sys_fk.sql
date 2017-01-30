@@ -249,10 +249,8 @@ ALTER TABLE "element_x_gully" ADD CONSTRAINT "element_x_gully_gully_id_fkey" FOR
 
 ALTER TABLE "db_cat_table" DROP CONSTRAINT IF EXISTS "db_cat_table_db_cat_clientlayer_id_fkey";
 ALTER TABLE db_cat_table ADD CONSTRAINT "db_cat_table_db_cat_clientlayer_id_fkey" FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "db_cat_view" DROP CONSTRAINT IF EXISTS "db_cat_view_db_cat_clientlayer_id_key";
-ALTER TABLE db_cat_view ADD CONSTRAINT "db_cat_view_db_cat_clientlayer_id_key" FOREIGN KEY ("db_cat_clientlayer_id") REFERENCES db_cat_clientlayer ("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "db_cat_columns" DROP CONSTRAINT IF EXISTS "db_cat_columns_db_cat_table_id_fkey";
-ALTER TABLE db_cat_columns ADD CONSTRAINT "db_cat_columns_db_cat_table_id_fkey" FOREIGN KEY ("db_cat_table_id") REFERENCES db_cat_table ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "db_cat_table_x_column" DROP CONSTRAINT IF EXISTS "db_cat_table_x_column_db_cat_table_fkey";
+ALTER TABLE ONLY "db_cat_table_x_column" ADD CONSTRAINT "db_cat_table_x_column_db_cat_table_fkey" FOREIGN KEY ("table_id") REFERENCES db_cat_table("id") ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_id_fkey";
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_featurecat_id_fkey" FOREIGN KEY ("featurecat_id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
