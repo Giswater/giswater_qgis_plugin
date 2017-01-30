@@ -62,3 +62,12 @@ CREATE TABLE db_cat_clientlayer (
   CONSTRAINT db_cat_clientlayer_pkey PRIMARY KEY (qgis_layer_id));
 
 
+DROP TABLE IF EXISTS db_cat_client_agrupation CASCADE; 
+CREATE TABLE db_cat_client_agrupation(
+  id varchar(50) NOT NULL,
+  description text,
+  workflow text,
+  pre_dependences text,
+  post_dependences text,
+  db_cat_client_layer_agrupation_id varchar(50),
+  CONSTRAINT db_cat_client_agrupation_pkey PRIMARY KEY (id));

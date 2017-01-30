@@ -62,4 +62,13 @@ CREATE TABLE db_cat_clientlayer (
     automatic_reload_layer boolean
 );
 
+DROP TABLE IF EXISTS db_cat_client_agrupation CASCADE; 
+CREATE TABLE db_cat_client_agrupation(
+  id varchar(50) NOT NULL,
+  description text,
+  workflow text,
+  pre_dependences text,
+  post_dependences text,
+  db_cat_client_layer_agrupation_id varchar(50),
+  CONSTRAINT db_cat_client_agrupation_pkey PRIMARY KEY (id));
 
