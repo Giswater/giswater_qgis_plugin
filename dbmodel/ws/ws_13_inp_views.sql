@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-
 DROP VIEW IF EXISTS v_inp_arc CASCADE;
 CREATE OR REPLACE VIEW v_inp_arc AS 
  SELECT temp_arc.arc_id, 
@@ -30,7 +29,9 @@ CREATE OR REPLACE VIEW v_inp_arc AS
         END AS length, 
     temp_arc.the_geom
    FROM temp_arc
-   JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text;
+   JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
+   JOIN inp_selector_sector ON (((temp_arc.sector_id)::text = (inp_selector_sector.sector_id)::text))
+   JOIN inp_selector_state ON (((temp_arc."state")::text = (inp_selector_state.id)::text));
 
 
 DROP VIEW IF EXISTS v_inp_node CASCADE;
@@ -45,31 +46,33 @@ CREATE OR REPLACE VIEW v_inp_node AS
     temp_node.dma_id,
     temp_node.state,
     temp_node.the_geom
-   FROM temp_node;
-      
- 
+   FROM temp_node
+   JOIN inp_selector_sector ON (((temp_node.sector_id)::text = (inp_selector_sector.sector_id)::text))
+   JOIN inp_selector_state ON (((temp_node."state")::text = (inp_selector_state.id)::text));
+   
+
 CREATE OR REPLACE VIEW v_inp_arc_x_node1 AS 
- SELECT temp_arc.arc_id,
-    temp_arc.node_1,
-    temp_node.elevation AS elevation1,
-    temp_node.depth AS depth1,
+ SELECT arc.arc_id,
+    arc.node_1,
+    node.elevation AS elevation1,
+    node.depth AS depth1,
     cat_arc.dext / 1000::numeric AS dext,
-    temp_node.depth - cat_arc.dext / 1000::numeric AS r1
-   FROM temp_arc
-     JOIN temp_node ON temp_arc.node_1::text = temp_node.node_id::text
-     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text AND temp_arc.arccat_id::text = cat_arc.id::text;
+    node.depth - cat_arc.dext / 1000::numeric AS r1
+   FROM v_inp_arc arc
+     JOIN v_inp_node node ON arc.node_1::text = node.node_id::text
+     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
 CREATE OR REPLACE VIEW v_inp_arc_x_node2 AS 
- SELECT temp_arc.arc_id,
-    temp_arc.node_2,
-    temp_node.elevation AS elevation2,
-    temp_node.depth AS depth2,
+ SELECT arc.arc_id,
+    arc.node_2,
+    node.elevation AS elevation2,
+    node.depth AS depth2,
     cat_arc.dext / 1000::numeric AS dext,
-    temp_node.depth - cat_arc.dext / 1000::numeric AS r2
-   FROM temp_arc
-     JOIN temp_node ON temp_arc.node_2::text = temp_node.node_id::text
-     JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text AND temp_arc.arccat_id::text = cat_arc.id::text;
+    node.depth - cat_arc.dext / 1000::numeric AS r2
+   FROM v_inp_arc arc
+     JOIN v_inp_node node ON arc.node_2::text = node.node_id::text
+     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
 
 
 
@@ -84,12 +87,12 @@ CREATE OR REPLACE VIEW v_inp_arc_x_node AS
     v_inp_arc_x_node2.elevation2,
     v_inp_arc_x_node2.depth2,
     v_inp_arc_x_node2.r2,
-    temp_arc.state,
-    temp_arc.sector_id,
-    temp_arc.the_geom
+    arc.state,
+    arc.sector_id,
+    arc.the_geom
    FROM v_inp_arc_x_node1
      JOIN v_inp_arc_x_node2 ON v_inp_arc_x_node1.arc_id::text = v_inp_arc_x_node2.arc_id::text
-     JOIN temp_arc ON v_inp_arc_x_node2.arc_id::text = temp_arc.arc_id::text;
+     JOIN v_inp_arc arc ON v_inp_arc_x_node2.arc_id::text = arc.arc_id::text;
 
 	 
 	 
@@ -152,21 +155,17 @@ SELECT
 
 CREATE OR REPLACE VIEW v_inp_status AS
 SELECT 
-    temp_arc.arc_id,
+    arc.arc_id,
     inp_valve.status
-    FROM temp_arc
-    JOIN inp_valve ON temp_arc.arc_id::text = concat(inp_valve.node_id, '_n2a')
-    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
-    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    FROM v_inp_arc arc
+    JOIN inp_valve ON arc.arc_id::text = concat(inp_valve.node_id, '_n2a')
     WHERE inp_valve.status::text = 'OPEN'::text OR inp_valve.status::text = 'CLOSED'::text
 UNION
     SELECT 
-    temp_arc.arc_id,
+    arc.arc_id,
     inp_pump.status
-    FROM temp_arc
-    JOIN inp_pump ON temp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
-    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
-    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    FROM v_inp_arc arc
+    JOIN inp_pump ON arc.arc_id::text = concat(inp_pump.node_id, '_n2a')
     WHERE inp_pump.status::text = 'OPEN'::text OR inp_pump.status::text = 'CLOSED'::text;
 
 
@@ -183,74 +182,63 @@ SELECT
 DROP VIEW IF EXISTS "v_inp_reservoir" CASCADE;
 CREATE VIEW "v_inp_reservoir" AS 
 SELECT 
-	inp_reservoir.node_id, inp_reservoir.head, inp_reservoir.pattern_id, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, inp_selector_sector.sector_id 
-	FROM (((v_inp_node node JOIN inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text))) 
-	JOIN inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text)))
-	JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text))) ;
+	inp_reservoir.node_id, inp_reservoir.head, inp_reservoir.pattern_id, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, node.sector_id 
+	FROM (((v_inp_node node JOIN inp_reservoir ON (((inp_reservoir.node_id)::text = (node.node_id)::text)))));
 
 
 DROP VIEW IF EXISTS "v_inp_tank" CASCADE;
 CREATE VIEW "v_inp_tank" AS 
 SELECT 
-	inp_tank.node_id, node.elevation, inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, inp_selector_sector.sector_id 
+	inp_tank.node_id, node.elevation, inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, inp_tank.curve_id, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, node.sector_id 
 	FROM (((inp_tank 
-	JOIN v_inp_node node ON (((inp_tank.node_id)::text = (node.node_id)::text))) 
-	JOIN inp_selector_sector ON (((node.sector_id)::text = (inp_selector_sector.sector_id)::text)))
-	JOIN inp_selector_state ON (((node."state")::text = (inp_selector_state.id)::text))) ;
+	JOIN v_inp_node node ON (((inp_tank.node_id)::text = (node.node_id)::text)))));
 
 
 
 DROP VIEW IF EXISTS "v_inp_junction" CASCADE;
 CREATE OR REPLACE VIEW v_inp_junction AS 
- SELECT temp_node.node_id, 
-    temp_node.elevation, 
-    (temp_node.elevation - temp_node.depth)::numeric(12,4) AS elev, 
+ SELECT node.node_id, 
+    node.elevation, 
+    (node.elevation - node.depth)::numeric(12,4) AS elev, 
     inp_junction.demand, 
     inp_junction.pattern_id, 
-    st_x(temp_node.the_geom)::numeric(16,3) AS xcoord, 
-    st_y(temp_node.the_geom)::numeric(16,3) AS ycoord, 
-    inp_selector_sector.sector_id
-   FROM temp_node
-   LEFT JOIN inp_junction ON inp_junction.node_id::text = temp_node.node_id::text
-   JOIN inp_selector_sector ON temp_node.sector_id::text = inp_selector_sector.sector_id::text
-   JOIN inp_selector_state ON temp_node.state::text = inp_selector_state.id::text
-  WHERE temp_node.epa_type::text = 'JUNCTION'::text
-  ORDER BY temp_node.node_id;
+    st_x(node.the_geom)::numeric(16,3) AS xcoord, 
+    st_y(node.the_geom)::numeric(16,3) AS ycoord, 
+    node.sector_id
+   FROM v_inp_node node
+   LEFT JOIN inp_junction ON inp_junction.node_id::text = node.node_id::text
+   WHERE epa_type='JUNCTION'
+   ORDER BY node.node_id;
 
 
 DROP VIEW IF EXISTS "v_inp_pump" CASCADE;
 CREATE VIEW "v_inp_pump" AS 
 SELECT 
 	concat(inp_pump.node_id, '_n2a') AS arc_id,
-	temp_arc.node_1, 
-	temp_arc.node_2, 
+	arc.node_1, 
+	arc.node_2, 
 	(('POWER'::text || ' '::text) || (inp_pump.power)::text) AS power, 
 	(('HEAD'::text || ' '::text) || (inp_pump.curve_id)::text) AS head, (('SPEED'::text || ' '::text) || inp_pump.speed) AS speed, 
 	(('PATTERN'::text || ' '::text) || (inp_pump.pattern)::text) AS pattern, 
-	inp_selector_sector.sector_id 
-	FROM temp_arc
-	JOIN inp_pump ON temp_arc.arc_id = concat(inp_pump.node_id, '_n2a')
-	JOIN inp_selector_sector ON ((temp_arc.sector_id)::text = (inp_selector_sector.sector_id)::text)
-	JOIN inp_selector_state ON ((temp_arc."state")::text = (inp_selector_state.id)::text);
-
+	arc.sector_id 
+	FROM v_inp_arc arc
+	JOIN inp_pump ON arc.arc_id = concat(inp_pump.node_id, '_n2a');
 
 
 DROP VIEW IF EXISTS v_inp_valve_cu CASCADE;
 CREATE OR REPLACE VIEW v_inp_valve_cu AS 
 SELECT 
 	concat(inp_valve.node_id, '_n2a') AS arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
+    arc.node_1,
+    arc.node_2,
     cat_arc.dint AS diameter,
     inp_valve.valv_type,
     inp_valve.curve_id,
     inp_valve.minorloss,
-    inp_selector_sector.sector_id
-	FROM temp_arc
-	JOIN inp_valve ON temp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-	JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
-    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
-    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    arc.sector_id
+	FROM v_inp_arc arc
+	JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
+	JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 	WHERE inp_valve.valv_type::text = 'GPV'::text;
 
 
@@ -258,18 +246,16 @@ SELECT
 DROP VIEW IF EXISTS v_inp_valve_fl CASCADE;
 CREATE OR REPLACE VIEW v_inp_valve_fl AS 
  SELECT concat(inp_valve.node_id, '_n2a') AS arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
+    arc.node_1,
+    arc.node_2,
     cat_arc.dint AS diameter,
     inp_valve.valv_type,
     inp_valve.flow,
     inp_valve.minorloss,
-    inp_selector_sector.sector_id
-    FROM temp_arc
-    JOIN inp_valve ON temp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
-    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
-    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    arc.sector_id
+    FROM v_inp_arc arc
+    JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
+    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 	WHERE inp_valve.valv_type::text = 'FCV'::text;
 
 
@@ -278,18 +264,16 @@ DROP VIEW IF EXISTS v_inp_valve_lc CASCADE;
 CREATE OR REPLACE VIEW v_inp_valve_lc AS 
 SELECT 
 	concat(inp_valve.node_id, '_n2a') AS arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
+    arc.node_1,
+    arc.node_2,
     cat_arc.dint AS diameter,
     inp_valve.valv_type,
     inp_valve.coef_loss,
     inp_valve.minorloss,
-    inp_selector_sector.sector_id
-	FROM temp_arc
-    JOIN inp_valve ON temp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
-    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
-    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    arc.sector_id
+	FROM v_inp_arc arc
+    JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
+    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 	WHERE inp_valve.valv_type::text = 'TCV'::text;
 
 
@@ -297,18 +281,16 @@ SELECT
 DROP VIEW IF EXISTS v_inp_valve_pr CASCADE;
 CREATE OR REPLACE VIEW v_inp_valve_pr AS 
 SELECT concat(inp_valve.node_id, '_n2a') AS arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
+    arc.node_1,
+    arc.node_2,
     cat_arc.dint AS diameter,
     inp_valve.valv_type,
     inp_valve.pressure,
     inp_valve.minorloss,
-    inp_selector_sector.sector_id
-    FROM temp_arc
-    JOIN inp_valve ON temp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
-    JOIN inp_selector_sector ON temp_arc.sector_id::text = inp_selector_sector.sector_id::text
-    JOIN inp_selector_state ON temp_arc.state::text = inp_selector_state.id::text
+    arc.sector_id
+    FROM v_inp_arc arc
+    JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
+    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
     WHERE inp_valve.valv_type::text = 'PRV'::text OR inp_valve.valv_type::text = 'PSV'::text OR inp_valve.valv_type::text = 'PBV'::text;
 
 
@@ -339,8 +321,6 @@ CREATE OR REPLACE VIEW v_inp_pipe AS
    JOIN inp_pipe ON arc.arc_id::text = inp_pipe.arc_id::text
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
-   JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
-   JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
    JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text 
    where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age 
 UNION 
@@ -363,28 +343,12 @@ UNION
    JOIN inp_shortpipe ON arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
-   JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
-   JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
    JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
 
 
 
 DROP VIEW IF EXISTS v_inp_vertice CASCADE;
 CREATE OR REPLACE VIEW v_inp_vertice AS 
- (SELECT nextval ('"SCHEMA_NAME".inp_vertice_id_seq'::regclass) AS id, 
-    arc.arc_id, 
-    st_x(arc.point)::numeric(16,3) AS xcoord, 
-    st_y(arc.point)::numeric(16,3) AS ycoord
-   FROM ( SELECT (st_dumppoints(arc_1.the_geom)).geom AS point, 
-            st_startpoint(arc_1.the_geom) AS startpoint, 
-            st_endpoint(arc_1.the_geom) AS endpoint, 
-            arc_1.sector_id, 
-            arc_1.arc_id
-           FROM arc arc_1) arc
-   JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
-  WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)) AND
-	  arc.arc_id NOT IN (SELECT arc_id FROM temp_arc WHERE arc_id IS NOT NULL)
- UNION
   SELECT nextval ('"SCHEMA_NAME".inp_vertice_id_seq'::regclass) AS id, 
     arc.arc_id, 
     st_x(arc.point)::numeric(16,3) AS xcoord, 
@@ -394,11 +358,13 @@ CREATE OR REPLACE VIEW v_inp_vertice AS
             st_endpoint(arc_1.the_geom) AS endpoint, 
             arc_1.sector_id, 
             arc_1.arc_id
-           FROM temp_arc arc_1) arc
-   JOIN inp_selector_sector ON arc.sector_id::text = inp_selector_sector.sector_id::text
-  WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)))
-  ORDER BY id;
+           FROM v_inp_arc arc_1) arc
+  WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint))
+  ORDER BY 1;
 
+  
+  
+  
   
 
 -- ----------------------------
@@ -711,8 +677,6 @@ WHERE ((rpt_node.result_id)::text = (rpt_selector_compare.result_id)::text)
 AND rpt_selector_compare.cur_user="current_user"()::text
 GROUP BY node.node_id, rpt_selector_compare.result_id, node.the_geom 
 ORDER BY node.node_id;
-
-
 
 
 
