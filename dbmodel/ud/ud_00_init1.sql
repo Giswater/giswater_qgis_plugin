@@ -22,36 +22,10 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 CREATE EXTENSION IF NOT EXISTS tablefunc;
 
 
-
-CREATE SEQUENCE  db_cat_table_seq
-    START WITH 1
-    INCREMENT BY 10
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE  db_cat_view_seq
-    START WITH 1
-    INCREMENT BY 10
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-CREATE SEQUENCE  db_cat_columns_seq
-    START WITH 1
-    INCREMENT BY 10
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-
 -- Catalog of tables and views
 DROP TABLE IF EXISTS db_cat_table CASCADE; 
 CREATE TABLE db_cat_table (
-    id text NOT NULL,
+    id text NOT NULL PRIMARY KEY,
     context text,
     db_cat_clientlayer_id text,
     description text
@@ -61,7 +35,7 @@ CREATE TABLE db_cat_table (
 -- Catalog of columns
 DROP TABLE IF EXISTS db_cat_table_x_column CASCADE; 
 CREATE TABLE db_cat_table_x_column (
-    id text NOT NULL,
+    id text NOT NULL PRIMARY KEY,
     table_id text,
     column_id text,
     column_type text,
