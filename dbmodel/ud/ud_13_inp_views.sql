@@ -255,6 +255,41 @@ JOIN inp_loadings_pol_x_subc ON (((inp_loadings_pol_x_subc.subc_id)::text = (sub
 JOIN inp_selector_hydrology ON (((subcatchment.hydrology_id)::text = (inp_selector_hydrology.hydrology_id)::text)));
 
 
+CREATE VIEW v_subcatchment AS SELECT   
+subc_id ,
+  node_id,
+  rg_id,
+  area,
+  imperv,
+  width,
+  slope,
+  clength,
+  snow_id ,
+  nimp,
+  nperv,
+  simp,
+  sperv,
+  zero,
+  routeto,
+  rted,
+  maxrate,
+  minrate,
+  decay,
+  drytime,
+  maxinfil,
+  suction,
+  conduct,
+  initdef,
+  curveno,
+  conduct_2,
+  drytime_2,
+  subcatchment.sector_id,
+  subcatchment.hydrology_id,
+  the_geom
+FROM subcatchment 
+JOIN inp_selector_hydrology ON inp_selector_hydrology.hydrology_id=subcatchment.hydrology_id
+JOIN inp_selector_sector ON inp_selector_sector.sector_id=subcatchment.sector_id;
+
 
 
 
