@@ -58,6 +58,7 @@ class Giswater(QObject):
 
         # initialize locale
         locale = QSettings().value('locale/userLocale')
+
         locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -473,10 +474,10 @@ class Giswater(QObject):
                 
         # Hide all toolbars
         self.hide_toolbars()
-                    
+               
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
-
+            
         if len(layers) == 0:
             return    
         
@@ -797,7 +798,28 @@ class Giswater(QObject):
             project_type = self.mg.project_type
             self.set_fieldRelation(self.layer_man_pgully,project_type)                   
 
+        self.controller.set_project_user()
+        ''' 
+        # Layer inventory
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+
+        for layer in layers:
+    
+            # layer_alias
+            layer_alias = layer.name()
+
+            # Layer_id
+            qgis_layer_id = layer.id()
             
+            # layer name in DB
+            cat_table_id = self.controller.get_layer_source_table_name(layer)
+            
+            sql = "INSERT INTO "+self.schema_name+".db_cat_clientlayer (qgis_layer_id,db_cat_table_id, layer_alias)"
+            sql+= " VALUES ('"+qgis_layer_id+"','"+cat_table_id+"', '"+layer_alias+"')"
+            self.controller.execute_sql(sql)      
+        '''
+     
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
@@ -1088,10 +1110,9 @@ class Giswater(QObject):
    
         if project_type == 'ws':
             path = os.path.join(self.plugin_dir, 'xml','WS_valueRelation'+element+'.xml')
-            print ("ws") 
         elif project_type == 'ud':
             path = os.path.join(self.plugin_dir, 'xml','UD_valueRelation'+element+'.xml')
-            print ("ud") 
+
         
         xmldoc = minidom.parse(path)
         itemlist = xmldoc.getElementsByTagName('edittype')

@@ -49,14 +49,14 @@ class DaoController():
             host = qgis_settings.value(root+"host", '')
             port = qgis_settings.value(root+"port", '')            
             db = qgis_settings.value(root+"database", '')
-            user = qgis_settings.value(root+"username", '')
+            self.user = qgis_settings.value(root+"username", '')
             pwd = qgis_settings.value(root+"password", '') 
             # We need to create this connections for Table Views
             self.db = QSqlDatabase.addDatabase("QPSQL")
             self.db.setHostName(host)
             self.db.setPort(int(port))
             self.db.setDatabaseName(db)
-            self.db.setUserName(user)
+            self.db.setUserName(self.user)
             self.db.setPassword(pwd)
             self.status = self.db.open()    
             if not self.status:
@@ -69,7 +69,7 @@ class DaoController():
     
         # Connect to Database 
         self.dao = PgDao()     
-        self.dao.set_params(host, port, db, user, pwd)
+        self.dao.set_params(host, port, db, self.user, pwd)
         status = self.dao.init_db()
         
         # TODO: Get postgresql data folder
@@ -299,4 +299,18 @@ class DaoController():
             uri_schema = uri[pos_ini + 6:pos_end_schema-3]
 
         return uri_schema
+    
+    
+        
+    def set_project_user(self):
+        # Set user
+        sql = "UPDATE "+self.schema_name+".rpt_selector_result"
+        sql+= " SET cur_user = '"+self.user+"'"
+        sql+= " WHERE id = '1'" 
+        print sql
+        self.dao.execute_sql(sql)  
+   
+
+
+
     

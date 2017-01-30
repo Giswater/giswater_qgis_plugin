@@ -124,6 +124,7 @@ class ManArcDialog(ParentDialog):
         
         # Manage 'cat_shape'
         self.setImage("label_image_ud_shape")
+        
     
     
     

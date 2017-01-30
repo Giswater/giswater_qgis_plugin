@@ -1008,8 +1008,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>560</width>
+        <height>366</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4407,9 +4407,9 @@
       <widget class="QLabel" name="label_cost_bulk">
        <property name="geometry">
         <rect>
-         <x>40</x>
+         <x>54</x>
          <y>202</y>
-         <width>51</width>
+         <width>39</width>
          <height>22</height>
         </rect>
        </property>
@@ -4425,7 +4425,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <property name="text">
-        <string>bulk (m):</string>
+        <string>bulk:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -4459,9 +4459,9 @@
       <widget class="QLabel" name="label_cost_con_area">
        <property name="geometry">
         <rect>
-         <x>5</x>
+         <x>26</x>
          <y>178</y>
-         <width>81</width>
+         <width>73</width>
          <height>22</height>
         </rect>
        </property>
@@ -4477,7 +4477,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <property name="text">
-        <string>Con. area (m²):</string>
+        <string>Con. area:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
