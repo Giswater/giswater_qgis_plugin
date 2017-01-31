@@ -351,6 +351,7 @@ class Giswater(QObject):
             for i in range(30,37):
                 self.add_action(str(i), self.toolbar_ed, self.ag_ed)                   
          
+         
         # Disable and hide all toolbars
         self.enable_actions(False)
         self.hide_toolbars() 
@@ -474,7 +475,8 @@ class Giswater(QObject):
                 
         # Hide all toolbars
         self.hide_toolbars()
-               
+
+        
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
             
@@ -798,28 +800,9 @@ class Giswater(QObject):
             project_type = self.mg.project_type
             self.set_fieldRelation(self.layer_man_pgully,project_type)                   
 
-        self.controller.set_project_user()
-        ''' 
-        # Layer inventory
-        # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
-
-        for layer in layers:
-    
-            # layer_alias
-            layer_alias = layer.name()
-
-            # Layer_id
-            qgis_layer_id = layer.id()
-            
-            # layer name in DB
-            cat_table_id = self.controller.get_layer_source_table_name(layer)
-            
-            sql = "INSERT INTO "+self.schema_name+".db_cat_clientlayer (qgis_layer_id,db_cat_table_id, layer_alias)"
-            sql+= " VALUES ('"+qgis_layer_id+"','"+cat_table_id+"', '"+layer_alias+"')"
-            self.controller.execute_sql(sql)      
-        '''
-     
+        
+        
+        
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
@@ -918,6 +901,14 @@ class Giswater(QObject):
             self.actions['32'].setVisible(False)                     
         
         self.custom_enable_actions()
+        
+
+        # Delete python compiled files
+        self.delete_pyc_files()
+        
+        # Create layer inventory 
+        self.layer_inventory()
+    
                             
                                 
     def current_layer_changed(self, layer):
@@ -1038,6 +1029,7 @@ class Giswater(QObject):
             except KeyError, e:
                 print "current_layer_changed: "+str(e)
                         
+ 
     
     def custom_enable_actions(self):
         ''' Enable selected actions '''
@@ -1123,4 +1115,40 @@ class Giswater(QObject):
                 layer_element.setEditType(index,QgsVectorLayer.ValueRelation)
                        
             index=index+1
+        
+        
+    def delete_pyc_files(self):
+        
+        path = self.plugin_dir
+        filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
+        for f in filelist:
+            os.remove(f)
+            
+            
+    def layer_inventory(self):
+        ''' Create layer inventoory '''
+        
+        # Layer inventory
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+
+        for layer in layers:
+            sql = "DELETE FROM "+self.schema_name+".db_cat_clientlayer"
+            self.controller.execute_sql(sql) 
+ 
+            # layer_alias
+            layer_alias = layer.name()
+            print "--------------------"
+            print layer_alias
+            # Layer_id
+            qgis_layer_id = layer.id()
+            
+            # layer name in DB
+            cat_table_id = self.controller.get_layer_source_table_name(layer)
+            print cat_table_id
+            '''
+            sql = "INSERT INTO "+self.schema_name+".db_cat_clientlayer (qgis_layer_id,db_cat_table_id, layer_alias)"
+            sql+= " VALUES ('"+qgis_layer_id+"','"+cat_table_id+"', '"+layer_alias+"')"
+            self.controller.execute_sql(sql)  
+            '''
         

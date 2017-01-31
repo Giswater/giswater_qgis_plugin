@@ -5,11 +5,9 @@ from qgis.gui import QgsMessageBar
 from PyQt4.QtSql import QSqlTableModel
 
 
-
 import os
 import sys
 import webbrowser
-
 
 
 
@@ -274,15 +272,24 @@ class Mg():
         rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
         rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
 
+        # Set project user
+        user = self.controller.set_project_user()
+
         # Delete previous values
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql= "DELETE FROM "+self.schema_name+".rpt_selector_result" 
+        sql = "DELETE FROM "+self.schema_name+".rpt_selector_result" 
         self.dao.execute_sql(sql)
-        sql= "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
+        sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
         self.dao.execute_sql(sql)
-        sql= "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
+        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
+        print sql
         self.dao.execute_sql(sql)
-        sql= "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
+        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
+        sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
+        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
+        print sql
         self.dao.execute_sql(sql)
 
         # Show message to user

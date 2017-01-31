@@ -304,11 +304,16 @@ class DaoController():
         
     def set_project_user(self):
         # Set user
+        '''
         sql = "UPDATE "+self.schema_name+".rpt_selector_result"
         sql+= " SET cur_user = '"+self.user+"'"
         sql+= " WHERE id = '1'" 
         print sql
         self.dao.execute_sql(sql)  
+        '''
+        print "user from function"
+        print self.user
+        return self.user
    
 
 
