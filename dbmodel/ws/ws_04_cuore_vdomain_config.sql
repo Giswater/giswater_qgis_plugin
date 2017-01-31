@@ -7,4 +7,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-INSERT INTO config_search_plus VALUES ('1', 'v_edit_man_junction', 'dma_id', 'node_id', 'ext_urban_propierties', 'placement', 'square', 'code', 'ext_streetaxis', 'id', 'name', 'v_edit_man_wjoin', 'wjoin_streetaxis_id', 'wjoin_postnumber', 'v_edit_man_wjoin', 'connec_id', 'v_rtc_hydrometer', 'hydrometer_id', 'connec_id');
+INSERT INTO config_search_plus VALUES ('1', 'v_edit_man_wjoin', 'dma_id', 'connec_id', 'ext_urban_propierties', 'placement', 'square', 'code', 'ext_streetaxis', 'id', 'name', 'v_edit_man_wjoin', 'wjoin_streetaxis_id', 'wjoin_postnumber', NULL, NULL, NULL, NULL, NULL);

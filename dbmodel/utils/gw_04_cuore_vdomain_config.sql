@@ -13,16 +13,16 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,0.5,false, true, true, true, 0.001, 0.001, true, true, true, 1);
+INSERT INTO config VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, NULL, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
 
 INSERT INTO config_csv_import VALUES ('inp_pattern', 'Patterns');
 INSERT INTO config_csv_import VALUES ('inp_curve', 'Curve');
 
 INSERT INTO config_extract_raster_value VALUES ('1', 'topo', '1', 'v_edit_node', 'elev');
 
-INSERT INTO config_param_text VALUES ('custom_giswater_folder', 'c:/',null,null,null,null);
-INSERT INTO config_param_text VALUES ('doc_absolute_path', 'c:/',null,null,null,null);
-INSERT INTO config_param_text VALUES ('om_visit_absolute_path', 'https://www.',null,null,null,null);
+INSERT INTO config_param_text VALUES ('custom_giswater_folder', 'c:/', NULL, NULL, NULL, NULL);
+INSERT INTO config_param_text VALUES ('om_visit_absolute_path', 'https://www.', NULL, NULL, NULL, NULL);
+INSERT INTO config_param_text VALUES ('doc_absolute_path', 'c:/', NULL, NULL, NULL, NULL);
 
 
 INSERT INTO config_ui_forms VALUES (3868, NULL, 'v_ui_element_x_gully', NULL, true, 100, 5, NULL);

@@ -9,7 +9,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 --Insert demo values on doc tables
-SELECT gw_fct_fill_doc_tables();
+--SELECT gw_fct_fill_doc_tables();
 
 -- Insert demo values on om tables
 SELECT gw_fct_fill_om_tables();
@@ -25,3 +25,10 @@ INSERT INTO inp_selector_sector VALUES ('sector_01');
 -- Default values of plan psector
 -- ----------------------------
 -- INSERT INTO plan_selector_psector VALUES ('psector_01');
+
+
+-- ----------------------------
+-- Default values of rpt selectors
+-- ----------------------------
+INSERT INTO rpt_selector_result VALUES (1, 'sample_epanet', 'postgres');
+INSERT INTO rpt_selector_compare VALUES (1, 'sample_epanet_hy', 'postgres');

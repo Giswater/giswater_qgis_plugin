@@ -13,9 +13,6 @@ INSERT INTO cat_tag VALUES ('PRIORITY NORMAL', NULL);
 INSERT INTO cat_tag VALUES ('PRIORITY HIGH', NULL);
 
 
-INSERT INTO doc VALUES (2, 'INCIDENT', 'c:/docs/incident.pdf', 'Incident from public works', 'PRIORITY HIGH', '2016-05-31 14:20:25', 'postgres');
-INSERT INTO doc VALUES (3, 'OTHER', 'c:/docs/other.pdf', 'Other', 'PRIORITY HIGH', '2016-05-31 14:21:03', 'postgres');
-INSERT INTO doc VALUES (1, 'AS_BUILT', 'c:/docs/doc.pdf', 'As built documentation', 'PRIORITY HIGH', '2016-05-31 14:19:39', 'postgres');
-INSERT INTO doc VALUES (4, 'PICTURE', 'c:/docs/demo_picture.png', 'Demo picture', 'PRIORITY HIGH', '2016-05-31 14:19:39', 'postgres');
+
 
 
