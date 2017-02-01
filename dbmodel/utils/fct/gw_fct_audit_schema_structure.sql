@@ -51,13 +51,13 @@ BEGIN
 
 
 	CREATE OR REPLACE VIEW v_audit_schema_catalog_column AS 
-	 SELECT (db_cat_table.name || '_'::text) || db_cat_columns.column_name AS id, 
-		db_cat_table.name AS table_name, 
-		db_cat_columns.column_name, 
-		db_cat_columns.column_type, 
-		db_cat_columns.description
-	   FROM db_cat_columns
-	   JOIN db_cat_table ON db_cat_columns.db_cat_table_id = db_cat_table.id;
+	 SELECT (db_cat_table.id || '_'::text) || db_cat_table_x_column.column_id AS id, 
+		db_cat_table.id AS table_name, 
+		db_cat_table_x_column.column_id as column_name,
+		db_cat_table_x_column.column_type, 
+		db_cat_table_x_column.description
+	   FROM db_cat_table_x_column
+	   JOIN db_cat_table ON db_cat_table_x_column.id = db_cat_table.id;
 
 
 
@@ -66,16 +66,16 @@ BEGIN
 	CREATE OR REPLACE VIEW "v_audit_schema_catalog_compare_table" AS 
 	SELECT
 		table_name as schema_table_name,
-		name as catalog_table_name
+		db_cat_table.id as catalog_table_name
 		FROM information_schema.columns
-		LEFT JOIN db_cat_table ON name=table_name
-		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and db_cat_table.name is null
+		LEFT JOIN db_cat_table ON db_cat_table.id=table_name
+		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and db_cat_table.id is null
 	UNION
 		SELECT
 		table_name as schema_table_name,
-		name as catalog_table_name
+		db_cat_table.id as catalog_table_name
 		FROM information_schema.columns
-		RIGHT JOIN db_cat_table ON name=table_name
+		RIGHT JOIN db_cat_table ON db_cat_table.id=table_name
 		WHERE columns.table_schema::text = 'SCHEMA_NAME'::text and columns.table_name is null
 		ORDER BY 1,2;
 
@@ -169,6 +169,5 @@ RETURN;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-  
   
 

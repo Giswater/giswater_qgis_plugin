@@ -456,8 +456,8 @@ FROM inp_reactions_el
 ORDER BY id;
 
 
-DROP VIEW IF EXISTS "V_inp_reactions_gl" CASCADE;
-CREATE VIEW "V_inp_reactions_gl"  AS
+DROP VIEW IF EXISTS "v_inp_reactions_gl" CASCADE;
+CREATE VIEW "v_inp_reactions_gl"  AS
 SELECT id,
 react_type,
 parameter,
