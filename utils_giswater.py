@@ -12,7 +12,7 @@
 """
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget,QPixmap,QImage, QDoubleSpinBox, QCheckBox, QLabel   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QImage, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit   #@UnresolvedImport
 
 import inspect
 import os
@@ -63,13 +63,19 @@ def getText(widget):
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)          
     if widget:
-        if widget.text():
-            elem_text = widget.text()
+        if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
+            text = widget.text()
+        elif type(widget) is QTextEdit:
+            text = widget.toPlainText()    
+            print text                
+        if text:
+            elem_text = text
         else:
             elem_text = "null"
     else:
         elem_text = "null"
     return elem_text      
+
 
 
 def setText(widget, text):
@@ -80,15 +86,22 @@ def setText(widget, text):
         return    
     
     value = unicode(text)
-    if type(widget) is QLineEdit: 
+    if type(widget) is QLineEdit or type(widget) is QTextEdit: 
         if value == 'None':    
             value = ""        
         widget.setText(value)       
     elif type(widget) is QDoubleSpinBox: 
         if value == 'None':    
             value = 0        
-        widget.setValue(float(value))     
+        widget.setValue(float(value))          
           
+
+def getWidget(widget):
+    
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)    
+    return widget    
+
 
 def getWidgetType(widget):
     
@@ -106,10 +119,8 @@ def getWidgetText(widget, add_quote=False):
     if not widget:
         return None   
     text = None
-    if type(widget) is QLineEdit:
-        text = getText(widget)
-    elif type(widget) is QDoubleSpinBox:
-        text = getText(widget)        
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QDoubleSpinBox:
+        text = getText(widget)    
     elif type(widget) is QComboBox:
         text = getSelectedItem(widget)
     if add_quote and text <> "null":

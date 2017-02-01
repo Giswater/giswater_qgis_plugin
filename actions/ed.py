@@ -39,13 +39,19 @@ class Ed():
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.settings.value('files/gsw_file')  
+        self.gsw_file = self.controller.plugin_settings_value('gsw_file')  
         
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')   
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')   
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
+        
+        self.table_man_arc = self.settings.value('db/table_man_arc', 'v_edit_man_arc')        
+        self.table_man_node = self.settings.value('db/table_man_node', 'v_edit_man_node')   
+        self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')   
+        self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully') 
+        
         self.table_version = self.settings.value('db/table_version', 'version') 
         
         self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
@@ -94,6 +100,12 @@ class Ed():
             
     def ed_search_plus(self):   
         ''' Button 32. Open search plus dialog ''' 
+        
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)
+        
+        
         try:
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
@@ -104,6 +116,10 @@ class Ed():
     def ed_check(self):
         ''' Initial check for buttons 33 and 34 '''
         
+        
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)
         # Check if at least one node is checked          
         self.layer = self.iface.activeLayer()  
         if self.layer is None:
@@ -131,6 +147,9 @@ class Ed():
             
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 36)        
         
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
@@ -169,8 +188,8 @@ class Ed():
         ''' Button 33. Add element '''
 
         # Uncheck all actions (buttons) except this one
-        #self.controller.check_actions(False)
-        #self.controller.check_action(True, 33)        
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)       
           
         # Create the dialog and signals
         self.dlg = Add_element()
@@ -287,7 +306,7 @@ class Ed():
                 sql+= ", workcat_id_end= '"+workcat_id_end+"', workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
                 sql+= ", rotation= '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ= '"+observ+"',link = '"+link+"', verified = '"+verified+"'"
                 sql+= " WHERE element_id = '"+element_id+"'" 
-                self.dao.execute_sql(sql)  
+                self.controller.execute_sql(sql)  
             else:
                 self.close_dialog(self.dlg)
         else:
@@ -315,8 +334,8 @@ class Ed():
         ''' Button 34. Add file '''
 
         # Uncheck all actions (buttons) except this one
-        #self.controller.check_actions(False)
-        #self.controller.check_action(True, 34)        
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)      
                         
         # Create the dialog and signals
         self.dlg = Add_file()
@@ -425,55 +444,20 @@ class Ed():
     def ed_add_to_feature(self, table_name, value_id):   
         ''' Add document or element to selected features '''
         
-        # Initialize variables                    
-        table_arc = self.schema_name+'."'+self.table_arc+'"'
-        table_node = self.schema_name+'."'+self.table_node+'"'
-        table_connec = self.schema_name+'."'+self.table_connec+'"'
-        table_gully = self.schema_name+'."'+self.table_gully+'"'
-        
-        table_man_arc = self.schema_name+'."v_edit_man_arc"'
-        table_man_node = self.schema_name+'."v_edit_man_node"'
-        table_man_connec = self.schema_name+'."v_edit_man_connec"'
-        table_man_gully = self.schema_name+'."v_edit_man_gully"'
-        
-        table_wjoin = self.schema_name+'."'+self.table_wjoin+'"'
-        table_tap = self.schema_name+'."'+self.table_tap+'"'
-        table_greentap = self.schema_name+'."'+self.table_greentap+'"'
-        table_fountain = self.schema_name+'."'+self.table_fountain+'"'
-        
-        table_tank = self.schema_name+'."'+self.table_tank+'"'
-        table_pump = self.schema_name+'."'+self.table_pump+'"'
-        table_source = self.schema_name+'."'+self.table_source+'"'
-        table_meter = self.schema_name+'."'+self.table_meter+'"'
-        table_junction = self.schema_name+'."'+self.table_junction+'"'
-        table_waterwell = self.schema_name+'."'+self.table_waterwell+'"'
-        table_reduction = self.schema_name+'."'+self.table_reduction+'"'
-        table_hydrant = self.schema_name+'."'+self.table_hydrant+'"'
-        table_valve = self.schema_name+'."'+self.table_valve+'"'
-        table_manhole = self.schema_name+'."'+self.table_manhole+'"'
-        
-        table_chamber = self.schema_name+'."'+self.table_chamber+'"'
-        table_chamber_pol = self.schema_name+'."'+self.table_chamber_pol+'"'
-        table_netgully = self.schema_name+'."'+self.table_netgully+'"'
-        table_netgully_pol = self.schema_name+'."'+self.table_netgully_pol+'"'
-        table_netinit = self.schema_name+'."'+self.table_netinit+'"'
-        table_wjump = self.schema_name+'."'+self.table_wjump+'"'
-        table_wwtp = self.schema_name+'."'+self.table_wwtp+'"'
-        table_wwtp_pol = self.schema_name+'."'+self.table_wwtp_pol+'"'
-        table_storage = self.schema_name+'."'+self.table_storage+'"'
-        table_storage_pol = self.schema_name+'."'+self.table_storage_pol+'"'
-        table_outfall = self.schema_name+'."'+self.table_outfall+'"'
-        
-        table_varc = self.schema_name+'."'+self.table_varc+'"'
-        table_siphon = self.schema_name+'."'+self.table_siphon+'"'
-        table_conduit = self.schema_name+'."'+self.table_conduit+'"'
-        table_waccel = self.schema_name+'."'+self.table_waccel+'"'
 
         # Get schema and table name of selected layer       
+        #layer_source = self.controller.get_layer_source(self.layer)
+        # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
+        print "layer source"
+        print layer_source
+        uri_table = layer_source['table'] 
+        print "uri_table"
+        print uri_table
+          
 
         #uri_table = layer_source['table']
-        uri_table = layer_source[1]
+        #uri_table = layer_source[1]
 
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
@@ -481,121 +465,121 @@ class Ed():
         
         field_id= None
 
-        if table_arc in uri_table:  
+        if self.table_arc in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
-        if table_node in uri_table: 
+        if self.table_node in uri_table: 
             elem_type = "node"
             field_id = "node_id"
-        if table_connec in uri_table: 
+        if self.table_connec in uri_table: 
             elem_type = "connec"
             field_id = "connec_id"
-        if table_gully in uri_table:  
+        if self.table_gully in uri_table:  
             elem_type = "gully"
             field_id = "gully_id"  
             
-        if table_man_arc in uri_table:  
+        if self.table_man_arc in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
-        if table_man_node in uri_table: 
+        if self.table_man_node in uri_table: 
             elem_type = "node"
             field_id = "node_id"
-        if table_man_connec in uri_table: 
+        if self.table_man_connec in uri_table: 
             elem_type = "connec"
             field_id = "connec_id"
-        if table_man_gully in uri_table:  
+        if self.table_man_gully in uri_table:  
             elem_type = "gully"
             field_id = "gully_id"
                  
-        if table_wjoin in uri_table:  
+        if self.table_wjoin in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
-        if table_tap in uri_table:  
+        if self.table_tap in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
-        if table_greentap in uri_table:  
+        if self.table_greentap in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
-        if table_fountain in uri_table:  
+        if self.table_fountain in uri_table:  
             elem_type = "connec"
             field_id = "connec_id"
              
-        if table_tank in uri_table:  
+        if self.table_tank in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_pump in uri_table:  
+        if self.table_pump in uri_table:  
             elem_type = "node"
             field_id = "node_id"    
-        if table_source in uri_table:  
+        if self.table_source in uri_table:  
             elem_type = "node"
             field_id = "node_id"    
-        if table_meter in uri_table:  
+        if self.table_meter in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_junction in uri_table:  
+        if self.table_junction in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_waterwell in uri_table:  
+        if self.table_waterwell in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_reduction in uri_table:  
+        if self.table_reduction in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_hydrant in uri_table:  
+        if self.table_hydrant in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_valve in uri_table:  
+        if self.table_valve in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-        if table_manhole in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-            
-        if table_chamber in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_chamber_pol in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_netgully in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_netgully_pol in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_netinit in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_wjump in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_wwtp in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_wwtp_pol in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_storage in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_storage_pol in uri_table:  
-            elem_type = "node"
-            field_id = "node_id"
-        if table_outfall in uri_table:  
+        if self.table_manhole in uri_table:  
             elem_type = "node"
             field_id = "node_id"
             
+        if self.table_chamber in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_chamber_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_netgully in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_netgully_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_netinit in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_wjump in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_wwtp in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_wwtp_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_storage in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_storage_pol in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
+        if self.table_outfall in uri_table:  
+            elem_type = "node"
+            field_id = "node_id"
             
-        if table_varc in uri_table:  
+            
+        if self.table_varc in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
-        if table_siphon in uri_table:  
+        if self.table_siphon in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
-        if table_conduit in uri_table:  
+        if self.table_conduit in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
-        if table_waccel in uri_table:  
+        if self.table_waccel in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
 
@@ -605,7 +589,7 @@ class Ed():
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
-            self.dao.execute_sql(sql) 
+            self.controller.execute_sql(sql) 
                           
         
     def ed_add_file_accept(self): 
@@ -627,7 +611,7 @@ class Ed():
                 sql = "UPDATE "+self.schema_name+".doc "
                 sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"',observ = '"+observ+"', path = '"+path+"'"
                 sql+= " WHERE id = '"+doc_id+"'" 
-                self.dao.execute_sql(sql) 
+                self.controller.execute_sql(sql) 
             else:
                 self.close_dialog(self.dlg) 
         else:

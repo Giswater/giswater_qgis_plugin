@@ -242,19 +242,18 @@ class ValveAnalytics(ParentMapTool):
 
 
     def mg_analytics(self):
-        ''' Button 27. Valve analytics ''' 
-                
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 27)        
+        print "test"
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
-        
-        #self.show_progressBar()
-
-        result = self.controller.execute_sql(sql)    
-
+        result = self.controller.execute_sql(sql)      
         if result:
             message = "Valve analytics executed successfully"
             self.controller.show_info(message, 30, context_name='ui_message')
+
 
 
     def set_rubber_band(self):

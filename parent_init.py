@@ -39,41 +39,56 @@ class ParentDialog(object):
         self.feature = feature
         self.context_name = "ws_parent"    
         self.iface = iface    
-        self.init_config()             
+        self.init_config()     
+        self.set_signals()        
     
         
     def init_config(self):    
      
-        # initialize plugin directory
-        user_folder = os.path.expanduser("~") 
-        self.plugin_name = 'giswater'  
-        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/'+self.plugin_name)    
+        # Initialize plugin directory
+        cur_path = os.path.dirname(__file__)
+        self.plugin_dir = os.path.abspath(cur_path)
+        self.plugin_name = os.path.basename(self.plugin_dir) 
+
         
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         if not os.path.isfile(setting_file):
             message = "Config file not found at: "+setting_file
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5)  
+            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 20)  
             self.close()
             return
             
+        # Set plugin settings
         self.settings = QSettings(setting_file, QSettings.IniFormat)
         self.settings.setIniCodec(sys.getfilesystemencoding())
         
+        # Set QGIS settings. Stored in the registry (on Windows) or .ini file (on Unix) 
+        self.qgis_settings = QSettings()
+        self.qgis_settings.setIniCodec(sys.getfilesystemencoding())  
+        
         # Set controller to handle settings and database connection
-        # TODO: Try to make only one connection
         self.controller = DaoController(self.settings, self.plugin_name, iface)
+        self.controller.set_qgis_settings(self.qgis_settings)  
         status = self.controller.set_database_connection()      
         if not status:
-            message = self.controller.getLastError()
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
+            message = self.controller.last_error
+            self.controller.show_warning(message) 
             return 
              
-        self.schema_name = self.settings.value("db/schema_name")           
+        # Get schema_name and DAO object                
         self.dao = self.controller.dao
+        self.schema_name = self.controller.schema_name    
         
         
-
+    def set_signals(self):
+        
+        try:
+            self.dialog.parent().accepted.connect(self.save)
+            self.dialog.parent().rejected.connect(self.close)
+        except:
+            pass
+        
             
     def translate_form(self, context_name):
         ''' Translate widgets of the form to current language '''
@@ -176,13 +191,13 @@ class ParentDialog(object):
         ''' Save feature '''
         self.save_data()   
         self.dialog.accept()
-        self.layer.commitChanges()    
+        #self.layer.commitChanges()    
         self.close()     
         
         
     def close(self):
         ''' Close form without saving '''
-        self.layer.rollBack()   
+        #self.layer.rollBack()   
         self.dialog.parent().setVisible(False)         
         
         
@@ -237,7 +252,7 @@ class ParentDialog(object):
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
             widget.model().select()
  
          
@@ -271,11 +286,11 @@ class ParentDialog(object):
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE hydrometer_id IN ("+list_id+")"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
 
             sql = "DELETE FROM "+self.schema_name+"."+table_name2 
             sql+= " WHERE hydrometer_id IN ("+list_id+")"
-            self.dao.execute_sql(sql)
+            self.controller.execute_sql(sql)
             
             widget.model().select()
             
@@ -317,12 +332,12 @@ class ParentDialog(object):
             # Insert hydrometer_id in v_rtc_hydrometer
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer (hydrometer_id) "
             sql+= " VALUES ('"+self.hydro_id+"')"
-            self.dao.execute_sql(sql) 
+            self.controller.execute_sql(sql) 
             
             # insert hydtometer_id and connec_id in rtc_hydrometer_x_connec
             sql = "INSERT INTO "+self.schema_name+".rtc_hydrometer_x_connec (hydrometer_id, connec_id) "
             sql+= " VALUES ('"+self.hydro_id+"','"+self.connec_id+"')"
-            self.dao.execute_sql(sql) 
+            self.controller.execute_sql(sql) 
         
             # Refresh table in Qtableview
             # Fill tab Hydrometer
@@ -515,6 +530,10 @@ class ParentDialog(object):
         Set visibility of columns
         Set width of columns '''
         
+        widget = utils_giswater.getWidget(widget)
+        if not widget:
+            return        
+        
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = "SELECT column_index, width, alias, status"
@@ -522,21 +541,23 @@ class ParentDialog(object):
         sql+= " WHERE ui_table = '"+table_name+"'"
         sql+= " ORDER BY column_index"
         rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:        
-                if not row['status']:
-                    columns_to_delete.append(row['column_index']-1)
-                else:
-                    width = row['width']
-                    if width is None:
-                        width = 100
-                    widget.setColumnWidth(row['column_index']-1, width)
-                    widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+        if not rows:
+            return
         
+        for row in rows:        
+            if not row['status']:
+                columns_to_delete.append(row['column_index']-1)
+            else:
+                width = row['width']
+                if width is None:
+                    width = 100
+                widget.setColumnWidth(row['column_index']-1, width)
+                widget.model().setHeaderData(row['column_index']-1, Qt.Horizontal, row['alias'])
+    
         # Set order
         widget.model().setSort(0, Qt.AscendingOrder)    
         widget.model().select()
-        
+
         # Delete columns        
         for column in columns_to_delete:
             widget.hideColumn(column) 
@@ -819,13 +840,13 @@ class ParentDialog(object):
         cur_layer = self.iface.activeLayer()  
         table_name = self.controller.get_layer_source_table_name(cur_layer) 
         column_name = cur_layer.name().lower()+"_cat_shape"
-        print column_name
+    
         # Get cat_shape value from database       
         sql = "SELECT "+column_name+"" 
         sql+= " FROM "+self.schema_name+"."+table_name+""
         sql+= " WHERE arc_id = '"+arc_id+"'"
         row = self.dao.get_row(sql)
-        print row
+    
         
         
         if row[0] != 'VIRTUAL': 

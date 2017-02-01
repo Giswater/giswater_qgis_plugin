@@ -3370,7 +3370,10 @@
         <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
         <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
     </message>
-   
+    <message>
+        <source>Any table has been selected</source>
+        <translation>Any table has been selected</translation>
+    </message>   
 
 
 </context>

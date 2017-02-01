@@ -42,7 +42,7 @@ class SnappingConfigManager():
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man      
-
+ 
 
     def getSnappingOptions(self):
         ''' Function that collects all the snapping options and put it in an array '''

@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>60</y>
+     <y>50</y>
      <width>231</width>
      <height>17</height>
     </rect>
@@ -56,7 +56,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>90</y>
+     <y>80</y>
      <width>221</width>
      <height>17</height>
     </rect>
@@ -69,7 +69,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>120</y>
+     <y>110</y>
      <width>241</width>
      <height>17</height>
     </rect>
@@ -82,7 +82,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>170</y>
+     <y>180</y>
      <width>241</width>
      <height>17</height>
     </rect>
@@ -95,7 +95,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>30</y>
+     <y>20</y>
      <width>251</width>
      <height>17</height>
     </rect>
@@ -104,16 +104,20 @@
     <string>     Node orphan identifier</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="check_topology_repair">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>140</y>
+     <width>241</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>     Node topology review</string>
+   </property>
+  </widget>
  </widget>
- <tabstops>
-  <tabstop>check_node_orphan</tabstop>
-  <tabstop>check_node_duplicated</tabstop>
-  <tabstop>check_connec_duplicated</tabstop>
-  <tabstop>check_arc_same_startend</tabstop>
-  <tabstop>check_node_sink</tabstop>
-  <tabstop>btn_accept</tabstop>
-  <tabstop>btn_cancel</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -127,7 +127,7 @@ class DeleteNodeMapTool(ParentMapTool):
                 status = self.controller.execute_sql(sql)
                 if status:
                     message = "Node deleted successfully"
-                    self.controller.show_warning(message, context_name='ui_message' )  
+                    self.controller.show_info(message, context_name='ui_message' )  
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refreshAllLayers()
