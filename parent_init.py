@@ -233,25 +233,30 @@ class ParentDialog(object):
             return
         
         inf_text = ""
-        list_id = ""
+        list_doc_id = ""
         row_index = ""
+        list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = widget.model().record(row).value("doc_id")
-            if id_ == None:
-                id_ = widget.model().record(row).value("element_id")
-            inf_text+= str(id_)+", "
-            list_id = list_id+str(id_)+", "
+            doc_id_ = widget.model().record(row).value("doc_id")
+            id_ = widget.model().record(row).value("id")
+            if doc_id_ == None:
+                doc_id_ = widget.model().record(row).value("element_id")
+            inf_text += str(doc_id_)+", "
+            list_id += str(id_)+", "
+            list_doc_id = list_doc_id+str(doc_id_)+", "
             row_index += str(row+1)+", "
             
         row_index = row_index[:-2]
         inf_text = inf_text[:-2]
+        list_doc_id = list_doc_id[:-2]
         list_id = list_id[:-2]
-        
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_id)
+  
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_doc_id)
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
+            print sql
             self.controller.execute_sql(sql)
             widget.model().select()
  
