@@ -86,22 +86,26 @@ class SnappingConfigManager():
     def snapToArc(self):
         ''' Set snapping to Arc '''
         QgsProject.instance().setSnapSettingsForLayer(self.layer_arc.id(), True, 2, 2, 1.0, False)
+        QgsProject.instance().blockSignals(False)
 
 
     def snapToNode(self):
         ''' Set snapping to Node '''
         QgsProject.instance().setSnapSettingsForLayer(self.layer_node.id(), True, 0, 2, 1.0, False)
+        QgsProject.instance().blockSignals(False)
 
 
     def snapToConnec(self):
         ''' Set snapping to Connec '''
         QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
-
+        QgsProject.instance().blockSignals(False)
+        
 
     def snapToLayer(self, Layer):
         ''' Set snapping to Layer '''
         QgsProject.instance().setSnapSettingsForLayer(Layer.id(), True, 2, 2, 1.0, False)
-
+        QgsProject.instance().blockSignals(False)
+        
 
     def applySnappingOptions(self, snappingsOptions):
         ''' Function that restores the previous snapping '''

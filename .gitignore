@@ -43,3 +43,4 @@ sdist/
 develop-eggs/
 .installed.cfg
 i18n/lrelease.exe
+dao/controller.py
