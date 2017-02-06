@@ -126,13 +126,19 @@ class PgDao():
     
     
     def check_table(self, schemaname, tablename):
-        ''' Check if selected table exists in selected schema '''        
+        ''' Check if selected table exists in selected schema '''    
+        print "from dao check table "
         exists = True
-        sql = "SELECT * FROM pg_tables"
-        sql+= " WHERE schemaname = '"+schemaname+"' AND tablename = '"+tablename+"'"    
+        #sql = "SELECT * FROM pg_tables"
+        #sql+= " WHERE schemaname = '"+schemaname+"' AND tablename = '"+tablename+"'"    
+
+        sql = "SELECT EXISTS (SELECT * FROM information_schema.tables WHERE table_schema = '"+schemaname+"' AND table_name = '"+tablename+"')"
+        print sql
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
+        print exists
+        
         return exists         
     
     

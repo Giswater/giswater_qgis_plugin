@@ -24,6 +24,9 @@ from PyQt4.QtGui import QCursor
 
 from snapping_utils import SnappingConfigManager
 
+import sys
+
+
 
 class ParentMapTool(QgsMapTool):
 
@@ -47,6 +50,9 @@ class ParentMapTool(QgsMapTool):
         self.schema_name = None        
         self.controller = None        
         self.dao = None 
+        
+        reload(sys)
+        sys.setdefaultencoding('utf-8')   #@UndefinedVariable   
         
         # Call superclass constructor and set current action        
         QgsMapTool.__init__(self, self.canvas)

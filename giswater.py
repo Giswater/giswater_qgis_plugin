@@ -30,6 +30,8 @@ from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
 from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
 
+from project_check import ProjectCheck
+
 from xml.dom import minidom
 
 
@@ -72,8 +74,7 @@ class Giswater(QObject):
         self.translator = QTranslator()
         self.translator.load(locale_path)
         QCoreApplication.installTranslator(self.translator)
-         
-        
+            
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         if not os.path.exists(setting_file):
@@ -105,13 +106,17 @@ class Giswater(QObject):
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
+        
+        self.project_check = ProjectCheck(self.iface, self.settings, self.controller, self.plugin_dir)
         self.set_signals()
- 
                
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
-        self.legend.currentLayerChanged.connect(self.current_layer_changed)       
+        self.legend.currentLayerChanged.connect(self.current_layer_changed) 
+        print "giswater function set signal"
+        self.project_check.check_layers()
+             
         
   
     def tr(self, message):
@@ -221,7 +226,7 @@ class Giswater(QObject):
             # If this action has an associated map tool, add this to dictionary of available map_tools
             if map_tool:
                 self.map_tools[function_name] = map_tool
-                print self.map_tools[function_name]
+                #print self.map_tools[function_name]
         
         return action         
 
@@ -461,8 +466,7 @@ class Giswater(QObject):
         except:
             pass                  
 
-                            
-        
+                          
     def project_read(self): 
         ''' Function executed when a user opens a QGIS project (*.qgs) '''
         
@@ -472,7 +476,6 @@ class Giswater(QObject):
         # Hide all toolbars
         self.hide_toolbars()
 
-        
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
             
@@ -481,21 +484,15 @@ class Giswater(QObject):
         
         # Initialize variables
         self.layer_arc = None
-        #self.layer_arc_man_UD = [None for i in range(4)]
-        #self.layer_arc_man_WS = [None for i in range(1)]
         self.layer_arc_man_UD = []
         self.layer_arc_man_WS = []
 
         self.layer_node = None
-        #self.layer_node_man_UD = [None for i in range(10)]
-        #self.layer_node_man_WS = [None for i in range(11)]
         self.layer_node_man_UD = []
         self.layer_node_man_WS = []
         self.layer_valve = None
 
         self.layer_connec = None
-        #self.layer_connec_man_UD = [None for i in range(1)]
-        #self.layer_connec_man_WS = [None for i in range(4)]
         self.layer_connec_man_UD = []
         self.layer_connec_man_WS = []
 
@@ -650,9 +647,7 @@ class Giswater(QObject):
         self.search_project_type()
                                         
         self.controller.set_actions(self.actions)
-         
-        # Set layer custom UI form and init function  
-        
+
         # Set layer custom UI form and init function   
         if self.load_custom_forms:
             
@@ -720,12 +715,12 @@ class Giswater(QObject):
         self.set_map_tool('mg_flow_trace')
         self.set_map_tool('mg_flow_exit')
         self.set_map_tool('mg_connec_tool')
+        self.set_map_tool('mg_analytics')
         self.set_map_tool('mg_extract_raster_value')
 
         # Set SearchPlus object
         self.set_search_plus()
         
-
         #self.custom_enable_actions()
         
         # Delete python compiled files
@@ -742,7 +737,7 @@ class Giswater(QObject):
         name_init = self.mg.project_type+'_'+name+'_init.py'
         name_function = 'formOpen'
         file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir, name_init)                     
+        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
         layer.editFormConfig().setUiForm(file_ui) 
         layer.editFormConfig().setInitCodeSource(1)
         layer.editFormConfig().setInitFilePath(file_init)           
@@ -759,27 +754,19 @@ class Giswater(QObject):
             map_tool = self.map_tools[map_tool_name]
             print map_tool
             if self.mg.project_type == 'ws':
-                print "project WS"
-                print self.mg.project_type
-                print self.layer_node_man_WS
                 map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
                 map_tool.set_controller(self.controller)
-                print "map tools WS"
-                print map_tool
+
             else:
-                print self.mg.project_type
                 map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
                 map_tool.set_controller(self.controller)
-                print "UD map tools"
-                print map_tool
-                print self.layer_node_man_UD
+
             if map_tool_name == 'mg_extract_raster_value':
                 map_tool.set_config_action(self.actions['99'])                
         else:
             print "key not found: "+map_tool_name
             
-
-            
+       
     def set_search_plus(self):
         ''' Set SearchPlus object '''
         

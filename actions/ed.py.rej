@@ -1,0 +1,15 @@
+diff a/actions/ed.py b/actions/ed.py	(rejected hunks)
+@@ -449,12 +449,8 @@
+         #layer_source = self.controller.get_layer_source(self.layer)
+         # Get schema and table name of selected layer       
+         layer_source = self.controller.get_layer_source(self.layer)
+-        print "layer source"
+-        print layer_source
++
+         uri_table = layer_source['table'] 
+-        print "uri_table"
+-        print uri_table
+-          
+ 
+         #uri_table = layer_source['table']
+         #uri_table = layer_source[1]

@@ -40,7 +40,10 @@ class ParentDialog(object):
         self.context_name = "ws_parent"    
         self.iface = iface    
         self.init_config()     
-        self.set_signals()        
+        self.set_signals()     
+        
+        reload(sys)
+        sys.setdefaultencoding('utf-8')   #@UndefinedVariable   
     
         
     def init_config(self):    
