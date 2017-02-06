@@ -10,14 +10,14 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of inp_options
 -- ----------------------------
  
-INSERT INTO "inp_options" VALUES ('CMS', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2001', '00:00:00', '01/01/2001', '05:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', '10', '00:15:00', '00:05:00', '01:00:00', '00:00:02', null, null, 'NONE', 'BOTH', '0', '0', 'YES', null, '0','0','5','5');
+INSERT INTO inp_options VALUES ('CMS', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'NO', 'NO', 'NO', 'NO', '01/01/2017', '00:00:00', '01/02/2017', '00:00:00', '01/01/2001', '00:00:00', '01/01', '12/31', 10, '00:05:00', '00:05:00', '01:00:00', '00:00:02', NULL, NULL, 'NONE', 'BOTH', 0.000000, 0.000000, 'YES', NULL, 0, 0.0000, 5, 5);
 
 
 -- ----------------------------
 -- Records of inp_report
 -- ----------------------------
  
-INSERT INTO "inp_report" VALUES ('YES', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'ALL');
+INSERT INTO inp_report VALUES ('YES', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'ALL');
 
 
 -- ----------------------------

@@ -31,21 +31,24 @@ INSERT INTO node_type VALUES ('NETGULLY', 'NETGULLY', 'JUNCTION', 'man_netgully'
 
 
 
+
+
 -- ----------------------------
 -- Records of arc type system table
 -- ----------------------------
 
 INSERT INTO arc_type VALUES ('CONDUIT', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
-INSERT INTO arc_type VALUES ('PUMP PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
 INSERT INTO arc_type VALUES ('SIPHON', 'SIPHON', 'CONDUIT', 'man_siphon', 'inp_conduit', 'om_visit_x_arc');
 INSERT INTO arc_type VALUES ('WACCEL', 'WACCEL', 'CONDUIT', 'man_waccel', 'inp_conduit', 'om_visit_x_arc');
 INSERT INTO arc_type VALUES ('VARC', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', 'om_visit_x_arc');
+INSERT INTO arc_type VALUES ('PUMP PIPE', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', 'om_visit_x_arc');
+
 
 
 -- ----------------------------
 -- Records of connec_type
 -- ----------------------------
-INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec' ,'om_visit_x_connec');
+INSERT INTO connec_type VALUES ('CONNEC', 'CONNEC', 'man_connec', 'om_visit_x_connec');
 
 
 

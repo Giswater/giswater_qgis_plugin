@@ -29,7 +29,7 @@ INSERT INTO "inp_selector_sector" VALUES ('sector_01');
 -- ----------------------------
 -- Default values of rpt selectors
 -- ----------------------------
-INSERT INTO rpt_selector_result VALUES (1, 'ud_sample', 'postgres');
-INSERT INTO rpt_selector_compare VALUES (1, 'ud_sample_hy', 'postgres');
+INSERT INTO rpt_selector_result VALUES (1, 't5_1h_5m', 'postgres');
+INSERT INTO rpt_selector_compare VALUES (1, 't5_1h_5m_plan', 'postgres');
 SELECT pg_catalog.setval('"SCHEMA_NAME".rpt_selector_result_id_seq', 1, true);
 

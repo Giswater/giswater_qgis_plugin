@@ -59,14 +59,12 @@ INSERT INTO price_compost VALUES ('A_PVC_DN80', 'm', 'PVC sewer pipe with nomina
 INSERT INTO price_compost VALUES ('A_PVC_DN20', 'm', 'PVC sewer pipe with nominal diameter of 200mm', 'PVC sewer pipe with nominal diameter of 200mm with helix form and rigid profile strengthen on the outside, self-supporting, elastic join with polyurethane adhesive putty and located on the ditch bottom.', NULL);
 INSERT INTO price_compost VALUES ('S_EXC', 'm3', 'Excavation of trench up to 2 m wide and up to 4 meters deep', 'Excavation of trench up to 2 m wide and up to 4 meters deep in compact ground with backhoe and large mechanical load of excavated material', NULL);
 INSERT INTO price_compost VALUES ('SECURITY_HEALTH', 'pa', 'Health and safety of works', 'Plan for the implementation of health and safety throughout the works according to the program and instructions of project management.', 0.0300);
-INSERT INTO price_compost VALUES ('PROTEC_SERVIS', 'pa', 'Protection of extsting services', 'Location and protection of all existing services that may be affected by the works.', 0.0500);
 INSERT INTO price_compost VALUES ('S_TRANS', 'm3', 'Transport of waste to authorized waste management facility', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loading machine, with a distance of more than 15 and up to 20 km', NULL);
 INSERT INTO price_compost VALUES ('N_PRD100-H160', 'u', 'Circular manhole with diameter of 100cm, 1,6m deep', 'Circular manhole with diameter of 100cm, 1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', NULL);
 INSERT INTO price_compost VALUES ('N_PRD100-H280', 'u', 'Circular manhole with diameter of 100cm, 2,8m deep', 'Circular manhole with diameter of 100cm, 2,8m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', NULL);
 INSERT INTO price_compost VALUES ('N_PRD80-H160', 'u', 'Circular manhole with diameter of 80cm, 1,6m deep', 'Circular manhole with diameter of 80cm, 1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', NULL);
 INSERT INTO price_compost VALUES ('N_PRD80-H280', 'u', 'Circular manhole with diameter of 80cm, 2,8m deep', 'Circular manhole with diameter of 80cm, 2,8m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ100-H160', 'u', 'Rectangle manhole with dimensions of 100x100cm ,1,6m deep', 'Rectangle manhole with dimensions of 100x100cm ,1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_CH300x250-H300', 'm2', 'Rectangle chamber with dimensions of 300x250m and 3m deep', 'Rectangle chamber with dimensions of 300x250m and 3m deep', 2900.0000);
 INSERT INTO price_compost VALUES ('A_CON_R150', 'm', 'Rectangle concrete sewer pipe with with dimensions 1.50x1.50x1.00m', 'Rectangle concrete sewer pipe with dimensions 1.50x1.50x1.00m, assembled, placed on a settlement layer of concrete, joined by cement mortar and protected with concrete.', 360.0000);
@@ -74,26 +72,22 @@ INSERT INTO price_compost VALUES ('A_CON_R200', 'm', 'Rectangle concrete sewer p
 INSERT INTO price_compost VALUES ('S_REB', 'm3', 'Filling and bottom of ditch of more than 1.5 and up to 2 m', 'Filling and compact of ditch of more than 1.5 and up to 2 m, with selected material from the excavation itself in thick, batch of up to 25 cm, using vibrating roller to compact with 95% compaction PM.', NULL);
 INSERT INTO price_compost VALUES ('S_REP', 'm3', 'Level and compact of ditch soil', 'Level and compact of ditch soil of more than 0,6 and less than 1,5m, with compact of 90% PM.', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ100-H280', 'u', 'Rectangle manhole with dimensions of 100x100cm ,2,8m deep', 'Rectangle manhole with dimensions of 100x100cm ,2,8m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ150-H250', 'u', 'Rectangle manhole with dimensions of 150x150cm ,2,5m deep', 'Rectangle manhole with dimensions of 150x150cm ,2,5m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ200-H250', 'u', 'Rectangle manhole with dimensions of 200x200cm ,2,5m deep', 'Rectangle manhole with dimensions of 200x200cm ,2,5m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ60-H160', 'u', 'Rectangle manhole with dimensions of 60x60cm ,1,6m deep', 'Rectangle manhole with dimensions of 60x60cm ,1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ80-H160', 'u', 'Rectangle manhole with dimensions of 80x80cm ,1,6m deep', 'Rectangle manhole with dimensions of 80x80cm ,1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_PRQ80-H280', 'u', 'Rectangle manhole with dimensions of 80x80cm ,2,8m deep', 'Rectangle manhole with dimensions of 80x80cm ,2,8m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.
-
 ', NULL);
 INSERT INTO price_compost VALUES ('N_STR500x350x475', 'u', 'Construction of retention tank of rainwater of dimensions 500x350x475cm.', 'Construction of retention tank of rainwater of dimensions 500x350x475cm.', 106000.0000);
 INSERT INTO price_compost VALUES ('N_VAL_01', 'u', 'Check valve of PVC, with diameter of 400mm.', 'Check valve of PVC, with diameter of 400mm,with polypropylene clapper', 1447.5100);
 INSERT INTO price_compost VALUES ('N_JUMP100', 'm', 'Circular jump manhole with diameter of 100cm, 1,6m deep', 'Circular jump manhole with diameter of 100cm, 1,6m deep, with the base of sett over concrete layer HM-20P/20/I, walls of perforated brick of 11,5cm thick,  plastered and slid inside with mixed mortar 1:0.5:4. Iron cover support and manhole''s cover with diameter of 70cm, and iron steps of 200x200x200 mm.', 330.0000);
+INSERT INTO price_compost VALUES ('PROTECT_SERVICES', 'pa', 'Protection of extsting services', 'Location and protection of all existing services that may be affected by the works.', 0.0500);
+INSERT INTO price_compost VALUES ('UNEXPECTED', 'pa', 'Unexpected work', 'Implementation of the unexpected work units in the project application with the same price.', 0.0700);
 
 
 INSERT INTO price_compost_value VALUES (1, 'A_PRE_PE_DN20', 'GFB1L425', 1.0000);
@@ -130,4 +124,7 @@ INSERT INTO price_compost_value VALUES (23, 'S_EXC', 'F2225243', 1.0000);
 INSERT INTO price_compost_value VALUES (24, 'S_REB', 'F228FB0F', 1.0000);
 INSERT INTO price_compost_value VALUES (25, 'S_REP', 'F227A00A', 1.0000);
 INSERT INTO price_compost_value VALUES (26, 'S_TRANS', 'F2R5426A', 1.0000);
+
+
+SELECT pg_catalog.setval('price_compost_value_seq', 38, false);
 
