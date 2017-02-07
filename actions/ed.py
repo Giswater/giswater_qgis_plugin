@@ -367,6 +367,7 @@ class Ed():
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc "
         row = self.dao.get_rows(sql)
+        print row
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -449,12 +450,8 @@ class Ed():
         #layer_source = self.controller.get_layer_source(self.layer)
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
-        print "layer source"
-        print layer_source
+
         uri_table = layer_source['table'] 
-        print "uri_table"
-        print uri_table
-          
 
         #uri_table = layer_source['table']
         #uri_table = layer_source[1]
@@ -611,12 +608,14 @@ class Ed():
                 sql = "UPDATE "+self.schema_name+".doc "
                 sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"',observ = '"+observ+"', path = '"+path+"'"
                 sql+= " WHERE id = '"+doc_id+"'" 
+                print sql
                 self.controller.execute_sql(sql) 
             else:
                 self.close_dialog(self.dlg) 
         else:
             sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
             sql+= " VALUES ('"+doc_id+"', '"+doc_type+"', '"+path+"', '"+observ+"', '"+tagcat_id+"')"
+            print sql
             status = self.controller.execute_sql(sql) 
             if not status:
                 message = "Error inserting element in table, you need to review data"

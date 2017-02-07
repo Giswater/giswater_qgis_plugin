@@ -145,6 +145,7 @@ class DaoController():
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
         self.show_message(text, 1, duration, context_name)
      
+     
     def show_warning_detail(self, text, detail_text, context_name=None):
         ''' Show warning message with a button to show more details '''  
         inf_text = "Press 'Show Me' button to get more details..."
@@ -237,7 +238,10 @@ class DaoController():
     def execute_sql(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
+        print "frpm controller"
+        print sql
         result = self.dao.execute_sql(sql)
+        print result
         if not result:
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
             return False

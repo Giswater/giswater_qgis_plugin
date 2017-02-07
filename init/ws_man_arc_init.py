@@ -85,7 +85,7 @@ class ManArcDialog(ParentDialog):
         # self.layer.startEditing()
         
         # Manage tab visibility
-        self.set_tabs_visibility(4)  
+        #self.set_tabs_visibility(4)  
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)

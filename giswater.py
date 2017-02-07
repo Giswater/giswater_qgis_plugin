@@ -30,8 +30,6 @@ from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
 from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
 
-from project_check import ProjectCheck
-
 from xml.dom import minidom
 
 
@@ -106,18 +104,13 @@ class Giswater(QObject):
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
-        
-        self.project_check = ProjectCheck(self.iface, self.settings, self.controller, self.plugin_dir)
         self.set_signals()
                
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
         self.legend.currentLayerChanged.connect(self.current_layer_changed) 
-        print "giswater function set signal"
-        self.project_check.check_layers()
-             
-        
+
   
     def tr(self, message):
         if self.controller:
@@ -612,13 +605,32 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-                    
-        # Check if table 'version' exists
+             
         
+        # Check if table 'version' and man_junction exists
+        self.table_junction = 'man_junction'
+        self.version = 'version'
+        schema_name =  self.controller.schema_name 
+        
+        exists = self.dao.check_table(schema_name,self.table_junction)
+
+        if self.layer_version is None and exists == False:
+            pass
+        elif self.layer_version is not None and exists == True:
+
+            pass
+        else:
+            message = "To use this project with Giswater layers man_junction and version must exist. Please check your project !"
+            self.controller.show_warning(message)
+            return
+        
+        '''
         if self.layer_version is None:
+            exist_layer_version = False
+          
             self.controller.show_warning("Layer version not found")
             return
-                 
+        '''
         # Get schema name from table 'version'
         # Check if really exists
         layer_source = self.controller.get_layer_source(self.layer_version)  
@@ -1023,4 +1035,4 @@ class Giswater(QObject):
             sql+= " VALUES ('"+qgis_layer_id+"','"+cat_table_id+"', '"+layer_alias+"')"
             self.controller.execute_sql(sql)  
             '''
-        
+   

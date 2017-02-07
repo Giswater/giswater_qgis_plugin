@@ -839,7 +839,8 @@ class Mg():
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
         if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name 
+
+            sql = "DELETE FROM "+self.schema_name+"."+table_name
             sql+= " WHERE id IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()

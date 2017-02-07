@@ -80,7 +80,9 @@ class MoveNodeMapTool(ParentMapTool):
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
         print sql
+        print "status"
         status = self.controller.execute_sql(sql) 
+        print status
         if status:
             # Execute SQL function and show result to the user
             function_name = "gw_fct_node2arc"
@@ -288,7 +290,9 @@ class MoveNodeMapTool(ParentMapTool):
 
                         # Get selected feature (at this moment it will have one and only one)
                         feature = self.snappFeat
+                        print feature
                         node_id = feature.attribute('node_id')
+                        print node_id
 
                         # Move selected node to the released point
                         self.move_node(node_id, point)
