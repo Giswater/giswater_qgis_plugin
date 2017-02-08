@@ -27,7 +27,6 @@ DROP TABLE IF EXISTS db_cat_table CASCADE;
 CREATE TABLE db_cat_table (
     id text NOT NULL PRIMARY KEY,
     context text,
-    db_cat_clientlayer_id integer,
     description text
 );
 
