@@ -33,6 +33,6 @@ CREATE OR REPLACE VIEW gw_saa.v_rtc_hydrometer AS
      LEFT JOIN gw_saa.ext_client_hydrometer ON ext_client_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
      LEFT JOIN gw_saa.ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
      LEFT JOIN gw_saa.ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
-     JOIN gw_saa.ext_hydrometer_category ON ext_hydrometer_category.id = ext_rtc_hydrometer.hydrometer_category::text
+     LEFT JOIN gw_saa.ext_hydrometer_category ON ext_hydrometer_category.id = ext_rtc_hydrometer.hydrometer_category::text
      JOIN gw_saa.rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = rtc_hydrometer.hydrometer_id::text
      JOIN gw_saa.connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text;
