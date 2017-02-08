@@ -288,7 +288,7 @@ class ParentDialog(object):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
 
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", row_index)
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_id)
         table_name = '"rtc_hydrometer_x_connec"'
         table_name2 = '"rtc_hydrometer"'
         if answer:
