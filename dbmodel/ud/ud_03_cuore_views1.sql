@@ -100,7 +100,8 @@ SELECT v_arc_x_node1.arc_id,
     v_arc_x_node1.r1,
     v_arc_x_node2.r2,
         CASE
-            WHEN ((1::numeric * (v_arc_x_node1.elev1 + v_arc_x_node1.z1 - (v_arc_x_node2.elev2 + v_arc_x_node2.z2)))::double precision / st_length(arc.the_geom)) > 1::double precision THEN NULL::numeric(6,4)
+			WHEN (st_length(arc.the_geom) = 0) THEN NULL::numeric(6,4)	
+            WHEN (1::numeric * (v_arc_x_node1.elev1 + v_arc_x_node1.z1 - (v_arc_x_node2.elev2 + v_arc_x_node2.z2)))::double precision / st_length(arc.the_geom) > 1::double precision THEN NULL::numeric(6,4)
             ELSE ((1::numeric * (v_arc_x_node1.elev1 + v_arc_x_node1.z1 - (v_arc_x_node2.elev2 + v_arc_x_node2.z2)))::double precision / st_length(arc.the_geom))::numeric(6,4)
         END AS slope,
     arc.state,
