@@ -52,6 +52,7 @@ INSERT INTO price_simple VALUES ('GF3D15B5', 'u', 'GF3D15B5', NULL, 103.0900, NU
 
 INSERT INTO price_compost VALUES ('S_EXC', 'm3', 'Excavation of trench up to 2 m wide and up to 4 meters deep', 'Excavation of trench up to 2 m wide and up to 4 meters deep in compact ground with backhoe and large mechanical load of excavated material', NULL);
 INSERT INTO price_compost VALUES ('S_NULL', 'm3', 'Filling pipe material', 'Filling pipe material', 0.0000);
+INSERT INTO price_compost VALUES ('S_TRENCH' 'm3', 'Trenchlining of excavation', 'Trenchlining of excavation', 30.0000);
 INSERT INTO price_compost VALUES ('S_REB', 'm3', 'Filling and bottom of ditch of more than 1.5 and up to 2 m', 'Filling and compact of ditch of more than 1.5 and up to 2 m, with selected material from the excavation itself in thick, batch of up to 25 cm, using vibrating roller to compact with 95% compaction PM.', NULL);
 INSERT INTO price_compost VALUES ('S_REP', 'm3', 'Level and compact of ditch soil', 'Level and compact of ditch soil of more than 0,6 and less than 1,5m, with compact of 90% PM.', NULL);
 INSERT INTO price_compost VALUES ('S_TRANS', 'm3', 'Transport of waste to authorized waste management facility', 'Transport of waste to authorized waste management facility, with 12 t truck and waiting time for loading machine, with a distance of more than 15 and up to 20 km', NULL);

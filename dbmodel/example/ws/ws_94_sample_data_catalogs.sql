@@ -166,7 +166,7 @@ INSERT INTO cat_owner VALUES ('OWNER NO DATA', NULL, NULL, NULL);
 -- Records of cat_soil
 -- ----------------------------
 INSERT INTO cat_soil VALUES ('SOIL NO DATA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO cat_soil VALUES ('SOIL_01', 'Sòl estandard de plana d''inundació', NULL, NULL, NULL, 5.00, 0.20, 0.00, 'S_EXC', 'S_REB', 'S_TRANS', 'S_NULL');
+INSERT INTO cat_soil VALUES ('SOIL_01', 'Sòl estandard de plana d''inundació', NULL, NULL, NULL, 5.00, 0.20, 0.00, 'S_EXC', 'S_REB', 'S_TRANS', 'S_TRENCH');
 
 -- ----------------------------
 -- Records of cat_work
