@@ -7,6 +7,22 @@ This version of Giswater is provided by Giswater Association
 
 -- EXTERNALS
 
+CREATE VIEW gw_saa.ext_rtc_scada_x_value as
+SELECT 
+pea_id ,
+    lei_stamp  ,
+    msetor_id ,
+    p1_mca  ,
+    p2_mca  ,
+    p3_mca  ,
+    q_m3h  ,
+    tot1_m3  ,
+    q1m_m3h ,
+    tot_dia_m3 
+FROM  gcd_online_msetor;
+
+
+
 CREATE OR REPLACE VIEW gw_saa.ext_hydrometer_category AS 
  SELECT vw_daecom_categorias.cod_categoria::text AS id,
     vw_daecom_categorias.categoria AS observ

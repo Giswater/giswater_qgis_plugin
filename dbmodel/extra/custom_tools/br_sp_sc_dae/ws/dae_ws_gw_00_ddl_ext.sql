@@ -1,4 +1,18 @@
-﻿CREATE  TABLE vw_daecom_cadastro
+﻿CREATE FOREIGN TABLE gcd_online_msetor
+   (pea_id integer NOT NULL,
+    lei_stamp timestamp without time zone ,
+    msetor_id character varying(30) ,
+    p1_mca real ,
+    p2_mca real ,
+    p3_mca real ,
+    q_m3h real ,
+    tot1_m3 double precision ,
+    q1m_m3h real ,
+    tot_dia_m3 double precision );
+
+
+
+CREATE  TABLE vw_daecom_cadastro
   (cod_dae integer NOT NULL,
     inscr_iptu character varying(10) ,
     cod_categoria integer ,

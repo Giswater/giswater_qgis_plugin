@@ -7,6 +7,27 @@ This version of Giswater is provided by Giswater Association
 
 -- GISWATER MODIFIED
 
+
+
+CREATE OR REPLACE VIEW gw_saa.v_rtc_scada_value AS 
+ SELECT 
+    rtc_scada_node.node_id,
+    pea_id ,
+    lei_stamp  ,
+    msetor_id ,
+    p1_mca  ,
+    p2_mca  ,
+    p3_mca  ,
+    q_m3h  ,
+    tot1_m3  ,
+    q1m_m3h ,
+    tot_dia_m3 
+   FROM gw_saa.rtc_scada_node
+   JOIN gw_saa.ext_rtc_scada_x_value ON ext_rtc_scada_x_value.pea_id::text = rtc_scada_node.scada_id::text;
+
+
+
+
 DROP VIEW if exists gw_saa.v_rtc_hydrometer;
 CREATE OR REPLACE VIEW gw_saa.v_rtc_hydrometer AS 
  SELECT rtc_hydrometer.hydrometer_id,
