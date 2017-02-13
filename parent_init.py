@@ -20,7 +20,7 @@ import os.path
 import sys  
 
 import utils_giswater
-from controller import DaoController
+from dao.controller import DaoController
 
 import urlparse
 import webbrowser
@@ -40,10 +40,11 @@ class ParentDialog(object):
         self.context_name = "ws_parent"    
         self.iface = iface    
         self.init_config()     
-        self.set_signals()     
+        self.set_signals()    
         
+        # Set default encoding 
         reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable   
+        sys.setdefaultencoding('utf-8')    
     
         
     def init_config(self):    
@@ -53,7 +54,6 @@ class ParentDialog(object):
         self.plugin_dir = os.path.abspath(cur_path)
         self.plugin_name = os.path.basename(self.plugin_dir) 
 
-        
         # Get config file
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
         if not os.path.isfile(setting_file):
@@ -215,7 +215,6 @@ class ParentDialog(object):
         model.setFilter(filter_)
 
         model.select()         
-        
 
         # Check for errors
         if model.lastError().isValid():
@@ -444,7 +443,6 @@ class ParentDialog(object):
         inf_text = inf_text[:-2]
         self.path = inf_text 
         
-
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
@@ -854,12 +852,14 @@ class ParentDialog(object):
         sql+= " FROM "+self.schema_name+"."+table_name+""
         sql+= " WHERE arc_id = '"+arc_id+"'"
         row = self.dao.get_row(sql)
-    
+
         
+        if row is not None:
+            if row[0] != 'VIRTUAL': 
+                utils_giswater.setImage("label_image_ud_shape", row[0])
+            # If selected table is Virtual hide tab cost
+            else :
+                self.tab_main.removeTab(4)
         
-        if row[0] != 'VIRTUAL': 
-            utils_giswater.setImage("label_image_ud_shape", row[0])
-        # If selected table is Virtual hide tab cost
-        else :
-            self.tab_main.removeTab(4)
+
         

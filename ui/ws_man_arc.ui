@@ -407,7 +407,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -423,7 +423,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
@@ -2079,7 +2079,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_8">
       <property name="geometry">
@@ -4450,7 +4450,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>ws_shape.png</pixmap>
+        <pixmap>../png/ws_shape.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>

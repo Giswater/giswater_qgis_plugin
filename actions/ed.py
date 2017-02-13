@@ -26,9 +26,10 @@ from ..ui.add_file import Add_file          # @UnresolvedImport
 
 class Ed():
    
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self, iface, settings, controller, plugin_dir):     
+        ''' Class to control Management toolbar actions '''  
         
-        ''' Class to control Management toolbar actions '''    
+        # Initialize instance attributes  
         self.iface = iface
         self.settings = settings
         self.controller = controller
@@ -54,11 +55,13 @@ class Ed():
         
         self.table_version = self.settings.value('db/table_version', 'version') 
         
+        # Tables connec_group
         self.table_wjoin = self.settings.value('db/table_wjoin', 'v_edit_man_wjoin')
         self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
         self.table_greentap = self.settings.value('db/table_greentap', 'v_edit_man_greentap')
         self.table_fountain = self.settings.value('db/table_fountain', 'v_edit_man_fountain')
         
+        # Tables node_group
         self.table_tank = self.settings.value('db/table_tank', 'v_edit_man_tank')
         self.table_pump = self.settings.value('db/table_pump', 'v_edit_man_pump')
         self.table_source = self.settings.value('db/table_source', 'v_edit_man_source')
@@ -70,6 +73,7 @@ class Ed():
         self.table_valve = self.settings.value('db/table_valve', 'v_edit_man_valve')
         self.table_manhole = self.settings.value('db/table_manhole', 'v_edit_man_manhole')
         
+        # Tables arc_group
         self.table_varc = self.settings.value('db/table_varc', 'v_edit_man_varc')  
         self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
         self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')      
@@ -90,6 +94,7 @@ class Ed():
                
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
+        
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
@@ -105,7 +110,6 @@ class Ed():
         self.controller.check_actions(False)
         self.controller.check_action(True, 32)
         
-        
         try:
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
@@ -116,10 +120,10 @@ class Ed():
     def ed_check(self):
         ''' Initial check for buttons 33 and 34 '''
         
-        
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 32)
+        
         # Check if at least one node is checked          
         self.layer = self.iface.activeLayer()  
         if self.layer is None:
@@ -138,6 +142,7 @@ class Ed():
     
     def populate_combo(self, widget, table_name, field_name="id"): 
         ''' Executes query and fill combo box ''' 
+        
         sql = "SELECT "+field_name+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field_name
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
@@ -147,6 +152,7 @@ class Ed():
             
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
+        
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 36)        
@@ -205,7 +211,6 @@ class Ed():
             return
             
         # Fill combo boxes
-        
         self.populate_combo("elementcat_id", "cat_element")
         self.populate_combo("state", "value_state")
         self.populate_combo("location_type", "man_type_location")
@@ -226,7 +231,6 @@ class Ed():
             aux = row[i]
             row[i] = str(aux[0])
             
-        #self.get_date()
         model.setStringList(row)
         self.completer.setModel(model)
         
@@ -241,16 +245,18 @@ class Ed():
         ''' Get date_from and date_to from ComboBoxes
         Filter the table related on selected value
         '''
-        #self.tbl_document.setModel(self.model)
+        
+        # Get widgets
         self.date_document_from = self.dlg.findChild(QDateTimeEdit, "builtdate") 
         self.date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
         
+        # Get date
         date_from=self.date_document_from.date() 
         date_to=self.date_document_to.date() 
       
+        # Check if interval is valid
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
-        
         else :
             message="Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
@@ -278,6 +284,8 @@ class Ed():
 
     
     def ed_add_element_accept(self):
+        ''' Function for btn_accept of btn_33
+        Update or Insert values '''
            
         # Get values from dialog
         element_id = utils_giswater.getWidgetText("element_id")
@@ -301,32 +309,41 @@ class Ed():
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
+                # If data for selected element_id exist than UPDATE
                 sql = "UPDATE "+self.schema_name+".element"
                 sql+= " SET element_id = '"+element_id+"', elementcat_id= '"+elementcat_id+"',state = '"+state+"', location_type = '"+location_type+"'"
                 sql+= ", workcat_id_end= '"+workcat_id_end+"', workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
                 sql+= ", rotation= '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ= '"+observ+"',link = '"+link+"', verified = '"+verified+"'"
                 sql+= " WHERE element_id = '"+element_id+"'" 
-                self.controller.execute_sql(sql)  
+                status = self.controller.execute_sql(sql)
+                if status:
+                    # Inserting value to table_name of feature
+                    self.ed_add_to_feature("element", element_id)
+                    # Show message to user
+                    message = "Values has been updated"
+                    self.controller.show_info(message) 
+                
             else:
                 self.close_dialog(self.dlg)
         else:
+            # If data for selected element_id doesn't exist than INSERT
             sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
             sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified,workcat_id_end) "
             sql+= " VALUES ('"+element_id+"', '"+elementcat_id+"', '"+state+"', '"+location_type+"', '"
             sql+= workcat_id+"', '"+buildercat_id+"', '"+ownercat_id+"', '"+rotation+"', '"+comment+"', '"
             sql+= annotation+"','"+observ+"','"+link+"','"+verified+"','"+workcat_id_end+"')"
             status = self.controller.execute_sql(sql) 
+            if status:
+                # Inserting value to table_name of feature
+                self.ed_add_to_feature("element", element_id) 
+                # Show message to user
+                message = "Values has been updated"
+                self.controller.show_info(message)
             if not status:
                 message = "Error inserting element in table, you need to review data"
                 self.controller.show_warning(message, context_name='ui_message') 
                 return
-        
-        # Add document to selected feature
-        self.ed_add_to_feature("element", element_id)
-                
-        # Show message to user
-        message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message')
+
         self.close_dialog()
     
     
@@ -343,8 +360,7 @@ class Ed():
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         
-        #self.dlg.findChild(QPushButton, "path_doc").clicked.connect(self.open_file_dialog)
-        #self.dlg.findChild(QPushButton, "path_url").clicked.connect(self.open_web_browser)
+        # Get widgets
         self.path = self.dlg.findChild(QLineEdit, "path")
         self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser,self.path))
         self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog,self.path))
@@ -367,7 +383,6 @@ class Ed():
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc "
         row = self.dao.get_rows(sql)
-        print row
         for i in range(0,len(row)):
             aux = row[i]
             row[i] = str(aux[0])
@@ -382,50 +397,10 @@ class Ed():
         # Open the dialog
         self.dlg.exec_()
         
-        
-    def open_file_dialog(self,widget):
-        ''' Open File Dialog '''
-        
-        
-        # Set default value from QLine
-        self.file_path = utils_giswater.getWidgetText(widget)
-    
-        # Check if file exists
-        if not os.path.exists(self.file_path):
-            message = "File path doesn't exist"
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            self.file_path = self.plugin_dir
-        #else:
-        # Set default value if necessary
-        elif self.file_path == 'null': 
-            self.file_path = self.plugin_dir
-                
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_path)
-        os.chdir(folder_path)
-        msg = "Select file"
-        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
-        #self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.pdf')
-        # Set text to QLineEdit
-        widget.setText(self.file_path)     
-
-
-        
-      
-    def open_web_browser(self, widget):
-        ''' Display url using the default browser '''
-        
-        url = utils_giswater.getWidgetText(widget) 
-        if url == 'null' :
-            url = 'www.giswater.org'
-            webbrowser.open(url)
-        else :
-            webbrowser.open(url)
-        
   
     def ed_add_file_autocomplete(self): 
         ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
-
+        
         self.dlg.doc_id.setCompleter(self.completer)
         doc_id = utils_giswater.getWidgetText("doc_id") 
         
@@ -445,16 +420,9 @@ class Ed():
     def ed_add_to_feature(self, table_name, value_id):   
         ''' Add document or element to selected features '''
         
-
-        # Get schema and table name of selected layer       
-        #layer_source = self.controller.get_layer_source(self.layer)
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
-
         uri_table = layer_source['table'] 
-
-        #uri_table = layer_source['table']
-        #uri_table = layer_source[1]
 
         if uri_table is None:
             self.controller.show_warning("Error getting table name from selected layer")
@@ -565,8 +533,7 @@ class Ed():
         if self.table_outfall in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-            
-            
+                
         if self.table_varc in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
@@ -586,9 +553,10 @@ class Ed():
             elem_id = feature.attribute(field_id)
             sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
             sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
+            
             self.controller.execute_sql(sql) 
+            
                           
-        
     def ed_add_file_accept(self): 
         ''' Insert or update document. Add document to selected feature '''  
         
@@ -604,28 +572,73 @@ class Ed():
         row = self.dao.get_row(sql)
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
+            
             if answer:
+                # If document already exist than UPDATE
                 sql = "UPDATE "+self.schema_name+".doc "
                 sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"',observ = '"+observ+"', path = '"+path+"'"
                 sql+= " WHERE id = '"+doc_id+"'" 
-                print sql
-                self.controller.execute_sql(sql) 
+                status = self.controller.execute_sql(sql) 
+                if status:
+                    # Inserting value to table_name of feature
+                    self.ed_add_to_feature("doc", doc_id)
+                    # Show message to user
+                    message = "Values has been updated"
+                    self.controller.show_info(message)
             else:
+                
                 self.close_dialog(self.dlg) 
         else:
+            # If document doesnt exist than INSERT
             sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
             sql+= " VALUES ('"+doc_id+"', '"+doc_type+"', '"+path+"', '"+observ+"', '"+tagcat_id+"')"
-            print sql
-            status = self.controller.execute_sql(sql) 
+            status = self.controller.execute_sql(sql)
+            if status:
+                # Inserting value to table_name of feature
+                self.ed_add_to_feature("doc", doc_id) 
+                # Show message to user
+                message = "Values has been updated"
+                self.controller.show_info(message)
             if not status:
                 message = "Error inserting element in table, you need to review data"
                 self.controller.show_warning(message, context_name='ui_message')
                 return
-        
-        # Add document to selected feature
-        self.ed_add_to_feature("doc", doc_id)
-           
-        # Show message to user
-        message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message')
+
         self.close_dialog()  
+          
+        
+    def open_file_dialog(self,widget):
+        ''' Open File Dialog '''
+   
+        # Set default value from QLine
+        self.file_path = utils_giswater.getWidgetText(widget)
+    
+        # Check if file exists
+        if not os.path.exists(self.file_path):
+            message = "File path doesn't exist"
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            self.file_path = self.plugin_dir
+        # Set default value if necessary
+        elif self.file_path == 'null': 
+            self.file_path = self.plugin_dir
+                
+        # Get directory of that file
+        folder_path = os.path.dirname(self.file_path)
+        os.chdir(folder_path)
+        msg = "Select file"
+        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
+
+        # Set text to QLineEdit
+        widget.setText(self.file_path)     
+
+
+    def open_web_browser(self, widget):
+        ''' Display url using the default browser '''
+    
+        url = utils_giswater.getWidgetText(widget) 
+        
+        if url == 'null' :
+            url = 'www.giswater.org'
+            webbrowser.open(url)
+        else :
+            webbrowser.open(url)

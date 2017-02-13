@@ -105,6 +105,11 @@ class Giswater(QObject):
         
         # Define signals
         self.set_signals()
+        
+        # Set default encoding 
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
+        
                
     def set_signals(self): 
         ''' Define widget and event signals '''
@@ -576,9 +581,9 @@ class Giswater(QObject):
                 if 'v_edit_man_tap' == uri_table :
                     self.layer_connec_man_WS.append(cur_layer)
                     
-                
                 if self.table_arc == uri_table:
                     self.layer_arc = cur_layer
+                    
                 if 'v_edit_man_conduit' == uri_table:
                     self.layer_arc_man_UD.append(cur_layer)
                 if 'v_edit_man_siphon' == uri_table:
@@ -606,31 +611,22 @@ class Giswater(QObject):
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
              
-        
         # Check if table 'version' and man_junction exists
-        self.table_junction = 'man_junction'
-        self.version = 'version'
-        schema_name =  self.controller.schema_name 
-        
-        exists = self.dao.check_table(schema_name,self.table_junction)
+        exists = False
+        for layer in layers:
+            layer_DB = self.controller.get_layer_source_table_name(layer) 
+            if layer_DB == 'v_edit_man_junction':
+                exists = True
 
         if self.layer_version is None and exists == False:
             pass
         elif self.layer_version is not None and exists == True:
-
             pass
         else:
             message = "To use this project with Giswater layers man_junction and version must exist. Please check your project !"
             self.controller.show_warning(message)
             return
-        
-        '''
-        if self.layer_version is None:
-            exist_layer_version = False
-          
-            self.controller.show_warning("Layer version not found")
-            return
-        '''
+
         # Get schema name from table 'version'
         # Check if really exists
         layer_source = self.controller.get_layer_source(self.layer_version)  
@@ -647,7 +643,6 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
-
         # Set SRID from table node
         sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
         row = self.dao.get_row(sql)
@@ -670,7 +665,7 @@ class Giswater(QObject):
             if self.layer_arc_man_UD is not None:
                 for i in range(len(self.layer_arc_man_UD)):
                     if self.layer_arc_man_UD[i] is not None:    
-                        self.set_layer_custom_form(self.layer_arc_man_UD[1], 'man_arc')
+                        self.set_layer_custom_form(self.layer_arc_man_UD[i], 'man_arc')
                         
             if self.layer_arc_man_WS is not None: 
                 for i in range(len(self.layer_arc_man_WS)):
@@ -690,8 +685,7 @@ class Giswater(QObject):
                 for i in range(len(self.layer_node_man_WS)):
                     if self.layer_node_man_WS[i] is not None:   
                         self.set_layer_custom_form(self.layer_node_man_WS[i], 'man_node')
-                                   
-                                                          
+                                                                               
             if self.layer_connec is not None:       
                 self.set_layer_custom_form(self.layer_connec, 'connec')
                 
@@ -704,8 +698,7 @@ class Giswater(QObject):
                 for i in range(len(self.layer_connec_man_WS)):
                     if self.layer_connec_man_WS[i] is not None:  
                         self.set_layer_custom_form(self.layer_connec_man_WS[i], 'man_connec')     
-                
-                
+                 
             if self.layer_gully is not None:       
                 self.set_layer_custom_form(self.layer_gully, 'gully') 
             if self.layer_man_gully is not None:       
@@ -739,7 +732,7 @@ class Giswater(QObject):
         self.delete_pyc_files()
 
         # Create layer inventory 
-        self.layer_inventory()
+        #self.layer_inventory()
                   
                             
     def set_layer_custom_form(self, layer, name):
@@ -756,7 +749,7 @@ class Giswater(QObject):
         layer.editFormConfig().setInitFunction(name_function) 
         
         project_type = self.mg.project_type
-        self.set_fieldRelation(layer,project_type)   
+        #self.set_fieldRelation(layer,project_type)   
         
     
     def set_map_tool(self, map_tool_name):
@@ -839,7 +832,6 @@ class Giswater(QObject):
             elif self.table_tap in uri_table:  
                 setting_name = 'buttons_connec'
                 
-            
             elif self.table_tank in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_pump in uri_table:  
@@ -886,7 +878,6 @@ class Giswater(QObject):
             elif self.table_outfall in uri_table:  
                 setting_name = 'buttons_node'        
               
-            
             elif self.table_varc in uri_table:  
                 setting_name = 'buttons_arc'  
             elif self.table_siphon in uri_table:  
@@ -975,15 +966,14 @@ class Giswater(QObject):
     def set_fieldRelation(self,layer_element,project_type):
         # Parametrization of path 
         element = None
-        '''
+        
         element = layer_element.name()
    
         if project_type == 'ws':
             path = os.path.join(self.plugin_dir, 'xml','WS_valueRelation'+element+'.xml')
         elif project_type == 'ud':
             path = os.path.join(self.plugin_dir, 'xml','UD_valueRelation'+element+'.xml')
-
-        
+  
         xmldoc = minidom.parse(path)
         itemlist = xmldoc.getElementsByTagName('edittype')
         itemlist_detail = xmldoc.getElementsByTagName('widgetv2config')
@@ -1000,7 +990,6 @@ class Giswater(QObject):
                 layer_element.valueRelation(index).mKey = key 
                 layer_element.valueRelation(index).mValue = value 
             index=index+1
-        '''
         
         
     def delete_pyc_files(self):
@@ -1010,29 +999,29 @@ class Giswater(QObject):
         for f in filelist:
             os.remove(f)
             
-            
+        
     def layer_inventory(self):
         ''' Create layer inventoory '''
         
         # Layer inventory
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
+        sql = "DELETE FROM "+self.schema_name+".db_cat_clientlayer"
+        self.controller.execute_sql(sql) 
         for layer in layers:
-            sql = "DELETE FROM "+self.schema_name+".db_cat_clientlayer"
-            self.controller.execute_sql(sql) 
- 
+
             # layer_alias
             layer_alias = layer.name()
 
             # Layer_id
             qgis_layer_id = layer.id()
-            
+
             # layer name in DB
             cat_table_id = self.controller.get_layer_source_table_name(layer)
             
-            '''
             sql = "INSERT INTO "+self.schema_name+".db_cat_clientlayer (qgis_layer_id,db_cat_table_id, layer_alias)"
             sql+= " VALUES ('"+qgis_layer_id+"','"+cat_table_id+"', '"+layer_alias+"')"
             self.controller.execute_sql(sql)  
-            '''
+
+            
    

@@ -26,8 +26,6 @@ from snapping_utils import SnappingConfigManager
 
 import sys
 
-
-
 class ParentMapTool(QgsMapTool):
 
 
@@ -51,9 +49,6 @@ class ParentMapTool(QgsMapTool):
         self.controller = None        
         self.dao = None 
         
-        reload(sys)
-        sys.setdefaultencoding('utf-8')   #@UndefinedVariable   
-        
         # Call superclass constructor and set current action        
         QgsMapTool.__init__(self, self.canvas)
         self.setAction(action)
@@ -67,7 +62,11 @@ class ParentMapTool(QgsMapTool):
         self.cursor.setShape(Qt.CrossCursor)
 
         # Get default cursor
-        self.stdCursor = self.parent().cursor()        
+        self.stdCursor = self.parent().cursor()    
+        
+        # Set default encoding 
+        reload(sys)
+        sys.setdefaultencoding('utf-8')    
         
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):

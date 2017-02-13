@@ -4,12 +4,9 @@ from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommand
 from qgis.gui import QgsMessageBar
 from PyQt4.QtSql import QSqlTableModel
 
-
 import os
 import sys
 import webbrowser
-
-
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -25,17 +22,20 @@ from ..ui.file_manager import FileManager                       # @UnresolvedImp
 
 from functools import partial
 
+
 class Mg():
    
     def __init__(self, iface, settings, controller, plugin_dir):
         ''' Class to control Management toolbar actions '''  
           
+        # Initialize instance attributes
         self.iface = iface
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir       
         self.dao = self.controller.dao         
-        self.schema_name = self.controller.schema_name    
+        self.schema_name = self.controller.schema_name  
+          
         # Get files to execute giswater jar
         self.java_exe = self.settings.value('files/java_exe')          
         self.giswater_jar = self.settings.value('files/giswater_jar')          
@@ -59,7 +59,6 @@ class Mg():
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 19)
-        
         
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()     
@@ -109,7 +108,6 @@ class Mg():
             
         # Refresh map canvas
         self.iface.mapCanvas().refresh()             
-
 
 
     def mg_table_wizard(self):
@@ -429,15 +427,12 @@ class Mg():
         self.controller.execute_sql(sql)
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
         self.controller.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
-        print sql
         self.controller.execute_sql(sql)
         #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
-        print sql
         self.controller.execute_sql(sql)
 
         # Show message to user
@@ -604,7 +599,6 @@ class Mg():
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
         self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
         
-        
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
@@ -632,8 +626,7 @@ class Mg():
         self.generic_columns = self.mg_config_get_data('config')    
         self.search_plus_columns = self.mg_config_get_data('config_search_plus')    
         self.raster_columns = self.mg_config_get_data('config_extract_raster_value')    
-        
-        
+         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'config')               
         self.dlg.exec_()        
@@ -641,7 +634,6 @@ class Mg():
     
     def open_file_dialog(self, widget):
         ''' Open File Dialog '''
-        
         
         # Set default value from QLine
         self.file_path = utils_giswater.getWidgetText(widget)
@@ -669,7 +661,6 @@ class Mg():
         widget.setText(abs_path[0]+'/')     
 
    
-      
     def open_web_browser(self, widget):
         ''' Display url using the default browser '''
         
@@ -680,8 +671,7 @@ class Mg():
         else :
             webbrowser.open(url)
             
-            
-            
+                 
     def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''
         
@@ -725,7 +715,6 @@ class Mg():
         sql+= " SET value = '"+self.doc_absolute_path +"'"
         sql+= " WHERE id = 'doc_absolute_path'" 
         self.controller.execute_sql(sql)
-        
 
         # Show message and close form
         message = "Values has been updated"
@@ -764,8 +753,6 @@ class Mg():
         utils_giswater.setDialog(self.dlg_multi)
         
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl") 
-        #table = "man_selector_state"
-        #self.dlg.btn_accept.pressed.connect(self.)
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
            
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
@@ -774,22 +761,17 @@ class Mg():
         
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
         
-        #self.tbl = self.dlg_multi.findChild(QTableView, "tbl")    
-        #self.table = "man_selector_state"
         self.fill_table(self.tbl, self.schema_name+"."+table)
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_multi, 'config')               
         self.dlg_multi.exec_()
         
-        
-        
+             
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu''' 
         
         self.menu.clear()
-        #menuItem1=menu.addAction('Menu Item1')
-        #self.menu.addAction('Item1')
         sql = "SELECT id FROM "+self.schema_name+".value_state"
         sql+= " ORDER BY id"
         rows = self.dao.get_rows(sql) 
@@ -814,7 +796,6 @@ class Mg():
         sql+= " VALUES ('"+id_action+"')"
         self.controller.execute_sql(sql)   
         
-     
         self.fill_table(self.tbl, self.schema_name+"."+table)
     
         
@@ -839,14 +820,12 @@ class Mg():
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
         if answer:
-
-            sql = "DELETE FROM "+self.schema_name+"."+table_name
+            sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()
         
-        
-    
+         
     def close_dialog_multi(self, dlg=None): 
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
@@ -856,8 +835,7 @@ class Mg():
         except AttributeError:
             pass   
         
-        
-            
+             
     def fill_table(self, widget, table_name): 
         ''' Set a model with selected filter.
         Attach that model to selected table '''

@@ -245,6 +245,7 @@ class ValveAnalytics(ParentMapTool):
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 27)        
+        print "test"
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
