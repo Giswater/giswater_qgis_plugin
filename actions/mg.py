@@ -93,9 +93,7 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
             self.controller.execute_sql(sql) 
          
-        # Show message and close the dialog    
-        #message = "Selected functions have been executed"
-        #self.controller.show_info(message, context_name='ui_message') 
+        # Close the dialog    
         self.close_dialog()         
             
         # Refresh map canvas
@@ -320,9 +318,7 @@ class Mg():
         self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
                 
-        # Show message and close form
-#         message = "Values has been updated"
-#         self.controller.show_info(message, context_name='ui_message') 
+        # Close form
         self.close_dialog(self.dlg)    
                 
                     
@@ -550,7 +546,7 @@ class Mg():
         message = "Node type has been update!"
         self.controller.show_info(message, context_name='ui_message' ) 
         
-        # Close dialog
+        # Close form
         self.close_dialog()
                 
                    

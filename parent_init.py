@@ -10,7 +10,7 @@ import os.path
 import sys  
 
 import utils_giswater
-from controller import DaoController
+from controller import DaoController   #@UnresolvedImport
         
         
 class ParentDialog(object):   

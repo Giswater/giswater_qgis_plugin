@@ -76,7 +76,6 @@ class ConnecMapTool(ParentMapTool):
         
         # Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            print "Plugin loader bug"
             self.iface.actionPan().trigger()
             return
         
@@ -100,7 +99,7 @@ class ConnecMapTool(ParentMapTool):
             eventPoint = QPoint(x, y)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
 
             # That's the snapped point
             if result <> []:
@@ -120,7 +119,7 @@ class ConnecMapTool(ParentMapTool):
                         break
 
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.selectRect.setRect(0, 0, 0, 0)
         self.rubberBand.reset()

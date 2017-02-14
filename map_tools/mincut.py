@@ -61,8 +61,7 @@ class MincutMapTool(ParentMapTool):
         # Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError,KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError,KeyError):
             self.iface.actionPan().trigger()
             return
         
@@ -120,7 +119,6 @@ class MincutMapTool(ParentMapTool):
             function_name = "gw_fct_mincut"
             sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+elem_type+"');"
             result = self.controller.execute_sql(sql)
-            print sql
             if result:
                 # Get 'arc' and 'node' list and select them
                 self.mg_flow_trace_select_features(self.layer_arc, 'arc')

@@ -512,8 +512,6 @@ class Giswater(QObject):
             map_tool.set_controller(self.controller)
             if map_tool_name == 'mg_extract_raster_value':
                 map_tool.set_config_action(self.actions['99'])                
-        else:
-            print "key not found: "+map_tool_name
                 
     
     def set_search_plus(self):
@@ -576,10 +574,10 @@ class Giswater(QObject):
                         index_action = str(list_index_action)
                         if index_action != '-1' and str(index_action) in self.actions:
                             self.actions[index_action].setEnabled(True)                
-            except AttributeError, e:
-                print "current_layer_changed: "+str(e)
-            except KeyError, e:
-                print "current_layer_changed: "+str(e)
+            except AttributeError:
+                pass
+            except KeyError:
+                pass
                         
     
     def custom_enable_actions(self):

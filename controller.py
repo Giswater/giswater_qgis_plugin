@@ -52,12 +52,9 @@ class DaoController():
         key = index
         if type(index) is int:
             key = str(index).zfill(2)
-        print key
         if key in self.actions:
             action = self.actions[key]
-            action.setChecked(check)  
-        else:
-            print "not found: "+str(index)          
+            action.setChecked(check)          
                 
     
     def set_database_connection(self):

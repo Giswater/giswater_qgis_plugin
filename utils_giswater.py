@@ -31,7 +31,6 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)    
     if widget is None:
-        print "Combo not found: "+str(widget)
         return None
 
     # Populate combo with values stored in dictionary variable
@@ -54,8 +53,7 @@ def getText(widget):
         if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
             text = widget.text()
         elif type(widget) is QTextEdit:
-            text = widget.toPlainText()    
-            print text                
+            text = widget.toPlainText()                 
         if text:
             elem_text = text
         else:

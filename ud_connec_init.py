@@ -48,10 +48,7 @@ class ConnecDialog(ParentDialog):
         # Manage i18n
         self.translate_form(context_name)        
         
-        # Load data from related tables
-        #self.load_data()
-		
-		#Set layer in editing mode
+        #Set layer in editing mode
         self.layer.startEditing()	
 
         # Fill the info table

@@ -58,8 +58,7 @@ class DeleteNodeMapTool(ParentMapTool):
         # Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError,KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError,KeyError):
             self.iface.actionPan().trigger()
             return
 
@@ -106,11 +105,8 @@ class DeleteNodeMapTool(ParentMapTool):
 
                     if snapPoint.layer.name() == self.layer_node.name():
                         # Get the point
-                        point = QgsPoint(result[0].snappedVertex)
-
-                        snappFeat = next(
-                            result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-
+                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                        snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                         break
 
             if snappFeat is not None:

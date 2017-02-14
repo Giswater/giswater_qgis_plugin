@@ -165,8 +165,7 @@ class MoveNodeMapTool(ParentMapTool):
         # Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError,KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError,KeyError):
             self.iface.actionPan().trigger()
             return
 

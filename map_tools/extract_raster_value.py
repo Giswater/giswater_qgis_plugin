@@ -84,10 +84,8 @@ class ExtractRasterValue(ParentMapTool):
         if self.vectorLayer is None:
             return
         
-        
         # Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            print "Plugin loader bug"
             self.iface.actionPan().trigger()
             return
         
@@ -132,7 +130,7 @@ class ExtractRasterValue(ParentMapTool):
                         break
 
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.selectRect.setRect(0, 0, 0, 0)
         self.rubberBand.reset()
