@@ -7,13 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDialogButtonBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.add_sum import Add_sum          # @UnresolvedImport
 
 
 def formOpen(dialog, layer, feature):
@@ -36,10 +35,6 @@ def init_config():
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)    
     
-    # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
-    #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)
      
 class ManGullyDialog(ParentDialog):   
     
@@ -55,7 +50,6 @@ class ManGullyDialog(ParentDialog):
         table_element = "v_ui_element_x_gully" 
         table_document = "v_ui_doc_x_gully"   
         table_event_gully = "v_ui_om_visit_x_gully"
-
               
         # Define class variables
         self.field_id = "gully_id"        
@@ -70,12 +64,8 @@ class ManGullyDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")  
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event") 
 
-              
         # Load data from related tables
         self.load_data()
-        
-        # Set layer in editing mode
-        # self.layer.startEditing()
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -97,9 +87,8 @@ class ManGullyDialog(ParentDialog):
         # Configuration of table event
         self.set_configuration(self.tbl_event, table_event_gully)
         
-  
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
+              
         
-     

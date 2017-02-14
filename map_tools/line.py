@@ -317,7 +317,6 @@ class LineMapTool(QgsMapTool):
         layer = self.iface.activeLayer()        
         provider = layer.dataProvider()
         f = QgsFeature()
-    	
         if (geom.isGeosValid()):
             f.setGeometry(geom)
         else:
@@ -328,7 +327,6 @@ class LineMapTool(QgsMapTool):
                 f.setGeometry(geom)
             else:
                 return False
-				
       
         # Add attribute fields to feature.
         fields = layer.pendingFields()

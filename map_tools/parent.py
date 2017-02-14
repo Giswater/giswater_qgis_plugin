@@ -66,7 +66,7 @@ class ParentMapTool(QgsMapTool):
         
         # Set default encoding 
         reload(sys)
-        sys.setdefaultencoding('utf-8')    
+        sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
         
 
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):

@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsMapLayer
+from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor
@@ -43,6 +43,8 @@ class DeleteNodeMapTool(ParentMapTool):
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
 
+
+
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
@@ -57,8 +59,7 @@ class DeleteNodeMapTool(ParentMapTool):
         #Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError, KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
 
@@ -82,6 +83,7 @@ class DeleteNodeMapTool(ParentMapTool):
                     self.vertexMarker.show()
 
                     break
+                
 
     def canvasReleaseEvent(self, event):
 
@@ -108,11 +110,8 @@ class DeleteNodeMapTool(ParentMapTool):
                     #if snapPoint.layer.name() == self.layer_node.name():
                     if exist : 
                         # Get the point
-                        point = QgsPoint(result[0].snappedVertex)
-
-                        snappFeat = next(
-                            result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-
+                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                        snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                         break
 
             if snappFeat is not None:
@@ -174,7 +173,5 @@ class DeleteNodeMapTool(ParentMapTool):
         self.canvas.setCursor(self.stdCursor)
 
         # Removehighlight
-        self.h = None
-
-    
+        self.h = None   
     

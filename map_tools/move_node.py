@@ -18,20 +18,19 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsMapLayer, QgsFeatureRequest, QgsProject
+from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
 from map_tools.parent import ParentMapTool
-import time
 
 
 class MoveNodeMapTool(ParentMapTool):
     ''' Button 16. Move node
     Execute SQL function: 'gw_fct_node2arc' '''        
 
-    def __init__(self, iface, settings, action, index_action, controller, srid):
+    def __init__(self, iface, settings, action, index_action, srid):
         ''' Class constructor '''        
         
         # Call ParentMapTool constructor     
@@ -55,11 +54,6 @@ class MoveNodeMapTool(ParentMapTool):
 
     def reset(self):
                 
-        # Clear selected features 
-        # layer = self.canvas.currentLayer()
-        # if layer is not None:
-        #     layer.removeSelection()
-
         # Graphic elements
         self.rubberBand.reset()
 
@@ -79,20 +73,17 @@ class MoveNodeMapTool(ParentMapTool):
         the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(self.srid) + ")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
         sql+= " WHERE node_id = '"+node_id+"'"
-        print sql
         status = self.controller.execute_sql(sql) 
         if status:
             # Execute SQL function and show result to the user
             function_name = "gw_fct_node2arc"
             sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"
-            print sql
             self.controller.execute_sql(sql)
         else:
             message = "Move node: Error updating geometry"
             self.controller.show_warning(message, context_name='ui_message')
             
         # Refresh map canvas
-        print "refresh"
         self.canvas.currentLayer().triggerRepaint()  
 
                 
@@ -168,16 +159,9 @@ class MoveNodeMapTool(ParentMapTool):
         #Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError, KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
-
-        # # Node layer
-        # layer = self.canvas.currentLayer()
-        # if layer is None:
-        #     return
-
         
         # Select node or arc
         if self.snappFeat == None:
@@ -222,9 +206,6 @@ class MoveNodeMapTool(ParentMapTool):
                     # Select the arc
                     result[0].layer.removeSelection()
                     result[0].layer.select([result[0].snappedAtGeometry])
-                    # for layer_arc in self.layer_arc_man:
-                    #     layer_arc.removeSelection()
-                    #     layer_arc.select([result[0].snappedAtGeometry])
     
                     # Bring the rubberband to the cursor i.e. the clicked point
                     self.rubberBand.movePoint(point)
@@ -246,9 +227,6 @@ class MoveNodeMapTool(ParentMapTool):
             y = event.pos().y()
             eventPoint = QPoint(x,y)
 
-            # Node layer
-            # layer = self.canvas.currentLayer()
-
             # Select node or arc
             if self.snappFeat == None:
 
@@ -263,8 +241,6 @@ class MoveNodeMapTool(ParentMapTool):
                     exist = self.snapperManager.check_node_group(result[0].layer)
                     if exist:
                         point = QgsPoint(result[0].snappedVertex)
-    
-                        # layer.select([result[0].snappedAtGeometry])
 
                         # Hide highlight
                         self.vertexMarker.hide()
@@ -318,4 +294,4 @@ class MoveNodeMapTool(ParentMapTool):
 
             for layerRefresh in self.iface.mapCanvas().layers():
                 layerRefresh.triggerRepaint()
-                       
+

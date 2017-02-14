@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
 from PyQt4.QtGui import QApplication, QColor
@@ -62,8 +62,7 @@ class MincutMapTool(ParentMapTool):
         #Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError, KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
 
@@ -130,8 +129,6 @@ class MincutMapTool(ParentMapTool):
             QApplication.setOverrideCursor(Qt.WaitCursor)
 
             result = self.controller.execute_sql(sql)
-            print sql
-
             if result:
                 # Get 'arc' and 'node' list and select them
                 self.mg_mincut_select_features()

@@ -41,24 +41,15 @@ class GullyDialog(ParentDialog):
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")      
         self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")    
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")             
-        '''
-        self.tbl_rtc = self.dialog.findChild(QTableView, "tbl_rtc")             
-        '''    
+  
         # Manage tab visibility
         self.set_tabs_visibility()
 
         # Manage i18n
         self.translate_form(context_name)        
-        
-        # Load data from related tables
-        #self.load_data()
-
-        # Set layer in editing mode
-        #self.layer.startEditing()
-        
+               
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
-        
         
         # Configuration of info table
         self.set_configuration(self.tbl_element, table_element)

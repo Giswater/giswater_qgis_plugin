@@ -4,7 +4,6 @@ from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
 
 import subprocess
-
 from functools import partial
 
 from pg_dao import PgDao
@@ -39,26 +38,24 @@ class DaoController():
     def plugin_settings_set_value(self, key, value):
         self.qgis_settings.setValue(self.plugin_name+"/"+key, value)            
     
-    
     def set_actions(self, actions):
         self.actions = actions     
+        
         
     def check_actions(self, check=True):
         ''' Utility to check/uncheck all actions '''
         for action_index, action in self.actions.iteritems():   #@UnusedVariable
             action.setChecked(check)    
+    
                              
     def check_action(self, check=True, index=1):
         ''' Check/Uncheck selected action '''
         key = index
         if type(index) is int:
             key = str(index).zfill(2)
-        print key
         if key in self.actions:
             action = self.actions[key]
-            action.setChecked(check)  
-        else:
-            print "not found: "+str(index)          
+            action.setChecked(check)     
     
     
     def set_database_connection(self):
@@ -106,8 +103,6 @@ class DaoController():
         self.dao = PgDao()     
         self.dao.set_params(host, port, db, self.user, pwd)
         status = self.dao.init_db()
-        
-        # TODO: Get postgresql data folder
        
         return status    
     
@@ -197,9 +192,8 @@ class DaoController():
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
             msg_box.setInformativeText(inf_text);        
-        #msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         msg_box.setDefaultButton(QMessageBox.No)        
-        ret = msg_box.exec_()
+        ret = msg_box.exec_()   #@UnusedVariable
                           
             
     def get_row(self, sql, search_audit=True):
@@ -297,9 +291,8 @@ class DaoController():
                 
                         
     def start_program(self, program):     
-        ''' Start a minimized external program '''
+        ''' Start an external program (hidden) '''
            
-        SW_MINIMIZE = 6
         SW_HIDE = 0
         info = subprocess.STARTUPINFO()
         info.dwFlags = subprocess.STARTF_USESHOWWINDOW
@@ -341,14 +334,12 @@ class DaoController():
     def get_layer_source_table_name(self, layer):
         ''' Get table or view name of selected layer '''
 
-        uri_schema = None
         uri_table = None
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('table=')
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
         if pos_ini <> -1 and pos_fi <> -1:
-            uri_schema = uri[pos_ini + 6:pos_end_schema]
             uri_table = uri[pos_end_schema+2:pos_fi ]
 
         return uri_table    
@@ -369,18 +360,13 @@ class DaoController():
     
     
     def set_project_user(self):
-        # Set user
+        # TODO: Set user
         pass
         '''
         sql = "UPDATE "+self.schema_name+".rpt_selector_result"
         sql+= " SET cur_user = '"+self.user+"'"
         sql+= " WHERE id = '1'" 
-        print sql
         self.dao.execute_sql(sql)  
         '''
-
-   
-
-
 
     

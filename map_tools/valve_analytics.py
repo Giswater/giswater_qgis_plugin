@@ -18,22 +18,15 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QGis
+from qgis.core import QgsPoint, QgsRectangle
 from qgis.gui import QgsRubberBand, QgsVertexMarker
-from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor, QProgressBar ,QPixmap
-
-from PyQt4.QtGui import QLabel, QWidget
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QColor, QProgressBar, QPixmap, QLabel, QWidget
 
 from map_tools.parent import ParentMapTool
 
-import datetime, time
-
-from multiprocessing import Process
-from threading import Thread
-
+import time
 import os
-import sys
 
 
 class ValveAnalytics(ParentMapTool):
@@ -63,15 +56,7 @@ class ValveAnalytics(ParentMapTool):
         self.reset()
 
 
-
     def reset(self):
-        ''' Clear selected features '''
-        
-        '''
-        layer = self.layer_connec
-        if layer is not None:
-            layer.removeSelection()
-        '''
 
         # Graphic elements
         self.rubberBand.reset()
@@ -86,10 +71,8 @@ class ValveAnalytics(ParentMapTool):
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
 
-
-        #Plugin reloader bug, MapTool should be deactivated
+        # Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            print "Plugin loader bug"
             self.iface.actionPan().trigger()
             return
 
@@ -136,36 +119,20 @@ class ValveAnalytics(ParentMapTool):
 
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            
             # That's the snapped point
             if result <> [] :
-            #exist=self.snapperManager.check_connec_group(result[0].layer)
-
-                #if exist :
+                
                 if result[0].layer.name() == 'Valve':
                     point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                    
-                    #result[0].layer.removeSelection()
                     result[0].layer.select([result[0].snappedAtGeometry])
-    
-    
                     # Hide highlight
                     self.vertexMarker.hide()
 
-
         elif event.button() == Qt.RightButton:
-            '''
-            process1 = Process(target = self.mg_analytics())
-            process1.start()
-            process2 = Process(target = self.show_progressBar())
-            process2.start()
             
-            Thread(target=self.mg_analytics).start()
-            Thread(target=self.show_progressBar).start()
-            
-            '''
-
-            #self.show_loader()
             self.mg_analytics()
+            
             
     def show_loader(self):
         
@@ -176,25 +143,14 @@ class ValveAnalytics(ParentMapTool):
          
         # Create widget
         label = QLabel(w)
-        '''
-        picfile='logo.png'
-        logo = os.getcwd() + '\\' + picfile
-        print logo
-        '''
         plugin_dir = os.path.dirname(__file__)    
-        pic_file = os.path.join(plugin_dir, 'png','loader.gif') 
-        #if os.path.isfile(pic_file):
+        pic_file = os.path.join(plugin_dir, 'png',' loader.gif') 
         pixmap = QPixmap(pic_file)
         label.setPixmap(pixmap)
-        #w.resize(pixmap.width(),pixmap.height())
          
         # Draw window
         w.show()
-        #app.exec_()
-        '''
-        else:
-            print "I expected to find a png picture called logo.png in "+ os.getcwd() 
-        '''
+
     
     def activate(self):
 
@@ -242,10 +198,10 @@ class ValveAnalytics(ParentMapTool):
 
 
     def mg_analytics(self):
+        
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 27)        
-        print "test"
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
         sql = "SELECT "+self.schema_name+"."+function_name+"();"  
@@ -290,10 +246,10 @@ class ValveAnalytics(ParentMapTool):
         self.iface.messageBar().pushWidget(widget, self.iface.messageBar().INFO)
         
         for i in range(1,10):
-            #errCount += 1
-            print i
             time.sleep(1.1)
             prgBar.setValue(i*12)
 
         self.iface.messageBar().clearWidgets()
         self.iface.mapCanvas().refresh()
+        
+        

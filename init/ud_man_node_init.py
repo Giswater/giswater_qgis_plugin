@@ -7,13 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.add_sum import Add_sum          # @UnresolvedImport
 
 
 def formOpen(dialog, layer, feature):
@@ -35,11 +34,7 @@ def init_config():
     # Manage 'nodecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
-    
-    # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
-    #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+          
      
 class ManNodeDialog(ParentDialog):   
     
@@ -94,9 +89,6 @@ class ManNodeDialog(ParentDialog):
               
         # Load data from related tables
         self.load_data()
-        
-        # Set layer in editing mode
-        # self.layer.startEditing()
         
         # Manage tab visibility
         self.set_tabs_visibility(9)  

@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QgsRaster, QgsFeature, QgsFeatureRequest, QGis
+from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QgsRaster, QgsFeature, QgsFeatureRequest, QGis
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt, QCoreApplication
 from PyQt4.QtGui import QApplication, QColor, QAction
@@ -84,9 +84,8 @@ class ExtractRasterValue(ParentMapTool):
         if self.vectorLayer is None:
             return
 
-        #Plugin reloader bug, MapTool should be deactivated
+        # Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            print "Plugin loader bug"
             self.iface.actionPan().trigger()
             return
 
@@ -130,7 +129,7 @@ class ExtractRasterValue(ParentMapTool):
                         break
 
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.selectRect.setRect(0, 0, 0, 0)
         self.rubberBand.reset()
@@ -366,14 +365,6 @@ class ExtractRasterValue(ParentMapTool):
 
             # Default choice
             behaviour = QgsVectorLayer.SetSelection
-
-            # # Modifiers
-            # modifiers = QApplication.keyboardModifiers()
-            #
-            # if modifiers == Qt.ControlModifier:
-            #     behaviour = QgsVectorLayer.AddToSelection
-            # elif modifiers == Qt.ShiftModifier:
-            #     behaviour = QgsVectorLayer.RemoveFromSelection
 
             # Selection
             self.vectorLayer.selectByRect(selectGeometry, behaviour)

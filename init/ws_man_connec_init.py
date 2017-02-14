@@ -7,13 +7,11 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QDialogButtonBox, QPushButton, QTableView, QTabWidget, QLineEdit
-from qgis.core import QgsVectorLayer
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.add_sum import Add_sum          # @UnresolvedImport
 
 
 def formOpen(dialog, layer, feature):
@@ -35,11 +33,7 @@ def init_config():
     # Manage 'connecat_id'
     connecat_id = utils_giswater.getWidgetText("connecat_id") 
     utils_giswater.setSelectedItem("connecat_id", connecat_id)   
-
-    # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
-    #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)            
+        
      
 class ManConnecDialog(ParentDialog):   
     
@@ -85,9 +79,6 @@ class ManConnecDialog(ParentDialog):
         # Load data from related tables
         self.load_data()
         
-        # Set layer in editing mode
-        #self.layer.startEditing()
-        
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
@@ -104,6 +95,7 @@ class ManConnecDialog(ParentDialog):
         # Fill tab event | connec
         self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_connec, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        
         # Configuration of table event | connec
         self.set_configuration(self.tbl_event, table_event_connec)
         
@@ -122,6 +114,6 @@ class ManConnecDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
-        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer, table_hydrometer))               
+        self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
 

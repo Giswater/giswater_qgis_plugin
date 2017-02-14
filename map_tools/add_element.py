@@ -18,14 +18,13 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QGis,QgsExpression
+from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis,QgsExpression
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt
 from PyQt4.QtGui import QApplication, QColor, QLineEdit, QCompleter, QDateTimeEdit, QStringListModel
 from qgis.gui import QgsMessageBar
 
 from map_tools.parent import ParentMapTool
-
 from ..ui.add_element import Add_element    # @UnresolvedImport
 
 import utils_giswater  
@@ -59,12 +58,10 @@ class AddElementMapTool(ParentMapTool):
 
         # Select rectangle
         self.selectRect = QRect()
-        print ("******init***************")
 
 
     def reset(self):
         ''' Clear selected features '''
-        print "reset"
         layer = self.layer_connec
         if layer is not None:
             layer.removeSelection()
@@ -77,11 +74,9 @@ class AddElementMapTool(ParentMapTool):
 
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
-        print ("move")
 
         #Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            print "Plugin loader bug"
             self.iface.actionPan().trigger()
             return
 
@@ -105,7 +100,7 @@ class AddElementMapTool(ParentMapTool):
             eventPoint = QPoint(x, y)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
 
             # That's the snapped point
             if result <> []:
@@ -127,7 +122,7 @@ class AddElementMapTool(ParentMapTool):
                         break
 
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.selectRect.setRect(0, 0, 0, 0)
         self.rubberBand.reset()
@@ -135,7 +130,7 @@ class AddElementMapTool(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
         ''' With left click the digitizing is finished '''
-        print "relese"
+
         if event.button() == Qt.LeftButton:
 
             # Get the click
@@ -147,14 +142,11 @@ class AddElementMapTool(ParentMapTool):
             if not self.dragging:
 
                 # Snap to node
-                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+                (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  #@UnusedVariable
 
                 # That's the snapped point
                 if result <> [] :
-                    
-                    #exist=self.snapperManager.check_connec_group(result[0].layer)
 
-                    #if exist :
                     for snapPoint in result:
                         layer = self.iface.activeLayer()  
                         if snapPoint.layer == layer:
@@ -184,9 +176,6 @@ class AddElementMapTool(ParentMapTool):
                 selectGeom = self.rubberBand.asGeometry()   #@UnusedVariable
                 self.select_multiple_features(self.selectRectMapCoord)
                 self.dragging = False
-
-                # Create link
-                #self.link_connec()
                 self.ed_add_element()
                 
         elif event.button() == Qt.RightButton:
@@ -200,16 +189,12 @@ class AddElementMapTool(ParentMapTool):
 
             if numberFeatures > 0:
                 answer = self.controller.ask_question("There are " + str(numberFeatures) + " features selected in the connec group, do you want to update values on them?", "Interpolate value")
-
                 if answer:
-
-                    # Create link
-                    # self.link_connec()
                     self.ed_add_element()
 
 
     def activate(self):
-        print "test"
+
         # Check button
         self.action().setChecked(True)
 
@@ -223,21 +208,20 @@ class AddElementMapTool(ParentMapTool):
         self.snapperManager.clearSnapping()
         
         layer = self.iface.activeLayer()
-        exist=self.snapperManager.check_connec_group(layer)
-        if exist : 
+        exist = self.snapperManager.check_connec_group(layer)
+        if exist: 
             # Set snapping to connec
             self.snapperManager.snapToConnec()  
 
-        exist=self.snapperManager.check_node_group(layer)
-        if exist : 
+        exist = self.snapperManager.check_node_group(layer)
+        if exist: 
             # Set snapping to node
             self.snapperManager.snapToNode()
             
-        exist=self.snapperManager.check_arc_group(layer)
-        if exist : 
+        exist = self.snapperManager.check_arc_group(layer)
+        if exist: 
             # Set snapping to arc
             self.snapperManager.snapToArc()
-
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -245,7 +229,7 @@ class AddElementMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
-            self.controller.show_info(message, context_name='ui_message' )  
+            self.controller.show_info(message, context_name='ui_message')  
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
@@ -267,8 +251,6 @@ class AddElementMapTool(ParentMapTool):
         self.canvas.setCursor(self.stdCursor)
 
 
-    
-
     def set_rubber_band(self):
 
         # Coordinates transform
@@ -288,7 +270,7 @@ class AddElementMapTool(ParentMapTool):
         self.rubberBand.addPoint(ul, False)
         self.rubberBand.addPoint(ll, True)
 
-        self.selectRectMapCoord =     QgsRectangle(ll, ur)
+        self.selectRectMapCoord = QgsRectangle(ll, ur)
 
 
     def select_multiple_features(self, selectGeometry):
@@ -303,14 +285,6 @@ class AddElementMapTool(ParentMapTool):
 
             # Default choice
             behaviour = QgsVectorLayer.SetSelection
-
-            # # Modifiers
-            # modifiers = QApplication.keyboardModifiers()
-            #
-            # if modifiers == Qt.ControlModifier:
-            #     behaviour = QgsVectorLayer.AddToSelection
-            # elif modifiers == Qt.ShiftModifier:
-            #     behaviour = QgsVectorLayer.RemoveFromSelection
 
             # Selection for all connec group layers
             layer = self.iface.activeLayer
@@ -352,10 +326,6 @@ class AddElementMapTool(ParentMapTool):
 
     def ed_add_element(self):
         ''' Button 33. Add element '''
-
-        # Uncheck all actions (buttons) except this one
-        #self.controller.check_actions(False)
-        #self.controller.check_action(True, 33)        
           
         # Create the dialog and signals
         self.dlg = Add_element()
@@ -371,7 +341,6 @@ class AddElementMapTool(ParentMapTool):
             return
             
         # Fill combo boxes
-        
         self.populate_combo("elementcat_id", "cat_element")
         self.populate_combo("state", "value_state")
         self.populate_combo("location_type", "man_type_location")
@@ -407,18 +376,19 @@ class AddElementMapTool(ParentMapTool):
         ''' Get date_from and date_to from ComboBoxes
         Filter the table related on selected value
         '''
-        #self.tbl_document.setModel(self.model)
+
         self.date_document_from = self.dlg.findChild(QDateTimeEdit, "builtdate") 
         self.date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
         
         date_from=self.date_document_from.date() 
         date_to=self.date_document_to.date() 
       
+        # TODO:
         if (date_from < date_to):
             expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
         
-        else :
-            message="Valid interval!"
+        else:
+            message = "Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsMapTool
 
 
@@ -91,7 +90,7 @@ class PointMapTool(QgsMapTool):
 
     def canvasReleaseEvent(self, e):
            
-        # Get clicked point and current layer               
+        # TODO: Get clicked point and current layer               
         self.point = self.toMapCoordinates(e.pos())             
         layer = self.iface.activeLayer()     
         
@@ -102,17 +101,5 @@ class PointMapTool(QgsMapTool):
 
         for layerRefresh in self.iface.mapCanvas().layers():
             layerRefresh.triggerRepaint()
-        '''
-        if last_id != -1:
-            filter_expr = "node_id = '"+str(last_id)+"'"    
-            expr = QgsExpression(filter_expr)
-            f_request = QgsFeatureRequest(expr)
-            f_iterator = layer.getFeatures(f_request)
-            for feature in f_iterator: 
-                self.iface.openFeatureForm(layer, feature)
-                break
-        else:   
-            message = "Error inserting node"
-            self.controller.show_warning(message, context_name='ui_message')   
-        '''
+
         

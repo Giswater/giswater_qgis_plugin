@@ -88,9 +88,6 @@ class ConnecDialog(ParentDialog):
         # Load data from related tables
         self.load_data()
         
-        # Set layer in editing mode
-        #self.layer.startEditing()
-        
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
@@ -295,8 +292,7 @@ class ConnecDialog(ParentDialog):
             self.tbl_dae_2.model().select()
         else:
             self.tbl_dae_2.model().database().rollback()
-            error = self.tbl_dae_2.model().lastError()
-            print str(error.text())  
             
         self.save()
+    
     

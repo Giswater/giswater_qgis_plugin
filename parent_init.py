@@ -9,25 +9,20 @@ or (at your option) any later version.
 
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
+from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QPixmap, QImage, QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QMessageBox, QWidget
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
 from PyQt4.QtSql import QSqlTableModel
-
-
 
 from functools import partial
 import os.path
 import sys  
-
-import utils_giswater
-from dao.controller import DaoController
-
 import urlparse
 import webbrowser
 
-from ui.add_sum import Add_sum          # @UnresolvedImport
-from matplotlib import widgets
-from PyQt4.Qt import QTableView, QDate
+import utils_giswater
+from dao.controller import DaoController
+from ui.add_sum import Add_sum          #@UnresolvedImport
         
         
 class ParentDialog(object):   
@@ -44,7 +39,7 @@ class ParentDialog(object):
         
         # Set default encoding 
         reload(sys)
-        sys.setdefaultencoding('utf-8')    
+        sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
     
         
     def init_config(self):    
@@ -119,37 +114,16 @@ class ParentDialog(object):
         pass
                 
     def load_tab_document(self):
-        ''' TODO: Load data from tab 'Document' '''   
-        pass
-                
-    def load_tab_picture(self):
-        ''' TODO: Load data from tab 'Document' '''   
-        pass
-                
-    def load_tab_event(self):
-        ''' TODO: Load data from tab 'Event' '''   
-        pass
-                
-    def load_tab_log(self):
-        ''' TODO: Load data from tab 'Log' '''   
-        pass
-        
-    def load_tab_rtc(self):
-        ''' TODO: Load data from tab 'RTC' '''   
+        ''' Load data from tab 'Document' '''   
         pass
     
     def load_data(self):
         ''' Load data from related tables '''
-        
         self.load_tab_add_info()
         self.load_tab_analysis()
         self.load_tab_document()
-        self.load_tab_picture()
-        self.load_tab_event()
-        self.load_tab_log()
-        self.load_tab_rtc()
         
-
+        
     def save_tab_add_info(self):
         ''' Save tab from tab 'Add. info' '''                
         pass
@@ -159,48 +133,25 @@ class ParentDialog(object):
         pass
                 
     def save_tab_document(self):
-        ''' TODO: Save tab from tab 'Document' '''   
-        pass
-                
-    def save_tab_picture(self):
-        ''' TODO: Save tab from tab 'Document' '''   
-        pass
-                
-    def save_tab_event(self):
-        ''' TODO: Save tab from tab 'Event' '''   
-        pass
-                
-    def save_tab_log(self):
-        ''' TODO: Save tab from tab 'Log' '''   
-        pass
-        
-    def save_tab_rtc(self):
-        ''' TODO: Save tab from tab 'RTC' '''   
-        pass
-        
+        ''' Save tab from tab 'Document' '''   
+        pass       
                         
     def save_data(self):
         ''' Save data from related tables '''        
         self.save_tab_add_info()
         self.save_tab_analysis()
-        self.save_tab_document()
-        self.save_tab_picture()
-        self.save_tab_event()
-        self.save_tab_log()
-        self.save_tab_rtc()       
+        self.save_tab_document()  
                 
                
     def save(self):
         ''' Save feature '''
         self.save_data()   
         self.dialog.accept()
-        #self.layer.commitChanges()    
         self.close()     
         
         
     def close(self):
-        ''' Close form without saving '''
-        #self.layer.rollBack()   
+        ''' Close form without saving ''' 
         self.dialog.parent().setVisible(False)         
         
         
@@ -258,12 +209,11 @@ class ParentDialog(object):
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
             sql+= " WHERE id IN ("+list_id+")"
-            print sql
             self.controller.execute_sql(sql)
             widget.model().select()
  
          
-    def delete_records_hydro(self, widget, table_name):
+    def delete_records_hydro(self, widget):
         ''' Delete selected elements of the table '''
 
         # Get selected rows
@@ -370,10 +320,10 @@ class ParentDialog(object):
             self.path = self.tbl_document.selectedIndexes()[0].data()
 
             # Parse a URL into components
-            url=urlparse.urlsplit(self.path)
+            url = urlparse.urlsplit(self.path)
 
             # Check if path is URL
-            if url.scheme=="http":
+            if url.scheme == "http":
                 # If path is URL open URL in browser
                 webbrowser.open(self.path) 
             else: 
@@ -381,7 +331,6 @@ class ParentDialog(object):
                 if not os.path.exists(self.path):
                     message = "File not found!"
                     self.controller.show_warning(message, context_name='ui_message')
-                   
                 else:
                     # Open the document
                     os.startfile(self.path)   
@@ -398,16 +347,16 @@ class ParentDialog(object):
             self.path = self.tbl_event.selectedIndexes()[0].data()
 
             sql = "SELECT value FROM "+self.schema_name+".config_param_text"
-            sql +=" WHERE id = 'om_visit_absolute_path'"
+            sql+= " WHERE id = 'om_visit_absolute_path'"
             row = self.dao.get_row(sql)
             # Full path= path + value from row
-            self.full_path =row[0]+self.path
+            self.full_path = row[0]+self.path
             
             # Parse a URL into components
-            url=urlparse.urlsplit(self.full_path)
+            url = urlparse.urlsplit(self.full_path)
         
             # Check if path is URL
-            if url.scheme=="http":
+            if url.scheme == "http":
                 # If path is URL open URL in browser
                 webbrowser.open(self.full_path) 
             else: 
@@ -415,12 +364,9 @@ class ParentDialog(object):
                 if not os.path.exists(self.full_path):
                     message = "File not found!"
                     self.controller.show_warning(message, context_name='ui_message')
-                   
                 else:
                     # Open the document
-                    os.startfile(self.full_path)  
-        else:
-            print "file opened"            
+                    os.startfile(self.full_path)          
                            
                     
     def open_selected_document_from_table(self):
@@ -435,7 +381,6 @@ class ParentDialog(object):
             return
         
         inf_text = ""
-        list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = self.tbl_document.model().record(row).value("path")
@@ -612,7 +557,6 @@ class ParentDialog(object):
         self.set_model_to_table(widget, table_name, filter_)
         
         
-        
     def fill_tbl_document_man(self, widget, table_name, filter_):
         ''' Fill the table control to show documents'''
         
@@ -757,6 +701,7 @@ class ParentDialog(object):
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
             expr+= " AND parameter_id = '"+event_id+"'"
+            
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
@@ -785,6 +730,7 @@ class ParentDialog(object):
         event_id = utils_giswater.getWidgetText("event_id")
         if event_id != 'null': 
             expr+= " AND parameter_id = '"+event_id+"'"
+            
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
@@ -840,7 +786,8 @@ class ParentDialog(object):
                 self.tab_main.removeTab(i) 
                 
                 
-    def setImage(self,widget):
+    def setImage(self, widget):
+        
         # Manage 'cat_shape'
         arc_id = utils_giswater.getWidgetText("arc_id") 
         cur_layer = self.iface.activeLayer()  
@@ -853,13 +800,11 @@ class ParentDialog(object):
         sql+= " WHERE arc_id = '"+arc_id+"'"
         row = self.dao.get_row(sql)
 
-        
         if row is not None:
             if row[0] != 'VIRTUAL': 
-                utils_giswater.setImage("label_image_ud_shape", row[0])
+                utils_giswater.setImage(widget, row[0])
             # If selected table is Virtual hide tab cost
             else :
-                self.tab_main.removeTab(4)
-        
+                self.tab_main.removeTab(4)       
 
         

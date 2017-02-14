@@ -50,10 +50,8 @@ class SnappingConfigManager():
         snappingLayersOptions = []
 
         layers = self.iface.legendInterface().layers()
-
         for layer in layers:
             options = QgsProject.instance().snapSettingsForLayer(layer.id())
-
             snappingLayersOptions.append(
                 {'layerid': layer.id(), 'enabled': options[1], 'snapType': options[2], 'unitType': options[3],
                  'tolerance': options[4], 'avoidInt': options[5]})
@@ -161,24 +159,20 @@ class SnappingConfigManager():
         self.applySnappingOptions(self.previousSnapping)
         
 
-
     def check_node_group(self, snapped_layer):
-        ''' Check if snapped layer is in the node_group''' 
-        
+        ''' Check if snapped layer is in the node group''' 
         if snapped_layer in self.layer_node_man:
             return 1
-        
-        
-        
+
+
     def check_connec_group(self, snapped_layer):
-        ''' Check if snapped layer is in the node_group''' 
-        
+        ''' Check if snapped layer is in the connec group''' 
         if snapped_layer in self.layer_connec_man:
             return 1
         
         
     def check_arc_group(self, snapped_layer):
-        ''' Check if snapped layer is in the node_group''' 
-        
+        ''' Check if snapped layer is in the arc group''' 
         if snapped_layer in self.layer_arc_man:
             return 1
+        

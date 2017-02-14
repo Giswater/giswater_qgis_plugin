@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression, QgsMapLayer, QgsProject
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
 from PyQt4.QtGui import QColor
@@ -61,8 +61,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         #Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError, KeyError) as e:
-            print "Plugin loader bug"
+        except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
 
@@ -98,6 +97,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
         ''' With left click the digitizing is finished '''
+        
         if event.button() == Qt.LeftButton and self.current_layer is not None:
 
             feature = self.snappFeat
@@ -108,12 +108,10 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 function_name = "gw_fct_flow_trace"
                 sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"');"
                 result = self.controller.execute_sql(sql)
-                print sql
             else:
                 function_name = "gw_fct_flow_exit"
                 sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"');"
                 result = self.controller.execute_sql(sql)
-                print sql
 
             if result:
                 # Get 'arc' and 'node' list and select them
@@ -193,7 +191,6 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
             self.iface.setActiveLayer(self.layer_node_man[0])
 
 
-
     def deactivate(self):
 
         # Check button
@@ -207,6 +204,5 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
         # Remove highlight
         self.h = None
-
-        
+                
         

@@ -12,11 +12,11 @@
 """
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QImage, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit   #@UnresolvedImport
 
 import inspect
 import os
-import sys
+
 
 def setDialog(p_dialog):
     global _dialog
@@ -43,7 +43,6 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)    
     if widget is None:
-        print "Combo not found: "+str(widget)
         return None
 
     # Populate combo with values stored in dictionary variable
@@ -66,8 +65,7 @@ def getText(widget):
         if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
             text = widget.text()
         elif type(widget) is QTextEdit:
-            text = widget.toPlainText()    
-            print text                
+            text = widget.toPlainText()         
         if text:
             elem_text = text
         else:
@@ -212,7 +210,6 @@ def setWidgetVisible(widget, visible=True):
     if widget:
         widget.setVisible(visible)
         
-        
 
 def setImage(widget,cat_shape):
     ''' Set pictures for UD'''
@@ -224,13 +221,9 @@ def setImage(widget,cat_shape):
         return
     if type(widget) is QLabel:
         plugin_dir = os.path.dirname(__file__)    
-        pic_file = os.path.join(plugin_dir, 'png','ud_section_'+element+'.png') 
+        pic_file = os.path.join(plugin_dir, 'png', 'ud_section_'+element+'.png') 
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
-        widget.show()
-
-        
-        
-        
-                
+        widget.show()  
+                        
                 

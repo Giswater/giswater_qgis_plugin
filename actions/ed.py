@@ -114,7 +114,7 @@ class Ed():
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
         except RuntimeError as e:
-            print "Error ed_search_plus: "+str(e)
+            pass
             
                 
     def ed_check(self):

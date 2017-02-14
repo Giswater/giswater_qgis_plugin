@@ -18,7 +18,7 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsMapLayer, QgsVectorLayer, QgsRectangle, QGis
+from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
 from qgis.gui import QgsRubberBand, QgsVertexMarker
 from PyQt4.QtCore import QPoint, QRect, Qt
 from PyQt4.QtGui import QApplication, QColor
@@ -74,10 +74,8 @@ class ConnecMapTool(ParentMapTool):
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
 
-
         #Plugin reloader bug, MapTool should be deactivated
         if not hasattr(Qt, 'LeftButton'):
-            print "Plugin loader bug"
             self.iface.actionPan().trigger()
             return
 
@@ -111,7 +109,6 @@ class ConnecMapTool(ParentMapTool):
                     
                     exist=self.snapperManager.check_connec_group(snapPoint.layer)
                     if exist : 
-                    #if snapPoint.layer == self.layer_connec:
 
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)
@@ -123,7 +120,7 @@ class ConnecMapTool(ParentMapTool):
                         break
 
 
-    def canvasPressEvent(self, event):
+    def canvasPressEvent(self, event):   #@UnusedVariable
 
         self.selectRect.setRect(0, 0, 0, 0)
         self.rubberBand.reset()
@@ -245,7 +242,6 @@ class ConnecMapTool(ParentMapTool):
     def link_connec(self):
         ''' Link selected connec to the pipe '''
 
-
         # Check features selected
         numberFeatures = 0
 
@@ -260,7 +256,7 @@ class ConnecMapTool(ParentMapTool):
         aux = "{"
         
         for layer in self.layer_connec_man:
-        #layer = self.layer_connec
+            
             if layer.selectedFeatureCount() > 0:
 
                 features = layer.selectedFeatures()
@@ -318,14 +314,6 @@ class ConnecMapTool(ParentMapTool):
             # Default choice
             behaviour = QgsVectorLayer.SetSelection
 
-            # # Modifiers
-            # modifiers = QApplication.keyboardModifiers()
-            #
-            # if modifiers == Qt.ControlModifier:
-            #     behaviour = QgsVectorLayer.AddToSelection
-            # elif modifiers == Qt.ShiftModifier:
-            #     behaviour = QgsVectorLayer.RemoveFromSelection
-
             # Selection for all connec group layers
             for layer in self.layer_connec_man:
                 layer.selectByRect(selectGeometry, behaviour)
@@ -338,3 +326,4 @@ class ConnecMapTool(ParentMapTool):
 
         # Old cursor
         QApplication.restoreOverrideCursor()
+        

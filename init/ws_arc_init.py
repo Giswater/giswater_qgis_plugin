@@ -38,7 +38,6 @@ def init_config():
     feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
     feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)      
     
-    
      
 class ArcDialog(ParentDialog):   
     
@@ -83,9 +82,6 @@ class ArcDialog(ParentDialog):
         # Load data from related tables
         self.load_data()
         
-        # Set layer in editing mode
-        #self.layer.startEditing()
-        
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
         
@@ -101,6 +97,7 @@ class ArcDialog(ParentDialog):
         # Set signals    
         btn_element_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
         btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
+        # TODO
         if btn_element_delete:             
             btn_element_delete.clicked.connect(partial(self.delete_records, self.tbl_info, table_element))  
         if btn_doc_delete:               

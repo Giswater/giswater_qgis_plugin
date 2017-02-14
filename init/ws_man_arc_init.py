@@ -7,14 +7,12 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit, QDialogButtonBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit
 from PyQt4.QtCore import Qt
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.add_sum import Add_sum          # @UnresolvedImport
-from PyQt4.Qt import left
 
 
 def formOpen(dialog, layer, feature):
@@ -33,14 +31,10 @@ def init_config():
     arccat_id = utils_giswater.getWidgetText("arccat_id") 
     utils_giswater.setSelectedItem("arccat_id", arccat_id)   
 
-	# Manage 'state'
+    # Manage 'state'
     state = utils_giswater.getWidgetText("state") 
     utils_giswater.setSelectedItem("state", state)   
     
-    # Set button signals      
-    #feature_dialog.dialog.findChild(QPushButton, "btn_accept").clicked.connect(feature_dialog.save)            
-    #feature_dialog.dialog.findChild(QPushButton, "btn_close").clicked.connect(feature_dialog.close)  
-    #feature_dialog.dialog.findChild(QDialogButtonBox, "ok").clicked.connect(feature_dialog.save)
      
 class ManArcDialog(ParentDialog):   
     
@@ -57,13 +51,10 @@ class ManArcDialog(ParentDialog):
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
 
- 
-        
         self.table_varc = self.schema_name+'."v_edit_man_varc"'
         self.table_siphon = self.schema_name+'."v_edit_man_siphon"'
         self.table_conduit = self.schema_name+'."v_edit_man_conduit"'
         self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
-        
 
         # Define class variables
         self.field_id = "arc_id"        
@@ -80,12 +71,6 @@ class ManArcDialog(ParentDialog):
         
         # Load data from related tables
         self.load_data()
-        
-        # Set layer in editing mode
-        # self.layer.startEditing()
-        
-        # Manage tab visibility
-        #self.set_tabs_visibility(4)  
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
@@ -109,7 +94,6 @@ class ManArcDialog(ParentDialog):
   
         # Fill tab costs 
         self.fill_costs()
-        
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
@@ -137,12 +121,10 @@ class ManArcDialog(ParentDialog):
         m3excess_cost = self.dialog.findChild(QLineEdit, "m3excess_cost")
         m2trenchl_cost = self.dialog.findChild(QLineEdit, "m2trenchl_cost")
         m2pavement_cost = self.dialog.findChild(QLineEdit, "m2pavement_cost")
-        m2mlbase = self.dialog.findChild(QLineEdit, "m2mlbase")
         m3mlprotec = self.dialog.findChild(QLineEdit, "m3mlprotec")
         m3mlexc = self.dialog.findChild(QLineEdit, "m3mlexc")
         m3mlfill = self.dialog.findChild(QLineEdit, "m3mlfill")
         m3mlexcess = self.dialog.findChild(QLineEdit, "m3mlexcess")
-        m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl_2")
         m2mlpavement = self.dialog.findChild(QLineEdit, "m2mlpavement")
         base_cost = self.dialog.findChild(QLineEdit, "base_cost")
         protec_cost = self.dialog.findChild(QLineEdit, "protec_cost")
@@ -159,7 +141,6 @@ class ManArcDialog(ParentDialog):
         m2mlpav = self.dialog.findChild(QLineEdit, "m2mlpav") 
         m2mlbottom_2 = self.dialog.findChild(QLineEdit, "m2mlbottom_2")    
         
-        
         z1 = self.dialog.findChild(QLineEdit, "z1")
         z2 = self.dialog.findChild(QLineEdit, "z2")
         bulk = self.dialog.findChild(QLineEdit, "bulk")
@@ -171,8 +152,6 @@ class ManArcDialog(ParentDialog):
         m3mlexc_2 = self.dialog.findChild(QLineEdit, "m3mlexc_2")
         m3mlexcess_2 = self.dialog.findChild(QLineEdit, "m3mlexcess_2")
         m2mltrenchl_2 = self.dialog.findChild(QLineEdit, "m2mltrenchl_2")
-        m2trenchl_cost_2 = self.dialog.findChild(QLineEdit, "m2trenchl_cost_2")
-        calculed_y = self.dialog.findChild(QLineEdit, "calculed_y")  
         thickness = self.dialog.findChild(QLineEdit, "thickness")
         m2mltrenchl = self.dialog.findChild(QLineEdit, "m2mltrenchl")
         width = self.dialog.findChild(QLineEdit, "width")
@@ -213,12 +192,9 @@ class ManArcDialog(ParentDialog):
         m2mlpav.setText('None') 
         m2mlbottom_2.setText('None') 
 
-
-
         z1.setText('None') 
         z2.setText('None') 
         bulk.setText('None') 
-        #geom1.setText('None') 
         b.setText('None') 
         b_2.setText('None') 
         y_param.setText('None') 
@@ -227,8 +203,6 @@ class ManArcDialog(ParentDialog):
         m3mlexcess_2.setText('None') 
         m2mltrenchl_2.setText('None') 
         thickness.setText('None') 
-        #m2trenchl_cost_2.setText('None') 
-        #calculed_y.setText('None') 
         m2mltrenchl.setText('None') 
         width.setText('None') 
         
@@ -277,7 +251,6 @@ class ManArcDialog(ParentDialog):
         z1.setText(str(row['z1']))
         z2.setText(str(row['z2']))
         bulk.setText(str(row['bulk']))
-        #geom1.setText(str(row['geom1']))
         b.setText(str(row['b']))
         b_2.setText(str(row['b']))
         y_param.setText(str(row['y_param']))
@@ -286,11 +259,8 @@ class ManArcDialog(ParentDialog):
         m3mlexcess_2.setText(str(row['m3mlexcess']))
         m2mltrenchl_2.setText(str(row['m2mltrenchl']))
         thickness.setText(str(row['thickness']))
-        #m2trenchl_cost_2.setText(str(row['m2trenchl_cost']))
-        #calculed_y.setText(str(row['calculed_y'])) 
         m2mltrenchl.setText(str(row['m2mltrenchl']))
         width.setText(str(row['width']))
-
 
         # Get values from database        
         sql = "SELECT length,budget"
@@ -300,15 +270,7 @@ class ManArcDialog(ParentDialog):
         
         self.length.setText(str(row['length'])) 
         self.budget.setText(str(row['budget'])) 
-        
-        
-        # Get arccat_id and soilcat_id from v_plan_cost_arc
-        arccat_id = None
-        sql = "SELECT arccat_id FROM "+self.schema_name+".v_plan_cost_arc WHERE arc_id = '"+self.arc_id+"'" 
-        row = self.dao.get_row(sql)
-        arccat_id = row[0]
-
-        # Fill QLineEdit 
+    
         element = None
         sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'element'" 
         row = self.dao.get_row(sql)
@@ -341,7 +303,6 @@ class ManArcDialog(ParentDialog):
         arc_bottom.setAlignment(Qt.AlignJustify)
         arc_protection.setText(m3protec)
         arc_protection.setAlignment(Qt.AlignJustify)
-        
         
         # Fill QLineEdit -> Soilcat
         m3exc = None
@@ -386,4 +347,5 @@ class ManArcDialog(ParentDialog):
         soil_excess.setAlignment(Qt.AlignJustify)
         soil_trenchlining.setText(m2trenchl)
         soil_trenchlining.setAlignment(Qt.AlignJustify)
+        
         

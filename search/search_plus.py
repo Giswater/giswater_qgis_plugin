@@ -146,26 +146,22 @@ class SearchPlus(QObject):
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_code, 
                                      self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
-            #print "Error populating Tab 'Hydrometer'"
             self.dlg.tab_main.removeTab(3)
                  
         # Tab 'Address'      
         status = self.address_populate('street_layer')
         if not status:
-            #print "Error populating Tab 'Address'"   
             self.dlg.tab_main.removeTab(2)                       
         
         # Tab 'Ppoint'      
         status = self.populate_combo('ppoint_layer', self.dlg.ppoint_field_zone, self.params['ppoint_field_zone'])
         status_2 = self.populate_combo('ppoint_layer', self.dlg.ppoint_number, self.params['ppoint_field_number'])
         if not status or not status_2:
-            #print "Error populating Tab 'Ppoint'"
             self.dlg.tab_main.removeTab(1)              
               
         # Tab 'Urban Properties'      
         status = self.urban_populate('urban_propierties_layer')
         if not status:
-            #print "Error populating Tab 'Urban Properties'"
             self.dlg.tab_main.removeTab(0)              
             
         return True
@@ -175,9 +171,7 @@ class SearchPlus(QObject):
         ''' Populate combo 'address_street' '''
         
         # Check if we have this search option available
-        if not parameter in self.layers:
-            #message = "Layer '{}' not found in parameter '{}'".format(self.params[parameter], parameter)  
-            #print message          
+        if not parameter in self.layers:  
             return False
 
         # Get layer features
@@ -215,8 +209,7 @@ class SearchPlus(QObject):
                            
         # get selected street
         selected = self.dlg.adress_street.currentText()
-        if selected == '':
-            print "Any record selected"            
+        if selected == '':        
             return
         
         # get street code
@@ -271,8 +264,7 @@ class SearchPlus(QObject):
         
         # Get selected street
         selected = self.dlg.adress_street.currentText()
-        if selected == '':
-            print "Any record selected"            
+        if selected == '':       
             return
 
         data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
@@ -298,7 +290,6 @@ class SearchPlus(QObject):
         street = self.dlg.adress_street.currentText()
         civic = self.dlg.adress_number.currentText()
         if street == '' or civic == '':
-            print "Any record selected"
             return  
                 
         # Get selected portal
@@ -346,7 +337,6 @@ class SearchPlus(QObject):
         # Get selected element from combo    
         element = combo.currentText()
         if element.strip() == '':
-            print "Any record selected"
             return None
                 
         elem = combo.itemData(combo.currentIndex())
@@ -582,14 +572,11 @@ class SearchPlus(QObject):
         ''' Populate selected combo from features of selected layer '''        
         
         # Check if we have this search option available
-        if not parameter in self.layers:
-            message = "Layer '{}' not found in parameter '{}'".format(self.params[parameter], parameter)  
-            print(message)    
+        if not parameter in self.layers: 
             return False
 
         # Fields management
         layer = self.layers[parameter]
-        #records = [(-1, '')]
         records = []
         idx_field = layer.fieldNameIndex(fieldname) 
         if idx_field == -1:           
