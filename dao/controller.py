@@ -358,15 +358,5 @@ class DaoController():
 
         return uri_schema
     
-    
-    def set_project_user(self):
-        # TODO: Set user
-        pass
-        '''
-        sql = "UPDATE "+self.schema_name+".rpt_selector_result"
-        sql+= " SET cur_user = '"+self.user+"'"
-        sql+= " WHERE id = '1'" 
-        self.dao.execute_sql(sql)  
-        '''
 
     

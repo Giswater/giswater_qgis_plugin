@@ -417,10 +417,8 @@ class Mg():
         # Get new values from widgets of type QComboBox
         rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
         rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
-
+        
         # Set project user
-        user = self.controller.set_project_user()
-
         # Delete previous values
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_result" 
@@ -428,11 +426,11 @@ class Mg():
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
         self.controller.execute_sql(sql)
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
-        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
+        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+rpt_selector_compare_id+"')"
         self.controller.execute_sql(sql)
         #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
-        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
+        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+rpt_selector_compare_id+"')"
         self.controller.execute_sql(sql)
 
         # Show message to user

@@ -256,7 +256,8 @@ class Ed():
       
         # Check if interval is valid
         if (date_from < date_to):
-            expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
+            #expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
+            pass
         else :
             message="Valid interval!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
@@ -302,7 +303,13 @@ class Ed():
         rotation = utils_giswater.getWidgetText("rotation")
         link = utils_giswater.getWidgetText("link")
         verified = utils_giswater.getWidgetText("verified")
-
+        
+        if element_id == 'null':
+            # Show warning message    
+            message = "You need to insert element_id"
+            self.controller.show_warning(message, context_name='ui_message' )   
+            return
+        
         # Check if we already have data with selected element_id
         sql = "SELECT DISTINCT(element_id) FROM "+self.schema_name+".element WHERE element_id = '"+element_id+"'"    
         row = self.dao.get_row(sql)
@@ -567,6 +574,12 @@ class Ed():
         observ = utils_giswater.getWidgetText("observ")
         path = utils_giswater.getWidgetText("path")
         
+
+        if doc_id == 'null':
+            # Show warning message    
+            message = "You need to insert doc_id"
+            self.controller.show_warning(message, context_name='ui_message' )   
+            return
         # Check if this document already exists
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc WHERE id = '"+doc_id+"'" 
         row = self.dao.get_row(sql)
