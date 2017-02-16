@@ -1,3 +1,10 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapTool
 
@@ -90,13 +97,11 @@ class PointMapTool(QgsMapTool):
 
     def canvasReleaseEvent(self, e):
            
-        # TODO: Get clicked point and current layer               
+        # Get clicked point and current layer               
         self.point = self.toMapCoordinates(e.pos())             
-        layer = self.iface.activeLayer()     
         
-        # Insert new node into selected point. Open its feature form
-        last_id = self.insert_node(self.point.x(), self.point.y())
-
+        # Insert new node into selected point
+        self.insert_node(self.point.x(), self.point.y())
         self.iface.mapCanvas().refreshAllLayers()
 
         for layerRefresh in self.iface.mapCanvas().layers():

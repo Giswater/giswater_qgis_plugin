@@ -6,15 +6,12 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
-from PyQt4.QtGui import QComboBox, QDateEdit, QPushButton, QTableView, QTabWidget, QLineEdit
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.add_sum import Add_sum          # @UnresolvedImport
-from PyQt4.Qt import QDialogButtonBox
 
 
 def formOpen(dialog, layer, feature):
@@ -56,7 +53,6 @@ class ManConnecDialog(ParentDialog):
       
         table_element = "v_ui_element_x_connec" 
         table_document = "v_ui_doc_x_connec"
-        #table_event_connec = "v_ui_doc_x_connec"
         table_event_connec = "v_ui_om_visit_x_connec"
         table_hydrometer = "v_rtc_hydrometer"    
         table_hydrometer_value = "v_edit_rtc_hydro_data_x_connec"    
@@ -79,9 +75,6 @@ class ManConnecDialog(ParentDialog):
               
         # Load data from related tables
         self.load_data()
-        
-        # Set layer in editing mode
-        #self.layer.startEditing()
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
@@ -114,7 +107,6 @@ class ManConnecDialog(ParentDialog):
         # Configuration of table hydrometer | hydrometer value
         self.set_configuration(self.tbl_hydrometer_value, table_hydrometer_value)
         
-        
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
@@ -122,7 +114,3 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
         
         
-        #self.dialog.findChild(QPushButton, "buttonBox").clicked.connect(self.save)
-      
-        
-       

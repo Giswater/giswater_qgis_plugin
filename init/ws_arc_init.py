@@ -1,5 +1,14 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QComboBox, QPushButton, QTableView, QTabWidget
+
+from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
@@ -97,7 +106,6 @@ class ArcDialog(ParentDialog):
         # Set signals    
         btn_element_delete = self.dialog.findChild(QPushButton, "btn_element_delete")
         btn_doc_delete = self.dialog.findChild(QPushButton, "btn_doc_delete")
-        # TODO
         if btn_element_delete:             
             btn_element_delete.clicked.connect(partial(self.delete_records, self.tbl_info, table_element))  
         if btn_doc_delete:               

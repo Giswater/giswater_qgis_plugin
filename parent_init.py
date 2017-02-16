@@ -6,7 +6,6 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate

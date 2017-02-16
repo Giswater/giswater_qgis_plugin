@@ -6,7 +6,6 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit
 from PyQt4.QtCore import Qt
 from functools import partial
@@ -76,9 +75,6 @@ class ManArcDialog(ParentDialog):
         
         # Load data from related tables
         self.load_data()
-        
-        # Set layer in editing mode
-        # self.layer.startEditing()
         
         # Manage tab visibility
         self.set_tabs_visibility(4)  

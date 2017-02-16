@@ -6,10 +6,8 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
 from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit, QFileDialog, QPushButton
 from qgis.gui import QgsMessageBar
-from qgis.core import QgsExpression
 
 import os
 import sys
@@ -113,7 +111,7 @@ class Ed():
         try:
             if self.search_plus is not None:         
                 self.search_plus.dlg.setVisible(True)             
-        except RuntimeError as e:
+        except RuntimeError:
             pass
             
                 
@@ -256,10 +254,9 @@ class Ed():
       
         # Check if interval is valid
         if (date_from < date_to):
-            #expr = QgsExpression('format_date("date",\'yyyyMMdd\') > ' + self.date_document_from.date().toString('yyyyMMdd')+'AND format_date("date",\'yyyyMMdd\') < ' + self.date_document_to.date().toString('yyyyMMdd')+ ' AND "arc_id" ='+ self.arc_id_selected+'' )
             pass
         else :
-            message="Valid interval!"
+            message = "Date interval not valid!"
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
             return
 
@@ -307,7 +304,7 @@ class Ed():
         if element_id == 'null':
             # Show warning message    
             message = "You need to insert element_id"
-            self.controller.show_warning(message, context_name='ui_message' )   
+            self.controller.show_warning(message, context_name='ui_message')   
             return
         
         # Check if we already have data with selected element_id
@@ -655,3 +652,5 @@ class Ed():
             webbrowser.open(url)
         else :
             webbrowser.open(url)
+            
+            
