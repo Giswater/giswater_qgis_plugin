@@ -6,7 +6,6 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 
 from functools import partial
@@ -52,7 +51,6 @@ class ManNodeDialog(ParentDialog):
         table_event_node = "v_ui_om_visit_x_node"
         table_scada = "v_rtc_scada"    
         table_scada_value = "v_rtc_scada_value"    
-        
         table_price_node = "v_price_x_node"
         
         self.table_chamber = self.schema_name+'."v_edit_man_chamber"'

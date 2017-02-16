@@ -6,7 +6,6 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
 
 from functools import partial

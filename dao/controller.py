@@ -1,3 +1,10 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings   
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
@@ -358,15 +365,5 @@ class DaoController():
 
         return uri_schema
     
-    
-    def set_project_user(self):
-        # TODO: Set user
-        pass
-        '''
-        sql = "UPDATE "+self.schema_name+".rpt_selector_result"
-        sql+= " SET cur_user = '"+self.user+"'"
-        sql+= " WHERE id = '1'" 
-        self.dao.execute_sql(sql)  
-        '''
 
     

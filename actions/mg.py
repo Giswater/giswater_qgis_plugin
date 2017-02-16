@@ -1,7 +1,13 @@
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
+
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QCommandLinkButton, QTableView, QMenu, QPushButton
-from qgis.gui import QgsMessageBar
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -101,9 +107,7 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"  
             self.controller.execute_sql(sql) 
          
-        # Show message and close the dialog    
-        #message = "Selected functions have been executed"
-        #self.controller.show_info(message, context_name='ui_message') 
+        # Close the dialog    
         self.close_dialog()         
             
         # Refresh map canvas
@@ -329,9 +333,7 @@ class Mg():
         self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
                 
-        # Show message and close form
-#         message = "Values has been updated"
-#         self.controller.show_info(message, context_name='ui_message') 
+        # Close form
         self.close_dialog(self.dlg)    
                 
                     
@@ -418,21 +420,18 @@ class Mg():
         rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
         rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
 
-        # Set project user
-        user = self.controller.set_project_user()
-
         # Delete previous values
-        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_result" 
         self.controller.execute_sql(sql)
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
         self.controller.execute_sql(sql)
+        
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
-        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
+        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+rpt_selector_compare_id+"')"
         self.controller.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
-        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
+        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+rpt_selector_compare_id+"')"
         self.controller.execute_sql(sql)
 
         # Show message to user
@@ -458,7 +457,6 @@ class Mg():
         Combo to select new node_type.type
         Combo to select new node_type.id
         Combo to select new cat_node.id
-        TODO: Trigger 'gw_trg_edit_node' has to be disabled temporarily 
         '''
         
         # Uncheck all actions (buttons) except this one
@@ -561,7 +559,7 @@ class Mg():
         message = "Node type has been update!"
         self.controller.show_info(message, context_name='ui_message' ) 
         
-        # Close dialog
+        # Close form
         self.close_dialog()
                 
                    
@@ -589,8 +587,6 @@ class Mg():
         
         self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
-        
-        
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         
@@ -605,8 +601,7 @@ class Mg():
         row = self.dao.get_row(sql)
         if row :
             path = str(row['value'])
-            self.om_visit_absolute_path.setText(path)
-            #self.om_visit_absolute_path.clicked.connect(partial(self.geth_path, path))   
+            self.om_visit_absolute_path.setText(path)  
         
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
@@ -614,8 +609,6 @@ class Mg():
         if row : 
             path = str(row['value'])
             self.doc_absolute_path.setText(path)
-            #self.doc_absolute_path.clicked.connect(partial(self.geth_path, path))
-        
 
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
@@ -785,17 +778,14 @@ class Mg():
             if row == None:
                 self.menu.addAction(elem,partial(self.insert, elem,table))
         
-        #self.menu.activated.connect(self.insert)
-        
                  
-    def insert(self,id_action,table):
+    def insert(self, id_action, table):
         ''' On action(select value from menu) execute SQL '''
 
         # Insert value into database
         sql = "INSERT INTO "+self.schema_name+"."+table+" (id) "
         sql+= " VALUES ('"+id_action+"')"
         self.controller.execute_sql(sql)   
-        
         self.fill_table(self.tbl, self.schema_name+"."+table)
     
         
