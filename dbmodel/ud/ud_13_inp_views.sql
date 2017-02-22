@@ -246,6 +246,7 @@ JOIN subcatchment ON (((inp_coverage_land_x_subc.subc_id)::text = (subcatchment.
 JOIN inp_selector_sector ON (((subcatchment.sector_id)::text = (inp_selector_sector.sector_id)::text)))
 JOIN inp_selector_hydrology ON (((subcatchment.hydrology_id)::text = (inp_selector_hydrology.hydrology_id)::text)));
 
+
 DROP VIEW IF EXISTS "v_inp_loadings" CASCADE;
 CREATE VIEW "v_inp_loadings" AS 
 SELECT inp_loadings_pol_x_subc.poll_id, inp_loadings_pol_x_subc.subc_id, inp_loadings_pol_x_subc.ibuildup, inp_selector_sector.sector_id 
@@ -255,6 +256,7 @@ JOIN inp_loadings_pol_x_subc ON (((inp_loadings_pol_x_subc.subc_id)::text = (sub
 JOIN inp_selector_hydrology ON (((subcatchment.hydrology_id)::text = (inp_selector_hydrology.hydrology_id)::text)));
 
 
+DROP VIEW IF EXISTS "v_subcatchment" CASCADE;
 CREATE VIEW v_subcatchment AS SELECT   
 subc_id ,  node_id,  rg_id,  area,  imperv,  width,  slope,  clength,  snow_id ,  nimp,  nperv,  
 simp,  sperv,  zero,  routeto,  rted,  maxrate,  minrate,  decay,  drytime,  maxinfil,  suction,  conduct,  initdef, 
