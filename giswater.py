@@ -426,7 +426,7 @@ class Giswater(QObject):
             for feature in features:
                 wsoftware = feature['wsoftware']
           
-                if wsoftware.lower() == 'epanet':
+                if wsoftware.lower() == 'ws':
                     self.mg.project_type = 'ws'
                     self.actions['26'].setVisible(True)
                     self.actions['27'].setVisible(True)
@@ -434,7 +434,7 @@ class Giswater(QObject):
                     self.actions['57'].setVisible(False)
                     if self.toolbar_ws_enabled:
                         self.toolbar_ws.setVisible(True)                            
-                elif wsoftware.lower() == 'epaswmm':
+                elif wsoftware.lower() == 'ud':
                     self.mg.project_type = 'ud'
                     self.actions['26'].setVisible(False)
                     self.actions['27'].setVisible(False)
