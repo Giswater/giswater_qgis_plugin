@@ -10,7 +10,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Default values of state selection
 -- ----------------------------
-INSERT INTO "inp_selector_state" VALUES ('ON_SERVICE');
+INSERT INTO inp_selector_state VALUES ('ON_SERVICE');
+INSERT INTO inp_selector_state VALUES ('RECONSTRUCT');
+INSERT INTO inp_selector_state VALUES ('OBSOLETE');
 
 
 -- ----------------------------
