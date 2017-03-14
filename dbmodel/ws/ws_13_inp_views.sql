@@ -343,7 +343,8 @@ UNION
    JOIN inp_shortpipe ON arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
-   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text ;
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text   
+   where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age  ;
 
 
 
