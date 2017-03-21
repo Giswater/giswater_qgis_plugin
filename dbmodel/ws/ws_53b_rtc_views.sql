@@ -101,15 +101,14 @@ CREATE OR REPLACE VIEW v_rtc_dma_parameter_period AS
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
-SELECT
-rtc_hydrometer_x_connec.hydrometer_id,
-rtc_hydrometer_x_connec.connec_id,
-arc.arc_id,
-arc.node_1,
-arc.node_2
-FROM rtc_hydrometer_x_connec
-JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-JOIN arc ON arc.arc_id::text = v_edit_connec.arc_id;
+ SELECT rtc_hydrometer_x_connec.hydrometer_id,
+    rtc_hydrometer_x_connec.connec_id,
+    temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2
+   FROM rtc_hydrometer_x_connec
+     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN temp_arc ON temp_arc.arc_id::text = v_edit_connec.arc_id::text;
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
@@ -145,7 +144,7 @@ UNION
 
 
 DROP VIEW IF EXISTS "v_inp_demand" CASCADE;
-CREATE OR REPLACE VIEW v_inp_demand AS 
+CREATE OR REPLACE VIEW v_inp_demand_v AS 
  SELECT v_rtc_hydrometer_x_node_period.node_id,
         CASE
             WHEN rtc_options.coefficient::text = 'MIN'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_min)
@@ -159,14 +158,13 @@ CREATE OR REPLACE VIEW v_inp_demand AS
             ELSE NULL::character varying
         END AS pattern_id
    FROM inp_junction
-     JOIN node ON node.node_id::text = inp_junction.node_id::text
-     JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id::text = node.node_id::text
+     JOIN temp_node ON temp_node.node_id::text = inp_junction.node_id::text
+     JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id::text = temp_node.node_id::text
      JOIN rtc_options ON rtc_options.period_id::text = v_rtc_hydrometer_x_node_period.period_id::text
-     JOIN inp_selector_sector ON node.sector_id::text = inp_selector_sector.sector_id::text
-     JOIN inp_selector_state ON node.state::text = inp_selector_state.id::text
+     JOIN inp_selector_sector ON temp_node.sector_id::text = inp_selector_sector.sector_id::text
+     JOIN inp_selector_state ON temp_node.state::text = inp_selector_state.id::text
   WHERE rtc_options.rtc_status::text = 'ON'::text
   GROUP BY v_rtc_hydrometer_x_node_period.node_id, inp_junction.pattern_id, v_rtc_hydrometer_x_node_period.period_id, rtc_options.coefficient;
-
 
 DROP VIEW IF EXISTS "v_rtc_scada" CASCADE;
 CREATE OR REPLACE VIEW v_rtc_scada AS 
