@@ -144,7 +144,7 @@ UNION
 
 
 DROP VIEW IF EXISTS "v_inp_demand" CASCADE;
-CREATE OR REPLACE VIEW v_inp_demand_v AS 
+CREATE OR REPLACE VIEW v_inp_demand AS 
  SELECT v_rtc_hydrometer_x_node_period.node_id,
         CASE
             WHEN rtc_options.coefficient::text = 'MIN'::text THEN sum(v_rtc_hydrometer_x_node_period.lps_min)
