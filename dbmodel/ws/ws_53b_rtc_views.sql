@@ -108,12 +108,14 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS
     temp_arc.node_2
    FROM rtc_hydrometer_x_connec
      JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_arc ON temp_arc.arc_id::text = v_edit_connec.arc_id::text;
+     RIGHT JOIN temp_arc ON temp_arc.arc_id::text = v_edit_connec.arc_id::text;
 
 
-DROP VIEW IF EXISTS v_rtc_hydrometer_x_node_period CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
- SELECT v_rtc_hydrometer_x_arc.node_1 AS node_id,
+ SELECT 
+    v_rtc_hydrometer_x_arc.hydrometer_id,
+    v_rtc_hydrometer_x_arc.node_1 AS node_id,
+    v_rtc_hydrometer_x_arc.arc_id,
     v_rtc_hydrometer_period.dma_id,
     v_rtc_hydrometer_period.period_id,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision AS lps_avg_real,
@@ -124,10 +126,13 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
    FROM v_rtc_hydrometer_x_arc
-     JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::integer = v_rtc_hydrometer_x_arc.hydrometer_id::integer
+     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::integer = v_rtc_hydrometer_x_arc.hydrometer_id::integer
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text = v_rtc_dma_parameter_period.period_id::text
 UNION
- SELECT v_rtc_hydrometer_x_arc.node_2 AS node_id,
+ SELECT 
+    v_rtc_hydrometer_x_arc.hydrometer_id,
+    v_rtc_hydrometer_x_arc.node_2 AS node_id,
+    v_rtc_hydrometer_x_arc.arc_id,
     v_rtc_hydrometer_period.dma_id,
     v_rtc_hydrometer_period.period_id,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision AS lps_avg_real,
@@ -138,7 +143,7 @@ UNION
     v_rtc_dma_parameter_period.cmax,
     v_rtc_hydrometer_period.lps_avg * 0.5::double precision * v_rtc_dma_parameter_period.cmax AS lps_max
    FROM v_rtc_hydrometer_x_arc
-     JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::integer = v_rtc_hydrometer_x_arc.hydrometer_id::integer
+     LEFT JOIN v_rtc_hydrometer_period ON v_rtc_hydrometer_period.hydrometer_id::integer = v_rtc_hydrometer_x_arc.hydrometer_id::integer
      LEFT JOIN v_rtc_dma_parameter_period ON v_rtc_hydrometer_period.period_id::text = v_rtc_dma_parameter_period.period_id::text;
 
 
@@ -158,13 +163,15 @@ CREATE OR REPLACE VIEW v_inp_demand AS
             ELSE NULL::character varying
         END AS pattern_id
    FROM inp_junction
-     JOIN temp_node ON temp_node.node_id::text = inp_junction.node_id::text
+     RIGHT JOIN temp_node ON temp_node.node_id::text = inp_junction.node_id::text
      JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id::text = temp_node.node_id::text
      JOIN rtc_options ON rtc_options.period_id::text = v_rtc_hydrometer_x_node_period.period_id::text
      JOIN inp_selector_sector ON temp_node.sector_id::text = inp_selector_sector.sector_id::text
      JOIN inp_selector_state ON temp_node.state::text = inp_selector_state.id::text
   WHERE rtc_options.rtc_status::text = 'ON'::text
   GROUP BY v_rtc_hydrometer_x_node_period.node_id, inp_junction.pattern_id, v_rtc_hydrometer_x_node_period.period_id, rtc_options.coefficient;
+  
+  
 
 DROP VIEW IF EXISTS "v_rtc_scada" CASCADE;
 CREATE OR REPLACE VIEW v_rtc_scada AS 
@@ -174,6 +181,7 @@ ext_rtc_scada.cat_scada_id,
 ext_rtc_scada.text
 FROM ext_rtc_scada
 JOIN rtc_scada_node ON rtc_scada_node.scada_id::text = ext_rtc_scada.scada_id::text;
+
 
 
 DROP VIEW IF EXISTS "v_rtc_scada_data" CASCADE;
@@ -186,6 +194,7 @@ ext_rtc_scada_x_data.avg,
 ext_rtc_scada_x_data.sum,
 ext_rtc_scada_x_data.cat_period_id
 FROM ext_rtc_scada_x_data JOIN rtc_scada_node ON rtc_scada_node.scada_id::text=ext_rtc_scada_x_data.scada_id::text;
+
 
 
 DROP VIEW IF EXISTS "v_rtc_scada_value" CASCADE;
