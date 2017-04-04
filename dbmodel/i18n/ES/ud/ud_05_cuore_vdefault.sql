@@ -30,7 +30,7 @@ ALTER VIEW v_edit_connec ALTER state SET DEFAULT 'EN_SERVICIO';
 ALTER VIEW v_edit_connec ALTER verified SET DEFAULT 'PARA REVISAR';
 
 ALTER TABLE element ALTER COLUMN state SET DEFAULT 'EN_SERVICIO';
-ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'EN_SERVICIO';
+ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'PARA REVISAR';
 
 
 -- Custom values (User can customize other fields....)

@@ -30,7 +30,7 @@ ALTER VIEW v_edit_connec ALTER state SET DEFAULT 'ON_SERVICE';
 ALTER VIEW v_edit_connec ALTER verified SET DEFAULT 'TO REVIEW';
 
 ALTER TABLE element ALTER COLUMN state SET DEFAULT 'ON_SERVICE';
-ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'ON_SERVICE';
+ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'TO REVIEW';
 
 
 -- Custom values (User can customize other fields....)
