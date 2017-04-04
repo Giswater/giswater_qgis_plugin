@@ -7,3 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+ALTER TABLE element ADD COLUMN units integer;
+
+ALTER TABLE element ALTER COLUMN verified SET DEFAULT NULL;
