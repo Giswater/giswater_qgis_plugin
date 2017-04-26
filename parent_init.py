@@ -408,7 +408,7 @@ class ParentDialog(object):
             else: 
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
-                    message = "File not found!"
+                    message = "File not found:"+self.full_path 
                     self.controller.show_warning(message, context_name='ui_message')
                        
                 else:
