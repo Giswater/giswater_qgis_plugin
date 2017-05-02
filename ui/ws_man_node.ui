@@ -6,20 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>603</width>
-    <height>615</height>
+    <width>616</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>0</width>
     <height>0</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>830</width>
-    <height>615</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -33,7 +27,7 @@
     <rect>
      <x>10</x>
      <y>64</y>
-     <width>577</width>
+     <width>591</width>
      <height>473</height>
     </rect>
    </property>
@@ -48,7 +42,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_67">
     <attribute name="title">
@@ -59,7 +53,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>571</width>
        <height>420</height>
       </rect>
      </property>
@@ -76,7 +70,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>571</width>
         <height>312</height>
        </rect>
       </property>
@@ -87,7 +81,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>20</y>
+         <y>40</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -103,7 +97,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
+         <y>40</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -139,7 +133,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>80</y>
+         <y>100</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -158,7 +152,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>80</y>
+         <y>100</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -194,7 +188,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>50</y>
+         <y>70</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -230,7 +224,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>50</y>
+         <y>70</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -243,7 +237,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>20</y>
+         <y>40</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -262,7 +256,7 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>20</y>
+         <y>40</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -298,7 +292,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>80</y>
+         <y>100</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -308,7 +302,7 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>50</y>
+         <y>70</y>
          <width>101</width>
          <height>22</height>
         </rect>
@@ -344,7 +338,7 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>80</y>
+         <y>100</y>
          <width>101</width>
          <height>22</height>
         </rect>
@@ -380,7 +374,7 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>110</y>
+         <y>130</y>
          <width>101</width>
          <height>22</height>
         </rect>
@@ -416,7 +410,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>110</y>
+         <y>130</y>
          <width>160</width>
          <height>22</height>
         </rect>
@@ -429,7 +423,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>50</y>
+         <y>70</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -448,7 +442,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>110</y>
+         <y>130</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -458,7 +452,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>110</y>
+         <y>130</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -496,8 +490,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>28</height>
+        <width>571</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -507,7 +501,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>50</y>
+         <y>30</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -520,7 +514,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
+         <y>0</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -556,7 +550,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>20</y>
+         <y>0</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -572,7 +566,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>50</y>
+         <y>30</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -608,7 +602,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>50</y>
+         <y>30</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -627,7 +621,7 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>50</y>
+         <y>30</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -663,7 +657,7 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>20</y>
+         <y>0</y>
          <width>90</width>
          <height>22</height>
         </rect>
@@ -699,7 +693,7 @@
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>20</y>
+         <y>0</y>
          <width>160</width>
          <height>20</height>
         </rect>
@@ -1248,8 +1242,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -2432,8 +2426,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -3610,8 +3604,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -4788,8 +4782,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -5969,8 +5963,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7147,8 +7141,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -8451,8 +8445,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -10119,8 +10113,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -12124,8 +12118,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>312</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -13302,8 +13296,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -14483,8 +14477,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
-        <height>339</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -14693,31 +14687,93 @@
     <attribute name="title">
      <string>Element</string>
     </attribute>
-    <widget class="QTableView" name="tbl_element">
+    <widget class="QTabWidget" name="tab_event_2">
      <property name="geometry">
       <rect>
-       <x>12</x>
-       <y>46</y>
-       <width>550</width>
-       <height>385</height>
-      </rect>
-     </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="delete_row_info">
-     <property name="geometry">
-      <rect>
-       <x>460</x>
+       <x>10</x>
        <y>10</y>
-       <width>100</width>
-       <height>23</height>
+       <width>560</width>
+       <height>423</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Unlink element</string>
+     <property name="currentIndex">
+      <number>1</number>
      </property>
+     <widget class="QWidget" name="page_element_node">
+      <attribute name="title">
+       <string>Element</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_element">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>42</y>
+         <width>531</width>
+         <height>345</height>
+        </rect>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="delete_row_info">
+       <property name="geometry">
+        <rect>
+         <x>438</x>
+         <y>10</y>
+         <width>100</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Unlink element</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_14">
+      <attribute name="title">
+       <string>Node</string>
+      </attribute>
+      <widget class="QPushButton" name="delete_row_info_2">
+       <property name="geometry">
+        <rect>
+         <x>438</x>
+         <y>12</y>
+         <width>100</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Delete node</string>
+       </property>
+      </widget>
+      <widget class="QTableView" name="tbl_element_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>44</y>
+         <width>531</width>
+         <height>337</height>
+        </rect>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="delete_row_info_3">
+       <property name="geometry">
+        <rect>
+         <x>324</x>
+         <y>12</y>
+         <width>100</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>View node</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="page_document">
@@ -15552,7 +15608,7 @@
   <widget class="QComboBox" name="epa_type">
    <property name="geometry">
     <rect>
-     <x>448</x>
+     <x>470</x>
      <y>30</y>
      <width>131</width>
      <height>20</height>
@@ -15572,9 +15628,9 @@
   <widget class="QLineEdit" name="presszonecat_id">
    <property name="geometry">
     <rect>
-     <x>274</x>
-     <y>560</y>
-     <width>105</width>
+     <x>10</x>
+     <y>610</y>
+     <width>121</width>
      <height>20</height>
     </rect>
    </property>
@@ -15622,30 +15678,17 @@
     <rect>
      <x>278</x>
      <y>30</y>
-     <width>161</width>
+     <width>181</width>
      <height>20</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="undelete">
-   <property name="geometry">
-    <rect>
-     <x>512</x>
-     <y>560</y>
-     <width>79</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>396</x>
-     <y>560</y>
-     <width>107</width>
+     <x>140</x>
+     <y>610</y>
+     <width>121</width>
      <height>20</height>
     </rect>
    </property>
@@ -15761,7 +15804,7 @@
   <widget class="QLabel" name="label_epa_type">
    <property name="geometry">
     <rect>
-     <x>448</x>
+     <x>470</x>
      <y>10</y>
      <width>90</width>
      <height>22</height>
@@ -15869,8 +15912,8 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>396</x>
-     <y>540</y>
+     <x>140</x>
+     <y>590</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -15905,8 +15948,8 @@
   <widget class="QLabel" name="label_presszone">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>540</y>
+     <x>6</x>
+     <y>590</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -15941,14 +15984,163 @@
   <widget class="QDialogButtonBox" name="ok">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>590</y>
+     <x>440</x>
+     <y>650</y>
      <width>156</width>
      <height>23</height>
     </rect>
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="undelete_3">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>610</y>
+     <width>71</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Inventory</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="undelete_4">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>610</y>
+     <width>81</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Undelete</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="undelete_5">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>610</y>
+     <width>79</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Publish</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_dma_2">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>540</y>
+     <width>90</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Exploitation:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="dma_id_2">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>560</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="maxVisibleItems">
+    <number>8</number>
+   </property>
+   <property name="frame">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_sector_2">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>540</y>
+     <width>90</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Macrosector:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="sector_id_2">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>560</y>
+     <width>119</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="maxVisibleItems">
+    <number>8</number>
+   </property>
+   <property name="frame">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>
@@ -16248,7 +16440,6 @@
   <tabstop>dma_id</tabstop>
   <tabstop>presszonecat_id</tabstop>
   <tabstop>verified</tabstop>
-  <tabstop>undelete</tabstop>
   <tabstop>delete_row_info</tabstop>
   <tabstop>tbl_element</tabstop>
   <tabstop>date_document_from</tabstop>

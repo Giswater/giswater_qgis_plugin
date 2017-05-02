@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>262</height>
+    <width>350</width>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>220</y>
+     <x>176</x>
+     <y>310</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>220</y>
+     <x>256</x>
+     <y>310</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -39,83 +39,223 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="check_node_duplicated">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>50</y>
-     <width>231</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>     Node duplicated identifier</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="check_connec_duplicated">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>80</y>
-     <width>221</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>     Connec duplicated  identifier</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="check_arc_same_startend">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>110</y>
-     <width>241</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>     Arc with same start-end indetifier</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="check_node_sink">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>180</y>
-     <width>241</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>     Node sink identifier (only for ud projects)</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="check_node_orphan">
+  <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>251</width>
-     <height>17</height>
+     <width>303</width>
+     <height>279</height>
     </rect>
    </property>
-   <property name="text">
-    <string>     Node orphan identifier</string>
+   <property name="currentIndex">
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QCheckBox" name="check_topology_repair">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>140</y>
-     <width>241</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>     Node topology review</string>
-   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Basics</string>
+    </attribute>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>279</width>
+       <height>49</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string> Topology builder</string>
+     </property>
+     <widget class="QCheckBox" name="check_arc_same_startend_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>23</y>
+        <width>271</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nodes from arcs</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>66</y>
+       <width>279</width>
+       <height>179</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Topology review</string>
+     </property>
+     <widget class="QCheckBox" name="check_topology_repair_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>150</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string> Node topology review</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_connec_duplicated_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>221</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Connec duplicated  identifier</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_duplicated_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>60</y>
+        <width>231</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Node duplicated identifier</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_arc_same_startend_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>120</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string> Arc with same start-end indetifier</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_orphan_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>251</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Node orphan identifier</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>UD</string>
+    </attribute>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>275</width>
+       <height>233</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Review</string>
+     </property>
+     <widget class="QCheckBox" name="check_node_sink_4">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>86</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Arcs sortint més alts que tubs</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_sink_3">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>56</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nodes sospitosos de ser reguladors</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_sink">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>26</y>
+        <width>241</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Node sink identifier</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_sink_5">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>116</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ars interseccionats</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_sink_6">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>146</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ars girats</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="check_node_sink_7">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>174</y>
+        <width>241</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Arcs que no tenen algun node inici o fi</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>
