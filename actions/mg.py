@@ -420,24 +420,31 @@ class Mg():
         rpt_selector_result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
         rpt_selector_compare_id = utils_giswater.getWidgetText("rpt_selector_compare_id")
 
+        # Set project user
+        user = self.controller.get_project_user()
+
         # Delete previous values
-        sql = "DELETE FROM "+self.schema_name+".rpt_selector_result" 
-        self.controller.execute_sql(sql)
-        sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
-        self.controller.execute_sql(sql)
-        
         # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
+        sql = "DELETE FROM "+self.schema_name+".rpt_selector_result" 
+        self.dao.execute_sql(sql)
+        sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
+        self.dao.execute_sql(sql)
+        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
-        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+rpt_selector_compare_id+"')"
-        self.controller.execute_sql(sql)
+        sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
+
+        self.dao.execute_sql(sql)
+        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
-        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+rpt_selector_compare_id+"')"
-        self.controller.execute_sql(sql)
+        sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
+
+        self.dao.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message') 
         self.close_dialog(self.dlg) 
+
 
 
     def mg_analytics(self):

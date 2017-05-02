@@ -678,12 +678,7 @@ class SearchPlus(QObject):
                     newattributeList.append(QgsField(attrib.name(), attrib.type()))
             mem_layer.dataProvider().addAttributes(newattributeList)
             mem_layer.updateFields()
-            
-            # Insert layer in the top of the TOC           
-            root = QgsProject.instance().layerTreeRoot()           
-            QgsMapLayerRegistry.instance().addMapLayer(mem_layer, False)
-            node_layer = QgsLayerTreeLayer(mem_layer)
-            root.insertChildNode(0, node_layer)                 
+           
      
         # Prepare memory layer for editing
         mem_layer.startEditing()
