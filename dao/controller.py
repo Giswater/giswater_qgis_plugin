@@ -101,7 +101,7 @@ class DaoController():
                 self.last_error = self.tr(msg)
                 return False           
         else:
-            msg = "Database connection name not found. Please check configuration file 'sewernet_qgis.config'"
+            msg = "Database connection name not found. Please check configuration file 'giswater.config'"
             self.show_warning(msg)
             self.last_error = self.tr(msg)
             return False
