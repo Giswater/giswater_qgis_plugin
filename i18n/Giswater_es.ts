@@ -63,7 +63,7 @@
     </message>      
     <message>
         <source>11_text</source>
-        <translation>Insert hydrant</translation>
+        <translation>Insertar hidrante</translation>
     </message>      
     <message>
         <source>12_text</source>
