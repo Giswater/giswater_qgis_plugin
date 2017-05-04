@@ -735,7 +735,8 @@ class Giswater(QObject):
             if map_tool_name == 'mg_extract_raster_value':
                 map_tool.set_config_action(self.actions['99'])                
 
-
+            
+       
     def set_search_plus(self):
         ''' Set SearchPlus object '''
         
