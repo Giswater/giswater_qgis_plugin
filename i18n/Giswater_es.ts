@@ -55,7 +55,7 @@
     </message>      
     <message>
         <source>08_text</source>
-        <translation>Insert filter</translation>
+        <translation>Insertar filtro</translation>
     </message>        
     <message>
         <source>10_text</source>
