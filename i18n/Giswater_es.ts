@@ -71,7 +71,7 @@
     </message>      
     <message>
         <source>13_text</source>
-        <translation>Insert pipe</translation>
+        <translation>Insertar tubería</translation>
     </message>      
     <message>
         <source>14_text</source>
