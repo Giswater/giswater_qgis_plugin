@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>440</x>
-     <y>30</y>
+     <y>25</y>
      <width>137</width>
      <height>20</height>
     </rect>
@@ -67,12 +67,12 @@
     <rect>
      <x>10</x>
      <y>64</y>
-     <width>577</width>
+     <width>601</width>
      <height>473</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>12</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -83,7 +83,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -95,7 +95,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -600,13 +600,142 @@
         <number>3</number>
        </property>
       </widget>
+      <widget class="QLabel" name="label_chamber_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="chamber_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="chamber_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_chamber_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_chamber_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="chamber_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="page_2">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -900,7 +1029,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -1434,7 +1563,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -1647,9 +1776,9 @@
     <widget class="QToolBox" name="toolBox_17">
      <property name="geometry">
       <rect>
-       <x>7</x>
+       <x>5</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -1661,7 +1790,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>339</height>
        </rect>
       </property>
@@ -2164,6 +2293,135 @@
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_junction_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_junction_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="junction_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="junction_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_junction_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="junction_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -2921,7 +3179,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -2933,7 +3191,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -3436,6 +3694,135 @@
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_manhole_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="manhole_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_manhole_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="manhole_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_manhole_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="manhole_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -4319,7 +4706,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -4331,7 +4718,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>339</height>
        </rect>
       </property>
@@ -4825,6 +5212,135 @@
        </property>
        <property name="text">
         <string>Estimated depth:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="netgully_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_netgully_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_netgully_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="netgully_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="netgully_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_netgully_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -5591,7 +6107,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -5603,7 +6119,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -6108,6 +6624,135 @@
         <number>3</number>
        </property>
       </widget>
+      <widget class="QLabel" name="label_netinit_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_netinit_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="netinit_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="netinit_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="netinit_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_netinit_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
@@ -6353,8 +6998,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>581</width>
+        <height>312</height>
        </rect>
       </property>
       <attribute name="label">
@@ -7102,7 +7747,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -7114,7 +7759,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -7617,6 +8262,135 @@
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_outfall_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="outfall_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_outfall_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="outfall_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_outfall_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="outfall_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -8442,7 +9216,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -8454,7 +9228,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -8957,6 +9731,135 @@
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_storage_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="storage_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="storage_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_storage_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_storage_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="storage_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -10121,7 +11024,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -10133,7 +11036,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>339</height>
        </rect>
       </property>
@@ -10638,14 +11541,143 @@
         <number>3</number>
        </property>
       </widget>
+      <widget class="QLineEdit" name="valve_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_valve_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_valve_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="valve_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="valve_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_valve_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="page_52">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>581</width>
+        <height>339</height>
        </rect>
       </property>
       <attribute name="label">
@@ -11393,7 +12425,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -11405,7 +12437,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -11899,6 +12931,135 @@
        </property>
        <property name="text">
         <string>Estimated depth:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="wjump_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_wjump_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_wjump_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="wjump_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="wjump_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_wjump_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::AutoText</enum>
@@ -13185,7 +14346,7 @@
       <rect>
        <x>7</x>
        <y>10</y>
-       <width>560</width>
+       <width>581</width>
        <height>420</height>
       </rect>
      </property>
@@ -13197,7 +14358,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>560</width>
+        <width>581</width>
         <height>312</height>
        </rect>
       </property>
@@ -13700,6 +14861,135 @@
        </property>
        <property name="margin">
         <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_wwtp_end_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>End date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="wwtp_code">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_wwtp_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>220</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>XYZ date:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_wwtp_code">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>190</y>
+         <width>90</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Code:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="wwtp_end_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>190</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="wwtp_xyz_date">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>220</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -14523,7 +15813,7 @@
     <widget class="QTableView" name="tbl_element">
      <property name="geometry">
       <rect>
-       <x>12</x>
+       <x>22</x>
        <y>46</y>
        <width>550</width>
        <height>385</height>
@@ -14536,7 +15826,7 @@
     <widget class="QPushButton" name="delete_row_info">
      <property name="geometry">
       <rect>
-       <x>460</x>
+       <x>470</x>
        <y>10</y>
        <width>100</width>
        <height>23</height>
@@ -15427,14 +16717,14 @@
   <widget class="QCheckBox" name="undelete">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>485</x>
      <y>610</y>
      <width>77</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Undel.</string>
+    <string>Undelete</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_dma">
@@ -15766,7 +17056,7 @@
   <widget class="QCheckBox" name="undelete_5">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>555</x>
      <y>610</y>
      <width>79</width>
      <height>17</height>
@@ -15779,9 +17069,9 @@
   <widget class="QCheckBox" name="undelete_2">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>345</x>
      <y>610</y>
-     <width>61</width>
+     <width>86</width>
      <height>17</height>
     </rect>
    </property>
@@ -15792,7 +17082,7 @@
   <widget class="QCheckBox" name="undelete_3">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>410</x>
      <y>610</y>
      <width>71</width>
      <height>17</height>
@@ -15805,7 +17095,7 @@
   <widget class="QCheckBox" name="undelete_4">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>275</x>
      <y>610</y>
      <width>79</width>
      <height>17</height>
@@ -15836,7 +17126,7 @@
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>Macro sector:</string>
+    <string>Macrodma:</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -15869,7 +17159,7 @@
     <rect>
      <x>400</x>
      <y>560</y>
-     <width>201</width>
+     <width>206</width>
      <height>20</height>
     </rect>
    </property>
