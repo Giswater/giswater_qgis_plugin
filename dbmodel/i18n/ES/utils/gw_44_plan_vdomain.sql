@@ -24,7 +24,7 @@ INSERT INTO price_value_unit VALUES ('t');
 -- ----------------------------
 INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_ALTA');
 INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_NORMAL');
-INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_BAIXA');
+INSERT INTO plan_value_ps_priority VALUES ('PRIORIDAD_BAJA');
 
 
 
