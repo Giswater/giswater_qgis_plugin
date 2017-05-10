@@ -7,6 +7,23 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- ----------------------------
+-- EXPLOTITATION STRATEGY
+-- ----------------------------
+
+CREATE TABLE exploitation(
+expl_id integer  NOT NULL PRIMARY KEY,
+short_descript character varying(50) NOT NULL,
+descript character varying(100),
+the_geom geometry(POLYGON,SRID_VALUE),
+undelete boolean
+);
+
+
+CREATE TABLE expl_selector (
+expl_id integer NOT NULL PRIMARY KEY,
+cur_user text
+);
 
 -- ----------------------------
 -- ADDING GEOMETRY TO CATALOG OF WORKS

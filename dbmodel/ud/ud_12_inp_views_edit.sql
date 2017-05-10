@@ -113,7 +113,7 @@ CREATE VIEW v_edit_raingage AS SELECT
 	sta,
 	units,
 	raingage.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,raingage
 JOIN exploitation ON raingage.expl_id=exploitation.expl_id
 WHERE ((raingage.expl_id)::text=(expl_selector.expl_id)::text
@@ -152,7 +152,7 @@ CREATE VIEW v_edit_subcatchment AS SELECT
 	sector_id,
 	hydrology_id,
 	subcatchment.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,subcatchment
 JOIN exploitation ON subcatchment.expl_id=exploitation.expl_id
 WHERE ((subcatchment.expl_id)::text=(expl_selector.expl_id)::text

@@ -83,20 +83,6 @@ CREATE TABLE doc_x_tag(
 );
 
 
-CREATE TABLE exploitation(
-expl_id integer NOT NULL PRIMARY KEY,
-descript character varying(100),
-the_geom geometry(POLYGON,SRID_VALUE),
-undelete boolean
-);
-
-
-CREATE TABLE expl_selector (
-expl_id integer NOT NULL PRIMARY KEY,
-cur_user text
-);
-
-
  -- fotos
  
  

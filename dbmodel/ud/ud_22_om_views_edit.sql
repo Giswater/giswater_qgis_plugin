@@ -15,7 +15,7 @@ CREATE VIEW v_edit_om_visit AS SELECT
 	user_name,
 	om_visit.the_geom,
 	webclient_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,om_visit
 JOIN exploitation ON om_visit.expl_id=exploitation.expl_id
 WHERE ((om_visit.expl_id)::text=(expl_selector.expl_id)::text

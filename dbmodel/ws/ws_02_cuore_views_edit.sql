@@ -55,7 +55,7 @@ node.publish,
 node.inventory,
 node.end_date,
 node.macrodma_id,
-exploitation.descript AS expl_name
+exploitation.short_descript AS expl_name
 FROM expl_selector, node
 LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -112,7 +112,7 @@ arc.publish,
 arc.inventory,
 arc.end_date,
 arc.macrodma_id,
-exploitation.descript AS expl_name
+exploitation.short_descript AS expl_name
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
@@ -188,7 +188,7 @@ arc.publish,
 arc.inventory,
 arc.end_date,
 arc.macrodma_id,
-exploitation.descript AS expl_name
+exploitation.short_descript AS expl_name
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
@@ -245,11 +245,11 @@ arc.publish,
 arc.inventory,
 arc.end_date,
 arc.macrodma_id,
-exploitation.descript AS expl_name
+exploitation.short_descript AS expl_name
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
-JOIN man_varc ON varc.arc_id=arc.arc_id
+JOIN man_varc ON man_varc.arc_id=arc.arc_id
 JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
@@ -308,7 +308,7 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
 	node.inventory,
 	node.end_date AS hydrant_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -366,7 +366,7 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 	node.inventory,
 	node.end_date AS junction_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -422,7 +422,7 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
 	node.inventory,
 	node.end_date AS manhole_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -479,7 +479,7 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
 	node.inventory,
 	node.end_date AS meter_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -536,7 +536,7 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	node.end_date AS pump_end_date,
 	node.macrodma_id,
 	man_pump.elev_height,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -595,7 +595,7 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
 	node.inventory,
 	node.end_date AS reduction_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -651,7 +651,7 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
 	node.inventory,
 	node.end_date AS source_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -729,7 +729,7 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	node.end_date AS valve_end_date,
 	node.macrodma_id,
 	man_valve.cat_valve2 AS valve_cat_valve2,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -785,7 +785,7 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
 	node.inventory,
 	node.end_date AS waterwell_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -842,7 +842,7 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
 	node.inventory,
 	node.end_date AS filter_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -852,61 +852,6 @@ FROM expl_selector, node
 	AND expl_selector.cur_user="current_user"()::text);
 	
 	
-DROP VIEW IF EXISTS v_edit_man_waterwell CASCADE;
-CREATE OR REPLACE VIEW v_edit_man_waterwell AS 
- SELECT node.node_id,
-    node.elevation AS waterwell_elevation,
-    node.depth AS waterwell_depth,
-    node.node_type,
-    node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
-    node.epa_type,
-    node.sector_id,
-    node.state AS waterwell_state,
-    node.annotation AS waterwell_annotation,
-    node.observ AS waterwell_observ,
-    node.comment AS waterwell_comment,
-    node.dma_id,
-    dma.presszonecat_id,
-    node.soilcat_id AS waterwell_soilcat_id,
-    node.category_type AS waterwell_category_type,
-    node.fluid_type AS waterwell_fluid_type,
-    node.location_type AS waterwell_location_type,
-    node.workcat_id AS waterwell_workcat_id,
-    node.workcat_id_end AS waterwell_workcat_id_end,
-    node.buildercat_id AS waterwell_buildercat_id,
-    node.builtdate AS waterwell_builtdate,
-    node.ownercat_id AS waterwell_ownercat_id,
-    node.adress_01 AS waterwell_adress_01,
-    node.adress_02 AS waterwell_adress_02,
-    node.adress_03 AS waterwell_adress_03,
-    node.descript AS waterwell_descript,
-    cat_node.svg AS cat_svg,
-    node.rotation AS waterwell_rotation,
-    node.link AS waterwell_link,
-    node.verified,
-    node.the_geom,
-    node.undelete,
-    node.label_x AS waterwell_label_x,
-    node.label_y AS waterwell_label_y,
-    node.label_rotation AS waterwell_label_rotation,
-	node.code AS waterwell_code,
-	node.publish,
-	node.inventory,
-	node.end_date AS waterwell_end_date,
-	node.macrodma_id,
-	exploitation.descript AS expl_name
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_waterwell ON node.node_id::text = man_waterwell.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
-	
-
 DROP VIEW IF EXISTS v_edit_man_register CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_register AS 
  SELECT node.node_id,
@@ -952,7 +897,7 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	node.inventory,
 	node.end_date AS register_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name,
+	exploitation.short_descript AS expl_name,
 	man_register.pol_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -1009,7 +954,7 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
 	node.inventory,
 	node.end_date AS register_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1065,7 +1010,7 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	node.inventory,
 	node.end_date AS netwjoin_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name,
+	exploitation.short_descript AS expl_name,
 	man_netwjoin.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -1121,7 +1066,7 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
 	node.inventory,
 	node.end_date AS flexunion_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name,
+	exploitation.short_descript AS expl_name,
 	man_flexunion.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -1177,7 +1122,7 @@ CREATE OR REPLACE VIEW v_edit_man_pressdevice AS
 	node.inventory,
 	node.end_date AS pressdevice_end_date,
 	node.macrodma_id,
-	exploitation.descript AS expl_name,
+	exploitation.short_descript AS expl_name,
 	man_pressdevice.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -1195,7 +1140,7 @@ CREATE VIEW v_edit_sector AS SELECT
 	sector.descript,
 	sector.the_geom,
 	sector.undelete,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,sector 
 JOIN exploitation ON sector.expl_id=exploitation.expl_id
 WHERE ((sector.expl_id)::text=(expl_selector.expl_id)::text
@@ -1212,7 +1157,7 @@ CREATE VIEW v_edit_dma AS SELECT
 	dma.the_geom,
 	dma.undelete,
 	dma.macrodma_id,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 	FROM expl_selector, dma 
 	JOIN exploitation ON dma.expl_id=exploitation.expl_id
 WHERE ((dma.expl_id)::text=(expl_selector.expl_id)::text
@@ -1225,7 +1170,7 @@ CREATE VIEW v_edit_macrodma AS SELECT
 	macrodma.descript,
 	macrodma.the_geom,
 	macrodma.undelete,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, macrodma 
 JOIN exploitation ON macrodma.expl_id=exploitation.expl_id
 WHERE ((macrodma.expl_id)::text=(expl_selector.expl_id)::text
@@ -1240,7 +1185,7 @@ CREATE VIEW v_edit_presszone AS SELECT
 	presszone.sector,
 	presszone.text,
 	presszone.undelete,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,presszone
 JOIN exploitation ON presszone.expl_id=exploitation.expl_id
 WHERE ((presszone.expl_id)::text=(expl_selector.expl_id)::text
@@ -1253,7 +1198,7 @@ CREATE VIEW v_edit_polygon AS SELECT
 	text,
 	polygon.the_geom,
 	polygon.undelete,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector, polygon
 JOIN exploitation ON polygon.expl_id=exploitation.expl_id
 WHERE ((polygon.expl_id)::text=(expl_selector.expl_id)::text
@@ -1269,7 +1214,7 @@ CREATE VIEW v_edit_vnode AS SELECT
 	state,
 	annotation,
 	vnode.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,vnode
 JOIN exploitation ON vnode.expl_id=exploitation.expl_id
 WHERE ((vnode.expl_id)::text=(expl_selector.expl_id)::text
@@ -1284,7 +1229,7 @@ CREATE VIEW v_edit_point AS SELECT
 	text,
 	link,
 	point.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,point
 JOIN exploitation ON point.expl_id=exploitation.expl_id
 WHERE ((point.expl_id)::text=(expl_selector.expl_id)::text
@@ -1297,7 +1242,7 @@ CREATE VIEW v_edit_pond AS SELECT
 	connec_id,
 	code_comercial,
 	pond.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,pond
 JOIN exploitation ON pond.expl_id=exploitation.expl_id
 WHERE ((pond.expl_id)::text=(expl_selector.expl_id)::text
@@ -1310,7 +1255,7 @@ CREATE VIEW v_edit_pool AS SELECT
 	connec_id,
 	code_comercial,
 	pool.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,pool
 JOIN exploitation ON pool.expl_id=exploitation.expl_id
 WHERE ((pool.expl_id)::text=(expl_selector.expl_id)::text
@@ -1334,7 +1279,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	dma_id2,
 	observations,
 	samplepoint.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,samplepoint
 JOIN exploitation ON samplepoint.expl_id=exploitation.expl_id
 WHERE ((samplepoint.expl_id)::text=(expl_selector.expl_id)::text
@@ -1361,7 +1306,7 @@ CREATE VIEW v_edit_element AS SELECT
 	workcat_id_end,
 	code,
 	element.the_geom,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
 FROM expl_selector,element
 JOIN exploitation ON element.expl_id=exploitation.expl_id
 WHERE ((element.expl_id)::text=(expl_selector.expl_id)::text
