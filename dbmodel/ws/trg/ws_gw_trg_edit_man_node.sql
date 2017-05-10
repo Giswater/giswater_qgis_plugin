@@ -285,25 +285,25 @@ BEGIN
 	
 	ELSIF man_table ='man_tank' THEN
 			IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
+				IF (NEW.tank_pol_id IS NULL) THEN
+					NEW.tank_pol_id:= (SELECT nextval('pol_id_seq'));
 					END IF;
 				
-					INSERT INTO man_tank (node_id,vmax,chlorination,function,area,pol_id) VALUES (NEW.node_id, NEW.tank_vmax,NEW.tank_chlorination, NEW.tank_function,NEW.tank_area, NEW.pol_id);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					INSERT INTO man_tank (node_id,vmax,chlorination,function,area,pol_id) VALUES (NEW.node_id, NEW.tank_vmax,NEW.tank_chlorination, NEW.tank_function,NEW.tank_area, NEW.tank_pol_id);
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_tank (node_id,vmax,chlorination,function,area) VALUES (NEW.node_id, NEW.tank_vmax,NEW.tank_chlorination, NEW.tank_function,NEW.tank_area);
 			END IF;
 	
 	ELSIF man_table='man_tank_pol' THEN
 		IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
+				IF (NEW.tank_pol_id IS NULL) THEN
+					NEW.tank_pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_tank (node_id,vmax,chlorination,function,area,pol_id) VALUES (NEW.node_id, NEW.tank_vmax,NEW.tank_chlorination, NEW.tank_function,NEW.tank_area, NEW.pol_id);
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
+				INSERT INTO man_tank (node_id,vmax,chlorination,function,area,pol_id) VALUES (NEW.node_id, NEW.tank_vmax,NEW.tank_chlorination, NEW.tank_function,NEW.tank_area, NEW.tank_pol_id);
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,NEW.the_geom);
+				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.tank_pol_id) WHERE node_id=NEW.node_id;
 			END IF;
 			
 	ELSIF man_table='man_pump' THEN
@@ -340,25 +340,25 @@ BEGIN
 	
 	ELSIF man_table ='man_register' THEN
 			IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
+				IF (NEW.register_pol_id IS NULL) THEN
+					NEW.register_pol_id:= (SELECT nextval('pol_id_seq'));
 					END IF;
 				
-					INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.pol_id);
-					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
+					INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			ELSE
 				INSERT INTO man_register (node_id) VALUES (NEW.node_id);
 			END IF;	
 			
 	ELSIF man_table='man_register_pol' THEN
 		IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.pol_id IS NULL) THEN
-					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
+				IF (NEW.register_pol_id IS NULL) THEN
+					NEW.register_pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.pol_id);
+				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
+				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.register_pol_id) WHERE node_id=NEW.node_id;
 			END IF;			
 			
 	ELSIF man_table='man_netwjoin' THEN
@@ -495,17 +495,17 @@ BEGIN
 		SET node_id=NEW.node_id, vmax=NEW.tank_vmax, chlorination=NEW.tank_chlorination, function=NEW.tank_function, area=NEW.tank_area
 		WHERE node_id=OLD.node_id;
 		
-		IF (NEW.pol_id IS NULL) THEN
+		IF (NEW.tank_pol_id IS NULL) THEN
 				UPDATE man_tank 
-				SET node_id=NEW.node_id, vmax=NEW.tank_vmax, chlorination=NEW.tank_chlorination, function=NEW.tank_function, area=NEW.tank_area, pol_id=NEW.pol_id
+				SET node_id=NEW.node_id, vmax=NEW.tank_vmax, chlorination=NEW.tank_chlorination, function=NEW.tank_function, area=NEW.tank_area, pol_id=NEW.tank_pol_id
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 		ELSE
 				UPDATE man_tank 
-				SET node_id=NEW.node_id, vmax=NEW.tank_vmax, chlorination=NEW.tank_chlorination, function=NEW.tank_function, area=NEW.tank_area, pol_id=NEW.pol_id
+				SET node_id=NEW.node_id, vmax=NEW.tank_vmax, chlorination=NEW.tank_chlorination, function=NEW.tank_function, area=NEW.tank_area, pol_id=NEW.tank_pol_id
 				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
+				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.tank_pol_id
 				WHERE pol_id=OLD.pol_id;
 		END IF;
 
@@ -644,7 +644,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_register
-		SET node_id=NEW.node_id, pol_id=NEW.pol_id
+		SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
 		WHERE node_id=OLD.node_id;		
 
 
@@ -660,20 +660,20 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_register
-		SET node_id=NEW.node_id, pol_id=NEW.pol_id
+		SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
 		WHERE node_id=OLD.node_id;			
 
-		IF (NEW.pol_id IS NULL) THEN
+		IF (NEW.register_pol_id IS NULL) THEN
 				UPDATE man_register
-				SET node_id=NEW.node_id, pol_id=NEW.pol_id
+				SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 		ELSE
 				UPDATE man_register
-				SET node_id=NEW.node_id, pol_id=NEW.pol_id
+				SET node_id=NEW.node_id, pol_id=NEW.register_pol_id
 				WHERE node_id=OLD.node_id;
-				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
+				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.register_pol_id
 				WHERE pol_id=OLD.pol_id;
 		END IF;
 		

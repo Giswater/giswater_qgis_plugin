@@ -898,7 +898,7 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	node.end_date AS register_end_date,
 	node.macrodma_id,
 	exploitation.short_descript AS expl_name,
-	man_register.pol_id
+	man_register.pol_id AS register_pol_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -910,7 +910,7 @@ FROM expl_selector, node
 	
 	DROP VIEW IF EXISTS v_edit_man_register_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_register_pol AS 
- SELECT man_register.pol_id,
+ SELECT man_register.pol_id AS register_pol_id,
 	node.node_id,
     node.elevation AS register_elevation,
     node.depth AS register_depth,
