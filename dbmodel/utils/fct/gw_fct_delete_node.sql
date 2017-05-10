@@ -90,6 +90,9 @@ BEGIN
                     UPDATE arc SET node_1 = myRecord2.node_1, node_2 = myRecord2.node_2, the_geom = myRecord2.the_geom WHERE arc_id = myRecord2.arc_id;
 
                 END IF;
+				
+			--INSERT DATA INTO OM_TRACEABILITY
+				INSERT INTO om_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", "user") VALUES ('ARC FUSION', myRecord2.arc_id, myRecord2.arc_id,myRecord1.arc_id,exists_id, CURRENT_TIMESTAMP, CURRENT_USER);
 
                 -- Delete previous node
                 DELETE FROM node WHERE node_id = node_id_arg;

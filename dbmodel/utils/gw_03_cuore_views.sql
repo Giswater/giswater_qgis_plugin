@@ -50,7 +50,10 @@ element.state,
 element.observ,
 element.comment,
 element.builtdate,
-element.enddate
+element.enddate,
+element.link,
+element.publish,
+element.inventory
 FROM element_x_arc
 JOIN element ON element.element_id::text = element_x_arc.element_id::text;
 
@@ -67,7 +70,10 @@ element.state,
 element.observ,
 element.comment,
 element.builtdate,
-element.enddate
+element.enddate,
+element.link,
+element.publish,
+element.inventory
 FROM element_x_node
 JOIN element ON element.element_id::text = element_x_node.element_id::text;
 
@@ -84,7 +90,10 @@ element.state,
 element.observ,
 element.comment,
 element.builtdate,
-element.enddate
+element.enddate,
+element.link,
+element.publish,
+element.inventory
 FROM element_x_connec
 JOIN element ON element.element_id::text = element_x_connec.element_id::text;
 

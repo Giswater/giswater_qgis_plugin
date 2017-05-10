@@ -278,65 +278,104 @@ JOIN inp_selector_sector ON inp_selector_sector.sector_id=subcatchment.sector_id
 -- ------------------------------------------------------------------
 
 DROP VIEW IF EXISTS "v_inp_conduit_cu" CASCADE;
-CREATE VIEW "v_inp_conduit_cu" AS 
-SELECT 
-arc.arc_id, v_arc_x_node.node_1, v_arc_x_node.node_2, arc.length AS length, v_arc_x_node.z1, v_arc_x_node.z2, 
-CASE
-	WHEN inp_conduit.custom_n IS NOT NULL THEN custom_n
-	ELSE cat_mat_arc.n
-END AS n,
-cat_arc.shape, cat_arc.curve_id, cat_arc.geom1, cat_arc.geom2, cat_arc.geom3, cat_arc.geom4,  
-inp_conduit.q0, inp_conduit.qmax, 
-inp_conduit.barrels, inp_conduit.culvert, inp_conduit.seepage, inp_selector_sector.sector_id 
-FROM ((((((v_arc arc
-JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
-JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)))   
-JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))) 
-JOIN cat_mat_arc ON (((arc.matcat_id)::text = (cat_mat_arc.id)::text)))
-JOIN inp_selector_sector ON (((inp_selector_sector.sector_id)::text = (arc.sector_id)::text))) 
-JOIN inp_selector_state ON (((arc."state")::text = (inp_selector_state.id)::text)))
-WHERE ((cat_arc.shape)::text = 'CUSTOM'::text);
+CREATE OR REPLACE VIEW v_inp_conduit_cu AS 
+ SELECT arc.arc_id,
+    v_arc_x_node.node_1,
+    v_arc_x_node.node_2,
+    arc.length,
+    v_arc_x_node.elevmax1 as z1,
+    v_arc_x_node.elevmax2 as z2,
+        CASE
+            WHEN inp_conduit.custom_n IS NOT NULL THEN inp_conduit.custom_n
+            ELSE cat_mat_arc.n
+        END AS n,
+    cat_arc.shape,
+    cat_arc.curve_id,
+    cat_arc.geom1,
+    cat_arc.geom2,
+    cat_arc.geom3,
+    cat_arc.geom4,
+    inp_conduit.q0,
+    inp_conduit.qmax,
+    inp_conduit.barrels,
+    inp_conduit.culvert,
+    inp_conduit.seepage,
+    inp_selector_sector.sector_id
+   FROM v_arc arc
+     JOIN inp_conduit ON arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_mat_arc ON arc.matcat_id::text = cat_mat_arc.id::text
+     JOIN inp_selector_sector ON inp_selector_sector.sector_id::text = arc.sector_id::text
+     JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
+  WHERE cat_arc.shape::text = 'CUSTOM'::text;
 
 
 DROP VIEW IF EXISTS "v_inp_conduit_no" CASCADE;
-CREATE VIEW "v_inp_conduit_no" AS 
-SELECT arc.arc_id, 
-v_arc_x_node.node_1, v_arc_x_node.node_2, arc.length AS length, v_arc_x_node.z1, v_arc_x_node.z2, 
-CASE
-	WHEN inp_conduit.custom_n IS NOT NULL THEN custom_n
-	ELSE cat_mat_arc.n
-END AS n,
-cat_arc.shape, cat_arc.geom1, cat_arc.geom2, cat_arc.geom3, cat_arc.geom4,  
-inp_conduit.q0, inp_conduit.qmax, inp_conduit.barrels, inp_conduit.culvert, inp_conduit.seepage, inp_selector_sector.sector_id 
-FROM ((((((v_arc arc
-JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
-JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)))   
-JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))) 
-JOIN cat_mat_arc ON (((arc.matcat_id)::text = (cat_mat_arc.id)::text)))
-JOIN inp_selector_sector ON (((inp_selector_sector.sector_id)::text = (arc.sector_id)::text))) 
-JOIN inp_selector_state ON (((arc."state")::text = (inp_selector_state.id)::text))) 
-WHERE ((((cat_arc.shape)::text < 'CUSTOM'::text) OR (((cat_arc.shape)::text > 'CUSTOM'::text) AND ((cat_arc.shape)::text < 'IRREGULAR'::text))) OR ((cat_arc.shape)::text > 'IRREGULAR'::text));
+CREATE OR REPLACE VIEW v_inp_conduit_no AS 
+ SELECT arc.arc_id,
+    v_arc_x_node.node_1,
+    v_arc_x_node.node_2,
+    arc.length,
+    v_arc_x_node.elevmax1 as z1,
+    v_arc_x_node.elevmax2 as z2,
+        CASE
+            WHEN inp_conduit.custom_n IS NOT NULL THEN inp_conduit.custom_n
+            ELSE cat_mat_arc.n
+        END AS n,
+    cat_arc.shape,
+    cat_arc.geom1,
+    cat_arc.geom2,
+    cat_arc.geom3,
+    cat_arc.geom4,
+    inp_conduit.q0,
+    inp_conduit.qmax,
+    inp_conduit.barrels,
+    inp_conduit.culvert,
+    inp_conduit.seepage,
+    inp_selector_sector.sector_id
+   FROM v_arc arc
+     JOIN inp_conduit ON arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_mat_arc ON arc.matcat_id::text = cat_mat_arc.id::text
+     JOIN inp_selector_sector ON inp_selector_sector.sector_id::text = arc.sector_id::text
+     JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
+  WHERE cat_arc.shape!='CUSTOM' AND cat_arc.shape!='IRREGULAR';
 
 
 DROP VIEW IF EXISTS "v_inp_conduit_xs" CASCADE;
-CREATE VIEW "v_inp_conduit_xs" AS 
-SELECT arc.arc_id, v_arc_x_node.node_1, v_arc_x_node.node_2, arc.length AS length, v_arc_x_node.z1, v_arc_x_node.z2, 
-CASE
-	WHEN inp_conduit.custom_n IS NOT NULL THEN custom_n
-	ELSE cat_mat_arc.n
-END AS n,
-cat_arc.shape, cat_arc.tsect_id, cat_arc.geom1, cat_arc.geom2, cat_arc.geom3, cat_arc.geom4, 
-inp_conduit.q0, inp_conduit.qmax, inp_conduit.barrels,inp_conduit.culvert, inp_conduit.seepage, inp_selector_sector.sector_id 
-FROM ((((((v_arc arc
-JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text)))
-JOIN v_arc_x_node ON (((v_arc_x_node.arc_id)::text = (arc.arc_id)::text)))   
-JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))) 
-JOIN cat_mat_arc ON (((arc.matcat_id)::text = (cat_mat_arc.id)::text)))
-JOIN inp_selector_sector ON (((inp_selector_sector.sector_id)::text = (arc.sector_id)::text))) 
-JOIN inp_selector_state ON (((arc."state")::text = (inp_selector_state.id)::text)))
-WHERE ((cat_arc.shape)::text = 'IRREGULAR'::text);
-
-
+ CREATE OR REPLACE VIEW v_inp_conduit_xs AS 
+ SELECT arc.arc_id,
+    v_arc_x_node.node_1,
+    v_arc_x_node.node_2,
+    arc.length,
+    v_arc_x_node.elevmax1 as z1,
+    v_arc_x_node.elevmax2 as z2,
+        CASE
+            WHEN inp_conduit.custom_n IS NOT NULL THEN inp_conduit.custom_n
+            ELSE cat_mat_arc.n
+        END AS n,
+    cat_arc.shape,
+    cat_arc.tsect_id,
+    cat_arc.geom1,
+    cat_arc.geom2,
+    cat_arc.geom3,
+    cat_arc.geom4,
+    inp_conduit.q0,
+    inp_conduit.qmax,
+    inp_conduit.barrels,
+    inp_conduit.culvert,
+    inp_conduit.seepage,
+    inp_selector_sector.sector_id
+   FROM v_arc arc
+     JOIN inp_conduit ON arc.arc_id::text = inp_conduit.arc_id::text
+     JOIN v_arc_x_node ON v_arc_x_node.arc_id::text = arc.arc_id::text
+     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+     JOIN cat_mat_arc ON arc.matcat_id::text = cat_mat_arc.id::text
+     JOIN inp_selector_sector ON inp_selector_sector.sector_id::text = arc.sector_id::text
+     JOIN inp_selector_state ON arc.state::text = inp_selector_state.id::text
+  WHERE cat_arc.shape::text = 'IRREGULAR'::text;
 
 
 
@@ -745,6 +784,23 @@ value_11,
 value_12
 FROM inp_adjustments
 ORDER BY id;
+
+
+
+DROP VIEW IF EXISTS  "v_inp_subcatch2node" CASCADE;
+CREATE OR REPLACE VIEW v_inp_subcatch2node AS 
+ SELECT subcatchment.subc_id,
+    st_makeline(st_centroid(subcatchment.the_geom), node.the_geom) AS the_geom
+   FROM subcatchment
+   JOIN node ON node.node_id::text = subcatchment.node_id::text;
+
+
+   
+DROP VIEW IF EXISTS  "v_inp_subcatchcentroid" CASCADE;
+CREATE OR REPLACE VIEW v_inp_subcatchcentroid AS 
+ SELECT subcatchment.subc_id,
+    st_centroid(subcatchment.the_geom) AS the_geom
+   FROM subcatchment;
 
 
 

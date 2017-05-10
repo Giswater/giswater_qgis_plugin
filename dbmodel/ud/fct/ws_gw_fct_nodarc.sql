@@ -4,9 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+/*
+-- TODO: 
+short_conduits(longitud que en Vicente tabuli en funció de l'alçada)
+result_id
+millorar les taules temp_arc 6 temp_node. Fer-les més petites, només amb la informació que ens fa falta
+Modificar les claus foraneas de les taules de resultats, cap a temp_arc_ temp_node
+Permetre que els arc_id i node_id siguin varchar... en la temp...
+*/
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node2arc();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc()  RETURNS integer AS $BODY$
+
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_nodarc();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_nodarc()  RETURNS integer AS $BODY$
 DECLARE
     
     record_node SCHEMA_NAME.node%ROWTYPE;

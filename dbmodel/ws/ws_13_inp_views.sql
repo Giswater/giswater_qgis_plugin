@@ -194,7 +194,6 @@ SELECT
 	JOIN v_inp_node node ON (((inp_tank.node_id)::text = (node.node_id)::text)))));
 
 
-
 DROP VIEW IF EXISTS "v_inp_junction" CASCADE;
 CREATE OR REPLACE VIEW v_inp_junction AS 
  SELECT node.node_id, 
@@ -240,8 +239,7 @@ SELECT
 	JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
 	JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 	WHERE inp_valve.valv_type::text = 'GPV'::text;
-
-
+  
 
 DROP VIEW IF EXISTS v_inp_valve_fl CASCADE;
 CREATE OR REPLACE VIEW v_inp_valve_fl AS 
@@ -257,7 +255,6 @@ CREATE OR REPLACE VIEW v_inp_valve_fl AS
     JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 	WHERE inp_valve.valv_type::text = 'FCV'::text;
-
 
 
 DROP VIEW IF EXISTS v_inp_valve_lc CASCADE;
@@ -277,7 +274,6 @@ SELECT
 	WHERE inp_valve.valv_type::text = 'TCV'::text;
 
 
-
 DROP VIEW IF EXISTS v_inp_valve_pr CASCADE;
 CREATE OR REPLACE VIEW v_inp_valve_pr AS 
 SELECT concat(inp_valve.node_id, '_n2a') AS arc_id,
@@ -292,7 +288,6 @@ SELECT concat(inp_valve.node_id, '_n2a') AS arc_id,
     JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
     WHERE inp_valve.valv_type::text = 'PRV'::text OR inp_valve.valv_type::text = 'PSV'::text OR inp_valve.valv_type::text = 'PBV'::text;
-
 
 
 DROP VIEW IF EXISTS v_inp_pipe CASCADE;
@@ -343,9 +338,8 @@ UNION
    JOIN inp_shortpipe ON arc.arc_id::text = concat(inp_shortpipe.node_id, '_n2a')
    JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
    JOIN cat_mat_arc ON cat_arc.matcat_id::text = cat_mat_arc.id::text
-   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text   
-   where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age  ;
-
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id::text = cat_mat_arc.id::text
+   WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age;
 
 
 DROP VIEW IF EXISTS v_inp_vertice CASCADE;
@@ -363,9 +357,6 @@ CREATE OR REPLACE VIEW v_inp_vertice AS
   WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint))
   ORDER BY 1;
 
-  
-  
-  
   
 
 -- ----------------------------
@@ -486,7 +477,6 @@ ORDER BY id;
   
   
 
-
 -- ----------------------------
 -- View structure for v_rpt_result
 -- ----------------------------
@@ -516,6 +506,7 @@ AND rpt_selector_result.cur_user="current_user"()::text
 GROUP BY arc.arc_id, rpt_selector_result.result_id, arc.the_geom 
 ORDER BY arc.arc_id;
 
+
 DROP VIEW IF EXISTS "v_rpt_energy_usage" CASCADE;
 CREATE VIEW "v_rpt_energy_usage" AS 
 SELECT rpt_energy_usage.id, 
@@ -531,6 +522,7 @@ FROM rpt_energy_usage,rpt_selector_result
 WHERE ((rpt_selector_result.result_id)::text = (rpt_energy_usage.result_id)::text)
 AND rpt_selector_result.cur_user="current_user"()::text
 GROUP BY rpt_energy_usage.id,  rpt_selector_result.result_id;
+
 
 DROP VIEW IF EXISTS "v_rpt_hydraulic_status" CASCADE;
 CREATE VIEW "v_rpt_hydraulic_status" AS 
@@ -649,6 +641,7 @@ FROM rpt_energy_usage,rpt_selector_compare
 WHERE ((rpt_selector_compare.result_id)::text = (rpt_energy_usage.result_id)::text)
 AND rpt_selector_compare.cur_user="current_user"()::text;
 
+
 DROP VIEW IF EXISTS "v_rpt_comp_hydraulic_status" CASCADE;
 CREATE VIEW "v_rpt_comp_hydraulic_status" AS 
 SELECT rpt_hydraulic_status.id, 
@@ -658,6 +651,7 @@ rpt_hydraulic_status.text
 FROM rpt_hydraulic_status ,rpt_selector_compare
 WHERE ((rpt_selector_compare.result_id)::text = (rpt_hydraulic_status.result_id)::text)
 AND rpt_selector_compare.cur_user="current_user"()::text;
+
 
 DROP VIEW IF EXISTS "v_rpt_comp_node" CASCADE;
 CREATE VIEW "v_rpt_comp_node" AS 
@@ -678,9 +672,4 @@ WHERE ((rpt_node.result_id)::text = (rpt_selector_compare.result_id)::text)
 AND rpt_selector_compare.cur_user="current_user"()::text
 GROUP BY node.node_id, rpt_selector_compare.result_id, node.the_geom 
 ORDER BY node.node_id;
-
-
-
-
-
 

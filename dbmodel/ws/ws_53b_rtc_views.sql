@@ -108,6 +108,18 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS
     temp_arc.node_2
    FROM rtc_hydrometer_x_connec
      JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
+     JOIN temp_arc ON temp_arc.arc_id::text = v_edit_connec.arc_id::text;
+
+
+DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
+ SELECT rtc_hydrometer_x_connec.hydrometer_id,
+    rtc_hydrometer_x_connec.connec_id,
+    temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2
+   FROM rtc_hydrometer_x_connec
+     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
      RIGHT JOIN temp_arc ON temp_arc.arc_id::text = v_edit_connec.arc_id::text;
 
 

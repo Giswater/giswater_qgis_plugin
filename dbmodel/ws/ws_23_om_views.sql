@@ -17,3 +17,4 @@ CREATE OR REPLACE VIEW v_om_visit_leak AS
      JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
      JOIN om_visit_parameter ON om_visit_event.parameter_id::text = om_visit_parameter.id::text
   WHERE om_visit_parameter.parameter_type::text = 'LEAK'::text;
+  
