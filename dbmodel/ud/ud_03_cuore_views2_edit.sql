@@ -907,7 +907,10 @@ CREATE OR REPLACE VIEW v_edit_man_netgully AS
 	node.xyz_date AS netgully_xyz_date,
 	node.unconnected,
 	node.macrosector_id,
-	exploitation.descript AS expl_name
+	exploitation.descript AS expl_name,
+	gully.connec_length,
+	gully.connec_depth
+
    FROM expl_selector, node
      JOIN man_netgully ON man_netgully.node_id::text = node.node_id::text
 	 JOIN v_node ON v_node.node_id::text = node.node_id::text

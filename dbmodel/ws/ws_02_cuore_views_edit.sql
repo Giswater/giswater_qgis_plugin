@@ -197,6 +197,63 @@ WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
 
+DROP VIEW IF EXISTS v_edit_man_varc CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_varc AS
+SELECT 
+arc.arc_id,
+arc.node_1,
+arc.node_2,
+arc.arccat_id, 
+cat_arc.arctype_id AS "cat_arctype_id",
+cat_arc.matcat_id AS "cat_matcat_id",
+cat_arc.pnom AS "cat_pnom",
+cat_arc.dnom AS "cat_dnom",
+st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+arc.epa_type,
+arc.sector_id, 
+arc."state", 
+arc.annotation, 
+arc.observ, 
+arc."comment",
+arc.custom_length,
+arc.dma_id,
+dma.presszonecat_id,
+arc.soilcat_id,
+arc.category_type,
+arc.fluid_type,
+arc.location_type,
+arc.workcat_id,
+arc.buildercat_id,
+arc.builtdate,
+arc.ownercat_id,
+arc.adress_01,
+arc.adress_02,
+arc.adress_03,
+arc.descript,
+cat_arc.svg AS "cat_svg",
+arc.rotation,
+arc.link,
+arc.verified,
+arc.the_geom,
+arc.workcat_id_end,
+arc.undelete,
+arc.label_x,
+arc.label_y,
+arc.label_rotation,
+arc.code,
+arc.publish,
+arc.inventory,
+arc.end_date,
+arc.macrodma_id,
+exploitation.descript AS expl_name
+FROM expl_selector,arc 
+LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
+LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
+JOIN man_varc ON varc.arc_id=arc.arc_id
+JOIN exploitation ON arc.expl_id=exploitation.expl_id
+WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
+
 
 DROP VIEW IF EXISTS v_edit_man_hydrant CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_hydrant AS 
@@ -794,7 +851,344 @@ FROM expl_selector, node
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
-		
+	
+DROP VIEW IF EXISTS v_edit_man_waterwell CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_waterwell AS 
+ SELECT node.node_id,
+    node.elevation AS waterwell_elevation,
+    node.depth AS waterwell_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS waterwell_state,
+    node.annotation AS waterwell_annotation,
+    node.observ AS waterwell_observ,
+    node.comment AS waterwell_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS waterwell_soilcat_id,
+    node.category_type AS waterwell_category_type,
+    node.fluid_type AS waterwell_fluid_type,
+    node.location_type AS waterwell_location_type,
+    node.workcat_id AS waterwell_workcat_id,
+    node.workcat_id_end AS waterwell_workcat_id_end,
+    node.buildercat_id AS waterwell_buildercat_id,
+    node.builtdate AS waterwell_builtdate,
+    node.ownercat_id AS waterwell_ownercat_id,
+    node.adress_01 AS waterwell_adress_01,
+    node.adress_02 AS waterwell_adress_02,
+    node.adress_03 AS waterwell_adress_03,
+    node.descript AS waterwell_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS waterwell_rotation,
+    node.link AS waterwell_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS waterwell_label_x,
+    node.label_y AS waterwell_label_y,
+    node.label_rotation AS waterwell_label_rotation,
+	node.code AS waterwell_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS waterwell_end_date,
+	node.macrodma_id,
+	exploitation.descript AS expl_name
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_waterwell ON node.node_id::text = man_waterwell.node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+	
+
+DROP VIEW IF EXISTS v_edit_man_register CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_register AS 
+ SELECT node.node_id,
+    node.elevation AS register_elevation,
+    node.depth AS register_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS register_state,
+    node.annotation AS register_annotation,
+    node.observ AS register_observ,
+    node.comment AS register_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS register_soilcat_id,
+    node.category_type AS register_category_type,
+    node.fluid_type AS register_fluid_type,
+    node.location_type AS register_location_type,
+    node.workcat_id AS register_workcat_id,
+    node.workcat_id_end AS register_workcat_id_end,
+    node.buildercat_id AS register_buildercat_id,
+    node.builtdate AS register_builtdate,
+    node.ownercat_id AS register_ownercat_id,
+    node.adress_01 AS register_adress_01,
+    node.adress_02 AS register_adress_02,
+    node.adress_03 AS register_adress_03,
+    node.descript AS register_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS register_rotation,
+    node.link AS register_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS register_label_x,
+    node.label_y AS register_label_y,
+    node.label_rotation AS register_label_rotation,
+	node.code AS register_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS register_end_date,
+	node.macrodma_id,
+	exploitation.descript AS expl_name,
+	man_register.pol_id
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_register ON node.node_id::text = man_register.node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+
+	
+	DROP VIEW IF EXISTS v_edit_man_register_pol CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_register_pol AS 
+ SELECT man_register.pol_id,
+	node.node_id,
+    node.elevation AS register_elevation,
+    node.depth AS register_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS register_state,
+    node.annotation AS register_annotation,
+    node.observ AS register_observ,
+    node.comment AS register_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS register_soilcat_id,
+    node.category_type AS register_category_type,
+    node.fluid_type AS register_fluid_type,
+    node.location_type AS register_location_type,
+    node.workcat_id AS register_workcat_id,
+    node.workcat_id_end AS register_workcat_id_end,
+    node.buildercat_id AS register_buildercat_id,
+    node.builtdate AS register_builtdate,
+    node.ownercat_id AS register_ownercat_id,
+    node.adress_01 AS register_adress_01,
+    node.adress_02 AS register_adress_02,
+    node.adress_03 AS register_adress_03,
+    node.descript AS register_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS register_rotation,
+    node.link AS register_link,
+    node.verified,
+    polygon.the_geom,
+    node.undelete,
+    node.label_x AS register_label_x,
+    node.label_y AS register_label_y,
+    node.label_rotation AS register_label_rotation,
+	node.code AS register_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS register_end_date,
+	node.macrodma_id,
+	exploitation.descript AS expl_name
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_register ON node.node_id::text = man_register.node_id::text
+	JOIN polygon ON polygon.pol_id::text = man_register.pol_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+
+	
+	DROP VIEW IF EXISTS v_edit_man_netwjoin CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_netwjoin AS 
+ SELECT node.node_id,
+    node.elevation AS netwjoin_elevation,
+    node.depth AS netwjoin_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS netwjoin_state,
+    node.annotation AS netwjoin_annotation,
+    node.observ AS netwjoin_observ,
+    node.comment AS netwjoin_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS netwjoin_soilcat_id,
+    node.category_type AS netwjoin_category_type,
+    node.fluid_type AS netwjoin_fluid_type,
+    node.location_type AS netwjoin_location_type,
+    node.workcat_id AS netwjoin_workcat_id,
+    node.workcat_id_end AS netwjoin_workcat_id_end,
+    node.buildercat_id AS netwjoin_buildercat_id,
+    node.builtdate AS netwjoin_builtdate,
+    node.ownercat_id AS netwjoin_ownercat_id,
+    node.adress_01 AS netwjoin_adress_01,
+    node.adress_02 AS netwjoin_adress_02,
+    node.adress_03 AS netwjoin_adress_03,
+    node.descript AS netwjoin_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS netwjoin_rotation,
+    node.link AS netwjoin_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS netwjoin_label_x,
+    node.label_y AS netwjoin_label_y,
+    node.label_rotation AS netwjoin_label_rotation,
+	node.code AS netwjoin_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS netwjoin_end_date,
+	node.macrodma_id,
+	exploitation.descript AS expl_name,
+	man_netwjoin.parent_node_id
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_netwjoin ON node.node_id::text = man_netwjoin.node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+	
+	
+	DROP VIEW IF EXISTS v_edit_man_flexunion CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_flexunion AS 
+ SELECT node.node_id,
+    node.elevation AS flexunion_elevation,
+    node.depth AS flexunion_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS flexunion_state,
+    node.annotation AS flexunion_annotation,
+    node.observ AS flexunion_observ,
+    node.comment AS flexunion_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS flexunion_soilcat_id,
+    node.category_type AS flexunion_category_type,
+    node.fluid_type AS flexunion_fluid_type,
+    node.location_type AS flexunion_location_type,
+    node.workcat_id AS flexunion_workcat_id,
+    node.workcat_id_end AS flexunion_workcat_id_end,
+    node.buildercat_id AS flexunion_buildercat_id,
+    node.builtdate AS flexunion_builtdate,
+    node.ownercat_id AS flexunion_ownercat_id,
+    node.adress_01 AS flexunion_adress_01,
+    node.adress_02 AS flexunion_adress_02,
+    node.adress_03 AS flexunion_adress_03,
+    node.descript AS flexunion_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS flexunion_rotation,
+    node.link AS flexunion_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS flexunion_label_x,
+    node.label_y AS flexunion_label_y,
+    node.label_rotation AS flexunion_label_rotation,
+	node.code AS flexunion_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS flexunion_end_date,
+	node.macrodma_id,
+	exploitation.descript AS expl_name,
+	man_flexunion.parent_node_id
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_flexunion ON node.node_id::text = man_flexunion.node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+	
+	
+	DROP VIEW IF EXISTS v_edit_man_pressdevice CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_pressdevice AS 
+ SELECT node.node_id,
+    node.elevation AS pressdevice_elevation,
+    node.depth AS pressdevice_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS pressdevice_state,
+    node.annotation AS pressdevice_annotation,
+    node.observ AS pressdevice_observ,
+    node.comment AS pressdevice_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS pressdevice_soilcat_id,
+    node.category_type AS pressdevice_category_type,
+    node.fluid_type AS pressdevice_fluid_type,
+    node.location_type AS pressdevice_location_type,
+    node.workcat_id AS pressdevice_workcat_id,
+    node.workcat_id_end AS pressdevice_workcat_id_end,
+    node.buildercat_id AS pressdevice_buildercat_id,
+    node.builtdate AS pressdevice_builtdate,
+    node.ownercat_id AS pressdevice_ownercat_id,
+    node.adress_01 AS pressdevice_adress_01,
+    node.adress_02 AS pressdevice_adress_02,
+    node.adress_03 AS pressdevice_adress_03,
+    node.descript AS pressdevice_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS pressdevice_rotation,
+    node.link AS pressdevice_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS pressdevice_label_x,
+    node.label_y AS pressdevice_label_y,
+    node.label_rotation AS pressdevice_label_rotation,
+	node.code AS pressdevice_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS pressdevice_end_date,
+	node.macrodma_id,
+	exploitation.descript AS expl_name,
+	man_pressdevice.parent_node_id
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_pressdevice ON node.node_id::text = man_pressdevice.node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+	
+	
+
 	DROP VIEW IF EXISTS v_edit_sector CASCADE;
 CREATE VIEW v_edit_sector AS SELECT
 	sector.sector_id,
@@ -1005,3 +1399,4 @@ DROP VIEW IF EXISTS v_edit_review_arc CASCADE;
    FROM arc
      JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
   WHERE review_audit_arc.field_checked IS TRUE AND review_audit_arc.office_checked IS NOT TRUE;
+ 

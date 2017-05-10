@@ -127,7 +127,7 @@ CONSTRAINT man_pressdevice_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "man_dilator" (
+CREATE TABLE "man_flexunion" (
 "node_id" varchar(16) NOT NULL,
 "parent_node_id" character varying(16),
 "add_info" varchar(255),
