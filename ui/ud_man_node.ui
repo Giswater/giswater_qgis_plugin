@@ -52,7 +52,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label_expl_id">
+   <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
       <x>405</x>
@@ -64,8 +64,8 @@
     <property name="font">
      <font>
       <pointsize>8</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="frameShape">
@@ -119,25 +119,6 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="expl_id">
-    <property name="geometry">
-     <rect>
-      <x>405</x>
-      <y>555</y>
-      <width>206</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="maxVisibleItems">
-     <number>8</number>
-    </property>
-    <property name="frame">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tab_main">
     <property name="geometry">
      <rect>
@@ -148,7 +129,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -766,7 +747,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="chamber_est_ymax_2">
+       <widget class="QLineEdit" name="chamber_est_ymax">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -779,7 +760,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_chamber_est_ymax_2">
+       <widget class="QLabel" name="label_chamber_est_ymax">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -908,8 +889,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1196,14 +1177,95 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QCheckBox" name="chamber_bottom_chanel">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>110</y>
+          <width>101</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Bottom channel</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_chamber_accessibility">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>105</y>
+          <width>91</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Accessibility:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="manhole_chamber">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>105</y>
+          <width>160</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="chamber_inlet">
+        <property name="geometry">
+         <rect>
+          <x>285</x>
+          <y>110</y>
+          <width>61</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Inlet</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_38">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1736,8 +1798,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1963,8 +2025,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2700,8 +2762,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3234,8 +3296,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3454,15 +3516,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_41">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4105,7 +4167,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>190</y>
+          <y>185</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -4198,8 +4260,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4318,14 +4380,95 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QCheckBox" name="manhole_inlet">
+        <property name="geometry">
+         <rect>
+          <x>285</x>
+          <y>45</y>
+          <width>61</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Inlet</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="manhole_bottom_chanel">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>45</y>
+          <width>101</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Bottom channel</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="manhole_accessibility">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>40</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_manhole_accessibility">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>91</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Accessibility:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_42">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4858,8 +5001,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5078,15 +5221,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_43">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5096,7 +5239,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5106,7 +5249,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5139,7 +5282,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>70</y>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5149,7 +5292,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>70</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5182,7 +5325,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>130</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5192,7 +5335,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>160</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5205,7 +5348,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>160</y>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5238,7 +5381,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>130</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5271,7 +5414,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5304,7 +5447,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>225</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5314,7 +5457,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5357,7 +5500,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5367,7 +5510,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>225</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5394,7 +5537,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>70</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5421,7 +5564,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5439,6 +5582,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -5458,7 +5603,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5468,7 +5613,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>70</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5478,7 +5623,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5486,6 +5631,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -5505,7 +5652,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>130</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5515,7 +5662,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -5547,54 +5694,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="netgully_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>160</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_netgully_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="netgully_end_date">
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>190</y>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -5603,8 +5707,8 @@
        <widget class="QLabel" name="label_netgully_code">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>280</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5637,7 +5741,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>220</y>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5669,8 +5773,8 @@
        <widget class="QLineEdit" name="netgully_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>190</y>
+          <x>380</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -5680,7 +5784,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>220</y>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -5690,7 +5794,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>190</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5719,14 +5823,150 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLineEdit" name="netgully_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netgully_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netgully_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>160</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netgully_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>195</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netgully_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>190</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netgully_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>165</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_44">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6259,8 +6499,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6479,15 +6719,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_45">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6497,7 +6737,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6507,7 +6747,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6540,7 +6780,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>70</y>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6550,7 +6790,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>70</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6583,7 +6823,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>130</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6593,7 +6833,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>160</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6606,7 +6846,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>160</y>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6639,7 +6879,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>130</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6672,7 +6912,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6705,7 +6945,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6715,7 +6955,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6758,7 +6998,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6768,7 +7008,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6795,7 +7035,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>70</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6822,7 +7062,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6840,6 +7080,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -6859,7 +7101,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6869,7 +7111,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>70</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6879,7 +7121,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6887,6 +7129,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -6906,7 +7150,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>130</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6916,7 +7160,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -6948,54 +7192,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="netinit_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>160</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_netinit_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_netinit_end_date">
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>190</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7028,7 +7229,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>220</y>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7060,8 +7261,8 @@
        <widget class="QLineEdit" name="netinit_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>190</y>
+          <x>380</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -7071,7 +7272,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>190</y>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -7081,7 +7282,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>220</y>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -7090,8 +7291,8 @@
        <widget class="QLabel" name="label_netinit_code">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>280</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7120,14 +7321,150 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_netinit_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netinit_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netinit_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>160</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netinit_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>185</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netinit_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>190</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netinit_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_3">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7359,14 +7696,95 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QCheckBox" name="netinit_inlet">
+        <property name="geometry">
+         <rect>
+          <x>285</x>
+          <y>75</y>
+          <width>61</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Inlet</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netinit_accessibility">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>91</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Accessibility:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netinit_accessibility">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>70</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="netinit_bottom_chanel">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>75</y>
+          <width>101</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Bottom channel</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_46">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7899,8 +8317,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8119,15 +8537,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_47">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8137,7 +8555,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8147,7 +8565,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8180,7 +8598,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>70</y>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8190,7 +8608,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>70</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8223,7 +8641,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>130</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8233,7 +8651,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>160</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8246,7 +8664,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>160</y>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8279,7 +8697,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>130</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8312,7 +8730,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8345,7 +8763,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8355,7 +8773,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8398,7 +8816,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8408,7 +8826,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8435,7 +8853,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>70</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8462,7 +8880,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8480,6 +8898,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -8499,7 +8919,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8509,7 +8929,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>70</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8519,7 +8939,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8527,6 +8947,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -8546,7 +8968,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>130</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8556,7 +8978,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -8588,54 +9010,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="outfall_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>160</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_outfall_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_outfall_end_date">
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>190</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8668,7 +9047,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>190</y>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -8678,7 +9057,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>220</y>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8710,8 +9089,8 @@
        <widget class="QLineEdit" name="outfall_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>190</y>
+          <x>380</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -8720,8 +9099,8 @@
        <widget class="QLabel" name="label_outfall_code">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>280</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8754,10 +9133,146 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>220</y>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="outfall_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_outfall_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="outfall_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>160</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="outfall_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>190</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_outfall_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>185</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_outfall_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>
@@ -8766,8 +9281,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8834,8 +9349,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9368,8 +9883,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9588,15 +10103,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_49">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9606,7 +10121,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9616,7 +10131,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9649,7 +10164,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>70</y>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9659,7 +10174,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>70</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9692,7 +10207,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>130</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9702,7 +10217,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>160</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9715,7 +10230,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>160</y>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9748,7 +10263,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>130</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9781,7 +10296,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9814,7 +10329,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9824,7 +10339,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9867,7 +10382,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9877,7 +10392,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9904,7 +10419,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>70</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9931,7 +10446,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9949,6 +10464,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -9968,7 +10485,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9978,7 +10495,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>70</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9988,7 +10505,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9996,6 +10513,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -10015,7 +10534,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>130</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -10025,7 +10544,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -10057,54 +10576,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="storage_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>160</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_storage_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_storage_end_date">
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>190</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -10137,7 +10613,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>220</y>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -10147,7 +10623,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>190</y>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -10156,8 +10632,8 @@
        <widget class="QLabel" name="label_storage_code">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>280</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -10190,7 +10666,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>220</y>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -10222,11 +10698,147 @@
        <widget class="QLineEdit" name="storage_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>190</y>
+          <x>380</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="storage_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_storage_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_storage_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_storage_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>185</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="storage_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>160</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="storage_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>190</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -10235,8 +10847,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10642,8 +11254,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11176,8 +11788,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11403,8 +12015,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11414,7 +12026,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11424,7 +12036,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11457,7 +12069,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>70</y>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11467,7 +12079,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>70</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11500,7 +12112,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>130</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11510,7 +12122,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>160</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11523,7 +12135,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>160</y>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11556,7 +12168,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>130</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11589,7 +12201,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11622,7 +12234,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11632,7 +12244,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11675,7 +12287,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11685,7 +12297,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11712,7 +12324,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>70</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11739,7 +12351,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11757,6 +12369,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -11776,7 +12390,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11786,7 +12400,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>70</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11796,7 +12410,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11804,6 +12418,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -11823,7 +12439,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>130</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11833,7 +12449,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -11865,54 +12481,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="valve_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>160</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_valve_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="valve_end_date">
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>190</y>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -11921,8 +12494,8 @@
        <widget class="QLabel" name="label_valve_code">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>280</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11955,7 +12528,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>220</y>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11987,8 +12560,8 @@
        <widget class="QLineEdit" name="valve_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>190</y>
+          <x>380</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -11998,7 +12571,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>220</y>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -12008,7 +12581,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>190</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12037,14 +12610,150 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_valve_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="valve_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="valve_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>190</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="valve_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>160</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_valve_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_valve_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>185</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_52">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12577,8 +13286,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12790,8 +13499,8 @@
      <widget class="QToolBox" name="toolBox_24">
       <property name="geometry">
        <rect>
-        <x>5</x>
-        <y>15</y>
+        <x>7</x>
+        <y>10</y>
         <width>581</width>
         <height>420</height>
        </rect>
@@ -12804,8 +13513,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12814,8 +13523,8 @@
        <widget class="QComboBox" name="wjump_workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>105</y>
+          <x>380</x>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -12824,8 +13533,8 @@
        <widget class="QLabel" name="label_wjump_workcat_id_end">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>105</y>
+          <x>280</x>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12857,8 +13566,8 @@
        <widget class="QComboBox" name="wjump_workcat_id">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>75</y>
+          <x>380</x>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -12867,8 +13576,8 @@
        <widget class="QLabel" name="label_wjump_workcat_id">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>75</y>
+          <x>280</x>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12900,8 +13609,8 @@
        <widget class="QComboBox" name="wjump_buildercat_id">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>135</y>
+          <x>380</x>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -12910,8 +13619,8 @@
        <widget class="QDateEdit" name="wjump_builtdate">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>165</y>
+          <x>380</x>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -12923,8 +13632,8 @@
        <widget class="QLabel" name="label_wjump_builtdate">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>165</y>
+          <x>280</x>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12956,8 +13665,8 @@
        <widget class="QLabel" name="label_wjump_buildercat_id">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>135</y>
+          <x>280</x>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12989,8 +13698,8 @@
        <widget class="QLabel" name="label_wjump_owner">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>45</y>
+          <x>280</x>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13022,8 +13731,8 @@
        <widget class="QLineEdit" name="wjump_sander">
         <property name="geometry">
          <rect>
-          <x>121</x>
-          <y>105</y>
+          <x>110</x>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13032,8 +13741,8 @@
        <widget class="QLabel" name="label_wjump_state">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>15</y>
+          <x>280</x>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13065,8 +13774,8 @@
        <widget class="QLineEdit" name="wjump_top_elev">
         <property name="geometry">
          <rect>
-          <x>121</x>
-          <y>15</y>
+          <x>110</x>
+          <y>10</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13075,8 +13784,8 @@
        <widget class="QComboBox" name="wjump_state">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>15</y>
+          <x>380</x>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13085,8 +13794,8 @@
        <widget class="QLabel" name="label_wjump_sander">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>105</y>
+          <x>10</x>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13112,8 +13821,8 @@
        <widget class="QLabel" name="label_wjump_elev">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>75</y>
+          <x>10</x>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13139,8 +13848,8 @@
        <widget class="QComboBox" name="wjump_ownercat_id">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>45</y>
+          <x>380</x>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13149,8 +13858,8 @@
        <widget class="QLabel" name="label_wjump_top_elev">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>15</y>
+          <x>10</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13158,6 +13867,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -13176,8 +13887,8 @@
        <widget class="QLineEdit" name="wjump_ymax">
         <property name="geometry">
          <rect>
-          <x>121</x>
-          <y>45</y>
+          <x>110</x>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13186,8 +13897,8 @@
        <widget class="QLineEdit" name="wjump_elev">
         <property name="geometry">
          <rect>
-          <x>121</x>
-          <y>75</y>
+          <x>110</x>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13196,8 +13907,8 @@
        <widget class="QLabel" name="label_wjump_ymax">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>45</y>
+          <x>10</x>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13205,6 +13916,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -13223,8 +13936,8 @@
        <widget class="QLineEdit" name="wjump_est_top_elev">
         <property name="geometry">
          <rect>
-          <x>121</x>
-          <y>135</y>
+          <x>110</x>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13233,8 +13946,8 @@
        <widget class="QLabel" name="label_wjump_est_top_elev">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>125</y>
+          <x>10</x>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -13266,54 +13979,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="wjump_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>121</x>
-          <y>165</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_wjump_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>21</x>
-          <y>165</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="wjump_end_date">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>195</y>
+          <x>380</x>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -13322,8 +13992,8 @@
        <widget class="QLabel" name="label_wjump_code">
         <property name="geometry">
          <rect>
-          <x>21</x>
-          <y>195</y>
+          <x>279</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13355,8 +14025,8 @@
        <widget class="QLabel" name="label_wjump_xyz_date">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>225</y>
+          <x>280</x>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13388,8 +14058,8 @@
        <widget class="QLineEdit" name="wjump_code">
         <property name="geometry">
          <rect>
-          <x>121</x>
-          <y>195</y>
+          <x>379</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -13398,8 +14068,8 @@
        <widget class="QLineEdit" name="wjump_xyz_date">
         <property name="geometry">
          <rect>
-          <x>391</x>
-          <y>225</y>
+          <x>380</x>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -13408,8 +14078,8 @@
        <widget class="QLabel" name="label_wjump_end_date">
         <property name="geometry">
          <rect>
-          <x>291</x>
-          <y>195</y>
+          <x>280</x>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13438,14 +14108,150 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLineEdit" name="wjump_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wjump_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wjump_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>185</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wjump_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wjump_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>160</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wjump_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>190</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_16">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13964,8 +14770,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14498,8 +15304,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14725,8 +15531,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14736,7 +15542,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>100</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14746,7 +15552,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>100</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14779,7 +15585,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>70</y>
+          <y>100</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14789,7 +15595,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>70</y>
+          <y>100</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14822,7 +15628,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>130</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14832,7 +15638,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>160</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14845,7 +15651,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>160</y>
+          <y>190</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14878,7 +15684,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>130</y>
+          <y>160</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14911,7 +15717,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14944,7 +15750,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>100</y>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14954,7 +15760,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14997,7 +15803,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15007,7 +15813,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15034,7 +15840,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>70</y>
+          <y>130</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15061,7 +15867,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15079,6 +15885,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -15098,7 +15906,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15108,7 +15916,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>70</y>
+          <y>130</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15118,7 +15926,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15126,6 +15934,8 @@
         <property name="font">
          <font>
           <pointsize>8</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
          </font>
         </property>
         <property name="frameShape">
@@ -15145,7 +15955,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>130</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15155,7 +15965,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>30</y>
           <width>91</width>
           <height>41</height>
          </rect>
@@ -15187,54 +15997,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="wwtp_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>160</y>
-          <width>161</width>
-          <height>20</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_wwtp_est_ymax">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>160</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>Estimated depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_wwtp_end_date">
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>190</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15266,8 +16033,8 @@
        <widget class="QLineEdit" name="wwtp_code">
         <property name="geometry">
          <rect>
-          <x>110</x>
-          <y>190</y>
+          <x>380</x>
+          <y>10</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -15277,7 +16044,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>220</y>
+          <y>250</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15309,8 +16076,8 @@
        <widget class="QLabel" name="label_wwtp_code">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>190</y>
+          <x>280</x>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15343,7 +16110,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>190</y>
+          <y>220</y>
           <width>161</width>
           <height>20</height>
          </rect>
@@ -15353,10 +16120,146 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>220</y>
+          <y>250</y>
           <width>161</width>
           <height>20</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wwtp_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>90</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated Y max:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wwtp_est_ymax">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>100</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wwtp_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>185</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>System elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wwtp_sys_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>190</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(83, 83, 83);</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wwtp_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>160</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wwtp_est_elev">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>155</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Estimated elevation:</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>
@@ -15365,8 +16268,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15433,8 +16336,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15967,8 +16870,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17221,6 +18124,9 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(83, 83, 83);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -17337,8 +18243,8 @@
     <property name="font">
      <font>
       <pointsize>8</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="frameShape">
@@ -17515,6 +18421,22 @@
     </property>
     <property name="text">
      <string>Publish</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="expl_name">
+    <property name="geometry">
+     <rect>
+      <x>405</x>
+      <y>555</y>
+      <width>211</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(83, 83, 83);</string>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

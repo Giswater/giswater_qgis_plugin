@@ -75,8 +75,8 @@
     <property name="font">
      <font>
       <pointsize>8</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="frameShape">
@@ -101,7 +101,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label_expl_id">
+   <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
       <x>281</x>
@@ -113,8 +113,8 @@
     <property name="font">
      <font>
       <pointsize>8</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="frameShape">
@@ -205,6 +205,9 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(83, 83, 83);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -219,7 +222,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -235,7 +238,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="page_7">
        <property name="geometry">
@@ -249,7 +252,7 @@
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QLineEdit" name="y1_2">
+       <widget class="QLineEdit" name="y1">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -259,7 +262,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="top_elev_2">
+       <widget class="QLineEdit" name="top_elev">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -269,7 +272,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="ymax_2">
+       <widget class="QLineEdit" name="ymax">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -279,7 +282,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_top_elev_2">
+       <widget class="QLabel" name="label_top_elev">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -308,7 +311,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_y_max_2">
+       <widget class="QLabel" name="label_y_max">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -337,7 +340,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_y1_2">
+       <widget class="QLabel" name="label_y1">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -370,7 +373,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="y2_2">
+       <widget class="QLineEdit" name="y2">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -380,7 +383,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_y2_2">
+       <widget class="QLabel" name="label_y2">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -413,7 +416,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_workcat_id_end_2">
+       <widget class="QLabel" name="label_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -446,7 +449,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="buildercat_id_2">
+       <widget class="QComboBox" name="buildercat_id">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -456,7 +459,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QDateEdit" name="builtdate_2">
+       <widget class="QDateEdit" name="builtdate">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -469,7 +472,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="workcat_id_end_2">
+       <widget class="QComboBox" name="workcat_id_end">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -479,7 +482,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="workcat_id_2">
+       <widget class="QComboBox" name="workcat_id">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -489,7 +492,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_builtdate_3">
+       <widget class="QLabel" name="label_builtdate">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -522,7 +525,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_buildercat_id_2">
+       <widget class="QLabel" name="label_buildercat_id">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -555,7 +558,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_workcat_id_2">
+       <widget class="QLabel" name="label_workcat_id">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -588,7 +591,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="ownercat_id_2">
+       <widget class="QComboBox" name="ownercat_id">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -598,7 +601,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_ownercat_id_2">
+       <widget class="QLabel" name="label_ownercat_id">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -631,7 +634,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_state_2">
+       <widget class="QLabel" name="label_state">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -664,7 +667,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="state_2">
+       <widget class="QComboBox" name="state">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -674,7 +677,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_demand_2">
+       <widget class="QLabel" name="label_demand">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -710,7 +713,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="demand_2">
+       <widget class="QLineEdit" name="demand">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -728,7 +731,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="code_2">
+       <widget class="QLineEdit" name="code">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -746,7 +749,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_code_2">
+       <widget class="QLabel" name="label_code">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -782,7 +785,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="streetname_2">
+       <widget class="QLineEdit" name="streetname">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -801,7 +804,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_streetaxis_id_2">
+       <widget class="QLabel" name="label_streetaxis_id">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -837,7 +840,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_postnumber_2">
+       <widget class="QLabel" name="label_postnumber">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -873,7 +876,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="postnumber_2">
+       <widget class="QLineEdit" name="postnumber">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -892,7 +895,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="streetaxis_id_2">
+       <widget class="QLineEdit" name="streetaxis_id">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -911,7 +914,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_streetname_2">
+       <widget class="QLabel" name="label_streetname">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -947,7 +950,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="n_hydrometer_2">
+       <widget class="QLineEdit" name="n_hydrometer">
         <property name="geometry">
          <rect>
           <x>105</x>
@@ -965,7 +968,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_n_hydrometer_2">
+       <widget class="QLabel" name="label_n_hydrometer">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -1004,7 +1007,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="end_date_2">
+       <widget class="QDateEdit" name="end_date">
         <property name="geometry">
          <rect>
           <x>375</x>
@@ -1017,7 +1020,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_builtdate_4">
+       <widget class="QLabel" name="label_end_date">
         <property name="geometry">
          <rect>
           <x>275</x>
@@ -1063,7 +1066,7 @@
        <attribute name="label">
         <string>Specific information</string>
        </attribute>
-       <widget class="QLineEdit" name="feature_id_2">
+       <widget class="QLineEdit" name="feature_id">
         <property name="geometry">
          <rect>
           <x>390</x>
@@ -1073,7 +1076,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="featurecat_id_4">
+       <widget class="QComboBox" name="featurecat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1083,7 +1086,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_connec_feature_type_2">
+       <widget class="QLabel" name="label_connec_featurecat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1119,7 +1122,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_feature_id_2">
+       <widget class="QLabel" name="label_feature_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1152,7 +1155,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_diagonal_2">
+       <widget class="QLabel" name="label_diagonal">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1185,7 +1188,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_accessible_2">
+       <widget class="QLabel" name="label_accessibility">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1218,7 +1221,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_private_concat_2">
+       <widget class="QLabel" name="label_private_connecat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1257,7 +1260,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="connec_type_4">
+       <widget class="QComboBox" name="private_connecat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1267,7 +1270,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="featurecat_id_5">
+       <widget class="QComboBox" name="accessibility">
         <property name="geometry">
          <rect>
           <x>390</x>
@@ -1277,7 +1280,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="featurecat_id_6">
+       <widget class="QComboBox" name="diagonal">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1300,7 +1303,7 @@
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QComboBox" name="soilcat_id_2">
+       <widget class="QComboBox" name="soilcat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1310,7 +1313,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_location_type_2">
+       <widget class="QLabel" name="label_location_type">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1346,7 +1349,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_adress_3">
+       <widget class="QLabel" name="label_adress_02">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1382,7 +1385,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="location_type_2">
+       <widget class="QComboBox" name="location_type">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1392,7 +1395,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_observ_2">
+       <widget class="QLabel" name="label_observ">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1428,7 +1431,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_fluid_type_2">
+       <widget class="QLabel" name="label_fluid_type">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1464,7 +1467,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="adress_3">
+       <widget class="QLineEdit" name="adress_02">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1474,7 +1477,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_adress_2">
+       <widget class="QLabel" name="label_adress_01">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1510,7 +1513,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_category_type_2">
+       <widget class="QLabel" name="label_category_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1546,7 +1549,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="category_type_2">
+       <widget class="QComboBox" name="category_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1556,7 +1559,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_link_2">
+       <widget class="QLabel" name="label_link">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1592,7 +1595,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_annotation_2">
+       <widget class="QLabel" name="label_annotation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1628,7 +1631,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="comment_2">
+       <widget class="QTextEdit" name="comment">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1644,7 +1647,7 @@
          <number>1</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="descript_2">
+       <widget class="QTextEdit" name="descript">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1654,7 +1657,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_soilcat_id_2">
+       <widget class="QLabel" name="label_soilcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1690,7 +1693,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="adress_2">
+       <widget class="QLineEdit" name="adress_01">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1703,7 +1706,7 @@
          <enum>QLineEdit::Normal</enum>
         </property>
        </widget>
-       <widget class="QTextEdit" name="observ_2">
+       <widget class="QTextEdit" name="observ">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1713,7 +1716,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_descript_2">
+       <widget class="QLabel" name="label_descript">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1749,7 +1752,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_comment_2">
+       <widget class="QLabel" name="label_comment">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1785,7 +1788,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="link_2">
+       <widget class="QTextEdit" name="link">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1795,7 +1798,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QTextEdit" name="annotation_2">
+       <widget class="QTextEdit" name="annotation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1811,7 +1814,7 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
-       <widget class="QComboBox" name="fluid_type_2">
+       <widget class="QComboBox" name="fluid_type">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1834,7 +1837,7 @@
        <attribute name="label">
         <string>Feature graphic design</string>
        </attribute>
-       <widget class="QLabel" name="label_label_rotation_2">
+       <widget class="QLabel" name="label_label_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1870,7 +1873,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_y_2">
+       <widget class="QLineEdit" name="label_y">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1883,7 +1886,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_x_2">
+       <widget class="QLineEdit" name="label_x">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1896,7 +1899,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_label_x_2">
+       <widget class="QLabel" name="label_label_x">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1932,7 +1935,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_label_y_2">
+       <widget class="QLabel" name="label_label_y">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1968,7 +1971,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="rotation_2">
+       <widget class="QLineEdit" name="rotation">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1981,7 +1984,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_svg_rotation_2">
+       <widget class="QLabel" name="label_svg_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -2017,7 +2020,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_rotation_2">
+       <widget class="QLineEdit" name="label_rotation">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -2037,7 +2040,7 @@
      <attribute name="title">
       <string>Element</string>
      </attribute>
-     <widget class="QTableView" name="tbl_element_2">
+     <widget class="QTableView" name="tbl_element">
       <property name="geometry">
        <rect>
         <x>12</x>
@@ -2050,7 +2053,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_element_delete_2">
+     <widget class="QPushButton" name="btn_element_delete">
       <property name="geometry">
        <rect>
         <x>690</x>
@@ -2063,7 +2066,7 @@
        <string>Unlink element</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="delete_row_info_2">
+     <widget class="QPushButton" name="delete_row_info">
       <property name="geometry">
        <rect>
         <x>460</x>
@@ -2094,13 +2097,13 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_11">
        <attribute name="title">
         <string>Hydrometer</string>
        </attribute>
-       <widget class="QPushButton" name="btn_delete_hydrometer_2">
+       <widget class="QPushButton" name="btn_delete_hydrometer">
         <property name="geometry">
          <rect>
           <x>436</x>
@@ -2113,7 +2116,7 @@
          <string>Delete Hydrometer</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="btn_add_hydrometer_2">
+       <widget class="QPushButton" name="btn_add_hydrometer">
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -2126,7 +2129,7 @@
          <string>Add Hydrometer</string>
         </property>
        </widget>
-       <widget class="QTableView" name="tbl_hydro_2">
+       <widget class="QTableView" name="tbl_hydro">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2144,7 +2147,7 @@
        <attribute name="title">
         <string>Hydrometer values</string>
        </attribute>
-       <widget class="QTableView" name="tbl_hydro_value_2">
+       <widget class="QTableView" name="tbl_hydro_value">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2159,7 +2162,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QLabel" name="label_hydrometer_to_2">
+     <widget class="QLabel" name="label_hydrometer_to">
       <property name="geometry">
        <rect>
         <x>153</x>
@@ -2192,7 +2195,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_el_to_2">
+     <widget class="QDateEdit" name="date_el_to">
       <property name="geometry">
        <rect>
         <x>153</x>
@@ -2212,7 +2215,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_hydrometer_from_2">
+     <widget class="QLabel" name="label_hydrometer_from">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2248,7 +2251,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_el_from_2">
+     <widget class="QDateEdit" name="date_el_from">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2286,7 +2289,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QTableView" name="tbl_document_2">
+     <widget class="QTableView" name="tbl_document">
       <property name="geometry">
        <rect>
         <x>12</x>
@@ -2299,7 +2302,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_doc_to_2">
+     <widget class="QLabel" name="label_doc_to">
       <property name="geometry">
        <rect>
         <x>153</x>
@@ -2332,7 +2335,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QComboBox" name="doc_type_2">
+     <widget class="QComboBox" name="doc_type">
       <property name="geometry">
        <rect>
         <x>296</x>
@@ -2342,7 +2345,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_doc_from_2">
+     <widget class="QLabel" name="label_doc_from">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2378,7 +2381,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_doc_type_2">
+     <widget class="QLabel" name="label_doc_type">
       <property name="geometry">
        <rect>
         <x>296</x>
@@ -2414,7 +2417,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_doc_tag_2">
+     <widget class="QLabel" name="label_doc_tag">
       <property name="geometry">
        <rect>
         <x>440</x>
@@ -2447,7 +2450,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_document_from_2">
+     <widget class="QDateEdit" name="date_document_from">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2467,7 +2470,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QComboBox" name="doc_tag_2">
+     <widget class="QComboBox" name="doc_tag">
       <property name="geometry">
        <rect>
         <x>440</x>
@@ -2477,7 +2480,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_document_to_2">
+     <widget class="QDateEdit" name="date_document_to">
       <property name="geometry">
        <rect>
         <x>153</x>
@@ -2497,7 +2500,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_doc_delete_2">
+     <widget class="QPushButton" name="btn_doc_delete">
       <property name="geometry">
        <rect>
         <x>460</x>
@@ -2510,7 +2513,7 @@
        <string>Unlink document</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btn_open_path_2">
+     <widget class="QPushButton" name="btn_open_path">
       <property name="geometry">
        <rect>
         <x>340</x>
@@ -2544,7 +2547,7 @@
        <attribute name="title">
         <string>Connec</string>
        </attribute>
-       <widget class="QTableView" name="tbl_event_connec_2">
+       <widget class="QTableView" name="tbl_event_connec">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2559,7 +2562,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QLabel" name="label_event_parameter_2">
+     <widget class="QLabel" name="label_event_parameter">
       <property name="geometry">
        <rect>
         <x>440</x>
@@ -2592,7 +2595,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_date_to_2">
+     <widget class="QLabel" name="label_event_date_to">
       <property name="geometry">
        <rect>
         <x>153</x>
@@ -2625,7 +2628,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QComboBox" name="event_type_2">
+     <widget class="QComboBox" name="event_type">
       <property name="geometry">
        <rect>
         <x>296</x>
@@ -2635,7 +2638,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QComboBox" name="event_id_2">
+     <widget class="QComboBox" name="event_id">
       <property name="geometry">
        <rect>
         <x>440</x>
@@ -2645,7 +2648,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_date_from_2">
+     <widget class="QLabel" name="label_event_date_from">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2681,7 +2684,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_event_parameter_type_2">
+     <widget class="QLabel" name="label_event_parameter_type">
       <property name="geometry">
        <rect>
         <x>296</x>
@@ -2717,7 +2720,7 @@
        <number>3</number>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_event_from_2">
+     <widget class="QDateEdit" name="date_event_from">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -2737,7 +2740,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QDateEdit" name="date_event_to_2">
+     <widget class="QDateEdit" name="date_event_to">
       <property name="geometry">
        <rect>
         <x>153</x>
@@ -3028,25 +3031,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="expl_id">
-    <property name="geometry">
-     <rect>
-      <x>281</x>
-      <y>550</y>
-      <width>311</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="maxVisibleItems">
-     <number>8</number>
-    </property>
-    <property name="frame">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QComboBox" name="connec_type">
     <property name="geometry">
      <rect>
@@ -3055,6 +3039,22 @@
       <width>151</width>
       <height>20</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="expl_name">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>550</y>
+      <width>306</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(83, 83, 83);</string>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>
