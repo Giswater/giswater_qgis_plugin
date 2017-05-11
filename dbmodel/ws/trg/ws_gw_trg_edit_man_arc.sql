@@ -13,11 +13,13 @@ DECLARE
     man_table varchar;
     v_sql varchar;
     arc_id_seq int8;
+	expl_id_int integer;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
+        man_table:= TG_ARGV[0];
+		
     IF TG_OP = 'INSERT' THEN
     
         -- Arc ID
@@ -63,17 +65,15 @@ BEGIN
         END IF;
 		
 		--Exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;	
 
        
         
@@ -81,14 +81,32 @@ BEGIN
         NEW.epa_type = 'PIPE';        
     
         -- FEATURE INSERT
-        INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
+		IF man_table='man_pipe' THEN 
+		
+				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
-					expl_id, publish, inventory, end_date, macrodma_id)
-					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length,NEW.dma_id,NEW.soilcat_id, 
-					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, 
-					NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.workcat_id_end, NEW.label_x,NEW.label_y,NEW.label_rotation, 
-					NEW.expl_id, NEW.publish, NEW.inventory, NEW.end_date, NEW.macrodma_id);
-
+					publish, inventory, end_date, macrodma_id,expl_id)
+					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.pipe_state, NEW.pipe_annotation, NEW.pipe_observ, NEW.pipe_comment, NEW.pipe_custom_length,NEW.dma_id,NEW.pipe_soilcat_id, 
+					NEW.pipe_category_type, NEW.pipe_fluid_type, NEW.pipe_location_type, NEW.pipe_workcat_id, NEW.pipe_buildercat_id, NEW.pipe_builtdate,NEW.pipe_ownercat_id, NEW.pipe_adress_01, NEW.pipe_adress_02, NEW.pipe_adress_03, 
+					NEW.pipe_descript, NEW.pipe_rotation, NEW.pipe_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.pipe_workcat_id_end, NEW.pipe_label_x,NEW.pipe_label_y,NEW.pipe_label_rotation, 
+					NEW.publish, NEW.inventory, NEW.pipe_end_date, NEW.macrodma_id,expl_id_int);
+				
+				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
+		
+		ELSIF man_table='man_varc' THEN
+				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
+					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
+					publish, inventory, end_date, macrodma_id,expl_id)
+					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.varc_state, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, NEW.varc_custom_length,NEW.dma_id,NEW.varc_soilcat_id, 
+					NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_buildercat_id, NEW.varc_builtdate,NEW.varc_ownercat_id, NEW.varc_adress_01, NEW.varc_adress_02, NEW.varc_adress_03, 
+					NEW.varc_descript, NEW.varc_rotation, NEW.varc_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.varc_workcat_id_end, NEW.varc_label_x,NEW.varc_label_y,NEW.varc_label_rotation, 
+					NEW.publish, NEW.inventory, NEW.varc_end_date, NEW.macrodma_id,expl_id_int);
+				
+					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
+					
+		END IF;
+		RETURN NEW;
+		
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
             inp_table:= 'inp_pipe';
@@ -124,16 +142,38 @@ BEGIN
             END IF;
 
         END IF;
-    
-        UPDATE arc 
-        SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", 
-            "comment"=NEW."comment", custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
-            location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
-            ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end,undelete=NEW.undelete, label_x=NEW.label_x,
-			label_y=NEW.label_y,label_rotation=NEW.label_rotation, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, macrodma_id=NEW.macrodma_id
-        WHERE arc_id=OLD.arc_id;
-
+		
+		
+		IF man_table='man_pipe' THEN
+			UPDATE arc 
+			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.pipe_state, annotation= NEW.pipe_annotation, "observ"=NEW.pipe_observ, 
+				"comment"=NEW.pipe_comment, custom_length=NEW.pipe_custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.pipe_soilcat_id, category_type=NEW.pipe_category_type, fluid_type=NEW.pipe_fluid_type, 
+				location_type=NEW.pipe_location_type, workcat_id=NEW.pipe_workcat_id, buildercat_id=NEW.pipe_buildercat_id, builtdate=NEW.pipe_builtdate,
+				ownercat_id=NEW.pipe_ownercat_id, adress_01=NEW.pipe_adress_01, adress_02=NEW.pipe_adress_02, adress_03=NEW.pipe_adress_03, descript=NEW.pipe_descript,
+				rotation=NEW.pipe_rotation, link=NEW.pipe_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.pipe_workcat_id_end,undelete=NEW.undelete, label_x=NEW.pipe_label_x,
+				label_y=NEW.pipe_label_y,label_rotation=NEW.pipe_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.pipe_end_date, macrodma_id=NEW.macrodma_id
+			WHERE arc_id=OLD.arc_id;
+			
+			UPDATE man_pipe
+			SET arc_id=NEW.arc_id
+			WHERE arc_id=OLD.arc_id;
+			
+		ELSIF man_table='man_varc' THEN
+			UPDATE arc
+			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.varc_state, annotation= NEW.varc_annotation, "observ"=NEW.varc_observ, 
+				"comment"=NEW.varc_comment, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.varc_soilcat_id, category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type, 
+				location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,
+				ownercat_id=NEW.varc_ownercat_id, adress_01=NEW.varc_adress_01, adress_02=NEW.varc_adress_02, adress_03=NEW.varc_adress_03, descript=NEW.varc_descript,
+				rotation=NEW.varc_rotation, link=NEW.varc_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.varc_workcat_id_end,undelete=NEW.undelete, label_x=NEW.varc_label_x,
+				label_y=NEW.varc_label_y,label_rotation=NEW.varc_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.varc_end_date, macrodma_id=NEW.macrodma_id
+			WHERE arc_id=OLD.arc_id;
+			
+			UPDATE man_varc
+			SET arc_id=NEW.arc_id
+			WHERE arc_id=OLD.arc_id;	
+			
+		END IF;
+		
         PERFORM audit_function(2,340); 
         RETURN NEW;
 
@@ -151,7 +191,8 @@ $BODY$
   
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_pipe ON "SCHEMA_NAME".v_edit_man_pipe;
-CREATE TRIGGER gw_trg_edit_man_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pipe
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc();
+CREATE TRIGGER gw_trg_edit_man_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pipe FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('man_pipe');
 
+DROP TRIGGER IF EXISTS gw_trg_edit_man_varc ON "SCHEMA_NAME".v_edit_man_varc;
+CREATE TRIGGER gw_trg_edit_man_varc INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_varc FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_arc('man_varc');
       
