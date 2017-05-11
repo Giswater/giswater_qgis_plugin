@@ -779,6 +779,10 @@ CREATE TABLE "element" (
 "link" character varying(512),
 "verified" varchar(20)   NOT NULL,
 "workcat_id_end" varchar(255),
+"link" varchar(512),
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"publish" boolean,
+"inventory" boolean,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
@@ -891,5 +895,5 @@ CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
 CREATE INDEX link_index ON link USING GIST (the_geom);
 CREATE INDEX point_index ON point USING GIST (the_geom);
 CREATE INDEX presszone_index ON presszone USING GIST (the_geom);
-
+CREATE INDEX element_index ON element USING GIST (the_geom);
 

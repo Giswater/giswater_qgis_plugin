@@ -77,6 +77,19 @@ BEGIN
             END IF;            
         END IF;
 
+		
+		--Municipality
+        IF (NEW.municipality_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM municipality_selector) = 0) THEN
+                --PERFORM audit_function(125,340);
+				RETURN NULL;				
+            END IF;
+            NEW.municipality_id := (SELECT municipality_id FROM municipality_selector WHERE ST_DWithin(NEW.the_geom, municipality_selector.the_geom,0.001) LIMIT 1);
+            IF (NEW.municipality_id IS NULL) THEN
+                --PERFORM audit_function(130,340);
+				RETURN NULL; 
+            END IF;
+        END IF;
         
         -- FEATURE INSERT
 

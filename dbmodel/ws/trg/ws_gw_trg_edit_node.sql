@@ -70,6 +70,19 @@ BEGIN
             END IF;            
         END IF;
         
+		--Municipality
+        IF (NEW.municipality_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM municipality_selector) = 0) THEN
+                --PERFORM audit_function(125,340);
+				RETURN NULL;				
+            END IF;
+            NEW.municipality_id := (SELECT municipality_id FROM municipality_selector WHERE ST_DWithin(NEW.the_geom, municipality_selector.the_geom,0.001) LIMIT 1);
+            IF (NEW.municipality_id IS NULL) THEN
+                --PERFORM audit_function(130,340);
+				RETURN NULL; 
+            END IF;
+        END IF;		
+        
         -- FEATURE INSERT      
         INSERT INTO node (node_id,elevation,"depth",node_type,nodecat_id,epa_type,sector_id,"state",annotation,"observ","comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,builtdate,
 					ownercat_id,adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation)

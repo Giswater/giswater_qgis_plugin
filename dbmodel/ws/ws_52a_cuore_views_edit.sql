@@ -63,14 +63,22 @@ connec.undelete,
 connec.label_x,
 connec.label_y,
 connec.label_rotation,
-connec.workcat_id_end
-FROM connec
+connec.workcat_id_end,
+connec.publish,
+connec.inventory,
+connec.end_date,
+connec.macrodma_id,
+exploitation.descript AS expl_name	
+FROM expl_selector, connec
 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
 LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
 LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
 LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
 LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
-LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text;
+LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
+JOIN exploitation ON connec.expl_id=exploitation.expl_id
+WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
 
 
 DROP VIEW IF EXISTS v_edit_man_wjoin CASCADE;
@@ -122,15 +130,24 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
     man_wjoin.length AS wjoin_length,
     man_wjoin.top_floor AS wjoin_top_floor,
     man_wjoin.lead_verified AS wjoin_lead_verified,
-    man_wjoin.lead_facade AS wjoin_lead_facade
-   FROM connec
+    man_wjoin.lead_facade AS wjoin_lead_facade,
+	connec.publish,
+	connec.inventory,
+	connec.end_date AS wjoin_end_date,
+	connec.macrodma_id,
+	man_wjoin.cat_valve2 AS wjoin_cat_valve2,
+	exploitation.descript AS expl_name	
+ FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
-     JOIN man_wjoin ON man_wjoin.connec_id::text = connec.connec_id::text;
+     JOIN man_wjoin ON man_wjoin.connec_id::text = connec.connec_id::text
+	 JOIN exploitation ON connec.expl_id=exploitation.expl_id
+	 WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
+ 	 AND expl_selector.cur_user="current_user"()::text);
 
 	 
 	 
@@ -191,15 +208,25 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
     man_tap.drain_gully AS tap_drain_gully,
     man_tap.drain_distance AS tap_drain_distance,
     man_tap.arquitect_patrimony AS tap_arquitect_patrimony,
-    man_tap.communication AS tap_communication
-   FROM connec
+    man_tap.communication AS tap_communication,
+	connec.publish,
+	connec.inventory,
+	connec.end_date AS tap_end_date,
+	connec.macrodma_id,
+	man_tap.cat_valve2 AS tap_cat_valve2,
+	man_tap.linked_connec AS tap_linked_connec,
+	exploitation.descript AS expl_name	
+ FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
-     JOIN man_tap ON man_tap.connec_id::text = connec.connec_id::text;
+     JOIN man_tap ON man_tap.connec_id::text = connec.connec_id::text
+	 JOIN exploitation ON connec.expl_id=exploitation.expl_id
+	 WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
+ 	 AND expl_selector.cur_user="current_user"()::text);
 
 	 
 	 
@@ -257,15 +284,25 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
     man_fountain.regulation_tank AS fountain_regulation_tank,
     man_fountain.name AS fountain_name,
     man_fountain.connection AS fountain_connection,
-    man_fountain.chlorinator AS fountain_chlorinator
-   FROM connec
+    man_fountain.chlorinator AS fountain_chlorinator,
+	connec.publish,
+	connec.inventory,
+	connec.end_date AS fountain_end_date,
+	connec.macrodma_id,
+	man_fountain.linked_connec AS fountain_linked_connec,
+	man_fountain.the_geom_pol,
+	exploitation.descript AS expl_name
+ FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
-     JOIN man_fountain ON man_fountain.connec_id::text = connec.connec_id::text;
+     JOIN man_fountain ON man_fountain.connec_id::text = connec.connec_id::text
+	 JOIN exploitation ON connec.expl_id=exploitation.expl_id
+	 WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
+ 	 AND expl_selector.cur_user="current_user"()::text);
 
 
 	 
@@ -314,13 +351,22 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
     connec.link AS greentap_link,
     connec.verified,
     connec.the_geom,
-	connec.undelete
-   FROM connec
+	connec.undelete,
+	connec.publish,
+	connec.inventory,
+	connec.end_date AS greentap_end_date,
+	connec.macrodma_id,
+	man_greentap.linked_connec AS greentap_linked_connec,
+	exploitation.descript AS expl_name	
+ FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
-     JOIN man_greentap ON man_greentap.connec_id::text = connec.connec_id::text;
+     JOIN man_greentap ON man_greentap.connec_id::text = connec.connec_id::text
+	 JOIN exploitation ON connec.expl_id=exploitation.expl_id
+	 WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
+ 	 AND expl_selector.cur_user="current_user"()::text);
 

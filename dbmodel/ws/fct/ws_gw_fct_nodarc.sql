@@ -5,8 +5,17 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node2arc();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node2arc()  RETURNS integer AS $BODY$
+/*
+-- TODO: 
+result_id
+millorar les taules temp_arc 6 temp_node. Fer-les més petites, només amb la informació que ens fa falta
+Modificar les claus foraneas de les taules de resultats, cap a temp_arc_ temp_node
+Permetre que els arc_id i node_id siguin varchar... en la temp...
+*/
+
+
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_nodarc();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_nodarc()  RETURNS integer AS $BODY$
 DECLARE
     
     record_node SCHEMA_NAME.node%ROWTYPE;
@@ -32,11 +41,6 @@ BEGIN
 	
     RAISE NOTICE 'Starting node2arc process.';
 	
---  Armonize the NOT DEFINED nodes with arcs
-	UPDATE arc set epa_type='NOT DEFINED' from node where node.epa_type='NOT DEFINED' and node_1=node_id;
-	UPDATE arc set epa_type='NOT DEFINED' from node where node.epa_type='NOT DEFINED' and node_2=node_id;
-	
-	
 --  Empty temp tables
     RAISE NOTICE 'Clear temp tables.';
 
@@ -52,7 +56,6 @@ BEGIN
 --  Move valves to arc
     RAISE NOTICE 'Start loop.';
 
-/*
     
     FOR node_id_aux IN (SELECT node_id FROM SCHEMA_NAME.inp_valve UNION SELECT node_id FROM SCHEMA_NAME.inp_shortpipe UNION SELECT node_id FROM SCHEMA_NAME.inp_pump)
     LOOP
@@ -220,8 +223,6 @@ BEGIN
 
     END LOOP;
 
-*/
-	
     RETURN 1;
 	
 --	RETURN SCHEMA_NAME.audit_function(0,90);

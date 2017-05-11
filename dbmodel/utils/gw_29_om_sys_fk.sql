@@ -19,14 +19,14 @@ ALTER TABLE "om_visit_parameter" ADD CONSTRAINT "om_visit_parameter_parameter_ty
 ALTER TABLE "om_visit_x_node" DROP CONSTRAINT IF EXISTS "om_visit_x_node_visit_id_fkey";
 ALTER TABLE "om_visit_x_node" ADD CONSTRAINT "om_visit_x_node_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_x_node" DROP CONSTRAINT IF EXISTS "om_visit_x_node_node_id_fkey";
-ALTER TABLE "om_visit_x_node" ADD CONSTRAINT "om_visit_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_visit_x_node" ADD CONSTRAINT "om_visit_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "om_visit_x_arc" DROP CONSTRAINT IF EXISTS "om_visit_x_arc_visit_id_fkey";
 ALTER TABLE "om_visit_x_arc" ADD CONSTRAINT "om_visit_x_arc_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_x_arc" DROP CONSTRAINT IF EXISTS "om_visit_x_arc_arc_id_fkey";
-ALTER TABLE "om_visit_x_arc" ADD CONSTRAINT "om_visit_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_visit_x_arc" ADD CONSTRAINT "om_visit_x_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "om_visit_x_connec" DROP CONSTRAINT IF EXISTS "om_visit_x_connec_visit_id_fkey";
 ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_x_connec" DROP CONSTRAINT IF EXISTS "om_visit_x_connec_connec_id_fkey";
-ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "om_visit_x_connec" ADD CONSTRAINT "om_visit_x_connec_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE RESTRICT ON UPDATE CASCADE;
