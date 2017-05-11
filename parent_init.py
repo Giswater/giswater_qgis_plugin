@@ -783,6 +783,10 @@ class ParentDialog(object):
             tab_text = self.tab_main.tabText(i)
             if selected_layer != tab_text :
                 self.tab_main.removeTab(i) 
+
+        # For virtual arc remove tab Costs
+        if self.layer.name() == "Varc" :
+            self.tab_main.removeTab(4)          
                 
                 
     def setImage(self, widget):

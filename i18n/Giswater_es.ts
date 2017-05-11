@@ -30,16 +30,20 @@
     
 
     <message>
+	 <source>60_text</source>
+	 <translation>Botón de prueba</translation>
+    </message>
+    <message>
         <source>01_text</source>
-        <translation>Insert junction</translation>
+        <translation>Insertar unión</translation>
     </message>      
     <message>
         <source>02_text</source>
-        <translation>Insert outfall</translation>
+        <translation>Insertar descarga</translation>
     </message>   
     <message>
         <source>03_text</source>
-        <translation>Insert virtual arc</translation>
+        <translation>Insertar arco virtual</translation>
     </message>      
     <message>
         <source>04_text</source>
@@ -59,7 +63,7 @@
     </message>      
     <message>
         <source>11_text</source>
-        <translation>Insert hydrant</translation>
+        <translation>Insertar hidrante</translation>
     </message>      
     <message>
         <source>12_text</source>
@@ -67,7 +71,7 @@
     </message>      
     <message>
         <source>13_text</source>
-        <translation>Insert pipe</translation>
+        <translation>Insertar tubería</translation>
     </message>      
     <message>
         <source>14_text</source>
