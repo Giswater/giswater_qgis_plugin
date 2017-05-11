@@ -24,7 +24,7 @@ This version of Giswater is provided by Giswater Association
 						IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN
 							
 									UPDATE review_audit_node SET node_id=NEW.node_id, the_geom=NEW.the_geom, top_elev=NEW.top_elev, ymax=NEW.ymax, node_type=NEW.node_type,
-									cat_matcat=NEW.cat_matcat, dimensions=NEW.dimensions, annotation=NEW.annotation, observ=NEW.observ, verified=NEW.verified, field_checked=NEW.field_checked, "operation"='UPDATE',"user"=user, date_field=CURRENT_TIMESTAMP, office_checked=NEW.office_checked,moved_geom='TRUE'
+									cat_matcat=NEW.cat_matcat, dimensions=NEW.dimensions, annotation=NEW.annotation, observ=NEW.observ, verified='REVISED', field_checked=NEW.field_checked, "operation"='UPDATE',"user"=user, date_field=CURRENT_TIMESTAMP, office_checked=NEW.office_checked
 									WHERE node_id=OLD.node_id;
 									
 								IF NEW.the_geom::text<>OLD.the_geom::text THEN
@@ -36,11 +36,11 @@ This version of Giswater is provided by Giswater Association
 						ELSE
 							IF NEW.the_geom=OLD.the_geom THEN
 								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
-								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, NEW.verified, NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
+								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked,'FALSE');						
 						ELSE 
 								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
-								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, NEW.verified, NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
+								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked,'TRUE');
 							END IF;
 							
