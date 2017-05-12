@@ -22,15 +22,36 @@ DECLARE
 BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-
-    -- Insert catalog table
-    SELECT nextval ('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) INTO result_cat_id_aux ;
-    INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+	
+	--Set the mincut_id
+	IF NEW.id IS NOT NULL THEN
+	
+			IF EXISTS (SELECT id FROM anl_mincut_result_cat WHERE id=NEW.id) THEN 
+				SELECT anl_mincut_result_cat(id) INTO result_cat_id_aux;
+				
+				DELETE FROM anl_mincut_result_cat WHERE id=OLD.id;
+							
+				INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+				 
+			ELSE 
+			
+				SELECT anl_mincut_result_cat(id) INTO result_cat_id_aux;
+				INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+				 
+			END IF;
+		
+	ELSE 
+	
+		 SELECT nextval ('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) INTO result_cat_id_aux ;
+		 INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+		 
+	END IF;
+	 
 
     -- Insert polygon table
     SELECT * INTO polygon_rec FROM anl_mincut_polygon;
     INSERT INTO anl_mincut_result_polygon (mincut_result_cat_id,polygon_id,the_geom) VALUES (result_cat_id_aux, polygon_rec.polygon_id, polygon_rec.the_geom);
-        
+
     -- Insert arc table
     FOR arc_rec IN SELECT * FROM anl_mincut_arc
     LOOP

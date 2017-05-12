@@ -56,6 +56,20 @@ tstamp timestamp(6) without time zone,
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
 -- ----------------------------
 
+CREATE SEQUENCE review_arc_id_seq
+    START WITH 1000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE review_node_id_seq
+    START WITH 1000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 DROP TABLE IF EXISTS review_arc;
 CREATE TABLE review_arc
 (  arc_id character varying(16),
