@@ -102,7 +102,7 @@ JOIN element ON element.element_id::text = element_x_connec.element_id::text;
 
 DROP VIEW IF EXISTS v_edit_review_node CASCADE;
 CREATE VIEW v_edit_review_node AS 
- SELECT node.node_id,
+ SELECT review_audit_node.node_id,
     node.top_elev,
     node.ymax,
     review_audit_node.top_elev AS cota_tapa,
@@ -112,12 +112,12 @@ CREATE VIEW v_edit_review_node AS
     review_audit_node.office_checked,
 	node.the_geom	
    FROM node
-     JOIN review_audit_node ON node.node_id::text = review_audit_node.node_id::text
+     RIGHT JOIN review_audit_node ON node.node_id::text = review_audit_node.node_id::text
   WHERE review_audit_node.field_checked IS TRUE AND review_audit_node.office_checked IS NOT TRUE;
   
 DROP VIEW IF EXISTS v_edit_review_arc CASCADE;
   CREATE VIEW v_edit_review_arc AS 
- SELECT arc.arc_id,
+ SELECT review_audit_arc.arc_id,
 	arc.arccat_id,
     arc.y1,
     arc.y2,
@@ -129,5 +129,5 @@ DROP VIEW IF EXISTS v_edit_review_arc CASCADE;
     review_audit_arc.office_checked,
 	arc.the_geom
    FROM arc
-     JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
+     RIGHT JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
   WHERE review_audit_arc.field_checked IS TRUE AND review_audit_arc.office_checked IS NOT TRUE;
