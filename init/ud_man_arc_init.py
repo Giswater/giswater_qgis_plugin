@@ -31,12 +31,12 @@ def init_config():
     utils_giswater.setSelectedItem("arc_type", arc_type)
      
     # Manage 'arccat_id'
-    arccat_id = utils_giswater.getWidgetText("arccat_id") 
-    utils_giswater.setSelectedItem("arccat_id", arccat_id)   
+    # arccat_id = utils_giswater.getWidgetText("arccat_id") 
+    # utils_giswater.setSelectedItem("arccat_id", arccat_id)   
 
     # Manage 'state'
-    state = utils_giswater.getWidgetText("conduit_state") 
-    utils_giswater.setSelectedItem("conduit_state", state)   
+    # state = utils_giswater.getWidgetText("conduit_state") 
+    # utils_giswater.setSelectedItem("conduit_state", state)   
     
 
 

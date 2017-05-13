@@ -28,13 +28,13 @@ def formOpen(dialog, layer, feature):
 def init_config():
      
     # Manage 'arccat_id'
-    arccat_id = utils_giswater.getWidgetText("arccat_id") 
-    utils_giswater.setSelectedItem("arccat_id", arccat_id)   
+    # arccat_id = utils_giswater.getWidgetText("arccat_id") 
+    # utils_giswater.setSelectedItem("arccat_id", arccat_id)   
 
     # Manage 'state'
-    state = utils_giswater.getWidgetText("state") 
-    utils_giswater.setSelectedItem("state", state)   
-    
+    # state = utils_giswater.getWidgetText("state") 
+    # utils_giswater.setSelectedItem("state", state)   
+    pass
      
 class ManArcDialog(ParentDialog):   
     
