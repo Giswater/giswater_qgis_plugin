@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -153,7 +153,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="workcat_id_end">
+    <widget class="QLineEdit" name="verified">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -187,7 +187,7 @@
       <enum>QFrame::Plain</enum>
      </property>
      <property name="text">
-      <string>Workcat id_end:</string>
+      <string>Verified:</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
