@@ -9,6 +9,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_arc()
   RETURNS trigger AS
 $BODY$
 DECLARE 
+
     inp_table varchar;
     man_table varchar;
     v_sql varchar;
@@ -18,8 +19,9 @@ DECLARE
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-        man_table:= TG_ARGV[0];
-		
+	        man_table:= TG_ARGV[0];
+	
+	
     IF TG_OP = 'INSERT' THEN
     
         -- Arc ID
@@ -66,7 +68,32 @@ BEGIN
                 RETURN audit_function(130,340); 
             END IF;
         END IF;
+	
+  	    -- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT state_vdefault FROM config);
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
+            END IF;
+        END IF;
 		
+		-- Workcat_id
+        IF (NEW.workcat_id IS NULL) THEN
+            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
+            IF (NEW.workcat_id IS NULL) THEN
+                NEW.workcat_id := (SELECT id FROM cat_work limit 1);
+            END IF;
+        END IF;
+		
+		-- Verified
+        IF (NEW.verified IS NULL) THEN
+            NEW.verified := (SELECT verified_vdefault FROM config);
+            IF (NEW.verified IS NULL) THEN
+                NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+			
+			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);

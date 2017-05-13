@@ -53,6 +53,30 @@ BEGIN
             END IF;
         END IF;
 		
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT state_vdefault FROM config);
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
+            END IF;
+        END IF;
+		
+		-- Workcat_id
+        IF (NEW.workcat_id IS NULL) THEN
+            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
+            IF (NEW.workcat_id IS NULL) THEN
+                NEW.workcat_id := (SELECT id FROM cat_work limit 1);
+            END IF;
+        END IF;
+		
+		-- Verified
+        IF (NEW.verified IS NULL) THEN
+            NEW.verified := (SELECT verified_vdefault FROM config);
+            IF (NEW.verified IS NULL) THEN
+                NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+		
 		--Municipality
         IF (NEW.municipality_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM municipality_selector) = 0) THEN
