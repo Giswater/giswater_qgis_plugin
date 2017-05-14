@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -559,54 +559,67 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLabel" name="label_copy_attribute_adherence">
+    <widget class="QGroupBox" name="groupBox">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>240</y>
-       <width>231</width>
-       <height>22</height>
+       <x>14</x>
+       <y>242</y>
+       <width>435</width>
+       <height>61</height>
       </rect>
      </property>
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-      </font>
+     <property name="title">
+      <string>UD PROJECTS</string>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string>Copy attribute by adherence</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="copy_attribute_adherence">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>240</y>
-       <width>20</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
+     <widget class="QCheckBox" name="slope_arc_direction">
+      <property name="geometry">
+       <rect>
+        <x>256</x>
+        <y>18</y>
+        <width>20</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_copy_attribute_adherence">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>18</y>
+        <width>231</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="text">
+       <string>Geometry direction as slope arc direction:</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="margin">
+       <number>3</number>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
