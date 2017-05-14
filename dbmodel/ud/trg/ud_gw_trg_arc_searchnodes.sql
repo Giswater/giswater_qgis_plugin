@@ -5,12 +5,15 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger AS
+
+$BODY$
 DECLARE 
     nodeRecord1 Record; 
     nodeRecord2 Record;
     optionsRecord Record;
     rec Record;
+    slope_arc_direction_bool boolean;
     z1 double precision;
     z2 double precision;
     z_aux double precision;
@@ -23,7 +26,8 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
     -- Get data from config table
-    SELECT * INTO rec FROM config;    
+    SELECT * INTO rec FROM config;
+    SELECT value INTO slope_arc_direction_bool FROM config_param_bool where id='slope_arc_direction';    
 
     SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
@@ -53,18 +57,24 @@ BEGIN
                     z2 := NEW.y2;
             END IF;
 
-            IF ((z1 > z2) AND NEW.inverted_slope is not true) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
+            IF (z1 > z2) AND (NEW.inverted_slope is not true) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
                 NEW.node_1 := nodeRecord1.node_id; 
                 NEW.node_2 := nodeRecord2.node_id;
             ELSE 
 
-                -- Update conduit direction
-                NEW.the_geom := ST_reverse(NEW.the_geom);
-                z_aux := NEW.y1;
-                NEW.y1 := NEW.y2;
-                NEW.y2 := z_aux;
-                NEW.node_1 := nodeRecord2.node_id;
-                NEW.node_2 := nodeRecord1.node_id;
+		IF (slope_arc_direction_bool IS TRUE) THEN 
+			-- Update conduit direction
+			NEW.the_geom := ST_reverse(NEW.the_geom);
+			z_aux := NEW.y1;
+			NEW.y1 := NEW.y2;
+			NEW.y2 := z_aux;
+			NEW.node_1 := nodeRecord2.node_id;
+			NEW.node_2 := nodeRecord1.node_id;
+		ELSE 
+			NEW.node_1 := nodeRecord1.node_id; 
+			NEW.node_2 := nodeRecord2.node_id;
+		
+		END IF;
                 RETURN NEW;
             END IF;
 
@@ -123,8 +133,9 @@ BEGIN
     END IF;
     
 END;  
-$$;
-
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
 DROP TRIGGER IF EXISTS gw_trg_arc_searchnodes ON "SCHEMA_NAME"."arc";
 CREATE TRIGGER gw_trg_arc_searchnodes BEFORE INSERT OR UPDATE OF the_geom ON "SCHEMA_NAME"."arc" 

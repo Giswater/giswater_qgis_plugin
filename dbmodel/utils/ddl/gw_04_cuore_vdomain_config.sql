@@ -13,7 +13,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, NULL, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
+INSERT INTO config VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, NULL, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1, NULL, NULL, NULL);
+
+INSERT INTO config_param_bool VALUES ('slope_arc_direction', true, NULL, NULL, NULL, NULL);
 
 INSERT INTO config_csv_import VALUES ('inp_pattern', 'Patterns');
 INSERT INTO config_csv_import VALUES ('inp_curve', 'Curve');
