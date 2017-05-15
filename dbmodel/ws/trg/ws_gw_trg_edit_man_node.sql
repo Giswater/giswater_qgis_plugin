@@ -259,15 +259,15 @@ BEGIN
 		NEW.the_geom, NEW.netwjoin_workcat_id_end, NEW.undelete,NEW.netwjoin_label_x,NEW.netwjoin_label_y,NEW.netwjoin_label_rotation, NEW.netwjoin_code, expl_id_int, NEW.publish, 
 		NEW.inventory, NEW.netwjoin_end_date, NEW.macrodma_id);
 		
-	ELSIF man_table='man_pressdevice' THEN
+	ELSIF man_table='man_expansiontank' THEN
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, macrodma_id) 
-		VALUES (NEW.node_id, NEW.pressdevice_elevation, NEW.pressdevice_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.pressdevice_state, NEW.pressdevice_annotation, NEW.pressdevice_observ,
-		NEW.pressdevice_comment, NEW.dma_id, NEW.pressdevice_soilcat_id, NEW.pressdevice_category_type, NEW.pressdevice_fluid_type, NEW.pressdevice_location_type, NEW.pressdevice_workcat_id, NEW.pressdevice_buildercat_id, 
-		NEW.pressdevice_builtdate,NEW.pressdevice_ownercat_id, NEW.pressdevice_adress_01, NEW.pressdevice_adress_02, NEW.pressdevice_adress_03, NEW.pressdevice_descript, NEW.pressdevice_rotation, NEW.pressdevice_link, NEW.verified, 
-		NEW.the_geom, NEW.pressdevice_workcat_id_end, NEW.undelete,NEW.pressdevice_label_x,NEW.pressdevice_label_y,NEW.pressdevice_label_rotation, NEW.pressdevice_code, expl_id_int, NEW.publish, 
-		NEW.inventory, NEW.pressdevice_end_date, NEW.macrodma_id);
+		VALUES (NEW.node_id, NEW.exptank_elevation, NEW.exptank_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.exptank_state, NEW.exptank_annotation, NEW.exptank_observ,
+		NEW.exptank_comment, NEW.dma_id, NEW.exptank_soilcat_id, NEW.exptank_category_type, NEW.exptank_fluid_type, NEW.exptank_location_type, NEW.exptank_workcat_id, NEW.exptank_buildercat_id, 
+		NEW.exptank_builtdate,NEW.exptank_ownercat_id, NEW.exptank_adress_01, NEW.exptank_adress_02, NEW.exptank_adress_03, NEW.exptank_descript, NEW.exptank_rotation, NEW.exptank_link, NEW.verified, 
+		NEW.the_geom, NEW.exptank_workcat_id_end, NEW.undelete,NEW.exptank_label_x,NEW.exptank_label_y,NEW.exptank_label_rotation, NEW.exptank_code, expl_id_int, NEW.publish, 
+		NEW.inventory, NEW.exptank_end_date, NEW.macrodma_id);
 		
 	ELSIF man_table='man_flexunion' THEN
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -388,8 +388,8 @@ BEGIN
 	ELSIF man_table='man_netwjoin' THEN
 		INSERT INTO man_netwjoin (node_id, parent_node_id) VALUES(NEW.node_id, NEW.parent_node_id);
 
-	ELSIF man_table='man_pressdevice' THEN
-		INSERT INTO man_pressdevice (node_id,parent_node_id) VALUES(NEW.node_id, NEW.parent_node_id);
+	ELSIF man_table='man_expansiontank' THEN
+		INSERT INTO man_expansiontank (node_id,parent_node_id) VALUES(NEW.node_id, NEW.parent_node_id);
 
 	ELSIF man_table='man_flexunion' THEN
 		INSERT INTO man_flexunion (node_id,parent_node_id) VALUES(NEW.node_id, NEW.parent_node_id);
@@ -716,18 +716,18 @@ BEGIN
 		SET node_id=NEW.node_id, parent_node_id=NEW.parent_node_id
 		WHERE node_id=OLD.node_id;		
 		
-	ELSIF man_table ='man_pressdevice' THEN
+	ELSIF man_table ='man_expansiontank' THEN
 		UPDATE node
-		SET node_id=NEW.node_id, elevation=NEW.pressdevice_elevation, "depth"=NEW."pressdevice_depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."pressdevice_state", annotation=NEW.pressdevice_annotation, "observ"=NEW."pressdevice_observ", "comment"=NEW."pressdevice_comment", dma_id=NEW.dma_id, soilcat_id=NEW.pressdevice_soilcat_id, 
-		category_type=NEW.pressdevice_category_type, fluid_type=NEW.pressdevice_fluid_type, location_type=NEW.pressdevice_location_type, workcat_id=NEW.pressdevice_workcat_id, buildercat_id=NEW.pressdevice_buildercat_id,
-		builtdate=NEW.pressdevice_builtdate, ownercat_id=NEW.pressdevice_ownercat_id, adress_01=NEW.pressdevice_adress_01, adress_02=NEW.pressdevice_adress_02, adress_03=NEW.pressdevice_adress_03, 
-		descript=NEW.pressdevice_descript,rotation=NEW.pressdevice_rotation, link=NEW.pressdevice_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.pressdevice_workcat_id_end, 
-		undelete=NEW.undelete, label_x=NEW.pressdevice_label_x, label_y=NEW.pressdevice_label_y, label_rotation=NEW.pressdevice_label_rotation, code=NEW.pressdevice_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.pressdevice_end_date, macrodma_id=NEW.macrodma_id
+		SET node_id=NEW.node_id, elevation=NEW.exptank_elevation, "depth"=NEW."exptank_depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		"state"=NEW."exptank_state", annotation=NEW.exptank_annotation, "observ"=NEW."exptank_observ", "comment"=NEW."exptank_comment", dma_id=NEW.dma_id, soilcat_id=NEW.exptank_soilcat_id, 
+		category_type=NEW.exptank_category_type, fluid_type=NEW.exptank_fluid_type, location_type=NEW.exptank_location_type, workcat_id=NEW.exptank_workcat_id, buildercat_id=NEW.exptank_buildercat_id,
+		builtdate=NEW.exptank_builtdate, ownercat_id=NEW.exptank_ownercat_id, adress_01=NEW.exptank_adress_01, adress_02=NEW.exptank_adress_02, adress_03=NEW.exptank_adress_03, 
+		descript=NEW.exptank_descript,rotation=NEW.exptank_rotation, link=NEW.exptank_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.exptank_workcat_id_end, 
+		undelete=NEW.undelete, label_x=NEW.exptank_label_x, label_y=NEW.exptank_label_y, label_rotation=NEW.exptank_label_rotation, code=NEW.exptank_code,
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.exptank_end_date, macrodma_id=NEW.macrodma_id
 		WHERE node_id = OLD.node_id;
 	
-		UPDATE man_pressdevice
+		UPDATE man_expansiontank
 		SET node_id=NEW.node_id, parent_node_id=NEW.parent_node_id
 		WHERE node_id=OLD.node_id;		
 
@@ -822,8 +822,8 @@ CREATE TRIGGER gw_trg_edit_man_register_pol INSTEAD OF INSERT OR DELETE OR UPDAT
 DROP TRIGGER IF EXISTS gw_trg_edit_man_netwjoin ON "SCHEMA_NAME".v_edit_man_netwjoin;
 CREATE TRIGGER gw_trg_edit_man_netwjoin INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_netwjoin FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_netwjoin');
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_pressdevice ON "SCHEMA_NAME".v_edit_man_pressdevice;
-CREATE TRIGGER gw_trg_edit_man_pressdevice INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pressdevice FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_pressdevice');
+DROP TRIGGER IF EXISTS gw_trg_edit_man_expansiontank ON "SCHEMA_NAME".v_edit_man_expansiontank;
+CREATE TRIGGER gw_trg_edit_man_expansiontank INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_expansiontank FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_expansiontank');
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_flexunion ON "SCHEMA_NAME".v_edit_man_flexunion;
 CREATE TRIGGER gw_trg_edit_man_flexunion INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_flexunion FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_node('man_flexunion');

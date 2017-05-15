@@ -15,8 +15,8 @@ INSERT INTO node_type VALUES ('ARQUETA SIMPLE', 'REGISTER', 'JUNCTION', 'man_reg
 INSERT INTO node_type VALUES ('ARQUETA CONTROL', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ARQUETA BYPASS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ARQUETA VALVULES', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('CALDERI', 'PRESSDEVICE', 'JUNCTION', 'man_pressdevice', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ESCOMESA', 'NETWJOIN', 'JUNCTION', 'man_netwjoin', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('DILATADOR', 'DILATOR', 'JUNCTION', 'man_dilator', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('CALDERI', 'PRESSDEVICE', 'JUNCTION', 'man_pressdevice', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('DILATADOR', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction', 'om_visit_x_node');
 
 

@@ -119,11 +119,11 @@ CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "man_pressdevice" (
+CREATE TABLE "man_expansiontank" (
 "node_id" varchar(16) NOT NULL,
 "parent_node_id" character varying(16),
 "add_info" varchar(255),
-CONSTRAINT man_pressdevice_pkey PRIMARY KEY (node_id)
+CONSTRAINT man_expansiontank_pkey PRIMARY KEY (node_id)
 );
 
 

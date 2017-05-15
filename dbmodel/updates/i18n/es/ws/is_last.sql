@@ -6,3 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+INSERT INTO node_type VALUES ('ARQUETA SIMPLE', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('ARQUETA CONTROL', 'REGISTER', 'VALVE', 'man_register', 'inp_valve', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('ARQUETA BYPASS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('ARQUETA VÁLVULAS', 'REGISTER', 'JUNCTION', 'man_register', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('ACOMETIDA', 'NETWJOIN', 'JUNCTION', 'man_netwjoin', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('VASO EXPANSIÓN', 'EXPANSIONTANK', 'JUNCTION', 'man_expansiontank', 'inp_junction', 'om_visit_x_node');
+INSERT INTO node_type VALUES ('JUNTA DILATACIÓN', 'FLEXUNION', 'JUNCTION', 'man_flexunion', 'inp_junction', 'om_visit_x_node');

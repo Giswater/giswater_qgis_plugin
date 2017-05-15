@@ -1078,11 +1078,11 @@ FROM expl_selector, node
 	AND expl_selector.cur_user="current_user"()::text);
 	
 	
-	DROP VIEW IF EXISTS v_edit_man_pressdevice CASCADE;
-CREATE OR REPLACE VIEW v_edit_man_pressdevice AS 
- SELECT node.node_id,
-    node.elevation AS pressdevice_elevation,
-    node.depth AS pressdevice_depth,
+	DROP VIEW IF EXISTS v_edit_man_expansiontank CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_expansiontank AS 
+SELECT node.node_id,
+    node.elevation AS exptank_elevation,
+    node.depth AS exptank_depth,
     node.node_type,
     node.nodecat_id,
     cat_node.matcat_id AS cat_matcat_id,
@@ -1090,45 +1090,45 @@ CREATE OR REPLACE VIEW v_edit_man_pressdevice AS
     cat_node.dnom AS cat_dnom,
     node.epa_type,
     node.sector_id,
-    node.state AS pressdevice_state,
-    node.annotation AS pressdevice_annotation,
-    node.observ AS pressdevice_observ,
-    node.comment AS pressdevice_comment,
+    node.state AS exptank_state,
+    node.annotation AS exptank_annotation,
+    node.observ AS exptank_observ,
+    node.comment AS exptank_comment,
     node.dma_id,
     dma.presszonecat_id,
-    node.soilcat_id AS pressdevice_soilcat_id,
-    node.category_type AS pressdevice_category_type,
-    node.fluid_type AS pressdevice_fluid_type,
-    node.location_type AS pressdevice_location_type,
-    node.workcat_id AS pressdevice_workcat_id,
-    node.workcat_id_end AS pressdevice_workcat_id_end,
-    node.buildercat_id AS pressdevice_buildercat_id,
-    node.builtdate AS pressdevice_builtdate,
-    node.ownercat_id AS pressdevice_ownercat_id,
-    node.adress_01 AS pressdevice_adress_01,
-    node.adress_02 AS pressdevice_adress_02,
-    node.adress_03 AS pressdevice_adress_03,
-    node.descript AS pressdevice_descript,
+    node.soilcat_id AS exptank_soilcat_id,
+    node.category_type AS exptank_category_type,
+    node.fluid_type AS exptank_fluid_type,
+    node.location_type AS exptank_location_type,
+    node.workcat_id AS exptank_workcat_id,
+    node.workcat_id_end AS exptank_workcat_id_end,
+    node.buildercat_id AS exptank_buildercat_id,
+    node.builtdate AS exptank_builtdate,
+    node.ownercat_id AS exptank_ownercat_id,
+    node.adress_01 AS exptank_adress_01,
+    node.adress_02 AS exptank_adress_02,
+    node.adress_03 AS exptank_adress_03,
+    node.descript AS exptank_descript,
     cat_node.svg AS cat_svg,
-    node.rotation AS pressdevice_rotation,
-    node.link AS pressdevice_link,
+    node.rotation AS exptank_rotation,
+    node.link AS exptank_link,
     node.verified,
     node.the_geom,
     node.undelete,
-    node.label_x AS pressdevice_label_x,
-    node.label_y AS pressdevice_label_y,
-    node.label_rotation AS pressdevice_label_rotation,
-	node.code AS pressdevice_code,
+    node.label_x AS exptank_label_x,
+    node.label_y AS exptank_label_y,
+    node.label_rotation AS exptank_label_rotation,
+	node.code AS exptank_code,
 	node.publish,
 	node.inventory,
-	node.end_date AS pressdevice_end_date,
+	node.end_date AS exptank_end_date,
 	node.macrodma_id,
 	exploitation.short_descript AS expl_name,
-	man_pressdevice.parent_node_id
+	man_expansiontank .parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_pressdevice ON node.node_id::text = man_pressdevice.node_id::text
+	JOIN man_expansiontank ON node.node_id::text = man_expansiontank .node_id::text
 	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
