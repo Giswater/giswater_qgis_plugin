@@ -631,6 +631,7 @@ class Giswater(QObject):
         
         self.layer_version = None
         self.layer_dimensions = None
+
         #exists_version = False
         #exists_man_junction = False
 
