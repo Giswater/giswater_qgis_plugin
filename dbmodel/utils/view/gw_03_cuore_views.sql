@@ -110,24 +110,24 @@ CREATE VIEW v_edit_review_node AS
     review_audit_node.annotation,
 	review_audit_node.moved_geom,
     review_audit_node.office_checked,
-	node.the_geom	
+	review_audit_node.the_geom	
    FROM node
      RIGHT JOIN review_audit_node ON node.node_id::text = review_audit_node.node_id::text
   WHERE review_audit_node.field_checked IS TRUE AND review_audit_node.office_checked IS NOT TRUE;
   
-DROP VIEW IF EXISTS v_edit_review_arc CASCADE;
-  CREATE VIEW v_edit_review_arc AS 
+
+CREATE OR REPLACE VIEW mollet_ide_ud.v_edit_review_arc AS 
  SELECT review_audit_arc.arc_id,
-	arc.arccat_id,
+    arc.arccat_id,
     arc.y1,
     arc.y2,
     review_audit_arc.arccat_id AS seccio,
     review_audit_arc.y1 AS sonda_ini,
-	review_audit_arc.y2 AS sonda_fi,
-	review_audit_arc.annotation,
-	review_audit_arc.moved_geom,
+    review_audit_arc.y2 AS sonda_fi,
+    review_audit_arc.annotation,
+    review_audit_arc.moved_geom,
     review_audit_arc.office_checked,
-	arc.the_geom
+    review_audit_arc.the_geom
    FROM arc
      RIGHT JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
   WHERE review_audit_arc.field_checked IS TRUE AND review_audit_arc.office_checked IS NOT TRUE;

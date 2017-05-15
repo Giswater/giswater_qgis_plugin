@@ -8,18 +8,19 @@ This version of Giswater is provided by Giswater Association
 			CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_review_audit_node() RETURNS trigger AS
 			$BODY$
 			
-			DECLARE
-
-			r "SCHEMA_NAME".review_node%rowtype;
-			move_geom record;
-			
 			BEGIN
 				EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-					SELECT * into r FROM review_node;
-					SELECT * INTO move_geom FROM node;
 
+					IF TG_OP = 'INSERT' THEN
 					
-					FOR  r IN SELECT field_checked FROM review_node WHERE NEW.field_checked is TRUE LOOP
+							IF NEW.field_checked=TRUE THEN
+								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked) 
+								VALUES(NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
+								NEW.office_checked);
+								RETURN NEW;
+							END IF;	
+					
+					ELSIF TG_OP = 'UPDATE' THEN
 					
 						IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN
 							
@@ -48,9 +49,9 @@ This version of Giswater is provided by Giswater Association
 							RETURN NEW;	
 							
 						END IF;
-						
-					END LOOP;
-					
+											
+
+				END IF;
 				RETURN NEW;
 			END;
 			$BODY$
@@ -58,5 +59,5 @@ This version of Giswater is provided by Giswater Association
 			  COST 100;
 			  
 			DROP TRIGGER IF EXISTS gw_trg_review_audit_node ON "SCHEMA_NAME".review_node;
-			CREATE TRIGGER gw_trg_review_audit_node AFTER UPDATE ON "SCHEMA_NAME".review_node FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_review_audit_node();
+			CREATE TRIGGER gw_trg_review_audit_node AFTER INSERT OR UPDATE ON "SCHEMA_NAME".review_node FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_review_audit_node();
 			
