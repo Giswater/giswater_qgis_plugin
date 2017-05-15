@@ -43,8 +43,7 @@ class Mg():
         self.schema_name = self.controller.schema_name  
           
         # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')          
-        self.giswater_jar = self.settings.value('files/giswater_jar')          
+        self.java_exe = self.settings.value('files/java_exe')                 
         self.gsw_file = self.controller.plugin_settings_value('gsw_file')                   
     
                   

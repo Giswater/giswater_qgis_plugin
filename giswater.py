@@ -347,11 +347,6 @@ class Giswater(QObject):
         # Disable and hide all toolbars
         self.enable_actions(False)
         self.hide_toolbars() 
-        
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')          
-        self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')      
                          
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
@@ -489,7 +484,7 @@ class Giswater(QObject):
         self.layer_man_pgully = None
         
         self.layer_version = None
-        
+
         exists_version = False
         exists_man_junction = False
 

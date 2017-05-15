@@ -35,9 +35,8 @@ class Ed():
         self.dao = self.controller.dao             
         self.schema_name = self.controller.schema_name    
         
-        # Get files to execute giswater jar
+        # Get files to execute giswater jar   
         self.java_exe = self.settings.value('files/java_exe')          
-        self.giswater_jar = self.settings.value('files/giswater_jar')          
         self.gsw_file = self.controller.plugin_settings_value('gsw_file')  
         
         # Get tables or views specified in 'db' config section         
@@ -147,39 +146,56 @@ class Ed():
         if len(rows) > 0:  
             utils_giswater.setCurrentIndex(widget, 1);             
 
-            
+
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
         
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 36)        
-        
+        # Get giswater information from windows registry
+        reg_hkey = "HKEY_LOCAL_MACHINE"
+        reg_path = "SOFTWARE\\Giswater\\2.1"
+        reg_name = "InstallFolder"
+        giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
+        if giswater_folder is None:
+            message = "Cannot get giswater folder from windows registry at: "+reg_path
+            self.controller.show_info(message, 10, context_name='ui_message')
+            return
+            
+        # Check if giswater folder exists
+        if not os.path.exists(giswater_folder):
+            message = "Giswater folder not found at: "+giswater_folder
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return          
+            
+        # Check if giswater executable file file exists
+        giswater_jar = giswater_folder+"\giswater.jar"
+        if not os.path.exists(giswater_jar):
+            message = "Giswater executable file not found at: "+giswater_jar
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return               
+
         # Check if java.exe file exists
         if not os.path.exists(self.java_exe):
             message = "Java Runtime executable file not found at: "+self.java_exe
             self.controller.show_warning(message, 10, context_name='ui_message')
-            return  
+            return       
         
-        # Check if giswater.jar file exists
-        if not os.path.exists(self.giswater_jar):
-            message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return  
-                  
-        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
-        if not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.giswater_jar
+        # Check if gsw file exists. If not giswater will open with the last .gsw file
+        if self.gsw_file != "" and not os.path.exists(self.gsw_file):
+            message = "GSW file not found at: "+self.gsw_file
             self.controller.show_info(message, 10, context_name='ui_message')
-            self.gsw_file = "" 
-            
+            self.gsw_file = ""          
+        
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 36)                
+        
         # Start program     
-        aux = '"'+self.giswater_jar+'"'
+        aux = '"'+giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "ed_giswater_jar"]
+            program = [self.java_exe, "-jar", giswater_jar, self.gsw_file, "ed_giswater_jar"]
         else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", "ed_giswater_jar"]
+            program = [self.java_exe, "-jar", giswater_jar, "", "ed_giswater_jar"]
             
         self.controller.start_program(program)               
         

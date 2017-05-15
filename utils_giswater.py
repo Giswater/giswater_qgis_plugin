@@ -16,6 +16,7 @@ from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, 
 
 import inspect
 import os
+import _winreg
 
 
 def setDialog(p_dialog):
@@ -225,5 +226,23 @@ def setImage(widget,cat_shape):
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()  
-                        
-                
+
+
+def get_reg(reg_hkey, reg_path, reg_name):
+    
+    reg_root = None
+    if reg_hkey == "HKEY_LOCAL_MACHINE":
+        reg_root = _winreg.HKEY_LOCAL_MACHINE
+    elif reg_hkey == "HKEY_CURRENT_USER":
+        reg_root = _winreg.HKEY_CURRENT_USER
+    
+    if reg_root is not None:
+        try:
+            registry_key = _winreg.OpenKey(reg_root, reg_path)
+            value, regtype = _winreg.QueryValueEx(registry_key, reg_name)
+            _winreg.CloseKey(registry_key)
+            return value
+        except WindowsError:
+            return None
+            
+            
