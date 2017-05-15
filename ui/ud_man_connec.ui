@@ -197,6 +197,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="macrodma_id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>16</x>
@@ -206,7 +209,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(83, 83, 83);</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string/>
@@ -238,7 +241,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_7">
        <property name="geometry">
@@ -1830,8 +1833,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>312</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3042,6 +3045,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="expl_name">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>280</x>
@@ -3051,7 +3057,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(83, 83, 83);</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string/>

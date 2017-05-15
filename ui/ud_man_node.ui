@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>629</width>
     <height>721</height>
    </rect>
   </property>
@@ -129,7 +129,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>9</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -833,6 +833,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="chamber_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -843,11 +846,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -889,8 +892,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1181,7 +1184,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>110</y>
+          <y>105</y>
           <width>101</width>
           <height>17</height>
          </rect>
@@ -1194,7 +1197,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>105</y>
+          <y>100</y>
           <width>91</width>
           <height>22</height>
          </rect>
@@ -1230,7 +1233,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>105</y>
+          <y>100</y>
           <width>160</width>
           <height>21</height>
          </rect>
@@ -1249,7 +1252,7 @@
         <property name="geometry">
          <rect>
           <x>285</x>
-          <y>110</y>
+          <y>105</y>
           <width>61</width>
           <height>17</height>
          </rect>
@@ -2025,8 +2028,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2666,6 +2669,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="junction_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2676,11 +2682,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -2762,8 +2768,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3296,8 +3302,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3516,15 +3522,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_41">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4224,6 +4230,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="manhole_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -4234,11 +4243,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -4260,8 +4269,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5221,15 +5230,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_43">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5447,7 +5456,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>225</y>
+          <y>220</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5510,7 +5519,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>225</y>
+          <y>220</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5872,7 +5881,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>160</y>
+          <y>155</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -5899,21 +5908,24 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="netgully_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>195</y>
+          <y>190</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -5923,7 +5935,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>190</y>
+          <y>185</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -5953,7 +5965,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>165</y>
+          <y>160</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5965,8 +5977,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6499,8 +6511,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6719,15 +6731,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_45">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7407,6 +7419,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="netinit_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -7417,11 +7432,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -8537,15 +8552,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_47">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9195,6 +9210,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="outfall_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -9205,11 +9223,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -9281,8 +9299,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10103,15 +10121,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_49">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10821,6 +10839,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="storage_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -10831,11 +10852,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -10847,8 +10868,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12015,8 +12036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12656,6 +12677,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="valve_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -12666,11 +12690,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -13513,8 +13537,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14224,6 +14248,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="wjump_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -14234,11 +14261,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -15531,8 +15558,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16202,6 +16229,9 @@
         </property>
        </widget>
        <widget class="QLineEdit" name="wwtp_sys_elev">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -16212,11 +16242,11 @@
         </property>
         <property name="font">
          <font>
-          <italic>true</italic>
+          <italic>false</italic>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(83, 83, 83);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -18116,6 +18146,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="macrodma_id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>15</x>
@@ -18125,7 +18158,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(83, 83, 83);</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string/>
@@ -18424,6 +18457,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="expl_name">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>405</x>
@@ -18433,7 +18469,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(83, 83, 83);</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string/>
