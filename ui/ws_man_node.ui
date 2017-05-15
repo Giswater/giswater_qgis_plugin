@@ -280,7 +280,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>9</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -308,8 +308,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -879,8 +879,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1097,8 +1097,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1631,8 +1631,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1864,8 +1864,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2985,8 +2985,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3212,8 +3212,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4265,8 +4265,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4492,8 +4492,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5545,8 +5545,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5772,8 +5772,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6828,8 +6828,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7055,8 +7055,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7574,8 +7574,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9514,8 +9514,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11284,8 +11284,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12111,8 +12111,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14729,8 +14729,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14956,8 +14956,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16012,8 +16012,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16239,8 +16239,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17571,8 +17571,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18835,7 +18835,7 @@
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
-      <string>Pressdevice</string>
+      <string>Expansion tank</string>
      </attribute>
      <widget class="QToolBox" name="toolBox_16">
       <property name="geometry">
@@ -18847,21 +18847,21 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_65">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QComboBox" name="pressdevice_ownercat_id">
+       <widget class="QComboBox" name="exptank_ownercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -18871,7 +18871,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_owner">
+       <widget class="QLabel" name="label_exptank_owner">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -18907,7 +18907,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_depth">
+       <widget class="QLineEdit" name="exptank_depth">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -18920,7 +18920,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_elevation">
+       <widget class="QLineEdit" name="exptank_elevation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -18936,7 +18936,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_elevation">
+       <widget class="QLabel" name="label_exptank_elevation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -18974,7 +18974,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_depth">
+       <widget class="QLabel" name="label_exptank_depth">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19012,7 +19012,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_state">
+       <widget class="QComboBox" name="exptank_state">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19031,7 +19031,7 @@
          <bool>false</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_state">
+       <widget class="QLabel" name="label_exptank_state">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19067,7 +19067,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_workcat_id_end">
+       <widget class="QComboBox" name="exptank_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19086,7 +19086,7 @@
          <bool>false</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_buildercat_id">
+       <widget class="QLabel" name="label_exptank_buildercat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19122,7 +19122,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_builtdate">
+       <widget class="QLabel" name="label_exptank_builtdate">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19158,7 +19158,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_workcat_id">
+       <widget class="QComboBox" name="exptank_workcat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19177,7 +19177,7 @@
          <bool>false</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="pressdevice_builtdate">
+       <widget class="QDateEdit" name="exptank_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19190,7 +19190,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_buildercat_id">
+       <widget class="QComboBox" name="exptank_buildercat_id">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19200,7 +19200,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_workcat_id">
+       <widget class="QLabel" name="label_exptank_workcat_id">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19236,7 +19236,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_workcat_id_end">
+       <widget class="QLabel" name="label_exptank_workcat_id_end">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19272,7 +19272,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_end_date">
+       <widget class="QLabel" name="label_exptank_end_date">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19308,7 +19308,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_code">
+       <widget class="QLabel" name="label_exptank_code">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19344,7 +19344,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_code">
+       <widget class="QLineEdit" name="exptank_code">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19357,7 +19357,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="pressdevice_end_date">
+       <widget class="QDateEdit" name="exptank_end_date">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19383,7 +19383,7 @@
        <attribute name="label">
         <string>Additional information</string>
        </attribute>
-       <widget class="QTextEdit" name="pressdevice_descript">
+       <widget class="QTextEdit" name="exptank_descript">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19393,7 +19393,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QTextEdit" name="pressdevice_link">
+       <widget class="QTextEdit" name="exptank_link">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19403,7 +19403,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_descript">
+       <widget class="QLabel" name="label_exptank_descript">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19439,7 +19439,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_link">
+       <widget class="QLabel" name="label_exptank_link">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19475,7 +19475,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="pressdevice_observ">
+       <widget class="QTextEdit" name="exptank_observ">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19485,7 +19485,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QTextEdit" name="pressdevice_comment">
+       <widget class="QTextEdit" name="exptank_comment">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19501,7 +19501,7 @@
          <number>1</number>
         </property>
        </widget>
-       <widget class="QTextEdit" name="pressdevice_annotation">
+       <widget class="QTextEdit" name="exptank_annotation">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19517,7 +19517,7 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_category_type">
+       <widget class="QComboBox" name="exptank_category_type">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19527,7 +19527,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_location_type">
+       <widget class="QComboBox" name="exptank_location_type">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19537,7 +19537,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_soilcat_id">
+       <widget class="QComboBox" name="exptank_soilcat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19547,7 +19547,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="pressdevice_fluid_type">
+       <widget class="QComboBox" name="exptank_fluid_type">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19557,7 +19557,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_adress_01">
+       <widget class="QLineEdit" name="exptank_adress_01">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19570,7 +19570,7 @@
          <enum>QLineEdit::Normal</enum>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_adress_02">
+       <widget class="QLineEdit" name="exptank_adress_02">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19580,7 +19580,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_soilcat_id">
+       <widget class="QLabel" name="label_exptank_soilcat_id">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19616,7 +19616,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_category_type">
+       <widget class="QLabel" name="label_exptank_category_type">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19652,7 +19652,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_location_type">
+       <widget class="QLabel" name="label_exptank_location_type">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19688,7 +19688,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_fluid_type">
+       <widget class="QLabel" name="label_exptank_fluid_type">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -19724,7 +19724,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_adress_01">
+       <widget class="QLabel" name="label_exptank_adress_01">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19760,7 +19760,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_adress">
+       <widget class="QLabel" name="label_exptank_adress">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19796,7 +19796,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_annotation">
+       <widget class="QLabel" name="label_exptank_annotation">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19832,7 +19832,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_observ">
+       <widget class="QLabel" name="label_exptank_observ">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19868,7 +19868,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_comment">
+       <widget class="QLabel" name="label_exptank_comment">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -19917,7 +19917,7 @@
        <attribute name="label">
         <string>Feature graphic design</string>
        </attribute>
-       <widget class="QLineEdit" name="pressdevice_label_x">
+       <widget class="QLineEdit" name="exptank_label_x">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19930,7 +19930,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_label_y">
+       <widget class="QLineEdit" name="exptank_label_y">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -19943,7 +19943,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_rotation">
+       <widget class="QLineEdit" name="exptank_rotation">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19956,7 +19956,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pressdevice_label_rotation">
+       <widget class="QLineEdit" name="exptank_label_rotation">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19969,7 +19969,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_label_x">
+       <widget class="QLabel" name="label_exptank_label_x">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -20005,7 +20005,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_label_y">
+       <widget class="QLabel" name="label_exptank_label_y">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -20041,7 +20041,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_label_rotation">
+       <widget class="QLabel" name="label_exptank_label_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -20077,7 +20077,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pressdevice_rotation">
+       <widget class="QLabel" name="label_exptank_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
