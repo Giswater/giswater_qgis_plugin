@@ -341,6 +341,9 @@ class DaoController():
     def get_layer_source_table_name(self, layer):
         ''' Get table or view name of selected layer '''
 
+        if leyer is None:
+            return None
+        
         uri_table = None
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('table=')

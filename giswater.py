@@ -489,6 +489,9 @@ class Giswater(QObject):
         self.layer_man_pgully = None
         
         self.layer_version = None
+        
+        exists_version = False
+        exists_man_junction = False
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
@@ -541,6 +544,7 @@ class Giswater(QObject):
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
+                    exists_man_junction = True
                 if 'v_edit_man_valve' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_filter' == uri_table:
@@ -589,20 +593,11 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
+                    exists_version = True
              
-        # Check if table 'version' and man_junction exists
-        exists = False
-        for layer in layers:
-            layer_DB = self.controller.get_layer_source_table_name(layer) 
-            if layer_DB == 'v_edit_man_junction':
-                exists = True
-
-        if self.layer_version is None and exists == False:
-            pass
-        elif self.layer_version is not None and exists == True:
-            pass
-        else:
-            message = "To use this project with Giswater layers man_junction and version must exist. Please check your project !"
+        # Check if table 'version' and 'man_junction' exists
+        if not exists_version or not exists_man_junction:
+            message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
             self.controller.show_warning(message)
             return
 
