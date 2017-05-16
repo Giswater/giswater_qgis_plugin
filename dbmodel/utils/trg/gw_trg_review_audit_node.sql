@@ -17,9 +17,13 @@ This version of Giswater is provided by Giswater Association
 								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked) 
 								VALUES(NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked);
-								RETURN NEW;
+								
+								UPDATE review_node SET verified='REVISED' where node_id=NEW.node_id;
+								
 							END IF;	
-					
+							
+							RETURN NEW;
+							
 					ELSIF TG_OP = 'UPDATE' THEN
 					
 						IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN
@@ -32,17 +36,25 @@ This version of Giswater is provided by Giswater Association
 									UPDATE review_audit_node SET moved_geom='TRUE'
 									WHERE node_id=OLD.node_id;
 								END IF;	
-							RETURN NEW;
+								RETURN NEW;
+								
+								UPDATE review_node SET verified='REVISED' where node_id=OLD.node_id;
 							
 						ELSE
 							IF NEW.the_geom=OLD.the_geom THEN
 								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
 								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked,'FALSE');						
+								
+								UPDATE review_node SET verified='REVISED' where node_id=OLD.node_id;
+								
 						ELSE 
 								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
 								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked,'TRUE');
+								
+								UPDATE review_node SET verified='REVISED' where node_id=OLD.node_id;
+							
 							END IF;
 							
 							

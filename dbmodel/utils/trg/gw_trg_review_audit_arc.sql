@@ -17,9 +17,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		IF NEW.field_checked=TRUE THEN
 			INSERT INTO review_audit_arc (arc_id, the_geom, y1, y2, arc_type, arccat_id, annotation, verified, field_checked,"operation","user",date_field, office_checked) 
 			VALUES(NEW.arc_id, NEW.the_geom, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, NEW.annotation, 'REVISED', NEW.field_checked,'UPDATE',user,CURRENT_TIMESTAMP, NEW.office_checked);
-			RETURN NEW;
-		END IF;	
 
+			UPDATE review_arc SET verified='REVISED' where arc_id=NEW.arc_id;
+		END IF;
+		
+	RETURN NEW;
+	
       ELSIF TG_OP = 'UPDATE' THEN
 		IF EXISTS (SELECT arc_id FROM review_audit_arc WHERE arc_id=NEW.arc_id) THEN					
 			UPDATE review_audit_arc SET arc_id=NEW.arc_id, the_geom=NEW.the_geom, y1=NEW.y1, y2=NEW.y2, arc_type=NEW.arc_type,
@@ -31,16 +34,25 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 					WHERE arc_id=OLD.arc_id;
 				END IF;	
 				RETURN NEW;
+				
+				UPDATE review_arc SET verified='REVISED' where arc_id=OLD.arc_id;
 					
 		ELSE
 				IF NEW.the_geom=OLD.the_geom THEN
 					INSERT INTO review_audit_arc(arc_id, the_geom, y1, y2, arc_type, arccat_id, annotation, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
 					VALUES (NEW.arc_id, NEW.the_geom, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'FALSE');
+					
+					UPDATE review_arc SET verified='REVISED' where arc_id=OLD.arc_id;
+					
 				ELSE
 					INSERT INTO review_audit_arc(arc_id, the_geom, y1, y2, arc_type, arccat_id, annotation, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
 					VALUES (NEW.arc_id, NEW.the_geom, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'TRUE');
-					RETURN NEW;	
+					
+					UPDATE review_arc SET verified='REVISED' where arc_id=OLD.arc_id;
+					
 				END IF;
+				
+				RETURN NEW;	
 		END IF;
      END IF;
 

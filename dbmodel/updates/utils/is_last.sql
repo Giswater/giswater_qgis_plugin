@@ -89,7 +89,7 @@ CREATE SEQUENCE review_node_id_seq
 	
 DROP TABLE IF EXISTS review_arc;
 CREATE TABLE review_arc
-(  arc_id character varying(16),
+(  arc_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_arc_id_seq'::regclass),,
   the_geom geometry(LINESTRING,SRID_VALUE),
   y1 numeric(12,3),
   y2 numeric(12,3),
@@ -104,7 +104,7 @@ CREATE TABLE review_arc
 
 DROP TABLE IF EXISTS review_node;
 CREATE TABLE review_node
-( node_id character varying(16),
+( node_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_node_id_seq'::regclass),,
   the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
@@ -121,7 +121,7 @@ CREATE TABLE review_node
   
 DROP TABLE IF EXISTS review_audit_arc;
 CREATE TABLE review_audit_arc
-(  arc_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_arc_id_seq'::regclass),
+(  arc_id character varying(16) NOT NULL,
   the_geom geometry(LINESTRING,SRID_VALUE),
   y1 numeric(12,3),
   y2 numeric(12,3),
@@ -140,7 +140,7 @@ CREATE TABLE review_audit_arc
   
 DROP TABLE IF EXISTS review_audit_node;
 CREATE TABLE review_audit_node
-(  node_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_node_id_seq'::regclass),
+(  node_id character varying(16) NOT NULL,
   the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
