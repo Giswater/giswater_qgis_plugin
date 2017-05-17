@@ -99,7 +99,11 @@ CREATE TABLE doc_x_tag(
 
 );
 
-    
+CREATE TABLE "anl_mincut_result_cat_cause" (
+id varchar(30) NOT NULL,
+descript text,
+CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
+);
 
 
 ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN anl_cause character varying (30);
@@ -213,6 +217,10 @@ ALTER TABLE man_fountain  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (
 ALTER TABLE man_tap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE man_greentap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+
+ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_cause_anl_cause_fkey FOREIGN KEY (anl_cause) REFERENCES anl_mincut_result_cat_cause (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_type_mincut_result_type_fkey FOREIGN KEY (mincut_result_type) REFERENCES anl_mincut_result_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mincut_result_state_fkey FOREIGN KEY (mincut_result_state) REFERENCES anl_mincut_result_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
  CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)
       REFERENCES om_visit_event (id) MATCH SIMPLE
