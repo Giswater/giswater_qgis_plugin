@@ -449,7 +449,7 @@ class Mg():
 
 
     def mg_analytics(self):
-        ''' Button 27. Valve analytics ''' 
+        ''' Button 27. Valve analytics '''
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"

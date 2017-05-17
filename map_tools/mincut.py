@@ -25,6 +25,10 @@ from PyQt4.QtGui import QApplication, QColor
 
 from map_tools.parent import ParentMapTool
 
+from ..ui.mincut import Mincut
+
+import utils_giswater
+
 
 class MincutMapTool(ParentMapTool):
     ''' Button 26. User select one node or arc.
@@ -205,6 +209,10 @@ class MincutMapTool(ParentMapTool):
 
         # Check button
         self.action().setChecked(True)
+        print "test"
+        # Create the dialog and signals
+        self.dlg = Mincut()
+        utils_giswater.setDialog(self.dlg)
 
         # Store user snapping configuration
         self.snapperManager.storeSnappingOptions()
@@ -227,6 +235,10 @@ class MincutMapTool(ParentMapTool):
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
             self.iface.setActiveLayer(self.layer_node_man[0])
+            
+        # Open the dialog
+        self.dlg.show() 
+        
 
 
 
