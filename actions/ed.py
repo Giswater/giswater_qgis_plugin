@@ -359,7 +359,7 @@ class Ed():
         self.controller.check_action(True, 32)      
                         
         # Create the dialog and signals
-        self.dlg = Add_file()
+        self.dlg = Add_doc()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.ed_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
