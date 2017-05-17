@@ -19,7 +19,7 @@ sys.path.append(plugin_path)
 import utils_giswater      
          
 from ..ui.add_element import Add_element    # @UnresolvedImport
-from ..ui.add_file import Add_file          # @UnresolvedImport
+from ..ui.add_doc import Add_doc          # @UnresolvedImport
 
 
 class Ed():
