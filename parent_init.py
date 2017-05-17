@@ -10,7 +10,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -783,6 +783,10 @@ class ParentDialog(object):
             tab_text = self.tab_main.tabText(i)
             if selected_layer != tab_text :
                 self.tab_main.removeTab(i) 
+
+        # For virtual arc remove tab Costs
+        if self.layer.name() == "Varc" :
+            self.tab_main.removeTab(4)          
                 
                 
     def setImage(self, widget):
@@ -807,3 +811,5 @@ class ParentDialog(object):
                 self.tab_main.removeTab(4)       
 
         
+
+    

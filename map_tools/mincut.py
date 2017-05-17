@@ -21,11 +21,16 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
-from PyQt4.QtGui import QApplication, QColor
+from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit
+from PyQt4.Qt import  QDate, QTime
 
 from map_tools.parent import ParentMapTool
 
 from ..ui.mincut import Mincut
+from ..ui.mincut_fin import Mincut_fin
+
+from datetime import *
+
 
 import utils_giswater
 
@@ -49,9 +54,9 @@ class MincutMapTool(ParentMapTool):
         self.vertexMarker.setIconSize(11)
         self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
-
-
-
+       
+        
+        
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
@@ -204,16 +209,10 @@ class MincutMapTool(ParentMapTool):
                 layer_node.setSelectedFeatures(id_list)
 
 
-
-    def activate(self):
-
-        # Check button
-        self.action().setChecked(True)
-        print "test"
-        # Create the dialog and signals
-        self.dlg = Mincut()
-        utils_giswater.setDialog(self.dlg)
-
+    def mincut(self):
+        ''' mincut function'''
+        print "mincut"
+        
         # Store user snapping configuration
         self.snapperManager.storeSnappingOptions()
 
@@ -235,12 +234,84 @@ class MincutMapTool(ParentMapTool):
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
             self.iface.setActiveLayer(self.layer_node_man[0])
+        
+        
+    def mincut2(self):
+        print "valve analytics"
+        
+    def config(self):
+        print "mconfig"
+        
+    def real_start(self):
+       
+        #date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        #print date
+        
+        self.date_start = QDate.currentDate()
+        self.cbx_date_start.setDate(self.date_start)
+        
+        self.time_start = QTime.currentTime()
+        self.cbx_hours_start.setTime(self.time_start)
+        
+        self.btn_end.setEnabled(True)   
+        
+       
+    def real_end(self):
+
+        self.date_end = QDate.currentDate()
+        self.cbx_date_end.setDate(self.date_end)
+        
+        self.time_end = QTime.currentTime()
+        self.cbx_hours_end.setTime(self.time_end)
+        
+        # Create the dialog and signals
+        self.dlg_fin = Mincut_fin()
+        utils_giswater.setDialog(self.dlg_fin)
+        
+        self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
+        self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
+        self.cbx_date_start_fin.setDate(self.date_start)
+        self.cbx_hours_start_fin.setTime(self.time_start)
+        
+        self.cbx_date_end_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_end_fin")
+        self.cbx_hours_end_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_end_fin")
+        self.cbx_date_end_fin.setDate(self.date_end)
+        self.cbx_hours_end_fin.setTime(self.time_end)      
+        
+        # Open the dialog
+        self.dlg_fin.show() 
+        
+        
+    def activate(self):
+
+        # Check button
+        self.action().setChecked(True)
+        print "test"
+        # Create the dialog and signals
+        self.dlg = Mincut()
+        utils_giswater.setDialog(self.dlg)
+        
+        #self.dlg.findChild(QPushButton, "btn_start").clicked.connect(self.real_start)
+        self.btn_start = self.dlg.findChild(QPushButton, "btn_start")  
+        self.btn_start.clicked.connect(self.real_start)
+        #self.dlg.findChild(QPushButton, "btn_end").clicked.connect(self.real_end)
+        self.btn_end = self.dlg.findChild(QPushButton, "btn_end")  
+        self.btn_end.clicked.connect(self.real_end)
+               
+        # Toolbar actions
+        self.dlg.findChild(QAction, "actionConfig").triggered.connect(self.config)
+        self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincut)
+        self.dlg.findChild(QAction, "actionMincut2").triggered.connect(self.mincut2)
+        
+        self.cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
+        self.cbx_hours_start = self.dlg.findChild(QTimeEdit, "cbx_hours_start")
+        
+        self.cbx_date_end = self.dlg.findChild(QDateEdit, "cbx_date_end")
+        self.cbx_hours_end = self.dlg.findChild(QTimeEdit, "cbx_hours_end")
             
         # Open the dialog
         self.dlg.show() 
         
-
-
 
     def deactivate(self):
 

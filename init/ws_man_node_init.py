@@ -130,5 +130,38 @@ class ManNodeDialog(ParentDialog):
   
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))             
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))   
+
+        # Toolbar actions
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
+        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
+        
+        
+        
+    def actionZoom(self):
+       
+        print "zoom"
+        #feature = self.feature
+
+        canvas = self.iface.mapCanvas()
+        # Get the active layer (must be a vector layer)
+        layer = self.iface.activeLayer()
+
+        # Get the first feature from the layer
+        # feature = layer.getFeatures().next()
+        # Add this features to the selected list
+        layer.setSelectedFeatures([feature.id()])
+
+        canvas.zoomToSelected(layer)
+        canvas.zoomIn()
+    
+    def actionCentered(self):
+        ''' Centered feature '''
+        print "centered"
+        
+    def actionEnabled(self):
+        print "enabled" 
+        
+
 

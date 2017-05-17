@@ -234,26 +234,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QDateEdit" name="dateEdit">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>90</y>
-      <width>161</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-   </widget>
-   <widget class="QTimeEdit" name="timeEdit">
+   <widget class="QTimeEdit" name="cbx_hours_start_fin">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -290,7 +271,7 @@
      <string>H:mm:ss</string>
     </property>
    </widget>
-   <widget class="QTimeEdit" name="timeEdit_2">
+   <widget class="QTimeEdit" name="cbx_hours_end_fin">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -378,11 +359,30 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QDateEdit" name="dateEdit_2">
+   <widget class="QDateEdit" name="cbx_date_end_fin">
     <property name="geometry">
      <rect>
       <x>110</x>
       <y>150</y>
+      <width>161</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="cbx_date_start_fin">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>90</y>
       <width>161</width>
       <height>22</height>
      </rect>

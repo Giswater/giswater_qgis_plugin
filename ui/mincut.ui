@@ -403,7 +403,10 @@
     <property name="title">
      <string>Real dates</string>
     </property>
-    <widget class="QDateEdit" name="builtdate_7">
+    <widget class="QDateEdit" name="cbx_date_end">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -416,7 +419,10 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTimeEdit" name="timeEdit_8">
+    <widget class="QTimeEdit" name="cbx_hours_end">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -426,7 +432,10 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateEdit" name="builtdate_8">
+    <widget class="QDateEdit" name="cbx_date_start">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -439,7 +448,10 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTimeEdit" name="timeEdit_9">
+    <widget class="QTimeEdit" name="cbx_hours_start">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -449,7 +461,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="btn_start">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -462,7 +474,10 @@
       <string>Start</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="btn_end">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -475,7 +490,7 @@
       <string>End</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="label_x_6">
+    <widget class="QLineEdit" name="lbl_distance">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -742,6 +757,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="label_x_5">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -815,6 +833,9 @@
      <normaloff>../icons/99.png</normaloff>../icons/99.png</iconset>
    </property>
    <property name="text">
+    <string>config</string>
+   </property>
+   <property name="iconText">
     <string>config</string>
    </property>
   </action>
