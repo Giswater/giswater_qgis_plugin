@@ -769,11 +769,18 @@ class Mg():
         self.dlg_multi.exec_()
 
     def mg_exploitation_selector(self):
+    
         self.dlg_multiexp = Multiexpl_selector()
         utils_giswater.setDialog(self.dlg_multiexp)
 
         self.tbl_all_explot=self.dlg_multiexp.findChild(QTableView, "all_explot")
         self.tbl_selected_explot = self.dlg_multiexp.findChild(QTableView, "selected_explot")
+        
+        self.btn_select=self.dlg_multiexp.findChild(QPushButton, "btn_select")
+        self.btn_unselect = self.dlg_multiexp.findChild(QPushButton, "btn_unselect")
+        
+        self.btn_select.pressed.connect(self.selection)
+        self.btn_unselect.pressed.connect(self.unselection) 
 
         self.dlg_multiexp.btn_cancel.pressed.connect(self.close_dialog_multiexp)
         self.dlg_multiexp.btn_accept.pressed.connect(self.accept_dialog_multiexp)
@@ -781,8 +788,58 @@ class Mg():
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
 
         self.dlg_multiexp.exec_()
-        print "etst multi"
 
+        
+    def selection(self):
+        print "test"
+        
+        self.tbl_all_explot = self.dlg_multiexp.findChild(QTableView, "all_explot") 
+        self.tbl_selected_explot = self.dlg_multiexp.findChild(QTableView, "selected_explot") 
+        
+        selected_list =self.tbl_all_explot.selectionModel().selectedRows()   
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+            
+        row_index = ""
+        expl_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = self.tbl_all_explot.model().record(row).value("expl_id")
+
+            expl_id += str(id_)+", "
+            row_index += str(row+1)+", "
+            
+        row_index = row_index[:-2]
+        expl_id = expl_id[:-2]
+        
+        print row_index
+        print expl_id
+        
+        table_name_select = "exploitation"
+        
+        sql = "DELETE FROM "+self.schema_name+"."+table_name_select 
+        sql+= " WHERE expl_id IN ("+expl_id+")"
+        self.controller.execute_sql(sql)
+        #self.tbl_all_explot.model().select()
+        
+        
+        table_name_unselect = "expl_selector"
+        for i in range(0, len(expl_id)):
+            sql = "INSERT INTO "+self.schema_name+".expl_selector (expl_id) "
+            sql+= " VALUES ('"+expl_id[i]+"')"
+            self.controller.execute_sql(sql) 
+        
+        self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
+        #refresh
+        self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
+     
+            
+    def unselection(self):
+        print "test"
+        
+        
     def accept_dialog_multiexp(self):
         print "test button accept"
         '''
@@ -795,7 +852,6 @@ class Mg():
         #self.tbl_selected_explot.addItem(layerlist)
 
 
-
     def close_dialog_multiexp(self, dlg=None):
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
@@ -805,6 +861,7 @@ class Mg():
         except AttributeError:
             pass
 
+            
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu''' 
         

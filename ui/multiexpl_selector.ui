@@ -62,30 +62,30 @@
     </rect>
    </property>
   </widget>
-  <widget class="QToolButton" name="btn_unselect">
+  <widget class="QPushButton" name="btn_select">
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>90</y>
-     <width>36</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;&lt;</string>
-   </property>
-  </widget>
-  <widget class="QToolButton" name="btn_select">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>45</y>
+     <y>30</y>
      <width>36</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>&gt;&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_unselect">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>75</y>
+     <width>36</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;&lt;</string>
    </property>
   </widget>
  </widget>
