@@ -17,6 +17,7 @@ DECLARE
 	new_man_table varchar;
 	old_man_table varchar;
     connec_id_seq int8;
+	expl_id_int integer;
 
 BEGIN
 
@@ -65,22 +66,7 @@ BEGIN
             END IF;
         END IF;
 		
-	    -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;
-		
-		-- Workcat_id
-        IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
-            IF (NEW.workcat_id IS NULL) THEN
-                NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-            END IF;
-        END IF;
-		
+	
 		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT verified_vdefault FROM config);
@@ -88,23 +74,36 @@ BEGIN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
         END IF;
-        
-		--Exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
+		
+ 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;		
-        
 		
         -- FEATURE INSERT
 		IF man_table='man_greentap' THEN
+					-- State
+			IF (NEW.greentap_state IS NULL) THEN
+				NEW.greentap_state := (SELECT state_vdefault FROM config);
+				IF (NEW.greentap_state IS NULL) THEN
+						NEW.greentap_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.greentap_workcat_id IS NULL) THEN
+				NEW.greentap_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.greentap_workcat_id IS NULL) THEN
+					NEW.greentap_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+		
 		  INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
 		  workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete, workcat_id_end,label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, end_date, macrodma_id) 
@@ -112,11 +111,27 @@ BEGIN
 		  NEW.greentap_observ, NEW.greentap_comment, NEW.greentap_rotation,NEW.dma_id, NEW.greentap_soilcat_id, NEW.greentap_category_type, NEW.greentap_fluid_type, NEW.greentap_location_type, NEW.greentap_workcat_id, 
 		  NEW.greentap_buildercat_id, NEW.greentap_builtdate,NEW.greentap_ownercat_id, NEW.greentap_adress_01, NEW.greentap_adress_02, NEW.greentap_adress_03, NEW.greentap_streetname, NEW.greentap_postnumber, 
 		  NEW.greentap_descript, NEW.greentap_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.greentap_workcat_id_end,NEW.greentap_label_x,NEW.greentap_label_y,NEW.greentap_label_rotation, 
-		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.greentap_end_date, NEW.macrodma_id);
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.greentap_end_date, NEW.macrodma_id);
 		  
 		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.greentap_linked_connec);
 		  
 		ELSIF man_table='man_fountain' THEN
+				-- State
+			IF (NEW.fountain_state IS NULL) THEN
+				NEW.fountain_state := (SELECT state_vdefault FROM config);
+				IF (NEW.fountain_state IS NULL) THEN
+						NEW.fountain_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.fountain_workcat_id IS NULL) THEN
+				NEW.fountain_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.fountain_workcat_id IS NULL) THEN
+					NEW.fountain_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+		
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
 		  workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete,workcat_id_end,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory, end_date, macrodma_id) 
@@ -124,19 +139,35 @@ BEGIN
 		  NEW.fountain_observ, NEW.fountain_comment, NEW.fountain_rotation,NEW.dma_id, NEW.fountain_soilcat_id, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
 		  NEW.fountain_buildercat_id, NEW.fountain_builtdate,NEW.fountain_ownercat_id, NEW.fountain_adress_01, NEW.fountain_adress_02, NEW.fountain_adress_03, NEW.fountain_streetname, NEW.fountain_postnumber, 
 		  NEW.fountain_descript, NEW.fountain_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.fountain_workcat_id_end,NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
-		  NEW.expl_id, NEW.publish, NEW.inventory, NEW.fountain_end_date, NEW.macrodma_id);
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.fountain_end_date, NEW.macrodma_id);
 		 
 		 INSERT INTO man_fountain(connec_id, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, linked_connec, the_geom_pol) 
 		 VALUES (NEW.connec_id, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
 		 NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_linked_connec, NEW.the_geom_pol);
 		 
 		ELSIF man_table='man_tap' THEN
+					-- State
+			IF (NEW.tap_state IS NULL) THEN
+				NEW.tap_state := (SELECT state_vdefault FROM config);
+				IF (NEW.tap_state IS NULL) THEN
+						NEW.tap_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.tap_workcat_id IS NULL) THEN
+				NEW.tap_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.tap_workcat_id IS NULL) THEN
+					NEW.tap_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, 
 		  location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber,descript,link,verified, the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory, end_date, macrodma_id) 
 		  VALUES (NEW.connec_id, NEW.tap_elevation, NEW.tap_depth, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.tap_code, NEW.tap_n_hydrometer, NEW.tap_demand, NEW.tap_state, NEW.tap_annotation, NEW.tap_observ, 
 		  NEW.tap_comment, NEW.tap_rotation,NEW.dma_id, NEW.tap_soilcat_id, NEW.tap_category_type, NEW.tap_fluid_type, NEW.tap_location_type, NEW.tap_workcat_id, NEW.tap_buildercat_id, NEW.tap_builtdate,
-		  NEW.tap_ownercat_id, NEW.tap_adress_01, NEW.tap_adress_02, NEW.tap_adress_03, NEW.tap_streetname, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.tap_workcat_id_end,  NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.tap_end_date, NEW.macrodma_id);
+		  NEW.tap_ownercat_id, NEW.tap_adress_01, NEW.tap_adress_02, NEW.tap_adress_03, NEW.tap_streetname, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.tap_workcat_id_end,  NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.tap_end_date, NEW.macrodma_id);
 		  
 		  INSERT INTO man_tap(connec_id, type, connection, continous, shutvalve_type, shutvalve_diam, shutvalve_number, drain_diam, drain_exit, drain_gully, drain_distance, arquitect_patrimony, communication,
 		  cat_valve2, linked_connec) 
@@ -144,13 +175,29 @@ BEGIN
 		  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arquitect_patrimony, NEW.tap_communication, NEW.tap_cat_valve2, NEW.tap_linked_connec);
 		  
 		ELSIF man_table='man_wjoin' THEN  
+					-- State
+			IF (NEW.wjoin_state IS NULL) THEN
+				NEW.wjoin_state := (SELECT state_vdefault FROM config);
+				IF (NEW.wjoin_state IS NULL) THEN
+						NEW.wjoin_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.wjoin_workcat_id IS NULL) THEN
+				NEW.wjoin_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.wjoin_workcat_id IS NULL) THEN
+					NEW.wjoin_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation, dma_id, soilcat_id, category_type, fluid_type, 
 		  location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom,undelete, workcat_id_end,label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, end_date, macrodma_id) 
 		  VALUES (NEW.connec_id, NEW.wjoin_elevation, NEW.wjoin_depth, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.wjoin_code, NEW.wjoin_n_hydrometer, NEW.wjoin_demand, NEW.wjoin_state, NEW.wjoin_annotation, NEW.wjoin_observ, 
 		  NEW.wjoin_comment, NEW.wjoin_rotation,NEW.dma_id, NEW.wjoin_soilcat_id, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.wjoin_buildercat_id, 
 		  NEW.wjoin_builtdate,NEW.wjoin_ownercat_id, NEW.wjoin_adress_01, NEW.wjoin_adress_02, NEW.wjoin_adress_03, NEW.wjoin_streetname, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_link, NEW.verified, 
-		  NEW.the_geom, NEW.undelete, NEW.wjoin_workcat_id_end,NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wjoin_end_date, NEW.macrodma_id); 
+		  NEW.the_geom, NEW.undelete, NEW.wjoin_workcat_id_end,NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.wjoin_end_date, NEW.macrodma_id); 
 		 
 		 INSERT INTO man_wjoin (connec_id, arc_id, length, top_floor, lead_verified, lead_facade, cat_valve2) 
 		 VALUES (NEW.connec_id, NEW.arc_id, NEW.wjoin_length, NEW.wjoin_top_floor, NEW.wjoin_lead_verified, NEW.wjoin_lead_facade, NEW.wjoin_cat_valve2);
