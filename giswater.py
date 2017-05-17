@@ -1,3 +1,4 @@
+
 '''
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
@@ -126,7 +127,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (19, 21, 23, 24, 25, 28, 99):
+                if int(index_action) in (19, 21, 23, 24, 25, 28, 41,99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -317,7 +318,7 @@ class Giswater(QObject):
         # Set an action list for every toolbar    
         self.list_actions_ud = ['01','02','04','05']
         self.list_actions_ws = ['10','11','12','14','15','08','29','13']
-        self.list_actions_mg = ['16','28','17','18','19','20','21','22','23','24','25','26','27','99','56','57']
+        self.list_actions_mg = ['16','28','17','18','19','20','21','22','23','24','25','26','27','41','99','56','57']
         self.list_actions_ed = ['30','31','32','33','34','35','36']
                 
         # UD toolbar   

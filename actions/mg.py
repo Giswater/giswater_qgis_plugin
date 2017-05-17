@@ -25,6 +25,7 @@ from ..ui.table_wizard import TableWizard                       # @UnresolvedImp
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
+from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
 
 from functools import partial
 
@@ -752,7 +753,7 @@ class Mg():
         self.dlg_multi = Multi_selector()
         utils_giswater.setDialog(self.dlg_multi)
         
-        self.tbl = self.dlg_multi.findChild(QTableView, "tbl") 
+        self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
            
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
@@ -766,8 +767,44 @@ class Mg():
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_multi, 'config')               
         self.dlg_multi.exec_()
-        
-             
+
+    def mg_exploitation_selector(self):
+        self.dlg_multiexp = Multiexpl_selector()
+        utils_giswater.setDialog(self.dlg_multiexp)
+
+        self.tbl_all_explot=self.dlg_multiexp.findChild(QTableView, "all_explot")
+        self.tbl_selected_explot = self.dlg_multiexp.findChild(QTableView, "selected_explot")
+
+        self.dlg_multiexp.btn_cancel.pressed.connect(self.close_dialog_multiexp)
+        self.dlg_multiexp.btn_accept.pressed.connect(self.accept_dialog_multiexp)
+
+        self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
+
+        self.dlg_multiexp.exec_()
+        print "etst multi"
+
+    def accept_dialog_multiexp(self):
+        print "test button accept"
+        '''
+        layerlist = []
+        print self.schema_name
+        for row in self.rowsss:
+            print row[1]
+            layerlist.append(row)
+        '''
+        #self.tbl_selected_explot.addItem(layerlist)
+
+
+
+    def close_dialog_multiexp(self, dlg=None):
+        ''' Close dialog '''
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg_multiexp
+        try:
+            dlg.close()
+        except AttributeError:
+            pass
+
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu''' 
         
@@ -849,4 +886,7 @@ class Mg():
 
         # Attach model to table view
         widget.setModel(model)    
-        
+
+
+
+
