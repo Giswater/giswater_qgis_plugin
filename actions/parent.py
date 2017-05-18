@@ -33,10 +33,47 @@ class ParentAction():
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name  
           
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')                 
+        # Get files to execute giswater jar              
         self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
+       
+       
+    def get_java_exe(self):
+        ''' Get executable Java file from windows registry '''
+
+        reg_hkey = "HKEY_LOCAL_MACHINE"
+        reg_path = "SOFTWARE\JavaSoft\Java Runtime Environment"
+        reg_name = "CurrentVersion"
+        java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         
+        # Check if java version exists
+        if java_version is None:
+            message = "Cannot get current Java version from windows registry at: "+reg_path
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None
+      
+        reg_path+= "\\"+java_version
+        reg_name = "JavaHome"
+        java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
+        if java_folder is None:
+            message = "Cannot get Java folder from windows registry at: "+reg_path
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None         
+
+        # Check if java folder exists
+        if not os.path.exists(java_folder):
+            message = "Java folder not found at: "+java_folder
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None  
+
+        # Check if java executable file exists
+        java_exe = java_folder+"/bin/java.exe"
+        if not os.path.exists(java_exe):
+            message = "Java executable file not found at: "+java_exe
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None  
+                
+        return java_exe
+    
 
     def execute_giswater(self, parameter, index_action):
         ''' Executes giswater with selected parameter '''
@@ -48,7 +85,7 @@ class ParentAction():
         giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if giswater_folder is None:
             message = "Cannot get giswater folder from windows registry at: "+reg_path
-            self.controller.show_info(message, 10, context_name='ui_message')
+            self.controller.show_warning(message, 10, context_name='ui_message')
             return
             
         # Check if giswater folder exists
@@ -62,12 +99,11 @@ class ParentAction():
         if not os.path.exists(giswater_jar):
             message = "Giswater executable file not found at: "+giswater_jar
             self.controller.show_warning(message, 10, context_name='ui_message')
-            return               
-
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, 10, context_name='ui_message')
+            return      
+        
+        # Get executable Java file from windows registry
+        java_exe = self.get_java_exe()
+        if java_exe is None:
             return       
         
         # Check if gsw file exists. If not giswater will open with the last .gsw file
@@ -84,9 +120,9 @@ class ParentAction():
         aux = '"'+giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", giswater_jar, self.gsw_file, parameter]
+            program = [java_exe, "-jar", giswater_jar, self.gsw_file, parameter]
         else:
-            program = [self.java_exe, "-jar", giswater_jar, "", parameter]
+            program = [java_exe, "-jar", giswater_jar, "", parameter]
             
         self.controller.start_program(program)               
         
