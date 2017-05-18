@@ -50,7 +50,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="label_x_4">
+   <widget class="QLineEdit" name="id">
     <property name="geometry">
      <rect>
       <x>395</x>
@@ -75,7 +75,7 @@
     <property name="title">
      <string>Location</string>
     </property>
-    <widget class="QLineEdit" name="label_x_3">
+    <widget class="QLineEdit" name="number">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -160,20 +160,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="label_x">
-     <property name="geometry">
-      <rect>
-       <x>110</x>
-       <y>25</y>
-       <width>160</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="label_x_2">
+    <widget class="QLineEdit" name="street">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -220,6 +207,16 @@
      </property>
      <property name="margin">
       <number>3</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="exploitation">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>25</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -347,7 +344,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="observ_3">
+    <widget class="QTextEdit" name="pred_description">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -490,7 +487,7 @@
       <string>End</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lbl_distance">
+    <widget class="QLineEdit" name="distance">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -542,7 +539,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="label_x_7">
+    <widget class="QLineEdit" name="depth">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -591,7 +588,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTextEdit" name="observ_4">
+    <widget class="QTextEdit" name="real_description">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -650,7 +647,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="doc_type">
+    <widget class="QComboBox" name="type">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -696,7 +693,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QComboBox" name="doc_type_2">
+    <widget class="QComboBox" name="cause">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -706,19 +703,6 @@
       </rect>
      </property>
     </widget>
-   </widget>
-   <widget class="QDialogButtonBox" name="ok">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>625</y>
-      <width>156</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="standardButtons">
-     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-    </property>
    </widget>
    <widget class="QLabel" name="label_label_x_11">
     <property name="geometry">
@@ -756,7 +740,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="label_x_5">
+   <widget class="QLineEdit" name="state">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -803,6 +787,32 @@
     </property>
     <property name="margin">
      <number>3</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_cancel">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>620</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cancel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_accept">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>620</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OK</string>
     </property>
    </widget>
   </widget>

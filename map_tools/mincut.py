@@ -21,7 +21,7 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
-from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit
+from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox
 from PyQt4.Qt import  QDate, QTime
 
 from map_tools.parent import ParentMapTool
@@ -211,7 +211,6 @@ class MincutMapTool(ParentMapTool):
 
     def mincut(self):
         ''' mincut function'''
-        print "mincut"
         
         # Store user snapping configuration
         self.snapperManager.storeSnappingOptions()
@@ -255,6 +254,9 @@ class MincutMapTool(ParentMapTool):
         
         self.btn_end.setEnabled(True)   
         
+        # set status
+        self.state.setText(str(self.state_values[1][0]) )
+        
        
     def real_end(self):
 
@@ -263,6 +265,8 @@ class MincutMapTool(ParentMapTool):
         
         self.time_end = QTime.currentTime()
         self.cbx_hours_end.setTime(self.time_end)
+        
+
         
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
@@ -276,11 +280,46 @@ class MincutMapTool(ParentMapTool):
         self.cbx_date_end_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_end_fin")
         self.cbx_hours_end_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_end_fin")
         self.cbx_date_end_fin.setDate(self.date_end)
-        self.cbx_hours_end_fin.setTime(self.time_end)      
+        self.cbx_hours_end_fin.setTime(self.time_end)   
+        
+        self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
+        self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
+        
+        self.btn_accept.clicked.connect(self.accept)
+        
+        #self.btn_cancel.clicked.connect(self.close)
+
+        
+        # Set values mincut and address
+        self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
+        self.address_fin = self.dlg_fin.findChild(QLineEdit, "address")
+        id_fin = self.id.text()
+        street_fin = self.street.text()
+        number_fin = str(self.number.text())
+        address_fin = street_fin +" "+ number_fin
+        self.mincut_fin.setText(id_fin)
+        self.address_fin.setText(address_fin)
+        
+        # set status
+        self.state.setText(str(self.state_values[2][0]) )
         
         # Open the dialog
         self.dlg_fin.show() 
         
+    def accept(self):
+        
+        print "test"
+        # reach end_date and end_hour from mincut_fin dialog
+        date = self.cbx_date_end_fin.date()
+        time = self.cbx_hours_end_fin.time()  
+     
+        # set new values of date in mincut dialog
+        self.cbx_date_end.setDate(date)
+        self.cbx_hours_end.setTime(time)
+
+        self.dlg_fin.close()
+        
+
         
     def activate(self):
 
@@ -290,6 +329,11 @@ class MincutMapTool(ParentMapTool):
         # Create the dialog and signals
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
+        
+        self.btn_accept = self.dlg.findChild(QPushButton, "btn_accept")
+        self.btn_cancel = self.dlg.findChild(QPushButton, "btn_cancel")
+        
+        self.btn_accept.clicked.connect(self.accept_save_data)
         
         #self.dlg.findChild(QPushButton, "btn_start").clicked.connect(self.real_start)
         self.btn_start = self.dlg.findChild(QPushButton, "btn_start")  
@@ -308,10 +352,81 @@ class MincutMapTool(ParentMapTool):
         
         self.cbx_date_end = self.dlg.findChild(QDateEdit, "cbx_date_end")
         self.cbx_hours_end = self.dlg.findChild(QTimeEdit, "cbx_hours_end")
-            
+        
+        
+        self.state = self.dlg.findChild(QLineEdit, "state")
+        self.id = self.dlg.findChild(QLineEdit, "id")
+        self.street = self.dlg.findChild(QLineEdit, "street")
+        self.number = self.dlg.findChild(QLineEdit, "number")
+        self.pred_description = self.dlg.findChild(QLineEdit, "pred_description")
+        self.real_description = self.dlg.findChild(QLineEdit, "real_description")
+        self.distance = self.dlg.findChild(QLineEdit, "distance")
+        self.depth = self.dlg.findChild(QLineEdit, "depth")
+        
+        self.exploitation = self.dlg.findChild(QComboBox, "exploitation")
+        self.type = self.dlg.findChild(QComboBox, "type")
+        self.cause = self.dlg.findChild(QComboBox ,"cause")
+        
+        # Fill widgets
+        sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_result_cat_state"
+        self.state_values = self.controller.get_rows(sql)
+        self.state.setText(str(self.state_values[0][0]) )
+
+        
+         
+        
+        # Fill ComboBox exploitation
+        sql = "SELECT short_descript"
+        sql+= " FROM "+ self.schema_name + ".exploitation"
+        sql+= " ORDER BY short_descript"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("exploitation", rows)   
+        
+        # Fill ComboBox type
+        sql = "SELECT id"
+        sql+= " FROM "+ self.schema_name + ".anl_mincut_result_cat_type"
+        sql+= " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("type", rows) 
+        
+        # Fill ComboBox cause
+        sql = "SELECT id"
+        sql+= " FROM "+ self.schema_name + ".anl_mincut_result_cat_cause"
+        sql+= " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("cause", rows) 
+        
+         
         # Open the dialog
         self.dlg.show() 
         
+    def accept_save_data(self):
+        
+        mincut_result_state = self.state.text() 
+        id = self.id.text()
+        #exploitation =
+        street = str(self.street.text())
+        number = str(self.number.text())
+        address = str(street +" "+ number)
+        mincut_result_type = str(utils_giswater.getWidgetText("type")) 
+        anl_cause = str(utils_giswater.getWidgetText("cause")) 
+        print anl_cause
+        #forecast_start = 
+        #forecast_end = 
+        anl_descript = str(utils_giswater.getWidgetText("pred_description")) 
+        #exec_start = 
+        #exec_end = 
+        
+        exec_limit_distance =  self.distance.text()
+        exec_depth =  self.depth.text()
+        exec_descript =  str(utils_giswater.getWidgetText("real_description")) 
+        
+        sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat (mincut_result_state,id,address,mincut_result_type,anl_cause,anl_descript,exec_limit_distance,exec_depth,exec_descript) "
+        sql+= " VALUES ('"+mincut_result_state+"','"+id+"','"+address+"','"+mincut_result_type+"','"+anl_cause+"','"+anl_descript+"','"+exec_limit_distance+"','"+exec_depth+"','"+exec_descript+"')"
+        print sql
+        self.controller.execute_sql(sql)
+  
+        self.dlg.close()
 
     def deactivate(self):
 
