@@ -3382,6 +3382,31 @@
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
+    <message>
+        <source>Cannot get giswater folder from windows registry at: </source>
+        <translation>Cannot get giswater folder from windows registry at: </translation>
+    </message>   
+    <message>
+        <source>Giswater folder not found at: </source>
+        <translation>Giswater folder not found at: </translation>
+    </message>        
+    <message>
+        <source>File path doesn't exist</source>
+        <translation>File path doesn't exist</translation>
+    </message>         
+    <message>
+        <source>Error getting table name from selected layer</source>
+        <translation>Error getting table name from selected layer</translation>
+    </message>         
+    <message>
+        <source>You need to insert doc_id</source>
+        <translation>You need to insert doc_id</translation>
+    </message>          
+    <message>
+        <source>Date interval not valid!</source>
+        <translation>Date interval not valid!</translation>
+    </message>    
+
 
 </context>
 
