@@ -368,7 +368,6 @@ class DaoController():
    
     def get_project_user(self):
         ''' Set user '''
-
         user = None
         layer = self.iface.activeLayer()  
         uri = layer.dataProvider().dataSourceUri().lower()
