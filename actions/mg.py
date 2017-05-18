@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -26,6 +26,9 @@ from ..ui.topology_tools import TopologyTools                   # @UnresolvedImp
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
+from ..ui.mincut_edit import Mincut_edit          # @UnresolvedImport
+from ..ui.mincut_fin import Mincut_fin
+from ..ui.mincut import Mincut
 
 from functools import partial
 
@@ -447,9 +450,9 @@ class Mg():
         self.close_dialog(self.dlg) 
 
 
-
+    '''
     def mg_analytics(self):
-        ''' Button 27. Valve analytics '''
+        # Button 27. Valve analytics 
                 
         # Execute SQL function  
         function_name = "gw_fct_valveanalytics"
@@ -458,6 +461,7 @@ class Mg():
         if result:
             message = "Valve analytics executed successfully"
             self.controller.show_info(message, 30, context_name='ui_message')
+    '''
 
 
     def mg_change_elem_type(self):                
@@ -1000,6 +1004,135 @@ class Mg():
         # Attach model to table view
         widget.setModel(model)    
 
+        
+        
+    def mg_mincut_edit(self):
+        # Button 27. mincut edit
+        print "mincut edit test"
+        
+        # Create the dialog and signals
+        self.dlg_min_edit = Mincut_edit()
+        utils_giswater.setDialog(self.dlg_min_edit)
+        
+        self.combo_state_edit= self.dlg_min_edit.findChild(QComboBox, "state_edit")
+        self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
+        
+        self.btn_accept_min= self.dlg_min_edit.findChild(QPushButton, "btn_accept")
+        self.btn_accept_min.clicked.connect(self.accept_min)
+        
+        # Fill ComboBox state
+        sql = "SELECT id"
+        sql+= " FROM "+ self.schema_name + ".anl_mincut_result_cat_state"
+        sql+= " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("state_edit", rows)  
+
+        self.fill_table(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
+        for i in range(1, 18):
+            self.tbl_mincut_edit.hideColumn(i)
+            
+            
+
+        self.dlg_min_edit.show()
+        
+        
+    def accept_min(self):
+        
+        selected_list = self.tbl_mincut_edit.selectionModel().selectedRows() 
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+        row = selected_list[0].row()
+        id = self.tbl_mincut_edit.model().record(row).value("id")
+        
+        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_result_cat WHERE id = '"+id+"'" 
+        print sql
+        rows = self.dao.get_row(sql)
+        print rows
+        
+        #self.dlg_min_edit.close()
+        
+        
+        # Create the dialog and signals
+        self.dlg_mincut = Mincut()
+        utils_giswater.setDialog(self.dlg_mincut)
+        
+        self.btn_accept_edit = self.dlg_mincut.findChild(QPushButton, "btn_accept")
+        self.btn_cancel_edit = self.dlg_mincut.findChild(QPushButton, "btn_cancel")
+        
+        self.btn_accept_edit.clicked.connect(self.accept_update)
+        
+        self.id = self.dlg_mincut.findChild(QLineEdit, "id")
+        self.state = self.dlg_mincut.findChild(QLineEdit, "state")
+        self.street = self.dlg_mincut.findChild(QLineEdit, "street")
+        self.number = self.dlg_mincut.findChild(QLineEdit, "number")
+        self.pred_description = self.dlg_mincut.findChild(QTextEdit, "pred_description")
+        self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
+        self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
+        self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+        
+        self.exploitation = self.dlg_mincut.findChild(QComboBox, "exploitation")
+        self.type = self.dlg_mincut.findChild(QComboBox, "type")
+        self.cause = self.dlg_mincut.findChild(QComboBox ,"cause")
+        
+        
+        self.id.setText(rows['id'])
+        self.state.setText(rows['mincut_result_state'])
+        utils_giswater.setWidgetText("pred_description",rows['anl_descript'])
+        utils_giswater.setWidgetText("real_description",rows['exec_descript']) 
+        self.distance.setText(str(rows['exec_limit_distance']))
+        self.depth.setText(str(rows['exec_depth']))
+        
+        #utils_giswater.fillComboBox("type", rows['mincut_result_type']) 
+        #utils_giswater.fillComboBox("cause", rows['anl_cause']) 
+        
+        self.old_id= self.id.text()
+       
+        
+        # Open the dialog
+        self.dlg_mincut.show() 
+        self.dlg_min_edit.close()
+        
+    def accept_update(self):
+        
+        
+        mincut_result_state = self.state.text() 
+        id = self.id.text()
+        #exploitation =
+        street = str(self.street.text())
+        number = str(self.number.text())
+        address = str(street +" "+ number)
+        mincut_result_type = str(utils_giswater.getWidgetText("type")) 
+        anl_cause = str(utils_giswater.getWidgetText("cause")) 
+        #forecast_start = 
+        #forecast_end = 
+        anl_descript = str(utils_giswater.getWidgetText("pred_description")) 
+        
+        #exec_start = 
+        #exec_end = 
+        
+        exec_limit_distance =  self.distance.text()
+        exec_depth =  self.depth.text()
+        exec_descript =  str(utils_giswater.getWidgetText("real_description")) 
+            
+        sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "
+        sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+"',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"' "
+        sql+= " WHERE id = '"+self.old_id+"'"
+        self.controller.execute_sql(sql)
+        
+        '''
+        self.fill_table(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
+        for i in range(1, 18):
+            self.tbl_mincut_edit.hideColumn(i)
+        '''
+        self.dlg_mincut.close() 
+        
+        
+    
+        
+        
+        
 
 
 

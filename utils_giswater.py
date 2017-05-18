@@ -132,7 +132,7 @@ def setWidgetText(widget, text):
         widget = _dialog.findChild(QWidget, widget)       
     if not widget:
         return
-    if type(widget) is QLineEdit:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit:
         setText(widget, text)
     elif type(widget) is QDoubleSpinBox:
         setText(widget, text)           

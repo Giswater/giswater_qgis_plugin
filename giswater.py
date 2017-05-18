@@ -1,4 +1,3 @@
-
 '''
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
@@ -127,7 +126,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (19, 21, 23, 24, 25, 28, 41,99):
+                if int(index_action) in (19, 21, 23, 24, 25,27,41, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -212,8 +211,8 @@ class Giswater(QObject):
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 27:
-                map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
+            #elif int(index_action) == 27:
+            #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 57:
@@ -698,7 +697,7 @@ class Giswater(QObject):
         self.set_map_tool('mg_flow_trace')
         self.set_map_tool('mg_flow_exit')
         self.set_map_tool('mg_connec_tool')
-        self.set_map_tool('mg_analytics')
+        #self.set_map_tool('mg_analytics')
         self.set_map_tool('mg_extract_raster_value')
 
         # Set SearchPlus object
