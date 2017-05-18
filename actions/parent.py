@@ -33,10 +33,40 @@ class ParentAction():
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name  
           
-        # Get files to execute giswater jar              
+        # Get files to execute giswater jar
+        self.java_exe = self.get_java_exe()              
+        self.giswater_jar = self.get_giswater_jar() 
         self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
        
        
+    def get_giswater_jar(self):
+        ''' Get executable Giswater file from windows registry '''
+             
+        reg_hkey = "HKEY_LOCAL_MACHINE"
+        reg_path = "SOFTWARE\\Giswater\\2.1"
+        reg_name = "InstallFolder"
+        giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
+        if giswater_folder is None:
+            message = "Cannot get giswater folder from windows registry at: "+reg_path
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None
+            
+        # Check if giswater folder exists
+        if not os.path.exists(giswater_folder):
+            message = "Giswater folder not found at: "+giswater_folder
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None           
+            
+        # Check if giswater executable file file exists
+        giswater_jar = giswater_folder+"\giswater.jar"
+        if not os.path.exists(giswater_jar):
+            message = "Giswater executable file not found at: "+giswater_jar
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None 
+        
+        return giswater_jar
+    
+           
     def get_java_exe(self):
         ''' Get executable Java file from windows registry '''
 
@@ -73,37 +103,15 @@ class ParentAction():
             return None  
                 
         return java_exe
-    
+                        
 
     def execute_giswater(self, parameter, index_action):
         ''' Executes giswater with selected parameter '''
 
-        # Get giswater information from windows registry
-        reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\Giswater\\2.1"
-        reg_name = "InstallFolder"
-        giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if giswater_folder is None:
-            message = "Cannot get giswater folder from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return
-            
-        # Check if giswater folder exists
-        if not os.path.exists(giswater_folder):
-            message = "Giswater folder not found at: "+giswater_folder
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return          
-            
-        # Check if giswater executable file file exists
-        giswater_jar = giswater_folder+"\giswater.jar"
-        if not os.path.exists(giswater_jar):
-            message = "Giswater executable file not found at: "+giswater_jar
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return      
+        if self.giswater_jar is None:
+            return               
         
-        # Get executable Java file from windows registry
-        java_exe = self.get_java_exe()
-        if java_exe is None:
+        if self.java_exe is None:
             return       
         
         # Check if gsw file exists. If not giswater will open with the last .gsw file
@@ -117,12 +125,12 @@ class ParentAction():
         self.controller.check_action(True, index_action)                
         
         # Start program     
-        aux = '"'+giswater_jar+'"'
+        aux = '"'+self.giswater_jar+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            program = [java_exe, "-jar", giswater_jar, self.gsw_file, parameter]
+            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, parameter]
         else:
-            program = [java_exe, "-jar", giswater_jar, "", parameter]
+            program = [self.java_exe, "-jar", self.giswater_jar, "", parameter]
             
         self.controller.start_program(program)               
         
