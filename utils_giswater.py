@@ -1,22 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
 
 ''' Module with utility functions to interact with dialog and its widgets '''
+# -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit   #@UnresolvedImport
 
 import inspect
 import os
 import _winreg
+import webbrowser
 
 
 def setDialog(p_dialog):
@@ -244,5 +240,20 @@ def get_reg(reg_hkey, reg_path, reg_name):
             return value
         except WindowsError:
             return None
+        
+        
+def get_settings_value(settings, parameter):
+    ''' Function that fix problem with network units in Windows '''
+    
+    file_aux = ""
+    try:
+        file_aux = settings.value(parameter)
+        unit = file_aux[:1]
+        if unit != '\\' and file_aux[1] != ':':
+            path = file_aux[1:]
+            file_aux = unit+":"+path
+    except IndexError:
+        pass   
+    return file_aux           
             
-            
+                        

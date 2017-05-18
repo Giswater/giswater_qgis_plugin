@@ -12,7 +12,7 @@ from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
-import webbrowser
+from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -25,26 +25,16 @@ from ..ui.table_wizard import TableWizard                       # @UnresolvedImp
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
+from parent import ParentAction
 
-from functools import partial
 
-
-class Mg():
+class Mg(ParentAction):
    
     def __init__(self, iface, settings, controller, plugin_dir):
         ''' Class to control Management toolbar actions '''  
-          
-        # Initialize instance attributes
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir       
-        self.dao = self.controller.dao         
-        self.schema_name = self.controller.schema_name  
-          
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')                 
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')                   
+                  
+        # Call ParentAction constructor      
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
     
                   
     def close_dialog(self, dlg=None): 
@@ -213,22 +203,6 @@ class Mg():
             message = "Selected CSV has been imported successfully"
             self.controller.show_info(message, context_name='ui_message')
         
-        
-    def get_settings_value(self, settings, parameter):
-        ''' Utility function that fix problem with network units in Windows '''
-        
-        file_aux = ""
-        try:
-            file_aux = settings.value(parameter)
-            unit = file_aux[:1]
-            if unit != '\\' and file_aux[1] != ':':
-                path = file_aux[1:]
-                file_aux = unit+":"+path
-        except IndexError:
-            pass   
-        return file_aux
-            
-             
              
     def mg_go2epa(self):
         ''' Button 23. Open form to set INP, RPT and project '''
@@ -254,7 +228,7 @@ class Mg():
         # Get last GSW file from giswater properties file
         java_settings = QSettings(java_properties_path, QSettings.IniFormat)
         java_settings.setIniCodec(sys.getfilesystemencoding())          
-        file_gsw = self.get_settings_value(java_settings, 'FILE_GSW')
+        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
         
         # Check if that file exists
         if not os.path.exists(file_gsw):
@@ -264,8 +238,8 @@ class Mg():
         
         # Get INP, RPT file path and project name from GSW file
         self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
-        self.file_inp = self.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = self.get_settings_value(self.gsw_settings, 'FILE_RPT')                
+        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')                
         self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
                 
         # Create dialog
@@ -341,43 +315,9 @@ class Mg():
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
         '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 24)
-                
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, context_name='ui_message')
-            return  
         
-        # Check if giswater.jar file exists
-        if not os.path.exists(self.giswater_jar):
-            message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, context_name='ui_message')
-            return  
-
-        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
-        if not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, context_name='ui_message')
-            self.gsw_file = ""    
-        
-        # Start program     
-        aux = '"'+self.giswater_jar+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
-            
-        self.controller.start_program(program)   
-        
-        # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message' )             
-                
+        self.execute_giswater("mg_go2epa_express", 24)
+                        
                 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
@@ -423,27 +363,23 @@ class Mg():
         user = self.controller.get_project_user()
 
         # Delete previous values
-        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_result" 
         self.dao.execute_sql(sql)
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare" 
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message') 
         self.close_dialog(self.dlg) 
-
 
 
     def mg_analytics(self):
@@ -596,10 +532,10 @@ class Mg():
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         
-        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
-        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
-        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
-        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
+        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
         
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
@@ -630,46 +566,6 @@ class Mg():
         self.controller.translate_form(self.dlg, 'config')               
         self.dlg.exec_()        
     
-    
-    def open_file_dialog(self, widget):
-        ''' Open File Dialog '''
-        
-        # Set default value from QLine
-        self.file_path = utils_giswater.getWidgetText(widget)
-    
-        # Check if file exists
-        if not os.path.exists(self.file_path):
-            message = "File path doesn't exist"
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            self.file_path = self.plugin_dir
-        #else:
-        # Set default value if necessary
-        elif self.file_path == 'null': 
-            self.file_path = self.plugin_dir
-                
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_path)
-        os.chdir(folder_path)
-        msg = "Select file"
-        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
-
-        # Separate path to components
-        abs_path = os.path.split(self.file_path)
-
-        # Set text to QLineEdit
-        widget.setText(abs_path[0]+'/')     
-
-   
-    def open_web_browser(self, widget):
-        ''' Display url using the default browser '''
-        
-        url = utils_giswater.getWidgetText(widget) 
-        if url == 'null' :
-            url = 'www.giswater.org'
-            webbrowser.open(url)
-        else :
-            webbrowser.open(url)
-            
                  
     def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''
@@ -724,24 +620,26 @@ class Mg():
     def mg_config_accept_table(self, tablename, columns):
         ''' Update values of selected 'tablename' with the content of 'columns' '''
         
-        if columns is not None:       
-            sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
-            for column_name in columns:
-                if column_name != 'id':
-                    widget_type = utils_giswater.getWidgetType(column_name)
-                    if widget_type is QCheckBox:
-                        value = utils_giswater.isChecked(column_name)                      
-                    else:
-                        value = utils_giswater.getWidgetText(column_name)
-                    if value is None or value == 'null':
-                        sql+= column_name+" = null, "     
-                    else:
-                        if type(value) is not bool:
-                            value = value.replace(",", ".")
-                        sql+= column_name+" = '"+str(value)+"', "           
-            
-            sql = sql[:-2]
-            self.controller.execute_sql(sql)
+        if columns is None:
+            return
+               
+        sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
+        for column_name in columns:
+            if column_name != 'id':
+                widget_type = utils_giswater.getWidgetType(column_name)
+                if widget_type is QCheckBox:
+                    value = utils_giswater.isChecked(column_name)                      
+                else:
+                    value = utils_giswater.getWidgetText(column_name)
+                if value is None or value == 'null':
+                    sql+= column_name+" = null, "     
+                else:
+                    if type(value) is not bool:
+                        value = value.replace(",", ".")
+                    sql+= column_name+" = '"+str(value)+"', "           
+        
+        sql = sql[:-2]
+        self.controller.execute_sql(sql)
                         
        
     def multi_selector(self,table):  
@@ -753,13 +651,11 @@ class Mg():
         
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl") 
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
-           
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
-        self.menu=QMenu()
+        
+        self.menu = QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
-        
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
-        
         self.fill_table(self.tbl, self.schema_name+"."+table)
         
         # Manage i18n of the form and open it
@@ -848,4 +744,5 @@ class Mg():
 
         # Attach model to table view
         widget.setModel(model)    
+        
         

@@ -6,12 +6,10 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit, QFileDialog, QPushButton
-from qgis.gui import QgsMessageBar
+from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit, QPushButton
 
 import os
 import sys
-import webbrowser
 from functools import partial
   
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -20,24 +18,16 @@ import utils_giswater
          
 from ..ui.add_element import Add_element    # @UnresolvedImport
 from ..ui.add_file import Add_file          # @UnresolvedImport
+from parent import ParentAction
 
 
-class Ed():
+class Ed(ParentAction):
    
     def __init__(self, iface, settings, controller, plugin_dir):     
         ''' Class to control Management toolbar actions '''  
-        
-        # Initialize instance attributes  
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir       
-        self.dao = self.controller.dao             
-        self.schema_name = self.controller.schema_name    
-        
-        # Get files to execute giswater jar   
-        self.java_exe = self.settings.value('files/java_exe')          
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')  
+                  
+        # Call ParentAction constructor      
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)        
         
         # Get tables or views specified in 'db' config section         
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')        
@@ -150,58 +140,7 @@ class Ed():
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
         
-        # Get giswater information from windows registry
-        reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\Giswater\\2.1"
-        reg_name = "InstallFolder"
-        giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
-        if giswater_folder is None:
-            message = "Cannot get giswater folder from windows registry at: "+reg_path
-            self.controller.show_info(message, 10, context_name='ui_message')
-            return
-            
-        # Check if giswater folder exists
-        if not os.path.exists(giswater_folder):
-            message = "Giswater folder not found at: "+giswater_folder
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return          
-            
-        # Check if giswater executable file file exists
-        giswater_jar = giswater_folder+"\giswater.jar"
-        if not os.path.exists(giswater_jar):
-            message = "Giswater executable file not found at: "+giswater_jar
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return               
-
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return       
-        
-        # Check if gsw file exists. If not giswater will open with the last .gsw file
-        if self.gsw_file != "" and not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, 10, context_name='ui_message')
-            self.gsw_file = ""          
-        
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 36)                
-        
-        # Start program     
-        aux = '"'+giswater_jar+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", giswater_jar, self.gsw_file, "ed_giswater_jar"]
-        else:
-            program = [self.java_exe, "-jar", giswater_jar, "", "ed_giswater_jar"]
-            
-        self.controller.start_program(program)               
-        
-        # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message')
+        self.execute_giswater("ed_giswater_jar", 36)
                                               
                           
     def ed_add_element(self):
@@ -265,15 +204,13 @@ class Ed():
         self.date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
         
         # Get date
-        date_from=self.date_document_from.date() 
-        date_to=self.date_document_to.date() 
+        date_from = self.date_document_from.date() 
+        date_to = self.date_document_to.date() 
       
         # Check if interval is valid
-        if (date_from < date_to):
-            pass
-        else :
+        if date_from >= date_to:
             message = "Date interval not valid!"
-            self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 5) 
+            self.controller.show_warnings(message, context_name='ui_message') 
             return
 
         
@@ -358,7 +295,7 @@ class Ed():
                 self.ed_add_to_feature("element", element_id) 
                 # Show message to user
                 message = "Values has been updated"
-                self.controller.show_info(message)
+                self.controller.show_info(message, context_name='ui_message')
             if not status:
                 message = "Error inserting element in table, you need to review data"
                 self.controller.show_warning(message, context_name='ui_message') 
@@ -382,8 +319,8 @@ class Ed():
         
         # Get widgets
         self.path = self.dlg.findChild(QLineEdit, "path")
-        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser,self.path))
-        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog,self.path))
+        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser ,self.path))
+        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog, self.path))
         
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')               
@@ -445,7 +382,8 @@ class Ed():
         uri_table = layer_source['table'] 
 
         if uri_table is None:
-            self.controller.show_warning("Error getting table name from selected layer")
+            msg = "Error getting table name from selected layer"
+            self.controller.show_warning(msg, context_name='ui_message')
             return
         
         field_id= None
@@ -586,12 +524,11 @@ class Ed():
         tagcat_id = utils_giswater.getWidgetText("tagcat_id")  
         observ = utils_giswater.getWidgetText("observ")
         path = utils_giswater.getWidgetText("path")
-        
 
         if doc_id == 'null':
             # Show warning message    
             message = "You need to insert doc_id"
-            self.controller.show_warning(message, context_name='ui_message' )   
+            self.controller.show_warning(message, context_name='ui_message')   
             return
         # Check if this document already exists
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc WHERE id = '"+doc_id+"'" 
@@ -602,7 +539,7 @@ class Ed():
             if answer:
                 # If document already exist than UPDATE
                 sql = "UPDATE "+self.schema_name+".doc "
-                sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"',observ = '"+observ+"', path = '"+path+"'"
+                sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"', observ = '"+observ+"', path = '"+path+"'"
                 sql+= " WHERE id = '"+doc_id+"'" 
                 status = self.controller.execute_sql(sql) 
                 if status:
@@ -630,43 +567,6 @@ class Ed():
                 self.controller.show_warning(message, context_name='ui_message')
                 return
 
-        self.close_dialog()  
-          
-        
-    def open_file_dialog(self,widget):
-        ''' Open File Dialog '''
-   
-        # Set default value from QLine
-        self.file_path = utils_giswater.getWidgetText(widget)
-    
-        # Check if file exists
-        if not os.path.exists(self.file_path):
-            message = "File path doesn't exist"
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            self.file_path = self.plugin_dir
-        # Set default value if necessary
-        elif self.file_path == 'null': 
-            self.file_path = self.plugin_dir
-                
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_path)
-        os.chdir(folder_path)
-        msg = "Select file"
-        self.file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
-
-        # Set text to QLineEdit
-        widget.setText(self.file_path)     
-
-
-    def open_web_browser(self, widget):
-        ''' Display url using the default browser '''
-    
-        url = utils_giswater.getWidgetText(widget) 
-        
-        if url == 'null' :
-            url = 'www.giswater.org'
-            webbrowser.open(url)
-        else :
-            webbrowser.open(url)
+        self.close_dialog()   
             
             
