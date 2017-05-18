@@ -7,12 +7,13 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QCursor, QFileDialog
 
 import os
 import sys
 import webbrowser
+import ConfigParser
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -34,13 +35,34 @@ class ParentAction():
         self.schema_name = self.controller.schema_name  
           
         # Get files to execute giswater jar
+        self.plugin_version = self.get_plugin_version()
         self.java_exe = self.get_java_exe()              
-        self.giswater_jar = self.get_giswater_jar() 
+        (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
         self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
-       
+    
+    
+    def get_plugin_version(self):
+        ''' Get plugin version from metadata.txt file '''
+               
+        # Check if metadata file exists    
+        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
+        if not os.path.exists(metadata_file):
+            message = "Metadata file not found at: "+metadata_file
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return None
+          
+        metadata = ConfigParser.ConfigParser()
+        metadata.read(metadata_file)
+        plugin_version = metadata.get('general', 'version')
+        if plugin_version is None:
+            msg = "Plugin version not found"
+            self.controller.show_warning(msg, 10, context_name='ui_message')
+        
+        return plugin_version
+               
        
     def get_giswater_jar(self):
-        ''' Get executable Giswater file from windows registry '''
+        ''' Get executable Giswater file and build version from windows registry '''
              
         reg_hkey = "HKEY_LOCAL_MACHINE"
         reg_path = "SOFTWARE\\Giswater\\2.1"
@@ -49,29 +71,54 @@ class ParentAction():
         if giswater_folder is None:
             message = "Cannot get giswater folder from windows registry at: "+reg_path
             self.controller.show_warning(message, 10, context_name='ui_message')
-            return None
+            return (None, None)
             
         # Check if giswater folder exists
         if not os.path.exists(giswater_folder):
             message = "Giswater folder not found at: "+giswater_folder
             self.controller.show_warning(message, 10, context_name='ui_message')
-            return None           
+            return (None, None)           
             
         # Check if giswater executable file file exists
-        giswater_jar = giswater_folder+"\giswater.jar"
-        if not os.path.exists(giswater_jar):
-            message = "Giswater executable file not found at: "+giswater_jar
+        giswater_file_path = giswater_folder+"\giswater.jar"
+        if not os.path.exists(giswater_file_path):
+            message = "Giswater executable file not found at: "+giswater_file_path
             self.controller.show_warning(message, 10, context_name='ui_message')
-            return None 
+            return (None, None) 
+
+        # Get giswater major version
+        reg_name = "MajorVersion"
+        major_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
+        if major_version is None:
+            message = "Cannot get giswater major version from windows registry at: "+reg_path
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return (giswater_file_path, None)    
+
+        # Get giswater minor version
+        reg_name = "MinorVersion"
+        minor_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
+        if minor_version is None:
+            message = "Cannot get giswater major version from windows registry at: "+reg_path
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return (giswater_file_path, None)  
+                        
+        # Get giswater build version
+        reg_name = "BuildVersion"
+        build_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
+        if build_version is None:
+            message = "Cannot get giswater build version from windows registry at: "+reg_path
+            self.controller.show_warning(message, 10, context_name='ui_message')
+            return (giswater_file_path, None)        
         
-        return giswater_jar
+        giswater_build_version = major_version+'.'+minor_version+'.'+build_version
+        return (giswater_file_path, giswater_build_version)
     
            
     def get_java_exe(self):
         ''' Get executable Java file from windows registry '''
 
         reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\JavaSoft\Java Runtime Environment"
+        reg_path = "SOFTWARE\\JavaSoft\\Java Runtime Environment"
         reg_name = "CurrentVersion"
         java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         
@@ -108,11 +155,8 @@ class ParentAction():
     def execute_giswater(self, parameter, index_action):
         ''' Executes giswater with selected parameter '''
 
-        if self.giswater_jar is None:
+        if self.giswater_file_path is None or self.java_exe is None:
             return               
-        
-        if self.java_exe is None:
-            return       
         
         # Check if gsw file exists. If not giswater will open with the last .gsw file
         if self.gsw_file != "" and not os.path.exists(self.gsw_file):
@@ -125,18 +169,25 @@ class ParentAction():
         self.controller.check_action(True, index_action)                
         
         # Start program     
-        aux = '"'+self.giswater_jar+'"'
+        aux = '"'+self.giswater_file_path+'"'
         if self.gsw_file != "":
             aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, parameter]
+            program = [self.java_exe, "-jar", self.giswater_file_path, self.gsw_file, parameter]
         else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", parameter]
+            program = [self.java_exe, "-jar", self.giswater_file_path, "", parameter]
             
         self.controller.start_program(program)               
         
+        # Compare Java and Plugin versions
+        if self.plugin_version <> self.giswater_build_version:
+            msg = "Giswater and plugin versions are different. "
+            msg+= "Giswater version: "+self.giswater_build_version
+            msg+= " - Plugin version: "+self.plugin_version
+            self.controller.show_info(msg, 10, context_name='ui_message')
         # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message')
+        else:
+            msg = "Executing... "+aux
+            self.controller.show_info(msg, context_name='ui_message')
         
         
     def open_web_browser(self, widget):
