@@ -79,21 +79,6 @@
 				END IF;
 			END IF;
 			
-			-- State
-			IF (NEW.state IS NULL) THEN
-				NEW.state := (SELECT state_vdefault FROM config);
-				IF (NEW.state IS NULL) THEN
-					NEW.state := (SELECT id FROM value_state limit 1);
-				END IF;
-			END IF;
-			
-			-- Workcat_id
-			IF (NEW.workcat_id IS NULL) THEN
-				NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
-				IF (NEW.workcat_id IS NULL) THEN
-					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-				END IF;
-			END IF;
 			
 			-- Verified
 			IF (NEW.verified IS NULL) THEN
@@ -120,6 +105,22 @@
 			
 			
 			IF man_table='man_conduit' THEN
+						-- State
+				IF (NEW.conduit_state IS NULL) THEN
+					NEW.conduit_state := (SELECT state_vdefault FROM config);
+					IF (NEW.conduit_state IS NULL) THEN
+							NEW.conduit_state := (SELECT id FROM value_state limit 1);
+					END IF;
+				END IF;
+						
+				-- Workcat_id
+				IF (NEW.conduit_workcat_id IS NULL) THEN
+					NEW.conduit_workcat_id := (SELECT workcat_vdefault FROM config);
+					IF (NEW.conduit_workcat_id IS NULL) THEN
+						NEW.conduit_workcat_id := (SELECT id FROM cat_work limit 1);
+					END IF;
+				END IF;
+				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
 				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
 				label_rotation, code, expl_id, publish, inventory, end_date, uncertain, macrodma_id) 
@@ -132,6 +133,22 @@
 				INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
 			
 			ELSIF man_table='man_siphon' THEN
+							-- State
+				IF (NEW.siphon_state IS NULL) THEN
+					NEW.siphon_state := (SELECT state_vdefault FROM config);
+					IF (NEW.siphon_state IS NULL) THEN
+							NEW.siphon_state := (SELECT id FROM value_state limit 1);
+					END IF;
+				END IF;
+						
+				-- Workcat_id
+				IF (NEW.siphon_workcat_id IS NULL) THEN
+					NEW.siphon_workcat_id := (SELECT workcat_vdefault FROM config);
+					IF (NEW.siphon_workcat_id IS NULL) THEN
+						NEW.siphon_workcat_id := (SELECT id FROM cat_work limit 1);
+					END IF;
+				END IF;
+				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,
 				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain, macrodma_id) 
@@ -144,6 +161,22 @@
 				INSERT INTO man_siphon (arc_id,security_bar,steps,siphon_name) VALUES (NEW.arc_id, NEW.siphon_security_bar, NEW.siphon_steps,NEW.siphon_name);
 				
 			ELSIF man_table='man_waccel' THEN
+								-- State
+				IF (NEW.waccel_state IS NULL) THEN
+					NEW.waccel_state := (SELECT state_vdefault FROM config);
+					IF (NEW.waccel_state IS NULL) THEN
+							NEW.waccel_state := (SELECT id FROM value_state limit 1);
+					END IF;
+				END IF;
+						
+				-- Workcat_id
+				IF (NEW.waccel_workcat_id IS NULL) THEN
+					NEW.waccel_workcat_id := (SELECT workcat_vdefault FROM config);
+					IF (NEW.waccel_workcat_id IS NULL) THEN
+						NEW.waccel_workcat_id := (SELECT id FROM cat_work limit 1);
+					END IF;
+				END IF;
+				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,
 				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain, macrodma_id)
@@ -157,6 +190,22 @@
 				VALUES (NEW.arc_id, NEW.waccel_sander_length, NEW.waccel_sander_depth,NEW.waccel_security_bar, NEW.waccel_steps,NEW.waccel_prot_surface,NEW.waccel_name);
 				
 			ELSIF man_table='man_varc' THEN
+								-- State
+					IF (NEW.varc_state IS NULL) THEN
+					NEW.varc_state := (SELECT state_vdefault FROM config);
+					IF (NEW.varc_state IS NULL) THEN
+							NEW.varc_state := (SELECT id FROM value_state limit 1);
+					END IF;
+				END IF;
+						
+				-- Workcat_id
+				IF (NEW.varc_workcat_id IS NULL) THEN
+					NEW.varc_workcat_id := (SELECT workcat_vdefault FROM config);
+					IF (NEW.varc_workcat_id IS NULL) THEN
+						NEW.varc_workcat_id := (SELECT id FROM cat_work limit 1);
+					END IF;
+				END IF;		
+				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,
 				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain, macrodma_id) 
@@ -187,7 +236,7 @@
 		ELSIF (NEW.epa_type = 'OUTLET') THEN 
             INSERT INTO inp_outlet (arc_id, outlet_type) VALUES (NEW.arc_id,'TABULAR/HEAD');
 			
-		END IF
+		END IF;
 			RETURN NEW;
 			   
 		ELSIF TG_OP = 'UPDATE' THEN

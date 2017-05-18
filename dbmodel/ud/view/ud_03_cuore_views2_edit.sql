@@ -209,18 +209,21 @@ AND expl_selector.cur_user="current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_link CASCADE;
-CREATE OR REPLACE VIEW v_edit_link AS
-SELECT 
-link.link_id,
-link.connec_id,
-link.vnode_id,
-st_length2d(link.the_geom) as gis_length,
-link.custom_length,
-connec.connecat_id,
-link.the_geom
-FROM (link 
-LEFT JOIN connec ON (((connec.connec_id)::text = (link.connec_id)::text))
-);
+CREATE OR REPLACE VIEW ws_sample_dev.v_edit_link AS 
+ SELECT link.link_id,
+    link.connec_id,
+    link.vnode_id,
+    st_length2d(link.the_geom) AS gis_length,
+    link.custom_length,
+    connec.connecat_id,
+    link.the_geom,
+    exploitation.short_descript AS expl_name
+   FROM ws_sample_dev.expl_selector,
+    ws_sample_dev.link
+     LEFT JOIN ws_sample_dev.connec ON connec.connec_id::text = link.connec_id::text
+     JOIN ws_sample_dev.exploitation ON link.expl_id = exploitation.expl_id
+  WHERE link.expl_id::text = expl_selector.expl_id::text AND expl_selector.cur_user = "current_user"()::text;
+  
 
 DROP VIEW IF EXISTS v_edit_gully CASCADE;
 CREATE OR REPLACE VIEW v_edit_gully AS

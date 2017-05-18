@@ -159,12 +159,30 @@ CREATE TABLE anl_node_flowregulator
   
   -- DWF ANALISYS
   
+  CREATE SEQUENCE connec_x_uses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+  
 CREATE TABLE anl_dwf_cat_scenario(
   scenario_id character varying(30) NOT NULL,
   descript text,
   text text,
   tstamp timestamp with time zone DEFAULT now(),
   CONSTRAINT anl_dwf_cat_scenario_pkey PRIMARY KEY (scenario_id));
+
+  
+
+CREATE TABLE anl_dwf_type_catastro_uses(
+  id character varying(16) NOT NULL,
+  descript text,
+  water_generator boolean,
+  value double precision,
+  type_value character varying,
+  CONSTRAINT ext_catastro_type_use2_pkey PRIMARY KEY (id));
 
   
 CREATE TABLE anl_dwf_connec_x_uses(
@@ -199,15 +217,6 @@ CREATE TABLE anl_dwf_selector_scenario(
   scenario_id character varying(16) NOT NULL,
   CONSTRAINT anl_dwf_selector_scenario_pkey PRIMARY KEY (scenario_id));
 
-
-CREATE TABLE anl_dwf_type_catastro_uses(
-  id character varying(16) NOT NULL,
-  descript text,
-  water_generator boolean,
-  value double precision,
-  type_value character varying,
-  CONSTRAINT ext_catastro_type_use2_pkey PRIMARY KEY (id));
-
   
 CREATE TABLE anl_dwf_config_float(
   id serial NOT NULL,
@@ -225,7 +234,7 @@ CREATE TABLE anl_dwf_config_float(
   descript text,
   text text,
   tstamp timestamp with time zone DEFAULT now(),
-  CONSTRAINT anl_dwf_cat_result_pkey PRIMARY KEY (result_id))
+  CONSTRAINT anl_dwf_cat_result_pkey PRIMARY KEY (result_id));
   
   
   CREATE TABLE anl_dwf_rpt_arc(
@@ -284,19 +293,7 @@ ALTER TABLE "inp_n2a_ori_weir" ADD CONSTRAINT "inp_n2a_ori_weir_fkey" FOREIGN KE
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 	  
-
 ALTER TABLE "anl_dwf_connec_x_uses" DROP CONSTRAINT IF EXISTS "anl_dwf_connec_x_uses_connec_id_pkey";
 ALTER TABLE "anl_dwf_connec_x_uses" ADD CONSTRAINT "anl_dwf_connec_x_uses_connec_id_pkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_dwf_connec_x_uses" DROP CONSTRAINT IF EXISTS "anl_dwf_connec_x_uses_type_use_fkey";

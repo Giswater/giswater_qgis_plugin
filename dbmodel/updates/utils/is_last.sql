@@ -46,7 +46,7 @@ cur_user text
 -- ADDING GEOMETRY TO CATALOG OF WORKS
 -- ----------------------------
 
-ALTER TABLE cat_works ADD COLUMN the_geom public.geometry(MULTIPOLYGON, SRID_VALUE);
+ALTER TABLE cat_work ADD COLUMN the_geom public.geometry(MULTIPOLYGON, SRID_VALUE);
 
 
 
@@ -89,7 +89,7 @@ CREATE SEQUENCE review_node_id_seq
 	
 DROP TABLE IF EXISTS review_arc;
 CREATE TABLE review_arc
-(  arc_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_arc_id_seq'::regclass),,
+(  arc_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_arc_id_seq'::regclass),
   the_geom geometry(LINESTRING,SRID_VALUE),
   y1 numeric(12,3),
   y2 numeric(12,3),
@@ -104,7 +104,7 @@ CREATE TABLE review_arc
 
 DROP TABLE IF EXISTS review_node;
 CREATE TABLE review_node
-( node_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_node_id_seq'::regclass),,
+( node_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_node_id_seq'::regclass),
   the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
@@ -212,7 +212,7 @@ ALTER TABLE om_visit
       REFERENCES om_visit_cat (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT;
 
- 
+
  
 CREATE TABLE om_visit_event_photo
 (

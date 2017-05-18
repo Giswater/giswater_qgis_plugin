@@ -26,6 +26,7 @@ DECLARE
     man_table_2 varchar;
 	rec Record;
     node_id_seq int8;
+	expl_id_int integer;
 
 
 BEGIN
@@ -90,21 +91,6 @@ BEGIN
             END IF;            
         END IF;
 		
-  	    -- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;
-		
-		-- Workcat_id
-        IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
-            IF (NEW.workcat_id IS NULL) THEN
-                NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-            END IF;
-        END IF;
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
@@ -114,110 +100,204 @@ BEGIN
             END IF;
         END IF;
 		
-		--Exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
+	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;		
 				
 		IF man_table='man_junction' THEN
+							-- State
+			IF (NEW.junction_state IS NULL) THEN
+				NEW.junction_state := (SELECT state_vdefault FROM config);
+				IF (NEW.junction_state IS NULL) THEN
+						NEW.junction_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.junction_workcat_id IS NULL) THEN
+				NEW.junction_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.junction_workcat_id IS NULL) THEN
+					NEW.junction_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom, 
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id)
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id)
 			VALUES (NEW.node_id,NEW.junction_top_elev,NEW.junction_ymax,NEW.junction_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.junction_state,NEW.junction_annotation,NEW.junction_observ,
 			NEW.junction_comment,NEW.dma_id,NEW.junction_soilcat_id,NEW.junction_category_type,NEW.junction_fluid_type,NEW.junction_location_type,NEW.junction_workcat_id,NEW.junction_buildercat_id,NEW.junction_builtdate,
 			NEW.junction_ownercat_id,NEW.junction_adress_01,NEW.junction_adress_02,NEW.junction_adress_03,NEW.junction_descript,NEW.junction_est_top_elev,NEW.junction_est_ymax,NEW.junction_rotation,NEW.junction_link,
 			NEW.verified,NEW.junction_workcat_id_end,NEW.undelete,NEW.junction_label_x,NEW.junction_label_y,NEW.junction_label_rotation,NEW.the_geom,
-			NEW.junction_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.junction_end_date, NEW.uncertain, NEW.junction_xyz_date, NEW.unconnected, NEW.macrodma_id);	
+			NEW.junction_code, expl_id_int, NEW.publish, NEW.inventory, NEW.junction_end_date, NEW.uncertain, NEW.junction_xyz_date, NEW.unconnected, NEW.macrosector_id);	
 
-			INSERT INTO man_junction (node_id,add_info) VALUES (NEW.node_id,NEW.junction_add_info);
+			INSERT INTO man_junction (node_id) VALUES (NEW.node_id);
 
 			        
 		ELSIF man_table='man_outfall' THEN
+							-- State
+			IF (NEW.outfall_state IS NULL) THEN
+				NEW.outfall_state := (SELECT state_vdefault FROM config);
+				IF (NEW.outfall_state IS NULL) THEN
+						NEW.outfall_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.outfall_workcat_id IS NULL) THEN
+				NEW.outfall_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.outfall_workcat_id IS NULL) THEN
+					NEW.outfall_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.outfall_top_elev,NEW.outfall_ymax,NEW.outfall_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.outfall_state,NEW.outfall_annotation,NEW.outfall_observ,
 			NEW.outfall_comment,NEW.dma_id,NEW.outfall_soilcat_id,NEW.outfall_category_type,NEW.outfall_fluid_type,NEW.outfall_location_type,NEW.outfall_workcat_id,NEW.outfall_buildercat_id,NEW.outfall_builtdate,
 			NEW.outfall_ownercat_id,NEW.outfall_adress_01,NEW.outfall_adress_02,NEW.outfall_adress_03,NEW.outfall_descript,NEW.outfall_est_top_elev,NEW.outfall_est_ymax,NEW.outfall_rotation,NEW.outfall_link,
 			NEW.verified,NEW.outfall_workcat_id_end,NEW.undelete,NEW.outfall_label_x,NEW.outfall_label_y,NEW.outfall_label_rotation,NEW.the_geom,
-			NEW.outfall_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.outfall_end_date, NEW.uncertain, NEW.outfall_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.outfall_code, expl_id_int, NEW.publish, NEW.inventory, NEW.outfall_end_date, NEW.uncertain, NEW.outfall_xyz_date, NEW.unconnected, NEW.macrosector_id);
 
-			INSERT INTO man_outfall (node_id,add_info,outfall_name) VALUES (NEW.node_id,NEW.outfall_add_info,NEW.outfall_name);
+			INSERT INTO man_outfall (node_id,outfall_name) VALUES (NEW.node_id,NEW.outfall_name);
         
 		ELSIF man_table='man_valve' THEN
+							-- State
+			IF (NEW.valve_state IS NULL) THEN
+				NEW.valve_state := (SELECT state_vdefault FROM config);
+				IF (NEW.valve_state IS NULL) THEN
+						NEW.valve_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.valve_workcat_id IS NULL) THEN
+				NEW.valve_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.valve_workcat_id IS NULL) THEN
+					NEW.valve_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.valve_top_elev,NEW.valve_ymax,NEW.valve_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.valve_state,NEW.valve_annotation,NEW.valve_observ,NEW.valve_comment,NEW.dma_id, NEW.valve_soilcat_id,NEW.valve_category_type,NEW.valve_fluid_type,NEW.valve_location_type,NEW.valve_workcat_id,NEW.valve_buildercat_id,NEW.valve_builtdate,NEW.valve_ownercat_id,NEW.valve_adress_01,
 			NEW.valve_adress_02,NEW.valve_adress_03,NEW.valve_descript,NEW.valve_est_top_elev,NEW.valve_est_ymax,NEW.valve_rotation,NEW.valve_link,NEW.verified,NEW.valve_workcat_id_end,NEW.undelete,NEW.valve_label_x,
-			NEW.valve_label_y,NEW.valve_label_rotation,NEW.the_geom, NEW.valve_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.valve_end_date, 
-			NEW.uncertain, NEW.valve_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.valve_label_y,NEW.valve_label_rotation,NEW.the_geom, NEW.valve_code, expl_id_int, NEW.publish, NEW.inventory, NEW.valve_end_date, 
+			NEW.uncertain, NEW.valve_xyz_date, NEW.unconnected, NEW.macrosector_id);
 
-			INSERT INTO man_valve (node_id,add_info,valve_name) VALUES (NEW.node_id,NEW.valve_add_info,NEW.valve_name);	
+			INSERT INTO man_valve (node_id,valve_name) VALUES (NEW.node_id,NEW.valve_name);	
 		
 		ELSIF man_table='man_storage' THEN
+							-- State
+			IF (NEW.storage_state IS NULL) THEN
+				NEW.storage_state := (SELECT state_vdefault FROM config);
+				IF (NEW.storage_state IS NULL) THEN
+						NEW.storage_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.storage_workcat_id IS NULL) THEN
+				NEW.storage_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.storage_workcat_id IS NULL) THEN
+					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.storage_top_elev,NEW.storage_ymax,NEW.storage_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.storage_state,NEW.storage_annotation,NEW.storage_observ,
 			NEW.storage_comment,NEW.dma_id,NEW.storage_soilcat_id,NEW.storage_category_type,NEW.storage_fluid_type,NEW.storage_location_type,NEW.storage_workcat_id,NEW.storage_buildercat_id,NEW.storage_builtdate,
 			NEW.storage_ownercat_id,NEW.storage_adress_01,NEW.storage_adress_02,NEW.storage_adress_03,NEW.storage_descript,NEW.storage_est_top_elev,NEW.storage_est_ymax,NEW.storage_rotation,NEW.storage_link,
 			NEW.verified,NEW.storage_workcat_id_end,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,NEW.the_geom,
-			NEW.storage_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.storage_end_date, NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.storage_code, expl_id_int, NEW.publish, NEW.inventory, NEW.storage_end_date, NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.macrosector_id);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_storage (node_id,pol_id,add_info,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,NEW.storage_add_info,
+				INSERT INTO man_storage (node_id,pol_id,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,
 				NEW.storage_total_volume,NEW.storage_util_volume,NEW.storage_min_height,NEW.storage_total_height,NEW.storage_total_length,NEW.storage_total_width,NEW.storage_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
-				INSERT INTO man_storage (node_id,pol_id,add_info,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,NEW.storage_add_info,
+				INSERT INTO man_storage (node_id,pol_id,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,
 				NEW.storage_total_volume,NEW.storage_util_volume,NEW.storage_min_height,NEW.storage_total_height,NEW.storage_total_length,NEW.storage_total_width,NEW.storage_name);
 			END IF;
 	
 		ELSIF man_table='man_netgully' THEN
+							-- State
+			IF (NEW.netgully_state IS NULL) THEN
+				NEW.netgully_state := (SELECT state_vdefault FROM config);
+				IF (NEW.netgully_state IS NULL) THEN
+						NEW.netgully_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.netgully_workcat_id IS NULL) THEN
+				NEW.netgully_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.netgully_workcat_id IS NULL) THEN
+					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.netgully_top_elev,NEW.netgully_ymax,NEW.netgully_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.netgully_state,NEW.netgully_annotation,NEW.netgully_observ,
 			NEW.netgully_comment,NEW.dma_id,NEW.netgully_soilcat_id,NEW.netgully_category_type,NEW.netgully_fluid_type,NEW.netgully_location_type,NEW.netgully_workcat_id,NEW.netgully_buildercat_id,NEW.netgully_builtdate,
 			NEW.netgully_ownercat_id,NEW.netgully_adress_01,NEW.netgully_adress_02,NEW.netgully_adress_03,NEW.netgully_descript,NEW.netgully_est_top_elev,NEW.netgully_est_ymax,NEW.netgully_rotation,NEW.netgully_link,
 			NEW.verified,NEW.netgully_workcat_id_end,NEW.undelete,NEW.netgully_label_x,NEW.netgully_label_y,NEW.netgully_label_rotation,NEW.the_geom,
-			NEW.netgully_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.netgully_end_date, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.netgully_code, expl_id_int, NEW.publish, NEW.inventory, NEW.netgully_end_date, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.macrosector_id);
 				
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_netgully (node_id,pol_id,add_info) VALUES(NEW.node_id, NEW.pol_id,NEW.netgully_add_info);
+				INSERT INTO man_netgully (node_id,pol_id) VALUES(NEW.node_id, NEW.pol_id);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
-				INSERT INTO man_netgully (node_id,add_info) VALUES(NEW.node_id,NEW.netgully_add_info);
+				INSERT INTO man_netgully (node_id) VALUES(NEW.node_id);
 			END IF;	
 
 			
 		ELSIF man_table='man_storage_pol' THEN
+									-- State
+			IF (NEW.storage_state IS NULL) THEN
+				NEW.storage_state := (SELECT state_vdefault FROM config);
+				IF (NEW.storage_state IS NULL) THEN
+						NEW.storage_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.storage_workcat_id IS NULL) THEN
+				NEW.storage_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.storage_workcat_id IS NULL) THEN
+					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id)
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id)
 			VALUES (NEW.node_id,NEW.storage_top_elev,NEW.storage_ymax,NEW.storage_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.storage_state,NEW.storage_annotation,NEW.storage_observ,
 			NEW.storage_comment,NEW.dma_id,NEW.storage_soilcat_id,NEW.storage_category_type,NEW.storage_fluid_type,NEW.storage_location_type,NEW.storage_workcat_id,NEW.storage_buildercat_id,NEW.storage_builtdate,
 			NEW.storage_ownercat_id,NEW.storage_adress_01,NEW.storage_adress_02,NEW.storage_adress_03,NEW.storage_descript,NEW.storage_est_top_elev,NEW.storage_est_ymax,NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.storage_workcat_id_end,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation, 
-			NEW.storage_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.storage_end_date, NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.storage_code, expl_id_int, NEW.publish, NEW.inventory, NEW.storage_end_date, NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.macrosector_id);
 			
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -225,21 +305,37 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_storage (node_id,pol_id,add_info,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,NEW.storage_add_info,
+				INSERT INTO man_storage (node_id,pol_id,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,
 				NEW.storage_total_volume,NEW.storage_util_volume,NEW.storage_min_height,NEW.storage_total_height,NEW.storage_total_length,NEW.storage_total_width,NEW.storage_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
 			END IF;
 			 
 		ELSIF man_table='man_netgully_pol' THEN
+									-- State
+			IF (NEW.netgully_state IS NULL) THEN
+				NEW.netgully_state := (SELECT state_vdefault FROM config);
+				IF (NEW.netgully_state IS NULL) THEN
+						NEW.netgully_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.netgully_workcat_id IS NULL) THEN
+				NEW.netgully_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.netgully_workcat_id IS NULL) THEN
+					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.netgully_top_elev,NEW.netgully_ymax,NEW.netgully_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.netgully_state,NEW.netgully_annotation,NEW.netgully_observ,
 			NEW.netgully_comment,NEW.dma_id,NEW.netgully_soilcat_id,NEW.netgully_category_type,NEW.netgully_fluid_type,NEW.netgully_location_type,NEW.netgully_workcat_id,NEW.netgully_buildercat_id,NEW.netgully_builtdate,
 			NEW.netgully_ownercat_id,NEW.netgully_adress_01,NEW.netgully_adress_02,NEW.netgully_adress_03,NEW.netgully_descript,NEW.netgully_est_top_elev,NEW.netgully_est_ymax,NEW.netgully_rotation,NEW.netgully_link,
 			NEW.verified,NEW.netgully_workcat_id_end,NEW.undelete,NEW.netgully_label_x,NEW.netgully_label_y,NEW.netgully_label_rotation,
-			NEW.netgully_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.netgully_end_date, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.netgully_code, expl_id_int, NEW.publish, NEW.inventory, NEW.netgully_end_date, NEW.uncertain, NEW.netgully_xyz_date, NEW.unconnected, NEW.macrosector_id);
 
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -247,132 +343,244 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_netgully (node_id,pol_id,add_info) VALUES(NEW.node_id, NEW.pol_id,NEW.netgully_add_info);
+				INSERT INTO man_netgully (node_id,pol_id) VALUES(NEW.node_id, NEW.pol_id);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
 				
 			END IF;
 			
 		ELSIF man_table='man_chamber' THEN
+					-- State
+			IF (NEW.chamber_state IS NULL) THEN
+				NEW.chamber_state := (SELECT state_vdefault FROM config);
+				IF (NEW.chamber_state IS NULL) THEN
+						NEW.chamber_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.chamber_workcat_id IS NULL) THEN
+				NEW.chamber_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.chamber_workcat_id IS NULL) THEN
+					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.chamber_top_elev,NEW.chamber_ymax,NEW.chamber_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.chamber_state,NEW.chamber_annotation,NEW.chamber_observ,
 			NEW.chamber_comment,NEW.dma_id,NEW.chamber_soilcat_id,NEW.chamber_category_type,NEW.chamber_fluid_type,NEW.chamber_location_type,NEW.chamber_workcat_id,NEW.chamber_buildercat_id,NEW.chamber_builtdate,
 			NEW.chamber_ownercat_id,NEW.chamber_adress_01,NEW.chamber_adress_02,NEW.chamber_adress_03,NEW.chamber_descript,NEW.chamber_est_top_elev,NEW.chamber_est_ymax,NEW.chamber_rotation,NEW.chamber_link,NEW.verified, NEW.chamber_workcat_id_end,NEW.undelete,NEW.chamber_label_x,NEW.chamber_label_y,NEW.chamber_label_rotation,NEW.the_geom, 
-			NEW.chamber_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.chamber_end_date, NEW.uncertain, NEW.chamber_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.chamber_code,expl_id_int, NEW.publish, NEW.inventory, NEW.chamber_end_date, NEW.uncertain, NEW.chamber_xyz_date, NEW.unconnected, NEW.macrosector_id);
 					
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_chamber (node_id,add_info,pol_id,total_volume,total_height,total_length,total_width, chamber_name, inlet, bottom_channel, accessibility) 
-				VALUES (NEW.node_id,NEW.chamber_add_info,NEW.pol_id,NEW.chamber_total_volume, NEW.chamber_total_height,NEW.chamber_total_length,NEW.chamber_total_width,NEW.chamber_name,
+				INSERT INTO man_chamber (node_id,pol_id,total_volume,total_height,total_length,total_width, chamber_name, inlet, bottom_channel, accessibility) 
+				VALUES (NEW.node_id,NEW.pol_id,NEW.chamber_total_volume, NEW.chamber_total_height,NEW.chamber_total_length,NEW.chamber_total_width,NEW.chamber_name,
 				NEW.chamber_inlet, NEW.chamber_bottom_channel, NEW.chamber_accessibility);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
-				INSERT INTO man_chamber (node_id,add_info,pol_id,total_volume,total_height,total_length,total_width,chamber_name, inlet, bottom_channel, accessibility) 
-				VALUES (NEW.node_id,NEW.chamber_add_info,NEW.pol_id,NEW.chamber_total_volume, NEW.chamber_total_height,NEW.chamber_total_length,NEW.chamber_total_width,
+				INSERT INTO man_chamber (node_id,pol_id,total_volume,total_height,total_length,total_width,chamber_name, inlet, bottom_channel, accessibility) 
+				VALUES (NEW.node_id,NEW.pol_id,NEW.chamber_total_volume, NEW.chamber_total_height,NEW.chamber_total_length,NEW.chamber_total_width,
 				NEW.chamber_name, NEW.chamber_inlet, NEW.chamber_bottom_channel, NEW.chamber_accessibility);
 			END IF;	
 			
 		ELSIF man_table='man_chamber_pol' THEN
+							-- State
+			IF (NEW.chamber_state IS NULL) THEN
+				NEW.chamber_state := (SELECT state_vdefault FROM config);
+				IF (NEW.chamber_state IS NULL) THEN
+						NEW.chamber_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.chamber_workcat_id IS NULL) THEN
+				NEW.chamber_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.chamber_workcat_id IS NULL) THEN
+					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.chamber_top_elev,NEW.chamber_ymax,NEW.chamber_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.chamber_state,NEW.chamber_annotation,NEW.chamber_observ,
 			NEW.chamber_comment,NEW.dma_id,NEW.chamber_soilcat_id,NEW.chamber_category_type,NEW.chamber_fluid_type,NEW.chamber_location_type,NEW.chamber_workcat_id,NEW.chamber_buildercat_id,NEW.chamber_builtdate,
 			NEW.chamber_ownercat_id,NEW.chamber_adress_01,NEW.chamber_adress_02,NEW.chamber_adress_03,NEW.chamber_descript,NEW.chamber_est_top_elev,NEW.chamber_est_ymax,NEW.chamber_rotation,NEW.chamber_link,
 			NEW.verified,NEW.chamber_workcat_id_end,NEW.undelete,NEW.chamber_label_x,NEW.chamber_label_y,NEW.chamber_label_rotation,
-			NEW.chamber_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.chamber_end_date, NEW.uncertain, NEW.chamber_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.chamber_code, expl_id_int, NEW.publish, NEW.inventory, NEW.chamber_end_date, NEW.uncertain, NEW.chamber_xyz_date, NEW.unconnected, NEW.macrosector_id);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_chamber (node_id,add_info,pol_id,total_volume,total_height,total_length,total_width,chamber_name) VALUES (NEW.node_id,NEW.chamber_add_info,NEW.pol_id,NEW.chamber_total_volume,
+				INSERT INTO man_chamber (node_id,pol_id,total_volume,total_height,total_length,total_width,chamber_name) VALUES (NEW.node_id,NEW.pol_id,NEW.chamber_total_volume,
 				NEW.chamber_total_height,NEW.chamber_total_length,NEW.chamber_total_width,NEW.chamber_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
 			END IF;
 			
 		ELSIF man_table='man_manhole' THEN
+							-- State
+			IF (NEW.manhole_state IS NULL) THEN
+				NEW.manhole_state := (SELECT state_vdefault FROM config);
+				IF (NEW.manhole_state IS NULL) THEN
+						NEW.manhole_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.manhole_workcat_id IS NULL) THEN
+				NEW.manhole_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.manhole_workcat_id IS NULL) THEN
+					NEW.manhole_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.manhole_top_elev,NEW.manhole_ymax,NEW.manhole_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.manhole_state,NEW.manhole_annotation,NEW.manhole_observ,
 			NEW.manhole_comment,NEW.dma_id,NEW.manhole_soilcat_id,NEW.manhole_category_type,NEW.manhole_fluid_type,NEW.manhole_location_type,NEW.manhole_workcat_id,NEW.manhole_buildercat_id,NEW.manhole_builtdate,
 			NEW.manhole_ownercat_id,NEW.manhole_adress_01,NEW.manhole_adress_02,NEW.manhole_adress_03,NEW.manhole_descript,NEW.manhole_est_top_elev,NEW.manhole_est_ymax,NEW.manhole_rotation,NEW.manhole_link,
 			NEW.verified,NEW.manhole_workcat_id_end,NEW.undelete,NEW.manhole_label_x,NEW.manhole_label_y,NEW.manhole_label_rotation,NEW.the_geom,
-			NEW.manhole_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.manhole_end_date, NEW.uncertain, NEW.manhole_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.manhole_code, expl_id_int, NEW.publish, NEW.inventory, NEW.manhole_end_date, NEW.uncertain, NEW.manhole_xyz_date, NEW.unconnected, NEW.macrosector_id);
 
-			INSERT INTO man_manhole (node_id,add_info,sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
-			VALUES (NEW.node_id,NEW.manhole_add_info,NEW.manhole_sander_depth,NEW.manhole_prot_surface, NEW.manhole_inlet, NEW.manhole_bottom_channel, NEW.manhole_accessibility);	
+			INSERT INTO man_manhole (node_id,sander_depth,prot_surface, inlet, bottom_channel, accessibility) 
+			VALUES (NEW.node_id,NEW.manhole_sander_depth,NEW.manhole_prot_surface, NEW.manhole_inlet, NEW.manhole_bottom_channel, NEW.manhole_accessibility);	
 		
 		ELSIF man_table='man_netinit' THEN
+							-- State
+			IF (NEW.netinit_state IS NULL) THEN
+				NEW.netinit_state := (SELECT state_vdefault FROM config);
+				IF (NEW.netinit_state IS NULL) THEN
+						NEW.netinit_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.netinit_workcat_id IS NULL) THEN
+				NEW.netinit_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.netinit_workcat_id IS NULL) THEN
+					NEW.netinit_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.netinit_top_elev,NEW.netinit_ymax,NEW.netinit_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.netinit_state,NEW.netinit_annotation,NEW.netinit_observ,
 			NEW.netinit_comment,NEW.dma_id,NEW.netinit_soilcat_id,NEW.netinit_category_type,NEW.netinit_fluid_type,NEW.netinit_location_type,NEW.netinit_workcat_id,NEW.netinit_buildercat_id,NEW.netinit_builtdate,
 			NEW.netinit_ownercat_id,NEW.netinit_adress_01,NEW.netinit_adress_02,NEW.netinit_adress_03,NEW.netinit_descript,NEW.netinit_est_top_elev,NEW.netinit_est_ymax,NEW.netinit_rotation,NEW.netinit_link,
 			NEW.verified,NEW.netinit_workcat_id_end,NEW.undelete,NEW.netinit_label_x,NEW.netinit_label_y,NEW.netinit_label_rotation,NEW.the_geom,
-			NEW.netinit_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.netinit_end_date, NEW.uncertain, NEW.netinit_xyz_date, NEW.unconnected, NEW.macrodma_id); 
+			NEW.netinit_code, expl_id_int, NEW.publish, NEW.inventory, NEW.netinit_end_date, NEW.uncertain, NEW.netinit_xyz_date, NEW.unconnected, NEW.macrosector_id); 
 
-			INSERT INTO man_netinit (node_id,add_info,mheight,mlength,mwidth,netinit_name, inlet, bottom_channel, accessibility) 
-			VALUES (NEW.node_id,NEW.netinit_add_info,NEW.netinit_mheight,NEW.netinit_mlength,NEW.netinit_mwidth,NEW.netinit_name, NEW.netinit_inlet, NEW.netinit_bottom_channel, NEW.netinit_accessibility);
+			INSERT INTO man_netinit (node_id,mheight,mlength,mwidth,netinit_name, inlet, bottom_channel, accessibility) 
+			VALUES (NEW.node_id,NEW.netinit_mheight,NEW.netinit_mlength,NEW.netinit_mwidth,NEW.netinit_name, NEW.netinit_inlet, NEW.netinit_bottom_channel, NEW.netinit_accessibility);
 			
 		ELSIF man_table='man_wjump' THEN
+							-- State
+			IF (NEW.wjump_state IS NULL) THEN
+				NEW.wjump_state := (SELECT state_vdefault FROM config);
+				IF (NEW.wjump_state IS NULL) THEN
+						NEW.wjump_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.wjump_workcat_id IS NULL) THEN
+				NEW.wjump_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.wjump_workcat_id IS NULL) THEN
+					NEW.wjump_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.wjump_top_elev,NEW.wjump_ymax,NEW.wjump_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.wjump_state,NEW.wjump_annotation,NEW.wjump_observ,NEW.wjump_comment,
 			NEW.dma_id,NEW.wjump_soilcat_id,NEW.wjump_category_type,NEW.wjump_fluid_type,NEW.wjump_location_type,NEW.wjump_workcat_id,NEW.wjump_buildercat_id,NEW.wjump_builtdate,NEW.wjump_ownercat_id,
 			NEW.wjump_adress_01,NEW.wjump_adress_02,NEW.wjump_adress_03,NEW.wjump_descript,NEW.wjump_est_top_elev,NEW.wjump_est_ymax,NEW.wjump_rotation,NEW.wjump_link,NEW.verified,NEW.wjump_workcat_id_end,NEW.undelete,NEW.wjump_label_x,NEW.wjump_label_y,NEW.wjump_label_rotation,NEW.the_geom,
-			NEW.wjump_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wjump_end_date, NEW.uncertain, NEW.wjump_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.wjump_code, expl_id_int, NEW.publish, NEW.inventory, NEW.wjump_end_date, NEW.uncertain, NEW.wjump_xyz_date, NEW.unconnected, NEW.macrosector_id);
 
-			INSERT INTO man_wjump (node_id,add_info,mheight,mlength,mwidth,sander_length,sander_depth,security_bar,steps,prot_surface,wjump_name) VALUES (NEW.node_id,NEW.wjump_add_info,NEW.wjump_mheight,
+			INSERT INTO man_wjump (node_id,mheight,mlength,mwidth,sander_length,sander_depth,security_bar,steps,prot_surface,wjump_name) VALUES (NEW.node_id,NEW.wjump_mheight,
 			NEW.wjump_mlength,NEW.wjump_mwidth,NEW.wjump_sander_length,NEW.wjump_sander_depth,NEW.wjump_security_bar,NEW.wjump_steps,NEW.wjump_prot_surface,NEW.wjump_name);	
 		
 		ELSIF man_table='man_wwtp' THEN
+							-- State
+			IF (NEW.wwtp_state IS NULL) THEN
+				NEW.wwtp_state := (SELECT state_vdefault FROM config);
+				IF (NEW.wwtp_state IS NULL) THEN
+						NEW.wwtp_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.wwtp_workcat_id IS NULL) THEN
+				NEW.wwtp_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.wwtp_workcat_id IS NULL) THEN
+					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.wwtp_top_elev,NEW.wwtp_ymax,NEW.wwtp_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.wwtp_state,NEW.wwtp_annotation,NEW.wwtp_observ,NEW.wwtp_comment,NEW.dma_id, NEW.wwtp_soilcat_id,NEW.wwtp_category_type,NEW.wwtp_fluid_type,NEW.wwtp_location_type,NEW.wwtp_workcat_id,NEW.wwtp_buildercat_id,NEW.wwtp_builtdate,
 			NEW.wwtp_ownercat_id,NEW.wwtp_adress_01,NEW.wwtp_adress_02, NEW.wwtp_adress_03,NEW.wwtp_descript,NEW.wwtp_est_top_elev,NEW.wwtp_est_ymax,NEW.wwtp_rotation,NEW.wwtp_link,
 			NEW.verified,NEW.wwtp_workcat_id_end,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y,NEW.wwtp_label_rotation,NEW.the_geom,
-			NEW.wwtp_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wwtp_end_date, NEW.uncertain, NEW.wwtp_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.wwtp_code, expl_id_int, NEW.publish, NEW.inventory, NEW.wwtp_end_date, NEW.uncertain, NEW.wwtp_xyz_date, NEW.unconnected, NEW.macrosector_id);
 
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_wwtp (node_id,add_info,pol_id,wwtp_name) VALUES (NEW.node_id,NEW.wwtp_add_info,NEW.pol_id,NEW.wwtp_name);
+				INSERT INTO man_wwtp (node_id,pol_id,wwtp_name) VALUES (NEW.node_id,NEW.pol_id,NEW.wwtp_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
-				INSERT INTO man_wwtp (node_id,add_info,wwtp_name) VALUES (NEW.node_id,NEW.wwtp_add_info,NEW.wwtp_name);
+				INSERT INTO man_wwtp (node_id,wwtp_name) VALUES (NEW.node_id,NEW.wwtp_name);
 			END IF;	
 			
 		ELSIF man_table='man_wwtp_pol' THEN
+							-- State
+			IF (NEW.wwtp_state IS NULL) THEN
+				NEW.wwtp_state := (SELECT state_vdefault FROM config);
+				IF (NEW.wwtp_state IS NULL) THEN
+						NEW.wwtp_state := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.wwtp_workcat_id IS NULL) THEN
+				NEW.wwtp_workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.wwtp_workcat_id IS NULL) THEN
+					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
-			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrodma_id) 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 
 			VALUES (NEW.node_id,NEW.wwtp_top_elev,NEW.wwtp_ymax,NEW.wwtp_sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.wwtp_state,NEW.wwtp_annotation,NEW.wwtp_observ,NEW.wwtp_comment,NEW.dma_id, 	NEW.wwtp_soilcat_id,NEW.wwtp_category_type,NEW.wwtp_fluid_type,NEW.wwtp_location_type,NEW.wwtp_workcat_id,NEW.wwtp_buildercat_id,NEW.wwtp_builtdate,
 			NEW.wwtp_ownercat_id,NEW.wwtp_adress_01,NEW.wwtp_adress_02, 	NEW.wwtp_adress_03,NEW.wwtp_descript,NEW.wwtp_est_top_elev,NEW.wwtp_est_ymax,NEW.wwtp_rotation,NEW.wwtp_link,
-			NEW.verified,NEW.wwtp_workcat_id_end,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y, NEW.wwtp_label_rotation, NEW.wwtp_code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.wwtp_end_date, 
-			NEW.uncertain, NEW.wwtp_xyz_date, NEW.unconnected, NEW.macrodma_id);
+			NEW.verified,NEW.wwtp_workcat_id_end,NEW.undelete,NEW.wwtp_label_x,NEW.wwtp_label_y, NEW.wwtp_label_rotation, NEW.wwtp_code,expl_id_int, NEW.publish, NEW.inventory, NEW.wwtp_end_date, 
+			NEW.uncertain, NEW.wwtp_xyz_date, NEW.unconnected, NEW.macrosector_id);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.pol_id IS NULL) THEN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_wwtp (node_id,add_info,pol_id,wwtp_name) VALUES (NEW.node_id,NEW.wwtp_add_info,NEW.pol_id,NEW.wwtp_name);
+				INSERT INTO man_wwtp (node_id,pol_id,wwtp_name) VALUES (NEW.node_id,NEW.pol_id,NEW.wwtp_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
 			END IF;
@@ -460,11 +668,11 @@ BEGIN
 			builtdate=NEW.junction_builtdate,ownercat_id=NEW.junction_ownercat_id, adress_01=NEW.junction_adress_01,adress_02=NEW.junction_adress_02, adress_03=NEW.junction_adress_03, descript=NEW.junction_descript,
 			est_top_elev=NEW.junction_est_top_elev, est_ymax=NEW.junction_est_ymax, rotation=NEW.junction_rotation, link=NEW.junction_link, verified=NEW.verified, workcat_id_end=NEW.junction_workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.junction_label_x, label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation,the_geom=NEW.the_geom, 
-			code=NEW.junction_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.junction_end_date, uncertain=NEW.uncertain, xyz_date=NEW.junction_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.junction_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.junction_end_date, uncertain=NEW.uncertain, xyz_date=NEW.junction_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 			
-            UPDATE man_junction SET node_id=NEW.node_id, add_info=NEW.junction_add_info
+            UPDATE man_junction SET node_id=NEW.node_id
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_netgully' THEN
@@ -476,11 +684,11 @@ BEGIN
 			builtdate=NEW.netgully_builtdate,ownercat_id=NEW.netgully_ownercat_id, adress_01=NEW.netgully_adress_01,adress_02=NEW.netgully_adress_02, adress_03=NEW.netgully_adress_03, descript=NEW.netgully_descript,
 			est_top_elev=NEW.netgully_est_top_elev, est_ymax=NEW.netgully_est_ymax, rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, workcat_id_end=NEW.netgully_workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, label_rotation=NEW.netgully_label_rotation, the_geom=NEW.the_geom, 
-			code=NEW.netgully_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netgully_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id			
+			code=NEW.netgully_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netgully_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id			
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.netgully_add_info
+			UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id
 			WHERE node_id=OLD.node_id;
 
 			
@@ -492,18 +700,18 @@ BEGIN
 			category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, buildercat_id=NEW.netgully_buildercat_id, 
 			builtdate=NEW.netgully_builtdate,ownercat_id=NEW.netgully_ownercat_id, adress_01=NEW.netgully_adress_01,adress_02=NEW.netgully_adress_02, adress_03=NEW.netgully_adress_03, 
 			descript=NEW.netgully_descript,est_top_elev=NEW.netgully_est_top_elev, est_ymax=NEW.netgully_est_ymax, rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, 
-			workcat_id_end=NEW.netgully_workcat_id_end, undelete=NEW.undelete,label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, label_rotation=NEW.netgully_label_rotation
-			code=NEW.netgully_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netgully_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			workcat_id_end=NEW.netgully_workcat_id_end, undelete=NEW.undelete,label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, label_rotation=NEW.netgully_label_rotation,
+			code=NEW.netgully_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netgully_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 			
 			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id,add_info=NEW.netgully_add_info
+				UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 			ELSE
-				UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id,add_info=NEW.netgully_add_info
+				UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
 				WHERE pol_id=OLD.pol_id;
@@ -518,11 +726,11 @@ BEGIN
 			builtdate=NEW.outfall_builtdate,ownercat_id=NEW.outfall_ownercat_id, adress_01=NEW.outfall_adress_01,adress_02=NEW.outfall_adress_02, adress_03=NEW.outfall_adress_03, 
 			descript=NEW.outfall_descript,est_top_elev=NEW.outfall_est_top_elev, est_ymax=NEW.outfall_est_ymax, rotation=NEW.outfall_rotation, link=NEW.outfall_link, verified=NEW.verified, 
 			workcat_id_end=NEW.outfall_workcat_id_end, undelete=NEW.undelete, label_x=NEW.outfall_label_x, label_y=NEW.outfall_label_y, label_rotation=NEW.outfall_label_rotation, the_geom=NEW.the_geom,
-			code=NEW.outfall_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.outfall_end_date, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.outfall_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.outfall_end_date, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 			
-			UPDATE man_outfall SET node_id=NEW.node_id, add_info=NEW.outfall_add_info, outfall_name=NEW.outfall_name
+			UPDATE man_outfall SET node_id=NEW.node_id,outfall_name=NEW.outfall_name
 			WHERE node_id=OLD.node_id;
 			
 		ELSIF man_table='man_storage' THEN
@@ -534,11 +742,11 @@ BEGIN
 			builtdate=NEW.storage_builtdate,ownercat_id=NEW.storage_ownercat_id, adress_01=NEW.storage_adress_01,adress_02=NEW.storage_adress_02, adress_03=NEW.storage_adress_03, descript=NEW.storage_descript,
 			est_top_elev=NEW.storage_est_top_elev, est_ymax=NEW.storage_est_ymax, rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, workcat_id_end=NEW.storage_workcat_id_end,	
 			undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, label_rotation=NEW.storage_label_rotation, the_geom=NEW.the_geom,
-			code=NEW.storage_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.storage_end_date, uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.storage_code,  publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.storage_end_date, uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.storage_add_info,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
+			UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
 			total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_name
 			WHERE node_id=OLD.node_id;
 
@@ -552,18 +760,18 @@ BEGIN
 			builtdate=NEW.storage_builtdate,ownercat_id=NEW.storage_ownercat_id, adress_01=NEW.storage_adress_01,adress_02=NEW.storage_adress_02, adress_03=NEW.storage_adress_03, descript=NEW.storage_descript,
 			est_top_elev=NEW.storage_est_top_elev, est_ymax=NEW.storage_est_ymax, rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, workcat_id_end=NEW.storage_workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, label_rotation=NEW.storage_label_rotation,
-			code=NEW.storage_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.storage_end_date, uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.storage_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.storage_end_date, uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
 			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.storage_add_info,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
+				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
 				total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 			ELSE
-				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.storage_add_info,total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
+				UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
 				total_height=NEW.storage_total_height,total_length=NEW.storage_total_length,total_width=NEW.storage_total_width,storage_name=NEW.storage_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
@@ -579,11 +787,11 @@ BEGIN
 			builtdate=NEW.valve_builtdate,ownercat_id=NEW.valve_ownercat_id, adress_01=NEW.valve_adress_01,adress_02=NEW.valve_adress_02, adress_03=NEW.valve_adress_03, descript=NEW.valve_descript,
 			est_top_elev=NEW.valve_est_top_elev, est_ymax=NEW.valve_est_ymax, rotation=NEW.valve_rotation, link=NEW.valve_link, verified=NEW.verified, workcat_id_end=NEW.valve_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.valve_label_x, label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, the_geom=NEW.the_geom,
-			code=NEW.valve_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.valve_end_date, uncertain=NEW.uncertain, xyz_date=NEW.valve_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.valve_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.valve_end_date, uncertain=NEW.uncertain, xyz_date=NEW.valve_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_valve SET node_id=NEW.node_id,add_info=NEW.valve_add_info, valve_name=NEW.valve_name
+			UPDATE man_valve SET node_id=NEW.node_id, valve_name=NEW.valve_name
 			WHERE node_id=OLD.node_id;
 
 		
@@ -596,11 +804,11 @@ BEGIN
 			builtdate=NEW.chamber_builtdate,ownercat_id=NEW.chamber_ownercat_id, adress_01=NEW.chamber_adress_01,adress_02=NEW.chamber_adress_02, adress_03=NEW.chamber_adress_03, descript=NEW.chamber_descript,
 			est_top_elev=NEW.chamber_est_top_elev, est_ymax=NEW.chamber_est_ymax, rotation=NEW.chamber_rotation, link=NEW.chamber_link, verified=NEW.verified, workcat_id_end=NEW.chamber_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.chamber_label_x, label_y=NEW.chamber_label_y, label_rotation=NEW.chamber_label_rotation, the_geom=NEW.the_geom,
-			code=NEW.chamber_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.chamber_end_date, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.chamber_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.chamber_end_date, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 			
-			UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.chamber_add_info,total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,total_length=NEW.chamber_total_length,total_width=NEW.chamber_total_width,chamber_name=NEW.chamber_name, inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, accessibility=NEW.chamber_accessibility,
+			UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id, total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,total_length=NEW.chamber_total_length,total_width=NEW.chamber_total_width,chamber_name=NEW.chamber_name, inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, accessibility=NEW.chamber_accessibility,
 			sandbox=NEW.chamber_sandbox
 			WHERE node_id=OLD.node_id;
 
@@ -614,19 +822,19 @@ BEGIN
 			builtdate=NEW.chamber_builtdate,ownercat_id=NEW.chamber_ownercat_id, adress_01=NEW.chamber_adress_01,adress_02=NEW.chamber_adress_02, adress_03=NEW.chamber_adress_03, descript=NEW.chamber_descript,
 			est_top_elev=NEW.chamber_est_top_elev, est_ymax=NEW.chamber_est_ymax, rotation=NEW.chamber_rotation, link=NEW.chamber_link, verified=NEW.verified, workcat_id_end=NEW.chamber_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.chamber_label_x, label_y=NEW.chamber_label_y, label_rotation=NEW.chamber_label_rotation,
-			code=NEW.chamber_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.chamber_end_date, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.chamber_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.chamber_end_date, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
 			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.chamber_add_info,total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,
+				UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id,total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,
 				total_length=NEW.chamber_total_length,total_width=NEW.chamber_total_width,chamber_name=NEW.chamber_name,  inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, 
 				accessibility=NEW.chamber_accessibility
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 			ELSE
-				UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.chamber_add_info,total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,
+				UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id, total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,
 				total_length=NEW.chamber_total_length,total_width=NEW.chamber_total_width,chamber_name=NEW.chamber_name,  inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, 
 				accessibility=NEW.chamber_accessibility
 				WHERE node_id=OLD.node_id;
@@ -643,11 +851,11 @@ BEGIN
 			builtdate=NEW.manhole_builtdate,ownercat_id=NEW.manhole_ownercat_id, adress_01=NEW.manhole_adress_01,adress_02=NEW.manhole_adress_02, adress_03=NEW.manhole_adress_03, descript=NEW.manhole_descript,
 			est_top_elev=NEW.manhole_est_top_elev, est_ymax=NEW.manhole_est_ymax, rotation=NEW.manhole_rotation, link=NEW.manhole_link, verified=NEW.verified, workcat_id_end=NEW.manhole_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.manhole_label_x, label_y=NEW.manhole_label_y, label_rotation=NEW.manhole_label_rotation, the_geom=NEW.the_geom, 
-			code=NEW.manhole_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.manhole_end_date, uncertain=NEW.uncertain, xyz_date=NEW.manhole_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.manhole_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.manhole_end_date, uncertain=NEW.uncertain, xyz_date=NEW.manhole_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 			
-			UPDATE man_manhole SET node_id=NEW.node_id,add_info=NEW.manhole_add_info, sander_depth=NEW.manhole_sander_depth, prot_surface=NEW.manhole_prot_surface, inlet=NEW.manhole_inlet,
+			UPDATE man_manhole SET node_id=NEW.node_id, sander_depth=NEW.manhole_sander_depth, prot_surface=NEW.manhole_prot_surface, inlet=NEW.manhole_inlet,
 			bottom_channel=NEW.manhole_bottom_channel, accessibility=NEW.manhole_accessibility
 			WHERE node_id=OLD.node_id;
 
@@ -661,11 +869,11 @@ BEGIN
 			builtdate=NEW.netinit_builtdate,ownercat_id=NEW.netinit_ownercat_id, adress_01=NEW.netinit_adress_01,adress_02=NEW.netinit_adress_02, adress_03=NEW.netinit_adress_03, descript=NEW.netinit_descript,
 			est_top_elev=NEW.netinit_est_top_elev, est_ymax=NEW.netinit_est_ymax, rotation=NEW.netinit_rotation, link=NEW.netinit_link, verified=NEW.verified, workcat_id_end=NEW.netinit_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.netinit_label_x, label_y=NEW.netinit_label_y, label_rotation=NEW.netinit_label_rotation, the_geom=NEW.the_geom,
-			code=NEW.netinit_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netinit_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netinit_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.netinit_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netinit_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netinit_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_netinit SET node_id=NEW.node_id,add_info=NEW.netinit_add_info, mheight=NEW.netinit_mheight,mlength=NEW.netinit_mlength,mwidth=NEW.netinit_mwidth, netinit_name=NEW.netinit_name, 
+			UPDATE man_netinit SET node_id=NEW.node_id, mheight=NEW.netinit_mheight,mlength=NEW.netinit_mlength,mwidth=NEW.netinit_mwidth, netinit_name=NEW.netinit_name, 
 			inlet=NEW.netinit_inlet, bottom_channel=NEW.netinit_bottom_channel, accessibility=NEW.netinit_accessibility
 			WHERE node_id=OLD.node_id;
 
@@ -679,11 +887,11 @@ BEGIN
 			adress_01=NEW.wjump_adress_01,adress_02=NEW.wjump_adress_02, adress_03=NEW.wjump_adress_03, descript=NEW.wjump_descript,est_top_elev=NEW.wjump_est_top_elev, est_ymax=NEW.wjump_est_ymax,
 			rotation=NEW.wjump_rotation, link=NEW.wjump_link, verified=NEW.verified, workcat_id_end=NEW.wjump_workcat_id_end, undelete=NEW.undelete, label_x=NEW.wjump_label_x,
 			label_y=NEW.wjump_label_y, label_rotation=NEW.wjump_label_rotation, the_geom=NEW.the_geom,
-			code=NEW.wjump_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wjump_end_date, uncertain=NEW.uncertain, xyz_date=NEW.wjump_xyz_date, 
-			unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			code=NEW.wjump_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wjump_end_date, uncertain=NEW.uncertain, xyz_date=NEW.wjump_xyz_date, 
+			unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_wjump SET node_id=NEW.node_id,add_info=NEW.wjump_add_info, mheight=NEW.wjump_mheight,mlength=NEW.wjump_mlength,mwidth=NEW.wjump_mwidth,sander_length=NEW.wjump_sander_length,
+			UPDATE man_wjump SET node_id=NEW.node_id, mheight=NEW.wjump_mheight,mlength=NEW.wjump_mlength,mwidth=NEW.wjump_mwidth,sander_length=NEW.wjump_sander_length,
 			sander_depth=NEW.wjump_sander_depth,security_bar=NEW.wjump_security_bar, steps=NEW.wjump_steps,prot_surface=NEW.wjump_prot_surface,wjump_name=NEW.wjump_name
 			WHERE node_id=OLD.node_id;
 
@@ -696,11 +904,11 @@ BEGIN
 			fluid_type=NEW.wwtp_fluid_type, location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate,ownercat_id=NEW.wwtp_ownercat_id,
 			adress_01=NEW.wwtp_adress_01,adress_02=NEW.wwtp_adress_02, adress_03=NEW.wwtp_adress_03, descript=NEW.wwtp_descript,est_top_elev=NEW.wwtp_est_top_elev, est_ymax=NEW.wwtp_est_ymax, 
 			rotation=NEW.wwtp_rotation, link=NEW.wwtp_link, verified=NEW.verified, workcat_id_end=NEW.wwtp_workcat_id_end, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,
-			label_rotation=NEW.wwtp_label_rotation, the_geom=NEW.the_geom, code=NEW.wwtp_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wwtp_end_date, 
-			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			label_rotation=NEW.wwtp_label_rotation, the_geom=NEW.the_geom, code=NEW.wwtp_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wwtp_end_date, 
+			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
-			UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.wwtp_add_info,wwtp_name=NEW.wwtp_name
+			UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, wwtp_name=NEW.wwtp_name
 			WHERE node_id=OLD.node_id;
 
 			
@@ -712,18 +920,18 @@ BEGIN
 			fluid_type=NEW.wwtp_fluid_type, location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate,ownercat_id=NEW.wwtp_ownercat_id,
 			adress_01=NEW.wwtp_adress_01,adress_02=NEW.wwtp_adress_02, adress_03=NEW.wwtp_adress_03, descript=NEW.wwtp_descript,est_top_elev=NEW.wwtp_est_top_elev, est_ymax=NEW.wwtp_est_ymax, 
 			rotation=NEW.wwtp_rotation, 	link=NEW.wwtp_link, verified=NEW.verified, workcat_id_end=NEW.wwtp_workcat_id_end, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,
-			label_rotation=NEW.wwtp_label_rotation, code=NEW.wwtp_code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wwtp_end_date, 
-			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, macrodma_id=NEW.macrodma_id
+			label_rotation=NEW.wwtp_label_rotation, code=NEW.wwtp_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wwtp_end_date, 
+			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, macrosector_id=NEW.macrosector_id
 			WHERE node_id = OLD.node_id;
 		
 		
 			IF (NEW.pol_id IS NULL) THEN
-				UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.wwtp_add_info,wwtp_name=NEW.wwtp_name
+				UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, wwtp_name=NEW.wwtp_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom
 				WHERE pol_id=OLD.pol_id;
 			ELSE
-				UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, add_info=NEW.wwtp_add_info,wwtp_name=NEW.wwtp_name
+				UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, wwtp_name=NEW.wwtp_name
 				WHERE node_id=OLD.node_id;
 				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.pol_id
 				WHERE pol_id=OLD.pol_id;
