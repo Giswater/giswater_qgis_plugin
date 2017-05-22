@@ -12,7 +12,7 @@
 """
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit   #@UnresolvedImport
 
 import inspect
 import os
@@ -29,7 +29,7 @@ def fillComboBox(widget, rows, allow_nulls=True):
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
     if allow_nulls:
-        widget.addItem('')     
+        widget.addItem('')
     for row in rows:       
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
@@ -56,7 +56,6 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
             if elem[0] == dict_field:
                 widget.addItem(elem[1])          
 
-
 def getText(widget):
     
     if type(widget) is str:
@@ -65,7 +64,7 @@ def getText(widget):
         if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
             text = widget.text()
         elif type(widget) is QTextEdit:
-            text = widget.toPlainText()         
+            text = widget.toPlainText()
         if text:
             elem_text = text
         else:
@@ -104,7 +103,7 @@ def getWidget(widget):
 def getWidgetType(widget):
     
     if type(widget) is str:
-        widget = _dialog.findChild(QWidget, widget)      
+        widget = _dialog.findChild(QWidget, widget)
     if not widget:
         return None   
     return type(widget)

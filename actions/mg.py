@@ -6,8 +6,8 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit
+from PyQt4.QtCore import Qt, QSettings,QDate
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit
 from PyQt4.QtSql import QSqlTableModel
 
 import os
@@ -606,7 +606,9 @@ class Mg():
         self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
         self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
-        
+
+        self.dlg.findChild(QDateEdit, "builtdate_vdefault").setDate(QDate.currentDate())
+
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
@@ -625,8 +627,21 @@ class Mg():
         # Set values from widgets of type QComboBox
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows) 
-        
+        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows)
+
+
+        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("state_vdefault", rows)
+        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("workcat_vdefault", rows)
+        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("verified_vdefault", rows)
+
+
+
         # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value' 
         self.generic_columns = self.mg_config_get_data('config')    
         self.search_plus_columns = self.mg_config_get_data('config_search_plus')    
@@ -693,17 +708,17 @@ class Mg():
             column_name = self.dao.get_column_name(i)
             widget_type = utils_giswater.getWidgetType(column_name)
             if widget_type is QCheckBox:
-                utils_giswater.setChecked(column_name, row[column_name])                        
+                utils_giswater.setChecked(column_name, row[column_name])
             else:
                 utils_giswater.setWidgetText(column_name, row[column_name])
             columns.append(column_name) 
-            
+
         return columns           
 
     
     def mg_config_accept(self):
         ''' Update current values to the configuration tables '''
-        
+
         self.mg_config_accept_table('config', self.generic_columns)
         self.mg_config_accept_table('config_search_plus', self.search_plus_columns)
         self.mg_config_accept_table('config_extract_raster_value', self.raster_columns)
@@ -736,7 +751,10 @@ class Mg():
                 if column_name != 'id':
                     widget_type = utils_giswater.getWidgetType(column_name)
                     if widget_type is QCheckBox:
-                        value = utils_giswater.isChecked(column_name)                      
+                        value = utils_giswater.isChecked(column_name)
+                    elif widget_type is QDateEdit:
+                        date = self.dlg.findChild(QDateEdit, str(column_name))
+                        value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
                     else:
                         value = utils_giswater.getWidgetText(column_name)
                     if value is None or value == 'null':
@@ -749,7 +767,7 @@ class Mg():
             sql = sql[:-2]
             self.controller.execute_sql(sql)
                         
-       
+
     def multi_selector(self,table):  
         ''' Execute form multi_selector ''' 
         
