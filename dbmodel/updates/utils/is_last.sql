@@ -15,6 +15,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ALTER TABLE config ADD COLUMN state_vdefault character varying(16);
 ALTER TABLE config ADD COLUMN workcat_vdefault character varying(30);
 ALTER TABLE config ADD COLUMN verified_vdefault character varying(20);
+ALTER TABLE config ADD COLUMN builtdate_vdefault date;
 
 ALTER TABLE "config" ADD CONSTRAINT "confige_state_vdefault_fkey" FOREIGN KEY ("state_vdefault") REFERENCES "value_state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "config" ADD CONSTRAINT "config_workcat_vdefault_fkey" FOREIGN KEY ("workcat_vdefault") REFERENCES "cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

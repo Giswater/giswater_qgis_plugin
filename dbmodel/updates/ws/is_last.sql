@@ -106,12 +106,13 @@ CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
 );
 
 
-ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN anl_cause character varying (30);
-ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN anl_the_geom public.geometry(POINT, SRID_VALUE);
-ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN exec_the_geom public.geometry(POINT, SRID_VALUE);
-ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN exec_depth float;
-ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN exec_limit_distance float;
-ALTER TABLE ws_sample.anl_mincut_result_cat ADD COLUMN exec_appropiate boolean;	
+ALTER TABLE anl_mincut_result_cat ADD COLUMN anl_cause character varying (30);
+ALTER TABLE anl_mincut_result_cat ADD COLUMN anl_the_geom public.geometry(POINT, SRID_VALUE);
+ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_the_geom public.geometry(POINT, SRID_VALUE);
+ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_depth float;
+ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_limit_distance float;
+ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_appropiate boolean;	
+ALTER TABLE anl_mincut_result_cat ADD COLUMN received_date date;	
 
 ALTER TABLE arc ADD COLUMN expl_id integer;
 ALTER TABLE node ADD COLUMN expl_id integer;
