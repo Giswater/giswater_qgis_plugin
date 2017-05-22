@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
 
 from functools import partial
 
@@ -132,6 +132,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))   
 
+        
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
@@ -142,26 +143,48 @@ class ManNodeDialog(ParentDialog):
     def actionZoom(self):
        
         print "zoom"
-        #feature = self.feature
+        feature = self.feature
 
         canvas = self.iface.mapCanvas()
         # Get the active layer (must be a vector layer)
         layer = self.iface.activeLayer()
 
-        # Get the first feature from the layer
-        # feature = layer.getFeatures().next()
-        # Add this features to the selected list
         layer.setSelectedFeatures([feature.id()])
 
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
     
-    def actionCentered(self):
-        ''' Centered feature '''
-        print "centered"
-        
     def actionEnabled(self):
-        print "enabled" 
-        
+        #btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
+        self.actionEnable = self.dialog.findChild(QAction, "actionEnable")
+        status = self.layer.startEditing()
+        self.set_icon(self.actionEnable, status)
 
+
+    def set_icon(self, widget, status):
+
+        # initialize plugin directory
+        user_folder = os.path.expanduser("~")
+        self.plugin_name = 'iw2pg'
+        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
+
+        self.layer = self.iface.activeLayer()
+        if status == True:
+
+            self.layer.startEditing()
+
+            widget.setActive(True)
+
+        if status == False:
+            self.layer.rollBack()
+
+    def actionCentered(self):
+        feature = self.feature
+        canvas = self.iface.mapCanvas()
+        # Get the active layer (must be a vector layer)
+        layer = self.iface.activeLayer()
+
+        layer.setSelectedFeatures([feature.id()])
+
+        canvas.zoomToSelected(layer)
 
