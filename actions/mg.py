@@ -1049,9 +1049,20 @@ class Mg():
         for i in range(1, 18):
             self.tbl_mincut_edit.hideColumn(i)
             
-            
+        self.combo_state_edit.activated.connect(partial(self.filter_by_state,self.tbl_mincut_edit))
+        
 
         self.dlg_min_edit.show()
+        
+        
+    def filter_by_state(self,widget):
+    
+        result_select = utils_giswater.getWidgetText("state_edit")
+        expr = " mincut_result_state = '"+result_select+"'"
+        
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select() 
         
         
     def accept_min(self):
