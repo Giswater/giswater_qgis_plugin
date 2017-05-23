@@ -488,6 +488,9 @@
      </property>
     </widget>
     <widget class="QLineEdit" name="distance">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -540,6 +543,9 @@
      </property>
     </widget>
     <widget class="QLineEdit" name="depth">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -589,6 +595,9 @@
      </property>
     </widget>
     <widget class="QTextEdit" name="real_description">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>110</x>

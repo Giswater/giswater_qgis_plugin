@@ -6,9 +6,11 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt, QSettings,QDate
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit
+from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit
 from PyQt4.QtSql import QSqlTableModel
+
+from PyQt4.Qt import  QDate, QTime
 
 import os
 import sys
@@ -1117,11 +1119,94 @@ class Mg():
         #utils_giswater.fillComboBox("cause", rows['anl_cause']) 
         
         self.old_id= self.id.text()
+        
+        
+        self.btn_start = self.dlg_mincut.findChild(QPushButton, "btn_start")  
+        self.btn_start.clicked.connect(self.real_start)
+        
+        self.btn_end = self.dlg_mincut.findChild(QPushButton, "btn_end")  
+        self.btn_end.clicked.connect(self.real_end)
+        
+        self.cbx_date_start = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start")
+        self.cbx_hours_start = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_start")
+        
+        self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
+        self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
+        self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
        
         
         # Open the dialog
         self.dlg_mincut.show() 
         self.dlg_min_edit.close()
+        
+        
+    def real_end(self):
+
+        #self.date_end = QDate.currentDate()
+        #self.cbx_date_end.setDate(self.date_end)
+        
+        #self.time_end = QTime.currentTime()
+        #self.cbx_hours_end.setTime(self.time_end)
+        
+
+        
+        # Create the dialog and signals
+        self.dlg_fin = Mincut_fin()
+        utils_giswater.setDialog(self.dlg_fin)
+        '''
+        self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
+        self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
+        self.cbx_date_start_fin.setDate(self.date_start)
+        self.cbx_hours_start_fin.setTime(self.time_start)
+        
+        self.cbx_date_end_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_end_fin")
+        self.cbx_hours_end_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_end_fin")
+        self.cbx_date_end_fin.setDate(self.date_end)
+        self.cbx_hours_end_fin.setTime(self.time_end)   
+        
+        self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
+        self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
+        
+        self.btn_accept.clicked.connect(self.accept)
+        
+        #self.btn_cancel.clicked.connect(self.close)
+
+        
+        # Set values mincut and address
+        self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
+        self.address_fin = self.dlg_fin.findChild(QLineEdit, "address")
+        id_fin = self.id.text()
+        street_fin = self.street.text()
+        number_fin = str(self.number.text())
+        address_fin = street_fin +" "+ number_fin
+        self.mincut_fin.setText(id_fin)
+        self.address_fin.setText(address_fin)
+        
+        # set status
+        self.state.setText(str(self.state_values[2][0]) )
+        '''
+        # Open the dialog
+        self.dlg_fin.show() 
+        
+        
+        
+    def real_start(self):
+       
+        #date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        #print date
+        
+        #self.date_start = QDate.currentDate()
+        #self.cbx_date_start.setDate(self.date_start)
+        
+        #self.time_start = QTime.currentTime()
+        #self.cbx_hours_start.setTime(self.time_start)
+        
+        self.btn_end.setEnabled(True)  
+
+        self.distance.setEnabled(True) 
+        self.depth.setEnabled(True) 
+        self.real_description.setEnabled(True)     
+        
         
     def accept_update(self):
         

@@ -21,7 +21,7 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt 
-from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox
+from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit
 from PyQt4.Qt import  QDate, QTime
 
 from map_tools.parent import ParentMapTool
@@ -252,7 +252,11 @@ class MincutMapTool(ParentMapTool):
         self.time_start = QTime.currentTime()
         self.cbx_hours_start.setTime(self.time_start)
         
-        self.btn_end.setEnabled(True)   
+        self.btn_end.setEnabled(True)  
+
+        self.distance.setEnabled(True) 
+        self.depth.setEnabled(True) 
+        self.real_description.setEnabled(True) 
         
         # set status
         self.state.setText(str(self.state_values[1][0]) )
@@ -359,7 +363,7 @@ class MincutMapTool(ParentMapTool):
         self.street = self.dlg.findChild(QLineEdit, "street")
         self.number = self.dlg.findChild(QLineEdit, "number")
         self.pred_description = self.dlg.findChild(QLineEdit, "pred_description")
-        self.real_description = self.dlg.findChild(QLineEdit, "real_description")
+        self.real_description = self.dlg.findChild(QTextEdit, "real_description")
         self.distance = self.dlg.findChild(QLineEdit, "distance")
         self.depth = self.dlg.findChild(QLineEdit, "depth")
         
