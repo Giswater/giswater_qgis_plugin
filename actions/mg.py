@@ -1134,8 +1134,42 @@ class Mg():
         number_db = rows['address_num']
         self.number.setText(number_db)
         
+        # Set values from mincut to comboBox
         #utils_giswater.fillComboBox("type", rows['mincut_result_type']) 
-        #utils_giswater.fillComboBox("cause", rows['anl_cause']) 
+        #utils_giswater.fillComboBox("cause", rows['anl_cause'])
+        type = rows['mincut_result_type']
+        cause = rows['anl_cause']
+        # Clear comboBoxes
+        self.type.clear()
+        self.cause.clear()
+        
+        # Fill comboBoxes
+        self.type.addItem(rows['mincut_result_type'])
+        self.cause.addItem(rows['anl_cause'])
+        
+        # Fill ComboBox type
+        sql = "SELECT id"
+        sql+= " FROM "+ self.schema_name + ".anl_mincut_result_cat_type"
+        sql+= " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        #utils_giswater.fillComboBox("type", rows) 
+        for row in rows:         
+            elem = str(row[0]) 
+            if elem != type:
+                self.type.addItem(elem)
+            
+        # Fill ComboBox cause
+        sql = "SELECT id"
+        sql+= " FROM "+ self.schema_name + ".anl_mincut_result_cat_cause"
+        sql+= " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        #utils_giswater.fillComboBox("cause", rows) 
+        for row in rows:         
+            elem = str(row[0]) 
+            if elem != cause:
+                self.cause.addItem(elem)
+        
+        
         
         self.old_id= self.id.text()
         
@@ -1163,6 +1197,9 @@ class Mg():
         self.cbx_hours_end.setEnabled(True) 
         self.cbx_date_start.setEnabled(True)    
         self.cbx_hours_start.setEnabled(True) 
+        
+        # Disable to edit ID
+        self.id.setEnabled(False)  
         
         # Open the dialog
         self.dlg_mincut.show() 
@@ -1266,17 +1303,47 @@ class Mg():
         exec_limit_distance =  self.distance.text()
         exec_depth =  self.depth.text()
         exec_descript =  str(utils_giswater.getWidgetText("real_description"))
+        
+        # Widgets for predict date
         self.cbx_date_start_predict = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start_predict")
         self.cbx_hours_start_predict = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_start_predict")
+        
+        self.cbx_date_end_predict = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end_predict")
+        self.cbx_hours_end_predict = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end_predict")
+        
+        # Widgets for real date
+        self.cbx_date_start = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start_predict")
+        self.cbx_hours_start = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_start_predict")
+        
+        self.cbx_date_end = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end")
+        self.cbx_hours_end = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end")
 
-        dateStart=self.cbx_date_start_predict.date()
-        timeStart=self.cbx_hours_start_predict.time()
-        forecast_start=dateStart.toString('yyyy-MM-dd')+ " "+ timeStart.toString('HH:mm:ss')
+        
+        # Get prediction date - start
+        dateStart_predict=self.cbx_date_start_predict.date()
+        timeStart_predict=self.cbx_hours_start_predict.time()
+        forecast_start_predict=dateStart_predict.toString('yyyy-MM-dd')+ " "+ timeStart_predict.toString('HH:mm:ss')
+        
+        # Get prediction date - end
+        dateEnd_predict=self.cbx_date_end_predict.date()
+        timeEnd_predict=self.cbx_hours_end_predict.time()
+        forecast_end_predict=dateEnd_predict.toString('yyyy-MM-dd')+ " "+ timeEnd_predict.toString('HH:mm:ss')
+        
+        # Get real date - start
+        dateStart_real = self.cbx_date_start.date()
+        timeStart_real = self.cbx_hours_start.time()
+        forecast_start_real = dateStart_real.toString('yyyy-MM-dd')+ " "+ timeStart_real.toString('HH:mm:ss')
+        
+        # Get real date - end
+        dateEnd_real = self.cbx_date_end.date()
+        timeEnd_real=self.cbx_hours_end.time()
+        forecast_end_real=dateEnd_real.toString('yyyy-MM-dd')+ " "+ timeEnd_real.toString('HH:mm:ss')
+        
 
         sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "
         sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+\
-              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', forecast_start='"+forecast_start+"' "
-        sql+= " WHERE id = '"+self.old_id+"'"
+              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', exec_limit_distance ='"+ exec_limit_distance+"', forecast_start='"+forecast_start_predict+"', forecast_end ='"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
+        sql+= " WHERE id = '"+id+"'"
         self.controller.execute_sql(sql)
         
         '''
