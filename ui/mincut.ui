@@ -265,7 +265,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QDateEdit" name="builtdate_3">
+    <widget class="QDateEdit" name="cbx_date_end_predict">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -311,7 +311,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QTimeEdit" name="timeEdit_5">
+    <widget class="QTimeEdit" name="cbx_hour_end_predict">
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -321,7 +321,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QDateEdit" name="builtdate_4">
+    <widget class="QDateEdit" name="cbx_date_start_predict">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -334,7 +334,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QTimeEdit" name="timeEdit_4">
+    <widget class="QTimeEdit" name="cbx_hours_start_predict">
      <property name="geometry">
       <rect>
        <x>290</x>

@@ -1053,6 +1053,7 @@ class Mg():
             
         self.combo_state_edit.activated.connect(partial(self.filter_by_state,self.tbl_mincut_edit))
         
+       
 
         self.dlg_min_edit.show()
         
@@ -1108,12 +1109,27 @@ class Mg():
         self.cause = self.dlg_mincut.findChild(QComboBox ,"cause")
         
         
+        self.cbx_date_end = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end")
+        self.cbx_hours_end = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end")
+        self.cbx_date_start = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end")
+        self.cbx_hours_start = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end")
+        
         self.id.setText(rows['id'])
         self.state.setText(rows['mincut_result_state'])
         utils_giswater.setWidgetText("pred_description",rows['anl_descript'])
         utils_giswater.setWidgetText("real_description",rows['exec_descript']) 
         self.distance.setText(str(rows['exec_limit_distance']))
         self.depth.setText(str(rows['exec_depth']))
+        
+        # from address separate street and number
+        address_db = rows['address']
+        #for ele in address_db:
+        #    if ele.isdigit():
+        #        out_number += ele
+                
+        #self.number.setText(out_number)
+        self.street.setText(address_db)
+          
         
         #utils_giswater.fillComboBox("type", rows['mincut_result_type']) 
         #utils_giswater.fillComboBox("cause", rows['anl_cause']) 
@@ -1134,6 +1150,16 @@ class Mg():
         self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
         self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
        
+        self.btn_end.setEnabled(True)  
+
+        self.distance.setEnabled(True) 
+        self.depth.setEnabled(True) 
+        self.real_description.setEnabled(True)    
+        
+        self.cbx_date_end.setEnabled(True)    
+        self.cbx_hours_end.setEnabled(True) 
+        self.cbx_date_start.setEnabled(True)    
+        self.cbx_hours_start.setEnabled(True) 
         
         # Open the dialog
         self.dlg_mincut.show() 
@@ -1142,35 +1168,34 @@ class Mg():
         
     def real_end(self):
 
-        #self.date_end = QDate.currentDate()
-        #self.cbx_date_end.setDate(self.date_end)
+        self.date_end = QDate.currentDate()
+        self.cbx_date_end.setDate(self.date_end)
         
-        #self.time_end = QTime.currentTime()
-        #self.cbx_hours_end.setTime(self.time_end)
-        
+        self.time_end = QTime.currentTime()
+        self.cbx_hours_end.setTime(self.time_end)
 
         
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
-        '''
+        
         self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
         self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
-        self.cbx_date_start_fin.setDate(self.date_start)
-        self.cbx_hours_start_fin.setTime(self.time_start)
+        #self.cbx_date_start_fin.setDate(self.date_start)
+        #self.cbx_hours_start_fin.setTime(self.time_start)
         
         self.cbx_date_end_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_end_fin")
         self.cbx_hours_end_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_end_fin")
-        self.cbx_date_end_fin.setDate(self.date_end)
-        self.cbx_hours_end_fin.setTime(self.time_end)   
+        #self.cbx_date_end_fin.setDate(self.date_end)
+        #self.cbx_hours_end_fin.setTime(self.time_end)   
         
         self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
         
         self.btn_accept.clicked.connect(self.accept)
         
-        #self.btn_cancel.clicked.connect(self.close)
-
+        #self.btn_cancel.clicked.connect()
+        
         
         # Set values mincut and address
         self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
@@ -1183,29 +1208,38 @@ class Mg():
         self.address_fin.setText(address_fin)
         
         # set status
-        self.state.setText(str(self.state_values[2][0]) )
-        '''
+        #self.state.setText(str(self.state_values[2][0]) )
+        
+        
+        
         # Open the dialog
         self.dlg_fin.show() 
         
+    def accept(self):
         
+        print "test"
+        # reach end_date and end_hour from mincut_fin dialog
+        date = self.cbx_date_end_fin.date()
+        time = self.cbx_hours_end_fin.time()  
+     
+        # set new values of date in mincut dialog
+        self.cbx_date_end.setDate(date)
+        self.cbx_hours_end.setTime(time)
+
+        self.dlg_fin.close()
         
     def real_start(self):
        
         #date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         #print date
         
-        #self.date_start = QDate.currentDate()
-        #self.cbx_date_start.setDate(self.date_start)
+        self.date_start = QDate.currentDate()
+        self.cbx_date_start.setDate(self.date_start)
         
-        #self.time_start = QTime.currentTime()
-        #self.cbx_hours_start.setTime(self.time_start)
+        self.time_start = QTime.currentTime()
+        self.cbx_hours_start.setTime(self.time_start)
         
-        self.btn_end.setEnabled(True)  
-
-        self.distance.setEnabled(True) 
-        self.depth.setEnabled(True) 
-        self.real_description.setEnabled(True)     
+         
         
         
     def accept_update(self):
@@ -1242,11 +1276,9 @@ class Mg():
         '''
         self.dlg_mincut.close() 
         
-        
-    
-        
-        
-        
+    def close(self, dlg):
+        ''' Close doialog '''
+        print "test"
 
 
 
