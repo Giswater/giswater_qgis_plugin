@@ -20,7 +20,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt 
+from PyQt4.QtCore import QPoint, Qt ,QDateTime
 from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit
 from PyQt4.Qt import  QDate, QTime
 
@@ -369,7 +369,7 @@ class MincutMapTool(ParentMapTool):
         self.id = self.dlg.findChild(QLineEdit, "id")
         self.street = self.dlg.findChild(QLineEdit, "street")
         self.number = self.dlg.findChild(QLineEdit, "number")
-        self.pred_description = self.dlg.findChild(QLineEdit, "pred_description")
+        self.pred_description = self.dlg.findChild(QTextEdit, "pred_description")
         self.real_description = self.dlg.findChild(QTextEdit, "real_description")
         self.distance = self.dlg.findChild(QLineEdit, "distance")
         self.depth = self.dlg.findChild(QLineEdit, "depth")
@@ -413,50 +413,68 @@ class MincutMapTool(ParentMapTool):
         
     def accept_save_data(self):
         
+        anl_cause = " "
         mincut_result_state = self.state.text() 
         id = self.id.text()
         #exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
-        address = str(street +" "+ number)
-        mincut_result_type = str(utils_giswater.getWidgetText("type")) 
-        anl_cause = str(utils_giswater.getWidgetText("cause")) 
-        print anl_cause
-        #forecast_start = 
-        #forecast_end = 
-        anl_descript = str(utils_giswater.getWidgetText("pred_description")) 
-        #exec_start = 
-        #exec_end = 
-        
+        #address = str(street +" "+ number)
+        #mincut_result_type = str(utils_giswater.getWidgetText("type")) 
+        #anl_cause = str(utils_giswater.getWidgetText("cause")) 
+        mincut_result_type = self.type.currentText()
+        anl_cause = self.cause.currentText()
+
+        #anl_descript = str(utils_giswater.getWidgetText("pred_description")) 
+        anl_descript = self.pred_description.toPlainText()
+        print anl_descript
+
         exec_limit_distance =  self.distance.text()
         exec_depth =  self.depth.text()
-        exec_descript =  str(utils_giswater.getWidgetText("real_description")) 
         
-        #date_from = self.date_event_from.date().toString('yyyyMMdd') 
-        date = self.cbx_date_start_predict.date()
-        value = date.dateTime().toString('yyyy-MM-dd')
-        #value = self.cbx_date_start_predict.date().toString('yyyyMMdd') 
-        #sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat (mincut_result_state,id,address,mincut_result_type,anl_cause,anl_descript,exec_limit_distance,exec_depth,exec_descript) "
-        #sql+= " VALUES ('"+mincut_result_state+"','"+id+"','"+address+"','"+mincut_result_type+"','"+anl_cause+"','"+anl_descript+"','"+exec_limit_distance+"','"+exec_depth+"','"+exec_descript+"')"
-        sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat (mincut_result_state,id,address,mincut_result_type,anl_cause,forecast_start) "
-        sql+= " VALUES ('"+mincut_result_state+"','"+id+"','"+address+"','"+mincut_result_type+"','"+anl_cause+"','"+value+"')"
-        print sql
+        #exec_descript =  str(utils_giswater.getWidgetText("real_description")) 
+        exec_descript = self.real_description.toPlainText()
+        print exec_descript
+        
+        # Widgets for predict date
+        self.cbx_date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
+        self.cbx_hours_start_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict")
+        
+        self.cbx_date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
+        self.cbx_hours_end_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_end_predict")
+        
+        # Widgets for real date
+        self.cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
+        self.cbx_hours_start = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict")
+        
+        self.cbx_date_end = self.dlg.findChild(QDateEdit, "cbx_date_end")
+        self.cbx_hours_end = self.dlg.findChild(QTimeEdit, "cbx_hours_end")
+        
+        # Get prediction date - start
+        dateStart_predict=self.cbx_date_start_predict.date()
+        timeStart_predict=self.cbx_hours_start_predict.time()
+        forecast_start_predict=dateStart_predict.toString('yyyy-MM-dd')+ " "+ timeStart_predict.toString('HH:mm:ss')
+        
+        # Get prediction date - end
+        dateEnd_predict=self.cbx_date_end_predict.date()
+        timeEnd_predict=self.cbx_hours_end_predict.time()
+        forecast_end_predict=dateEnd_predict.toString('yyyy-MM-dd')+ " "+ timeEnd_predict.toString('HH:mm:ss')
+        
+        # Get real date - start
+        dateStart_real = self.cbx_date_start.date()
+        timeStart_real = self.cbx_hours_start.time()
+        forecast_start_real = dateStart_real.toString('yyyy-MM-dd')+ " "+ timeStart_real.toString('HH:mm:ss')
+        
+        # Get real date - end
+        dateEnd_real = self.cbx_date_end.date()
+        timeEnd_real=self.cbx_hours_end.time()
+        forecast_end_real=dateEnd_real.toString('yyyy-MM-dd')+ " "+ timeEnd_real.toString('HH:mm:ss')
+
+        
+        sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat (mincut_result_state,id,address,address_num,mincut_result_type,anl_cause,forecast_start,forecast_end,anl_descript,exec_start,exec_end,exec_limit_distance,exec_depth,exec_descript) "
+        sql+= " VALUES ('"+mincut_result_state+"','"+id+"','"+street+"','"+number+"','"+mincut_result_type+"','"+anl_cause+"','"+forecast_start_predict+"','"+forecast_end_predict+"','"+anl_descript+"','"+forecast_start_real+"','"+forecast_end_real+"','"+exec_limit_distance+"','"+exec_depth+"','"+exec_descript+"')"
         self.controller.execute_sql(sql)
-        
-        # Get prediction dates 
-        #date = self.cbx_date_start_predict.date()
-        #time = self.cbx_hours_start_predict.time()  
-        
-        #date = self.dlg.findChild(QDateEdit, str(column_name))
-        #value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
-        '''
-        value = date.dateTime().toString('yyyy-MM-dd')
-        sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat (forecast_start) "
-        sql+= " VALUES ('"+value+"')"
-        print sql
-        self.controller.execute_sql(sql)
-        '''
-  
+ 
         self.dlg.close()
         
 
