@@ -11,7 +11,8 @@ from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableVi
 from PyQt4.QtSql import QSqlTableModel
 
 from PyQt4.Qt import  QDate, QTime
-
+from datetime import datetime
+import time
 import os
 import sys
 import webbrowser
@@ -1086,6 +1087,7 @@ class Mg():
         print sql
         rows = self.dao.get_row(sql)
         print rows
+
         
         #self.dlg_min_edit.close()
         
@@ -1127,13 +1129,10 @@ class Mg():
         
         # from address separate street and number
         address_db = rows['address']
-        #for ele in address_db:
-        #    if ele.isdigit():
-        #        out_number += ele
-                
-        #self.number.setText(out_number)
+
         self.street.setText(address_db)
-          
+        number_db = rows['address_num']
+        self.number.setText(number_db)
         
         #utils_giswater.fillComboBox("type", rows['mincut_result_type']) 
         #utils_giswater.fillComboBox("cause", rows['anl_cause']) 
@@ -1266,10 +1265,17 @@ class Mg():
         
         exec_limit_distance =  self.distance.text()
         exec_depth =  self.depth.text()
-        exec_descript =  str(utils_giswater.getWidgetText("real_description")) 
-            
+        exec_descript =  str(utils_giswater.getWidgetText("real_description"))
+        self.cbx_date_start_predict = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start_predict")
+        self.cbx_hours_start_predict = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_start_predict")
+
+        dateStart=self.cbx_date_start_predict.date()
+        timeStart=self.cbx_hours_start_predict.time()
+        forecast_start=dateStart.toString('yyyy-MM-dd')+ " "+ timeStart.toString('HH:mm:ss')
+
         sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "
-        sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+"',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"' "
+        sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+\
+              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', forecast_start='"+forecast_start+"' "
         sql+= " WHERE id = '"+self.old_id+"'"
         self.controller.execute_sql(sql)
         

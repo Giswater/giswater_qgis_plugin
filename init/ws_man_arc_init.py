@@ -94,6 +94,9 @@ class ManArcDialog(ParentDialog):
   
         # Fill tab costs 
         self.fill_costs()
+
+        # Manage tab visibility
+        self.set_tabs_visibility(2)
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
