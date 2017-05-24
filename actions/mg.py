@@ -630,8 +630,6 @@ class Mg():
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows)
-
-
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
@@ -642,9 +640,15 @@ class Mg():
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
 
+        # Set values from widgets of type QDateEdit
+        sql = "SELECT DISTINCT(builtdate_vdefault) FROM" + self.schema_name + ".config"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.setCalendarDate("builtdate_vdefault", rows[0][0])
 
 
-        # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value' 
+
+
+        # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value'
         self.generic_columns = self.mg_config_get_data('config')    
         self.search_plus_columns = self.mg_config_get_data('config_search_plus')    
         self.raster_columns = self.mg_config_get_data('config_extract_raster_value')    
@@ -692,7 +696,7 @@ class Mg():
             webbrowser.open(url)
         else :
             webbrowser.open(url)
-            
+
                  
     def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''

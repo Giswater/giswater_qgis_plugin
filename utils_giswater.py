@@ -13,7 +13,7 @@
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit   #@UnresolvedImport
-
+from PyQt4.Qt import  QDate
 import inspect
 import os
 
@@ -90,8 +90,20 @@ def setText(widget, text):
     elif type(widget) is QDoubleSpinBox: 
         if value == 'None':    
             value = 0        
-        widget.setValue(float(value))          
-          
+        widget.setValue(float(value))
+
+
+def setCalendarDate(widget, date):
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return
+    if type(widget) is QDateEdit:
+        if date == None:
+            date=QDate.currentDate()
+        widget.setDate(date)
+
+
 
 def getWidget(widget):
     
