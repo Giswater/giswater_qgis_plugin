@@ -43,6 +43,8 @@ expl_id integer NOT NULL PRIMARY KEY,
 cur_user text
 );
 
+ALTER TABLE ext_streetaxis ADD COLUMN expl_id integer;
+
 -- ----------------------------
 -- ADDING GEOMETRY TO CATALOG OF WORKS
 -- ----------------------------
