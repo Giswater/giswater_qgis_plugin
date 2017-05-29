@@ -75,6 +75,10 @@ class MoveNodeMapTool(ParentMapTool):
         sql+= " WHERE node_id = '"+node_id+"'"
         status = self.controller.execute_sql(sql) 
         if status:
+            # Show message before executing
+            message = "The procedure will delete features on database. Please ensure that features has no undelete value on true. On the other hand you must know that traceability table will storage precedent information."
+            self.controller.show_info_box(message, "Info")
+            
             # Execute SQL function and show result to the user
             function_name = "gw_fct_node2arc"
             sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(node_id)+"');"

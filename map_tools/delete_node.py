@@ -119,7 +119,11 @@ class DeleteNodeMapTool(ParentMapTool):
                 # Get selected features and layer type: 'node'
                 feature = snappFeat
                 node_id = feature.attribute('node_id')
-
+                
+                # Show message before executing
+                message = "The procedure will delete features on database. Please ensure that features has no undelete value on true. On the other hand you must know that traceability table will storage precedent information."
+                self.controller.show_info_box(message, "Info")
+                  
                 # Execute SQL function and show result to the user
                 function_name = "gw_fct_delete_node"
                 sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"

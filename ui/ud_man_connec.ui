@@ -1833,8 +1833,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>560</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3081,15 +3081,35 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAction"/>
+   <addaction name="actionZoom"/>
+   <addaction name="actionCentered"/>
+   <addaction name="actionEnabled"/>
   </widget>
-  <action name="actionAction">
+  <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>../icons/20.png</normaloff>../icons/20.png</iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
    </property>
    <property name="text">
-    <string>action</string>
+    <string>Zoom</string>
+   </property>
+  </action>
+  <action name="actionCentered">
+   <property name="icon">
+    <iconset>
+     <normaloff>centered.png</normaloff>centered.png</iconset>
+   </property>
+   <property name="text">
+    <string>Centered</string>
+   </property>
+  </action>
+  <action name="actionEnabled">
+   <property name="icon">
+    <iconset>
+     <normaloff>enable_edit.png</normaloff>enable_edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Enabled</string>
    </property>
   </action>
  </widget>

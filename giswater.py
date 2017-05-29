@@ -279,6 +279,11 @@ class Giswater(QObject):
         self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')
         self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')
         
+        self.table_register = self.settings.value('db/table_register', 'v_edit_man_register')
+        self.table_netwjoin = self.settings.value('db/table_netwjoin', 'v_edit_man_netwjoin')
+        self.table_expansiontank = self.settings.value('db/table_expansiontank', 'v_edit_man_expansiontank')
+        self.table_flexunion = self.settings.value('db/table_flexunion', 'v_edit_man_flexunion')
+          
         self.table_filter =  self.settings.value('db/table_filter', 'v_edit_man_filter')
       
         # Tables arc
@@ -545,7 +550,17 @@ class Giswater(QObject):
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_filter' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
-    
+                    
+                if 'v_edit_man_register' == uri_table:
+                    self.layer_node_man_WS.append(cur_layer)
+                if 'v_edit_man_netwjoin' == uri_table:
+                    self.layer_node_man_WS.append(cur_layer)
+                if 'v_edit_man_expansiontank' == uri_table:
+                    self.layer_node_man_WS.append(cur_layer)
+                if 'v_edit_man_flexunion' == uri_table:
+                    self.layer_node_man_WS.append(cur_layer)
+                    
+
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
                 
@@ -573,6 +588,8 @@ class Giswater(QObject):
                     self.layer_arc_man_UD.append(cur_layer)
                     
                 if 'v_edit_man_pipe' == uri_table:
+                    self.layer_arc_man_WS.append(cur_layer)
+                if 'v_edit_man_varc' == uri_table:
                     self.layer_arc_man_WS.append(cur_layer)
 
                 if self.table_gully == uri_table:
@@ -841,8 +858,19 @@ class Giswater(QObject):
             elif self.table_storage_pol in uri_table:  
                 setting_name = 'buttons_node'  
             elif self.table_outfall in uri_table:  
-                setting_name = 'buttons_node'        
-              
+                setting_name = 'buttons_node' 
+                
+                
+            elif self.table_register in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_netwjoin in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_expansiontank in uri_table:  
+                setting_name = 'buttons_node' 
+            elif self.table_flexunion in uri_table:  
+                setting_name = 'buttons_node' 
+
+ 
             elif self.table_varc in uri_table:  
                 setting_name = 'buttons_arc'  
             elif self.table_siphon in uri_table:  
@@ -852,7 +880,8 @@ class Giswater(QObject):
             elif self.table_waccel in uri_table:  
                 setting_name = 'buttons_arc'     
             elif self.table_pipe in uri_table:  
-                setting_name = 'buttons_arc'       
+                setting_name = 'buttons_arc'    
+   
         
         if setting_name is not None:
             try:
