@@ -143,7 +143,7 @@ ALTER TABLE sector ADD COLUMN macrosector_id character varying(50);
 ALTER TABLE dma ADD COLUMN macrosector_id character varying(50);
 
 ALTER TABLE arc ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE node ADD COLUMN macroserctor_id character varying(50);
+ALTER TABLE node ADD COLUMN macrosector_id character varying(50);
 ALTER TABLE connec ADD COLUMN macrosector_id character varying(50);
 ALTER TABLE gully ADD COLUMN macrosector_id character varying(50);
 
