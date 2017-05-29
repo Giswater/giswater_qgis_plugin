@@ -507,7 +507,9 @@ class MincutMapTool(ParentMapTool):
         self.btn_cancel = self.dlg.findChild(QPushButton, "btn_cancel")
         
         self.btn_accept.clicked.connect(self.accept_save_data)
-        
+        self.btn_cancel.clicked.connect(self.dlg.close)
+
+
         #self.dlg.findChild(QPushButton, "btn_start").clicked.connect(self.real_start)
         self.btn_start = self.dlg.findChild(QPushButton, "btn_start")  
         self.btn_start.clicked.connect(self.real_start)

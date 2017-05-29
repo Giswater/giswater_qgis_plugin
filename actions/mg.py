@@ -57,7 +57,7 @@ class Mg():
                   
     def close_dialog(self, dlg=None): 
         ''' Close dialog '''
-        
+        dlg.close()
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
@@ -81,6 +81,8 @@ class Mg():
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
+
+        print("asdas")
         
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'topology_tools')                
@@ -590,7 +592,7 @@ class Mg():
         self.dlg = Config()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.mg_config_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+        self.dlg.btn_cancel.pressed.connect(self.dlg.close)
         
         self.table_man_selector = "man_selector_state"
         self.table_anl_selector = "anl_selector_state"
@@ -812,7 +814,7 @@ class Mg():
         self.btn_select.pressed.connect(self.selection)
         self.btn_unselect.pressed.connect(self.unselection) 
 
-        self.dlg_multiexp.btn_cancel.pressed.connect(self.close_dialog_multiexp)
+        self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
         self.dlg_multiexp.btn_accept.pressed.connect(self.accept_dialog_multiexp)
 
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
@@ -935,16 +937,16 @@ class Mg():
         '''
         #self.tbl_selected_explot.addItem(layerlist)
 
-
+    '''
     def close_dialog_multiexp(self, dlg=None):
-        ''' Close dialog '''
+
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg_multiexp
         try:
             dlg.close()
         except AttributeError:
             pass
-
+    '''
             
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu''' 
@@ -1032,8 +1034,7 @@ class Mg():
         
     def mg_mincut_edit(self):
         # Button 27. mincut edit
-        print "mincut edit test"
-        
+
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         utils_giswater.setDialog(self.dlg_min_edit)
@@ -1043,7 +1044,9 @@ class Mg():
         
         self.btn_accept_min= self.dlg_min_edit.findChild(QPushButton, "btn_accept")
         self.btn_accept_min.clicked.connect(self.accept_min)
-        
+
+        self.dlg_min_edit.btn_cancel.pressed.connect(partial(self.close, self.dlg_min_edit))
+
         # Fill ComboBox state
         sql = "SELECT id"
         sql+= " FROM "+ self.schema_name + ".anl_mincut_result_cat_state"
@@ -1056,8 +1059,6 @@ class Mg():
             self.tbl_mincut_edit.hideColumn(i)
             
         self.combo_state_edit.activated.connect(partial(self.filter_by_state,self.tbl_mincut_edit))
-        
-       
 
         self.dlg_min_edit.show()
         
@@ -1070,7 +1071,6 @@ class Mg():
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select() 
-        
         
     def accept_min(self):
         
@@ -1097,7 +1097,7 @@ class Mg():
         self.btn_cancel_edit = self.dlg_mincut.findChild(QPushButton, "btn_cancel")
         
         self.btn_accept_edit.clicked.connect(self.accept_update)
-        
+
         self.id = self.dlg_mincut.findChild(QLineEdit, "id")
         self.state = self.dlg_mincut.findChild(QLineEdit, "state")
         self.street = self.dlg_mincut.findChild(QLineEdit, "street")
@@ -1329,7 +1329,8 @@ class Mg():
 
         sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "
         sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+\
-              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', exec_limit_distance ='"+ exec_limit_distance+"', forecast_start='"+forecast_start_predict+"', forecast_end ='"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
+              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', exec_limit_distance ='"+\
+              exec_limit_distance+"', forecast_start='"+forecast_start_predict+"', forecast_end ='"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
         sql+= " WHERE id = '"+id+"'"
         self.controller.execute_sql(sql)
         
@@ -1340,9 +1341,15 @@ class Mg():
         '''
         self.dlg_mincut.close() 
         
-    def close(self, dlg):
-        ''' Close doialog '''
-        print "test"
-
-
+    def close(self, dlg = None):
+        ''' Close dialog '''
+        dlg.close()
+        '''
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            dlg.close()
+        except AttributeError:
+            pass
+        '''
 
