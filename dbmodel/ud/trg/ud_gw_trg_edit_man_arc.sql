@@ -120,7 +120,12 @@
 						NEW.conduit_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
-				
+
+				--Builtdate
+				IF (NEW.conduit_builtdate IS NULL) THEN
+					NEW.conduit_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+		
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
 				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
 				label_rotation, code, expl_id, publish, inventory, end_date, uncertain, macrodma_id) 
@@ -147,6 +152,11 @@
 					IF (NEW.siphon_workcat_id IS NULL) THEN
 						NEW.siphon_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
+				END IF;
+
+				--Builtdate
+				IF (NEW.siphon_builtdate IS NULL) THEN
+					NEW.siphon_builtdate := (SELECT builtdate_vdefault FROM config);
 				END IF;
 				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
@@ -175,6 +185,11 @@
 					IF (NEW.waccel_workcat_id IS NULL) THEN
 						NEW.waccel_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
+				END IF;
+
+				--Builtdate
+				IF (NEW.waccel_builtdate IS NULL) THEN
+					NEW.waccel_builtdate := (SELECT builtdate_vdefault FROM config);
 				END IF;
 				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
@@ -205,6 +220,11 @@
 						NEW.varc_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;		
+		
+				--Builtdate
+				IF (NEW.varc_builtdate IS NULL) THEN
+					NEW.varc_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
 				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,

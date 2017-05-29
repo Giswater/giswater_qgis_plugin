@@ -94,7 +94,11 @@ BEGIN
             END IF;
         END IF;	
 	
-
+		--Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+		
         -- FEATURE INSERT
         IF gully_geometry = 'gully' THEN
         INSERT INTO gully (gully_id, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", rotation,dma_id, 

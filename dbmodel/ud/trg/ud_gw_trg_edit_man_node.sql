@@ -127,7 +127,12 @@ BEGIN
 					NEW.junction_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
-			
+
+			--Builtdate
+			IF (NEW.junction_builtdate IS NULL) THEN
+				NEW.junction_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
+				
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom, 
 			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id)
@@ -155,6 +160,11 @@ BEGIN
 				IF (NEW.outfall_workcat_id IS NULL) THEN
 					NEW.outfall_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.outfall_builtdate IS NULL) THEN
+				NEW.outfall_builtdate := (SELECT builtdate_vdefault FROM config);
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -184,6 +194,11 @@ BEGIN
 					NEW.valve_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
+
+			--Builtdate
+			IF (NEW.valve_builtdate IS NULL) THEN
+				NEW.valve_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
@@ -210,6 +225,11 @@ BEGIN
 				IF (NEW.storage_workcat_id IS NULL) THEN
 					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.storage_builtdate IS NULL) THEN
+				NEW.storage_builtdate := (SELECT builtdate_vdefault FROM config);
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -251,6 +271,11 @@ BEGIN
 					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
+
+			--Builtdate
+			IF (NEW.netgully_builtdate IS NULL) THEN
+				NEW.netgully_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
@@ -290,6 +315,11 @@ BEGIN
 					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
+
+			--Builtdate
+			IF (NEW.storage_builtdate IS NULL) THEN
+				NEW.storage_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
@@ -326,6 +356,11 @@ BEGIN
 				IF (NEW.netgully_workcat_id IS NULL) THEN
 					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.netgully_builtdate IS NULL) THEN
+				NEW.netgully_builtdate := (SELECT builtdate_vdefault FROM config);
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -364,6 +399,11 @@ BEGIN
 				IF (NEW.chamber_workcat_id IS NULL) THEN
 					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.chamber_builtdate IS NULL) THEN
+				NEW.chamber_builtdate := (SELECT builtdate_vdefault FROM config);
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -406,6 +446,11 @@ BEGIN
 					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
+
+			--Builtdate
+			IF (NEW.chamber_builtdate IS NULL) THEN
+				NEW.chamber_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
@@ -443,6 +488,11 @@ BEGIN
 					NEW.manhole_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
+
+			--Builtdate
+			IF (NEW.manhole_builtdate IS NULL) THEN
+				NEW.manhole_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
@@ -471,6 +521,11 @@ BEGIN
 				IF (NEW.netinit_workcat_id IS NULL) THEN
 					NEW.netinit_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.netinit_builtdate IS NULL) THEN
+				NEW.netinit_builtdate := (SELECT builtdate_vdefault FROM config);
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -501,6 +556,11 @@ BEGIN
 					NEW.wjump_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
+
+			--Builtdate
+			IF (NEW.wjump_builtdate IS NULL) THEN
+				NEW.wjump_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom,
@@ -528,6 +588,11 @@ BEGIN
 				IF (NEW.wwtp_workcat_id IS NULL) THEN
 					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.wwtp_builtdate IS NULL) THEN
+				NEW.wwtp_builtdate := (SELECT builtdate_vdefault FROM config);
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -567,6 +632,11 @@ BEGIN
 				END IF;
 			END IF;
 
+				--Builtdate
+			IF (NEW.wwtp_builtdate IS NULL) THEN
+				NEW.wwtp_builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
+			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
 			builtdate,ownercat_id,	adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,
 			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected, macrosector_id) 

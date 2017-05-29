@@ -113,6 +113,7 @@ ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_depth float;
 ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_limit_distance float;
 ALTER TABLE anl_mincut_result_cat ADD COLUMN exec_appropiate boolean;	
 ALTER TABLE anl_mincut_result_cat ADD COLUMN received_date date;	
+ALTER TABLE anl_mincut_result_cat ADD COLUMN address_num character varying (30);
 
 ALTER TABLE arc ADD COLUMN expl_id integer;
 ALTER TABLE node ADD COLUMN expl_id integer;

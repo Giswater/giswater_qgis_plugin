@@ -112,7 +112,12 @@ BEGIN
 						NEW.pipe_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
-		
+
+				-- Builtdate
+				IF (NEW.pipe_builtdate IS NULL) THEN
+					NEW.pipe_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+	
 				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 					publish, inventory, end_date, macrodma_id,expl_id)
@@ -139,7 +144,12 @@ BEGIN
 						NEW.varc_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
 				END IF;
-		
+				
+				-- Builtdate
+				IF (NEW.pipe_builtdate IS NULL) THEN
+					NEW.pipe_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+				
 				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 					publish, inventory, end_date, macrodma_id,expl_id)

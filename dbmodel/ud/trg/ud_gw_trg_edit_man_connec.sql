@@ -89,7 +89,11 @@ BEGIN
             END IF;
         END IF;
 		
-		
+		--Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
         -- FEATURE INSERT
         INSERT INTO connec (connec_id, top_elev, "ymax",connecat_id, sector_id,code, n_hydrometer, demand, "state", annotation, "observ", "comment", rotation, dma_id, soilcat_id, category_type, fluid_type, location_type,
 								workcat_id, buildercat_id, builtdate, ownercat_id, adress_01,adress_02,adress_03, streetaxis_id, postnumber, descript, link, verified, the_geom, workcat_id_end, y1, y2, undelete, featurecat_id,

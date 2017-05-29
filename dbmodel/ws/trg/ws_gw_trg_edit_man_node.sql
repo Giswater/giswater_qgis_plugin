@@ -128,7 +128,12 @@ BEGIN
 				NEW.tank_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-	
+
+		--Builtdate
+		IF (NEW.tank_builtdate IS NULL) THEN				
+			NEW.tank_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01,adress_02, adress_03, descript, rotation, link, verified,workcat_id_end,undelete,label_x,label_y,label_rotation, code, expl_id, publish, inventory, end_date, macrodma_id,the_geom) 
 		VALUES (NEW.node_id, NEW.tank_elevation, NEW.tank_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.tank_state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, 
@@ -152,7 +157,12 @@ BEGIN
 				NEW.tank_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+
+		--Builtdate
+		IF (NEW.tank_builtdate IS NULL) THEN				
+			NEW.tank_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01,adress_02, adress_03, descript, rotation, link, verified, workcat_id_end,undelete,label_x,label_y,label_rotation, code, expl_id, publish, inventory, end_date, macrodma_id) 
 		VALUES (NEW.node_id, NEW.tank_elevation, NEW.tank_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.tank_state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, 
@@ -176,7 +186,12 @@ BEGIN
 				NEW.hydrant_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+			
+		--Builtdate
+		IF (NEW.hydrant_builtdate IS NULL) THEN
+			NEW.hydrant_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, macrodma_id) 
 		VALUES (NEW.node_id, NEW.hydrant_elevation, NEW.hydrant_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.hydrant_state, NEW.hydrant_annotation, NEW.hydrant_observ, NEW.hydrant_comment, 
@@ -200,7 +215,12 @@ BEGIN
 				NEW.junction_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+	
+			--Builtdate
+		IF (NEW.junction_builtdate IS NULL) THEN
+			NEW.junction_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, macrodma_id)
 		VALUES (NEW.node_id, NEW.junction_elevation, NEW.junction_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.junction_state, NEW.junction_annotation, NEW.junction_observ, 
@@ -225,7 +245,12 @@ BEGIN
 				NEW.pump_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+	
+		--Builtdate
+		IF (NEW.pump_builtdate IS NULL) THEN
+			NEW.pump_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, macrodma_id) 
 		VALUES (NEW.node_id, NEW.pump_elevation, NEW.pump_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.pump_state, NEW.pump_annotation, NEW.pump_observ, NEW.pump_comment, NEW.dma_id, NEW.pump_soilcat_id, NEW.pump_category_type, NEW.pump_fluid_type, NEW.pump_location_type, NEW.pump_workcat_id, NEW.pump_buildercat_id, NEW.pump_builtdate,NEW.pump_ownercat_id, NEW.pump_adress_01,NEW.pump_adress_02, NEW.pump_adress_03, NEW.pump_descript, NEW.pump_rotation, NEW.pump_link, NEW.verified, NEW.the_geom,NEW.pump_workcat_id_end, NEW.undelete,NEW.pump_label_x,NEW.pump_label_y,NEW.pump_label_rotation, NEW.pump_code, expl_id_int, NEW.publish, NEW.inventory, NEW.pump_end_date, NEW.macrodma_id);
@@ -246,7 +271,12 @@ BEGIN
 				NEW.reduction_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+	
+		--Builtdate
+		IF (NEW.reduction_builtdate IS NULL) THEN
+			NEW.reduction_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id,
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, macrodma_id) 
 		VALUES (NEW.node_id, NEW.reduction_elevation, NEW.reduction_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.reduction_state, NEW.reduction_annotation, NEW.reduction_observ, 
@@ -271,7 +301,12 @@ BEGIN
 				NEW.valve_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+	
+		--Builtdate
+		IF (NEW.valve_builtdate IS NULL) THEN
+			NEW.valve_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, macrodma_id)
 		VALUES (NEW.node_id, NEW.valve_elevation, NEW.valve_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.valve_state, NEW.valve_annotation, NEW.valve_observ, NEW.valve_comment, 
@@ -295,7 +330,12 @@ BEGIN
 				NEW.manhole_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+
+			--Builtdate
+		IF (NEW.manhole_builtdate IS NULL) THEN
+			NEW.manhole_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, macrodma_id)
 		VALUES (NEW.node_id, 
@@ -320,6 +360,11 @@ BEGIN
 				NEW.meter_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
+
+			--Builtdate
+		IF (NEW.meter_builtdate IS NULL) THEN
+				NEW.meter_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;		
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  
@@ -345,7 +390,12 @@ BEGIN
 				NEW.source_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+
+		--Builtdate
+		IF (NEW.source_builtdate IS NULL) THEN
+			NEW.source_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory,
 		end_date, macrodma_id) VALUES (NEW.node_id, 
@@ -369,6 +419,11 @@ BEGIN
 			IF (NEW.waterwell_workcat_id IS NULL) THEN
 				NEW.waterwell_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
+		END IF;
+		
+		--Builtdate
+		IF (NEW.waterwell_builtdate IS NULL) THEN
+			NEW.waterwell_builtdate := (SELECT builtdate_vdefault FROM config);
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -396,6 +451,11 @@ BEGIN
 				NEW.filter_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
+
+		--Builtdate
+		IF (NEW.filter_builtdate IS NULL) THEN
+			NEW.filter_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
@@ -421,7 +481,12 @@ BEGIN
 				NEW.register_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
-		
+
+		--Builtdate
+		IF (NEW.register_builtdate IS NULL) THEN
+			NEW.register_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
+				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		code, expl_id, publish, inventory, end_date, macrodma_id) 
@@ -446,6 +511,11 @@ BEGIN
 			IF (NEW.register_workcat_id IS NULL) THEN
 				NEW.register_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
+		END IF;
+
+		--Builtdate
+		IF (NEW.register_builtdate IS NULL) THEN
+			NEW.register_builtdate := (SELECT builtdate_vdefault FROM config);
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -473,6 +543,11 @@ BEGIN
 				NEW.netwjoin_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
+
+		--Builtdate
+		IF (NEW.netwjoin_builtdate IS NULL) THEN
+			NEW.netwjoin_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
@@ -499,6 +574,11 @@ BEGIN
 				NEW.expansiontank_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
+
+		--Builtdate
+		IF (NEW.expansiontank_builtdate IS NULL) THEN
+			NEW.expansiontank_builtdate := (SELECT builtdate_vdefault FROM config);
+		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
@@ -524,6 +604,11 @@ BEGIN
 			IF (NEW.flexunion_workcat_id IS NULL) THEN
 				NEW.flexunion_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
+		END IF;
+
+		--Builtdate
+		IF (NEW.flexunion_builtdate IS NULL) THEN
+			NEW.flexunion_builtdate := (SELECT builtdate_vdefault FROM config);
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 

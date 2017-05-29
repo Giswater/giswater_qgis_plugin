@@ -103,7 +103,12 @@ BEGIN
 					NEW.greentap_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
-		
+			
+			--Builtdate
+				IF (NEW.greentap_builtdate IS NULL) THEN
+					NEW.greentap_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+
 		  INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
 		  workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete, workcat_id_end,label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, end_date, macrodma_id) 
@@ -131,7 +136,12 @@ BEGIN
 					NEW.fountain_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
-		
+			
+			--Builtdate
+				IF (NEW.fountain_builtdate IS NULL) THEN
+					NEW.fountain_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+				
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
 		  workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete,workcat_id_end,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory, end_date, macrodma_id) 
@@ -161,7 +171,12 @@ BEGIN
 					NEW.tap_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
-			
+
+			--Builtdate
+				IF (NEW.tap_builtdate IS NULL) THEN
+					NEW.tap_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, 
 		  location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber,descript,link,verified, the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory, end_date, macrodma_id) 
@@ -190,7 +205,12 @@ BEGIN
 					NEW.wjoin_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
 			END IF;
-			
+
+			--Builtdate
+				IF (NEW.wjoin_builtdate IS NULL) THEN
+					NEW.wjoin_builtdate := (SELECT builtdate_vdefault FROM config);
+				END IF;
+				
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation, dma_id, soilcat_id, category_type, fluid_type, 
 		  location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom,undelete, workcat_id_end,label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, end_date, macrodma_id) 
