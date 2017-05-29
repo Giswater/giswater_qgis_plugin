@@ -868,7 +868,7 @@ class Mg():
         
         cur_user = self.controller.get_project_user()
         table_name_unselect = "expl_selector"
-        
+
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
             sql = "SELECT DISTINCT(expl_id) FROM "+self.schema_name+".expl_selector WHERE expl_id = '"+expl_id[i]+"'" 
@@ -925,8 +925,7 @@ class Mg():
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         self.iface.mapCanvas().refresh()
         
-     
-        
+    
     def accept_dialog_multiexp(self):
         print "test button accept"
         '''
@@ -1088,9 +1087,7 @@ class Mg():
         rows = self.dao.get_row(sql)
         print rows
 
-        
         #self.dlg_min_edit.close()
-        
         
         # Create the dialog and signals
         self.dlg_mincut = Mincut()
@@ -1169,10 +1166,8 @@ class Mg():
             if elem != cause:
                 self.cause.addItem(elem)
         
-        
-        
+
         self.old_id= self.id.text()
-        
         
         self.btn_start = self.dlg_mincut.findChild(QPushButton, "btn_start")  
         self.btn_start.clicked.connect(self.real_start)
@@ -1236,7 +1231,6 @@ class Mg():
         
         #self.btn_cancel.clicked.connect()
         
-        
         # Set values mincut and address
         self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
         self.address_fin = self.dlg_fin.findChild(QLineEdit, "address")
@@ -1249,15 +1243,12 @@ class Mg():
         
         # set status
         #self.state.setText(str(self.state_values[2][0]) )
-        
-        
-        
+
         # Open the dialog
         self.dlg_fin.show() 
         
     def accept(self):
         
-        print "test"
         # reach end_date and end_hour from mincut_fin dialog
         date = self.cbx_date_end_fin.date()
         time = self.cbx_hours_end_fin.time()  
@@ -1270,18 +1261,14 @@ class Mg():
         
     def real_start(self):
        
-        #date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        #print date
-        
+
         self.date_start = QDate.currentDate()
         self.cbx_date_start.setDate(self.date_start)
         
         self.time_start = QTime.currentTime()
         self.cbx_hours_start.setTime(self.time_start)
         
-         
-        
-        
+
     def accept_update(self):
         
         

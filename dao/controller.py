@@ -369,8 +369,16 @@ class DaoController():
     def get_project_user(self):
         ''' Set user '''
         user = None
-        layer = self.iface.activeLayer()  
-        uri = layer.dataProvider().dataSourceUri().lower()
+        #self.canvas = self.iface.mapCanvas() 
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        
+        # Control current layer (due to QGIS bug in snapping system)
+        #if self.canvas.currentLayer() == None:
+        #    self.iface.setActiveLayer(layers[0])
+        #layer = self.iface.activeLayer()  
+        #uri = layer.dataProvider().dataSourceUri().lower()
+        uri = layers[0].dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('user=')
         pos_end_schema = uri.rfind('password=')
         if pos_ini <> -1:
@@ -379,5 +387,6 @@ class DaoController():
 
         return self.user
 
-
+    
+    
     

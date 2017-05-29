@@ -152,8 +152,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2028,8 +2028,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3529,8 +3529,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5237,8 +5237,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6738,8 +6738,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8559,8 +8559,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10128,8 +10128,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12036,8 +12036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>339</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13537,8 +13537,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18494,8 +18494,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionZoom"/>
-   <addaction name="actionActionCentered"/>
-   <addaction name="actionActionEnabled"/>
+   <addaction name="actionCentered"/>
+   <addaction name="actionEnabled"/>
   </widget>
   <action name="actionZoom">
    <property name="icon">
@@ -18506,7 +18506,7 @@
     <string>action</string>
    </property>
   </action>
-  <action name="actionActionCentered">
+  <action name="actionCentered">
    <property name="icon">
     <iconset>
      <normaloff>centered.png</normaloff>centered.png</iconset>
@@ -18515,7 +18515,7 @@
     <string>actionCentered</string>
    </property>
   </action>
-  <action name="actionActionEnabled">
+  <action name="actionEnabled">
    <property name="icon">
     <iconset>
      <normaloff>enable_edit.png</normaloff>enable_edit.png</iconset>
