@@ -21,18 +21,21 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt ,QDateTime
-from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit
+from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit, QMenu,  QTableView
 from PyQt4.Qt import  QDate, QTime
 
 from map_tools.parent import ParentMapTool
 
 from ..ui.mincut import Mincut
 from ..ui.mincut_fin import Mincut_fin
+from ..ui.mincut_config import Mincut_config
+from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 
 from datetime import *
-
+from functools import partial
 
 import utils_giswater
+from PyQt4.QtSql import QSqlTableModel
 
 
 class MincutMapTool(ParentMapTool):
@@ -239,7 +242,166 @@ class MincutMapTool(ParentMapTool):
         print "valve analytics"
         
     def config(self):
-        print "mconfig"
+        # Create the dialog and signals config format
+        self.dlg_config = Mincut_config()
+        utils_giswater.setDialog(self.dlg_config)
+        
+        # Dialog multi_selector
+        self.dlg_multi = Multi_selector()
+        utils_giswater.setDialog(self.dlg_multi)
+        
+        
+        self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
+        self.btn_insert =  self.dlg_multi.findChild(QPushButton, "btn_insert")
+        self.btn_delete =  self.dlg_multi.findChild(QPushButton, "btn_delete")
+        
+
+        # Dialog config
+        self.btn_analysis_selector = self.dlg_config.findChild(QPushButton, "btn_analysis_selector")  
+        self.btn_analysis_selector.clicked.connect(self.analysis_selector)
+        
+        self.btn_valve_selector= self.dlg_config.findChild(QPushButton, "btn_valve_selector")  
+        self.btn_valve_selector.clicked.connect(self.valve_selector)
+        
+        self.dlg_config.open()
+        #self.dlg_config.show()
+           
+        
+    def analysis_selector(self):
+        
+        table= "anl_selector_state"
+        self.fill_table(self.tbl, self.schema_name+"."+table)
+        self.menu_analysis=QMenu()
+        #self.menu_analysis.clear()
+        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu,table)) 
+        #self.menu=QMenu()
+        #self.menu.clear()
+        self.dlg_multi.btn_insert.setMenu(self.menu_analysis)
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
+        # Open form
+        
+        self.dlg_config.close()
+        self.dlg_multi.open()
+        
+        
+    def valve_selector(self):
+    
+        table= "man_selector_valve"
+        self.fill_table(self.tbl, self.schema_name+"."+table)
+        self.menu_valve=QMenu()
+        #self.menu_valve.clear()
+        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu,table)) 
+        #self.menu=QMenu()
+        #self.menu_valve.clear()
+        self.dlg_multi.btn_insert.setMenu(self.menu_valve)
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
+        # Open form
+        self.dlg_config.close()
+        self.dlg_multi.open()
+        
+        
+    def delete_records(self, widget, table_name):
+        ''' Delete selected elements of the table '''
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+        
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("id")
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            sql = "DELETE FROM "+self.schema_name+"."+table_name 
+            sql+= " WHERE id IN ("+list_id+")"
+            self.controller.execute_sql(sql)
+            widget.model().select()
+            
+        
+    def fill_table(self, widget, table_name): 
+        ''' Set a model with selected filter.
+        Attach that model to selected table '''
+        
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
+        model.select()         
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())      
+
+        # Attach model to table view
+        widget.setModel(model)    
+        
+        
+    
+    def fill_insert_menu(self,table):
+        ''' Insert menu on QPushButton->QMenu''' 
+
+        #self.menu.clear()
+        
+        if table == "anl_selector_state":
+            table = "anl_selector_state"
+            #self.menu_analysis.clear()
+            sql = "SELECT id FROM "+self.schema_name+".value_state"
+            sql+= " ORDER BY id"
+            rows = self.controller.get_rows(sql) 
+
+            # Fill menu
+            for row in rows:   
+                elem = row[0]
+                # If not exist in table _selector_state isert to menu
+                # Check if we already have data with selected id
+                sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
+                rows = self.controller.get_rows(sql)  
+     
+                if not rows:
+                #if rows == None:
+                    self.menu_analysis.addAction(elem,partial(self.insert, elem,table))
+                    #self.menu.addAction(elem,self.test)
+                 
+        if table == "man_selector_valve":
+            table = "man_selector_valve"
+            #self.menu_valve.clear()
+            type = "VALVE"
+            sql = "SELECT id FROM "+self.schema_name+".node_type WHERE type = '"+type+"'"
+            sql+= " ORDER BY id"
+            rows = self.controller.get_rows(sql) 
+
+            # Fill menu
+            for row in rows:   
+                elem = row[0]
+                # If not exist in table _selector_state isert to menu
+                # Check if we already have data with selected id
+                sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
+                rows = self.controller.get_rows(sql)  
+     
+                if not rows:
+                #if rows == None:
+                    self.menu_valve.addAction(elem,partial(self.insert, elem,table))
+                    #self.menu.addAction(elem,self.test)
+
+
+                
+    def insert(self, id_action, table):
+        ''' On action(select value from menu) execute SQL '''
+        # Insert value into database
+        sql = "INSERT INTO "+self.schema_name+"."+table+" (id) "
+        sql+= " VALUES ('"+id_action+"')"
+        self.controller.execute_sql(sql)   
+        self.fill_table(self.tbl, self.schema_name+"."+table)
+           
         
     def real_start(self):
        
