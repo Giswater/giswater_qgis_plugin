@@ -22,10 +22,10 @@ BEGIN
     IF NOT FOUND THEN
     
         -- Update value
-        INSERT INTO anl_flow_trace_node VALUES(node_id_arg, (SELECT the_geom FROM node WHERE node_id = node_id_arg));
+        INSERT INTO anl_flow_trace_node VALUES(node_id_arg, (SELECT the_geom FROM v_anl_node WHERE node_id = node_id_arg));
         
         -- Loop for all the upstream nodes
-        FOR rec_table IN SELECT arc_id, node_1, the_geom FROM arc WHERE node_2 = node_id_arg
+        FOR rec_table IN SELECT arc_id, node_1, the_geom FROM v_anl_arc WHERE node_2 = node_id_arg
         LOOP
 
             -- Insert into tables
