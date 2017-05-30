@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>374</width>
-    <height>321</height>
+    <height>336</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,8 +88,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>280</y>
+     <x>282</x>
+     <y>304</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -101,14 +101,27 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>280</y>
+     <x>202</x>
+     <y>304</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_view_map">
+   <property name="geometry">
+    <rect>
+     <x>26</x>
+     <y>280</y>
+     <width>105</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>View map</string>
    </property>
   </widget>
  </widget>
