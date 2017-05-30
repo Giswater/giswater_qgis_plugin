@@ -138,6 +138,20 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
+        
+        
+    def actionZoomOut(self):
+        feature = self.feature
+
+        canvas = self.iface.mapCanvas()
+        # Get the active layer (must be a vector layer)
+        layer = self.iface.activeLayer()
+
+        layer.setSelectedFeatures([feature.id()])
+
+        canvas.zoomToSelected(layer)
+        canvas.zoomOut()
         
         
         

@@ -8,6 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
 
+from qgis.gui import *
 from functools import partial
 
 import utils_giswater
@@ -137,12 +138,24 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
         
+        
+    def actionZoomOut(self):
+        feature = self.feature
+
+        canvas = self.iface.mapCanvas()
+        # Get the active layer (must be a vector layer)
+        layer = self.iface.activeLayer()
+
+        layer.setSelectedFeatures([feature.id()])
+
+        canvas.zoomToSelected(layer)
+        canvas.zoomOut()
         
         
     def actionZoom(self):
        
-        print "zoom"
         feature = self.feature
 
         canvas = self.iface.mapCanvas()
@@ -153,6 +166,7 @@ class ManNodeDialog(ParentDialog):
 
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
+    
     
     def actionEnabled(self):
         #btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
@@ -178,6 +192,7 @@ class ManNodeDialog(ParentDialog):
         if status == False:
             self.layer.rollBack()
 
+            
     def actionCentered(self):
         feature = self.feature
         canvas = self.iface.mapCanvas()

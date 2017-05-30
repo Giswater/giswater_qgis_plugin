@@ -3112,6 +3112,15 @@
     <string>Enabled</string>
    </property>
   </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset>
+     <normaloff>Zoom-Out-icon.png</normaloff>Zoom-Out-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>zoomOut</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

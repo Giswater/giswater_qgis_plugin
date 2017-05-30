@@ -6116,6 +6116,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionZoom"/>
+   <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
    <addaction name="actionEnabled"/>
   </widget>
@@ -6153,6 +6154,15 @@
    </property>
    <property name="toolTip">
     <string>enabled</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset>
+     <normaloff>Zoom-Out-icon.png</normaloff>Zoom-Out-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>zoomOut</string>
    </property>
   </action>
  </widget>
