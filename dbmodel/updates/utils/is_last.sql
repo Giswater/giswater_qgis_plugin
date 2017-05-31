@@ -235,4 +235,49 @@ CREATE TABLE om_visit_event_photo
       ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
+
+-- ----------------------------
+-- QAD DIMENSION TABLES
+-- ----------------------------
+
+
+CREATE TABLE dim_line
+(
+  line_type character varying(50),
+  color character varying(10),
+  type character varying(2),
+  id_parent bigint,
+  id serial NOT NULL,
+  the_geom geometry(LineString,SRID_VALUE),
+  CONSTRAINT dim_line_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE dim_symbol
+(
+  name character varying(50),
+  scale double precision,
+  rot double precision,
+  color character varying(10),
+  type character varying(2),
+  id_parent bigint,
+  id serial NOT NULL,
+  the_geom geometry(Point,SRID_VALUE),
+  CONSTRAINT dim_symbol_pkey PRIMARY KEY (id)
+  );
+
   
+CREATE TABLE dim_text
+(
+  id serial NOT NULL,
+  text character varying(50) NOT NULL,
+  font character varying(50),
+  h_text double precision,
+  rot double precision,
+  color character varying(10),
+  dim_style character varying(50),
+  dim_type character varying(2),
+  dim_id bigint,
+  the_geom geometry(Point,SRID_VALUE),
+  CONSTRAINT dim_text_pkey PRIMARY KEY (id)
+);
