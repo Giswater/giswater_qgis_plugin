@@ -372,7 +372,7 @@ BEGIN
 		VALUES (NEW.node_id, NEW.meter_elevation, NEW.meter_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.meter_state, NEW.meter_annotation, NEW.meter_observ, NEW.meter_comment, NEW.dma_id, 
 		NEW.meter_soilcat_id, NEW.meter_category_type, NEW.meter_fluid_type, NEW.meter_location_type, NEW.meter_workcat_id, NEW.meter_buildercat_id, NEW.meter_builtdate,NEW.meter_ownercat_id, NEW.meter_adress_01, 
 		NEW.meter_adress_02, NEW.meter_adress_03, NEW.meter_descript, NEW.meter_rotation, NEW.meter_link, NEW.verified, NEW.the_geom,NEW.meter_workcat_id_end, NEW.undelete,NEW.meter_label_x,NEW.meter_label_y,
-		NEW.meter_label_rotation, NEW.meter_code, expl_id_int, NEW.publish, NEW.inventory, NEW.meter_end_date;
+		NEW.meter_label_rotation, NEW.meter_code, expl_id_int, NEW.publish, NEW.inventory, NEW.meter_end_date);
 		
 	ELSIF man_table='man_source' THEN	
 			-- State

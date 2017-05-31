@@ -103,19 +103,12 @@ BEGIN
         IF gully_geometry = 'gully' THEN
         INSERT INTO gully (gully_id, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", rotation,dma_id, 
 					soilcat_id, category_type, fluid_type, location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, link, verified, the_geom, workcat_id_end,
-<<<<<<< Updated upstream
-					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, code, expl_id, publish, inventory, end_date, streetaxis_id, postnumber)
-					VALUES (NEW.gully_id, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
-					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
-                    NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end,NEW.undelete,NEW.featurecat_id,
-					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation, NEW.code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.end_date, NEW.streetaxis_id, NEW.postnumber);
-=======
 					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, code, expl_id, publish, inventory, end_date, streetaxis_id, postnumber,  connec_length, connec_depth)
 					VALUES (NEW.gully_id, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
 					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation,NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                     NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end,NEW.undelete,NEW.featurecat_id,
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation, NEW.code, NEW.expl_id, NEW.publish, NEW.inventory, NEW.end_date, NEW.streetaxis_id, NEW.postnumber, NEW.connec_length, NEW.connec_depth);
->>>>>>> Stashed changes
+
 
         ELSIF gully_geometry = 'pgully' THEN
         INSERT INTO gully (gully_id, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, siphon, arc_id,sector_id, "state", annotation, "observ", "comment", rotation,
@@ -150,11 +143,7 @@ BEGIN
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.workcat_id_end,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation,  code=NEW.code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, 
-<<<<<<< Updated upstream
-			end_date=NEW.end_date, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber
-=======
 			end_date=NEW.end_date, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  connec_length=NEW.connec_length, connec_depth=NEW.connec_depth
->>>>>>> Stashed changes
 			WHERE gully_id = OLD.gully_id;
 
         ELSIF gully_geometry = 'pgully' THEN
@@ -166,12 +155,9 @@ BEGIN
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom,workcat_id_end=NEW.workcat_id_end,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, code=NEW.code, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, 
-<<<<<<< Updated upstream
-			end_date=NEW.end_date, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber
-=======
 			end_date=NEW.end_date, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  connec_length=NEW.connec_length, connec_depth=NEW.connec_depth
 
->>>>>>> Stashed changes
+
 			WHERE gully_id = OLD.gully_id;
         END IF;  
                 

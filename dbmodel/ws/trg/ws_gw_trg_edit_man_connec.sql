@@ -116,7 +116,7 @@ BEGIN
 		  NEW.greentap_observ, NEW.greentap_comment, NEW.greentap_rotation,NEW.dma_id, NEW.greentap_soilcat_id, NEW.greentap_category_type, NEW.greentap_fluid_type, NEW.greentap_location_type, NEW.greentap_workcat_id, 
 		  NEW.greentap_buildercat_id, NEW.greentap_builtdate,NEW.greentap_ownercat_id, NEW.greentap_adress_01, NEW.greentap_adress_02, NEW.greentap_adress_03, NEW.greentap_streetname, NEW.greentap_postnumber, 
 		  NEW.greentap_descript, NEW.greentap_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.greentap_workcat_id_end,NEW.greentap_label_x,NEW.greentap_label_y,NEW.greentap_label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory, NEW.greentap_end_date, );
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.greentap_end_date );
 		  
 		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.greentap_linked_connec);
 		  
