@@ -59,7 +59,7 @@ CREATE OR REPLACE VIEW v_edit_man_tank AS
 	node.publish,
 	node.inventory,
 	node.end_date AS tank_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	man_tank.pol_id AS tank_pol_id,
 	exploitation.descript AS expl_name
 FROM expl_selector, node
@@ -123,7 +123,7 @@ CREATE OR REPLACE VIEW v_edit_man_tank_pol AS
 	node.publish,
 	node.inventory,
 	node.end_date AS tank_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	man_tank.pol_id AS tank_pol_id,
 	polygon.the_geom,
 	exploitation.descript AS expl_name	

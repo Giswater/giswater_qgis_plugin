@@ -35,14 +35,13 @@ CREATE SEQUENCE doc_x_tag_seq
 
 -- ADDING MACROSECTOR
 
-CREATE TABLE macrosector (
-macrosector_id character varying(50) NOT NULL PRIMARY KEY,
+CREATE TABLE macrodma(
+macrodma_id character varying(50) NOT NULL PRIMARY KEY,
 descript character varying(100),
 the_geom geometry(POLYGON,SRID_VALUE),
 undelete boolean,
 expl_id integer
 );
-
 
 -- ADDING RELATION 1-N BETEEWN DOCS AND TAGS
 
@@ -139,13 +138,7 @@ ALTER TABLE cat_work ADD COLUMN workid_key1 character varying(30);
 ALTER TABLE cat_work ADD COLUMN workid_key2 character varying(30);
 ALTER TABLE cat_work ADD COLUMN builtdate date;
 
-ALTER TABLE sector ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE dma ADD COLUMN macrosector_id character varying(50);
-
-ALTER TABLE arc ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE node ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE connec ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE gully ADD COLUMN macrosector_id character varying(50);
+ALTER TABLE dma ADD COLUMN macrodma_id character varying(50);
 
 ALTER TABLE om_visit ADD COLUMN  webclient_id character varying(50);
 
@@ -199,8 +192,5 @@ ALTER TABLE subcatchment  ADD CONSTRAINT subcatchment_expl_id_fkey FOREIGN KEY (
 
 ALTER TABLE gully ADD CONSTRAINT gully_streetaxis_id_fkey FOREIGN KEY (streetaxis_id) REFERENCES ext_streetaxis (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE arc  ADD CONSTRAINT arc_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE node  ADD CONSTRAINT node_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE connec  ADD CONSTRAINT connec_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE gully ADD CONSTRAINT gully_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
   
