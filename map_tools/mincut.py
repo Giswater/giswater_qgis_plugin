@@ -431,7 +431,6 @@ class MincutMapTool(ParentMapTool):
         
         self.time_end = QTime.currentTime()
         self.cbx_hours_end.setTime(self.time_end)
-        
 
         
         # Create the dialog and signals
@@ -459,8 +458,7 @@ class MincutMapTool(ParentMapTool):
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
         
         self.btn_accept.clicked.connect(self.accept)
-        
-        #self.btn_cancel.clicked.connect(self.close)
+        self.btn_cancel.clicked.connect(self.dlg_fin.close)
 
         
         # Set values mincut and address
@@ -474,21 +472,23 @@ class MincutMapTool(ParentMapTool):
         self.address_fin.setText(address_fin)
         
         # set status
-        self.state.setText(str(self.state_values[2][0]) )
+        self.state.setText(str(self.state_values[2][0]))
         
         # Open the dialog
-        self.dlg_fin.show() 
-        
+        self.dlg_fin.show()
+
     def accept(self):
-        
-        print "test"
         # reach end_date and end_hour from mincut_fin dialog
-        date = self.cbx_date_end_fin.date()
-        time = self.cbx_hours_end_fin.time()  
-     
+        datestart = self.cbx_date_start_fin.date()
+        timestart = self.cbx_hours_start_fin.time()
+        dateend = self.cbx_date_end_fin.date()
+        timeend = self.cbx_hours_end_fin.time()
+
         # set new values of date in mincut dialog
-        self.cbx_date_end.setDate(date)
-        self.cbx_hours_end.setTime(time)
+        self.cbx_date_start.setDate(datestart)
+        self.cbx_hours_start.setTime(timestart)
+        self.cbx_date_end.setDate(dateend)
+        self.cbx_hours_end.setTime(timeend)
 
         self.dlg_fin.close()
         
