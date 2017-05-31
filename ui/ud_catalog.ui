@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>123</height>
+    <width>236</width>
+    <height>228</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>90</y>
+     <x>60</x>
+     <y>190</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>90</y>
+     <x>140</x>
+     <y>190</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -39,57 +39,12 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="matcat_id">
-   <property name="geometry">
-    <rect>
-     <x>155</x>
-     <y>15</y>
-     <width>140</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Material</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="shape">
-   <property name="geometry">
-    <rect>
-     <x>5</x>
-     <y>15</y>
-     <width>140</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Shape</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="geom1">
-   <property name="geometry">
-    <rect>
-     <x>305</x>
-     <y>15</y>
-     <width>140</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Geometry</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QComboBox" name="id">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>55</y>
-     <width>301</width>
+     <x>20</x>
+     <y>150</y>
+     <width>196</width>
      <height>22</height>
     </rect>
    </property>
@@ -98,6 +53,64 @@
      <string>Catalog id</string>
     </property>
    </item>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>5</y>
+     <width>196</width>
+     <height>126</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Filter</string>
+   </property>
+   <widget class="QComboBox" name="geom1">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>176</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Geom1</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="matcat_id">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>176</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Material</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="shape">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>55</y>
+      <width>176</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Shape</string>
+     </property>
+    </item>
+   </widget>
   </widget>
  </widget>
  <resources/>
