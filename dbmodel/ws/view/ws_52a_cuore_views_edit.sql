@@ -67,7 +67,7 @@ connec.workcat_id_end,
 connec.publish,
 connec.inventory,
 connec.end_date,
-connec.macrodma_id,
+dma.macrodma_id,
 exploitation.descript AS expl_name	
 FROM expl_selector, connec
 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
@@ -134,7 +134,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
 	connec.publish,
 	connec.inventory,
 	connec.end_date AS wjoin_end_date,
-	connec.macrodma_id,
+	dma.macrodma_id,
 	man_wjoin.cat_valve2 AS wjoin_cat_valve2,
 	exploitation.descript AS expl_name	
  FROM expl_selector, connec
@@ -212,7 +212,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
 	connec.publish,
 	connec.inventory,
 	connec.end_date AS tap_end_date,
-	connec.macrodma_id,
+	dma.macrodma_id,
 	man_tap.cat_valve2 AS tap_cat_valve2,
 	man_tap.linked_connec AS tap_linked_connec,
 	exploitation.descript AS expl_name	
@@ -288,7 +288,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
 	connec.publish,
 	connec.inventory,
 	connec.end_date AS fountain_end_date,
-	connec.macrodma_id,
+	dma.macrodma_id,
 	man_fountain.linked_connec AS fountain_linked_connec,
 	man_fountain.the_geom_pol,
 	exploitation.descript AS expl_name
@@ -355,7 +355,7 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 	connec.publish,
 	connec.inventory,
 	connec.end_date AS greentap_end_date,
-	connec.macrodma_id,
+	dma.macrodma_id,
 	man_greentap.linked_connec AS greentap_linked_connec,
 	exploitation.descript AS expl_name	
  FROM expl_selector, connec

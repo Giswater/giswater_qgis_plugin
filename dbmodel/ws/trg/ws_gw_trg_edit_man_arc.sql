@@ -120,11 +120,11 @@ BEGIN
 	
 				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
-					publish, inventory, end_date, macrodma_id,expl_id)
+					publish, inventory, end_date, expl_id)
 					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.pipe_state, NEW.pipe_annotation, NEW.pipe_observ, NEW.pipe_comment, NEW.pipe_custom_length,NEW.dma_id,NEW.pipe_soilcat_id, 
 					NEW.pipe_category_type, NEW.pipe_fluid_type, NEW.pipe_location_type, NEW.pipe_workcat_id, NEW.pipe_buildercat_id, NEW.pipe_builtdate,NEW.pipe_ownercat_id, NEW.pipe_adress_01, NEW.pipe_adress_02, NEW.pipe_adress_03, 
 					NEW.pipe_descript, NEW.pipe_rotation, NEW.pipe_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.pipe_workcat_id_end, NEW.pipe_label_x,NEW.pipe_label_y,NEW.pipe_label_rotation, 
-					NEW.publish, NEW.inventory, NEW.pipe_end_date, NEW.macrodma_id,expl_id_int);
+					NEW.publish, NEW.inventory, NEW.pipe_end_date, expl_id_int);
 				
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
 		
@@ -152,11 +152,11 @@ BEGIN
 				
 				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
-					publish, inventory, end_date, macrodma_id,expl_id)
+					publish, inventory, end_date, expl_id)
 					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.varc_state, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, NEW.varc_custom_length,NEW.dma_id,NEW.varc_soilcat_id, 
 					NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_buildercat_id, NEW.varc_builtdate,NEW.varc_ownercat_id, NEW.varc_adress_01, NEW.varc_adress_02, NEW.varc_adress_03, 
 					NEW.varc_descript, NEW.varc_rotation, NEW.varc_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.varc_workcat_id_end, NEW.varc_label_x,NEW.varc_label_y,NEW.varc_label_rotation, 
-					NEW.publish, NEW.inventory, NEW.varc_end_date, NEW.macrodma_id,expl_id_int);
+					NEW.publish, NEW.inventory, NEW.varc_end_date, expl_id_int);
 				
 					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 					
@@ -207,7 +207,7 @@ BEGIN
 				location_type=NEW.pipe_location_type, workcat_id=NEW.pipe_workcat_id, buildercat_id=NEW.pipe_buildercat_id, builtdate=NEW.pipe_builtdate,
 				ownercat_id=NEW.pipe_ownercat_id, adress_01=NEW.pipe_adress_01, adress_02=NEW.pipe_adress_02, adress_03=NEW.pipe_adress_03, descript=NEW.pipe_descript,
 				rotation=NEW.pipe_rotation, link=NEW.pipe_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.pipe_workcat_id_end,undelete=NEW.undelete, label_x=NEW.pipe_label_x,
-				label_y=NEW.pipe_label_y,label_rotation=NEW.pipe_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.pipe_end_date, macrodma_id=NEW.macrodma_id
+				label_y=NEW.pipe_label_y,label_rotation=NEW.pipe_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.pipe_end_date
 			WHERE arc_id=OLD.arc_id;
 			
 			UPDATE man_pipe
@@ -221,7 +221,7 @@ BEGIN
 				location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,
 				ownercat_id=NEW.varc_ownercat_id, adress_01=NEW.varc_adress_01, adress_02=NEW.varc_adress_02, adress_03=NEW.varc_adress_03, descript=NEW.varc_descript,
 				rotation=NEW.varc_rotation, link=NEW.varc_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.varc_workcat_id_end,undelete=NEW.undelete, label_x=NEW.varc_label_x,
-				label_y=NEW.varc_label_y,label_rotation=NEW.varc_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.varc_end_date, macrodma_id=NEW.macrodma_id
+				label_y=NEW.varc_label_y,label_rotation=NEW.varc_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.varc_end_date
 			WHERE arc_id=OLD.arc_id;
 			
 			UPDATE man_varc

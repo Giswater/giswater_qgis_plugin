@@ -54,7 +54,7 @@ node.code,
 node.publish,
 node.inventory,
 node.end_date,
-node.macrodma_id,
+dma.macrodma_id,
 exploitation.short_descript AS expl_name
 FROM expl_selector, node
 LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -111,7 +111,7 @@ arc.code,
 arc.publish,
 arc.inventory,
 arc.end_date,
-arc.macrodma_id,
+dma.macrodma_id,
 exploitation.short_descript AS expl_name
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
@@ -150,7 +150,7 @@ arc.node_1 AS pipe_node_1,
 arc.node_2 AS pipe_node_2,
 arc.arccat_id, 
 cat_arc.arctype_id AS "cat_arctype_id",
-cat_arc.matcat_id AS "cat_matcat_id",
+cat_arc.matcat_id AS "pipe_matcat_id",
 cat_arc.pnom AS "pipe_cat_pnom",
 cat_arc.dnom AS "pipe_cat_dnom",
 st_length2d(arc.the_geom)::numeric(12,2) AS pipe_gis_length,
@@ -189,7 +189,7 @@ arc.code AS pipe_code,
 arc.publish,
 arc.inventory,
 arc.end_date AS pipe_end_date,
-arc.macrodma_id,
+dma.macrodma_id,
 exploitation.short_descript AS expl_name
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
@@ -208,7 +208,7 @@ arc.node_1 AS varc_node_1,
 arc.node_2 AS varc_node_2,
 arc.arccat_id, 
 cat_arc.arctype_id AS "cat_arctype_id",
-cat_arc.matcat_id AS "cat_matcat_id",
+cat_arc.matcat_id AS "varc_matcat_id",
 cat_arc.pnom  AS "varc_cat_pnom",
 cat_arc.dnom  AS "varc_cat_dnom",
 st_length2d(arc.the_geom)::numeric(12,2) AS varc_gis_length,
@@ -247,7 +247,7 @@ arc.code AS varc_code,
 arc.publish,
 arc.inventory,
 arc.end_date AS varc_end_date,
-arc.macrodma_id,
+dma.macrodma_id,
 exploitation.short_descript AS expl_name
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
@@ -310,7 +310,7 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
 	node.publish,
 	node.inventory,
 	node.end_date AS hydrant_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -368,7 +368,7 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 	node.publish,
 	node.inventory,
 	node.end_date AS junction_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -424,7 +424,7 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
 	node.publish,
 	node.inventory,
 	node.end_date AS manhole_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -481,7 +481,7 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
 	node.publish,
 	node.inventory,
 	node.end_date AS meter_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -537,7 +537,7 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	node.publish,
 	node.inventory,
 	node.end_date AS pump_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	man_pump.elev_height,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
@@ -597,7 +597,7 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
 	node.publish,
 	node.inventory,
 	node.end_date AS reduction_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -653,7 +653,7 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
 	node.publish,
 	node.inventory,
 	node.end_date AS source_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -730,7 +730,7 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	node.publish,
 	node.inventory,
 	node.end_date AS valve_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	man_valve.cat_valve2 AS valve_cat_valve2,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
@@ -787,7 +787,7 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
 	node.publish,
 	node.inventory,
 	node.end_date AS waterwell_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -844,7 +844,7 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
 	node.publish,
 	node.inventory,
 	node.end_date AS filter_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -899,7 +899,7 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	node.publish,
 	node.inventory,
 	node.end_date AS register_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
 	man_register.pol_id AS register_pol_id
 FROM expl_selector, node
@@ -956,7 +956,7 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
 	node.publish,
 	node.inventory,
 	node.end_date AS register_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
@@ -1012,7 +1012,7 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	node.publish,
 	node.inventory,
 	node.end_date AS netwjoin_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
 	man_netwjoin.parent_node_id
 FROM expl_selector, node
@@ -1068,7 +1068,7 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
 	node.publish,
 	node.inventory,
 	node.end_date AS flexunion_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
 	man_flexunion.parent_node_id
 FROM expl_selector, node
@@ -1124,7 +1124,7 @@ SELECT node.node_id,
 	node.publish,
 	node.inventory,
 	node.end_date AS exptank_end_date,
-	node.macrodma_id,
+	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
 	man_expansiontank .parent_node_id
 FROM expl_selector, node
