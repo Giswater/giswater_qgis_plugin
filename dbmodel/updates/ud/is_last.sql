@@ -35,8 +35,8 @@ CREATE SEQUENCE doc_x_tag_seq
 
 -- ADDING MACROSECTOR
 
-CREATE TABLE macrosector (
-macrosector_id character varying(50) NOT NULL PRIMARY KEY,
+CREATE TABLE macrodma (
+macrodma_id character varying(50) NOT NULL PRIMARY KEY,
 descript character varying(100),
 the_geom geometry(POLYGON,SRID_VALUE),
 undelete boolean,
@@ -58,14 +58,15 @@ CREATE TABLE doc_x_tag(
 
  -- PROFILE TOOLS
 
-
 CREATE TABLE anl_arc_profile_value
 (
   id serial NOT NULL,
-  profile_id bigint NOT NULL,
+  profile_id character varying(30) NOT NULL,
   arc_id bigint NOT NULL,
+  start_point bigint,
+  end_point bigint,
   CONSTRAINT anl_arc_profile_value_pkey PRIMARY KEY (id)
-  );
+);
 
  
   
@@ -139,13 +140,7 @@ ALTER TABLE cat_work ADD COLUMN workid_key1 character varying(30);
 ALTER TABLE cat_work ADD COLUMN workid_key2 character varying(30);
 ALTER TABLE cat_work ADD COLUMN builtdate date;
 
-ALTER TABLE sector ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE dma ADD COLUMN macrosector_id character varying(50);
-
-ALTER TABLE arc ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE node ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE connec ADD COLUMN macrosector_id character varying(50);
-ALTER TABLE gully ADD COLUMN macrosector_id character varying(50);
+ALTER TABLE dma ADD COLUMN macrodma_id character varying(50);
 
 ALTER TABLE om_visit ADD COLUMN  webclient_id character varying(50);
 
