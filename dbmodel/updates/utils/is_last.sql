@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
 -- ----------------------------
 -- VDEFAULT STRATEGY
 -- ----------------------------
@@ -281,3 +280,14 @@ CREATE TABLE dim_text
   the_geom geometry(Point,SRID_VALUE),
   CONSTRAINT dim_text_pkey PRIMARY KEY (id)
 );
+
+
+-- ----------------------------
+-- anl_arc_no_startend_node
+-- ----------------------------
+
+ALTER TABLE anl_arc_no_startend_node ADD COLUMN id serial;
+ALTER TABLE anl_arc_no_startend_node ALTER COLUMN id SET NOT NULL;
+ALTER TABLE anl_arc_no_startend_node DROP CONSTRAINT anl_arc_no_startend_node_pkey;
+ALTER TABLE anl_arc_no_startend_node ADD CONSTRAINT anl_arc_no_startend_node_pkey PRIMARY KEY(id);
+ALTER TABLE anl_arc_no_startend_node ADD COLUMN the_geom_p geometry(Point,SRID_VALUE);
