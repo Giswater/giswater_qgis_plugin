@@ -129,7 +129,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>9</number>
+     <number>10</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -15558,8 +15558,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>581</width>
-         <height>312</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17126,14 +17126,45 @@
      <widget class="QPushButton" name="delete_row_info">
       <property name="geometry">
        <rect>
-        <x>470</x>
-        <y>10</y>
+        <x>472</x>
+        <y>12</y>
         <width>100</width>
         <height>23</height>
        </rect>
       </property>
       <property name="text">
        <string>Unlink element</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_15">
+     <attribute name="title">
+      <string>Flow regulator</string>
+     </attribute>
+     <widget class="QPushButton" name="btn_delete_flow_regulator">
+      <property name="geometry">
+       <rect>
+        <x>445</x>
+        <y>14</y>
+        <width>121</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Delete flow regulator</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="tbl_flow_regulator">
+      <property name="geometry">
+       <rect>
+        <x>18</x>
+        <y>50</y>
+        <width>550</width>
+        <height>385</height>
+       </rect>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
