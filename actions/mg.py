@@ -1097,6 +1097,7 @@ class Mg():
         self.btn_cancel_edit = self.dlg_mincut.findChild(QPushButton, "btn_cancel")
         
         self.btn_accept_edit.clicked.connect(self.accept_update)
+        self.btn_cancel_edit.clicked.connect(self.dlg_mincut.close)
 
         self.id = self.dlg_mincut.findChild(QLineEdit, "id")
         self.state = self.dlg_mincut.findChild(QLineEdit, "state")
@@ -1228,6 +1229,9 @@ class Mg():
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
         
         self.btn_accept.clicked.connect(self.accept)
+        self.btn_cancel.clicked.connect(self.dlg_fin.close)
+
+
         
         #self.btn_cancel.clicked.connect()
         
@@ -1248,14 +1252,17 @@ class Mg():
         self.dlg_fin.show() 
         
     def accept(self):
-        
         # reach end_date and end_hour from mincut_fin dialog
-        date = self.cbx_date_end_fin.date()
-        time = self.cbx_hours_end_fin.time()  
+        datestart=self.cbx_date_start_fin.date()
+        timestart=self.cbx_hours_start_fin.time()
+        dateend = self.cbx_date_end_fin.date()
+        timeend = self.cbx_hours_end_fin.time()
      
         # set new values of date in mincut dialog
-        self.cbx_date_end.setDate(date)
-        self.cbx_hours_end.setTime(time)
+        self.cbx_date_start.setDate(datestart)
+        self.cbx_hours_start.setTime(timestart)
+        self.cbx_date_end.setDate(dateend)
+        self.cbx_hours_end.setTime(timeend)
 
         self.dlg_fin.close()
         
@@ -1270,8 +1277,6 @@ class Mg():
         
 
     def accept_update(self):
-        
-        
         mincut_result_state = self.state.text() 
         id = self.id.text()
         #exploitation =
@@ -1288,8 +1293,8 @@ class Mg():
         #exec_end = 
         
         exec_limit_distance =  self.distance.text()
-        exec_depth =  self.depth.text()
-        exec_descript =  str(utils_giswater.getWidgetText("real_description"))
+        exec_depth = self.depth.text()
+        exec_descript = str(utils_giswater.getWidgetText("real_description"))
         
         # Widgets for predict date
         self.cbx_date_start_predict = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start_predict")
@@ -1309,22 +1314,22 @@ class Mg():
         # Get prediction date - start
         dateStart_predict=self.cbx_date_start_predict.date()
         timeStart_predict=self.cbx_hours_start_predict.time()
-        forecast_start_predict=dateStart_predict.toString('yyyy-MM-dd')+ " "+ timeStart_predict.toString('HH:mm:ss')
+        forecast_start_predict=dateStart_predict.toString('yyyy-MM-dd') + " " + timeStart_predict.toString('HH:mm:ss')
         
         # Get prediction date - end
         dateEnd_predict=self.cbx_date_end_predict.date()
         timeEnd_predict=self.cbx_hours_end_predict.time()
-        forecast_end_predict=dateEnd_predict.toString('yyyy-MM-dd')+ " "+ timeEnd_predict.toString('HH:mm:ss')
+        forecast_end_predict=dateEnd_predict.toString('yyyy-MM-dd') + " " + timeEnd_predict.toString('HH:mm:ss')
         
         # Get real date - start
         dateStart_real = self.cbx_date_start.date()
         timeStart_real = self.cbx_hours_start.time()
-        forecast_start_real = dateStart_real.toString('yyyy-MM-dd')+ " "+ timeStart_real.toString('HH:mm:ss')
+        forecast_start_real = dateStart_real.toString('yyyy-MM-dd') + " " + timeStart_real.toString('HH:mm:ss')
         
         # Get real date - end
         dateEnd_real = self.cbx_date_end.date()
         timeEnd_real=self.cbx_hours_end.time()
-        forecast_end_real=dateEnd_real.toString('yyyy-MM-dd')+ " "+ timeEnd_real.toString('HH:mm:ss')
+        forecast_end_real=dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
         
 
         sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "

@@ -86,7 +86,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Macrosector:</string>
+     <string>Macrodma:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

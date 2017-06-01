@@ -17,7 +17,7 @@
    <widget class="QLabel" name="label_node_type">
     <property name="geometry">
      <rect>
-      <x>117</x>
+      <x>120</x>
       <y>5</y>
       <width>90</width>
       <height>22</height>
@@ -93,9 +93,9 @@
    <widget class="QComboBox" name="nodecat_id">
     <property name="geometry">
      <rect>
-      <x>255</x>
+      <x>260</x>
       <y>25</y>
-      <width>179</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -18067,7 +18067,7 @@
    <widget class="QLabel" name="label_epa_type">
     <property name="geometry">
      <rect>
-      <x>447</x>
+      <x>460</x>
       <y>5</y>
       <width>90</width>
       <height>22</height>
@@ -18105,7 +18105,7 @@
    <widget class="QComboBox" name="epa_type">
     <property name="geometry">
      <rect>
-      <x>450</x>
+      <x>460</x>
       <y>25</y>
       <width>137</width>
       <height>20</height>
@@ -18141,7 +18141,7 @@
    <widget class="QLabel" name="label_nodecat_id">
     <property name="geometry">
      <rect>
-      <x>255</x>
+      <x>260</x>
       <y>5</y>
       <width>90</width>
       <height>22</height>
@@ -18272,7 +18272,7 @@
    <widget class="QComboBox" name="node_type">
     <property name="geometry">
      <rect>
-      <x>119</x>
+      <x>122</x>
       <y>25</y>
       <width>125</width>
       <height>20</height>
@@ -18298,7 +18298,7 @@
    <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
-      <x>11</x>
+      <x>15</x>
       <y>585</y>
       <width>90</width>
       <height>22</height>
@@ -18318,7 +18318,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Macrosector:</string>
+     <string>Macrodma:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -18504,6 +18504,19 @@
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_9">
+    <property name="geometry">
+     <rect>
+      <x>425</x>
+      <y>25</y>
+      <width>26</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
     </property>
    </widget>
   </widget>
