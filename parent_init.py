@@ -207,7 +207,7 @@ class ParentDialog(object):
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", list_doc_id)
         if answer:
             sql = "DELETE FROM "+self.schema_name+"."+table_name 
-            sql+= " WHERE id IN ("+list_id+")"
+            sql+= " WHERE id::integer IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()
  
