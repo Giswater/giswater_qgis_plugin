@@ -23,13 +23,40 @@ ALTER TABLE node ADD COLUMN elev numeric(12,3);
 ALTER TABLE node ADD COLUMN est_elev numeric(12,3);
 
 
--- REHABILITACIÓ
+-- REPLACEMENT VALUE
 ALTER TABLE gully ADD COLUMN connec_length numeric(12,3);
 ALTER TABLE gully ADD COLUMN connec_depth numeric(12,3);
 
 
--- INP FLOW REGULATOR
+-- REHAB COST
+ALTER TABLE om_visit_parameter_type ADD COLUMN context varchar (30);
+ALTER TABLE om_visit_parameter_type ADD COLUMN une_code varchar (30);
+ALTER TABLE om_visit_parameter_type ADD COLUMN criticity int2;
 
+ CREATE TABLE "om_visit_value_context"(
+id character varying(16),
+obs text,
+CONSTRAINT om_visit_value_context_pkey PRIMARY KEY (id)
+);
+
+ CREATE TABLE "om_visit_value_criticity"(
+id int2,
+obs text,
+CONSTRAINT om_visit_value_criticity_pkey PRIMARY KEY (id)
+);
+
+
+
+
+ALTER TABLE om_visit_event ADD COLUMN geom1 float;
+ALTER TABLE om_visit_event ADD COLUMN geom2 float;
+ALTER TABLE om_visit_event ADD COLUMN geom3 float;
+ALTER TABLE om_visit_event ADD COLUMN geom3 float;
+ALTER TABLE om_visit_event ADD COLUMN value2 text;
+ALTER TABLE om_visit_event ADD COLUMN position_value text;
+
+
+-- INP FLOW REGULATOR
 CREATE TABLE "inp_flow_regulator_type"(
 id character varying(16),
 table_id character varying(50),
@@ -272,8 +299,13 @@ CREATE TABLE anl_dwf_rpt_node(
 	  
 ----
 -- FK
------
-	  
+----
+
+ALTER TABLE "om_visit_parameter_type" DROP CONSTRAINT IF EXISTS "om_visit_parameter_type_criticity_fkey";
+ALTER TABLE "om_visit_parameter_type" ADD CONSTRAINT "om_visit_parameter_type_criticity_fkey" FOREIGN KEY ("criticity") REFERENCES "om_visit_value_criticity" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "om_visit_parameter_type" DROP CONSTRAINT IF EXISTS "om_visit_parameter_type_context_fkey";
+ALTER TABLE "om_visit_parameter_type" ADD CONSTRAINT "om_visit_parameter_type_context_fkey" FOREIGN KEY ("context") REFERENCES "om_visit_value_context" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "inp_n2a_orifice" DROP CONSTRAINT IF EXISTS "inp_n2a_orifice_fkey";
 ALTER TABLE "inp_n2a_orifice" ADD CONSTRAINT "inp_n2a_orifice_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
