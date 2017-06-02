@@ -33,7 +33,7 @@ CREATE SEQUENCE doc_x_tag_seq
 -- NEW TABLES
 -------------
 
--- ADDING MACROSECTOR
+-- ADDING MACRODMA
 
 CREATE TABLE macrodma (
 macrodma_id character varying(50) NOT NULL PRIMARY KEY,
@@ -68,7 +68,36 @@ CREATE TABLE anl_arc_profile_value
   CONSTRAINT anl_arc_profile_value_pkey PRIMARY KEY (id)
 );
 
+
+ -- ANALYSIS
  
+ CREATE TABLE "anl_node_sink" (
+node_id varchar (16) NOT NULL,
+num_arcs integer,
+the_geom public.geometry (POINT, SRID_VALUE),
+CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE INDEX anl_node_sink_index ON anl_node_sink USING GIST (the_geom);
+
+  
+  -- PHOTO
+ 
+ 
+ CREATE TABLE om_visit_event_photo
+(
+  id bigserial NOT NULL,
+  visit_id bigint NOT NULL,
+  event_id bigint NOT NULL,
+  tstamp timestamp(6) without time zone DEFAULT now(),
+  value text,
+  text text,
+  compass double precision,
+  CONSTRAINT om_visit_event_foto_pkey PRIMARY KEY (id),
+
+);
+
   
  
 -------------
@@ -198,4 +227,9 @@ ALTER TABLE arc  ADD CONSTRAINT arc_macrodma_id_fkey FOREIGN KEY (macrodma_id) R
 ALTER TABLE node  ADD CONSTRAINT node_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE connec  ADD CONSTRAINT connec_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE gully ADD CONSTRAINT gully_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+ CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)      REFERENCES om_visit_event (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
+ CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
   
+

@@ -84,7 +84,31 @@ CREATE TABLE doc_x_tag(
 );
 
 
- -- fotos
+-- ANALYSIS
+
+DROP TABLE IF EXISTS anl_node_topological_consistency CASCADE;
+CREATE TABLE anl_node_topological_consistency (
+  node_id character varying(16) NOT NULL,
+  node_type character varying(30),
+  num_arcs integer,  
+  the_geom geometry(Point,SRID_VALUE),
+  CONSTRAINT anl_node_topological_consistency_pkey PRIMARY KEY (node_id)
+);
+
+
+
+DROP TABLE IF EXISTS anl_node_geometric_consistency CASCADE;
+CREATE TABLE anl_node_geometric_consistency(
+  node_id character varying(16) NOT NULL,
+  node_type character varying(30),
+  the_geom geometry(Point,SRID_VALUE),
+  CONSTRAINT anl_node_topological_geometric_pkey PRIMARY KEY (node_id)
+);
+
+
+
+
+ -- PHOTO
  
  
  CREATE TABLE om_visit_event_photo
@@ -220,10 +244,6 @@ ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_cause_an
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_type_mincut_result_type_fkey FOREIGN KEY (mincut_result_type) REFERENCES anl_mincut_result_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mincut_result_state_fkey FOREIGN KEY (mincut_result_state) REFERENCES anl_mincut_result_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
- CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)
-      REFERENCES om_visit_event (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT,
-  CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)
-      REFERENCES om_visit (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT
+ CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)      REFERENCES om_visit_event (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
+ CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
   
