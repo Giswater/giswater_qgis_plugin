@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION gw_fct_anl_arc_no_startend_node()  RETURNS void AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_arc_no_startend_node()  RETURNS void AS
 $BODY$
 DECLARE
 arc_rec record;
