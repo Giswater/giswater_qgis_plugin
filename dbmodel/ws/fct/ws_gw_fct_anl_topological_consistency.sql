@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE OR REPLACE FUNCTION gw_fct_anl_topological_consistency() RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION gw_fct_anl_node_topological_consistency() RETURNS void AS $BODY$
 DECLARE
     rec_node record;
     rec record;
@@ -18,11 +18,11 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Clear tables
-    DELETE FROM anl_topological_consistency;
-    DELETE FROM anl_geometrical_consistency;
+    DELETE FROM anl_node_topological_consistency;
+    DELETE FROM anl_node_geometric_consistency;
 
     -- Check number of connected pipes to node depending on node type
-    INSERT INTO anl_topological_consistency (node_id, node_type, num_arcs, the_geom)
+    INSERT INTO anl_node_topological_consistency (node_id, node_type, num_arcs, the_geom)
     SELECT node_id, node_type, COUNT(*), node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
 	JOIN cat_node ON nodecat_id=id	WHERE cat_node.num_arcs = 4 GROUP BY node.node_id HAVING COUNT(*) != 4
     UNION
@@ -36,7 +36,7 @@ BEGIN
 	JOIN cat_node ON nodecat_id=id	WHERE cat_node.num_arcs = 1 GROUP BY node.node_id HAVING COUNT(*) != 1;
         
    -- Check diameters
-    INSERT INTO anl_geometrical_consistency (node_id, node_type, node_dnom, num_arcs, arc_dnom1, arc_dnom2, the_geom)
+    INSERT INTO anl_node_geometric_consistency (node_id, node_type, node_dnom, num_arcs, arc_dnom1, arc_dnom2, the_geom)
     SELECT node_id, node_type, cat_node.dnom, num_arcs, (array_agg(cat_arc.dnom))[1], (array_agg(cat_arc.dnom))[2], node.the_geom 
         FROM node 
         INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
@@ -46,7 +46,7 @@ BEGIN
         GROUP BY node.node_id, cat_node.dnom, node_type.type, num_arcs
         HAVING COUNT(*) = 2 AND (((array_agg(cat_arc.dnom))[1] != (array_agg(cat_arc.dnom))[2] AND node_type.type != 'REDUCTION') OR ((array_agg(cat_arc.dnom))[1] = (array_agg(cat_arc.dnom))[2] AND node_type.type = 'REDUCTION'));
 
-    INSERT INTO anl_geometrical_consistency (node_id, node_type, node_dnom, num_arcs, arc_dnom1, arc_dnom2, arc_dnom3, the_geom)
+    INSERT INTO anl_node_geometric_consistency (node_id, node_type, node_dnom, num_arcs, arc_dnom1, arc_dnom2, arc_dnom3, the_geom)
     SELECT node_id, node_type, cat_node.dnom, num_arcs, (array_agg(cat_arc.dnom))[1], (array_agg(cat_arc.dnom))[2], (array_agg(cat_arc.dnom))[3], node.the_geom 
         FROM node 
         INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
@@ -56,7 +56,7 @@ BEGIN
         GROUP BY node.node_id, cat_node.dnom, node_type.type, num_arcs
         HAVING COUNT(*) = 3 AND cat_node.num_arcs = 3 AND COUNT(DISTINCT cat_arc.dnom) > 2;
 
-    INSERT INTO anl_geometrical_consistency (node_id, node_type, node_dnom, num_arcs, arc_dnom1, arc_dnom2, arc_dnom3, arc_dnom4, the_geom)
+    INSERT INTO anl_node_geometric_consistency (node_id, node_type, node_dnom, num_arcs, arc_dnom1, arc_dnom2, arc_dnom3, arc_dnom4, the_geom)
     SELECT node_id, node_type, cat_node.dnom, num_arcs, (array_agg(cat_arc.dnom))[1], (array_agg(cat_arc.dnom))[2], (array_agg(cat_arc.dnom))[3], (array_agg(cat_arc.dnom))[4], node.the_geom 
         FROM node 
         INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 

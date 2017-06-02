@@ -20,14 +20,6 @@ CONSTRAINT anl_node_orphan_pkey PRIMARY KEY (node_id)
 );
 
 
-CREATE TABLE "anl_node_sink" (
-node_id varchar (16) NOT NULL,
-num_arcs integer,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
-);
-
-
 CREATE TABLE "anl_node_duplicated" (
 node_id varchar (16) NOT NULL,
 node_conserv varchar (16) NOT NULL,
