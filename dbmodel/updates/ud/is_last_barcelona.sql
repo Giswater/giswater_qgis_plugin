@@ -45,15 +45,34 @@ obs text,
 CONSTRAINT om_visit_value_criticity_pkey PRIMARY KEY (id)
 );
 
-
-
-
 ALTER TABLE om_visit_event ADD COLUMN geom1 float;
 ALTER TABLE om_visit_event ADD COLUMN geom2 float;
 ALTER TABLE om_visit_event ADD COLUMN geom3 float;
 ALTER TABLE om_visit_event ADD COLUMN geom3 float;
 ALTER TABLE om_visit_event ADD COLUMN value2 text;
 ALTER TABLE om_visit_event ADD COLUMN position_value text;
+
+
+
+/*
+To do.......
+plan_cat_works  (diferents tipus (rehab,.....))
+plan_event_x_works
+plan_works_x_pcompost
+plan_event_cost
+*/
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 -- INP FLOW REGULATOR
@@ -168,19 +187,49 @@ CREATE TABLE "inp_n2a_ori_weir" (
 
 
 -- MORE TOPOLOGY FUNCTIONS
- 
- CREATE TABLE "anl_arc_intersection"(
+
+
+CREATE TABLE "anl_node_flowregulator" (
+  node_id character varying(16) NOT NULL,
+  the_geom geometry(Point,SRID_VALUE),
+  CONSTRAINT anl_node_floregulator_pkey PRIMARY KEY (node_id)
+);
+
+CREATE TABLE "anl_node_exit_upper_intro"(
 arc_id character varying(16),
-the_geom geometry(LINESTRING,25829),
+the_geom geometry(LINESTRING,SRID_VALUE),
+CONSTRAINT anl_node_exit_upper_intro_pkey PRIMARY KEY (node_id)
+);
+
+CREATE TABLE "anl_arc_intersection"(
+arc_id character varying(16),
+the_geom geometry(LINESTRING,SRID_VALUE),
 CONSTRAINT anl_arc_intersection_pkey PRIMARY KEY (arc_id)
 );
 
-CREATE TABLE anl_node_flowregulator
-(
-  node_id character varying(16) NOT NULL,
-  the_geom geometry(Point,25829),
-  CONSTRAINT anl_node_floregulator_pkey PRIMARY KEY (node_id)
+ CREATE TABLE "anl_arc_inverted"(
+arc_id character varying(16),
+the_geom geometry(LINESTRING,SRID_VALUE),
+CONSTRAINT anl_arc_inverted_pkey PRIMARY KEY (arc_id)
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   
@@ -343,9 +392,12 @@ ALTER TABLE "anl_dwf_connec_x_uses_value" ADD CONSTRAINT "anl_dwf_connec_x_uses_
 -------------
 -- INDEX
 -------------
+CREATE INDEX anl_node_flowregulator_index   ON anl_node_flowregulator  USING gist(the_geom);
+CREATE INDEX anl_node_exit_upper_intro_index   ON anl_node_exit_upper_intro   USING gist(the_geom);
 
-CREATE INDEX anl_arc_intersection_index   ON anl_arc_intersection   USING gist   (the_geom);
-CREATE INDEX anl_node_flowregulator_index   ON anl_node_flowregulator  USING gist  (the_geom);
+CREATE INDEX anl_arc_intersection_index   ON anl_arc_intersection   USING gist(the_geom);
+CREATE INDEX anl_arc_inverted_index   ON anl_arc_inverted   USING gist(the_geom);
+
 
 
 -------------
