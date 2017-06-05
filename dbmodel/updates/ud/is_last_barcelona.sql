@@ -47,11 +47,12 @@ CONSTRAINT om_visit_value_criticity_pkey PRIMARY KEY (id)
 
 ALTER TABLE om_visit_event ADD COLUMN geom1 float;
 ALTER TABLE om_visit_event ADD COLUMN geom2 float;
-ALTER TABLE om_visit_event ADD COLUMN geom3 float;
-ALTER TABLE om_visit_event ADD COLUMN geom3 float;
-ALTER TABLE om_visit_event ADD COLUMN value2 text;
-ALTER TABLE om_visit_event ADD COLUMN position_value text;
-
+ALTER TABLE om_visit_event ADD COLUMN geom3 float; 
+ALTER TABLE om_visit_event ADD COLUMN value1 integer;
+ALTER TABLE om_visit_event ADD COLUMN value2 integer;
+ALTER TABLE om_visit_event ADD COLUMN position_value float;
+ALTER TABLE om_visit_event ADD COLUMN status float;
+ALTER TABLE om_visit_event ADD COLUMN status_event_id float;
 
 
 /*
