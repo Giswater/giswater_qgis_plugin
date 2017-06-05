@@ -6,14 +6,14 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction,QMessageBox
 
 from qgis.gui import *
 from functools import partial
-
+import os
 import utils_giswater
 from parent_init import ParentDialog
-
+from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -131,9 +131,11 @@ class ManNodeDialog(ParentDialog):
   
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))   
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
 
-        
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
+
+
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
@@ -203,3 +205,43 @@ class ManNodeDialog(ParentDialog):
 
         canvas.zoomToSelected(layer)
 
+    def catalog(self):
+        self.dlg_cat=WScatalog()
+        utils_giswater.setDialog(self.dlg_cat)
+
+        self.dlg_cat.open()
+        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.nextwpi)
+        self.dlg_cat.matcat_id.clear()
+        self.dlg_cat.pnom.clear()
+        self.dlg_cat.dnom.clear()
+        '''
+        QMessageBox.about(None, 'Error', 'The field distance to be numerical')
+        '''
+        listmats=[]
+        pressurelist=[]
+        diameterlist=[]
+        sql= "SELECT DISTINCT(matcat_id) FROM ws_sample_dev.cat_node"
+        rows = self.controller.get_rows(sql)
+        for mats in rows:
+            listmats.append(mats[0])
+            listmats.sort()
+        self.dlg_cat.matcat_id.addItems(listmats)
+
+        sql= "SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_node"
+        rows = self.controller.get_rows(sql)
+        for mats in rows:
+            pressurelist.append(mats[0])
+            pressurelist.sort()
+        self.dlg_cat.pnom.addItems(pressurelist)
+
+        sql= "SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_node"
+        rows = self.controller.get_rows(sql)
+        for mats in rows:
+            diameterlist.append(mats[0])
+            diameterlist.sort()
+        self.dlg_cat.dnom.addItems(diameterlist)
+
+
+    def nextwpi(self):
+        QMessageBox.about(None, 'Error', 'work in progress')
+        #filtrar nodecar id: (combobox) table ...
