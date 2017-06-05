@@ -20,7 +20,7 @@ CREATE TABLE audit_cat_function (
     name text NOT NULL,
     function_type text,
     context text,
-    input_params json, 
+    input_params text, 
     return_type text
 );
 

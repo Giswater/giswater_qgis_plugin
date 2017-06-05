@@ -31,7 +31,7 @@ INSERT INTO audit_cat_function (id, name, function_type, context, input_params, 
 VALUES (70, 'gw_fct_connec_to_network', 'function', 'utils',null,null);
 
 INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
-VALUES (80, 'gw_fct_delete_node', 'function', 'utils', '{"node_id_arg": "varchar"}', 'integer');
+VALUES (80, 'gw_fct_delete_node', 'function', 'utils', null, 'integer');
 
 INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
 VALUES (90, 'gw_fct_node2arc', 'function','utils',null, null);
