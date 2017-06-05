@@ -265,9 +265,9 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
     node.depth AS hydrant_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS hydrant_cat_matcat_id,
+    cat_node.pnom AS hydrant_cat_pnom,
+    cat_node.dnom AS hydrant_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS hydrant_state,
@@ -311,7 +311,8 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
 	node.inventory,
 	node.end_date AS hydrant_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -331,9 +332,9 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
     node.depth AS junction_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS junction_cat_matcat_id,
+    cat_node.pnom AS junction_cat_pnom,
+    cat_node.dnom AS junction_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS junction_state,
@@ -369,7 +370,8 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 	node.inventory,
 	node.end_date AS junction_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -387,9 +389,9 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
     node.depth AS manhole_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS manhole_cat_matcat_id,
+    cat_node.pnom AS manhole_cat_pnom,
+    cat_node.dnom AS manhole_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS manhole_state,
@@ -425,7 +427,8 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
 	node.inventory,
 	node.end_date AS manhole_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -444,9 +447,9 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
     node.depth AS meter_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS meter_cat_matcat_id,
+    cat_node.pnom AS meter_cat_pnom,
+    cat_node.dnom AS meter_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS meter_state,
@@ -482,7 +485,8 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
 	node.inventory,
 	node.end_date AS meter_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -500,9 +504,9 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
     node.depth AS pump_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS pump_cat_matcat_id,
+    cat_node.pnom AS pump_cat_pnom,
+    cat_node.dnom AS pump_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS pump_state,
@@ -539,7 +543,8 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	node.end_date AS pump_end_date,
 	dma.macrodma_id,
 	man_pump.elev_height,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -558,9 +563,9 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
     node.depth AS reduction_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS reduction_cat_matcat_id,
+    cat_node.pnom AS reduction_cat_pnom,
+    cat_node.dnom AS reduction_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS reduction_state,
@@ -616,9 +621,9 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
     node.depth AS source_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS source_cat_matcat_id,
+    cat_node.pnom AS source_cat_pnom,
+    cat_node.dnom AS source_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS source_state,
@@ -654,7 +659,8 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
 	node.inventory,
 	node.end_date AS source_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -672,9 +678,9 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
     node.depth AS valve_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS valve_cat_matcat_id,
+    cat_node.pnom AS valve_cat_pnom,
+    cat_node.dnom AS valve_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS valve_state,
@@ -732,7 +738,8 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	node.end_date AS valve_end_date,
 	dma.macrodma_id,
 	man_valve.cat_valve2 AS valve_cat_valve2,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -750,9 +757,9 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
     node.depth AS waterwell_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS waterwell_cat_matcat_id,
+    cat_node.pnom AS waterwell_cat_pnom,
+    cat_node.dnom AS waterwell_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS waterwell_state,
@@ -788,7 +795,8 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
 	node.inventory,
 	node.end_date AS waterwell_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -807,9 +815,9 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
     node.depth AS filter_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS filter_cat_matcat_id,
+    cat_node.pnom AS filter_cat_pnom,
+    cat_node.dnom AS filter_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS filter_state,
@@ -845,7 +853,8 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
 	node.inventory,
 	node.end_date AS filter_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -862,9 +871,9 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
     node.depth AS register_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS register_cat_matcat_id,
+    cat_node.pnom AS register_cat_pnom,
+    cat_node.dnom AS register_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS register_state,
@@ -901,7 +910,8 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	node.end_date AS register_end_date,
 	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
-	man_register.pol_id AS register_pol_id
+	man_register.pol_id AS register_pol_id,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -919,9 +929,9 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
     node.depth AS register_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS register_cat_matcat_id,
+    cat_node.pnom AS register_cat_pnom,
+    cat_node.dnom AS register_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS register_state,
@@ -957,7 +967,8 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
 	node.inventory,
 	node.end_date AS register_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -975,9 +986,9 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
     node.depth AS netwjoin_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS netwjoin_cat_matcat_id,
+    cat_node.pnom AS netwjoin_cat_pnom,
+    cat_node.dnom AS netwjoin_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS netwjoin_state,
@@ -1014,7 +1025,7 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	node.end_date AS netwjoin_end_date,
 	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
-	man_netwjoin.parent_node_id
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1031,9 +1042,9 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
     node.depth AS flexunion_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS flexunion_cat_matcat_id,
+    cat_node.pnom AS flexunion_cat_pnom,
+    cat_node.dnom AS flexunion_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS flexunion_state,
@@ -1070,7 +1081,7 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
 	node.end_date AS flexunion_end_date,
 	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
-	man_flexunion.parent_node_id
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1087,9 +1098,9 @@ SELECT node.node_id,
     node.depth AS exptank_depth,
     node.node_type,
     node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
+    cat_node.matcat_id AS exptank_cat_matcat_id,
+    cat_node.pnom AS exptank_cat_pnom,
+    cat_node.dnom AS exptank_cat_dnom,
     node.epa_type,
     node.sector_id,
     node.state AS exptank_state,
@@ -1126,7 +1137,7 @@ SELECT node.node_id,
 	node.end_date AS exptank_end_date,
 	dma.macrodma_id,
 	exploitation.short_descript AS expl_name,
-	man_expansiontank .parent_node_id
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1135,6 +1146,117 @@ FROM expl_selector, node
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
+
+DROP VIEW IF EXISTS v_edit_man_netsamplepoint CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_netsamplepoint AS 
+SELECT node.node_id,
+    node.elevation AS netsample_elevation,
+    node.depth AS netsample_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS netsample_cat_matcat_id,
+    cat_node.pnom AS netsample_cat_pnom,
+    cat_node.dnom AS netsample_cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS netsample_state,
+    node.annotation AS netsample_annotation,
+    node.observ AS netsample_observ,
+    node.comment AS netsample_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS netsample_soilcat_id,
+    node.category_type AS netsample_category_type,
+    node.fluid_type AS netsample_fluid_type,
+    node.location_type AS netsample_location_type,
+    node.workcat_id AS netsample_workcat_id,
+    node.workcat_id_end AS netsample_workcat_id_end,
+    node.buildercat_id AS netsample_buildercat_id,
+    node.builtdate AS netsample_builtdate,
+    node.ownercat_id AS netsample_ownercat_id,
+    node.adress_01 AS netsample_adress_01,
+    node.adress_02 AS netsample_adress_02,
+    node.adress_03 AS netsample_adress_03,
+    node.descript AS netsample_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS netsample_rotation,
+    node.link AS netsample_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS netsample_label_x,
+    node.label_y AS netsample_label_y,
+    node.label_rotation AS netsample_label_rotation,
+	node.code AS netsample_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS netsample_end_date,
+	dma.macrodma_id,
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_netsamplepoint ON node.node_id::text = man_netsamplepoint .node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
+
+
+DROP VIEW IF EXISTS v_edit_man_netelement CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_netelement AS 
+SELECT node.node_id,
+    node.elevation AS netelement_elevation,
+    node.depth AS netelement_depth,
+    node.node_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS netelement_cat_matcat_id,
+    cat_node.pnom AS netelement_cat_pnom,
+    cat_node.dnom AS netelement_cat_dnom,
+    node.epa_type,
+    node.sector_id,
+    node.state AS netelement_state,
+    node.annotation AS netelement_annotation,
+    node.observ AS netelement_observ,
+    node.comment AS netelement_comment,
+    node.dma_id,
+    dma.presszonecat_id,
+    node.soilcat_id AS netelement_soilcat_id,
+    node.category_type AS netelement_category_type,
+    node.fluid_type AS netelement_fluid_type,
+    node.location_type AS netelement_location_type,
+    node.workcat_id AS netelement_workcat_id,
+    node.workcat_id_end AS netelement_workcat_id_end,
+    node.buildercat_id AS netelement_buildercat_id,
+    node.builtdate AS netelement_builtdate,
+    node.ownercat_id AS netelement_ownercat_id,
+    node.adress_01 AS netelement_adress_01,
+    node.adress_02 AS netelement_adress_02,
+    node.adress_03 AS netelement_adress_03,
+    node.descript AS netelement_descript,
+    cat_node.svg AS cat_svg,
+    node.rotation AS netelement_rotation,
+    node.link AS netelement_link,
+    node.verified,
+    node.the_geom,
+    node.undelete,
+    node.label_x AS netelement_label_x,
+    node.label_y AS netelement_label_y,
+    node.label_rotation AS netelement_label_rotation,
+	node.code AS netelement_code,
+	node.publish,
+	node.inventory,
+	node.end_date AS netelement_end_date,
+	dma.macrodma_id,
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
+FROM expl_selector, node
+	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN man_netelement ON node.node_id::text = man_netelement .node_id::text
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
+	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
 	
 
 	DROP VIEW IF EXISTS v_edit_sector CASCADE;

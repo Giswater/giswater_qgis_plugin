@@ -113,7 +113,6 @@ CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_netwjoin" (
 "node_id" varchar(16) NOT NULL,
-"parent_node_id" character varying(16),
 "add_info" varchar(255),
 CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
 );
@@ -121,7 +120,6 @@ CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_expansiontank" (
 "node_id" varchar(16) NOT NULL,
-"parent_node_id" character varying(16),
 "add_info" varchar(255),
 CONSTRAINT man_expansiontank_pkey PRIMARY KEY (node_id)
 );
@@ -129,10 +127,22 @@ CONSTRAINT man_expansiontank_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_flexunion" (
 "node_id" varchar(16) NOT NULL,
-"parent_node_id" character varying(16),
 "add_info" varchar(255),
 CONSTRAINT man_dilator_pkey PRIMARY KEY (node_id)
 );
+
+
+CREATE TABLE "man_netsamplepoint"(
+"node_id" varchar(16) NOT NULL,
+ code_lab character varying(30),
+"add_info" varchar(255)
+); 
+
+
+CREATE TABLE "man_netelement"(
+"node_id" varchar(16) NOT NULL,
+"add_info" varchar(255)
+); 
 
 -- arc topologic features
 
@@ -157,16 +167,10 @@ CONSTRAINT man_value_state PRIMARY KEY (id)
 
 
 --THE PARENT NODE STRATEGY IT NOT MUST BE APPLIED TO TANKS AND TO REGISTERS...
-ALTER TABLE man_junction ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_hydrant ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_pump ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_filter ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_meter ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_manhole ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_reduction ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_source ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE man_waterwell ADD COLUMN parent_node_id character varying(16);
 
+ALTER TABLE node ADD COLUMN parent_node_id character varying(16);
+ALTER TABLE node ADD CONSTRAINT node_parent_node_fkey FOREIGN KEY (parent_node_id) REFERENCES ws_sample_dev.node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+  
 
 ALTER TABLE man_junction ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_hydrant ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
@@ -174,7 +178,7 @@ ALTER TABLE man_pump ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id)
 ALTER TABLE man_filter ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_meter ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_manhole ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_manhole ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_reduction ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_source ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_waterwell ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
