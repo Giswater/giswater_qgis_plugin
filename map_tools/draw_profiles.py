@@ -162,7 +162,7 @@ class DrawProfiles(ParentMapTool):
                 end_point = self.dlg.findChild(QLineEdit, "end_point")  
                 utils_giswater.setText("end_point", end_point_id)
                 
-                self.shortest_path(self.list_of_selected_nodes[0],self.list_of_selected_nodes[1])
+                self.shortest_path(str(self.list_of_selected_nodes[0]),str(self.list_of_selected_nodes[1]))
 
                 
             '''
@@ -188,22 +188,14 @@ class DrawProfiles(ParentMapTool):
                 # Open the dialog
                 #self.dlg.exec_()
             '''
-            
-    
-    def set_points(self,widget):
-    
-        if widget == start_point:
-            start_point = self.dlg.findChild(QLineEdit, "start_point")  
-            utils_giswater.setText("start_point", node_id)
-        if widget == end_point:
-            start_point = self.dlg.findChild(QLineEdit, "end_point")  
-            utils_giswater.setText("end_point", node_id)
-            # activate shortest path
-        
-
+ 
 
     def activate(self):
 
+        # Control current layer (due to QGIS bug in snapping system)
+        #if self.canvas.currentLayer() == None:
+        #    self.iface.setActiveLayer(self.layer_node[0])
+            
         # Check button
         self.action().setChecked(True)
 
@@ -213,6 +205,8 @@ class DrawProfiles(ParentMapTool):
         
         self.dlg.findChild(QPushButton, "add_start_point").clicked.connect(self.btn_activate_snapping)
         #self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(self.paintEvent)
+        
+        #self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paintEvent,self.arc_id,self.node_id))
         
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  
         self.btn_save_profile.clicked.connect(self.save_profile)
@@ -226,17 +220,31 @@ class DrawProfiles(ParentMapTool):
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point") 
         
-        self.dlg.show()
-        
+        self.dlg.open()
+
         
     def save_profile(self):
     
         id = self.profile_id.text()
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
-       
-        # wip - check if id exist in dB
         
+        print id
+        print start_point
+        print end_point
+        
+        # TO DO :Check if all data are entered
+        if id == '' or start_point == '' or end_point == '':
+            self.controller.show_info_box("Some of data is missing", "Info")
+            return
+        
+        # Check if id of profile already exists in DB
+        sql = "SELECT DISTINCT(profile_id) FROM "+self.schema_name+".anl_arc_profile_value WHERE profile_id = '"+id+"'" 
+        row = self.controller.get_row(sql)
+        if row:
+        # if exist - show warning
+            self.controller.show_info_box("Profile_id "+id+" exist in data base!", "Info")
+            return
         
         n = len(self.arc_id)
         for i in range(n):
@@ -282,6 +290,8 @@ class DrawProfiles(ParentMapTool):
         # Selected item from list 
         selected_profile = self.tbl_profiles.currentItem().text()
         
+
+            
         # Get data from DB for selected item| profile_id, start_point, end_point
         sql = "SELECT start_point,end_point FROM"+self.schema_name+".anl_arc_profile_value WHERE profile_id ='"+selected_profile+"'"
         row = self.controller.get_rows(sql)
@@ -307,9 +317,14 @@ class DrawProfiles(ParentMapTool):
         row = self.controller.get_rows(sql)
         m=len(row)
        
+        '''
         for i in range(m):
             item_arc = QListWidgetItem(str(row[i][0]))
             tbl_list_arc.addItem(item_arc)
+        '''
+        
+        # Call dijkstra to set new list of arcs and list of nodes
+        self.shortest_path(str(start_point), str(end_point))
         
         self.dlg_load.close()
         self.dlg.open()
@@ -328,11 +343,6 @@ class DrawProfiles(ParentMapTool):
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
-
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be removed"
-            self.controller.show_warning(message, context_name='ui_message')
         
         
     def deactivate(self):
@@ -349,15 +359,13 @@ class DrawProfiles(ParentMapTool):
         # Removehighlight
         self.h = None
 
+        
 
     def paintEvent(self,arc_id,node_id):
         '''
         Parent function - Draw profiles
         '''
-        # Control current layer (due to QGIS bug in snapping system)
-        if self.canvas.currentLayer() == None:
-            self.iface.setActiveLayer(self.layer_node[0])
-            
+
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id,node_id)
         self.fill_memory(arc_id,node_id)
@@ -1021,6 +1029,9 @@ class DrawProfiles(ParentMapTool):
         
         self.node_id = []
         self.arc_id = []
+        
+        # Clear list of arcs and nodes - preparing for new profile
+            
         sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_test_arc'," + start_point + "," +end_point + ",false)"
       
         rows = self.controller.get_rows(sql)
@@ -1089,6 +1100,9 @@ class DrawProfiles(ParentMapTool):
         m=len(self.arc_id)
         list = []
 
+        # Clear list
+        self.tbl_list_arc.clear()
+        
         for i in range(m-1):
             item_arc = QListWidgetItem(self.arc_id[i])
             self.tbl_list_arc.addItem(item_arc)
@@ -1098,8 +1112,15 @@ class DrawProfiles(ParentMapTool):
         # Remove last element from list because is -1 
         self.arc_id.pop()
     
-      
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paintEvent,self.arc_id,self.node_id))
+
+        
+        
+        
+    
+            
+    
+    
         
 
             

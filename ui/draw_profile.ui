@@ -91,6 +91,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="end_point">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -141,6 +144,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="start_point">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>

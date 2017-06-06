@@ -129,7 +129,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>10</number>
+     <number>13</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -152,8 +152,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2028,8 +2028,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3529,8 +3529,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5237,8 +5237,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6738,8 +6738,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8559,8 +8559,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10128,8 +10128,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12036,8 +12036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13537,8 +13537,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15558,8 +15558,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>312</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17437,26 +17437,8 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_14">
-       <attribute name="title">
-        <string>Visit</string>
-       </attribute>
-       <widget class="QTableView" name="tbl_visit_node">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>18</y>
-          <width>530</width>
-          <height>300</height>
-         </rect>
-        </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
       <widget class="QWidget" name="page_event_node">
        <attribute name="title">
         <string>Event</string>
@@ -17465,24 +17447,6 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>20</y>
-          <width>530</width>
-          <height>300</height>
-         </rect>
-        </property>
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_13">
-       <attribute name="title">
-        <string>Picture</string>
-       </attribute>
-       <widget class="QTableView" name="tbl_picture_node">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
           <y>20</y>
           <width>530</width>
           <height>300</height>

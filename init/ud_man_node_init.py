@@ -13,6 +13,8 @@ from functools import partial
 import utils_giswater
 from parent_init import ParentDialog
 
+from ui.gallery import Gallery          #@UnresolvedImport
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
