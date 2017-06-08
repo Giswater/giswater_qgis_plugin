@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLabel, QPixmap, QLineEdit
 
 from functools import partial
 
@@ -14,6 +14,7 @@ import utils_giswater
 from parent_init import ParentDialog
 
 from ui.gallery import Gallery          #@UnresolvedImport
+from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
 
 
 def formOpen(dialog, layer, feature):
@@ -143,6 +144,154 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
         
         
+        # Event
+        
+        self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
+        self.btn_open_event.clicked.connect(self.open_selected_event_from_table) 
+        
+       
+    def open_selected_event_from_table(self):
+        ''' Button - Open document from table document'''
+        
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        # Get selected rows
+        selected_list = self.tbl_event.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+        '''
+        inf_text = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = self.tbl_event.model().record(row).value("value")
+            inf_text+= str(id_)+", "
+        inf_text = inf_text[:-2]
+        self.path = inf_text 
+
+        
+        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+        sql +=" WHERE id = 'doc_absolute_path'"
+        row = self.dao.get_row(sql)
+        if row is None:
+            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        else:
+            # Full path= path + value from row
+            self.full_path =row[0]+self.path
+           
+            # Parse a URL into components
+            url=urlparse.urlsplit(self.full_path)
+    
+            # Check if path is URL
+            if url.scheme=="http":
+                # If path is URL open URL in browser
+                webbrowser.open(self.full_path) 
+            else: 
+                # If its not URL ,check if file exist
+                if not os.path.exists(self.full_path):
+                    message = "File not found:"+self.full_path 
+                    self.controller.show_warning(message, context_name='ui_message')
+                       
+                else:
+                    # Open the document
+                    os.startfile(self.full_path) 
+        '''
+        #message = str(selected_list[0])
+        #self.controller.show_warning(message, context_name='ui_message' ) 
+        inf_text = ""
+        #for i in range(0, len(selected_list)):
+        row = selected_list[0].row()
+        #id_ = self.tbl_event.model().record(row).value("visit_id")
+        visit_id = self.tbl_event.model().record(row).value("visit_id")
+        event_id = self.tbl_event.model().record(row).value("event_id")
+        picture = self.tbl_event.model().record(row).value("value")
+        #inf_text+= str(id_)+", "
+        #inf_text = inf_text[:-2]
+        #self.visit_id = inf_text 
+
+
+
+        # Get all events | pictures for visit_id
+        sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
+        sql +=" WHERE visit_id = '"+str(visit_id)+"'"
+        rows = self.controller.get_rows(sql)
+
+        # Get absolute path
+        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+        sql +=" WHERE id = 'doc_absolute_path'"
+        row = self.dao.get_row(sql)
+
+        if row is None:
+            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
+            self.dao.show_warning(message, context_name='ui_message')
+            return
+        else:
+            print "full path"
+            # Full path= path + value from row
+            #self.full_path =row[0]+self.path
+            
+            # rows - list of relativ paths
+            # for each relative path make apsolute path
+            '''
+            for i in rows:
+                # Full path= path + value from row
+                self.full_path =row[0]+self.path
+                # list of paths of pictures
+                list.append(self.full_path)
+            
+            # set picture
+            '''
+        
+        message = "working"
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        # Create the dialog and signals
+        self.dlg_gallery = Gallery()
+        utils_giswater.setDialog(self.dlg_gallery)
+        
+        '''
+        img_0 = self.dlg_gallery.findChild(QLabel, 'img_0')
+        img_1 = self.dlg_gallery.findChild(QLabel, 'img_1')
+        img_2 = self.dlg_gallery.findChild(QLabel, 'img_2')
+        img_3 = self.dlg_gallery.findChild(QLabel, 'img_3')
+        img_4 = self.dlg_gallery.findChild(QLabel, 'img_4')
+        img_5 = self.dlg_gallery.findChild(QLabel, 'img_5')
+        img_6 = self.dlg_gallery.findChild(QLabel, 'img_6')
+        img_7 = self.dlg_gallery.findChild(QLabel, 'img_7')
+        img_8 = self.dlg_gallery.findChild(QLabel, 'img_8')
+        '''
+
+        
+        
+        txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
+        txt_visit_id.setText(str(visit_id))
+        
+        # Add picture to gallery
+        '''
+        pic_file = "C:/Users/tasladmin/Desktop/img_pipe.png"
+        pixmap = QPixmap(pic_file)
+        self.img_1.setPixmap(pixmap)
+        self.img_1.show()  
+        '''
+        img_path_list = ["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"]
+        message = str(len(img_path_list))
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        for i in range(0, len(img_path_list)):
+            pixmap = QPixmap(img_path_list[i])
+            widget_name = "img_"+str(i)
+            widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            widget.setPixmap(pixmap)
+            widget.show()
+      
+        self.dlg_gallery.exec_()
+
+  
+
+     
+        
     def actionZoomOut(self):
         feature = self.feature
 
@@ -182,7 +331,7 @@ class ManNodeDialog(ParentDialog):
 
         # initialize plugin directory
         user_folder = os.path.expanduser("~")
-        self.plugin_name = 'iw2pg'
+        self.plugin_name = 'giswater'
         self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
 
         self.layer = self.iface.activeLayer()

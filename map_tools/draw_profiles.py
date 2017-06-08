@@ -314,8 +314,8 @@ class DrawProfiles(ParentMapTool):
         row = self.controller.get_rows(sql)
       
         # Fill widget list_of_arcs
-        row = self.controller.get_rows(sql)
-        m=len(row)
+        #row = self.controller.get_rows(sql)
+        #m=len(row)
        
         '''
         for i in range(m):

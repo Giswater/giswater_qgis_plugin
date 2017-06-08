@@ -9,8 +9,8 @@ or (at your option) any later version.
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
-from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit
+from PyQt4.QtCore import QSettings, Qt, QAbstractItemModel
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit, QPixmap
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -22,7 +22,10 @@ import webbrowser
 import utils_giswater
 from dao.controller import DaoController
 from ui.add_sum import Add_sum          #@UnresolvedImport
-        
+
+
+
+
         
 class ParentDialog(object):   
     
@@ -367,6 +370,11 @@ class ParentDialog(object):
                     # Open the document
                     os.startfile(self.full_path)          
                            
+                           
+    
+        
+ 
+
                     
     def open_selected_document_from_table(self):
         ''' Button - Open document from table document'''
@@ -614,6 +622,9 @@ class ParentDialog(object):
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
         date = QDate.currentDate();
         self.date_event_to.setDate(date);
+        
+        #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
+        #self.btn_open_event.clicked.connect(self.open_selected_event_from_table) 
 
 
         # Set signals
@@ -651,7 +662,13 @@ class ParentDialog(object):
         
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)    
-                   
+        
+        
+        # On doble click open_event_gallery
+        ''' Button - Open gallery from table event'''
+        
+
+          
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
@@ -809,57 +826,5 @@ class ParentDialog(object):
             # If selected table is Virtual hide tab cost
             else :
                 self.tab_main.removeTab(4)  
-
-
-
-
-    def open_event_gallery(self):
-        ''' Button - Open gallery from table event'''
-        
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
-        # Get selected rows
-        selected_list = self.tbl_event.selectionModel().selectedRows()    
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
-            return
-        
-        inf_text = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = self.tbl_event.model().record(row).value("path")
-            inf_text+= str(id_)+", "
-        inf_text = inf_text[:-2]
-        self.path = inf_text 
-        
-        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
-        sql +=" WHERE id = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
-        if row is None:
-            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-        else:
-            # Full path= path + value from row
-            self.full_path =row[0]+self.path
-           
-            # Parse a URL into components
-            url=urlparse.urlsplit(self.full_path)
-    
-            # Check if path is URL
-            if url.scheme=="http":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found:"+self.full_path 
-                    self.controller.show_warning(message, context_name='ui_message')
-                       
-                else:
-                    # Open the document
-                    os.startfile(self.full_path)            
-
-        
 
     
