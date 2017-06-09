@@ -106,11 +106,16 @@ CREATE TABLE anl_node_geometric_consistency(
 );
 
 
+CREATE TABLE "anl_mincut_result_cat_cause" (
+id varchar(30) NOT NULL,
+descript text,
+CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
+);
+
 
 
  -- PHOTO
- 
- 
+  
  CREATE TABLE om_visit_event_photo
 (
   id bigserial NOT NULL,
@@ -121,14 +126,123 @@ CREATE TABLE anl_node_geometric_consistency(
   text text,
   compass double precision,
   CONSTRAINT om_visit_event_foto_pkey PRIMARY KEY (id),
-
 );
 
-CREATE TABLE "anl_mincut_result_cat_cause" (
-id varchar(30) NOT NULL,
-descript text,
-CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
+-- ----------------------------
+-- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
+-- ----------------------------
+
+	
+DROP TABLE IF EXISTS review_arc;
+CREATE TABLE review_arc
+(  arc_id character varying(16) NOT NULL,
+  the_geom geometry(LINESTRING,SRID_VALUE),
+  arc_type character varying(16),
+  arccat_id character varying(30),
+  annotation character varying(254),
+  verified character varying(16),
+  field_checked boolean,
+  office_checked boolean,
+  CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
 );
+
+DROP TABLE IF EXISTS review_node;
+CREATE TABLE review_node
+( node_id character varying(16) NOT NULL,
+  the_geom geometry(POINT,SRID_VALUE),
+  elevation numeric(12,3),
+  "depth" numeric(12,3),
+  node_type character varying(16),
+  cat_matcat character varying(16),
+  dimensions character varying(16),
+  annotation character varying(254),
+  observ character varying(254),
+  verified character varying(16),
+  field_checked boolean,
+  office_checked boolean,
+  CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
+  );
+
+DROP TABLE IF EXISTS review_connec;
+CREATE TABLE review_connec
+( connec_id character varying(16) NOT NULL,
+  the_geom geometry(POINT,SRID_VALUE),
+  elevation numeric(12,3),
+  "depth" numeric(12,3),
+  connec_type character varying(16),
+  conneccat_id character varying(16),
+  annotation character varying(254),
+  observ character varying(254),
+  verified character varying(16),
+  field_checked boolean,
+  office_checked boolean,
+  CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
+  );
+  
+DROP TABLE IF EXISTS review_audit_arc;
+CREATE TABLE review_audit_arc
+(  arc_id character varying(16) NOT NULL,
+  the_geom geometry(LINESTRING,SRID_VALUE),
+  arc_type character varying(16),
+  arccat_id character varying(30),
+  annotation character varying(254),
+  verified character varying(16),
+   moved_geom boolean,
+  field_checked boolean,
+  "operation" character varying(25),
+  "user" varchar (50),  
+  date_field timestamp (6) without time zone,
+  office_checked boolean,
+  CONSTRAINT review_audit_arc_pkey PRIMARY KEY (arc_id)
+  );
+  
+DROP TABLE IF EXISTS review_audit_node;
+CREATE TABLE review_audit_node
+(  node_id character varying(16) NOT NULL,
+  the_geom geometry(POINT,SRID_VALUE),
+  elevation numeric(12,3),
+  "depth" numeric(12,3),
+  node_type character varying(16),
+  cat_matcat character varying(16),
+  dimensions character varying(16),
+  annotation character varying(254),
+  observ character varying(254),
+  verified character varying(16),
+  moved_geom boolean,
+  field_checked boolean,
+  "operation" character varying(25),
+  "user" varchar (50),  
+  date_field timestamp (6) without time zone,
+  office_checked boolean,
+  CONSTRAINT review_audit_node_pkey PRIMARY KEY (node_id)
+  );
+  
+DROP TABLE IF EXISTS review_audit_connec;
+CREATE TABLE review_audit_connec
+(  connec_id character varying(16) NOT NULL,
+  the_geom geometry(POINT,SRID_VALUE),
+  elevation numeric(12,3),
+  "depth" numeric(12,3),
+  connec_type character varying(16),
+  connecat_id character varying(16),
+  annotation character varying(254),
+  observ character varying(254),
+  verified character varying(16),
+  moved_geom boolean,
+  field_checked boolean,
+  "operation" character varying(25),
+  "user" varchar (50),  
+  date_field timestamp (6) without time zone,
+  office_checked boolean,
+  CONSTRAINT review_audit_connec_pkey PRIMARY KEY (connec_id)
+  );
+  
+   
+-------------
+-- ALTER TABLES
+-------------
+
+
 
 
 ALTER TABLE anl_mincut_result_cat ADD COLUMN anl_cause character varying (30);
