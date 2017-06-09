@@ -7,6 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
+-- ----------------------------
+-- FIX ANL/MAN TOOLS SELECTOR ONLY WITH ONE ROW
+-- ----------------------------
+
+CREATE UNIQUE INDEX anl_selector_state_one_row ON anl_selector_state((id IS NOT NULL));
+CREATE UNIQUE INDEX man_selector_state_one_row ON man_selector_state((id IS NOT NULL));
+
+
 -- ----------------------------
 -- VDEFAULT STRATEGY
 -- ----------------------------

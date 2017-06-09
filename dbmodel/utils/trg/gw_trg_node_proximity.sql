@@ -19,11 +19,11 @@ BEGIN
 
     IF TG_OP = 'INSERT' THEN
         -- Existing nodes  
-        numNodes:= (SELECT COUNT(*) FROM node WHERE node.the_geom && ST_Expand(NEW.the_geom, rec.node_proximity));
+        numNodes:= (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.state= NEW.state);
 
     ELSIF TG_OP = 'UPDATE' THEN
         -- Existing nodes  
-       numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id);
+       numNodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, rec.node_proximity) AND node.node_id != NEW.node_id AND node.state= NEW.state);
     END IF;
 
     -- If there is an existing node closer than 'rec.node_tolerance' meters --> error
