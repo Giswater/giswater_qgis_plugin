@@ -14,8 +14,8 @@ This version of Giswater is provided by Giswater Association
 					IF TG_OP = 'INSERT' THEN
 					
 							IF NEW.field_checked=TRUE THEN
-								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked) 
-								VALUES(NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
+								INSERT INTO review_audit_node (node_id, the_geom, elevation, "depth", node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked) 
+								VALUES(NEW.node_id, NEW.the_geom, NEW.elevation, NEW."depth", NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked);
 								
 								UPDATE review_node SET verified='REVISED' where node_id=NEW.node_id;
@@ -28,7 +28,7 @@ This version of Giswater is provided by Giswater Association
 					
 						IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN
 							
-									UPDATE review_audit_node SET node_id=NEW.node_id, the_geom=NEW.the_geom, top_elev=NEW.top_elev, ymax=NEW.ymax, node_type=NEW.node_type,
+									UPDATE review_audit_node SET node_id=NEW.node_id, the_geom=NEW.the_geom, elevation=NEW.elevation, "depth"=NEW."depth", node_type=NEW.node_type,
 									cat_matcat=NEW.cat_matcat, dimensions=NEW.dimensions, annotation=NEW.annotation, observ=NEW.observ, verified='REVISED', field_checked=NEW.field_checked, "operation"='UPDATE',"user"=user, date_field=CURRENT_TIMESTAMP, office_checked=NEW.office_checked
 									WHERE node_id=OLD.node_id;
 									
@@ -42,15 +42,15 @@ This version of Giswater is provided by Giswater Association
 							
 						ELSE
 							IF NEW.the_geom=OLD.the_geom THEN
-								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
-								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
+								INSERT INTO review_audit_node (node_id, the_geom, elevation, "depth", node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
+								VALUES (NEW.node_id, NEW.the_geom, NEW.elevation, NEW."depth", NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked,'FALSE');						
 								
 								UPDATE review_node SET verified='REVISED' where node_id=OLD.node_id;
 								
 						ELSE 
-								INSERT INTO review_audit_node (node_id, the_geom, top_elev, ymax, node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
-								VALUES (NEW.node_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
+								INSERT INTO review_audit_node (node_id, the_geom, elevation, "depth", node_type, cat_matcat, dimensions, annotation, observ, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
+								VALUES (NEW.node_id, NEW.the_geom, NEW.elevation, NEW."depth", NEW.node_type, NEW.cat_matcat, NEW.dimensions, NEW.annotation, NEW.observ, 'REVISED', NEW.field_checked, 'INSERT', user, CURRENT_TIMESTAMP, 
 								NEW.office_checked,'TRUE');
 								
 								UPDATE review_node SET verified='REVISED' where node_id=OLD.node_id;
