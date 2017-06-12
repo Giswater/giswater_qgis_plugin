@@ -90,16 +90,6 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="nodecat_id">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>25</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QComboBox" name="sector_id">
     <property name="geometry">
      <rect>
@@ -129,7 +119,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>13</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -18494,6 +18484,19 @@
     </property>
     <property name="text">
      <string>...</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="nodecat_id">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>25</y>
+      <width>160</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

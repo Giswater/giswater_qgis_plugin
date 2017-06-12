@@ -858,8 +858,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>366</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2158,8 +2158,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4782,8 +4782,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6294,16 +6294,6 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="arccat_id">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>25</y>
-      <width>136</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
@@ -6360,6 +6350,16 @@
     </property>
     <property name="text">
      <string>...</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="arccat_id">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>25</y>
+      <width>136</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>
