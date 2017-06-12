@@ -9,8 +9,8 @@ or (at your option) any later version.
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
-from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit
+from PyQt4.QtCore import QSettings, Qt, QAbstractItemModel
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit, QPixmap
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -22,7 +22,10 @@ import webbrowser
 import utils_giswater
 from dao.controller import DaoController
 from ui.add_sum import Add_sum          #@UnresolvedImport
-        
+
+
+
+
         
 class ParentDialog(object):   
     
@@ -367,6 +370,11 @@ class ParentDialog(object):
                     # Open the document
                     os.startfile(self.full_path)          
                            
+                           
+    
+        
+ 
+
                     
     def open_selected_document_from_table(self):
         ''' Button - Open document from table document'''
@@ -614,6 +622,9 @@ class ParentDialog(object):
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
         date = QDate.currentDate();
         self.date_event_to.setDate(date);
+        
+        #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
+        #self.btn_open_event.clicked.connect(self.open_selected_event_from_table) 
 
 
         # Set signals
@@ -651,7 +662,13 @@ class ParentDialog(object):
         
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)    
-                   
+        
+        
+        # On doble click open_event_gallery
+        ''' Button - Open gallery from table event'''
+        
+
+          
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
@@ -808,8 +825,6 @@ class ParentDialog(object):
                 utils_giswater.setImage(widget, row[0])
             # If selected table is Virtual hide tab cost
             else :
-                self.tab_main.removeTab(4)       
-
-        
+                self.tab_main.removeTab(4)  
 
     

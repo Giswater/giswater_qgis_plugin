@@ -432,16 +432,6 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="arccat_id">
-    <property name="geometry">
-     <rect>
-      <x>275</x>
-      <y>20</y>
-      <width>146</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QDialogButtonBox" name="ok">
     <property name="geometry">
      <rect>
@@ -483,7 +473,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -8610,8 +8600,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>367</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13508,6 +13498,19 @@
     </property>
     <property name="text">
      <string>...</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="arccat_id">
+    <property name="geometry">
+     <rect>
+      <x>275</x>
+      <y>20</y>
+      <width>146</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

@@ -1264,10 +1264,9 @@ class Mg():
         self.cbx_date_end.setDate(dateend)
         self.cbx_hours_end.setTime(timeend)
 
-        self.dlg_fin.close()
+        #self.dlg_fin.close()
         
     def real_start(self):
-       
 
         self.date_start = QDate.currentDate()
         self.cbx_date_start.setDate(self.date_start)
@@ -1282,7 +1281,7 @@ class Mg():
         #exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
-        address = str(street +" "+ number)
+        address = str(street + " " + number)
         mincut_result_type = str(utils_giswater.getWidgetText("type")) 
         anl_cause = str(utils_giswater.getWidgetText("cause")) 
         #forecast_start = 

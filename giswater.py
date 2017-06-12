@@ -25,6 +25,10 @@ from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
 from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
+from map_tools.draw_profiles import DrawProfiles
+from map_tools.flow_regulator import FlowRegulator
+
+
 from search.search_plus import SearchPlus
 from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
 
@@ -126,7 +130,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (19, 21, 23, 24, 25,27,41, 28, 99):
+                if int(index_action) in (19, 21, 23, 24, 25,27,41,28,99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -213,6 +217,10 @@ class Giswater(QObject):
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             #elif int(index_action) == 27:
             #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 43:
+                map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 52:
+                map_tool = FlowRegulator(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 57:
@@ -322,8 +330,8 @@ class Giswater(QObject):
         # Set an action list for every toolbar    
         self.list_actions_ud = ['01','02','04','05']
         self.list_actions_ws = ['10','11','12','14','15','08','29','13']
-        self.list_actions_mg = ['16','28','17','18','19','20','21','22','23','24','25','26','27','41','99','56','57']
-        self.list_actions_ed = ['30','31','32','33','34','35','36']
+        self.list_actions_mg = ['16','17','18','19','20','21','22','23','24','25','26','27','28','41','43','99','56','57']
+        self.list_actions_ed = ['30','31','32','33','34','35','36','52']
                 
         # UD toolbar   
         if self.toolbar_ud_enabled:        
@@ -437,6 +445,8 @@ class Giswater(QObject):
                     self.actions['27'].setVisible(True)
                     self.actions['56'].setVisible(False)
                     self.actions['57'].setVisible(False)
+                    self.actions['43'].setVisible(False)
+                    self.actions['52'].setVisible(False)
                     if self.toolbar_ws_enabled:
                         self.toolbar_ws.setVisible(True)                            
                 elif wsoftware.lower() == 'ud':
@@ -445,6 +455,8 @@ class Giswater(QObject):
                     self.actions['27'].setVisible(False)
                     self.actions['56'].setVisible(True)
                     self.actions['57'].setVisible(True)
+                    self.actions['43'].setVisible(True)
+                    self.actions['52'].setVisible(True)
                     if self.toolbar_ud_enabled:
                         self.toolbar_ud.setVisible(True)                
 
@@ -716,6 +728,9 @@ class Giswater(QObject):
         self.set_map_tool('mg_connec_tool')
         #self.set_map_tool('mg_analytics')
         self.set_map_tool('mg_extract_raster_value')
+        self.set_map_tool('mg_draw_profiles')
+        self.set_map_tool('ed_flow_regulator')
+        
 
         # Set SearchPlus object
         self.set_search_plus()

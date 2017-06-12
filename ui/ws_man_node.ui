@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>610</width>
+    <width>738</width>
     <height>719</height>
    </rect>
   </property>
@@ -143,16 +143,6 @@
     </property>
     <property name="frame">
      <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="nodecat_id">
-    <property name="geometry">
-     <rect>
-      <x>275</x>
-      <y>25</y>
-      <width>156</width>
-      <height>20</height>
-     </rect>
     </property>
    </widget>
    <widget class="QLineEdit" name="node_id">
@@ -22613,7 +22603,7 @@
      <string notr="true"/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_9">
+   <widget class="QPushButton" name="btn_catalog">
     <property name="geometry">
      <rect>
       <x>435</x>
@@ -22624,6 +22614,16 @@
     </property>
     <property name="text">
      <string>...</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="nodecat_id">
+    <property name="geometry">
+     <rect>
+      <x>275</x>
+      <y>25</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -22652,7 +22652,7 @@
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+     <normaloff>../../../../../.designer/backup/zoom.png</normaloff>../../../../../.designer/backup/zoom.png</iconset>
    </property>
    <property name="text">
     <string>zoom</string>
@@ -22664,7 +22664,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>centered.png</normaloff>centered.png</iconset>
+     <normaloff>../../../../../.designer/backup/centered.png</normaloff>../../../../../.designer/backup/centered.png</iconset>
    </property>
    <property name="text">
     <string>Centered</string>
@@ -22673,7 +22673,7 @@
   <action name="actionEnabled">
    <property name="icon">
     <iconset>
-     <normaloff>enable_edit.png</normaloff>enable_edit.png</iconset>
+     <normaloff>../../../../../.designer/backup/enable_edit.png</normaloff>../../../../../.designer/backup/enable_edit.png</iconset>
    </property>
    <property name="text">
     <string>Enabled</string>
@@ -22682,7 +22682,7 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>Zoom-Out-icon.png</normaloff>Zoom-Out-icon.png</iconset>
+     <normaloff>../../../../../.designer/backup/Zoom-Out-icon.png</normaloff>../../../../../.designer/backup/Zoom-Out-icon.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>

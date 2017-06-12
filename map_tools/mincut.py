@@ -31,6 +31,8 @@ from ..ui.mincut_fin import Mincut_fin
 from ..ui.mincut_config import Mincut_config
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 
+from ..ui.flow_regulator import Flow_regulator
+        
 from datetime import *
 from functools import partial
 

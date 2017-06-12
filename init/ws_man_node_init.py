@@ -6,14 +6,14 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QMessageBox, QComboBox, QLineEdit
 
 from qgis.gui import *
 from functools import partial
-
+import os
 import utils_giswater
 from parent_init import ParentDialog
-
+from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -131,16 +131,22 @@ class ManNodeDialog(ParentDialog):
   
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))   
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
 
-        
+
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-        
-        
+
+
+        # QLineEdit
+        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        # ComboBox
+        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
+
     def actionZoomOut(self):
         feature = self.feature
 
@@ -203,3 +209,120 @@ class ManNodeDialog(ParentDialog):
 
         canvas.zoomToSelected(layer)
 
+    def catalog(self):
+        self.dlg_cat=WScatalog()
+        utils_giswater.setDialog(self.dlg_cat)
+        self.dlg_cat.open()
+
+        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtnodecat_id)
+        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+
+        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
+        self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")
+        self.dnom = self.dlg_cat.findChild(QComboBox, "dnom")
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxpnom)
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxdnom)
+
+        self.pnom.currentIndexChanged.connect(self.fillCbxCatalod_id)
+        self.pnom.currentIndexChanged.connect(self.fillCbxdnom)
+
+        self.dnom.currentIndexChanged.connect(self.fillCbxCatalod_id)
+
+
+        self.matcat_id.clear()
+        self.pnom.clear()
+        self.dnom.clear()
+
+        node_type = self.node_type.currentText()
+        sql= "SELECT DISTINCT(matcat_id) FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+
+
+        sql= "SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
+
+
+        sql= "SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "'"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
+
+
+    def fillCbxpnom(self,index):
+        if index == -1:
+            return
+
+        nodetype = self.node_type.currentText()
+        mats=self.matcat_id.currentText()
+
+        sql="SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_node"
+        if(str(nodetype)!= ""):
+            sql += " WHERE nodetype_id='"+nodetype+"'"
+        if (str(mats)!=""):
+            sql += " and matcat_id='"+str(mats)+"'"
+        rows = self.controller.get_rows(sql)
+        self.pnom.clear()
+        utils_giswater.fillComboBox(self.pnom, rows)
+        self.fillCbxdnom()
+
+    def fillCbxdnom(self,index):
+        if index == -1:
+            return
+
+        nodetype = self.node_type.currentText()
+        mats=self.matcat_id.currentText()
+        pnom=self.pnom.currentText()
+        sql="SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_node"
+        if(str(nodetype)!= ""):
+            sql += " WHERE nodetype_id='"+nodetype+"'"
+        if (str(mats)!=""):
+            sql += " and matcat_id='"+str(mats)+"'"
+        if(str(pnom)!= ""):
+            sql +=" and pnom='"+str(pnom)+"'"
+        rows = self.controller.get_rows(sql)
+        self.dnom.clear()
+        utils_giswater.fillComboBox(self.dnom, rows)
+
+    def fillCbxCatalod_id(self,index):    #@UnusedVariable
+
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        if self.id!='null':
+            nodetype = self.node_type.currentText()
+            mats = self.matcat_id.currentText()
+            pnom = self.pnom.currentText()
+            dnom = self.dnom.currentText()
+            sql = "SELECT DISTINCT(id) FROM ws_sample_dev.cat_node"
+            if(str(nodetype)!= ""):
+                sql += " WHERE nodetype_id='"+nodetype+"'"
+            if (str(mats)!=""):
+                sql += " and matcat_id='"+str(mats)+"'"
+            if (str(pnom) != ""):
+                sql += " and pnom='"+str(pnom)+"'"
+            if (str(dnom) != ""):
+                sql += " and dnom='" + str(dnom) + "'"
+            rows = self.controller.get_rows(sql)
+            self.id.clear()
+            utils_giswater.fillComboBox(self.id, rows)
+
+
+
+
+    '''
+    # QMessageBox.about(None, 'Ok', str(nodetype))
+    def initfillcbxnodecat_id(self):
+        sql = "SELECT DISTINCT(id) FROM ws_sample_dev.cat_node"
+        sql += " WHERE nodetype_id='" + self.node_type.currentText() + "'"
+        rows = self.controller.get_rows(sql)
+        self.nodecat_id.clear()
+        utils_giswater.fillComboBox(self.nodecat_id,rows)
+    '''
+
+    def fillTxtnodecat_id(self):
+        self.dlg_cat.close()
+        self.nodecat_id.clear()
+        self.nodecat_id.setText(str(self.id.currentText()))

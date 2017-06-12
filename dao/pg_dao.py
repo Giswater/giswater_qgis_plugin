@@ -153,5 +153,9 @@ class PgDao():
             self.cursor.copy_expert(sql, csv_file)
             return None
         except Exception as e:
-            return e        
+            return e 
+            
+
+
+    
         
