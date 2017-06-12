@@ -132,7 +132,6 @@ class ManNodeDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
-
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
 
 
@@ -147,8 +146,6 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         # ComboBox
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
-        #self.node_type.currentIndexChanged.connect(self.initfillcbxnodecat_id)
-        #self.dialog.cmbArcs.currentIndexChanged.connect(self.populateCmbNode)
 
     def actionZoomOut(self):
         feature = self.feature

@@ -87,7 +87,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -700,7 +700,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_7">
+       <widget class="QPushButton" name="btn_node_class1">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -713,7 +713,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_8">
+       <widget class="QPushButton" name="btn_node_class2">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -2000,7 +2000,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_9">
+       <widget class="QPushButton" name="pushButton_10">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -2013,7 +2013,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_10">
+       <widget class="QPushButton" name="pushButton_9">
         <property name="geometry">
          <rect>
           <x>245</x>
@@ -2158,8 +2158,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4782,8 +4782,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">

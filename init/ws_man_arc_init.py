@@ -7,12 +7,13 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction,QMessageBox
 from PyQt4.QtCore import Qt
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
+from init.ws_man_node_init import ManNodeDialog
 
 
 def formOpen(dialog, layer, feature):
@@ -36,7 +37,7 @@ def init_config():
     # utils_giswater.setSelectedItem("state", state)   
     pass
      
-class ManArcDialog(ParentDialog):   
+class ManArcDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
@@ -68,6 +69,9 @@ class ManArcDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
         self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
+
+        self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
+        self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
         
         # Load data from related tables
         self.load_data()
@@ -102,13 +106,18 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
 
+        self.btn_node_class1.clicked.connect(self.test)
+
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
         
-        
+    def test(self):
+        QMessageBox.about(None, 'Ok', str("test"))
+        #self.ManNodeDialog.init_config_form()
+
     def actionZoomOut(self):
         feature = self.feature
 
