@@ -586,7 +586,8 @@ class Mg():
         
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
-        self.controller.check_action(True, 28)        
+        #self.controller.check_action(True, 28)
+        self.controller.check_action(True, 99)               
         
         # Create the dialog and signals
         self.dlg = Config()
@@ -646,9 +647,7 @@ class Mg():
         # Set values from widgets of type QDateEdit
         sql = "SELECT DISTINCT(builtdate_vdefault) FROM" + self.schema_name + ".config"
         rows = self.dao.get_rows(sql)
-        utils_giswater.setCalendarDate("builtdate_vdefault", rows[0][0])
-
-
+        #utils_giswater.setCalendarDate("builtdate_vdefault", rows[0][0])
 
 
         # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value'

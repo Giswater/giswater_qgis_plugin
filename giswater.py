@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
-from PyQt4.QtGui import QAction, QActionGroup, QIcon
+from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
 import sys  
@@ -150,6 +150,10 @@ class Giswater(QObject):
      
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
+        
+     
+        
+        
         if parent is None:
             parent = self.iface.mainWindow()
 
@@ -163,6 +167,44 @@ class Giswater(QObject):
             action = QAction(text, parent) 
         else:
             action = QAction(icon, text, parent)  
+            if index_action == '99':
+                # Add drop down menu to button in toolbar
+                self.menu=QMenu()
+                self.sub_menu=QMenu()
+                '''
+                self.sub_menu.setTitle("sub_menu1")
+                
+                
+                self.menu.addMenu(self.sub_menu)
+                
+                
+                action.setMenu(self.menu)
+     
+                self.sub_menu.addAction("action 1",self.test)  
+                self.sub_menu.addAction("action 2",self.test) 
+                self.sub_menu.addAction("action 3",self.test) 
+                '''
+                
+                #self.menu.clear()
+                #sql = "SELECT DISTRICT(type) FROM "+self.schema_name+".node_type"#
+                sql =  "SELECT DISTRICT(type) FROM ws_sample_dev.node_type"
+                sql+= " ORDER BY type"
+                rows = self.controller.get_rows(sql) 
+                print rows
+                # Fill menu
+                '''
+                for row in rows:       
+                    elem = row[0]
+                    # If not exist in table _selector_state isert to menu
+                    # Check if we already have data with selected id
+                    #sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
+                    #row = self.dao.get_row(sql)  
+                    #if row == None:
+                    self.sub_menu.setTitle(elem)
+                    self.menu.addMenu(self.sub_menu)
+                '''
+                    
+    
                                     
         if toolbar is not None:
             toolbar.addAction(action)  
@@ -182,6 +224,11 @@ class Giswater(QObject):
         return action
             
         return action
+          
+          
+        
+    def test(self):
+        print ""
           
     
     def add_action(self, index_action, toolbar, parent):
@@ -643,6 +690,9 @@ class Giswater(QObject):
         if self.schema_name is None or not self.dao.check_schema(schema_name):
             self.controller.show_warning("Schema not found: "+self.schema_name)            
             return
+            
+            
+        
         
         # Set schema_name in controller and in config file
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   

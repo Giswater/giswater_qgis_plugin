@@ -7,6 +7,9 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLabel, QPixmap, QLineEdit
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+
 
 from functools import partial
 
@@ -151,7 +154,7 @@ class ManNodeDialog(ParentDialog):
         
        
     def open_selected_event_from_table(self):
-        ''' Button - Open document from table document'''
+        ''' Button - Open EVENT | gallery from table event '''
         
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         # Get selected rows
@@ -262,12 +265,12 @@ class ManNodeDialog(ParentDialog):
         img_7 = self.dlg_gallery.findChild(QLabel, 'img_7')
         img_8 = self.dlg_gallery.findChild(QLabel, 'img_8')
         '''
-
-        
         
         txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
         txt_visit_id.setText(str(visit_id))
         
+        txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
+        txt_event_id.setText(str(event_id))
         # Add picture to gallery
         '''
         pic_file = "C:/Users/tasladmin/Desktop/img_pipe.png"
@@ -275,22 +278,115 @@ class ManNodeDialog(ParentDialog):
         self.img_1.setPixmap(pixmap)
         self.img_1.show()  
         '''
-        img_path_list = ["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"]
-        message = str(len(img_path_list))
+        self.img_path_list = [["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"] ,["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]]
+        message = str(len(self.img_path_list))
         self.controller.show_warning(message, context_name='ui_message')
         
-        for i in range(0, len(img_path_list)):
-            pixmap = QPixmap(img_path_list[i])
+        #for i in range(0, len(self.img_path_list)):
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[0][i])
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             widget.setPixmap(pixmap)
             widget.show()
       
+        self.start_indx = 0
+        self.end_indx = len(self.img_path_list)-1
+        self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
+        self.btn_next.clicked.connect(self.next_gallery)
+        
+        self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
+        self.btn_previous.clicked.connect(self.previous_gallery)
+        
+        #label = self.dlg_gallery.findChild(QLabel, 'test')
+        #label_click = ClickableLabel(label)
+        #label_click.signalClicked.connec(self.test)
+        #pixmap = QPixmap("C:/Users/tasladmin/Desktop/events/img_pipe3.jpg")
+        #label.setPixmap(pixmap)
+        
         self.dlg_gallery.exec_()
 
-  
+    def test(self):
+        message = "test clicable albel"
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        
+    def next_gallery(self):
+        self.start_indx = self.start_indx+1
+        
+        
+        # First clear previous
+        for i in range(0, 9):
+            widget_name = "img_"+str(i)
+            widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            widget.clear()
+            # Add action to Label :on click zoom images
+                 
+            
+            
+        
+            
+            
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            widget_name = "img_"+str(i)
+            widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            #Define clicable label
+            #self.label=ClickableLabel(widget)
+            #self.label.signalClicked.connec(self.test)
+            
+            widget.setPixmap(pixmap)
+            widget.show()
+            
+            
+            
+        message = "start index next:"+str(self.start_indx)
+        self.controller.show_warning(message, context_name='ui_message')
+        if self.start_indx > 0 :
+            self.btn_previous.setEnabled(True) 
+            
+        # On last tab disable btn_next
+        #if self.start_indx == (len(self.img_path_list)-1) :
+        #    self.btn_next.setEnabled(False) 
+            
+        message = "start index next:"+str(self.start_indx)+"number of atbs:"+str(len(self.img_path_list))
+        self.controller.show_warning(message, context_name='ui_message')
+        
+    
+            
+    def previous_gallery(self):
+        #self.end_indx = self.end_indx-1
+        self.start_indx = self.start_indx-1
 
-     
+        # First clear previous
+        for i in range(0, 9):
+            widget_name = "img_"+str(i)
+            widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            widget.clear()
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            widget_name = "img_"+str(i)
+            widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            widget.setPixmap(pixmap)
+            widget.show()
+
+        message = "start index previous:"+str(self.start_indx)
+        self.controller.show_warning(message, context_name='ui_message')    
+          
+        if self.start_indx == 0 :
+            self.btn_previous.setEnabled(False)
+        if self.start_indx < len(self.img_path_list) :
+            self.btn_next.setEnabled(True)  
+        
+        
+
+    
+        
+        
+    ''' ACTIONS TOOLBAR '''    
+        
         
     def actionZoomOut(self):
         feature = self.feature
@@ -354,5 +450,23 @@ class ManNodeDialog(ParentDialog):
 
         canvas.zoomToSelected(layer)
 
-
+        
+''' Add click event for QLabel '''        
+        
+class ClickableLabel(QLabel):
+    '''Normal label, but emits an event if the label is left-clicked'''
+   
+    signalClicked = Signal()    # emitted whenever this label is left-clicked
+   
+    def __init__(self, text, parent=None):
+        super(ClickableLabel, self).__init__(text, parent)
+        self.setStyleSheet('''
+       QLabel {text-decoration:none}
+       QLabel:hover {color:white; background:grey;}
+       ''')
+        self.setFixedSize(self.sizeHint())
+   
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.signalClicked.emit()
     

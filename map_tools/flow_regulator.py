@@ -25,30 +25,24 @@ from PyQt4.QtGui import QColor
 
 from map_tools.parent import ParentMapTool
 
-from ..ui.flow_regulator import Flow_regulator
-
-import utils_giswater
-
 
 class FlowRegulator(ParentMapTool):
-    ''' Button 26. User select one node or arc.
-    Execute SQL function: 'gw_fct_mincut'
-    This function fills 3 temporary tables with id's: node_id, arc_id and valve_id
-    Returns and integer: error code
-    Get these id's and select them in its corresponding layers '''    
+    ''' Button 52. '''
 
-    def __init__(self, iface, settings, action, index_action):  
+    def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
-        
-        # Call ParentMapTool constructor     
-        super(FlowRegulator, self).__init__(iface, settings, action, index_action)  
+
+        # Call ParentMapTool constructor
+        super(FlowRegulator, self).__init__(iface, settings, action, index_action)
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
         self.vertexMarker.setColor(QColor(255, 25, 25))
-        self.vertexMarker.setIconSize(11)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX) # or ICON_CROSS, ICON_X
+        self.vertexMarker.setIconSize(12)
+        self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
         self.vertexMarker.setPenWidth(5)
-       
-        
+
+
+
+    
     
