@@ -365,6 +365,7 @@ ALTER TABLE cat_grate ADD COLUMN active boolean;
 ALTER TABLE cat_element ADD COLUMN madeby character varying(100);
 ALTER TABLE cat_element ADD COLUMN model character varying(100);
 
+ALTER TABLE cat_feature ADD feature_type character varying (18);
 
 ALTER TABLE doc_x_tag ADD CONSTRAINT doc_x_tag_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES cat_tag (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE doc_x_tag ADD CONSTRAINT doc_x_tag_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

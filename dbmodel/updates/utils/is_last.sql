@@ -7,7 +7,29 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- ----------------------------
+-- CUSTOM FIELDS
+-- ----------------------------
+DROP TABLE IF EXISTS man_custom_field_parameter;
+CREATE TABLE man_custom_field_parameter(
+field_id character varying (50) NOT NULL PRIMARY KEY,
+descript character varying (254),
+feature_type character varying (18) NOT NULL
+);
 
+DROP TABLE IF EXISTS man_custom_field;
+CREATE TABLE man_custom_field(
+id serial NOT NULL PRIMARY KEY,
+field_id character varying (50) NOT NULL,
+feature_id character varying (16),
+value character varying (50),
+tstamp timestamp default now()
+);
+
+
+ ALTER TABLE man_custom_field ADD CONSTRAINT man_custom_field_man_custom_field_parameter_fkey FOREIGN KEY (field_id) REFERENCES man_custom_field_parameter (field_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+  ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (feature_type) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ 
 -- ----------------------------
 -- FIX ANL/MAN TOOLS SELECTOR ONLY WITH ONE ROW
 -- ----------------------------

@@ -84,6 +84,13 @@ CREATE TABLE doc_x_tag(
 );
 
 
+CREATE TABLE cat_feature
+(
+  id character varying(50) NOT NULL,
+  feature_type character varying(18),
+  CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
+);
+
 -- ANALYSIS
 
 DROP TABLE IF EXISTS anl_node_topological_consistency CASCADE;
