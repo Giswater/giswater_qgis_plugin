@@ -186,6 +186,7 @@ CREATE TABLE review_audit_arc
   arc_type character varying(16),
   arccat_id character varying(30),
   annotation character varying(254),
+  observ character varying(254),
   verified character varying(16),
    moved_geom boolean,
   field_checked boolean,

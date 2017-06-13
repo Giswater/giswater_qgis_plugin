@@ -112,6 +112,7 @@ CREATE TABLE review_arc
   arc_type character varying(16),
   arccat_id character varying(30),
   annotation character varying(254),
+  observ character varying(254),
   verified character varying(16),
   field_checked boolean,
   office_checked boolean,

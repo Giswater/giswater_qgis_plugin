@@ -96,38 +96,3 @@ element.publish,
 element.inventory
 FROM element_x_connec
 JOIN element ON element.element_id::text = element_x_connec.element_id::text;
-
-
-
-
-DROP VIEW IF EXISTS v_edit_review_node CASCADE;
-CREATE VIEW v_edit_review_node AS 
- SELECT review_audit_node.node_id,
-    node.top_elev,
-    node.ymax,
-    review_audit_node.top_elev AS cota_tapa,
-    review_audit_node.ymax AS profunditat,
-    review_audit_node.annotation,
-	review_audit_node.moved_geom,
-    review_audit_node.office_checked,
-	review_audit_node.the_geom	
-   FROM node
-     RIGHT JOIN review_audit_node ON node.node_id::text = review_audit_node.node_id::text
-  WHERE review_audit_node.field_checked IS TRUE AND review_audit_node.office_checked IS NOT TRUE;
-  
-
-CREATE OR REPLACE VIEW mollet_ide_ud.v_edit_review_arc AS 
- SELECT review_audit_arc.arc_id,
-    arc.arccat_id,
-    arc.y1,
-    arc.y2,
-    review_audit_arc.arccat_id AS seccio,
-    review_audit_arc.y1 AS sonda_ini,
-    review_audit_arc.y2 AS sonda_fi,
-    review_audit_arc.annotation,
-    review_audit_arc.moved_geom,
-    review_audit_arc.office_checked,
-    review_audit_arc.the_geom
-   FROM arc
-     RIGHT JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
-  WHERE review_audit_arc.field_checked IS TRUE AND review_audit_arc.office_checked IS NOT TRUE;
