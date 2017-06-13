@@ -134,11 +134,11 @@ CREATE TABLE review_node
   office_checked boolean,
   CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
   );
-
+  
 DROP TABLE IF EXISTS review_connec;
 CREATE TABLE review_connec
 ( connec_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,SRID_VALUE),
+  the_geom geometry(POINT,25831),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   connec_type character varying(16),
@@ -148,13 +148,13 @@ CREATE TABLE review_connec
   verified character varying(16),
   field_checked boolean,
   office_checked boolean,
-  CONSTRAINT review_connec_pkey PRIMARY KEY (node_id)
+  CONSTRAINT review_connec_pkey PRIMARY KEY (connec_id)
   );
   
-  DROP TABLE IF EXISTS review_gully;
+DROP TABLE IF EXISTS review_gully;
 CREATE TABLE review_gully
 ( gully_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,SRID_VALUE),
+  the_geom geometry(POINT,25831),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   matcat_id character varying(18),
@@ -165,7 +165,7 @@ CREATE TABLE review_gully
   arc_id character varying(16),
   siphon character varying(3),
   featurecat_id character varying(50),
-  feature_id character varying(16)
+  feature_id character varying(16),
   connec_type character varying(16),
   conneccat_id character varying(16),
   annotation character varying(254),
@@ -173,7 +173,7 @@ CREATE TABLE review_gully
   verified character varying(16),
   field_checked boolean,
   office_checked boolean,
-  CONSTRAINT review_gully_pkey PRIMARY KEY (node_id)
+  CONSTRAINT review_gully_pkey PRIMARY KEY (gully_id)
   );
   
 DROP TABLE IF EXISTS review_audit_arc;
@@ -219,7 +219,7 @@ CREATE TABLE review_audit_node
 DROP TABLE IF EXISTS review_audit_connec;
 CREATE TABLE review_audit_connec
 (  connec_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,SRID_VALUE),
+  the_geom geometry(POINT,25831),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   connec_type character varying(16),
@@ -235,11 +235,11 @@ CREATE TABLE review_audit_connec
   office_checked boolean,
   CONSTRAINT review_audit_connec_pkey PRIMARY KEY (connec_id)
   );
-  
-  DROP TABLE IF EXISTS review_audit_gully;
-CREATE TABLE review_audit_gully
+
+ DROP TABLE IF EXISTS  review_audit_gully;
+ CREATE TABLE review_audit_gully
 (  gully_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,SRID_VALUE),
+  the_geom geometry(POINT,25831),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   matcat_id character varying(18),
