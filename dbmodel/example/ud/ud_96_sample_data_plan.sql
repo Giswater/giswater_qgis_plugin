@@ -11,19 +11,19 @@ INSERT INTO plan_psector VALUES ('ACT_02_F1', 'Expanding the capacity of the con
 INSERT INTO plan_psector VALUES ('ACT_01_F0', 'Expanding the capacity of the conduits located on Aragó avenue and Torre de la Vila avenue.', 'HIGH_PRIORITY', NULL, NULL, 'Action caused by the hydraulic insufficiency of the conduit and serious structural problems.', NULL, 1500.00, 'sector_01', '01', 19.00, 21.00, NULL, '0106000020E764000001000000010300000001000000050000007FD83C72699319411A5EFB06157551417FD83C7269931941D8DD28FAF3745141F50B5DD084971941D8DD28FAF3745141F50B5DD0849719411A5EFB06157551417FD83C72699319411A5EFB0615755141');
 
 
-INSERT INTO plan_arc_x_psector VALUES (1, 'A247', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_arc_x_psector VALUES (2, 'A248', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_arc_x_psector VALUES (3, 'A249', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_arc_x_psector VALUES (4, 'A250', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_arc_x_psector VALUES (5, 'A251', 'ACT_02_F1', '02', NULL);
-INSERT INTO plan_arc_x_psector VALUES (6, 'A252', 'ACT_02_F1', '02', NULL);
+INSERT INTO plan_arc_x_psector VALUES (1, '1247', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_arc_x_psector VALUES (2, '1248', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_arc_x_psector VALUES (3, '1249', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_arc_x_psector VALUES (4, '1250', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_arc_x_psector VALUES (5, '1251', 'ACT_02_F1', '02', NULL);
+INSERT INTO plan_arc_x_psector VALUES (6, '1252', 'ACT_02_F1', '02', NULL);
 
 
 
-INSERT INTO plan_node_x_psector VALUES (1, 'N91', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_node_x_psector VALUES (2, 'N92', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_node_x_psector VALUES (3, 'N94', 'ACT_01_F0', '01', NULL);
-INSERT INTO plan_node_x_psector VALUES (4, 'N36', 'ACT_02_F1', '02', NULL);
+INSERT INTO plan_node_x_psector VALUES (1, '5091', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_node_x_psector VALUES (2, '5092', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_node_x_psector VALUES (3, '5094', 'ACT_01_F0', '01', NULL);
+INSERT INTO plan_node_x_psector VALUES (4, '5036', 'ACT_02_F1', '02', NULL);
 
 
 INSERT INTO plan_other_x_psector VALUES (5, 'SECURITY_HEALTH', 43265.31, 'ACT_01_F0', '01', NULL);
