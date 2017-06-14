@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
+    <width>557</width>
     <height>317</height>
    </rect>
   </property>
@@ -18,17 +18,17 @@
     <rect>
      <x>15</x>
      <y>15</y>
-     <width>341</width>
+     <width>526</width>
      <height>256</height>
     </rect>
    </property>
    <property name="title">
-    <string>Select the mincut</string>
+    <string>Select mincut</string>
    </property>
    <widget class="QLabel" name="label_label_x_7">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>310</x>
       <y>20</y>
       <width>90</width>
       <height>22</height>
@@ -64,7 +64,7 @@
    <widget class="QComboBox" name="state_edit">
     <property name="geometry">
      <rect>
-      <x>185</x>
+      <x>365</x>
       <y>20</y>
       <width>146</width>
       <height>20</height>
@@ -76,7 +76,7 @@
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>321</width>
+      <width>506</width>
       <height>191</height>
      </rect>
     </property>
@@ -88,7 +88,7 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>282</x>
+     <x>450</x>
      <y>280</y>
      <width>75</width>
      <height>23</height>
@@ -101,7 +101,7 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>202</x>
+     <x>370</x>
      <y>280</y>
      <width>75</width>
      <height>23</height>
