@@ -222,7 +222,7 @@ BEGIN
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
-		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, parent_node_id)
+		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, code, expl_id, publish, inventory, end_date, parent_node_id)
 		VALUES (NEW.node_id, NEW.junction_elevation, NEW.junction_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.junction_state, NEW.junction_annotation, NEW.junction_observ, 
 		NEW.junction_comment, NEW.dma_id, NEW.junction_soilcat_id, NEW.junction_category_type, NEW.junction_fluid_type, NEW.junction_location_type, NEW.junction_workcat_id, NEW.junction_buildercat_id, 
 		NEW.junction_builtdate,NEW.junction_ownercat_id, NEW.junction_adress_01, NEW.junction_adress_02, NEW.junction_adress_03, NEW.junction_descript, NEW.junction_rotation, NEW.junction_link, NEW.verified, 

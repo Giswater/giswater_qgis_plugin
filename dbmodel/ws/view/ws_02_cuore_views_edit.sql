@@ -55,7 +55,8 @@ node.publish,
 node.inventory,
 node.end_date,
 dma.macrodma_id,
-exploitation.short_descript AS expl_name
+exploitation.short_descript AS expl_name,
+node.parent_node_id
 FROM expl_selector, node
 LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -603,7 +604,8 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
 	node.inventory,
 	node.end_date AS reduction_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	exploitation.short_descript AS expl_name,
+	node.parent_node_id
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
