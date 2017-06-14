@@ -36,7 +36,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Valve tipe selector</string>
+    <string>Valve type selector</string>
    </property>
   </widget>
  </widget>
