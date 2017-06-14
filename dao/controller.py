@@ -25,6 +25,8 @@ class DaoController():
         
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
+        
+    
     
     def tr(self, message, context_name=None):
         if context_name is None:
@@ -64,6 +66,9 @@ class DaoController():
             action = self.actions[key]
             action.setChecked(check)     
     
+    def get_schema_name(self):
+        self.schema_name = self.plugin_settings_value('schema_name')
+        return self.schema_name
     
     def set_database_connection(self):
         ''' Ser database connection '''

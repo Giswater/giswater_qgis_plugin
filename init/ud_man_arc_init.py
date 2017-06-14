@@ -6,12 +6,15 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
-from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QLabel
+from PyQt4.QtCore import Qt, QSettings
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
+from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
+
+#from init import ud_man_node_init 
 
 
 def formOpen(dialog, layer, feature):
@@ -38,6 +41,7 @@ def init_config():
     # state = utils_giswater.getWidgetText("conduit_state") 
     # utils_giswater.setSelectedItem("conduit_state", state)   
     
+    
 
 
 class ManArcDialog(ParentDialog):   
@@ -50,7 +54,31 @@ class ManArcDialog(ParentDialog):
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
-      
+        
+        
+        # Restoring layers from Qgs memory
+        proj = QgsProject.instance()
+        myint=proj.readNumEntry("myplugin","myint",123)[0]
+        message = str(myint)
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        
+        
+        
+        '''
+        self.settings=QSettings()  
+        size = self.settings.beginReadArray("layer_node_man_UD")
+        
+        message = str(size)
+        self.controller.show_warning(message, context_name='ui_message')
+        for i in range(0, size):
+            self.settings.setArrayIndex(i)
+            layer_node_man_UD[i]=settings.value("layer_node_man_UD")
+            message = "test settings"
+            self.controller.show_warning(message, context_name='ui_message')
+        self.settings.endArray()   
+        '''
+    
         table_element = "v_ui_element_x_arc" 
         table_document = "v_ui_doc_x_arc"   
         table_event_arc = "v_ui_om_visit_x_arc"
@@ -103,7 +131,12 @@ class ManArcDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))       
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
+
+        
+        #self.layer_node_man= self.SnappingConfigManager.get_layer_node()
+        #self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(self.go_child)
+        
         
         # Manage 'cat_shape'
         self.setImage("label_image_ud_shape")
@@ -115,6 +148,70 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
         
+        
+    def go_child(self):
+   
+        self.conduit_node_1 = self.dialog.findChild(QLineEdit,"conduit_node_1")
+        self.node_id= self.conduit_node_1.text()
+       
+        
+        layer = QgsMapLayerRegistry.instance().mapLayersByName( "Junction" )[0]
+        self.iface.setActiveLayer(layer)
+        message = "tes11t"
+        self.controller.show_warning(message, context_name='ui_message')
+        #feature = layer.getFeature(id_node1)
+        
+        # get pointer of node by ID
+        n=len(self.node_id)
+        aux = "\"node_id\" = "
+        # Get a featureIterator from this expression:
+        aux += "'" + str(self.node_id) + "', "
+        aux = aux[:-2] 
+        
+        message = aux
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        expr = QgsExpression(aux)
+        message = "test 2"
+        self.controller.show_warning(message, context_name='ui_message')
+        '''
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        '''
+
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        #feature = layer.getFeature(id_node1)
+        message = "test3"
+        self.controller.show_warning(message, context_name='ui_message')
+        # Build a list of feature id's from the previous result
+
+        
+        #--->id_list = it.id()
+        
+        #message =str(id_list)
+        #self.controller.show_warning(message, context_name='ui_message')
+
+        # Select features with these id's
+        #layer.setSelectedFeatures("11225")
+        
+        
+        message = "test55"
+        self.controller.show_warning(message, context_name='ui_message')
+        '''
+        for layer in self.layer_node_man:
+            feature = layer.getFeature(id_node1)
+            message = layer.name()
+            self.controller.show_warning(message, context_name='ui_message')
+            if feature != None:
+                print layer.name()
+                self.iface.setActiveLayer(layer)
+        '''
+         
+        ud_man_node_init.formOpen()
+        message = "test66"
+        self.controller.show_warning(message, context_name='ui_message')
         
     def actionZoomOut(self):
         feature = self.feature
@@ -155,7 +252,7 @@ class ManArcDialog(ParentDialog):
 
         # initialize plugin directory
         user_folder = os.path.expanduser("~")
-        self.plugin_name = 'iw2pg'
+        self.plugin_name = 'giswater'
         self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
 
         self.layer = self.iface.activeLayer()

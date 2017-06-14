@@ -284,9 +284,11 @@ class ManNodeDialog(ParentDialog):
         
         #for i in range(0, len(self.img_path_list)):
         for i in range(0, 9):
+            # Set image to QLabel
             pixmap = QPixmap(self.img_path_list[0][i])
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            #widget.mousePressEvent.connect(self.test)
             widget.setPixmap(pixmap)
             widget.show()
       
@@ -322,11 +324,7 @@ class ManNodeDialog(ParentDialog):
             widget.clear()
             # Add action to Label :on click zoom images
                  
-            
-            
-        
-            
-            
+
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])

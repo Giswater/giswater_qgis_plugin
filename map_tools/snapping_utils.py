@@ -38,6 +38,7 @@ class SnappingConfigManager():
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 
 
+        
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man

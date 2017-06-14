@@ -122,7 +122,8 @@ class PgDao():
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
-        return exists         
+        return exists    
+
     
     
     def check_table(self, schemaname, tablename):

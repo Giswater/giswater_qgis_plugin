@@ -30,7 +30,7 @@ from map_tools.flow_regulator import FlowRegulator
 
 
 from search.search_plus import SearchPlus
-from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
+from qgis.core import QgsExpressionContextUtils,QgsVectorLayer,QgsProject
 
 from xml.dom import minidom
 
@@ -46,6 +46,7 @@ class Giswater(QObject):
         '''
         super(Giswater, self).__init__()
         
+      
         # Initialize instance attributes
         self.iface = iface
         self.legend = iface.legendInterface()    
@@ -54,6 +55,7 @@ class Giswater(QObject):
         self.search_plus = None
         self.map_tools = {}
         self.srid = None  
+        self.menu_values = None
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
@@ -150,7 +152,7 @@ class Giswater(QObject):
      
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
-        
+        schema_name=self.controller.get_schema_name()
      
         
         
@@ -171,10 +173,10 @@ class Giswater(QObject):
                 # Add drop down menu to button in toolbar
                 self.menu=QMenu()
                 self.sub_menu=QMenu()
-                '''
-                self.sub_menu.setTitle("sub_menu1")
                 
-                
+                #self.menu_values
+                #self.sub_menu.setTitle(self.menu_values[0])
+                self.sub_menu.setTitle("sub_menu 1")
                 self.menu.addMenu(self.sub_menu)
                 
                 
@@ -183,15 +185,10 @@ class Giswater(QObject):
                 self.sub_menu.addAction("action 1",self.test)  
                 self.sub_menu.addAction("action 2",self.test) 
                 self.sub_menu.addAction("action 3",self.test) 
-                '''
-                
-                #self.menu.clear()
-                #sql = "SELECT DISTRICT(type) FROM "+self.schema_name+".node_type"#
-                sql =  "SELECT DISTRICT(type) FROM ws_sample_dev.node_type"
-                sql+= " ORDER BY type"
-                rows = self.controller.get_rows(sql) 
-                print rows
-                # Fill menu
+                sql = "SELECT DISTINCT(type) FROM "+schema_name+".node_type "    
+                row = self.dao.get_row(sql)  
+                self.sub_menu.addAction(row[0],self.test) 
+                #self.sub_menu.addAction(row[1],self.test) 
                 '''
                 for row in rows:       
                     elem = row[0]
@@ -532,11 +529,13 @@ class Giswater(QObject):
         if len(layers) == 0:
             return    
         
+        
         # Initialize variables
         self.layer_arc = None
         self.layer_arc_man_UD = []
         self.layer_arc_man_WS = []
 
+        
         self.layer_node = None
         self.layer_node_man_UD = []
         self.layer_node_man_WS = []
@@ -665,7 +664,23 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-             
+        
+        '''        
+        self.settings.beginWriteArray("layer_node_man_UD")
+        for i in range(0, len(self.layer_node_man_UD)):
+            self.settings.setArrayIndex(i)
+            self.settings.setValue("layer_node_man_UD",self.layer_node_man_UD[i])
+        self.settings.endArray()    
+        '''
+
+        # Saving layers from Qgs memory
+        #QStringList
+        #QString
+    
+        proj = QgsProject.instance()
+        proj.writeEntry("myplugin","myint",10)
+        
+        
         # Check if table 'version' and man_junction exists
         exists = False
         for layer in layers:
@@ -706,11 +721,15 @@ class Giswater(QObject):
         row = self.dao.get_row(sql)
         if row:
             self.srid = row[0]   
-            self.controller.plugin_settings_set_value("srid", self.srid)                           
+            self.controller.plugin_settings_set_value("srid", self.srid)  
+
+            
         
         # Search project type in table 'version'
         self.search_project_type()
-                                        
+        
+
+            
         self.controller.set_actions(self.actions)
 
         # Set layer custom UI form and init function   
