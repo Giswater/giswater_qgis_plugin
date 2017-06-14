@@ -11,7 +11,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		IF NEW.field_checked=TRUE THEN
 				
 			INSERT INTO review_audit_gully (gully_id, the_geom, top_elev, ymax, matcat_id, gratecat_id, units, groove, arccat_id, arc_id, siphon, featurecat_id, feature_id,annotation, verified, field_checked,"operation","user",date_field, office_checked) 
-			VALUES(NEW.connec_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.connec_type, NEW.connecat_id, NEW.annotation, 'REVISED', NEW.field_checked,'UPDATE',user,CURRENT_TIMESTAMP, NEW.office_checked);
+			VALUES(NEW.gully_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id,NEW.arc_id,NEW.siphon, NEW.featurecat_id, NEW.feature_id,NEW.annotation, 'REVISED', 
+			NEW.field_checked,'UPDATE',user,CURRENT_TIMESTAMP, NEW.office_checked);
 
 			UPDATE review_gully SET verified='REVISED' where gully_id=NEW.gully_id;
 		END IF;
@@ -46,7 +47,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				ELSE
 					INSERT INTO review_audit_gully(gully_id, the_geom, top_elev, ymax, matcat_id, gratecat_id, units, groove,arccat_id, arc_id, siphon, featurecat_id, feature_id, annotation, verified, field_checked,"operation", "user",
 					date_field, office_checked,moved_geom) 
-					VALUES (NEW.connec_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.connec_type, NEW.connecat_id, NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'TRUE');
+					VALUES (NEW.gully_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id, NEW.arc_id, NEW.siphon, NEW.featurecat_id, NEW.feature_id,
+					NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'TRUE');
 					
 					UPDATE review_gully SET verified='REVISED' WHERE gully_id=NEW.gully_id;
 					

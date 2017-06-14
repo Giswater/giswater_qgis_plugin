@@ -41,7 +41,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 					UPDATE review_connec SET verified='REVISED' where connec_id=OLD.connec_id;
 					
 				ELSE
-					INSERT INTO review_audit_connec(connec_id, the_geom, top_elev, ymax, connec_type, conneccat_id, annotation, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
+					INSERT INTO review_audit_connec(connec_id, the_geom, top_elev, ymax, connec_type, connecat_id, annotation, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
 					VALUES (NEW.connec_id, NEW.the_geom, NEW.top_elev, NEW.ymax, NEW.connec_type, NEW.connecat_id, NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'TRUE');
 					
 					UPDATE review_connec SET verified='REVISED' where connec_id=OLD.connec_id;

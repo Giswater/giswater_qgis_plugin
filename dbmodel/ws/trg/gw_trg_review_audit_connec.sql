@@ -20,7 +20,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
       ELSIF TG_OP = 'UPDATE' THEN
 		IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN					
-			UPDATE review_audit_connec SET connec_id_id=NEW.connec_id_id, the_geom=NEW.the_geom, elevation=NEW.elevation, "depth"=NEW."depth", connnec_type=NEW.connec_type,
+			UPDATE review_audit_connec SET connec_id=NEW.connec_id, the_geom=NEW.the_geom, elevation=NEW.elevation, "depth"=NEW."depth", connec_type=NEW.connec_type,
 			connecat_id=NEW.connecat_id, annotation=NEW.annotation, verified='REVISED', field_checked=NEW.field_checked,"operation"='UPDATE',"user"=user,date_field=CURRENT_TIMESTAMP, office_checked=NEW.office_checked
 			WHERE connec_id=OLD.connec_id;
 							
@@ -41,8 +41,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 					UPDATE review_connec SET verified='REVISED' where connec_id=OLD.connec_id;
 					
 				ELSE
-					INSERT INTO review_audit_connec(connec_id, the_geom, elevation, "depth", connec_type, conneccat_id, annotation, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
-					VALUES (NEW.connec_id, NEW.the_geom, NEW.elevation NEW."depth", NEW.connec_type, NEW.connecat_id, NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'TRUE');
+					INSERT INTO review_audit_connec(connec_id, the_geom, elevation, "depth", connec_type, connecat_id, annotation, verified, field_checked,"operation", "user", date_field, office_checked,moved_geom) 
+					VALUES (NEW.connec_id, NEW.the_geom, NEW.elevation, NEW."depth", NEW.connec_type, NEW.connecat_id, NEW.annotation, 'REVISED', NEW.field_checked,'INSERT', user, CURRENT_TIMESTAMP, NEW.office_checked,'TRUE');
 					
 					UPDATE review_connec SET verified='REVISED' where connec_id=OLD.connec_id;
 					

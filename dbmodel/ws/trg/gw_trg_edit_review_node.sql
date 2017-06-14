@@ -25,7 +25,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		
 		DELETE FROM review_node WHERE office_checked IS TRUE AND node_id = OLD.node_id;
 		
-		UPDATE node SET elevation=review_audit_node.elevation, "depth"=review_audit_node."depth" FROM review_audit_node 
+		UPDATE node SET elevation=review_audit_node.elevation, "depth"=review_audit_node."depth" , nodecat_id=review_audit_node.nodecat_id FROM review_audit_node 
 		WHERE node.node_id=review_audit_node.node_id AND office_checked is TRUE;
 		
 	END IF;	

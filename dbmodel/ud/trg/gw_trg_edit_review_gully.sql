@@ -27,7 +27,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		
 
 		UPDATE gully SET top_elev=review_audit_gully.top_elev, ymax=review_audit_gully.ymax, matcat_id=review_audit_gully.matcat_id, gratecat_id=review_audit_gully.gratecat_id, units=review_audit_gully.units, groove=review_audit_gully.groove, 
-		arccat_id=review_audit_gully.arccat_id, arc_id=review_audit_gully.arc_id, siphon=review_audit_gully.siphon, featurecat_id=review_audit_gully.featurecat_id, feature_id=review_audit_gully.feature_id
+		arccat_id=review_audit_gully.arccat_id, arc_id=review_audit_gully.arc_id, siphon=review_audit_gully.siphon, featurecat_id=review_audit_gully.featurecat_id, feature_id=review_audit_gully.feature_id, annotation=review_audit_gully.annotation
 		FROM review_audit_gully
 		WHERE gully.gully_id=review_audit_gully.gully_id AND office_checked is TRUE;
 

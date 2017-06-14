@@ -26,7 +26,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		DELETE FROM review_connec WHERE office_checked IS TRUE AND connec_id = OLD.connec_id;
 		
 			
-		UPDATE connec SET top_elev=review_audit_connec.top_elev, ymax=review_audit_connec.ymax, connec_type=review_audit_connec.connec_type, connecat_id=review_audit_connec.connecat_id FROM review_audit_connec
+		UPDATE connec SET top_elev=review_audit_connec.top_elev, ymax=review_audit_connec.ymax, connec_type=review_audit_connec.connec_type, connecat_id=review_audit_connec.connecat_id, annotation=review_audit_connec.annotation
+		FROM review_audit_connec
 		WHERE connec.connec_id=review_audit_connec.connec_id AND office_checked is TRUE;
 		
 	END IF;	

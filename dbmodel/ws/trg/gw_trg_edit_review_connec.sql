@@ -1,4 +1,4 @@
-/*
+	/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -18,15 +18,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		SET office_checked=NEW.office_checked
 		WHERE connec_id = OLD.connec_id;
 		
-		UPDATE review_arc
+		UPDATE review_connec
 		SET office_checked=NEW.office_checked
-		WHERE connecd = OLD.connec_id;
+		WHERE connec_id = OLD.connec_id;
 		
 		
 		DELETE FROM review_connec WHERE office_checked IS TRUE AND connec_id = OLD.connec_id;
 		
 			
-		UPDATE connec SET elevation=review_audit_connec.elevation, "depth"=review_audit_connec."depth", connec_type=review_audit_connec.connec_type, connecat_id=review_audit_connec.connecat_id FROM review_audit_connec
+		UPDATE connec SET elevation=review_audit_connec.elevation, "depth"=review_audit_connec."depth", connec_type=review_audit_connec.connec_type, connecat_id=review_audit_connec.connecat_id, annotation=review_audit_connec.annotation
+		FROM review_audit_connec
 		WHERE connec.connec_id=review_audit_connec.connec_id AND office_checked is TRUE;
 
 
