@@ -92,11 +92,11 @@
        <x>8</x>
        <y>6</y>
        <width>259</width>
-       <height>255</height>
+       <height>257</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -163,7 +163,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Arc without nodes start-end</string>
+         <string>Arc no start-end node</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_node_state_coherence">
@@ -204,7 +204,7 @@
          <x>10</x>
          <y>10</y>
          <width>231</width>
-         <height>221</height>
+         <height>209</height>
         </rect>
        </property>
        <property name="title">
@@ -220,7 +220,7 @@
          </rect>
         </property>
         <property name="text">
-         <string> Node topology coherence</string>
+         <string> Node topological consistency</string>
         </property>
        </widget>
       </widget>
@@ -235,7 +235,7 @@
          <x>10</x>
          <y>10</y>
          <width>237</width>
-         <height>223</height>
+         <height>213</height>
         </rect>
        </property>
        <property name="title">
@@ -245,13 +245,13 @@
         <property name="geometry">
          <rect>
           <x>18</x>
-          <y>86</y>
+          <y>82</y>
           <width>183</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Arc exit upper arc entry (on node)</string>
+         <string>Node exit upper intro</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_node_flow_regulator">
@@ -264,7 +264,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Node with flow regulator</string>
+         <string>Node flow regulator</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_node_sink">
@@ -290,14 +290,14 @@
          </rect>
         </property>
         <property name="text">
-         <string>Arc intersection (different level)</string>
+         <string>Arc intersection</string>
         </property>
        </widget>
        <widget class="QCheckBox" name="check_inverted_arcs">
         <property name="geometry">
          <rect>
           <x>18</x>
-          <y>144</y>
+          <y>142</y>
           <width>179</width>
           <height>17</height>
          </rect>
