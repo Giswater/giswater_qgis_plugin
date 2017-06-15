@@ -892,7 +892,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMincut"/>
-   <addaction name="actionMincut2"/>
+   <addaction name="actionCustomMincut"/>
    <addaction name="actionAddConnec"/>
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionConfig"/>
@@ -903,10 +903,10 @@
      <normaloff>../icons/99.png</normaloff>../icons/99.png</iconset>
    </property>
    <property name="text">
-    <string>config</string>
+    <string>Config</string>
    </property>
    <property name="iconText">
-    <string>config</string>
+    <string>Config</string>
    </property>
   </action>
   <action name="actionMincut">
@@ -915,16 +915,22 @@
      <normaloff>../icons/126.png</normaloff>../icons/126.png</iconset>
    </property>
    <property name="text">
-    <string>mincut</string>
+    <string>Automatic Mincut</string>
+   </property>
+   <property name="toolTip">
+    <string>Automatic Mincut</string>
    </property>
   </action>
-  <action name="actionMincut2">
+  <action name="actionCustomMincut">
    <property name="icon">
     <iconset>
      <normaloff>../icons/123.png</normaloff>../icons/123.png</iconset>
    </property>
    <property name="text">
-    <string>mincut2</string>
+    <string>Custom Mincut</string>
+   </property>
+   <property name="toolTip">
+    <string>Custom Mincut</string>
    </property>
   </action>
   <action name="actionAddConnec">
@@ -933,7 +939,7 @@
      <normaloff>../icons/121.png</normaloff>../icons/121.png</iconset>
    </property>
    <property name="text">
-    <string>AddConnec</string>
+    <string>Connec</string>
    </property>
   </action>
   <action name="actionAddHydrometer">
@@ -942,7 +948,7 @@
      <normaloff>../icons/122.png</normaloff>../icons/122.png</iconset>
    </property>
    <property name="text">
-    <string>AddHydrometer</string>
+    <string>Hydrometer</string>
    </property>
   </action>
  </widget>
