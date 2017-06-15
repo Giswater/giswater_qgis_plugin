@@ -6,10 +6,10 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLabel, QPixmap, QLineEdit
-from PyQt4.QtCore import *
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLabel, QPixmap, QLineEdit,QPixmap,QIcon
+from PyQt4.QtCore import QSize
 from PyQt4.QtGui import *
-
+from PyQt4.QtCore import *
 
 from functools import partial
 
@@ -39,6 +39,9 @@ def init_config():
     # Manage 'nodecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
+    
+def test():
+    print "test"
           
      
 class ManNodeDialog(ParentDialog):   
@@ -247,9 +250,6 @@ class ManNodeDialog(ParentDialog):
             # set picture
             '''
         
-        message = "working"
-        self.controller.show_warning(message, context_name='ui_message')
-        
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
@@ -279,8 +279,7 @@ class ManNodeDialog(ParentDialog):
         self.img_1.show()  
         '''
         self.img_path_list = [["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"] ,["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]]
-        message = str(len(self.img_path_list))
-        self.controller.show_warning(message, context_name='ui_message')
+        
         
         #for i in range(0, len(self.img_path_list)):
         for i in range(0, 9):
@@ -291,6 +290,11 @@ class ManNodeDialog(ParentDialog):
             #widget.mousePressEvent.connect(self.test)
             widget.setPixmap(pixmap)
             widget.show()
+
+            # Add functionality to button of zooming picture
+            btn_widget_name = "btn_zoom_img_"+str(i)
+            btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
+            btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[0][i]))
       
         self.start_indx = 0
         self.end_indx = len(self.img_path_list)-1
@@ -299,7 +303,7 @@ class ManNodeDialog(ParentDialog):
         
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
-        
+ 
         #label = self.dlg_gallery.findChild(QLabel, 'test')
         #label_click = ClickableLabel(label)
         #label_click.signalClicked.connec(self.test)
@@ -308,10 +312,6 @@ class ManNodeDialog(ParentDialog):
         
         self.dlg_gallery.exec_()
 
-    def test(self):
-        message = "test clicable albel"
-        self.controller.show_warning(message, context_name='ui_message')
-        
         
     def next_gallery(self):
         self.start_indx = self.start_indx+1
@@ -322,7 +322,7 @@ class ManNodeDialog(ParentDialog):
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             widget.clear()
-            # Add action to Label :on click zoom images
+            # WIP : Add action to Label :on click zoom images
                  
 
         # Add new 9 images
@@ -332,25 +332,38 @@ class ManNodeDialog(ParentDialog):
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             #Define clicable label
             #self.label=ClickableLabel(widget)
-            #self.label.signalClicked.connec(self.test)
-            
+            #self.label.signalClicked.connec(self.test) 
             widget.setPixmap(pixmap)
             widget.show()
+
+            # Add functionality to button of zooming picture
+            btn_widget_name = "btn_zoom_img_"+str(i)
+            btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
             
+            message = "btn_clicked"
+            self.controller.show_warning(message, context_name='ui_message')
             
-            
-        message = "start index next:"+str(self.start_indx)
-        self.controller.show_warning(message, context_name='ui_message')
+            btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
+
         if self.start_indx > 0 :
             self.btn_previous.setEnabled(True) 
             
         # On last tab disable btn_next
         #if self.start_indx == (len(self.img_path_list)-1) :
         #    self.btn_next.setEnabled(False) 
-            
-        message = "start index next:"+str(self.start_indx)+"number of atbs:"+str(len(self.img_path_list))
+
+    def zoom_img(self,img):
+        message = "zoom"
         self.controller.show_warning(message, context_name='ui_message')
-        
+
+        self.dlg_gallery_zoom = GalleryZoom()
+        pixmap = QPixmap(img)
+
+        lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
+        lbl_img.setPixmap(pixmap)
+        lbl_img.show()
+            
+        self.dlg_gallery_zoom.exec_() 
     
             
     def previous_gallery(self):
@@ -368,24 +381,20 @@ class ManNodeDialog(ParentDialog):
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             widget.setPixmap(pixmap)
-            widget.show()
-
-        message = "start index previous:"+str(self.start_indx)
-        self.controller.show_warning(message, context_name='ui_message')    
+            widget.show()  
+            
+            # Add functionality to button of zooming picture
+            btn_widget_name = "btn_zoom_img_"+str(i)
+            btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
           
         if self.start_indx == 0 :
             self.btn_previous.setEnabled(False)
         if self.start_indx < len(self.img_path_list) :
             self.btn_next.setEnabled(True)  
-        
-        
-
-    
+              
         
         
     ''' ACTIONS TOOLBAR '''    
-        
-        
     def actionZoomOut(self):
         feature = self.feature
 

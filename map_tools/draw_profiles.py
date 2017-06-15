@@ -365,11 +365,14 @@ class DrawProfiles(ParentMapTool):
         '''
         Parent function - Draw profiles
         '''
-
+        
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id,node_id)
+      
         self.fill_memory(arc_id,node_id)
+
         self.set_table_parameters()
+        
 
         # Start drawing
         # Draw first | start node
@@ -400,7 +403,7 @@ class DrawProfiles(ParentMapTool):
         # Clean array
         #self.list_of_selected_nodes.clear()
         #self.list_of_selected_arcs.clear()
-        
+
         # Maximeze window ( after drawing )
         mng = plt.get_current_fig_manager()
         mng.window.showMaximized()
@@ -408,7 +411,7 @@ class DrawProfiles(ParentMapTool):
 
         # Action on resizeing window
         cid = self.fig1.canvas.mpl_connect('resize_event',self.on_resize)
-     
+
 
 
     def set_properties(self):
@@ -473,17 +476,19 @@ class DrawProfiles(ParentMapTool):
             i = i + 1
 
 
-    def fill_memory(self,arc_id,node_id):
+    def fill_memory(self,arc_id,cnode_id):
         ''' Get parameters from data base
         Fill self.memory with parameterspostgres
         '''
         self.memory = []
-
+    
         i = 0
         # Get parameters and fill the memory
-        self.list_of_selected_nodes = node_id
+        self.list_of_selected_nodes = cnode_id
+      
 
         for node_id in self.list_of_selected_nodes:
+
 
             # start_point = self.start_point[i-1] + gis_length[i]
             # self.parameters : list of parameters for one node
@@ -491,7 +496,8 @@ class DrawProfiles(ParentMapTool):
             self.parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None,
                               None]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
-            sql = "SELECT top_elev,ymax,elev,nodecat_id"
+            # change elev to sys_elev
+            sql = "SELECT top_elev,ymax,sys_elev,nodecat_id"
             # sql += " FROM " + self.schema_name + ".     "
             sql += " FROM "+self.schema_name+".v_edit_node"
             sql += " WHERE node_id='" + str(node_id) + "'"
@@ -501,8 +507,10 @@ class DrawProfiles(ParentMapTool):
             self.parameters[13] = row[0][2]
             nodecat_id = row[0][3]
 
+
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
-            sql = "SELECT z1,z2,cat_geom1,elev1,elev2, y1,y2,slope"
+            # Change to elevmax1 and elevmax2
+            sql = "SELECT z1,z2,cat_geom1,elevmax1,elevmax2, y1,y2,slope"
             # sql += " FROM " + self.schema_name + ".     "
             sql += " FROM "+self.schema_name+".v_edit_arc"
             sql += " WHERE node_1='" + str(node_id) + "'"
@@ -515,6 +523,7 @@ class DrawProfiles(ParentMapTool):
             self.parameters[10] = row[0][5]
             self.parameters[11] = row[0][6]
             self.parameters[7] = row[0][7]
+            
 
             # Geom1 from cat_node
             sql = "SELECT geom1"
@@ -523,18 +532,23 @@ class DrawProfiles(ParentMapTool):
             sql += " WHERE id='" + str(nodecat_id) + "'"
             row = self.controller.get_rows(sql)
             self.parameters[6] = row[0][0]
+            
 
             # Set node_id in memory
             self.parameters[12] = node_id
 
             self.memory.append(self.parameters)
+
             i = i + 1
 
         # Check if we have all data for drawing
+        '''
         if 'None' in self.memory:
             message = "Missing some data"
             self.controller.show_info(message, context_name='ui_message')
             return
+        '''
+
 
 
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1,indx):
@@ -1027,29 +1041,81 @@ class DrawProfiles(ParentMapTool):
         args.append(end_point_id)
      
         
-        self.node_id = []
-        self.arc_id = []
+        self.rnode_id = []
+        self.rarc_id = []
+        
+
+        sql = "SELECT rid"
+        sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
+        sql += " WHERE node_id='" + start_point + "'"
+        row = self.controller.get_rows(sql)
+        rstart_point =int(row[0][0])
+        
+      
+        
+        sql = "SELECT rid"
+        sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
+        sql += " WHERE node_id='" + end_point + "'"
+        row = self.controller.get_rows(sql)
+        rend_point = int(row[0][0])
+        
         
         # Clear list of arcs and nodes - preparing for new profile
             
-        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_test_arc'," + start_point + "," +end_point + ",false)"
-      
+        #sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_test_arc'," + start_point + "," +end_point + ",false)"
+        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc'," + str(rstart_point) + "," +str(rend_point) + ",false,false)"
+
         rows = self.controller.get_rows(sql)
+        
+
+      
+        
         number_nodes=len(rows)
+
         for i in range(0, number_nodes ):
-            self.node_id.append(str(rows[i]['node']))
-            self.arc_id.append(str(rows[i]['edge']))
+            #self.node_id.append(str(rows[i]['node']))
+            #self.arc_id.append(str(rows[i]['edge']))
+            
+            self.rnode_id.append(str(rows[i][1]))
+            self.rarc_id.append(str(rows[i][2]))
+
+        self.rarc_id.pop()
+            
+        self.arc_id= []
+        self.node_id= []
+ 
+        
+        for n in range(0,len(self.rarc_id)):
+        # convert arc_ids   
+            sql = "SELECT arc_id"
+            sql += " FROM "+self.schema_name+".v_anl_pgrouting_arc"
+            sql += " WHERE id='" +str(self.rarc_id[n]) + "'"
+            rows = self.controller.get_rows(sql)
+            self.arc_id.append(str(rows[0][0]))
+        
+        
+        for m in range(0,len(self.rnode_id)):
+        # convert node_ids   
+
+            sql = "SELECT node_id"
+            sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
+            sql += " WHERE rid='" + str(self.rnode_id[m]) + "'"
+
+            row = self.controller.get_rows(sql)
+            self.node_id.append(str(row[0][0])) 
+
         
         # SELECT ARCS OF SHORTEST PATH
         if rows:
             # Build an expression to select them
             m=len(self.arc_id)
+
             aux = "\"arc_id\" IN ("
-            for i in range(m-1):
+            for i in range(m):
             # Get a featureIterator from this expression:
                 aux += "'" + str(self.arc_id[i]) + "', "
             aux = aux[:-2] + ")"
-        
+
             expr = QgsExpression(aux)
             '''
             if expr.hasParserError():
@@ -1103,15 +1169,16 @@ class DrawProfiles(ParentMapTool):
         # Clear list
         self.tbl_list_arc.clear()
         
-        for i in range(m-1):
+        for i in range(m):
             item_arc = QListWidgetItem(self.arc_id[i])
             self.tbl_list_arc.addItem(item_arc)
             #layer.changeAttributeValue(feature.id(), columnnumber, value)
             list.append(self.arc_id[i])
             
         # Remove last element from list because is -1 
-        self.arc_id.pop()
-    
+        #self.arc_id.pop()
+       
+        
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paintEvent,self.arc_id,self.node_id))
 
         

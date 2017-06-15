@@ -14,7 +14,8 @@ import utils_giswater
 from parent_init import ParentDialog
 from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
 
-#from init import ud_man_node_init 
+from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
+import init.ud_man_node_init 
 
 
 def formOpen(dialog, layer, feature):
@@ -135,7 +136,7 @@ class ManArcDialog(ParentDialog):
 
         
         #self.layer_node_man= self.SnappingConfigManager.get_layer_node()
-        #self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(self.go_child)
+        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(self.go_child)
         
         
         # Manage 'cat_shape'
@@ -155,7 +156,7 @@ class ManArcDialog(ParentDialog):
         self.node_id= self.conduit_node_1.text()
        
         
-        layer = QgsMapLayerRegistry.instance().mapLayersByName( "Junction" )[0]
+        layer = QgsMapLayerRegistry.instance().mapLayersByName( "Manhole" )[0]
         self.iface.setActiveLayer(layer)
         message = "tes11t"
         self.controller.show_warning(message, context_name='ui_message')
@@ -208,10 +209,59 @@ class ManArcDialog(ParentDialog):
                 print layer.name()
                 self.iface.setActiveLayer(layer)
         '''
-         
-        ud_man_node_init.formOpen()
-        message = "test66"
+        #QgsMapToolIdentify 
+        currentTool = self.iface.mapCanvas().mapTool()
+        message = str(currentTool)
         self.controller.show_warning(message, context_name='ui_message')
+        
+
+        
+        #canvas = self.iface.mapCanvas()
+        # Get the active layer (must be a vector layer)
+        #layer = self.iface.activeLayer()
+        #layer.setSelectedFeatures([feature.id()])
+        
+        
+        # set selected feature
+        # Add this features to the selected list
+        #layer.setSelectedFeatures([feature.id()])
+        canvas = self.iface.mapCanvas()
+        message = "test11df1"
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        # Build a list of feature id's from the previous result
+        id_list = [i.id() for i in it]
+
+        # Select features with these id's
+        layer.setSelectedFeatures(id_list)
+ 
+
+        # activate map tool QgsMapToolIdentify 
+        # provide canvas to map tool
+        currentTool = QgsMapToolIdentify(canvas)
+        message = "test2244"
+        self.controller.show_warning(message, context_name='ui_message')
+        currentTool.deactivate()
+        
+        
+        # QgsMapTool 
+        currentTool = QgsMapTool(canvas)
+        currentTool.activate()
+        
+        currentTool = QgsMapToolPan(canvas)
+        currentTool.activate()
+        message = "test22"
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        #self.toolIdentify = QgsMapToolIdentify(self.canvas) 
+        
+        
+        
+        #init.ud_man_node_init.test()
+        #message = "test66"
+        #init.ud_man_node_init.formOpen()
+        #self.controller.show_warning(message, context_name='ui_message')
+        
         
     def actionZoomOut(self):
         feature = self.feature

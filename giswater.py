@@ -114,6 +114,8 @@ class Giswater(QObject):
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable
         
+      
+        
                
     def set_signals(self): 
         ''' Define widget and event signals '''
@@ -132,7 +134,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (19, 21, 23, 24, 25,27,41,28,99):
+                if int(index_action) in (01,19, 21, 23, 24, 25,27,41,28,99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -153,7 +155,7 @@ class Giswater(QObject):
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
         schema_name=self.controller.get_schema_name()
-     
+
         
         
         if parent is None:
@@ -169,26 +171,122 @@ class Giswater(QObject):
             action = QAction(text, parent) 
         else:
             action = QAction(icon, text, parent)  
-            if index_action == '99':
+            if index_action == '01':
                 # Add drop down menu to button in toolbar
                 self.menu=QMenu()
                 self.sub_menu=QMenu()
+               
                 
                 #self.menu_values
                 #self.sub_menu.setTitle(self.menu_values[0])
-                self.sub_menu.setTitle("sub_menu 1")
+                sql = "SELECT DISTINCT(type) FROM "+schema_name+".node_type "    
+                row = self.dao.get_rows(sql) 
+                
+                '''
+                for i in range(0, len(row)):
+                    self.sub_menu=QMenu()
+                    self.sub_menu.setTitle(row[i])
+                    self.menu.addMenu(self.sub_menu)
+                '''
+                self.sub_menu=QMenu()
+                self.sub_menu.setTitle(row[0][0])
                 self.menu.addMenu(self.sub_menu)
+                
+                self.sub_menu1 = QMenu()
+                self.sub_menu1.setTitle(row[1][0])
+                self.menu.addMenu(self.sub_menu1)
+                
+                self.sub_menu2 = QMenu()
+                self.sub_menu2.setTitle(row[2][0])
+                self.menu.addMenu(self.sub_menu2)
+                
+                self.sub_menu3 = QMenu()
+                self.sub_menu3.setTitle(row[3][0])
+                self.menu.addMenu(self.sub_menu3)
+                
+                self.sub_menu4 = QMenu()
+                self.sub_menu4.setTitle(row[4][0])
+                self.menu.addMenu(self.sub_menu4)
+                
+                self.sub_menu5 = QMenu()
+                self.sub_menu5.setTitle(row[5][0])
+                self.menu.addMenu(self.sub_menu5)
+                
+                
+                self.sub_menu6 = QMenu()
+                self.sub_menu6.setTitle(row[6][0])
+                self.menu.addMenu(self.sub_menu6)
+                
+                self.sub_menu7 = QMenu()
+                self.sub_menu7.setTitle(row[7][0])
+                self.menu.addMenu(self.sub_menu7)
+                
+                self.sub_menu8 = QMenu()
+                self.sub_menu8.setTitle(row[8][0])
+                self.menu.addMenu(self.sub_menu8)
+                
+                self.sub_menu9 = QMenu()
+                self.sub_menu9.setTitle(row[9][0])
+                self.menu.addMenu(self.sub_menu9)
                 
                 
                 action.setMenu(self.menu)
      
-                self.sub_menu.addAction("action 1",self.test)  
-                self.sub_menu.addAction("action 2",self.test) 
-                self.sub_menu.addAction("action 3",self.test) 
-                sql = "SELECT DISTINCT(type) FROM "+schema_name+".node_type "    
-                row = self.dao.get_row(sql)  
-                self.sub_menu.addAction(row[0],self.test) 
-                #self.sub_menu.addAction(row[1],self.test) 
+                
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[0][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu.addAction(row1[i][0],self.test) 
+                
+                
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[1][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu1.addAction(row1[i][0],self.test) 
+                    
+                    
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[2][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu2.addAction(row1[i][0],self.test) 
+                    
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[3][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu3.addAction(row1[i][0],self.test) 
+                    
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[4][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu4.addAction(row1[i][0],self.test) 
+                    
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[5][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu5.addAction(row1[i][0],self.test)
+
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[6][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu6.addAction(row1[i][0],self.test) 
+                    
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[7][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu7.addAction(row1[i][0],self.test)     
+                    
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[8][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu8.addAction(row1[i][0],self.test)
+
+                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[9][0]+"'"    
+                row1 = self.dao.get_rows(sql)
+                for i in range(0, len(row1)):
+                    self.sub_menu9.addAction(row1[i][0],self.test) 
+
+                #self.sub_menu.addAction("action 1",self.test)  
+    
                 '''
                 for row in rows:       
                     elem = row[0]
@@ -200,8 +298,7 @@ class Giswater(QObject):
                     self.sub_menu.setTitle(elem)
                     self.menu.addMenu(self.sub_menu)
                 '''
-                    
-    
+ 
                                     
         if toolbar is not None:
             toolbar.addAction(action)  
@@ -372,9 +469,9 @@ class Giswater(QObject):
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
         # Set an action list for every toolbar    
-        self.list_actions_ud = ['01','02','04','05']
+        self.list_actions_ud = ['02','04','05']
         self.list_actions_ws = ['10','11','12','14','15','08','29','13']
-        self.list_actions_mg = ['16','17','18','19','20','21','22','23','24','25','26','27','28','41','43','99','56','57']
+        self.list_actions_mg = ['01','16','17','18','19','20','21','22','23','24','25','26','27','28','41','43','99','56','57']
         self.list_actions_ed = ['30','31','32','33','34','35','36','52']
                 
         # UD toolbar   
@@ -989,7 +1086,7 @@ class Giswater(QObject):
         ''' Enable selected actions '''
         
         # Enable MG toolbar
-        self.enable_actions(True, 16, 27)
+        self.enable_actions(True, 1, 27)
         self.enable_action(False, 22)            
         
         # Enable ED toolbar

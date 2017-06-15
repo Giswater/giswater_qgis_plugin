@@ -333,7 +333,7 @@
     <string>Event_id </string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_zoom_img_1">
+  <widget class="QPushButton" name="btn_zoom_img_0">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -353,10 +353,30 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_zoom_img_2">
+  <widget class="QPushButton" name="btn_zoom_img_1">
    <property name="geometry">
     <rect>
      <x>370</x>
+     <y>180</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_2">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
      <y>180</y>
      <width>20</width>
      <height>20</height>
@@ -376,8 +396,8 @@
   <widget class="QPushButton" name="btn_zoom_img_3">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>180</y>
+     <x>180</x>
+     <y>350</y>
      <width>20</width>
      <height>20</height>
     </rect>
@@ -396,7 +416,7 @@
   <widget class="QPushButton" name="btn_zoom_img_4">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>370</x>
      <y>350</y>
      <width>20</width>
      <height>20</height>
@@ -416,7 +436,7 @@
   <widget class="QPushButton" name="btn_zoom_img_5">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>560</x>
      <y>350</y>
      <width>20</width>
      <height>20</height>
@@ -436,26 +456,6 @@
   <widget class="QPushButton" name="btn_zoom_img_6">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>350</y>
-     <width>20</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>zoom.png</normaloff>zoom.png</iconset>
-   </property>
-   <property name="autoExclusive">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_zoom_img_7">
-   <property name="geometry">
-    <rect>
      <x>180</x>
      <y>510</y>
      <width>20</width>
@@ -473,7 +473,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_zoom_img_8">
+  <widget class="QPushButton" name="btn_zoom_img_7">
    <property name="geometry">
     <rect>
      <x>370</x>
@@ -493,7 +493,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_zoom_img_9">
+  <widget class="QPushButton" name="btn_zoom_img_8">
    <property name="geometry">
     <rect>
      <x>560</x>
