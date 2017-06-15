@@ -10,6 +10,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_connec()  RETURNS trigger
 DECLARE 
     v_sql varchar;
     connec_id_seq int8;
+	expl_id_int integer;
 
 BEGIN
 
@@ -62,7 +63,7 @@ BEGIN
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
+            NEW.workcat_id := (SELECT workcat_vdefault FROM config);
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
@@ -76,18 +77,16 @@ BEGIN
             END IF;
         END IF;
 		
-		--Exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
+	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;
 		
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
@@ -102,7 +101,7 @@ BEGIN
                                 NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, 
                                 NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.link, NEW.verified, NEW.the_geom, 
                                 NEW.workcat_id_end,NEW.y1,NEW.y2,NEW.undelete,NEW.featurecat_id,NEW.feature_id,NEW.private_connecat_id, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.accessibility, NEW.diagonal,
-								NEW.connec_type, NEW.expl_id, NEW.publish, NEW.inventory, NEW.end_date, NEW.uncertain);
+								NEW.connec_type, expl_id_int, NEW.publish, NEW.inventory, NEW.end_date, NEW.uncertain);
               
         PERFORM audit_function (1,860);
         RETURN NEW;
@@ -121,7 +120,7 @@ BEGIN
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
             ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,workcat_id_end=NEW.workcat_id_end,y1=NEW.y1,y2=NEW.y2,undelete=NEW.undelete,
-	    featurecat_id=NEW.featurecat_id,feature_id=NEW.feature_id, private_connecat_id=NEW.private_connecat_id, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, expl_id=NEW.expl_id, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain
+	    featurecat_id=NEW.featurecat_id,feature_id=NEW.feature_id, private_connecat_id=NEW.private_connecat_id, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain
         WHERE connec_id = OLD.connec_id;
                 
         PERFORM audit_function (2,860);

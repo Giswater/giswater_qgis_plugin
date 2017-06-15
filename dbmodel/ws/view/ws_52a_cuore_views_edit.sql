@@ -49,7 +49,7 @@ connec.adress_01,
 connec.adress_02,
 connec.adress_03,
 connec.streetaxis_id,
-ext_streetaxis.name,
+ext_streetaxis.name AS streetname,
 connec.postnumber,
 connec.descript,
 vnode.arc_id,
@@ -67,7 +67,7 @@ connec.publish,
 connec.inventory,
 connec.end_date,
 dma.macrodma_id,
-exploitation.descript AS expl_name	
+exploitation.short_descript AS expl_name
 FROM expl_selector, connec
 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
 LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
@@ -135,7 +135,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
 	connec.end_date AS wjoin_end_date,
 	dma.macrodma_id,
 	man_wjoin.cat_valve2 AS wjoin_cat_valve2,
-	exploitation.descript AS expl_name	
+	exploitation.short_descript AS expl_name
  FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
@@ -214,7 +214,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
 	dma.macrodma_id,
 	man_tap.cat_valve2 AS tap_cat_valve2,
 	man_tap.linked_connec AS tap_linked_connec,
-	exploitation.descript AS expl_name	
+	exploitation.short_descript AS expl_name
  FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
@@ -290,7 +290,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
 	dma.macrodma_id,
 	man_fountain.linked_connec AS fountain_linked_connec,
 	man_fountain.the_geom_pol,
-	exploitation.descript AS expl_name
+	exploitation.short_descript AS expl_name
  FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
@@ -356,7 +356,7 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
 	connec.end_date AS greentap_end_date,
 	dma.macrodma_id,
 	man_greentap.linked_connec AS greentap_linked_connec,
-	exploitation.descript AS expl_name	
+	exploitation.short_descript AS expl_name
  FROM expl_selector, connec
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text

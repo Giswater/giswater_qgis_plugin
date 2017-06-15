@@ -15,6 +15,10 @@ DECLARE
     new_man_table varchar;
     old_man_table varchar;
     v_sql varchar;
+	v_sql2 varchar;
+	man_table_2 varchar;
+	arc_id_seq int8;
+	expl_id_int integer;
 
 BEGIN
 
@@ -22,10 +26,12 @@ BEGIN
     
     IF TG_OP = 'INSERT' THEN
       
-		-- Arc ID
-        IF (NEW.arc_id IS NULL) THEN
-            NEW.arc_id:= (SELECT nextval('arc_id_seq'));
-        END IF;
+			-- Arc ID
+			IF (NEW.arc_id IS NULL) THEN
+				SELECT max(arc_id::integer) INTO arc_id_seq FROM arc WHERE arc_id ~ '^\d+$';
+				PERFORM setval('arc_id_seq',arc_id_seq,true);
+				NEW.arc_id:= (SELECT nextval('arc_id_seq'));
+			END IF;
 
          -- Arc type
         IF (NEW.arc_type IS NULL) THEN
@@ -40,12 +46,16 @@ BEGIN
 			NEW.epa_type:= (SELECT epa_default FROM arc_type WHERE arc_type.id=NEW.arc_type)::text;   
 		END IF;
         
-        -- Arc catalog ID
-        IF (NEW.arccat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-                RETURN audit_function(145,760); 
-            END IF; 
-        END IF;
+			-- Arc catalog ID
+			IF (NEW.arccat_id IS NULL) THEN
+				IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+					RETURN audit_function(145,840); 
+				END IF; 
+				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
+				IF (NEW.arccat_id IS NULL) THEN
+						NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+				END IF;       
+			END IF;
         
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
@@ -79,7 +89,7 @@ BEGIN
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
+            NEW.workcat_id := (SELECT workcat_vdefault FROM config);
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
@@ -93,26 +103,26 @@ BEGIN
             END IF;
         END IF;
     
-		--exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
+	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;
 		
         -- FEATURE INSERT
-		INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type, 
-                        location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,
-						label_y, label_rotation) 
-                VALUES (NEW.arc_id, null, null, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.inverted_slope, NEW.custom_length, 
-				NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript,
-				NEW.est_y1,NEW.est_y2, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.workcat_id_end,NEW.undelete,NEW.label_x,NEW.label_y, NEW.label_rotation);
+				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
+				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
+				label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
+				VALUES (NEW.arc_id, null, null, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
+				NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id,
+				NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.descript, NEW.est_y1, NEW.est_y2,
+				NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.workcat_id_end,NEW.undelete,NEW.label_x,NEW.label_y, NEW.label_rotation, 
+				NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.end_date, NEW.uncertain);
 				
 						
         -- EPA INSERT
@@ -184,14 +194,15 @@ BEGIN
 		END IF;
 	END IF;
     
-        UPDATE arc 
-        SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", 
-            "comment"=NEW."comment", inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
-            location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, 
-			adress_03=NEW.adress_03, descript=NEW.descript,rotation=NEW.rotation, link=NEW.link, est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
-			label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
-            workcat_id_end=NEW.workcat_id_end
-        WHERE arc_id=OLD.arc_id;
+		UPDATE arc 
+		SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
+		annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
+		soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
+		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, 
+		adress_03=NEW.adress_03, descript=NEW.descript,rotation=NEW.rotation, link=NEW.link, est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, 
+		the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end,
+		code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain
+		WHERE arc_id=OLD.arc_id;	
 
 		PERFORM audit_function (2,760);
         RETURN NEW;

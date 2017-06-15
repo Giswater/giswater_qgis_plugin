@@ -10,9 +10,11 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_arc()
 $BODY$
 DECLARE 
     inp_table varchar;
-    man_table varchar;
+	man_table varchar;
     v_sql varchar;
-
+    arc_id_seq int8;
+	expl_id_int integer;
+	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -21,6 +23,8 @@ BEGIN
     
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
+            SELECT max(arc_id::integer) INTO arc_id_seq FROM arc WHERE arc_id ~ '^\d+$';
+            PERFORM setval('arc_id_seq',arc_id_seq,true);
             NEW.arc_id:= (SELECT nextval('arc_id_seq'));
         END IF;
 
@@ -30,12 +34,15 @@ BEGIN
         END IF;
         
         -- Arc catalog ID
-        IF (NEW.arccat_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
-                RETURN audit_function(145,340); 
-            END IF;
-            NEW.arccat_id := (SELECT id FROM cat_arc WHERE arctype_id = NEW.cat_arctype_id LIMIT 1);
-        END IF;
+		IF (NEW.arccat_id IS NULL) THEN
+			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+				RETURN audit_function(145,840); 
+			END IF; 
+			NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
+			IF (NEW.arccat_id IS NULL) THEN
+				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+			END IF;       
+		END IF;
         
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
@@ -69,7 +76,7 @@ BEGIN
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_id_vdefault FROM config);
+            NEW.workcat_id := (SELECT workcat_vdefault FROM config);
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
@@ -83,28 +90,29 @@ BEGIN
             END IF;
         END IF;
 		
-		--exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
+		--Exploitation ID
+
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;		
-        
+			
         -- Set EPA type
         NEW.epa_type = 'PIPE';        
     
         -- FEATURE INSERT
-        INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
-					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation)
-					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.custom_length,NEW.dma_id,NEW.soilcat_id, 
+    		INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
+					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
+					publish, inventory, end_date, expl_id)
+					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id,NEW.soilcat_id, 
 					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, 
-					NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.workcat_id_end, NEW.label_x,NEW.label_y,NEW.label_rotation);
+					NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.workcat_id_end, NEW.label_x,NEW.label_y,NEW.label_rotation, 
+					NEW.publish, NEW.inventory, NEW.end_date, expl_id_int);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
@@ -142,13 +150,14 @@ BEGIN
 
         END IF;
     
-        UPDATE arc 
-        SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, "observ"=NEW."observ", 
-            "comment"=NEW."comment", custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
-            location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
-            ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end,undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y,label_rotation=NEW.label_rotation
-        WHERE arc_id=OLD.arc_id;
+UPDATE arc 
+			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, annotation= NEW.annotation, "observ"=NEW.observ, 
+				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
+				location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
+				ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
+				rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end,undelete=NEW.undelete, label_x=NEW.label_x,
+				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date
+			WHERE arc_id=OLD.arc_id;
 
         PERFORM audit_function(2,340); 
         RETURN NEW;

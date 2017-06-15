@@ -17,23 +17,26 @@ DECLARE
     v_sql varchar;
     old_nodetype varchar;
     new_nodetype varchar;
+	rec Record;
+    node_id_seq int8;
+	expl_id_int integer;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
+   
+   	--Get data from config table
+	SELECT * INTO rec FROM config;	
+	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
 
         -- Node ID
         IF (NEW.node_id IS NULL) THEN
+            SELECT max(node_id::integer) INTO node_id_seq FROM node WHERE node_id ~ '^\d+$';
+            PERFORM setval('node_id_seq',node_id_seq,true);
             NEW.node_id:= (SELECT nextval('node_id_seq'));
         END IF;
-
-		-- elev
-        IF (NEW.elev IS NOT NULL) THEN   	
-                RETURN audit_function(200,810);  
-		END IF;
 
         -- Node type
         IF (NEW.node_type IS NULL) THEN
@@ -78,26 +81,56 @@ BEGIN
         END IF;
 
 		
-		--exploitation ID
-        IF (NEW.expl_id IS NULL) THEN
+-- Verified
+        IF (NEW.verified IS NULL) THEN
+            NEW.verified := (SELECT verified_vdefault FROM config);
+            IF (NEW.verified IS NULL) THEN
+                NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+		
+	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (NEW.expl_id IS NULL) THEN
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        END IF;
         
+	-- State
+			IF (NEW."state" IS NULL) THEN
+				NEW."state" := (SELECT state_vdefault FROM config);
+				IF (NEW."state" IS NULL) THEN
+						NEW."state" := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+					
+			-- Workcat_id
+			IF (NEW.workcat_id IS NULL) THEN
+				NEW.workcat_id := (SELECT workcat_vdefault FROM config);
+				IF (NEW.workcat_id IS NULL) THEN
+					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
+				END IF;
+			END IF;
+
+			--Builtdate
+			IF (NEW.builtdate IS NULL) THEN
+				NEW.builtdate := (SELECT builtdate_vdefault FROM config);
+			END IF;
         -- FEATURE INSERT
 
-        INSERT INTO node (node_id, top_elev, ymax, sander, node_type, nodecat_id, epa_type, sector_id, "state", annotation, "observ", "comment",dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
-					buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_top_elev, est_ymax, rotation, link, verified, the_geom, workcat_id_end,undelete, label_x,label_y, label_rotation)
-					VALUES (NEW.node_id, NEW.top_elev, NEW.ymax, NEW.sander, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment",
-                    NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.adress_01, NEW.adress_02, 
-					NEW.adress_03, NEW.descript, NEW.est_top_elev, NEW.est_ymax, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.workcat_id_end,NEW.undelete, NEW.label_x,NEW.label_y, NEW.label_rotation);
+INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,
+"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
+			builtdate,ownercat_id,adress_01,adress_02,adress_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom, 
+			code, expl_id, publish, inventory, end_date, uncertain, xyz_date, unconnected)
+			VALUES (NEW.node_id,NEW.top_elev,NEW.ymax,NEW.sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state,NEW.annotation,NEW.observ,
+			NEW.comment,NEW.dma_id,NEW.soilcat_id,NEW.category_type,NEW.fluid_type,NEW.location_type,NEW.workcat_id,NEW.buildercat_id,NEW.builtdate,
+			NEW.ownercat_id,NEW.adress_01,NEW.adress_02,NEW.adress_03,NEW.descript,NEW.est_top_elev,NEW.est_ymax,NEW.rotation,NEW.link,
+			NEW.verified,NEW.workcat_id_end,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
+			NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.end_date, NEW.uncertain, NEW.xyz_date, NEW.unconnected);	
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
@@ -167,13 +200,16 @@ BEGIN
 			END IF;
 		END IF;
 
-        UPDATE node 
-        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, 
-            fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
-            ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
-            est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end, undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation 
-        WHERE node_id = OLD.node_id;
+		UPDATE node 
+			SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, 
+			sector_id=NEW.sector_id, "state"=NEW.state, annotation=NEW.annotation, "observ"=NEW.observ, "comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, 
+			category_type=NEW.category_type,fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, 
+			builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01,adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
+			est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, workcat_id_end=NEW.workcat_id_end,
+			undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation,the_geom=NEW.the_geom, 
+			code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, 
+			unconnected=NEW.unconnected
+			WHERE node_id = OLD.node_id;
                 
 		PERFORM audit_function (2,810);
         RETURN NEW;

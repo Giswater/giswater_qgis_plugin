@@ -21,7 +21,7 @@ node.ymax,
 node.est_ymax,
 node.elev,
 node.est_elev,
-v_node.elev,
+v_node.elev AS sys_elev,
 node.sander,
 node.node_type,
 node.nodecat_id,
@@ -286,7 +286,9 @@ dma.macrodma_id,
 gully.streetaxis_id,
 ext_streetaxis.name AS streetname,
 gully.postnumber,
-exploitation.short_descript AS expl_name
+exploitation.short_descript AS expl_name,
+gully.connec_length,
+gully.connec_depth 
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN ud_sample_dev.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
@@ -349,7 +351,9 @@ gully.end_date,
 dma.macrodma_id,
 gully.streetaxis_id,
 gully.postnumber,
-exploitation.short_descript AS expl_name
+exploitation.short_descript AS expl_name,
+gully.connec_length,
+gully.connec_depth 
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
@@ -1700,7 +1704,9 @@ dma.macrodma_id,
 gully.streetaxis_id,
 ext_streetaxis.name AS streetname,
 gully.postnumber,
-exploitation.short_descript AS expl_name
+exploitation.short_descript AS expl_name,
+gully.connec_length,
+gully.connec_depth 
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN ud_sample_dev.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
@@ -1763,7 +1769,9 @@ gully.end_date,
 dma.macrodma_id,
 gully.streetaxis_id,
 gully.postnumber,
-exploitation.short_descript AS expl_name
+exploitation.short_descript AS expl_name,
+gully.connec_length,
+gully.connec_depth 
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
