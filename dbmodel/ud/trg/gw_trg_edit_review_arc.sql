@@ -1,3 +1,10 @@
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_arc()
   RETURNS trigger AS
 $BODY$
@@ -19,7 +26,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		DELETE FROM review_arc WHERE office_checked IS TRUE AND arc_id = OLD.arc_id;
 		
 			
-		UPDATE arc SET y1=review_audit_arc.y1, y2=review_audit_arc.y2,arccat_id=review_audit_arc.arccat_id FROM review_audit_arc 
+		UPDATE arc SET y1=review_audit_arc.y1, y2=review_audit_arc.y2,arccat_id=review_audit_arc.arccat_id, arc_type=review_audit_arc.arc_type, annotation=review_audit_arc.annotation FROM review_audit_arc 
 		WHERE arc.arc_id=review_audit_arc.arc_id AND office_checked is TRUE;
 
 

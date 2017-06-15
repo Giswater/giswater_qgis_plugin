@@ -386,7 +386,9 @@ SELECT
 node.node_id,
 node.node_type,
 plan_node_x_psector.descript,
-(v_price_x_catnode.cost)::numeric(12,2) AS budget,
+v_plan_node.calculated_depth,
+(v_price_x_catnode.cost)::numeric(12,2),
+v_plan_node.budget,
 plan_node_x_psector.psector_id,
 node."state",
 plan_node_x_psector.atlas_id,
@@ -395,6 +397,7 @@ node.the_geom
 FROM ((node 
 JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
 JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text))))
+JOIN v_plan_node ON ((((v_plan_node.node_id)::text = (node.node_id)::text))))
 ORDER BY nodecat_id;
 
 

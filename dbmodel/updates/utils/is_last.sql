@@ -7,7 +7,29 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- ----------------------------
+-- CUSTOM FIELDS
+-- ----------------------------
+DROP TABLE IF EXISTS man_custom_field_parameter;
+CREATE TABLE man_custom_field_parameter(
+field_id character varying (50) NOT NULL PRIMARY KEY,
+descript character varying (254),
+feature_type character varying (18) NOT NULL
+);
 
+DROP TABLE IF EXISTS man_custom_field;
+CREATE TABLE man_custom_field(
+id serial NOT NULL PRIMARY KEY,
+field_id character varying (50) NOT NULL,
+feature_id character varying (16),
+value character varying (50),
+tstamp timestamp default now()
+);
+
+
+ ALTER TABLE man_custom_field ADD CONSTRAINT man_custom_field_man_custom_field_parameter_fkey FOREIGN KEY (field_id) REFERENCES man_custom_field_parameter (field_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+  ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (feature_type) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ 
 -- ----------------------------
 -- IMPROVE STATE TOPOLOGY COHERENCE TOOLS
 -- ----------------------------
@@ -99,99 +121,7 @@ tstamp timestamp(6) without time zone,
 );
 
 
-
--- ----------------------------
--- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
--- ----------------------------
-
-CREATE SEQUENCE review_arc_id_seq
-    START WITH 1000000
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE review_node_id_seq
-    START WITH 1000000
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-DROP TABLE IF EXISTS review_arc;
-CREATE TABLE review_arc
-(  arc_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_arc_id_seq'::regclass),
-  the_geom geometry(LINESTRING,SRID_VALUE),
-  y1 numeric(12,3),
-  y2 numeric(12,3),
-  arc_type character varying(16),
-  arccat_id character varying(30),
-  annotation character varying(254),
-  verified character varying(16),
-  field_checked boolean,
-  office_checked boolean,
-  CONSTRAINT review_arc_pkey PRIMARY KEY (arc_id)
-);
-
-DROP TABLE IF EXISTS review_node;
-CREATE TABLE review_node
-( node_id character varying(16) NOT NULL DEFAULT nextval('"SCHEMA_NAME".review_node_id_seq'::regclass),
-  the_geom geometry(POINT,SRID_VALUE),
-  top_elev numeric(12,3),
-  ymax numeric(12,3),
-  node_type character varying(16),
-  cat_matcat character varying(16),
-  dimensions character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  verified character varying(16),
-  field_checked boolean,
-  office_checked boolean,
-  CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
-  );
-  
-DROP TABLE IF EXISTS review_audit_arc;
-CREATE TABLE review_audit_arc
-(  arc_id character varying(16) NOT NULL,
-  the_geom geometry(LINESTRING,SRID_VALUE),
-  y1 numeric(12,3),
-  y2 numeric(12,3),
-  arc_type character varying(16),
-  arccat_id character varying(30),
-  annotation character varying(254),
-  verified character varying(16),
-   moved_geom boolean,
-  field_checked boolean,
-  "operation" character varying(25),
-  "user" varchar (50),  
-  date_field timestamp (6) without time zone,
-  office_checked boolean,
-  CONSTRAINT review_audit_arc_pkey PRIMARY KEY (arc_id)
-  );
-  
-DROP TABLE IF EXISTS review_audit_node;
-CREATE TABLE review_audit_node
-(  node_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,SRID_VALUE),
-  top_elev numeric(12,3),
-  ymax numeric(12,3),
-  node_type character varying(16),
-  cat_matcat character varying(16),
-  dimensions character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  verified character varying(16),
-  moved_geom boolean,
-  field_checked boolean,
-  "operation" character varying(25),
-  "user" varchar (50),  
-  date_field timestamp (6) without time zone,
-  office_checked boolean,
-  CONSTRAINT review_audit_node_pkey PRIMARY KEY (node_id)
-  );
-  
-  
-  
+ 
   -- ----------------------------
 -- VALUE DOMAIN ON WEB/MOBILE CLIENT
 -- ----------------------------
@@ -267,7 +197,27 @@ CREATE TABLE om_visit_event_photo
 -- ----------------------------
 -- QAD DIMENSION TABLES
 -- ----------------------------
-
+CREATE SEQUENCE dim_symbol_id_seq
+    START WITH 1000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+	CREATE SEQUENCE dim_text_id_seq
+    START WITH 1000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+	CREATE SEQUENCE dim_line_id_seq
+    START WITH 1000000
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
 
 CREATE TABLE dim_line
 (
@@ -275,7 +225,7 @@ CREATE TABLE dim_line
   color character varying(10),
   type character varying(2),
   id_parent bigint,
-  id serial NOT NULL,
+   id integer NOT NULL DEFAULT nextval('"SCHEMA_NAME".dim_line_id_seq'::regclass),
   the_geom geometry(LineString,SRID_VALUE),
   CONSTRAINT dim_line_pkey PRIMARY KEY (id)
 );
@@ -289,7 +239,7 @@ CREATE TABLE dim_symbol
   color character varying(10),
   type character varying(2),
   id_parent bigint,
-  id serial NOT NULL,
+  id integer NOT NULL DEFAULT nextval('"SCHEMA_NAME".dim_symbol_id_seq'::regclass),
   the_geom geometry(Point,SRID_VALUE),
   CONSTRAINT dim_symbol_pkey PRIMARY KEY (id)
   );
@@ -297,7 +247,7 @@ CREATE TABLE dim_symbol
   
 CREATE TABLE dim_text
 (
-  id serial NOT NULL,
+  id integer NOT NULL DEFAULT nextval('"SCHEMA_NAME".dim_text_id_seq'::regclass),
   text character varying(50) NOT NULL,
   font character varying(50),
   h_text double precision,

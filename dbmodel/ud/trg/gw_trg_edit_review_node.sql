@@ -1,3 +1,10 @@
+/*
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_review_node()
   RETURNS trigger AS
 $BODY$
@@ -18,7 +25,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		
 		DELETE FROM review_node WHERE office_checked IS TRUE AND node_id = OLD.node_id;
 		
-		UPDATE node SET top_elev=review_audit_node.top_elev, ymax=review_audit_node.ymax FROM review_audit_node 
+		UPDATE node SET top_elev=review_audit_node.top_elev, ymax=review_audit_node.ymax, nodecat_id=review_audit_node.nodecat_id, annotation=review_audit_node.annotation FROM review_audit_node 
 		WHERE node.node_id=review_audit_node.node_id AND office_checked is TRUE;
 		
 	END IF;	

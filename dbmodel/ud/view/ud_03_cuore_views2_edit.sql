@@ -16,8 +16,12 @@ DROP VIEW IF EXISTS v_edit_node CASCADE;
 CREATE VIEW v_edit_node AS
 SELECT node.node_id, 
 node.top_elev, 
+node.est_top_elev,
 node.ymax,
-node.top_elev-node.ymax as elev,
+node.est_ymax,
+node.elev,
+node.est_elev,
+v_node.elev,
 node.sander,
 node.node_type,
 node.nodecat_id,
@@ -42,8 +46,6 @@ node.adress_02,
 node.adress_03,
 node.descript,
 cat_node.svg AS "cat_svg",
-node.est_top_elev,
-node.est_ymax,
 node.rotation,
 node.link,
 node.verified,
@@ -64,7 +66,8 @@ dma.macrodma_id,
 exploitation.short_descript AS expl_name
    FROM expl_selector,node
    LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
+	JOIN v_node ON node.node_id=v_node.node_id
    JOIN exploitation ON node.expl_id=exploitation.expl_id
    WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
@@ -79,9 +82,13 @@ arc.node_1,
 arc.node_2,
 arc.y1, 
 arc.y2,
-v_arc_x_node.elev1,
-v_arc_x_node.elev2,
+arc.est_y1,
+arc.elev1,
+arc.est_elev1,
 v_arc_x_node.elevmax1,
+arc.est_y2,
+arc.elev2,
+arc.est_elev2,
 v_arc_x_node.elevmax2,
 v_arc_x_node.z1,
 v_arc_x_node.z2,
@@ -117,8 +124,6 @@ arc.adress_02,
 arc.adress_03,
 arc.descript,
 cat_arc.svg AS "cat_svg",
-arc.est_y1,
-arc.est_y2,
 arc.rotation,
 arc.link,
 arc.verified,
@@ -150,7 +155,7 @@ SELECT connec.connec_id,
 connec.top_elev, 
 connec.ymax, 
 connec.connecat_id,
-cat_connec.type AS "cat_connectype_id",
+connec.connec_type,
 cat_connec.matcat_id AS "cat_matcat_id",
 connec.sector_id,
 connec.code,
@@ -281,10 +286,8 @@ dma.macrodma_id,
 gully.streetaxis_id,
 ext_streetaxis.name AS streetname,
 gully.postnumber,
-exploitation.short_descript AS expl_name,
-gully.connec_length,
-gully.connec_depth
-FROM expl_selector, gully
+exploitation.short_descript AS expl_name
+FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN ud_sample_dev.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
@@ -296,7 +299,7 @@ AND expl_selector.cur_user="current_user"()::text;
 
 DROP VIEW IF EXISTS v_edit_pgully CASCADE;
 CREATE OR REPLACE VIEW v_edit_pgully AS
-SELECT gully.gully_id, 
+SELECT  gully.gully_id, 
 gully.top_elev, 
 gully.ymax, 
 gully.gratecat_id,
@@ -345,17 +348,13 @@ gully.inventory,
 gully.end_date,
 dma.macrodma_id,
 gully.streetaxis_id,
-ext_streetaxis.name AS streetname,
 gully.postnumber,
-exploitation.short_descript AS expl_name,
-gully.connec_length,
-gully.connec_depth
-FROM expl_selector, gully
+exploitation.short_descript AS expl_name
+FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
-LEFT JOIN ud_sample_dev.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
 JOIN exploitation ON gully.expl_id=exploitation.expl_id
-WHERE gully.the_geom_pol is not null 
+WHERE gully.the_geom_pol is not null
 AND (gully.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text;
 
@@ -1909,5 +1908,104 @@ FROM expl_selector,catchment
 JOIN exploitation ON catchment.expl_id=exploitation.expl_id
 WHERE ((catchment.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
+
+  
+ --REVIEW TABLES 
+
+DROP VIEW IF EXISTS v_edit_review_node CASCADE;
+CREATE VIEW v_edit_review_node AS 
+ SELECT review_audit_node.node_id,
+ node.nodecat_id,
+    node.top_elev,
+    node.ymax,
+	node."state",
+	review_audit_node.nodecat_id AS field_nodecat_id,
+    review_audit_node.top_elev AS field_top_elev,
+    review_audit_node.ymax AS field_ymax,
+    review_audit_node.annotation,
+    review_audit_node.observ,
+	review_audit_node.moved_geom,
+    review_audit_node.office_checked,
+	review_audit_node.the_geom	
+   FROM node
+     RIGHT JOIN review_audit_node ON node.node_id::text = review_audit_node.node_id::text
+  WHERE review_audit_node.field_checked IS TRUE AND review_audit_node.office_checked IS NOT TRUE;
+  
+
+CREATE OR REPLACE VIEW v_edit_review_arc AS 
+ SELECT review_audit_arc.arc_id,
+	arc.arc_type,
+    arc.arccat_id,
+    arc.y1,
+    arc.y2,
+	arc."state",
+	review_audit_arc.arc_type AS field_arc_type,
+    review_audit_arc.arccat_id AS field_arccat_id,
+    review_audit_arc.y1 AS field_y1,
+    review_audit_arc.y2 AS field_y2,
+    review_audit_arc.annotation,
+    review_audit_arc.observ,
+    review_audit_arc.moved_geom,
+    review_audit_arc.office_checked,
+    review_audit_arc.the_geom
+   FROM arc
+     RIGHT JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
+  WHERE review_audit_arc.field_checked IS TRUE AND review_audit_arc.office_checked IS NOT TRUE;
+  
+  
+  CREATE OR REPLACE VIEW v_edit_review_connec AS 
+	SELECT review_audit_connec.connec_id,
+	 connec.top_elev,
+	 connec.ymax,
+	 connec.connec_type,
+	 connec.connecat_id,
+	 connec."state",
+	 review_audit_connec.top_elev as field_top_elev,
+	 review_audit_connec.ymax AS field_ymax,
+	 review_audit_connec.connec_type AS field_connec_type,
+	 review_audit_connec.connecat_id AS field_connecat_id,
+	 review_audit_connec.annotation,
+	 review_audit_connec.observ,
+	 review_audit_connec.moved_geom,
+	 review_audit_connec.office_checked,
+	 review_audit_connec.the_geom
+	 FROM connec
+		RIGHT JOIN review_audit_connec ON connec.connec_id::text = review_audit_connec.connec_id::text
+  WHERE review_audit_connec.field_checked IS TRUE AND review_audit_connec.office_checked IS NOT TRUE;
+
+  
+  CREATE OR REPLACE VIEW v_edit_review_gully AS 
+	SELECT review_audit_gully.gully_id,
+	 gully.top_elev,
+	 gully.ymax,
+	 gully.matcat_id,
+	 gully.gratecat_id,
+	 gully.units,
+	 gully.groove,
+	 gully.arccat_id,
+	 gully.arc_id,
+	 gully.siphon,
+	 gully.featurecat_id,
+	 gully.feature_id,
+	 gully."state",
+	 review_audit_gully.ymax AS field_ymax,
+	 review_audit_gully.top_elev as field_top_elev,
+	 review_audit_gully.matcat_id AS field_matcat_id,
+	 review_audit_gully.gratecat_id AS field_gratecat_id,
+	 review_audit_gully.units AS field_units,
+	 review_audit_gully.groove AS field_groove,
+	 review_audit_gully.arccat_id AS field_arccat_id,
+	 review_audit_gully.arc_id AS field_arc_id,
+	 review_audit_gully.siphon AS field_siphon,
+	 review_audit_gully.featurecat_id AS field_featurecat_id,
+	 review_audit_gully.feature_id AS field_feature_id,	 
+	 review_audit_gully.annotation,
+	 review_audit_gully.observ,
+	 review_audit_gully.moved_geom,
+	 review_audit_gully.office_checked,
+	 review_audit_gully.the_geom
+	 FROM gully
+		RIGHT JOIN review_audit_gully ON gully.gully_id::text = review_audit_gully.gully_id::text
+  WHERE review_audit_gully.field_checked IS TRUE AND review_audit_gully.office_checked IS NOT TRUE;
 
   
