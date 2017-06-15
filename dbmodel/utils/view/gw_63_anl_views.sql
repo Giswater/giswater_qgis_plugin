@@ -40,4 +40,28 @@ JOIN anl_selector_state ON connec.state=anl_selector_state.id
 ;
 
 
+-- pgrouting views
+
+DROP VIEW IF EXISTS v_anl_pgrouting_node CASCADE;
+CREATE OR REPLACE VIEW v_anl_pgrouting_node AS 
+SELECT 
+row_number() OVER (order by node_id) AS rid,
+node_id
+from node
+
+
+
+DROP VIEW IF EXISTS v_anl_pgrouting_arc CASCADE;
+CREATE OR REPLACE VIEW v_anl_pgrouting_arc AS 
+SELECT 
+row_number() OVER (order by arc_id) AS rid,
+arc_id,
+a.rid as rnode_1,
+b.rid as rnode_2,
+the_geom
+from arc
+JOIN v_anl_pgrouting_node a on node_1=a.node_id
+JOIN v_anl_pgrouting_node b on node_2=b.node_id 
+
+
 
