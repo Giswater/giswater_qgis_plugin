@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>590</width>
-    <height>558</height>
+    <width>610</width>
+    <height>584</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>190</y>
-     <width>541</width>
+     <y>200</y>
+     <width>551</width>
      <height>16</height>
     </rect>
    </property>
@@ -30,8 +30,8 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>350</y>
-     <width>541</width>
+     <y>370</y>
+     <width>551</width>
      <height>16</height>
     </rect>
    </property>
@@ -45,7 +45,7 @@
      <x>200</x>
      <y>50</y>
      <width>20</width>
-     <height>451</height>
+     <height>481</height>
     </rect>
    </property>
    <property name="orientation">
@@ -55,10 +55,10 @@
   <widget class="Line" name="line_4">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>390</x>
      <y>50</y>
      <width>20</width>
-     <height>451</height>
+     <height>481</height>
     </rect>
    </property>
    <property name="orientation">
@@ -68,10 +68,10 @@
   <widget class="QLabel" name="img_0">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>60</y>
-     <width>161</width>
-     <height>121</height>
+     <x>30</x>
+     <y>50</y>
+     <width>171</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="text">
@@ -88,9 +88,9 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>60</y>
-     <width>161</width>
-     <height>121</height>
+     <y>50</y>
+     <width>171</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="text">
@@ -106,10 +106,10 @@
   <widget class="QLabel" name="img_2">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>60</y>
-     <width>161</width>
-     <height>121</height>
+     <x>410</x>
+     <y>50</y>
+     <width>171</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="text">
@@ -125,10 +125,10 @@
   <widget class="QLabel" name="img_3">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>30</x>
      <y>220</y>
-     <width>161</width>
-     <height>121</height>
+     <width>171</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="text">
@@ -146,8 +146,8 @@
     <rect>
      <x>220</x>
      <y>220</y>
-     <width>161</width>
-     <height>121</height>
+     <width>171</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="text">
@@ -163,10 +163,10 @@
   <widget class="QLabel" name="img_5">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>410</x>
      <y>220</y>
-     <width>161</width>
-     <height>121</height>
+     <width>171</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="text">
@@ -182,10 +182,10 @@
   <widget class="QLabel" name="img_6">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>370</y>
-     <width>161</width>
-     <height>121</height>
+     <x>30</x>
+     <y>390</y>
+     <width>171</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="text">
@@ -202,9 +202,9 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>370</y>
-     <width>161</width>
-     <height>121</height>
+     <y>390</y>
+     <width>171</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="text">
@@ -220,10 +220,10 @@
   <widget class="QLabel" name="img_8">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>370</y>
-     <width>161</width>
-     <height>121</height>
+     <x>410</x>
+     <y>390</y>
+     <width>171</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="text">
@@ -242,8 +242,8 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>520</y>
+     <x>220</x>
+     <y>550</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -258,8 +258,8 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>520</y>
+     <x>320</x>
+     <y>550</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -284,8 +284,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>18</x>
+     <y>13</y>
      <width>46</width>
      <height>13</height>
     </rect>
@@ -297,8 +297,8 @@
   <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>520</y>
+     <x>510</x>
+     <y>550</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -324,7 +324,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>10</y>
+     <y>13</y>
      <width>46</width>
      <height>13</height>
     </rect>
@@ -333,28 +333,183 @@
     <string>Event_id </string>
    </property>
   </widget>
-  <widget class="QLabel" name="test">
+  <widget class="QPushButton" name="btn_zoom_img_1">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>430</y>
-     <width>161</width>
-     <height>121</height>
+     <x>180</x>
+     <y>180</y>
+     <width>20</width>
+     <height>20</height>
     </rect>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::ClickFocus</enum>
    </property>
    <property name="text">
     <string/>
    </property>
-   <property name="pixmap">
-    <pixmap>ud_shape.png</pixmap>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
    </property>
-   <property name="scaledContents">
+   <property name="autoExclusive">
     <bool>true</bool>
    </property>
-   <property name="openExternalLinks">
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_2">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>180</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_3">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>180</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_4">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>350</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_5">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>350</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_6">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>350</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_7">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>510</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_8">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>510</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_zoom_img_9">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>510</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>zoom.png</normaloff>zoom.png</iconset>
+   </property>
+   <property name="autoExclusive">
     <bool>true</bool>
    </property>
   </widget>
