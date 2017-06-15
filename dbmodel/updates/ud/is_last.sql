@@ -62,9 +62,9 @@ CREATE TABLE anl_arc_profile_value
 (
   id serial NOT NULL,
   profile_id character varying(30) NOT NULL,
-  arc_id bigint NOT NULL,
-  start_point bigint,
-  end_point bigint,
+  arc_id varchar NOT NULL,
+  start_point varchar,
+  end_point varchar,
   CONSTRAINT anl_arc_profile_value_pkey PRIMARY KEY (id)
 );
 
