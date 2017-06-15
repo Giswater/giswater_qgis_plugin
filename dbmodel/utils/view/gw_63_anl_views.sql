@@ -58,6 +58,7 @@ row_number() OVER (order by arc_id) AS rid,
 arc_id,
 a.rid as rnode_1,
 b.rid as rnode_2,
+st_length(arc.the_geom) AS cost,
 the_geom
 from arc
 JOIN v_anl_pgrouting_node a on node_1=a.node_id
