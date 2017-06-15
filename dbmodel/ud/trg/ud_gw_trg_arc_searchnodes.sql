@@ -20,19 +20,23 @@ DECLARE
     vnoderec Record;
     newPoint public.geometry;    
     connecPoint public.geometry;
-
+    check_aux boolean;
+   
+	
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
+	
     -- Get data from config table
     SELECT * INTO rec FROM config;
     SELECT value INTO slope_arc_direction_bool FROM config_param_bool where id='slope_arc_direction';    
+	SELECT arc_topocoh INTO check_aux FROM value_state where NEW.state=id;
 
-    SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+   SELECT * INTO nodeRecord1 FROM node WHERE (ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes) AND ((check_aux IS true AND NEW.state=node.state) OR check_aux IS false))
     ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
-
-    SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
+	
+	SELECT * INTO nodeRecord2 FROM node WHERE (ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes) AND ((check_aux IS true AND NEW.state=node.state) OR check_aux IS false))
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
     SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
@@ -122,10 +126,13 @@ BEGIN
                 
         RETURN NEW;
 
-
-    -- Error, no existing nodes
+    -- Error, no existing nodes or there is an inchoerence of states
+    ELSIF (check_aux IS true AND (nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) THEN
+		RETURN audit_function (210,750);
+		
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
         RETURN audit_function (182,750);
+		
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
         RETURN NEW;
     ELSE

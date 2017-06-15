@@ -7,6 +7,26 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
+
+-- ----------------------------
+-- STATE TOPOLOGYC COHERENCE
+-- ----------------------------
+ALTER TABLE value_state ADD COLUMN node_topocoh boolean;
+ALTER TABLE value_state ADD COLUMN arc_topocoh boolean;
+
+-- CATALOG OF FUNCTION
+INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
+VALUES (190, 'gw_fct_node_state_update', 'trigger function', 'utils', null,null);
+
+INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
+VALUES (200, 'gw_fct_arc_state_update', 'trigger function', 'utils', null,null);
+
+
+
+
+
+
 -- ----------------------------
 -- CUSTOM FIELDS
 -- ----------------------------
@@ -43,17 +63,6 @@ CREATE UNIQUE INDEX man_selector_state_one_row ON man_selector_state((id IS NOT 
 --
 ALTER TABLE ws_sample.value_state ADD COLUMN node_topology_coherence boolean;
 ALTER TABLE ws_sample.value_state ADD COLUMN arc_topology_coherence boolean;
-
-
-
-
-
-
-
-
-
-
-
 
 
 
