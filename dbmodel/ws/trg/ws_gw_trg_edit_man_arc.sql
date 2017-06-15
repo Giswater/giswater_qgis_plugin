@@ -76,7 +76,15 @@ BEGIN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
         END IF;
-			
+
+	    -- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT state_vdefault FROM config);
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
+            END IF;
+        END IF;
+		
 			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
@@ -97,13 +105,6 @@ BEGIN
         -- FEATURE INSERT
 		IF man_table='man_pipe' THEN 
 				
-				  	    -- State
-				IF (NEW.pipe_state IS NULL) THEN
-					NEW.pipe_state := (SELECT state_vdefault FROM config);
-					IF (NEW.pipe_state IS NULL) THEN
-						NEW.pipe_state := (SELECT id FROM value_state limit 1);
-					END IF;
-				END IF;
 				
 				-- Workcat_id
 				IF (NEW.pipe_workcat_id IS NULL) THEN
@@ -121,7 +122,7 @@ BEGIN
 				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 					publish, inventory, end_date, expl_id)
-					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.pipe_state, NEW.pipe_annotation, NEW.pipe_observ, NEW.pipe_comment, NEW.pipe_custom_length,NEW.dma_id,NEW.pipe_soilcat_id, 
+					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.pipe_annotation, NEW.pipe_observ, NEW.pipe_comment, NEW.pipe_custom_length,NEW.dma_id,NEW.pipe_soilcat_id, 
 					NEW.pipe_category_type, NEW.pipe_fluid_type, NEW.pipe_location_type, NEW.pipe_workcat_id, NEW.pipe_buildercat_id, NEW.pipe_builtdate,NEW.pipe_ownercat_id, NEW.pipe_adress_01, NEW.pipe_adress_02, NEW.pipe_adress_03, 
 					NEW.pipe_descript, NEW.pipe_rotation, NEW.pipe_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.pipe_workcat_id_end, NEW.pipe_label_x,NEW.pipe_label_y,NEW.pipe_label_rotation, 
 					NEW.publish, NEW.inventory, NEW.pipe_end_date, expl_id_int);
@@ -129,13 +130,6 @@ BEGIN
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
 		
 		ELSIF man_table='man_varc' THEN
-				-- State
-				IF (NEW.varc_state IS NULL) THEN
-					NEW.varc_state := (SELECT state_vdefault FROM config);
-					IF (NEW.varc_state IS NULL) THEN
-							NEW.varc_state := (SELECT id FROM value_state limit 1);
-					END IF;
-				END IF;
 						
 				-- Workcat_id
 				IF (NEW.varc_workcat_id IS NULL) THEN
@@ -153,7 +147,7 @@ BEGIN
 				INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
 					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,rotation,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 					publish, inventory, end_date, expl_id)
-					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.varc_state, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, NEW.varc_custom_length,NEW.dma_id,NEW.varc_soilcat_id, 
+					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, NEW.varc_custom_length,NEW.dma_id,NEW.varc_soilcat_id, 
 					NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_buildercat_id, NEW.varc_builtdate,NEW.varc_ownercat_id, NEW.varc_adress_01, NEW.varc_adress_02, NEW.varc_adress_03, 
 					NEW.varc_descript, NEW.varc_rotation, NEW.varc_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.varc_workcat_id_end, NEW.varc_label_x,NEW.varc_label_y,NEW.varc_label_rotation, 
 					NEW.publish, NEW.inventory, NEW.varc_end_date, expl_id_int);
@@ -202,7 +196,7 @@ BEGIN
 		
 		IF man_table='man_pipe' THEN
 			UPDATE arc 
-			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.pipe_state, annotation= NEW.pipe_annotation, "observ"=NEW.pipe_observ, 
+			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.pipe_annotation, "observ"=NEW.pipe_observ, 
 				"comment"=NEW.pipe_comment, custom_length=NEW.pipe_custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.pipe_soilcat_id, category_type=NEW.pipe_category_type, fluid_type=NEW.pipe_fluid_type, 
 				location_type=NEW.pipe_location_type, workcat_id=NEW.pipe_workcat_id, buildercat_id=NEW.pipe_buildercat_id, builtdate=NEW.pipe_builtdate,
 				ownercat_id=NEW.pipe_ownercat_id, adress_01=NEW.pipe_adress_01, adress_02=NEW.pipe_adress_02, adress_03=NEW.pipe_adress_03, descript=NEW.pipe_descript,
@@ -216,7 +210,7 @@ BEGIN
 			
 		ELSIF man_table='man_varc' THEN
 			UPDATE arc
-			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.varc_state, annotation= NEW.varc_annotation, "observ"=NEW.varc_observ, 
+			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.varc_annotation, "observ"=NEW.varc_observ, 
 				"comment"=NEW.varc_comment, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.varc_soilcat_id, category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type, 
 				location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,
 				ownercat_id=NEW.varc_ownercat_id, adress_01=NEW.varc_adress_01, adress_02=NEW.varc_adress_02, adress_03=NEW.varc_adress_03, descript=NEW.varc_descript,
