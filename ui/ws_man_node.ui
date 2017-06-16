@@ -270,7 +270,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -345,61 +345,6 @@
         </property>
         <property name="text">
          <string>Elevation:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="tank_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_tank_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -674,7 +619,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -684,7 +629,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -756,7 +701,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -792,7 +737,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -818,7 +763,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>202</y>
+          <y>172</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -854,7 +799,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>202</y>
+          <y>172</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -916,7 +861,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>172</y>
+          <y>142</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -952,7 +897,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>172</y>
+          <y>142</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -967,8 +912,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1185,8 +1130,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>281</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1715,6 +1660,14 @@
        </widget>
       </widget>
       <widget class="QWidget" name="Customfields">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>100</width>
+         <height>30</height>
+        </rect>
+       </property>
        <attribute name="label">
         <string>Custom fields</string>
        </attribute>
@@ -1981,7 +1934,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1991,7 +1944,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2111,61 +2064,6 @@
         </property>
         <property name="text">
          <string>Elevation:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="pump_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_pump_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -2438,7 +2336,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -2474,7 +2372,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3329,7 +3227,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3339,7 +3237,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3471,61 +3369,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_source_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="source_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="source_buildercat_id">
@@ -3773,7 +3616,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -3809,7 +3652,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4609,7 +4452,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4619,7 +4462,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4751,61 +4594,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_meter_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="meter_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
         </property>
        </widget>
        <widget class="QDateEdit" name="meter_builtdate">
@@ -5053,7 +4841,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -5089,7 +4877,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5889,7 +5677,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5899,7 +5687,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6022,61 +5810,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="junction_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_junction_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -6336,7 +6069,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -6372,7 +6105,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6398,7 +6131,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>172</y>
+          <y>142</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6411,7 +6144,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>172</y>
+          <y>142</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -7028,6 +6761,14 @@
        </widget>
       </widget>
       <widget class="QWidget" name="page">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>560</width>
+         <height>308</height>
+        </rect>
+       </property>
        <attribute name="label">
         <string>Custom fields</string>
        </attribute>
@@ -7050,8 +6791,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7288,7 +7029,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>85</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -7298,7 +7039,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>85</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7354,61 +7095,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_waterwell_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="waterwell_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_waterwell_elevation">
@@ -7732,7 +7418,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>115</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -7768,7 +7454,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>115</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8669,61 +8355,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="reduction_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_reduction_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_reduction_workcat_id">
         <property name="geometry">
          <rect>
@@ -8933,7 +8564,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8943,7 +8574,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9015,7 +8646,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -9051,7 +8682,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9970,25 +9601,6 @@
        <attribute name="label">
         <string>Basic information</string>
        </attribute>
-       <widget class="QComboBox" name="hydrant_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="hydrant_depth">
         <property name="geometry">
          <rect>
@@ -10000,42 +9612,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_hydrant_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
         </property>
        </widget>
        <widget class="QLabel" name="label_hydrant_depth">
@@ -10339,7 +9915,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -10349,7 +9925,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -10421,7 +9997,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -10457,7 +10033,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -12050,66 +11626,11 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_valve_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="valve_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
        <widget class="QComboBox" name="valve_ownercat_id">
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -12119,7 +11640,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -12269,7 +11790,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -12305,7 +11826,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13909,7 +13430,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13919,7 +13440,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14051,61 +13572,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="manhole_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_manhole_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
         </property>
        </widget>
        <widget class="QDateEdit" name="manhole_builtdate">
@@ -14353,7 +13819,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -14389,7 +13855,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15189,7 +14655,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15199,7 +14665,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15322,61 +14788,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="filter_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_filter_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -15636,7 +15047,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -15672,7 +15083,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16472,7 +15883,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16482,7 +15893,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -16605,61 +16016,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="register_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_register_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -16919,7 +16275,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -16955,7 +16311,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16981,7 +16337,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>170</y>
+          <y>140</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -17017,7 +16373,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>170</y>
+          <y>140</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -17804,7 +17160,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -17814,7 +17170,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -17937,61 +17293,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="netwjoin_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_netwjoin_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -18251,7 +17552,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -18287,7 +17588,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -19087,7 +18388,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -19097,7 +18398,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -19220,61 +18521,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="exptank_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_exptank_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -19534,7 +18780,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -19570,7 +18816,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -20370,7 +19616,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -20380,7 +19626,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -20503,61 +19749,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="flexunion_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_flexunion_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -20817,7 +20008,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>101</width>
           <height>22</height>
          </rect>
@@ -20853,7 +20044,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>

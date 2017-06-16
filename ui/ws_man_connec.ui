@@ -276,7 +276,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>7</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -327,42 +327,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_wjoin_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
         </property>
        </widget>
        <widget class="QLineEdit" name="wjoin_elevation">
@@ -559,30 +523,6 @@
          <rect>
           <x>380</x>
           <y>20</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="wjoin_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -891,7 +831,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -901,7 +841,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -937,7 +877,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -973,7 +913,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -991,7 +931,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>170</y>
+          <y>140</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1027,7 +967,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>170</y>
+          <y>140</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1045,7 +985,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>195</y>
+          <y>165</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -1084,7 +1024,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>200</y>
+          <y>170</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -2143,15 +2083,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_3">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2168,42 +2108,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_tap_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
         </property>
        </widget>
        <widget class="QLineEdit" name="tap_elevation">
@@ -2390,25 +2294,6 @@
          <rect>
           <x>380</x>
           <y>20</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="tap_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -2687,7 +2572,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>170</y>
+          <y>140</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2723,7 +2608,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2759,7 +2644,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>195</y>
+          <y>165</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -2798,7 +2683,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -2808,7 +2693,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -2844,7 +2729,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -2862,7 +2747,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>200</y>
+          <y>170</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -2880,7 +2765,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>170</y>
+          <y>140</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -2898,7 +2783,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>230</y>
+          <y>200</y>
           <width>96</width>
           <height>21</height>
          </rect>
@@ -2937,7 +2822,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>230</y>
+          <y>200</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3674,8 +3559,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4428,15 +4313,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_13">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>320</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4611,7 +4496,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>170</y>
+          <y>140</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4647,7 +4532,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4683,7 +4568,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>195</y>
+          <y>165</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -4722,7 +4607,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4732,7 +4617,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4768,7 +4653,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4786,7 +4671,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>200</y>
+          <y>170</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4804,7 +4689,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>170</y>
+          <y>140</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4905,61 +4790,6 @@
         </property>
         <property name="text">
          <string>Depth:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="greentap_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_greentap_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5183,7 +5013,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>230</y>
+          <y>200</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5202,7 +5032,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>230</y>
+          <y>200</y>
           <width>96</width>
           <height>21</height>
          </rect>
@@ -5777,8 +5607,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>320</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5997,15 +5827,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_5">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6022,42 +5852,6 @@
         </property>
         <property name="frame">
          <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_fountain_state">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>80</y>
-          <width>90</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="text">
-         <string>State:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="margin">
-         <number>3</number>
         </property>
        </widget>
        <widget class="QLineEdit" name="fountain_elevation">
@@ -6244,25 +6038,6 @@
          <rect>
           <x>380</x>
           <y>20</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="fountain_state">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6541,7 +6316,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>110</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6560,7 +6335,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6596,7 +6371,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>140</y>
+          <y>110</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6614,7 +6389,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>195</y>
+          <y>165</y>
           <width>90</width>
           <height>31</height>
          </rect>
@@ -6653,7 +6428,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>200</y>
+          <y>170</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6671,7 +6446,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>170</y>
+          <y>140</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6689,7 +6464,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>170</y>
+          <y>140</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6725,7 +6500,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>110</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6761,7 +6536,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>230</y>
+          <y>200</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6780,7 +6555,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>230</y>
+          <y>200</y>
           <width>96</width>
           <height>21</height>
          </rect>
@@ -7311,8 +7086,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
