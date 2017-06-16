@@ -88,8 +88,16 @@
 					NEW.verified := (SELECT id FROM value_verified limit 1);
 				END IF;
 			END IF;
-		
-	--Exploitation ID
+
+			-- State
+			IF (NEW."state" IS NULL) THEN
+				NEW."state" := (SELECT state_vdefault FROM config);
+				IF (NEW."state" IS NULL) THEN
+						NEW."state" := (SELECT id FROM value_state limit 1);
+				END IF;
+			END IF;
+			
+			--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
@@ -104,13 +112,6 @@
 			
 			
 			IF man_table='man_conduit' THEN
-						-- State
-				IF (NEW.conduit_state IS NULL) THEN
-					NEW.conduit_state := (SELECT state_vdefault FROM config);
-					IF (NEW.conduit_state IS NULL) THEN
-							NEW.conduit_state := (SELECT id FROM value_state limit 1);
-					END IF;
-				END IF;
 						
 				-- Workcat_id
 				IF (NEW.conduit_workcat_id IS NULL) THEN
@@ -128,7 +129,7 @@
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
 				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
 				label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
-				VALUES (NEW.arc_id, null, null, NEW.conduit_y1, NEW.conduit_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.conduit_state, NEW.conduit_annotation, NEW.conduit_observ, NEW.conduit_comment, 
+				VALUES (NEW.arc_id, null, null, NEW.conduit_y1, NEW.conduit_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.conduit_annotation, NEW.conduit_observ, NEW.conduit_comment, 
 				NEW.conduit_inverted_slope, NEW.conduit_custom_length, NEW.dma_id, NEW.conduit_soilcat_id, NEW.conduit_category_type, NEW.conduit_fluid_type, NEW.conduit_location_type, NEW.conduit_workcat_id,
 				NEW.conduit_buildercat_id, NEW.conduit_builtdate, NEW.conduit_ownercat_id, NEW.conduit_adress_01, NEW.conduit_adress_02, NEW.conduit_adress_03, NEW.conduit_descript, NEW.conduit_est_y1, NEW.conduit_est_y2,
 				NEW.conduit_rotation, NEW.conduit_link, NEW.verified, NEW.the_geom,NEW.conduit_workcat_id_end,NEW.undelete,NEW.conduit_label_x,NEW.conduit_label_y, NEW.conduit_label_rotation, 
@@ -137,14 +138,7 @@
 				INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
 			
 			ELSIF man_table='man_siphon' THEN
-							-- State
-				IF (NEW.siphon_state IS NULL) THEN
-					NEW.siphon_state := (SELECT state_vdefault FROM config);
-					IF (NEW.siphon_state IS NULL) THEN
-							NEW.siphon_state := (SELECT id FROM value_state limit 1);
-					END IF;
-				END IF;
-						
+
 				-- Workcat_id
 				IF (NEW.siphon_workcat_id IS NULL) THEN
 					NEW.siphon_workcat_id := (SELECT workcat_vdefault FROM config);
@@ -161,7 +155,7 @@
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,
 				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
-				VALUES (NEW.arc_id, null, null, NEW.siphon_y1, NEW.siphon_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.siphon_state, NEW.siphon_annotation, NEW.siphon_observ, NEW.siphon_comment,
+				VALUES (NEW.arc_id, null, null, NEW.siphon_y1, NEW.siphon_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.siphon_annotation, NEW.siphon_observ, NEW.siphon_comment,
 				NEW.siphon_inverted_slope, NEW.siphon_custom_length, NEW.dma_id, NEW.siphon_soilcat_id, NEW.siphon_category_type, NEW.siphon_fluid_type, NEW.siphon_location_type, NEW.siphon_workcat_id,
 				NEW.siphon_buildercat_id, NEW.siphon_builtdate, NEW.siphon_ownercat_id, NEW.siphon_adress_01, NEW.siphon_adress_02, NEW.siphon_adress_03, NEW.siphon_descript, NEW.siphon_est_y1, NEW.siphon_est_y2, 
 				NEW.siphon_rotation, NEW.siphon_link, NEW.verified, NEW.the_geom,NEW.siphon_workcat_id_end,NEW.undelete,NEW.siphon_label_x,NEW.siphon_label_y, NEW.siphon_label_rotation,
@@ -170,13 +164,6 @@
 				INSERT INTO man_siphon (arc_id,security_bar,steps,siphon_name) VALUES (NEW.arc_id, NEW.siphon_security_bar, NEW.siphon_steps,NEW.siphon_name);
 				
 			ELSIF man_table='man_waccel' THEN
-								-- State
-				IF (NEW.waccel_state IS NULL) THEN
-					NEW.waccel_state := (SELECT state_vdefault FROM config);
-					IF (NEW.waccel_state IS NULL) THEN
-							NEW.waccel_state := (SELECT id FROM value_state limit 1);
-					END IF;
-				END IF;
 						
 				-- Workcat_id
 				IF (NEW.waccel_workcat_id IS NULL) THEN
@@ -194,7 +181,7 @@
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,
 				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain)
-				VALUES (NEW.arc_id, null, null, NEW.waccel_y1, NEW.waccel_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.waccel_state, NEW.waccel_annotation, NEW.waccel_observ, NEW.waccel_comment,
+				VALUES (NEW.arc_id, null, null, NEW.waccel_y1, NEW.waccel_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.waccel_annotation, NEW.waccel_observ, NEW.waccel_comment,
 				NEW.waccel_inverted_slope, NEW.waccel_custom_length, NEW.dma_id, NEW.waccel_soilcat_id, NEW.waccel_category_type, NEW.waccel_fluid_type, NEW.waccel_location_type, NEW.waccel_workcat_id, 
 				NEW.waccel_buildercat_id, NEW.waccel_builtdate, NEW.waccel_ownercat_id, NEW.waccel_adress_01, NEW.waccel_adress_02, NEW.waccel_adress_03, NEW.waccel_descript, NEW.waccel_est_y1, NEW.waccel_est_y2, 
 				NEW.waccel_rotation, NEW.waccel_link, NEW.verified, NEW.the_geom,NEW.waccel_workcat_id_end,NEW.undelete,NEW.waccel_label_x,NEW.waccel_label_y, NEW.waccel_label_rotation,
@@ -204,13 +191,6 @@
 				VALUES (NEW.arc_id, NEW.waccel_sander_length, NEW.waccel_sander_depth,NEW.waccel_security_bar, NEW.waccel_steps,NEW.waccel_prot_surface,NEW.waccel_name);
 				
 			ELSIF man_table='man_varc' THEN
-								-- State
-					IF (NEW.varc_state IS NULL) THEN
-					NEW.varc_state := (SELECT state_vdefault FROM config);
-					IF (NEW.varc_state IS NULL) THEN
-							NEW.varc_state := (SELECT id FROM value_state limit 1);
-					END IF;
-				END IF;
 						
 				-- Workcat_id
 				IF (NEW.varc_workcat_id IS NULL) THEN
@@ -228,7 +208,7 @@
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
 				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, rotation, link, verified, the_geom,workcat_id_end,undelete,
 				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
-				VALUES (NEW.arc_id, null, null, NEW.varc_y1, NEW.varc_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.varc_state, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, 
+				VALUES (NEW.arc_id, null, null, NEW.varc_y1, NEW.varc_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, 
 				NEW.varc_inverted_slope, NEW.varc_custom_length, NEW.dma_id, NEW.varc_soilcat_id, NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_buildercat_id, 
 				NEW.varc_builtdate, NEW.varc_ownercat_id, NEW.varc_adress_01, NEW.varc_adress_02, NEW.varc_adress_03, NEW.varc_descript, NEW.varc_est_y1, NEW.varc_est_y2, NEW.varc_rotation, NEW.varc_link, 
 				NEW.verified, NEW.the_geom,NEW.varc_workcat_id_end,NEW.undelete,NEW.varc_label_x,NEW.varc_label_y, NEW.varc_label_rotation,
@@ -307,7 +287,7 @@
 		   
 			IF man_table='man_conduit' THEN
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.conduit_y1, y2=NEW.conduit_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.conduit_state, 
+				SET arc_id=NEW.arc_id, y1=NEW.conduit_y1, y2=NEW.conduit_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.conduit_annotation, "observ"=NEW.conduit_observ,"comment"=NEW.conduit_comment, inverted_slope=NEW.conduit_inverted_slope, custom_length=NEW.conduit_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.conduit_soilcat_id, category_type=NEW.conduit_category_type, fluid_type=NEW.conduit_fluid_type,location_type=NEW.conduit_location_type, workcat_id=NEW.conduit_workcat_id, 
 				buildercat_id=NEW.conduit_buildercat_id, builtdate=NEW.conduit_builtdate,ownercat_id=NEW.conduit_ownercat_id, adress_01=NEW.conduit_adress_01, adress_02=NEW.conduit_adress_02, 
@@ -322,7 +302,7 @@
 			
 			ELSIF man_table='man_siphon' THEN			
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.siphon_y1, y2=NEW.siphon_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.siphon_state, 
+				SET arc_id=NEW.arc_id, y1=NEW.siphon_y1, y2=NEW.siphon_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.siphon_annotation, "observ"=NEW.siphon_observ,"comment"=NEW.siphon_comment, inverted_slope=NEW.siphon_inverted_slope, custom_length=NEW.siphon_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.siphon_soilcat_id, category_type=NEW.siphon_category_type, fluid_type=NEW.siphon_fluid_type,location_type=NEW.siphon_location_type, workcat_id=NEW.siphon_workcat_id, 
 				buildercat_id=NEW.siphon_buildercat_id, builtdate=NEW.siphon_builtdate,ownercat_id=NEW.siphon_ownercat_id, adress_01=NEW.siphon_adress_01, adress_02=NEW.siphon_adress_02, adress_03=NEW.siphon_adress_03, 
@@ -351,7 +331,7 @@
 			
 			ELSIF man_table='man_varc' THEN
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.varc_y1, y2=NEW.varc_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.varc_state, 
+				SET arc_id=NEW.arc_id, y1=NEW.varc_y1, y2=NEW.varc_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.varc_annotation, "observ"=NEW.varc_observ,"comment"=NEW.varc_comment, inverted_slope=NEW.varc_inverted_slope, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.varc_soilcat_id, category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type,location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, 
 				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,ownercat_id=NEW.varc_ownercat_id, adress_01=NEW.varc_adress_01, adress_02=NEW.varc_adress_02, adress_03=NEW.varc_adress_03, 
