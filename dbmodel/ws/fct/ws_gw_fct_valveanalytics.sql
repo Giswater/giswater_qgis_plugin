@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_valveanalytics();
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_valveanalytics() RETURNS integer AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_valveanalytics(character varying);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_valveanalytics(result_id character varying) RETURNS integer AS
 $BODY$
 DECLARE
     exists_id      text;
@@ -88,7 +88,7 @@ BEGIN
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
 
     --Insert into result catalog tables
-    PERFORM gw_fct_mincut_result_catalog();
+    PERFORM gw_fct_mincut_result_catalog(result_id);
 
     RETURN audit_function(0,320);
 

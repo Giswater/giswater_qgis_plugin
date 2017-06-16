@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_result_catalog();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_catalog()
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_result_catalog(character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_catalog(result_id character varying)
   RETURNS void AS
 $BODY$
 
@@ -24,19 +24,19 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 	
 	--Set the mincut_id
-	IF NEW.id IS NOT NULL THEN
+	IF result_id IS NOT NULL THEN
 	
-			IF EXISTS (SELECT id FROM anl_mincut_result_cat WHERE id=NEW.id) THEN 
-				SELECT anl_mincut_result_cat(id) INTO result_cat_id_aux;
+			IF EXISTS (SELECT id FROM anl_mincut_result_cat WHERE id=result_id) THEN 
+				SELECT result_id INTO result_cat_id_aux;
 				
-				DELETE FROM anl_mincut_result_cat WHERE id=OLD.id;
+				DELETE FROM anl_mincut_result_cat WHERE id=result_id;
 							
-				INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+				INSERT INTO anl_mincut_result_cat (id) VALUES (result_id);
 				 
 			ELSE 
 			
-				SELECT anl_mincut_result_cat(id) INTO result_cat_id_aux;
-				INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+				SELECT result_id INTO result_cat_id_aux;
+				INSERT INTO anl_mincut_result_cat (id) VALUES (result_id);
 				 
 			END IF;
 		

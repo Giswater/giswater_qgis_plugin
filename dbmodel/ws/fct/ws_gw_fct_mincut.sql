@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut(character varying, character varying);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying) RETURNS integer AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying, result_id character varying) RETURNS integer AS
 $BODY$
 DECLARE
     node_1_aux		text;
@@ -28,6 +28,8 @@ BEGIN
     DELETE FROM "anl_mincut_arc";
     DELETE FROM "anl_mincut_valve";
     DELETE FROM "anl_mincut_polygon";
+	
+	
 
      -- The element to isolate could be an arc or a node
     IF type_element_arg = 'arc' THEN
@@ -133,7 +135,7 @@ BEGIN
    UPDATE man_valve set mincut_anl=true;
    UPDATE man_valve set mincut_anl=false where node_id in(select valve_id from anl_mincut_valve);
 
-   PERFORM gw_fct_valveanalytics();
+   PERFORM gw_fct_valveanalytics(result_id);
     
     -- Insert into result catalog tables
     -- PERFORM gw_fct_mincut_result_catalog();
