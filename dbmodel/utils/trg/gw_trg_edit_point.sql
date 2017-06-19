@@ -19,16 +19,16 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
     
 
-	--Exploitation ID
-		IF (NEW.expl_id IS NULL) THEN
-				IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-					RETURN audit_function(125,430);
-				END IF;
-				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-				IF (NEW.expl_id IS NULL) THEN
-					RETURN audit_function(130,430);  
-				END IF;            
-			END IF;
+		--Exploitation ID
+            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+                --PERFORM audit_function(125,340);
+				RETURN NULL;				
+            END IF;
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
+                --PERFORM audit_function(130,340);
+				RETURN NULL; 
+            END IF;
 					
 	-- FEATURE INSERT      
 					
@@ -39,8 +39,8 @@ BEGIN
 			END IF;
 			
 			
-			INSERT INTO point (point_id, point_type, observ, text, link, the_geom, expl_id)
-			VALUES (NEW.point_id, NEW.point_type, NEW.observ, NEW.text, NEW.link, NEW.the_geom, NEW.expl_id);
+				INSERT INTO point (point_id, point_type,observ,text, link, the_geom, undelete, expl_id )
+				VALUES (NEW.point_id, NEW.point_type, NEW.observ, NEW.text, NEW.link, NEW.the_geom, NEW.undelete, expl_id_int);
 		
 		
 			RETURN NEW;
@@ -54,8 +54,8 @@ BEGIN
 
 -- MANAGEMENT UPDATE
 			UPDATE point
-			SET point_id=NEW.point_id, point_type=NEW.point_type, observ=NEW.observ, text=NEW.text, link=NEW.link, the_geom=NEW.the_geom, expl_id=NEW.expl_id
-			WHERE point_id = OLD.point_id;
+			SET point_id=NEW.point_id, point_type=NEW.point_type, observ=NEW.observ, text=NEW.text, link=NEW.link, the_geom=NEW.the_geom, undelete=NEW.undelete
+			WHERE point_id=OLD.point_id;			
 	
 			PERFORM audit_function(2,430); 
 			RETURN NEW;
