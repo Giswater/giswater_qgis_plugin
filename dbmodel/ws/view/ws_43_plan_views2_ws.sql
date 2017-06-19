@@ -155,15 +155,18 @@ v_price_x_catsoil.trenchlining,
 sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
-arc.the_geom
-
-FROM v_arc arc
+arc.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector, v_arc arc
 	JOIN v_arc_x_node ON ((((arc.arc_id)::text = (v_arc_x_node.arc_id)::text)))
 	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id)::text = (v_price_x_catarc.id)::text)))
 	LEFT JOIN v_price_x_catsoil ON ((((arc.soilcat_id)::text = (v_price_x_catsoil.id)::text)))
 	LEFT JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id)::text = (arc.arc_id)::text)))
 	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id)::text = (plan_arc_x_pavement.pavcat_id)::text)))
-	GROUP BY arc.arc_id, v_arc_x_node.depth1, v_arc_x_node.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, m2bottom_cost,m3protec_cost,v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom;
+    JOIN exploitation ON arc.expl_id=exploitation.expl_id
+	WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text)
+	GROUP BY arc.arc_id, v_arc_x_node.depth1, v_arc_x_node.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, m2bottom_cost,m3protec_cost,v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, exploitation.short_descript;
 	
 	
 
@@ -324,12 +327,15 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
 v_plan_ml_arc."state",
-v_plan_ml_arc.the_geom
-
-FROM v_plan_ml_arc
+v_plan_ml_arc.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector, v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id)::text = (v_plan_mlcost_arc.arc_id)::text)))
-	JOIN plan_selector_state ON (((v_plan_ml_arc."state")::text = (plan_selector_state.id)::text));
-
+	JOIN plan_selector_state ON (((v_plan_ml_arc."state")::text = (plan_selector_state.id)::text))
+	JOIN arc ON arc.arc_id=v_plan_ml_arc.arc_id
+    JOIN exploitation ON arc.expl_id=exploitation.expl_id
+	WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+	AND expl_selector.cur_user="current_user"()::text);
 
 
 -- ----------------------------
@@ -348,11 +354,14 @@ v_price_x_catnode.cost_unit,
 v_price_x_catnode.cost,
 (CASE WHEN (v_price_x_catnode.cost_unit='u'::text) THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
 node."state",
-node.the_geom
-
-FROM (v_node node
-LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
-JOIN plan_selector_state ON (((node."state")::text = (plan_selector_state.id)::text));
+node.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector, v_node node
+LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text)))
+JOIN plan_selector_state ON (((node."state")::text = (plan_selector_state.id)::text))
+JOIN exploitation ON node.expl_id=exploitation.expl_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
 
 
 
@@ -373,12 +382,15 @@ v_plan_arc.budget,
 plan_arc_x_psector.psector_id,
 arc."state",
 plan_arc_x_psector.atlas_id,
-arc.the_geom
-
-FROM (((arc 
-JOIN cat_arc ON ((((arc.arccat_id)::text = (cat_arc.id)::text))))
-JOIN plan_arc_x_psector ON ((((plan_arc_x_psector.arc_id)::text = (arc.arc_id)::text))))
-JOIN v_plan_arc ON ((((arc.arc_id)::text = (v_plan_arc.arc_id)::text))))
+arc.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector,arc 
+JOIN cat_arc ON ((((arc.arccat_id)::text = (cat_arc.id)::text)))
+JOIN plan_arc_x_psector ON ((((plan_arc_x_psector.arc_id)::text = (arc.arc_id)::text)))
+JOIN v_plan_arc ON ((((arc.arc_id)::text = (v_plan_arc.arc_id)::text)))
+JOIN exploitation ON arc.expl_id=exploitation.expl_id
+WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text)
 ORDER BY arccat_id;
 
 
@@ -398,11 +410,14 @@ plan_node_x_psector.descript,
 plan_node_x_psector.psector_id,
 node."state",
 node.the_geom,
-plan_node_x_psector.atlas_id
-
-FROM ((node 
-JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
-JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text))))
+plan_node_x_psector.atlas_id,
+exploitation.short_descript AS expl_name
+FROM expl_selector,node 
+JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text)))
+JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text)))
+ JOIN exploitation ON node.expl_id=exploitation.expl_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text)
 ORDER BY node_type;
 
 

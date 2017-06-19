@@ -1356,6 +1356,7 @@ CREATE VIEW v_edit_point AS SELECT
 	text,
 	link,
 	point.the_geom,
+	point.undelete,
 	exploitation.short_descript AS expl_name
 FROM expl_selector,point
 JOIN exploitation ON point.expl_id=exploitation.expl_id

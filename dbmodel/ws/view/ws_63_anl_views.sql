@@ -6,6 +6,45 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
+-- Consistency
+-- ----------------------------
+
+DROP VIEW IF EXISTS v_anl_topological_consistency CASCADE;
+CREATE OR REPLACE VIEW v_anl_topological_consistency AS
+SELECT
+anl_topological_consistency.node_id,
+anl_topological_consistency.node_type,
+anl_topological_consistency.num_arcs,
+anl_topological_consistency.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector, anl_topological_consistency
+JOIN node ON node.node_id=anl_topological_consistency.node_id
+JOIN exploitation ON node.expl_id=exploitation.expl_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
+
+
+DROP VIEW IF EXISTS v_anl_geometrical_consistency CASCADE;
+CREATE OR REPLACE VIEW v_anl_geometrical_consistency AS
+SELECT
+anl_geometrical_consistency.node_id,
+anl_geometrical_consistency.node_type,
+anl_geometrical_consistency.node_dnom,
+anl_geometrical_consistency.num_arcs,
+anl_geometrical_consistency.arc_dnom1,
+anl_geometrical_consistency.arc_dnom2,
+anl_geometrical_consistency.arc_dnom3,
+anl_geometrical_consistency.arc_dnom4,
+anl_geometrical_consistency.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector, anl_geometrical_consistency
+JOIN node ON node.node_id=anl_geometrical_consistency.node_id
+JOIN exploitation ON node.expl_id=exploitation.expl_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
+
+
+-- ----------------------------
 -- MINCUT
 -- ----------------------------
 
