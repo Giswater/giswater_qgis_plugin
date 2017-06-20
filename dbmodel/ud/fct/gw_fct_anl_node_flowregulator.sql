@@ -22,7 +22,7 @@ BEGIN
 	INSERT INTO anl_node_flowregulator	
 	SELECT node_1 as node_id, count(node_1) as num_arcs, node.the_geom from galia.arc join galia.node on node_id=node_1 group by node_1, node.the_geom having count(node_1)> 1 order by 2 desc;
 
-    RETURN;
+    RETURN NULL;
 --    PERFORM audit_function(0,50);
 
 

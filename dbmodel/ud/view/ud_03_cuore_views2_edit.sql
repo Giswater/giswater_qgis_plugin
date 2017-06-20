@@ -217,7 +217,7 @@ AND expl_selector.cur_user="current_user"()::text;
 
 
 DROP VIEW IF EXISTS v_edit_link CASCADE;
-CREATE OR REPLACE VIEW ws_sample_dev.v_edit_link AS 
+CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
     link.connec_id,
     link.vnode_id,
@@ -226,10 +226,10 @@ CREATE OR REPLACE VIEW ws_sample_dev.v_edit_link AS
     connec.connecat_id,
     link.the_geom,
     exploitation.short_descript AS expl_name
-   FROM ws_sample_dev.expl_selector,
-    ws_sample_dev.link
-     LEFT JOIN ws_sample_dev.connec ON connec.connec_id::text = link.connec_id::text
-     JOIN ws_sample_dev.exploitation ON link.expl_id = exploitation.expl_id
+   FROM expl_selector,
+    link
+     LEFT JOIN connec ON connec.connec_id::text = link.connec_id::text
+     JOIN exploitation ON link.expl_id = exploitation.expl_id
   WHERE link.expl_id::text = expl_selector.expl_id::text AND expl_selector.cur_user = "current_user"()::text;
   
 
@@ -291,7 +291,7 @@ gully.connec_length,
 gully.connec_depth 
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
-LEFT JOIN ud_sample_dev.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
 JOIN exploitation ON gully.expl_id=exploitation.expl_id
 WHERE gully.the_geom is not null 
@@ -1709,7 +1709,7 @@ gully.connec_length,
 gully.connec_depth 
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
-LEFT JOIN ud_sample_dev.ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
+LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
 JOIN exploitation ON gully.expl_id=exploitation.expl_id
 WHERE gully.the_geom is not null 
