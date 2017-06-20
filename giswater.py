@@ -635,8 +635,8 @@ class Giswater(QObject):
                     if self.layer_arc_man_WS[i] is not None:      
                         self.set_layer_custom_form(self.layer_arc_man_WS[i], 'man_arc')
                   
-            if self.layer_node is not None:       
-                self.set_layer_custom_form(self.layer_node, 'node') 
+            #if self.layer_node is not None:       
+            #    self.set_layer_custom_form(self.layer_node, 'node') 
                 
             if self.layer_node_man_UD is not None: 
                 for i in range(len(self.layer_node_man_UD)):
