@@ -21,7 +21,7 @@ import webbrowser
 
 import utils_giswater
 from dao.controller import DaoController
-from ui.add_sum import Add_sum          #@UnresolvedImport
+from init.add_sum import Add_sum          #@UnresolvedImport
         
         
 class ParentDialog(object):   
@@ -564,10 +564,9 @@ class ParentDialog(object):
         doc_tag = self.dialog.findChild(QComboBox, "doc_tag")
         self.date_document_to = self.dialog.findChild(QDateEdit, "date_document_to")
         self.date_document_from = self.dialog.findChild(QDateEdit, "date_document_from")
-        date = QDate.currentDate();
-        self.date_document_to.setDate(date);
+        date = QDate.currentDate()
+        self.date_document_to.setDate(date)
 
-           
         self.btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
         self.btn_open_path.clicked.connect(self.open_selected_document_from_table) 
         
