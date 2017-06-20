@@ -1355,8 +1355,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6229,7 +6229,7 @@
      <string notr="true"/>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_11">
+   <widget class="QPushButton" name="btn_catalog">
     <property name="geometry">
      <rect>
       <x>277</x>
