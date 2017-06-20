@@ -392,12 +392,15 @@ v_plan_node.budget,
 plan_node_x_psector.psector_id,
 node."state",
 plan_node_x_psector.atlas_id,
-node.the_geom
-
-FROM ((node 
-JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text))))
-JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text))))
-JOIN v_plan_node ON ((((v_plan_node.node_id)::text = (node.node_id)::text))))
+node.the_geom,
+exploitation.short_descript AS expl_name
+FROM expl_selector, node 
+JOIN v_price_x_catnode ON ((((node.nodecat_id)::text = (v_price_x_catnode.id)::text)))
+JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id)::text = (node.node_id)::text)))
+JOIN v_plan_node ON ((((v_plan_node.node_id)::text = (node.node_id)::text)))
+JOIN exploitation ON node.expl_id=exploitation.expl_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text)
 ORDER BY nodecat_id;
 
 

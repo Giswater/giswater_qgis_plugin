@@ -34,13 +34,24 @@ BEGIN
         WHERE node_id=OLD.node_id;
 
         IF node_table = 'inp_junction' THEN
-            UPDATE inp_junction SET node_id=NEW.node_id, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
+            UPDATE inp_junction 
+			SET node_id=NEW.node_id, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond 
+			WHERE node_id=OLD.node_id;
+			
         ELSIF node_table = 'inp_divider' THEN
-            UPDATE inp_divider SET node_id=NEW.node_id, divider_type=NEW.divider_type, arc_id=NEW.arc_id, curve_id=NEW.curve_id,qmin=NEW.qmin,ht=NEW.ht,cd=NEW.cd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id; 
+            UPDATE inp_divider 
+			SET node_id=NEW.node_id, divider_type=NEW.divider_type, arc_id=NEW.arc_id, curve_id=NEW.curve_id,qmin=NEW.qmin,ht=NEW.ht,cd=NEW.cd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond 
+			WHERE node_id=OLD.node_id; 
+			
         ELSIF node_table = 'inp_storage' THEN
-            UPDATE inp_storage SET node_id=NEW.node_id, storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond WHERE node_id=OLD.node_id;
+            UPDATE inp_storage 
+			SET node_id=NEW.node_id, storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond 
+			WHERE node_id=OLD.node_id;
+			
         ELSIF node_table = 'inp_outlfall' THEN          
-            UPDATE inp_outfall SET node_id=NEW.node_id,outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate WHERE node_id=OLD.node_id;
+            UPDATE inp_outfall 
+			SET node_id=NEW.node_id,outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate 
+			WHERE node_id=OLD.node_id;
         END IF;
 
         PERFORM audit_function(2,800); 
