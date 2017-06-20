@@ -18,7 +18,7 @@ from parent_init import ParentDialog
 
 from ui.gallery import Gallery          #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
-
+from ui.ud_catalog import UDcatalog                  # @UnresolvedImport
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -140,8 +140,8 @@ class ManNodeDialog(ParentDialog):
         
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
-        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element)) 
-
+        self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
 
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
@@ -153,9 +153,100 @@ class ManNodeDialog(ParentDialog):
         # Event
         
         self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table) 
-        
-       
+        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+
+    def catalog(self):
+        self.dlg_cat = UDcatalog()
+        utils_giswater.setDialog(self.dlg_cat)
+        self.dlg_cat.open()
+
+        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtnodecat_id)
+        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
+        self.shape = self.dlg_cat.findChild(QComboBox, "shape")
+        self.geom1 = self.dlg_cat.findChild(QComboBox, "geom1")
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxshape)
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxgeom1)
+
+        self.shape.currentIndexChanged.connect(self.fillCbxCatalod_id)
+        self.shape.currentIndexChanged.connect(self.fillCbxgeom1)
+
+        self.geom1.currentIndexChanged.connect(self.fillCbxCatalod_id)
+
+
+        self.matcat_id.clear()
+        self.shape.clear()
+        self.geom1.clear()
+
+
+        sql= "SELECT DISTINCT(matcat_id) FROM ud_sample_dev.cat_node"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+
+
+        sql= "SELECT DISTINCT(shape) FROM ud_sample_dev.cat_node"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.shape, rows)
+
+
+        sql= "SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_node"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.geom1, rows)
+
+
+    def fillCbxshape(self,index):
+        if index == -1:
+            return
+        mats=self.matcat_id.currentText()
+
+        sql="SELECT DISTINCT(shape) FROM ud_sample_dev.cat_node"
+        if (str(mats)!=""):
+            sql += " WHERE matcat_id='"+str(mats)+"'"
+        rows = self.controller.get_rows(sql)
+        self.shape.clear()
+        utils_giswater.fillComboBox(self.shape, rows)
+        self.fillCbxgeom1()
+
+    def fillCbxgeom1(self,index):
+        if index == -1:
+            return
+        mats=self.matcat_id.currentText()
+        shape=self.shape.currentText()
+        sql="SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_node"
+
+        if (str(mats)!=""):
+            sql += " WHERE matcat_id='"+str(mats)+"'"
+        if(str(shape)!= ""):
+            sql +=" and shape='"+str(shape)+"'"
+        rows = self.controller.get_rows(sql)
+        self.geom1.clear()
+        utils_giswater.fillComboBox(self.geom1, rows)
+
+    def fillCbxCatalod_id(self,index):    #@UnusedVariable
+
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        if self.id!='null':
+            mats = self.matcat_id.currentText()
+            shape = self.shape.currentText()
+            geom1 = self.geom1.currentText()
+            sql = "SELECT DISTINCT(id) FROM ud_sample_dev.cat_node"
+            if (str(mats)!=""):
+                sql += " WHERE matcat_id='"+str(mats)+"'"
+            if (str(shape) != ""):
+                sql += " and shape='"+str(shape)+"'"
+            if (str(geom1) != ""):
+                sql += " and geom1='" + str(geom1) + "'"
+            rows = self.controller.get_rows(sql)
+            self.id.clear()
+            utils_giswater.fillComboBox(self.id, rows)
+    def fillTxtnodecat_id(self):
+        self.dlg_cat.close()
+        self.nodecat_id.clear()
+        self.nodecat_id.setText(str(self.id.currentText()))
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
         

@@ -12,7 +12,7 @@
 """
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QMessageBox   #@UnresolvedImport
 from PyQt4.Qt import  QDate
 import inspect
 import os
@@ -24,7 +24,7 @@ def setDialog(p_dialog):
  
 
 def fillComboBox(widget, rows, allow_nulls=True):
-    
+    QMessageBox.about(None, 'Ok', str("test"))
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -33,9 +33,12 @@ def fillComboBox(widget, rows, allow_nulls=True):
     for row in rows:       
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
+            #why never join here???
             widget.addItem(str(elem))
         else:
-            widget.addItem(elem)
+            if elem!=None:
+                widget.addItem(str(elem))
+
         
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
