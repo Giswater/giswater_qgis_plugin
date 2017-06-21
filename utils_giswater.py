@@ -24,7 +24,7 @@ def setDialog(p_dialog):
  
 
 def fillComboBox(widget, rows, allow_nulls=True):
-    QMessageBox.about(None, 'Ok', str("test"))
+
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -34,6 +34,7 @@ def fillComboBox(widget, rows, allow_nulls=True):
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
             #why never join here???
+            QMessageBox.about(None, 'Ok', str("test"))
             widget.addItem(str(elem))
         else:
             if elem!=None:

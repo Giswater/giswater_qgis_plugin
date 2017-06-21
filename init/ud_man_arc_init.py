@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QLabel
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QLabel, QComboBox
 from PyQt4.QtCore import Qt, QSettings
 from functools import partial
 
@@ -15,7 +15,8 @@ from parent_init import ParentDialog
 from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
 
 from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
-import init.ud_man_node_init 
+import init.ud_man_node_init
+from ui.ud_catalog import UDcatalog
 
 
 def formOpen(dialog, layer, feature):
@@ -133,11 +134,13 @@ class ManArcDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
 
-        
         #self.layer_node_man= self.SnappingConfigManager.get_layer_node()
         self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(self.go_child)
-        
+
+        # QLineEdit
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         
         # Manage 'cat_shape'
         self.setImage("label_image_ud_shape")
@@ -148,8 +151,97 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-        
-        
+
+    def catalog(self):
+        self.dlg_cat = UDcatalog()
+        utils_giswater.setDialog(self.dlg_cat)
+        self.dlg_cat.open()
+        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtarccat_id_id)
+        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
+        self.shape = self.dlg_cat.findChild(QComboBox, "shape")
+        self.geom1 = self.dlg_cat.findChild(QComboBox, "geom1")
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxshape)
+        self.matcat_id.currentIndexChanged.connect(self.fillCbxgeom1)
+
+        self.shape.currentIndexChanged.connect(self.fillCbxCatalod_id)
+        self.shape.currentIndexChanged.connect(self.fillCbxgeom1)
+
+        self.geom1.currentIndexChanged.connect(self.fillCbxCatalod_id)
+
+        self.matcat_id.clear()
+        self.shape.clear()
+        self.geom1.clear()
+
+        sql= "SELECT DISTINCT(matcat_id) FROM ud_sample_dev.cat_arc"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+
+        sql= "SELECT DISTINCT(shape) FROM ud_sample_dev.cat_arc"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.shape, rows)
+
+        sql= "SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_arc"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.geom1, rows)
+
+
+    def fillCbxshape(self,index):
+        if index == -1:
+            return
+        mats=self.matcat_id.currentText()
+
+        sql="SELECT DISTINCT(shape) FROM ud_sample_dev.cat_arc"
+        if (str(mats)!=""):
+            sql += " WHERE matcat_id='"+str(mats)+"'"
+        rows = self.controller.get_rows(sql)
+        self.shape.clear()
+        utils_giswater.fillComboBox(self.shape, rows)
+        self.fillCbxgeom1()
+
+
+    def fillCbxgeom1(self,index):
+        if index == -1:
+            return
+        mats=self.matcat_id.currentText()
+        shape=self.shape.currentText()
+        sql="SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_arc"
+
+        if (str(mats)!=""):
+            sql += " WHERE matcat_id='"+str(mats)+"'"
+        if(str(shape)!= ""):
+            sql +=" and shape='"+str(shape)+"'"
+        rows = self.controller.get_rows(sql)
+        self.geom1.clear()
+        utils_giswater.fillComboBox(self.geom1, rows)
+
+
+    def fillCbxCatalod_id(self,index):    #@UnusedVariable
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+        if self.id!='null':
+            mats = self.matcat_id.currentText()
+            shape = self.shape.currentText()
+            geom1 = self.geom1.currentText()
+            sql = "SELECT DISTINCT(id) FROM ud_sample_dev.cat_arc"
+            if (str(mats)!=""):
+                sql += " WHERE matcat_id='"+str(mats)+"'"
+            if (str(shape) != ""):
+                sql += " and shape='"+str(shape)+"'"
+            if (str(geom1) != ""):
+                sql += " and geom1='" + str(geom1) + "'"
+            rows = self.controller.get_rows(sql)
+            self.id.clear()
+            utils_giswater.fillComboBox(self.id, rows)
+
+
+    def fillTxtarccat_id_id(self):
+        self.dlg_cat.close()
+        self.arccat_id.clear()
+        self.arccat_id.setText(str(self.id.currentText()))
+
     def go_child(self):
    
         self.conduit_node_1 = self.dialog.findChild(QLineEdit,"conduit_node_1")

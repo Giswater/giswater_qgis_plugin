@@ -148,7 +148,8 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-        
+        # QLineEdit
+        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         
         # Event
         
@@ -176,21 +177,17 @@ class ManNodeDialog(ParentDialog):
 
         self.geom1.currentIndexChanged.connect(self.fillCbxCatalod_id)
 
-
         self.matcat_id.clear()
         self.shape.clear()
         self.geom1.clear()
-
 
         sql= "SELECT DISTINCT(matcat_id) FROM ud_sample_dev.cat_node"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-
         sql= "SELECT DISTINCT(shape) FROM ud_sample_dev.cat_node"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.shape, rows)
-
 
         sql= "SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_node"
         rows = self.controller.get_rows(sql)
@@ -210,6 +207,7 @@ class ManNodeDialog(ParentDialog):
         utils_giswater.fillComboBox(self.shape, rows)
         self.fillCbxgeom1()
 
+
     def fillCbxgeom1(self,index):
         if index == -1:
             return
@@ -225,10 +223,9 @@ class ManNodeDialog(ParentDialog):
         self.geom1.clear()
         utils_giswater.fillComboBox(self.geom1, rows)
 
+
     def fillCbxCatalod_id(self,index):    #@UnusedVariable
-
         self.id = self.dlg_cat.findChild(QComboBox, "id")
-
         if self.id!='null':
             mats = self.matcat_id.currentText()
             shape = self.shape.currentText()
@@ -243,10 +240,14 @@ class ManNodeDialog(ParentDialog):
             rows = self.controller.get_rows(sql)
             self.id.clear()
             utils_giswater.fillComboBox(self.id, rows)
+
+
     def fillTxtnodecat_id(self):
         self.dlg_cat.close()
         self.nodecat_id.clear()
         self.nodecat_id.setText(str(self.id.currentText()))
+
+
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
         
