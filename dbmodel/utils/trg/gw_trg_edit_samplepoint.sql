@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_unconnected()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-
+	expl_id_int integer;
     sample_id_seq int8;
 
 BEGIN
@@ -54,7 +54,7 @@ BEGIN
 
 			UPDATE samplepoint 
 			SET sample_id=NEW.sample_id, state=NEW.state, rotation=NEW.rotation, code_lab=NEW.code_lab, element_type=NEW.element_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, street1=NEW.street1, 
-			street2=NEW.street2, place=NEW.place, element_code=NEW.element_code, cabinet=NEW.cabinet, dma_id2=NEW.dma_id2, observations=NEW.observations, the_geom=NEW.the_geom
+			street2=NEW.street2, place=NEW.place, element_code=NEW.element_code, cabinet=NEW.cabinet, dma_id2=NEW.dma_id2, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE sample_id=NEW.sample_id;
 
         PERFORM audit_function(2,430); 

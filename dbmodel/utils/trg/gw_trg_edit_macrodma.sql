@@ -44,7 +44,7 @@ BEGIN
 
 						
 			UPDATE macrodma 
-			SET macrodma_id=NEW.macrodma_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete
+			SET macrodma_id=NEW.macrodma_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete,expl_id=NEW.expl_id
 			WHERE macrodma_id=NEW.macrodma_id;
 			
 	

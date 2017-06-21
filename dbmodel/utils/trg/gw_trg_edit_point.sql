@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_point()
 $BODY$
 DECLARE 
     point_id_seq int8;
-
+	expl_id_int integer;
 
 BEGIN
 
@@ -54,7 +54,7 @@ BEGIN
 
 -- MANAGEMENT UPDATE
 			UPDATE point
-			SET point_id=NEW.point_id, point_type=NEW.point_type, observ=NEW.observ, text=NEW.text, link=NEW.link, the_geom=NEW.the_geom, undelete=NEW.undelete
+			SET point_id=NEW.point_id, point_type=NEW.point_type, observ=NEW.observ, text=NEW.text, link=NEW.link, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE point_id=OLD.point_id;			
 	
 			PERFORM audit_function(2,430); 

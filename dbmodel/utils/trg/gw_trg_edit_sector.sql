@@ -36,7 +36,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
    -- FEATURE UPDATE		
 			UPDATE sector 
-			SET sector_id=NEW.sector_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete
+			SET sector_id=NEW.sector_id, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE sector_id=NEW.sector_id;
 				
         PERFORM audit_function(2,340); 

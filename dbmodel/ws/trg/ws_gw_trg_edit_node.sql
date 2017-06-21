@@ -79,27 +79,28 @@ BEGIN
             END IF;            
         END IF;
 		
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_vdefault FROM config);
+            NEW.workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
         END IF;
 		
-		-- Verified
+-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
         
@@ -113,6 +114,11 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
+			
+					-- Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+		END IF;  
         
         -- FEATURE INSERT      
 INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -221,7 +227,7 @@ INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, se
 		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id,
 		builtdate=NEW.builtdate, ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end,  undelete=NEW.undelete, label_x=NEW.label_x, 
-		label_y=NEW.label_y, label_rotation=NEW.label_rotation, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, parent_node_id=NEW.parent_node_id
+		label_y=NEW.label_y, label_rotation=NEW.label_rotation, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
             
         PERFORM audit_function(2,380); 

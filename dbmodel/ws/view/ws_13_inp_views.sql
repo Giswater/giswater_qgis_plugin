@@ -28,13 +28,12 @@ CREATE OR REPLACE VIEW v_inp_arc AS
             ELSE st_length2d(temp_arc.the_geom)::numeric(12,3)
         END AS length, 
     temp_arc.the_geom,
-	exploitation.short_descript AS expl_name
+	arc.expl_id
    FROM expl_selector,temp_arc
    JOIN cat_arc ON temp_arc.arccat_id::text = cat_arc.id::text
    JOIN inp_selector_sector ON (((temp_arc.sector_id)::text = (inp_selector_sector.sector_id)::text))
    JOIN inp_selector_state ON (((temp_arc."state")::text = (inp_selector_state.id)::text))
    JOIN arc ON arc.arc_id=temp_arc.arc_id
-   JOIN exploitation ON arc.expl_id=exploitation.expl_id
 	WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -51,12 +50,11 @@ CREATE OR REPLACE VIEW v_inp_node AS
     temp_node.dma_id,
     temp_node.state,
     temp_node.the_geom,
-	exploitation.short_descript AS expl_name
+	node.expl_id
    FROM expl_selector,temp_node
    JOIN inp_selector_sector ON (((temp_node.sector_id)::text = (inp_selector_sector.sector_id)::text))
    JOIN inp_selector_state ON (((temp_node."state")::text = (inp_selector_state.id)::text))
    JOIN node ON node.node_id=temp_node.node_id
-   JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
       

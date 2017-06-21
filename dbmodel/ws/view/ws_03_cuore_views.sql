@@ -89,11 +89,11 @@ v_arc_x_node2.depth2,
 v_arc_x_node2.r2,
 arc."state",
 arc.sector_id,
-arc.the_geom
-FROM v_arc_x_node1
+arc.the_geom,
+arc.expl_id
+FROM expl_selector, v_arc_x_node1
 JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
 JOIN arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);;
 

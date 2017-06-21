@@ -16,19 +16,19 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 	
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;    
-
-		-- Verified
+-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
 		
@@ -70,7 +70,7 @@ BEGIN
 		UPDATE element
 		SET element_id=NEW.element_id, elementcat_id=NEW.elementcat_id, state=NEW.state, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
 		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, ownercat_id=NEW.ownercat_id, enddate=NEW.enddate, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, workcat_id_end=NEW.workcat_id_end, 
-		code=NEW.code, the_geom=NEW.the_geom
+		code=NEW.code, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 		WHERE element_id=OLD.element_id;
 
         PERFORM audit_function(2,430); 

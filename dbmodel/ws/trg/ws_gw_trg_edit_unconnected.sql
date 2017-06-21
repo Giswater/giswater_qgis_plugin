@@ -60,12 +60,12 @@ BEGIN
 						
 		IF man_table='pond' THEN
 			UPDATE pond
-			SET pond_id=NEW.pond_id, connec_id=NEW.connec_id, code_comercial=NEW.code_comercial, the_geom=NEW.the_geom
+			SET pond_id=NEW.pond_id, connec_id=NEW.connec_id, code_comercial=NEW.code_comercial, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE pond_id=OLD.pond_id;
 		
 		ELSIF man_table='pool' THEN
 			UPDATE pool
-			SET pool_id=NEW.pool_id, connec_id=NEW.connec_id, code_comercial=NEW.code_comercial, the_geom=NEW.the_geom
+			SET pool_id=NEW.pool_id, connec_id=NEW.connec_id, code_comercial=NEW.code_comercial, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE pool_id=NEW.pool_id;
 		
 		END IF;

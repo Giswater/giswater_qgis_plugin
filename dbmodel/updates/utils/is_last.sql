@@ -70,7 +70,13 @@ ALTER TABLE ws_sample.value_state ADD COLUMN arc_topology_coherence boolean;
 -- ----------------------------
 -- VDEFAULT STRATEGY
 -- ----------------------------
-
+CREATE TABLE config_vdefault (
+id serial PRIMARY KEY,
+"parameter" character varying (30),
+"value" character varying (30),
+"user" character varying (30)
+);
+/*
 ALTER TABLE config ADD COLUMN state_vdefault character varying(16);
 ALTER TABLE config ADD COLUMN workcat_vdefault character varying(30);
 ALTER TABLE config ADD COLUMN verified_vdefault character varying(20);
@@ -82,7 +88,7 @@ ALTER TABLE "config" ADD CONSTRAINT "config_verified_vdefault_fkey" FOREIGN KEY 
 
 ALTER TABLE "config" ADD CONSTRAINT "config_nodeinsert_catalog_vdefault_fkey" FOREIGN KEY ("nodeinsert_catalog_vdefault") REFERENCES "cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+*/
 -- ----------------------------
 -- EXPLOTITATION STRATEGY
 -- ----------------------------

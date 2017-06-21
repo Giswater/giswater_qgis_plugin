@@ -38,7 +38,7 @@ BEGIN
 		
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -71,7 +71,7 @@ BEGIN
 
 
 			UPDATE vnode
-			SET vnode_id=NEW.vnode_id, userdefined_pos=NEW.userdefined_pos, vnode_type=NEW.vnode_type, sector_id=NEW.sector_id, state=NEW.state, annotation=NEW.annotation, the_geom=NEW.the_geom
+			SET vnode_id=NEW.vnode_id, userdefined_pos=NEW.userdefined_pos, vnode_type=NEW.vnode_type, sector_id=NEW.sector_id, state=NEW.state, annotation=NEW.annotation, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE vnode_id=NEW.vnode_id;
 
 

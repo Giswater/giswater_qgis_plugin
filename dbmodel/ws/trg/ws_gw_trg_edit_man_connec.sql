@@ -68,7 +68,7 @@ BEGIN
 
 	    -- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -77,7 +77,7 @@ BEGIN
 	
 		-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
@@ -99,7 +99,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.greentap_workcat_id IS NULL) THEN
-				NEW.greentap_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.greentap_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.greentap_workcat_id IS NULL) THEN
 					NEW.greentap_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -107,7 +107,7 @@ BEGIN
 			
 			--Builtdate
 				IF (NEW.greentap_builtdate IS NULL) THEN
-					NEW.greentap_builtdate := (SELECT builtdate_vdefault FROM config);
+					NEW.greentap_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 
 		  INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
@@ -125,7 +125,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.fountain_workcat_id IS NULL) THEN
-				NEW.fountain_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.fountain_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.fountain_workcat_id IS NULL) THEN
 					NEW.fountain_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -133,7 +133,7 @@ BEGIN
 			
 			--Builtdate
 				IF (NEW.fountain_builtdate IS NULL) THEN
-					NEW.fountain_builtdate := (SELECT builtdate_vdefault FROM config);
+					NEW.fountain_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 				
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
@@ -153,7 +153,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.tap_workcat_id IS NULL) THEN
-				NEW.tap_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.tap_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.tap_workcat_id IS NULL) THEN
 					NEW.tap_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -161,7 +161,7 @@ BEGIN
 
 			--Builtdate
 				IF (NEW.tap_builtdate IS NULL) THEN
-					NEW.tap_builtdate := (SELECT builtdate_vdefault FROM config);
+					NEW.tap_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, 
@@ -180,7 +180,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.wjoin_workcat_id IS NULL) THEN
-				NEW.wjoin_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.wjoin_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.wjoin_workcat_id IS NULL) THEN
 					NEW.wjoin_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -188,7 +188,7 @@ BEGIN
 
 			--Builtdate
 				IF (NEW.wjoin_builtdate IS NULL) THEN
-					NEW.wjoin_builtdate := (SELECT builtdate_vdefault FROM config);
+					NEW.wjoin_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 				
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation, dma_id, soilcat_id, category_type, fluid_type, 
@@ -231,7 +231,7 @@ BEGIN
 			buildercat_id=NEW.greentap_buildercat_id, builtdate=NEW.greentap_builtdate,ownercat_id=NEW.greentap_ownercat_id, adress_01=NEW.greentap_adress_01, adress_02=NEW.greentap_adress_02, 
 			adress_03=NEW.greentap_adress_03, streetaxis_id=NEW.greentap_streetaxis_id, postnumber=NEW.greentap_postnumber, descript=NEW.greentap_descript, link=NEW.greentap_link, verified=NEW.verified, 
 			the_geom=NEW.the_geom, undelete=NEW.undelete,workcat_id_end=NEW.greentap_workcat_id_end, label_x=NEW.greentap_label_x,label_y=NEW.greentap_label_y, label_rotation=NEW.greentap_label_rotation,
-			 publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.greentap_end_date
+			 publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.greentap_end_date,expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_greentap 
@@ -245,7 +245,7 @@ BEGIN
 			soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, 
 			buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,ownercat_id=NEW.wjoin_ownercat_id, adress_01=NEW.wjoin_adress_01, adress_02=NEW.wjoin_adress_02, adress_03=NEW.wjoin_adress_03, 
 			streetaxis_id=NEW.wjoin_streetaxis_id, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,workcat_id_end=NEW.wjoin_workcat_id_end, label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, label_rotation=NEW.wjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
-			end_date=NEW.wjoin_end_date
+			end_date=NEW.wjoin_end_date, expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
 		
             UPDATE man_wjoin 
@@ -258,7 +258,7 @@ BEGIN
 			"state"=NEW."state", annotation=NEW.tap_annotation, observ=NEW.tap_observ, "comment"=NEW.tap_comment, rotation=NEW.tap_rotation,dma_id=NEW.dma_id, soilcat_id=NEW.tap_soilcat_id, 
 			category_type=NEW.tap_category_type, fluid_type=NEW.tap_fluid_type, location_type=NEW.tap_location_type, workcat_id=NEW.tap_workcat_id, buildercat_id=NEW.tap_buildercat_id, builtdate=NEW.tap_builtdate,
 			ownercat_id=NEW.tap_ownercat_id, adress_01=NEW.tap_adress_01, adress_02=NEW.tap_adress_02, adress_03=NEW.tap_adress_03, streetaxis_id=NEW.tap_streetaxis_id, postnumber=NEW.tap_postnumber, descript=NEW.tap_descript, link=NEW.tap_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, workcat_id_end=NEW.tap_workcat_id_end,label_x=NEW.tap_label_x,
-			label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.tap_end_date
+			label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.tap_end_date, expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_tap 
@@ -275,7 +275,7 @@ BEGIN
 			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, adress_01=NEW.fountain_adress_01, adress_02=NEW.fountain_adress_02,
 			adress_03=NEW.fountain_adress_03, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, link=NEW.fountain_link, verified=NEW.verified, 
 			the_geom=NEW.the_geom, undelete=NEW.undelete, workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation, 
-		    publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.fountain_end_date
+		    publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.fountain_end_date, expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
 			
 			UPDATE man_fountain 

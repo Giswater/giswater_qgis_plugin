@@ -16,10 +16,9 @@ anl_topological_consistency.node_id,
 anl_topological_consistency.node_type,
 anl_topological_consistency.num_arcs,
 anl_topological_consistency.the_geom,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, anl_topological_consistency
 JOIN node ON node.node_id=anl_topological_consistency.node_id
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -36,10 +35,9 @@ anl_geometrical_consistency.arc_dnom2,
 anl_geometrical_consistency.arc_dnom3,
 anl_geometrical_consistency.arc_dnom4,
 anl_geometrical_consistency.the_geom,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, anl_geometrical_consistency
 JOIN node ON node.node_id=anl_geometrical_consistency.node_id
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 

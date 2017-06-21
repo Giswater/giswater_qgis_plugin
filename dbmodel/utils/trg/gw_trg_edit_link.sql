@@ -41,7 +41,7 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, connec_id=NEW.connec_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom
+		SET link_id=NEW.link_id, connec_id=NEW.connec_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;

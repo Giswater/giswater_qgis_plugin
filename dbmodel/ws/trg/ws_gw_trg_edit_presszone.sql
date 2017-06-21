@@ -45,7 +45,7 @@ BEGIN
 
 							
 			UPDATE presszone 
-			SET id=NEW.id, the_geom=NEW.the_geom, presszonecat_id=NEW.presszonecat_id, sector=NEW.sector, text=NEW.text, undelete=NEW.undelete
+			SET id=NEW.id, the_geom=NEW.the_geom, presszonecat_id=NEW.presszonecat_id, sector=NEW.sector, text=NEW.text, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE id=NEW.id;
 			
 			

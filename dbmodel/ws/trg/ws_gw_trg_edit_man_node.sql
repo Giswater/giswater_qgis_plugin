@@ -93,7 +93,7 @@ BEGIN
 		
 	-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
@@ -101,7 +101,7 @@ BEGIN
 
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -124,15 +124,15 @@ BEGIN
 			
 		-- Workcat_id
 		IF (NEW.tank_workcat_id IS NULL) THEN
-			NEW.tank_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.tank_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.tank_workcat_id IS NULL) THEN
 				NEW.tank_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		END IF;
 
 		--Builtdate
-		IF (NEW.tank_builtdate IS NULL) THEN				
-			NEW.tank_builtdate := (SELECT builtdate_vdefault FROM config);
+		IF (NEW.tank_builtdate IS NULL) THEN
+			NEW.tank_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -146,7 +146,7 @@ BEGIN
 
 		-- Workcat_id
 		IF (NEW.tank_workcat_id IS NULL) THEN
-			NEW.tank_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.tank_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.tank_workcat_id IS NULL) THEN
 				NEW.tank_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -154,7 +154,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.tank_builtdate IS NULL) THEN				
-			NEW.tank_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.tank_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -168,7 +168,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.hydrant_workcat_id IS NULL) THEN
-			NEW.hydrant_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.hydrant_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.hydrant_workcat_id IS NULL) THEN
 				NEW.hydrant_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -176,7 +176,7 @@ BEGIN
 			
 		--Builtdate
 		IF (NEW.hydrant_builtdate IS NULL) THEN
-			NEW.hydrant_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.hydrant_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -189,7 +189,7 @@ BEGIN
 	ELSIF man_table='man_junction' THEN
 		-- Workcat_id
 		IF (NEW.junction_workcat_id IS NULL) THEN
-			NEW.junction_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.junction_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.junction_workcat_id IS NULL) THEN
 				NEW.junction_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -197,7 +197,7 @@ BEGIN
 	
 			--Builtdate
 		IF (NEW.junction_builtdate IS NULL) THEN
-			NEW.junction_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.junction_builtdate  :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -212,7 +212,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.pump_workcat_id IS NULL) THEN
-			NEW.pump_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.pump_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.pump_workcat_id IS NULL) THEN
 				NEW.pump_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -220,7 +220,7 @@ BEGIN
 	
 		--Builtdate
 		IF (NEW.pump_builtdate IS NULL) THEN
-			NEW.pump_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.pump_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -234,7 +234,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.reduction_workcat_id IS NULL) THEN
-			NEW.reduction_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.reduction_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.reduction_workcat_id IS NULL) THEN
 				NEW.reduction_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -242,7 +242,7 @@ BEGIN
 	
 		--Builtdate
 		IF (NEW.reduction_builtdate IS NULL) THEN
-			NEW.reduction_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.reduction_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id,
@@ -257,7 +257,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.valve_workcat_id IS NULL) THEN
-			NEW.valve_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.valve_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.valve_workcat_id IS NULL) THEN
 				NEW.valve_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -265,7 +265,7 @@ BEGIN
 	
 		--Builtdate
 		IF (NEW.valve_builtdate IS NULL) THEN
-			NEW.valve_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.valve_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -279,7 +279,7 @@ BEGIN
 
 		-- Workcat_id
 		IF (NEW.manhole_workcat_id IS NULL) THEN
-			NEW.manhole_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.manhole_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.manhole_workcat_id IS NULL) THEN
 				NEW.manhole_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -287,7 +287,7 @@ BEGIN
 
 			--Builtdate
 		IF (NEW.manhole_builtdate IS NULL) THEN
-			NEW.manhole_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.manhole_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -302,7 +302,7 @@ BEGIN
 			
 		-- Workcat_id
 		IF (NEW.meter_workcat_id IS NULL) THEN
-			NEW.meter_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.meter_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.meter_workcat_id IS NULL) THEN
 				NEW.meter_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -310,7 +310,7 @@ BEGIN
 
 			--Builtdate
 		IF (NEW.meter_builtdate IS NULL) THEN
-				NEW.meter_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.meter_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;		
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -325,7 +325,7 @@ BEGIN
 
 		-- Workcat_id
 		IF (NEW.source_workcat_id IS NULL) THEN
-			NEW.source_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.source_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.source_workcat_id IS NULL) THEN
 				NEW.source_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -333,7 +333,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.source_builtdate IS NULL) THEN
-			NEW.source_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.source_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -348,7 +348,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.waterwell_workcat_id IS NULL) THEN
-			NEW.waterwell_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.waterwell_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.waterwell_workcat_id IS NULL) THEN
 				NEW.waterwell_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -356,7 +356,7 @@ BEGIN
 		
 		--Builtdate
 		IF (NEW.waterwell_builtdate IS NULL) THEN
-			NEW.waterwell_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.waterwell_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -372,7 +372,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.filter_workcat_id IS NULL) THEN
-			NEW.filter_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.filter_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.filter_workcat_id IS NULL) THEN
 				NEW.filter_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -380,7 +380,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.filter_builtdate IS NULL) THEN
-			NEW.filter_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.filter_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -395,7 +395,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.register_workcat_id IS NULL) THEN
-			NEW.register_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.register_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.register_workcat_id IS NULL) THEN
 				NEW.register_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -403,7 +403,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.register_builtdate IS NULL) THEN
-			NEW.register_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.register_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 				
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -419,7 +419,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.register_workcat_id IS NULL) THEN
-			NEW.register_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.register_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.register_workcat_id IS NULL) THEN
 				NEW.register_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -427,7 +427,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.register_builtdate IS NULL) THEN
-			NEW.register_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.register_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -443,7 +443,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.netwjoin_workcat_id IS NULL) THEN
-			NEW.netwjoin_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.netwjoin_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.netwjoin_workcat_id IS NULL) THEN
 				NEW.netwjoin_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -451,7 +451,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.netwjoin_builtdate IS NULL) THEN
-			NEW.netwjoin_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.netwjoin_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -467,7 +467,7 @@ BEGIN
 
 		-- Workcat_id
 		IF (NEW.exptank_workcat_id IS NULL) THEN
-			NEW.exptank_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.exptank_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.exptank_workcat_id IS NULL) THEN
 				NEW.exptank_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -475,7 +475,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.exptank_builtdate IS NULL) THEN
-			NEW.exptank_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.exptank_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -491,7 +491,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.flexunion_workcat_id IS NULL) THEN
-			NEW.flexunion_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.flexunion_workcat_id :=  (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.flexunion_workcat_id IS NULL) THEN
 				NEW.flexunion_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -499,7 +499,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.flexunion_builtdate IS NULL) THEN
-			NEW.flexunion_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.flexunion_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -515,7 +515,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.netelement_workcat_id IS NULL) THEN
-			NEW.netelement_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.netelement_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.netelement_workcat_id IS NULL) THEN
 				NEW.netelement_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -523,7 +523,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.netelement_builtdate IS NULL) THEN
-			NEW.netelement_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.netelement_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -539,7 +539,7 @@ BEGIN
 				
 		-- Workcat_id
 		IF (NEW.netsample_workcat_id IS NULL) THEN
-			NEW.netsample_workcat_id := (SELECT workcat_vdefault FROM config);
+			NEW.netsample_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 			IF (NEW.netsample_workcat_id IS NULL) THEN
 				NEW.netsample_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
@@ -547,7 +547,7 @@ BEGIN
 
 		--Builtdate
 		IF (NEW.netsample_builtdate IS NULL) THEN
-			NEW.netsample_builtdate := (SELECT builtdate_vdefault FROM config);
+			NEW.netsample_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
@@ -769,7 +769,8 @@ BEGIN
 		category_type=NEW.junction_category_type, fluid_type=NEW.junction_fluid_type, location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, buildercat_id=NEW.junction_buildercat_id,
 		builtdate=NEW.junction_builtdate, ownercat_id=NEW.junction_ownercat_id, adress_01=NEW.junction_adress_01, adress_02=NEW.junction_adress_02, adress_03=NEW.junction_adress_03, descript=NEW.junction_descript,
 		rotation=NEW.junction_rotation, link=NEW.junction_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.junction_workcat_id_end,  undelete=NEW.undelete, label_x=NEW.junction_label_x, 
-		label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation, code=NEW.junction_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.junction_end_date, parent_node_id=NEW.parent_node_id
+		label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation, code=NEW.junction_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.junction_end_date, parent_node_id=NEW.parent_node_id,
+		expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_junction 
@@ -783,7 +784,7 @@ BEGIN
 		location_type=NEW.tank_location_type, workcat_id=NEW.tank_workcat_id, buildercat_id=NEW.tank_buildercat_id, builtdate=NEW.tank_builtdate, ownercat_id=NEW.tank_ownercat_id, adress_01=NEW.tank_adress_01, 
 		adress_02=NEW.tank_adress_02, adress_03=NEW.tank_adress_03, descript=NEW.tank_descript,rotation=NEW.tank_rotation, link=NEW.tank_link, verified=NEW.verified, the_geom=NEW.the_geom, 
 		workcat_id_end=NEW.tank_workcat_id_end, undelete=NEW.undelete, label_x=NEW.tank_label_x, label_y=NEW.tank_label_y, label_rotation=NEW.tank_label_rotation, code=NEW.tank_code, 
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.tank_end_date
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.tank_end_date, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 
 		UPDATE man_tank 
@@ -797,7 +798,7 @@ BEGIN
 		location_type=NEW.tank_location_type, workcat_id=NEW.tank_workcat_id, buildercat_id=NEW.tank_buildercat_id, builtdate=NEW.tank_builtdate, ownercat_id=NEW.tank_ownercat_id, adress_01=NEW.tank_adress_01, 
 		adress_02=NEW.tank_adress_02, adress_03=NEW.tank_adress_03, descript=NEW.tank_descript,rotation=NEW.tank_rotation, link=NEW.tank_link, verified=NEW.verified, workcat_id_end=NEW.tank_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.tank_label_x, label_y=NEW.tank_label_y, label_rotation=NEW.tank_label_rotation, code=NEW.tank_code, 
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.tank_end_date
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.tank_end_date, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 
 		UPDATE man_tank 
@@ -825,7 +826,7 @@ BEGIN
 		location_type=NEW.pump_location_type, workcat_id=NEW.pump_workcat_id, buildercat_id=NEW.pump_buildercat_id, builtdate=NEW.pump_builtdate, ownercat_id=NEW.pump_ownercat_id, adress_01=NEW.pump_adress_01,
 		adress_02=NEW.pump_adress_02, adress_03=NEW.pump_adress_03, descript=NEW.pump_descript,rotation=NEW.pump_rotation, link=NEW.pump_link, verified=NEW.verified, the_geom=NEW.the_geom, 
 		workcat_id_end=NEW.pump_workcat_id_end, undelete=NEW.undelete, label_x=NEW.pump_label_x, label_y=NEW.pump_label_y, label_rotation=NEW.pump_label_rotation, 
-		code=NEW.pump_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.pump_end_date, parent_node_id=NEW.parent_node_id
+		code=NEW.pump_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.pump_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_pump 
@@ -840,7 +841,7 @@ BEGIN
 		builtdate=NEW.manhole_builtdate, ownercat_id=NEW.manhole_ownercat_id, adress_01=NEW.manhole_adress_01, adress_02=NEW.manhole_adress_02, adress_03=NEW.manhole_adress_03, descript=NEW.manhole_descript,
 		rotation=NEW.manhole_rotation, link=NEW.manhole_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.manhole_workcat_id_end, undelete=NEW.undelete, label_x=NEW.manhole_label_x, 
 		label_y=NEW.manhole_label_y, label_rotation=NEW.manhole_label_rotation, code=NEW.manhole_code, publish=NEW.publish, inventory=NEW.inventory, 
-		end_date=NEW.manhole_end_date, parent_node_id=NEW.parent_node_id
+		end_date=NEW.manhole_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_manhole 
@@ -855,7 +856,7 @@ BEGIN
 		builtdate=NEW.hydrant_builtdate, ownercat_id=NEW.hydrant_ownercat_id, adress_01=NEW.hydrant_adress_01, adress_02=NEW.hydrant_adress_02, adress_03=NEW.hydrant_adress_03, descript=NEW.hydrant_descript,
 		rotation=NEW.hydrant_rotation, link=NEW.hydrant_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.hydrant_workcat_id_end, undelete=NEW.undelete, label_x=NEW.hydrant_label_x, 
 		label_y=NEW.hydrant_label_y, label_rotation=NEW.hydrant_label_rotation, code=NEW.hydrant_code, publish=NEW.publish, inventory=NEW.inventory, 
-		end_date=NEW.hydrant_end_date, parent_node_id=NEW.parent_node_id
+		end_date=NEW.hydrant_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_hydrant 
@@ -872,7 +873,7 @@ BEGIN
 		builtdate=NEW.source_builtdate, ownercat_id=NEW.source_ownercat_id, adress_01=NEW.source_adress_01, adress_02=NEW.source_adress_02, adress_03=NEW.source_adress_03, descript=NEW.source_descript,
 		rotation=NEW.source_rotation, link=NEW.source_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.source_workcat_id_end,undelete=NEW.undelete, label_x=NEW.source_label_x, 
 		label_y=NEW.source_label_y, label_rotation=NEW.source_label_rotation, code=NEW.source_code, publish=NEW.publish, inventory=NEW.inventory, 
-		end_date=NEW.source_end_date, parent_node_id=NEW.parent_node_id
+		end_date=NEW.source_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_source 
@@ -886,7 +887,7 @@ BEGIN
 		fluid_type=NEW.meter_fluid_type, location_type=NEW.meter_location_type, workcat_id=NEW.meter_workcat_id, buildercat_id=NEW.meter_buildercat_id, builtdate=NEW.meter_builtdate, ownercat_id=NEW.meter_ownercat_id,
 		adress_01=NEW.meter_adress_01, adress_02=NEW.meter_adress_02, adress_03=NEW.meter_adress_03, descript=NEW.meter_descript,rotation=NEW.meter_rotation, link=NEW.meter_link, verified=NEW.verified, 
 		the_geom=NEW.the_geom, workcat_id_end=NEW.meter_workcat_id_end,undelete=NEW.undelete, label_x=NEW.meter_label_x, label_y=NEW.meter_label_y, label_rotation=NEW.meter_label_rotation,
-		code=NEW.meter_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.meter_end_date, parent_node_id=NEW.parent_node_id
+		code=NEW.meter_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.meter_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_meter 
@@ -901,7 +902,7 @@ BEGIN
 		builtdate=NEW.waterwell_builtdate, ownercat_id=NEW.waterwell_ownercat_id, adress_01=NEW.waterwell_adress_01, adress_02=NEW.waterwell_adress_02, adress_03=NEW.waterwell_adress_03, 
 		descript=NEW.waterwell_descript,rotation=NEW.waterwell_rotation, link=NEW.waterwell_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.waterwell_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.waterwell_label_x, label_y=NEW.waterwell_label_y, label_rotation=NEW.waterwell_label_rotation, code=NEW.waterwell_code, publish=NEW.publish, inventory=NEW.inventory, 
-		end_date=NEW.waterwell_end_date, parent_node_id=NEW.parent_node_id
+		end_date=NEW.waterwell_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_waterwell 
@@ -916,7 +917,7 @@ BEGIN
 		builtdate=NEW.reduction_builtdate, ownercat_id=NEW.reduction_ownercat_id, adress_01=NEW.reduction_adress_01, adress_02=NEW.reduction_adress_02, adress_03=NEW.reduction_adress_03, 
 		descript=NEW.reduction_descript,rotation=NEW.reduction_rotation, link=NEW.reduction_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.reduction_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.reduction_label_x, label_y=NEW.reduction_label_y, label_rotation=NEW.reduction_label_rotation, 
-		code=NEW.reduction_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.reduction_end_date, parent_node_id=NEW.parent_node_id
+		code=NEW.reduction_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.reduction_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_reduction 
@@ -931,7 +932,7 @@ BEGIN
 		builtdate=NEW.valve_builtdate, ownercat_id=NEW.valve_ownercat_id, adress_01=NEW.valve_adress_01, adress_02=NEW.valve_adress_02, adress_03=NEW.valve_adress_03, descript=NEW.valve_descript,
 		rotation=NEW.valve_rotation, link=NEW.valve_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.valve_workcat_id_end, undelete=NEW.undelete, label_x=NEW.valve_label_x, 
 		label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, code=NEW.valve_code, publish=NEW.publish, inventory=NEW.inventory, 
-		end_date=NEW.valve_end_date, parent_node_id=NEW.parent_node_id
+		end_date=NEW.valve_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_valve 
@@ -949,7 +950,7 @@ BEGIN
 		builtdate=NEW.register_builtdate, ownercat_id=NEW.register_ownercat_id, adress_01=NEW.register_adress_01, adress_02=NEW.register_adress_02, adress_03=NEW.register_adress_03, 
 		descript=NEW.register_descript,rotation=NEW.register_rotation, link=NEW.register_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.register_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.register_label_x, label_y=NEW.register_label_y, label_rotation=NEW.register_label_rotation, code=NEW.register_code, 	publish=NEW.publish, inventory=NEW.inventory, 
-		end_date=NEW.register_end_date,parent_node_id=NEW.parent_node_id
+		end_date=NEW.register_end_date,parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_register
@@ -965,7 +966,7 @@ BEGIN
 		builtdate=NEW.register_builtdate, ownercat_id=NEW.register_ownercat_id, adress_01=NEW.register_adress_01, adress_02=NEW.register_adress_02, adress_03=NEW.register_adress_03, 
 		descript=NEW.register_descript,rotation=NEW.register_rotation, link=NEW.register_link, verified=NEW.verified, workcat_id_end=NEW.register_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.register_label_x, label_y=NEW.register_label_y, label_rotation=NEW.register_label_rotation, code=NEW.register_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.register_end_date,parent_node_id=NEW.parent_node_id
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.register_end_date,parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_register
@@ -994,7 +995,7 @@ BEGIN
 		builtdate=NEW.netwjoin_builtdate, ownercat_id=NEW.netwjoin_ownercat_id, adress_01=NEW.netwjoin_adress_01, adress_02=NEW.netwjoin_adress_02, adress_03=NEW.netwjoin_adress_03, 
 		descript=NEW.netwjoin_descript,rotation=NEW.netwjoin_rotation, link=NEW.netwjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.netwjoin_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.netwjoin_label_x, label_y=NEW.netwjoin_label_y, label_rotation=NEW.netwjoin_label_rotation, code=NEW.netwjoin_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netwjoin_end_date, parent_node_id=NEW.parent_node_id
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netwjoin_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netwjoin
@@ -1009,7 +1010,7 @@ BEGIN
 		builtdate=NEW.exptank_builtdate, ownercat_id=NEW.exptank_ownercat_id, adress_01=NEW.exptank_adress_01, adress_02=NEW.exptank_adress_02, adress_03=NEW.exptank_adress_03, 
 		descript=NEW.exptank_descript,rotation=NEW.exptank_rotation, link=NEW.exptank_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.exptank_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.exptank_label_x, label_y=NEW.exptank_label_y, label_rotation=NEW.exptank_label_rotation, code=NEW.exptank_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.exptank_end_date, parent_node_id=NEW.parent_node_id
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.exptank_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_expansiontank
@@ -1024,7 +1025,7 @@ BEGIN
 		builtdate=NEW.flexunion_builtdate, ownercat_id=NEW.flexunion_ownercat_id, adress_01=NEW.flexunion_adress_01, adress_02=NEW.flexunion_adress_02, adress_03=NEW.flexunion_adress_03, 
 		descript=NEW.flexunion_descript,rotation=NEW.flexunion_rotation, link=NEW.flexunion_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.flexunion_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.flexunion_label_x, label_y=NEW.flexunion_label_y, label_rotation=NEW.flexunion_label_rotation, code=NEW.flexunion_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.flexunion_end_date, parent_node_id=NEW.parent_node_id
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.flexunion_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_flexunion
@@ -1039,7 +1040,7 @@ BEGIN
 		builtdate=NEW.netelement_builtdate, ownercat_id=NEW.netelement_ownercat_id, adress_01=NEW.netelement_adress_01, adress_02=NEW.netelement_adress_02, adress_03=NEW.netelement_adress_03, 
 		descript=NEW.netelement_descript,rotation=NEW.netelement_rotation, link=NEW.netelement_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.netelement_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.netelement_label_x, label_y=NEW.netelement_label_y, label_rotation=NEW.netelement_label_rotation, code=NEW.netelement_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netelement_end_date, parent_node_id=NEW.parent_node_id
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netelement_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netelement
@@ -1054,7 +1055,7 @@ BEGIN
 		builtdate=NEW.netsample_builtdate, ownercat_id=NEW.netsample_ownercat_id, adress_01=NEW.netsample_adress_01, adress_02=NEW.netsample_adress_02, adress_03=NEW.netsample_adress_03, 
 		descript=NEW.netsample_descript,rotation=NEW.netsample_rotation, link=NEW.netsample_link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.netsample_workcat_id_end, 
 		undelete=NEW.undelete, label_x=NEW.netsample_label_x, label_y=NEW.netsample_label_y, label_rotation=NEW.netsample_label_rotation, code=NEW.netsample_code,
-		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netsample_end_date, parent_node_id=NEW.parent_node_id
+		publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netsample_end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netsamplepoint

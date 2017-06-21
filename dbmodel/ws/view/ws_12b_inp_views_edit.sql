@@ -29,10 +29,9 @@ node.verified,
 node.the_geom,
 inp_junction.demand, 
 inp_junction.pattern_id,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector,node
 JOIN inp_junction ON ((inp_junction.node_id)::text = (node.node_id)::text)
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -54,11 +53,10 @@ node.link,
 node.verified, 
 node.the_geom,
 inp_reservoir.head,
- inp_reservoir.pattern_id,
- exploitation.short_descript AS expl_name
+inp_reservoir.pattern_id,
+node.expl_id
 FROM expl_selector, node
 JOIN inp_reservoir ON ((inp_reservoir.node_id)::text = (node.node_id)::text)
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -86,10 +84,9 @@ inp_tank.maxlevel,
 inp_tank.diameter,
 inp_tank.minvol, 
 inp_tank.curve_id,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node
 JOIN inp_tank ON ((inp_tank.node_id)::text = (node.node_id)::text)
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -117,10 +114,9 @@ inp_pump.speed,
 inp_pump.pattern, 
 inp_pump.to_arc, 
 inp_pump.status,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node 
 JOIN inp_pump ON ((node.node_id)::text = (inp_pump.node_id)::text)
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -150,10 +146,9 @@ inp_valve.curve_id,
 inp_valve.minorloss, 
 inp_valve.to_arc,
 inp_valve.status,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node 
 JOIN inp_valve ON ((node.node_id)::text = (inp_valve.node_id)::text)
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -178,10 +173,9 @@ node.the_geom,
 inp_shortpipe.minorloss, 
 inp_shortpipe.to_arc, 
 inp_shortpipe.status,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector,node 
 JOIN inp_shortpipe ON ((inp_shortpipe.node_id)::text = (node.node_id)::text)
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -206,9 +200,8 @@ inp_pipe.minorloss,
 inp_pipe.status, 
 inp_pipe.custom_roughness, 
 inp_pipe.custom_dint,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector, arc 
 JOIN inp_pipe ON ((inp_pipe.arc_id)::text = (arc.arc_id)::text)
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);

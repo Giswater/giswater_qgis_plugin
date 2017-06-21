@@ -54,7 +54,7 @@ BEGIN
 
 -- MANAGEMENT UPDATE
 			UPDATE polygon 
-			SET pol_id=NEW.pol_id, text=NEW.text, the_geom=NEW.the_geom, undelete=NEW.undelete
+			SET pol_id=NEW.pol_id, text=NEW.text, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE pol_id=NEW.pol_id;
 
 			PERFORM audit_function(2,430); 
