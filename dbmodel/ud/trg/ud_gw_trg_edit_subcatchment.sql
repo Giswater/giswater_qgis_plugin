@@ -60,7 +60,7 @@ BEGIN
 			UPDATE subcatchment 
 			SET subc_id=NEW.subc_id, node_id=NEW.node_id, rg_id=NEW.rg_id, area=NEW.area, imperv=NEW.imperv, width=NEW.width, slope=NEW.slope, clength=NEW.clength, snow_id=NEW.snow_id, nimp=NEW.nimp, nperv=NEW.nperv, 
 			simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted, maxrate=NEW.maxrate, minrate=NEW.minrate, decay=NEW.decay, drytime=NEW.drytime, maxinfil=NEW.maxinfil, suction=NEW.suction, 
-			conduct=NEW.conduct, initdef=NEW.initdef, curveno=NEW.curveno, conduct_2=NEW.conduct_2, drytime_2=NEW.drytime_2, sector_id=NEW.sector_id, hydrology_id=NEW.hydrology_id, the_geom=NEW.the_geom
+			conduct=NEW.conduct, initdef=NEW.initdef, curveno=NEW.curveno, conduct_2=NEW.conduct_2, drytime_2=NEW.drytime_2, sector_id=NEW.sector_id, hydrology_id=NEW.hydrology_id, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE subc_id = OLD.subc_id;
 
 

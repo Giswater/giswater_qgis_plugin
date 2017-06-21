@@ -79,21 +79,20 @@
 					RETURN audit_function(130,840); 
 				END IF;
 			END IF;
-			
-			
-			-- Verified
+				
+		-- Verified
 			IF (NEW.verified IS NULL) THEN
-				NEW.verified := (SELECT verified_vdefault FROM config);
+				NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
 				IF (NEW.verified IS NULL) THEN
 					NEW.verified := (SELECT id FROM value_verified limit 1);
 				END IF;
 			END IF;
 
 			-- State
-			IF (NEW."state" IS NULL) THEN
-				NEW."state" := (SELECT state_vdefault FROM config);
-				IF (NEW."state" IS NULL) THEN
-						NEW."state" := (SELECT id FROM value_state limit 1);
+			IF (NEW.state IS NULL) THEN
+				NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+				IF (NEW.state IS NULL) THEN
+					NEW.state := (SELECT id FROM value_state limit 1);
 				END IF;
 			END IF;
 			
@@ -115,7 +114,7 @@
 						
 				-- Workcat_id
 				IF (NEW.conduit_workcat_id IS NULL) THEN
-					NEW.conduit_workcat_id := (SELECT workcat_vdefault FROM config);
+					NEW.conduit_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 					IF (NEW.conduit_workcat_id IS NULL) THEN
 						NEW.conduit_workcat_id := (SELECT id FROM cat_work limit 1);
 					END IF;
@@ -123,7 +122,7 @@
 
 				--Builtdate
 				IF (NEW.conduit_builtdate IS NULL) THEN
-					NEW.conduit_builtdate := (SELECT builtdate_vdefault FROM config);
+					NEW.conduit_builtdate:=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 		
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
@@ -141,9 +140,9 @@
 
 				-- Workcat_id
 				IF (NEW.siphon_workcat_id IS NULL) THEN
-					NEW.siphon_workcat_id := (SELECT workcat_vdefault FROM config);
+					NEW.siphon_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 					IF (NEW.siphon_workcat_id IS NULL) THEN
-						NEW.siphon_workcat_id := (SELECT id FROM cat_work limit 1);
+						NEW.siphon_workcat_id :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 					END IF;
 				END IF;
 
@@ -167,9 +166,9 @@
 						
 				-- Workcat_id
 				IF (NEW.waccel_workcat_id IS NULL) THEN
-					NEW.waccel_workcat_id := (SELECT workcat_vdefault FROM config);
+					NEW.waccel_workcat_id:= (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 					IF (NEW.waccel_workcat_id IS NULL) THEN
-						NEW.waccel_workcat_id := (SELECT id FROM cat_work limit 1);
+						NEW.waccel_workcat_id :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 					END IF;
 				END IF;
 
@@ -194,9 +193,9 @@
 						
 				-- Workcat_id
 				IF (NEW.varc_workcat_id IS NULL) THEN
-					NEW.varc_workcat_id := (SELECT workcat_vdefault FROM config);
+					NEW.varc_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 					IF (NEW.varc_workcat_id IS NULL) THEN
-						NEW.varc_workcat_id := (SELECT id FROM cat_work limit 1);
+						NEW.varc_workcat_id :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 					END IF;
 				END IF;		
 		
@@ -293,7 +292,7 @@
 				buildercat_id=NEW.conduit_buildercat_id, builtdate=NEW.conduit_builtdate,ownercat_id=NEW.conduit_ownercat_id, adress_01=NEW.conduit_adress_01, adress_02=NEW.conduit_adress_02, 
 				adress_03=NEW.conduit_adress_03, descript=NEW.conduit_descript,rotation=NEW.conduit_rotation, link=NEW.conduit_link, est_y1=NEW.conduit_est_y1, est_y2=NEW.conduit_est_y2, verified=NEW.verified, 
 				the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.conduit_label_x,label_y=NEW.conduit_label_y, label_rotation=NEW.conduit_label_rotation,workcat_id_end=NEW.conduit_workcat_id_end,
-				code=NEW.conduit_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.conduit_end_date, uncertain=NEW.uncertain
+				code=NEW.conduit_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.conduit_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 			
 			
@@ -308,7 +307,7 @@
 				buildercat_id=NEW.siphon_buildercat_id, builtdate=NEW.siphon_builtdate,ownercat_id=NEW.siphon_ownercat_id, adress_01=NEW.siphon_adress_01, adress_02=NEW.siphon_adress_02, adress_03=NEW.siphon_adress_03, 
 				descript=NEW.siphon_descript,rotation=NEW.siphon_rotation, link=NEW.siphon_link, est_y1=NEW.siphon_est_y1, est_y2=NEW.siphon_est_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
 				label_x=NEW.siphon_label_x,label_y=NEW.siphon_label_y, label_rotation=NEW.siphon_label_rotation,workcat_id_end=NEW.siphon_workcat_id_end,
-				code=NEW.siphon_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.siphon_end_date, uncertain=NEW.uncertain
+				code=NEW.siphon_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.siphon_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 				
 				UPDATE man_siphon SET arc_id=NEW.arc_id,security_bar=NEW.siphon_security_bar, steps=NEW.siphon_steps,siphon_name=NEW.siphon_name
@@ -322,7 +321,7 @@
 				buildercat_id=NEW.waccel_buildercat_id, builtdate=NEW.waccel_builtdate,ownercat_id=NEW.waccel_ownercat_id, adress_01=NEW.waccel_adress_01, adress_02=NEW.waccel_adress_02, adress_03=NEW.waccel_adress_03, 
 				descript=NEW.waccel_descript,rotation=NEW.waccel_rotation, link=NEW.waccel_link, est_y1=NEW.waccel_est_y1, est_y2=NEW.waccel_est_y2, verified=NEW.verified, the_geom=NEW.the_geom, 
 				undelete=NEW.undelete,label_x=NEW.waccel_label_x,label_y=NEW.waccel_label_y, label_rotation=NEW.waccel_label_rotation,workcat_id_end=NEW.waccel_workcat_id_end,
-				code=NEW.waccel_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.waccel_end_date, uncertain=NEW.uncertain
+				code=NEW.waccel_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.waccel_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;	
 				
 				UPDATE man_waccel SET arc_id=NEW.arc_id, sander_length=NEW.waccel_sander_length, sander_depth=NEW.waccel_sander_depth,security_bar=NEW.waccel_security_bar,
@@ -337,7 +336,7 @@
 				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,ownercat_id=NEW.varc_ownercat_id, adress_01=NEW.varc_adress_01, adress_02=NEW.varc_adress_02, adress_03=NEW.varc_adress_03, 
 				descript=NEW.varc_descript,rotation=NEW.varc_rotation, link=NEW.varc_link, est_y1=NEW.varc_est_y1, est_y2=NEW.varc_est_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
 				label_x=NEW.varc_label_x,label_y=NEW.varc_label_y, label_rotation=NEW.varc_label_rotation,workcat_id_end=NEW.varc_workcat_id_end,
-				code=NEW.varc_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.varc_end_date, uncertain=NEW.uncertain
+				code=NEW.varc_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.varc_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 				
 				UPDATE man_varc SET arc_id=NEW.arc_id

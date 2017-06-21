@@ -32,10 +32,9 @@ node.the_geom,
 inp_junction.y0, 
 inp_junction.ysur,
 inp_junction.apond,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node
 JOIN inp_junction ON (((inp_junction.node_id)::text = (node.node_id)::text))
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -70,10 +69,9 @@ inp_divider.cd,
 inp_divider.y0, 
 inp_divider.ysur, 
 inp_divider.apond,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node
 JOIN inp_divider ON (((node.node_id)::text = (inp_divider.node_id)::text))
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -104,10 +102,9 @@ inp_outfall.stage,
 inp_outfall.curve_id, 
 inp_outfall.timser_id,
 inp_outfall.gate,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node
 JOIN inp_outfall ON (((node.node_id)::text = (inp_outfall.node_id)::text))
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -145,10 +142,9 @@ inp_storage.imd,
 inp_storage.y0, 
 inp_storage.ysur, 
 inp_storage.apond,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, node
 JOIN inp_storage ON (((node.node_id)::text = (inp_storage.node_id)::text))
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -192,11 +188,10 @@ inp_conduit.q0,
 inp_conduit.qmax, 
 inp_conduit.seepage, 
 inp_conduit.custom_n,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc
 JOIN inp_conduit ON (((arc.arc_id)::text = (inp_conduit.arc_id)::text))
 JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -231,10 +226,9 @@ inp_orifice.geom1,
 inp_orifice.geom2, 
 inp_orifice.geom3, 
 inp_orifice.geom4,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc
 JOIN inp_orifice ON (((arc.arc_id)::text = (inp_orifice.arc_id)::text))
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -265,10 +259,9 @@ inp_outlet.curve_id,
 inp_outlet.cd1, 
 inp_outlet.cd2, 
 inp_outlet.flap,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc
 JOIN inp_outlet ON (((arc.arc_id)::text = (inp_outlet.arc_id)::text))
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -296,10 +289,9 @@ inp_pump.curve_id,
 inp_pump.status, 
 inp_pump.startup, 
 inp_pump.shutoff,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc
 JOIN inp_pump ON (((arc.arc_id)::text = (inp_pump.arc_id)::text))
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -334,10 +326,9 @@ inp_weir.geom2,
 inp_weir.geom3, 
 inp_weir.geom4, 
 inp_weir.surcharge,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc
 JOIN inp_weir ON (((arc.arc_id)::text = (inp_weir.arc_id)::text))
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -356,9 +347,8 @@ CREATE VIEW v_edit_raingage AS SELECT
 	sta,
 	units,
 	raingage.the_geom,
-	exploitation.short_descript AS expl_name
+	raingage.expl_id
 FROM expl_selector,raingage
-JOIN exploitation ON raingage.expl_id=exploitation.expl_id
 WHERE ((raingage.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -395,9 +385,8 @@ CREATE VIEW v_edit_subcatchment AS SELECT
 	sector_id,
 	hydrology_id,
 	subcatchment.the_geom,
-	exploitation.short_descript AS expl_name
+	subcatchment.expl_id
 FROM expl_selector,subcatchment
-JOIN exploitation ON subcatchment.expl_id=exploitation.expl_id
 WHERE ((subcatchment.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
    

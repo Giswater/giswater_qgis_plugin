@@ -49,9 +49,8 @@ SELECT
 anl_node_sink.node_id,
 anl_node_sink.num_arcs,
 anl_node_sink.the_geom,
-exploitation.short_descript AS expl_name
+node.expl_id
 FROM expl_selector, anl_node_sink
 JOIN node ON node.node_id=anl_node_sink.node_id
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);

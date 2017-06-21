@@ -22,8 +22,7 @@ CREATE VIEW v_edit_plan_psector AS SELECT
 	vat,
 	other,
 	plan_psector.the_geom,
-	exploitation.short_descript AS expl_name
+	plan_psector.expl_id
 FROM expl_selector,plan_psector
-JOIN exploitation ON plan_psector.expl_id::text=exploitation.expl_id::text
 WHERE ((plan_psector.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);

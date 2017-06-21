@@ -45,7 +45,7 @@ BEGIN
        -- UPDATE values
 		
 			UPDATE raingage 
-			SET rg_id=NEW.rg_id, form_type=NEW.form_type, intvl=NEW.intvl, scf=NEW.scf, rgage_type=NEW.rgage_type, timser_id=NEW.timser_id, fname=NEW.fname, sta=NEW.sta, units=NEW.units, the_geom=NEW.the_geom
+			SET rg_id=NEW.rg_id, form_type=NEW.form_type, intvl=NEW.intvl, scf=NEW.scf, rgage_type=NEW.rgage_type, timser_id=NEW.timser_id, fname=NEW.fname, sta=NEW.sta, units=NEW.units, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE rg_id = OLD.rg_id;
 
 
