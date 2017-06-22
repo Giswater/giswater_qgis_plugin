@@ -1073,14 +1073,22 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 		IF man_table ='man_tank'  THEN
-			IF OLD.pol_id IS NOT NULL THEN
-				DELETE FROM polygon WHERE pol_id = OLD.pol_id;
+			IF OLD.tank_pol_id IS NOT NULL THEN
+				DELETE FROM polygon WHERE pol_id = OLD.tank_pol_id;
+				DELETE FROM node WHERE node_id = OLD.node_id;
+			ELSE
+				DELETE FROM node WHERE node_id = OLD.node_id;
+			END IF;		
+		ELSIF man_table ='man_register'  THEN
+			IF OLD.register_pol_id IS NOT NULL THEN
+				DELETE FROM polygon WHERE pol_id = OLD.register_pol_id;
 				DELETE FROM node WHERE node_id = OLD.node_id;
 			ELSE
 				DELETE FROM node WHERE node_id = OLD.node_id;
 			END IF;
 		ELSE
 			DELETE FROM node WHERE node_id = OLD.node_id;
+		
 		END IF;
         PERFORM audit_function(3,430); 
         RETURN NULL;
