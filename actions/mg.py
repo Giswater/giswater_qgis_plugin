@@ -614,7 +614,14 @@ class Mg():
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
         self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
 
-        self.dlg.findChild(QDateEdit, "builtdate_vdefault").setDate(QDate.currentDate())
+
+
+        self.state_vdefault=self.dlg.findChild(QComboBox,"state_vdefault")
+        self.workcat_vdefault=self.dlg.findChild(QComboBox,"workcat_vdefault")
+        self.verified_vdefault = self.dlg.findChild(QComboBox, "verified_vdefault")
+        self.builtdate_vdefault = self.dlg.findChild(QDateEdit, "builtdate_vdefault")
+        self.builtdate_vdefault.setDate(QDate.currentDate())
+        #self.dlg.findChild(QDateEdit, "builtdate_vdefault").setDate(QDate("01/01/1111"))
 
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
@@ -727,7 +734,6 @@ class Mg():
 
     def mg_config_accept(self):
         ''' Update current values to the configuration tables '''
-
         self.mg_config_accept_table('config', self.generic_columns)
         self.mg_config_accept_table('config_search_plus', self.search_plus_columns)
         self.mg_config_accept_table('config_extract_raster_value', self.raster_columns)
@@ -745,10 +751,48 @@ class Mg():
         sql+= " WHERE id = 'doc_absolute_path'"
         self.controller.execute_sql(sql)
 
-        # Show message and close form
+        # Show message, insert in DB and close form
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message' )
+
+        self.insert_or_update(self.state_vdefault, "state_vdefault")
+        self.insert_or_update(self.workcat_vdefault, "workcat_vdefault")
+        self.insert_or_update(self.verified_vdefault, "verified_vdefault")
+        self.insert_or_update(self.builtdate_vdefault, "builtdate_vdefault")
+
         self.close_dialog(self.dlg)
+
+    def insert_or_update(self, widget, parameter):
+        sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
+        rows=self.controller.get_rows(sql)
+        self.exist = False
+        if type(widget) == QDateEdit:
+            QMessageBox.about(None, 'Ok', str("test"))
+            if widget.date() != "":
+                for row in rows:
+                    if row[1] == parameter:
+                        self.exist = True
+                if self.exist:
+                    sql = "UPDATE " + self.schema_name + ".config_vdefault SET value='" + widget.date().toString('yyyy-MM-dd') + "'"
+                    sql += " WHERE parameter='"+parameter+"'"
+                    self.controller.execute_sql(sql)
+                else:
+                    sql = 'INSERT INTO ' + self.schema_name + '.config_vdefault (parameter, value, "user")'
+                    sql += " VALUES ('" + parameter + "', '" + widget.date().toString('yyyy-MM-dd') + "', current_user)"
+                    self.controller.execute_sql(sql)
+
+        if widget.currentText() != "":
+            for row in rows:
+                if row[1] == parameter:
+                    self.exist = True
+            if self.exist:
+                sql = "UPDATE " + self.schema_name + ".config_vdefault SET value='" + widget.currentText() + "'"
+                sql += " WHERE parameter='" + parameter + "'"
+                self.controller.execute_sql(sql)
+            else:
+                sql = 'INSERT INTO ' + self.schema_name + '.config_vdefault (parameter, value, "user")'
+                sql += " VALUES ('"+parameter+"', '" + widget.currentText() + "', current_user)"
+                self.controller.execute_sql(sql)
 
 
     def mg_config_accept_table(self, tablename, columns):
