@@ -105,7 +105,7 @@ CONSTRAINT man_type_operation_pkey PRIMARY KEY (id)
 
 CREATE TABLE "man_register" (
 "node_id" varchar(16) NOT NULL,
-"pol_id" varchar(16) NOT NULL,
+"pol_id" varchar(16),
 "add_info" varchar(255),
 CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
 );
