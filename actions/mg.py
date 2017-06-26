@@ -11,7 +11,7 @@ from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableVi
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 from PyQt4.Qt import  QDate, QTime
-from datetime import datetime
+from datetime import datetime, date
 import time
 import os
 import sys
@@ -620,8 +620,13 @@ class Mg():
         self.workcat_vdefault=self.dlg.findChild(QComboBox,"workcat_vdefault")
         self.verified_vdefault = self.dlg.findChild(QComboBox, "verified_vdefault")
         self.builtdate_vdefault = self.dlg.findChild(QDateEdit, "builtdate_vdefault")
-        self.builtdate_vdefault.setDate(QDate.currentDate())
-        #self.dlg.findChild(QDateEdit, "builtdate_vdefault").setDate(QDate("01/01/1111"))
+        #self.builtdate_vdefault.setDate(QDate.currentDate())
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'builtdate_vdefault'"
+        row = self.dao.get_row(sql)
+        #date = datetime.strptime(row[0], '%Y-%m-%d')
+        utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
+
+
 
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
@@ -780,8 +785,7 @@ class Mg():
                     sql = 'INSERT INTO ' + self.schema_name + '.config_vdefault (parameter, value, "user")'
                     sql += " VALUES ('" + parameter + "', '" + widget.date().toString('yyyy-MM-dd') + "', current_user)"
                     self.controller.execute_sql(sql)
-
-        if widget.currentText() != "":
+        elif widget.currentText() != "":
             for row in rows:
                 if row[1] == parameter:
                     self.exist = True

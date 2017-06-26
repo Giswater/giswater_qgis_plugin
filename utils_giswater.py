@@ -13,7 +13,7 @@
 
 ''' Module with utility functions to interact with dialog and its widgets '''
 from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QMessageBox   #@UnresolvedImport
-from PyQt4.Qt import  QDate
+from PyQt4.Qt import QDate
 import inspect
 import os
 
@@ -34,7 +34,7 @@ def fillComboBox(widget, rows, allow_nulls=True):
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
             #why never join here???
-            QMessageBox.about(None, 'Ok', str("test"))
+
             widget.addItem(str(elem))
         else:
             if elem!=None:
