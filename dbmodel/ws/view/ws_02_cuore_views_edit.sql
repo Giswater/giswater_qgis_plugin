@@ -56,7 +56,8 @@ node.inventory,
 node.end_date,
 dma.macrodma_id,
 node.expl_id,
-node.parent_node_id
+node.parent_node_id,
+node.hemisphere
 FROM expl_selector, node
 LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -308,7 +309,8 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
 	node.end_date AS hydrant_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere AS hydrant_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -366,7 +368,8 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 	node.end_date AS junction_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as junction_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -422,7 +425,8 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
 	node.end_date AS manhole_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as manhole_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -479,7 +483,8 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
 	node.end_date AS meter_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as meter_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -536,7 +541,8 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	dma.macrodma_id,
 	man_pump.elev_height,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as pump_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -595,7 +601,8 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
 	node.end_date AS reduction_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as reduction_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -651,7 +658,8 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
 	node.end_date AS source_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as source_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -729,7 +737,8 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	dma.macrodma_id,
 	man_valve.cat_valve2 AS valve_cat_valve2,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as valve_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -785,7 +794,8 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
 	node.end_date AS waterwell_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as waterwell_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -842,7 +852,8 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
 	node.end_date AS filter_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as filter_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -898,7 +909,8 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	dma.macrodma_id,
 	node.expl_id,
 	man_register.pol_id AS register_pol_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as register_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -954,7 +966,8 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
 	node.end_date AS register_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as register_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1010,7 +1023,8 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	node.end_date AS netwjoin_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as netwjoin_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1065,7 +1079,8 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
 	node.end_date AS flexunion_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as flexunion_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1120,7 +1135,8 @@ SELECT node.node_id,
 	node.end_date AS exptank_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as exptank_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1175,7 +1191,8 @@ SELECT node.node_id,
 	node.end_date AS netsample_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as netsample_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
@@ -1230,7 +1247,8 @@ SELECT node.node_id,
 	node.end_date AS netelement_end_date,
 	dma.macrodma_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as netelement_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))

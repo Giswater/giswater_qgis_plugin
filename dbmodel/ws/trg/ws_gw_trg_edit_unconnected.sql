@@ -12,6 +12,8 @@ DECLARE
 
     man_table varchar;
 	expl_id_int integer;
+	pond_id_seq int8;
+	pool_id_seq int8;
 
 BEGIN
 
@@ -33,17 +35,28 @@ BEGIN
             END IF;
 
        
-        
-    
         -- FEATURE INSERT
 
 		
 		IF man_table='pond' THEN
 						
+				-- Pond ID
+			IF (NEW.pond_id IS NULL) THEN
+				SELECT max(pond_id::integer) INTO pond_id_seq FROM pond WHERE pond_id ~ '^\d+$';
+				PERFORM setval('pond_id_seq',pond_id_seq,true);
+				NEW.pond_id:= (SELECT nextval('pond_id_seq'));
+			END IF;		
+				
 				INSERT INTO pond (pond_id, connec_id, code_comercial, the_geom, expl_id)
 				VALUES (NEW.pond_id, NEW.connec_id, NEW.code_comercial, NEW.the_geom, expl_id_int);
 		
 		ELSIF man_table='pool' THEN
+			       			-- Pool ID
+			IF (NEW.pool_id IS NULL) THEN
+				SELECT max(pool_id::integer) INTO pool_id_seq FROM pool WHERE pool_id ~ '^\d+$';
+				PERFORM setval('pool_id_seq',pool_id_seq,true);
+				NEW.pool_id:= (SELECT nextval('pool_id_seq'));
+			END IF; 
 			
 				INSERT INTO pool(pool_id, connec_id, code_comercial, the_geom, expl_id)
 				VALUES (NEW.pool_id, NEW.connec_id, NEW.code_comercial, NEW.the_geom, expl_id_int);

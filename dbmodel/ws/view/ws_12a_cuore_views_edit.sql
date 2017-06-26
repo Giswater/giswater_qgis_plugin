@@ -62,7 +62,8 @@ CREATE OR REPLACE VIEW v_edit_man_tank AS
 	dma.macrodma_id,
 	man_tank.pol_id AS tank_pol_id,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as tank_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
      LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
@@ -127,7 +128,8 @@ CREATE OR REPLACE VIEW v_edit_man_tank_pol AS
 	man_tank.pol_id AS tank_pol_id,
 	polygon.the_geom,
 	node.expl_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as tank_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
      LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text

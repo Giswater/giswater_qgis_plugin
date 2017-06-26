@@ -17,7 +17,7 @@ BEGIN
 
     -- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
-    
+	
 
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
