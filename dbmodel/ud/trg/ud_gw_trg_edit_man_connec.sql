@@ -130,7 +130,7 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-        PERFORM audit_function (3,860);
+      --  PERFORM audit_function (3,860);
         RETURN NULL;
    
     END IF;

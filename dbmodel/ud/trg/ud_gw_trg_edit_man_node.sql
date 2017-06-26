@@ -228,6 +228,7 @@ BEGIN
 				
 				INSERT INTO man_storage (node_id,pol_id,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,
 				NEW.storage_total_volume,NEW.storage_util_volume,NEW.storage_min_height,NEW.storage_total_height,NEW.storage_total_length,NEW.storage_total_width,NEW.storage_name);
+				
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE

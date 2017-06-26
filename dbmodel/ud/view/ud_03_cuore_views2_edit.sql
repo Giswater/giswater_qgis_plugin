@@ -551,9 +551,13 @@ CREATE OR REPLACE VIEW v_edit_man_storage_pol AS
     polygon.pol_id,
     node.node_id,
     node.top_elev AS storage_top_elev,
+	node.est_top_elev AS storage_est_top_elev,
     node.ymax AS storage_ymax,
+	node.est_ymax AS storage_est_ymax,
+	node.elev AS storage_elev,
+	node.est_elev AS storage_est_elev,
+	v_node.elev AS storage_sys_elev,
     node.sander AS storage_sander,
-	node.elev as storage_elev,
     node.node_type,
     node.nodecat_id,
     node.epa_type,
@@ -590,6 +594,7 @@ CREATE OR REPLACE VIEW v_edit_man_storage_pol AS
     man_storage.total_height AS storage_total_height,
     man_storage.total_length AS storage_total_length,
     man_storage.total_width AS storage_total_width,
+    man_storage.pol_id,
     man_storage.storage_name,
 	node.code AS storage_code,
 	node.publish,
@@ -1060,7 +1065,8 @@ CREATE OR REPLACE VIEW v_edit_man_chamber AS
 DROP VIEW IF EXISTS v_edit_man_chamber_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_chamber_pol AS 
  SELECT 
- polygon.pol_id,node.node_id,
+ polygon.pol_id,
+ node.node_id,
     node.top_elev AS chamber_top_elev,
 	node.est_top_elev AS chamber_est_top_elev,
     node.ymax AS chamber_ymax,
@@ -1192,6 +1198,7 @@ DROP VIEW IF EXISTS v_edit_man_wwtp_pol CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_wwtp_pol AS 
  SELECT 
     polygon.pol_id,
+	node.node_id,
     node.top_elev AS wwtp_top_elev,
 	node.est_top_elev AS wwtp_est_top_elev,
     node.ymax AS wwtp_ymax,
@@ -1249,7 +1256,6 @@ CREATE OR REPLACE VIEW v_edit_man_wwtp_pol AS
 	AND expl_selector.cur_user="current_user"()::text; 
 
 
-	 
 
 DROP VIEW IF EXISTS v_edit_man_conduit CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_conduit AS 

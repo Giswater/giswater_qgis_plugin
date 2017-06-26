@@ -169,7 +169,7 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
-		PERFORM audit_function (3,850);
+		--PERFORM audit_function (3,850);
         RETURN NULL;
    
     END IF;

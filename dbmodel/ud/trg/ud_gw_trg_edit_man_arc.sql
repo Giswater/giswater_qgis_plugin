@@ -350,7 +350,7 @@
 		 ELSIF TG_OP = 'DELETE' THEN
 			DELETE FROM arc WHERE arc_id = OLD.arc_id;
 
-			PERFORM audit_function (3,840);
+			--PERFORM audit_function (3,840);
 			RETURN NULL;
 		 
 		 END IF;
