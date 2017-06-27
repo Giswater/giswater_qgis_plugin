@@ -270,7 +270,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -912,8 +912,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>281</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1130,8 +1130,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>281</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1664,8 +1664,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>281</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1690,8 +1690,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>281</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1749,8 +1749,8 @@
        <widget class="QLineEdit" name="tank_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1763,7 +1763,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>15</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1799,7 +1799,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>15</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1824,8 +1824,8 @@
        <widget class="QLabel" name="label_tank_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1891,6 +1891,55 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_tank_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>45</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="tank_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>45</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -2387,8 +2436,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2455,8 +2504,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2989,8 +3038,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3026,7 +3075,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>15</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3038,8 +3087,8 @@
        <widget class="QLineEdit" name="pump_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3123,8 +3172,8 @@
        <widget class="QLabel" name="label_pump_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3160,7 +3209,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>15</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3178,6 +3227,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="pump_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>45</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_pump_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>45</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3680,8 +3778,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4214,8 +4312,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4251,7 +4349,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4263,8 +4361,8 @@
        <widget class="QLineEdit" name="source_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4348,8 +4446,8 @@
        <widget class="QLabel" name="label_source_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4385,7 +4483,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4403,6 +4501,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="source_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_source_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -4905,8 +5052,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5439,8 +5586,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5450,7 +5597,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>26</y>
+          <y>25</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5463,7 +5610,7 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>56</y>
+          <y>55</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5476,7 +5623,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>25</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5488,8 +5635,8 @@
        <widget class="QLineEdit" name="meter_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>26</y>
+          <x>110</x>
+          <y>85</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5502,7 +5649,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>26</y>
+          <y>25</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5538,7 +5685,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>56</y>
+          <y>55</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5573,8 +5720,8 @@
        <widget class="QLabel" name="label_meter_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>26</y>
+          <x>10</x>
+          <y>85</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5610,7 +5757,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>56</y>
+          <y>26</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5628,6 +5775,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="meter_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>55</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_meter_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>55</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -6231,8 +6427,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6765,8 +6961,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6791,8 +6987,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6828,7 +7024,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6840,8 +7036,8 @@
        <widget class="QLineEdit" name="junction_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6925,8 +7121,8 @@
        <widget class="QLabel" name="label_junction_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6962,7 +7158,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6980,6 +7176,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="junction_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_junction_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -7482,8 +7727,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8016,8 +8261,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8075,8 +8320,8 @@
        <widget class="QLabel" name="label_waterwell_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>10</y>
+          <x>10</x>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8111,8 +8356,8 @@
        <widget class="QLineEdit" name="waterwell_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>10</y>
+          <x>110</x>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8174,7 +8419,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>10</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8210,6 +8455,19 @@
         <property name="geometry">
          <rect>
           <x>380</x>
+          <y>10</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="waterwell_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
           <y>40</y>
           <width>160</width>
           <height>20</height>
@@ -8217,6 +8475,42 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_waterwell_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>40</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>
@@ -8710,8 +9004,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8833,8 +9127,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9367,8 +9661,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9426,8 +9720,8 @@
        <widget class="QLabel" name="label_reduction_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9462,8 +9756,8 @@
        <widget class="QLineEdit" name="reduction_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9525,7 +9819,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9561,6 +9855,19 @@
         <property name="geometry">
          <rect>
           <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="reduction_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
           <y>50</y>
           <width>160</width>
           <height>20</height>
@@ -9568,6 +9875,42 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_reduction_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>
@@ -10061,8 +10404,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10548,8 +10891,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11082,8 +11425,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11119,7 +11462,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11131,8 +11474,8 @@
        <widget class="QLineEdit" name="hydrant_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11216,8 +11559,8 @@
        <widget class="QLabel" name="label_hydrant_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11253,7 +11596,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11271,6 +11614,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="hydrant_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_hydrant_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -11854,8 +12246,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12658,8 +13050,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13192,8 +13584,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13203,7 +13595,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13238,8 +13630,8 @@
        <widget class="QLabel" name="label_valve_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13275,7 +13667,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13336,8 +13728,8 @@
        <widget class="QLineEdit" name="valve_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13393,6 +13785,55 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="valve_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_valve_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>
@@ -13883,8 +14324,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14417,8 +14858,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14454,7 +14895,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14466,8 +14907,8 @@
        <widget class="QLineEdit" name="manhole_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -14551,8 +14992,8 @@
        <widget class="QLabel" name="label_manhole_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14588,7 +15029,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -14606,6 +15047,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="manhole_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_manhole_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -15111,8 +15601,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15645,8 +16135,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15682,7 +16172,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15694,8 +16184,8 @@
        <widget class="QLineEdit" name="filter_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15779,8 +16269,8 @@
        <widget class="QLabel" name="label_filter_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15816,7 +16306,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15834,6 +16324,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="filter_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_filter_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -16388,8 +16927,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16922,8 +17461,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16959,7 +17498,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16971,8 +17510,8 @@
        <widget class="QLineEdit" name="register_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -17056,8 +17595,8 @@
        <widget class="QLabel" name="label_register_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -17093,7 +17632,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -17111,6 +17650,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="register_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_register_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -17616,8 +18204,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18150,8 +18738,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18187,7 +18775,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -18199,8 +18787,8 @@
        <widget class="QLineEdit" name="netwjoin_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -18284,8 +18872,8 @@
        <widget class="QLabel" name="label_netwjoin_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -18321,7 +18909,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -18339,6 +18927,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netwjoin_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netwjoin_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -18844,8 +19481,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19378,8 +20015,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19415,7 +20052,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -19427,8 +20064,8 @@
        <widget class="QLineEdit" name="netelement_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -19512,8 +20149,8 @@
        <widget class="QLabel" name="label_netelement_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -19549,7 +20186,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -19567,6 +20204,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netelement_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netelement_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -20072,8 +20758,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20606,8 +21292,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20643,7 +21329,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -20655,8 +21341,8 @@
        <widget class="QLineEdit" name="netsample_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -20740,8 +21426,8 @@
        <widget class="QLabel" name="label_netsample_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -20777,7 +21463,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -20809,6 +21495,55 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLineEdit" name="netsample_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netsample_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -20826,15 +21561,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_65">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21834,8 +22569,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21871,7 +22606,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -21883,8 +22618,8 @@
        <widget class="QLineEdit" name="exptank_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -21968,8 +22703,8 @@
        <widget class="QLabel" name="label_exptank_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -22005,7 +22740,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -22023,6 +22758,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="exptank_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_exptank_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -22528,8 +23312,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23062,8 +23846,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23099,7 +23883,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -23111,8 +23895,8 @@
        <widget class="QLineEdit" name="flexunion_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -23196,8 +23980,8 @@
        <widget class="QLabel" name="label_flexunion_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -23233,7 +24017,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>20</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -23251,6 +24035,55 @@
         </property>
         <property name="text">
          <string>Svg rotation:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="flexunion_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_flexunion_hemisphere">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>50</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Hemisphere:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
