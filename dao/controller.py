@@ -27,9 +27,7 @@ class DaoController():
         self.iface = iface               
         
     def set_schema_name(self, schema_name):
-        self.schema_name = schema_name
-        
-    
+        self.schema_name = schema_name  
     
     def tr(self, message, context_name=None):
         if context_name is None:
@@ -51,15 +49,13 @@ class DaoController():
         self.qgis_settings.setValue(self.plugin_name+"/"+key, value)            
     
     def set_actions(self, actions):
-        self.actions = actions     
-        
+        self.actions = actions      
         
     def check_actions(self, check=True):
         ''' Utility to check/uncheck all actions '''
         for action_index, action in self.actions.iteritems():   #@UnusedVariable
             action.setChecked(check)    
-    
-                             
+                           
     def check_action(self, check=True, index=1):
         ''' Check/Uncheck selected action '''
         key = index
@@ -350,6 +346,9 @@ class DaoController():
     def get_layer_source_table_name(self, layer):
         ''' Get table or view name of selected layer '''
 
+        if layer is None:
+            return None
+        
         uri_table = None
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('table=')
@@ -377,6 +376,7 @@ class DaoController():
    
     def get_project_user(self):
         ''' Set user '''
+		
         user = None
         #self.canvas = self.iface.mapCanvas() 
         # Check if we have any layer loaded
@@ -393,9 +393,6 @@ class DaoController():
         if pos_ini <> -1:
             user = uri[pos_ini + 6:pos_end_schema-2]
 
-
-        return self.user
-
-    
+        return self.user   
     
     
