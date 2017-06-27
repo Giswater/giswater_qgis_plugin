@@ -38,10 +38,13 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				RETURN audit_function(145,840); 
 			END IF; 
+			NEW.arccat_id:= (SELECT "value" FROM config_vdefault WHERE "parameter"='arccat_vdefault' AND "user"="current_user"());
+			IF (NEW.arccat_id IS NULL) THEN
 			NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;       
+		END IF;
 		END IF;
         
         -- Sector ID
