@@ -54,3 +54,51 @@ FROM expl_selector, anl_node_sink
 JOIN node ON node.node_id=anl_node_sink.node_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
+
+
+_exit_node CASCADE;
+CREATE OR REPLACE VIEW v_anl_flow_exit_node AS
+SELECT
+anl_flow_exit_node.node_id,
+anl_flow_exit_node.the_geom,
+node.expl_id
+FROM expl_selector, anl_flow_exit_node
+JOIN node ON node.node_id=anl_flow_exit_node.node_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
+
+
+DROP VIEW IF EXISTS v_anl_flow_exit_arc CASCADE;
+CREATE OR REPLACE VIEW v_anl_flow_exit_arc AS
+SELECT
+anl_flow_exit_arc.arc_id,
+anl_flow_exit_arc.the_geom,
+arc.expl_id
+FROM expl_selector, anl_flow_exit_arc
+JOIN arc ON arc.arc_id=anl_flow_exit_arc.arc_id
+WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
+
+
+DROP VIEW IF EXISTS v_anl_flow_trace_node CASCADE;
+CREATE OR REPLACE VIEW v_anl_flow_trace_node AS
+SELECT
+anl_flow_trace_node.node_id,
+anl_flow_trace_node.the_geom,
+node.expl_id
+FROM expl_selector, anl_flow_trace_node
+JOIN node ON node.node_id=anl_flow_trace_node.node_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
+
+
+DROP VIEW IF EXISTS v_anl_flow_trace_arc CASCADE;
+CREATE OR REPLACE VIEW v_anl_flow_trace_arc AS
+SELECT
+anl_flow_trace_arc.arc_id,
+anl_flow_trace_arc.the_geom,
+arc.expl_id
+FROM expl_selector, anl_flow_trace_arc
+JOIN arc ON arc.arc_id=anl_flow_trace_arc.arc_id
+WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
