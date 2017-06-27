@@ -604,28 +604,47 @@ class Mg():
         self.dlg.btn_analysis.pressed.connect(partial(self.multi_selector,self.table_anl_selector))
         self.dlg.btn_planning.pressed.connect(partial(self.multi_selector,self.table_plan_selector))
 
+        # QLineEdit
         self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
 
+        # QPushButton
         self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
         self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
         self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
 
-
-
+        # QComboBox
         self.state_vdefault=self.dlg.findChild(QComboBox,"state_vdefault")
         self.workcat_vdefault=self.dlg.findChild(QComboBox,"workcat_vdefault")
         self.verified_vdefault = self.dlg.findChild(QComboBox, "verified_vdefault")
+        self.arccat_vdefault = self.dlg.findChild(QComboBox, "arccat_vdefault")
+        self.nodecat_vdefault = self.dlg.findChild(QComboBox, "nodecat_vdefault")
+        self.connecat_vdefault = self.dlg.findChild(QComboBox, "connecat_vdefault")
+
+        # QDateEdit
         self.builtdate_vdefault = self.dlg.findChild(QDateEdit, "builtdate_vdefault")
         #self.builtdate_vdefault.setDate(QDate.currentDate())
         sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'builtdate_vdefault'"
         row = self.dao.get_row(sql)
-        #date = datetime.strptime(row[0], '%Y-%m-%d')
         utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
+        #date = datetime.strptime(row[0], '%Y-%m-%d')
+        #utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(date))
 
+        # QCheckBox
+
+        self.chk_arccat_vdefault = self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault')
+        self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
+        self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
+
+        #self.arc_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox,self.arc_vdef_enabled, self.arccat_vdefault, "arccat_vdefault"))
+        #self.node_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.node_vdef_enabled, self.nodecat_vdefault))
+        #self.connec_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.connec_vdef_enabled, self.connecat_vdefault))
+        #self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault').stateChanged.connect(partial(self.test, "check"))
+        #self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault').stateChanged.connect(partial(self.test, "check"))
+        #self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault').stateChanged.connect(partial(self.test, "check"))
 
 
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
@@ -647,15 +666,27 @@ class Mg():
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows)
+
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
+
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
+
+        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("arccat_vdefault", rows)
+        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("nodecat_vdefault", rows)
+        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_connec ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("connecat_vdefault", rows)
 
         # Set values from widgets of type QDateEdit
         sql = "SELECT DISTINCT(builtdate_vdefault) FROM" + self.schema_name + ".config"
@@ -664,14 +695,42 @@ class Mg():
 
 
         # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value'
-        self.generic_columns = self.mg_config_get_data('config')
+        self.generic_columns=self.new_mg_config_get_data('config_vdefault')
+        #self.generic_columns = self.mg_config_get_data('config')
         self.search_plus_columns = self.mg_config_get_data('config_search_plus')
         self.raster_columns = self.mg_config_get_data('config_extract_raster_value')
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'config')
         self.dlg.exec_()
+    '''
+    def chec_checkbox(self, widget_chk, widget_cbx, state):
+        #QMessageBox.about(None, 'Ok', str(utils_giswater.isChecked(widget)))
+        if utils_giswater.isChecked(widget_chk)==True:
+            QMessageBox.about(None, 'Ok', str("true"))
+            self.insert_or_update(widget_cbx, state)
+        if utils_giswater.isChecked(widget_chk) == False:
+            QMessageBox.about(None, 'Ok', str("false"))
+    '''
+    # Like def mf_config_get_date(....): but for multi user
+    def new_mg_config_get_data(self,tablename):
+        sql = 'SELECT * FROM ' + self.schema_name + "." + tablename +' WHERE "user"=current_user'
+        rows = self.dao.get_rows(sql)
+        if not rows:
+            self.controller.show_warning("Any data found in table "+tablename)
+            return None
 
+        # Iterate over all columns and populate its corresponding widget
+        columns = []
+        for i in rows:
+            utils_giswater.setWidgetText(str(i[1]), str(i[2]))
+            utils_giswater.setChecked("chk_" + str(i[1]), True)
+            columns.append(str(i[1]))
+
+        return columns
+
+    def test(self, text):
+        QMessageBox.about(None, 'Ok', str(text))
 
     def open_file_dialog(self, widget):
         ''' Open File Dialog '''
@@ -739,7 +798,8 @@ class Mg():
 
     def mg_config_accept(self):
         ''' Update current values to the configuration tables '''
-        self.mg_config_accept_table('config', self.generic_columns)
+        #self.mg_config_accept_table('config', self.generic_columns)
+
         self.mg_config_accept_table('config_search_plus', self.search_plus_columns)
         self.mg_config_accept_table('config_extract_raster_value', self.raster_columns)
 
@@ -765,14 +825,29 @@ class Mg():
         self.insert_or_update(self.verified_vdefault, "verified_vdefault")
         self.insert_or_update(self.builtdate_vdefault, "builtdate_vdefault")
 
+        if utils_giswater.isChecked(self.chk_arccat_vdefault) == True:
+            self.insert_or_update(self.arccat_vdefault, "arccat_vdefault")
+        else:
+            self.delete_row("arccat_vdefault")
+        if utils_giswater.isChecked(self.chk_nodecat_vdefault) == True:
+            self.insert_or_update(self.nodecat_vdefault, "nodecat_vdefault")
+        else:
+            self.delete_row("nodecat_vdefault")
+        if utils_giswater.isChecked(self.chk_connecat_vdefault) == True:
+            self.insert_or_update(self.connecat_vdefault, "connecat_vdefault")
+        else:
+            self.delete_row("connecat_vdefault")
+
         self.close_dialog(self.dlg)
 
+    def delete_row(self,  parameter):
+        sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
+        self.controller.execute_sql(sql)
     def insert_or_update(self, widget, parameter):
         sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
         rows=self.controller.get_rows(sql)
         self.exist = False
         if type(widget) == QDateEdit:
-            QMessageBox.about(None, 'Ok', str("test"))
             if widget.date() != "":
                 for row in rows:
                     if row[1] == parameter:

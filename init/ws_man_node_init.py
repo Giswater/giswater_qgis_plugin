@@ -94,6 +94,7 @@ class ManNodeDialog(ParentDialog):
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
 
+
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
         

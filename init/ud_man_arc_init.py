@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QLabel, QComboBox
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QLabel, QComboBox,QMessageBox
 from PyQt4.QtCore import Qt, QSettings
 from functools import partial
 
@@ -56,8 +56,7 @@ class ManArcDialog(ParentDialog):
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
-        
-        
+
         # Restoring layers from Qgs memory
         proj = QgsProject.instance()
         myint=proj.readNumEntry("myplugin","myint",123)[0]
@@ -111,7 +110,7 @@ class ManArcDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
-        
+        QMessageBox.about(None, 'Ok', str("test"))
         # Configuration of info table
         self.set_configuration(self.tbl_element, table_element)    
         

@@ -96,13 +96,13 @@ class ManNodeDialog(ParentDialog):
               
         # Load data from related tables
         self.load_data()
-        
+
         # Manage tab visibility
-        self.set_tabs_visibility(9)  
-        
+        self.set_tabs_visibility(9)
+
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-       
+
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
         
@@ -531,9 +531,7 @@ class ManNodeDialog(ParentDialog):
 
         self.layer = self.iface.activeLayer()
         if status == True:
-
             self.layer.startEditing()
-
             widget.setActive(True)
 
         if status == False:

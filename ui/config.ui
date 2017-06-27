@@ -380,7 +380,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QCheckBox" name="arc_vdef_enabled">
+    <widget class="QCheckBox" name="chk_arccat_vdefault">
      <property name="geometry">
       <rect>
        <x>155</x>
@@ -393,7 +393,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="node_vdef_enabled">
+    <widget class="QCheckBox" name="chk_nodecat_vdefault">
      <property name="geometry">
       <rect>
        <x>155</x>
@@ -406,7 +406,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="connec_vdef_enabled">
+    <widget class="QCheckBox" name="chk_connecat_vdefault">
      <property name="geometry">
       <rect>
        <x>155</x>

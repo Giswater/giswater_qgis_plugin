@@ -10,7 +10,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt, QAbstractItemModel
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit, QPixmap
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit, QPixmap,QMessageBox
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -157,14 +157,14 @@ class ParentDialog(object):
     def set_model_to_table(self, widget, table_name, filter_): 
         ''' Set a model with selected filter.
         Attach that model to selected table '''
-        
+
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
         model.setFilter(filter_)
 
-        model.select()         
+        model.select()
 
         # Check for errors
         if model.lastError().isValid():
@@ -487,8 +487,8 @@ class ParentDialog(object):
         
         widget = utils_giswater.getWidget(widget)
         if not widget:
-            return        
-        
+            return
+
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = "SELECT column_index, width, alias, status"
