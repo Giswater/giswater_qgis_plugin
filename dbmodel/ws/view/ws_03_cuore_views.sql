@@ -27,7 +27,8 @@ arc.soilcat_id,
 (CASE 
 WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- field to use length/custom_length
 ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
-arc.the_geom
+arc.the_geom,
+ arc.expl_id
 FROM arc
 JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text;
 
@@ -44,7 +45,8 @@ node.epa_type,
 node.sector_id,
 node.dma_id,
 node.state,
-node.the_geom
+node.the_geom,
+node.expl_id
 FROM node;
 
 
@@ -87,10 +89,13 @@ v_arc_x_node2.depth2,
 v_arc_x_node2.r2,
 arc."state",
 arc.sector_id,
-arc.the_geom
-FROM v_arc_x_node1
+arc.the_geom,
+arc.expl_id
+FROM expl_selector, v_arc_x_node1
 JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
-JOIN arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text;
+JOIN arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text
+WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);;
 
 
 

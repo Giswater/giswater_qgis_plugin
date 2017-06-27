@@ -96,3 +96,7 @@ element.publish,
 element.inventory
 FROM element_x_connec
 JOIN element ON element.element_id::text = element_x_connec.element_id::text;
+
+
+
+

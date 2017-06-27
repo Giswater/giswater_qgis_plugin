@@ -61,13 +61,14 @@ CREATE OR REPLACE VIEW v_edit_man_tank AS
 	node.end_date AS tank_end_date,
 	dma.macrodma_id,
 	man_tank.pol_id AS tank_pol_id,
-	exploitation.descript AS expl_name
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as tank_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
      LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
      JOIN man_tank ON man_tank.node_id::text = node.node_id::text
      LEFT JOIN inp_tank ON inp_tank.node_id::text = man_tank.node_id::text
-	 JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -126,14 +127,15 @@ CREATE OR REPLACE VIEW v_edit_man_tank_pol AS
 	dma.macrodma_id,
 	man_tank.pol_id AS tank_pol_id,
 	polygon.the_geom,
-	exploitation.descript AS expl_name	
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as tank_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
      LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
      JOIN man_tank ON man_tank.node_id::text = node.node_id::text
      LEFT JOIN inp_tank ON inp_tank.node_id::text = man_tank.node_id::text
 	 JOIN polygon ON polygon.pol_id=man_tank.pol_id
-	 JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 

@@ -41,3 +41,16 @@ CREATE OR REPLACE VIEW v_anl_dwf_connec AS
    FROM connec
      JOIN anl_dwf_connec_x_uses_value ON anl_dwf_connec_x_uses_value.connec_id::text = connec.connec_id::text
      JOIN anl_dwf_selector_scenario ON anl_dwf_selector_scenario.scenario_id::text = anl_dwf_connec_x_uses_value.scenario_id::text;
+ 
+	 
+DROP VIEW IF EXISTS v_anl_node_sink CASCADE;
+CREATE OR REPLACE VIEW v_anl_node_sink AS
+SELECT
+anl_node_sink.node_id,
+anl_node_sink.num_arcs,
+anl_node_sink.the_geom,
+node.expl_id
+FROM expl_selector, anl_node_sink
+JOIN node ON node.node_id=anl_node_sink.node_id
+WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);

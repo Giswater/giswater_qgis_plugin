@@ -20,14 +20,15 @@ BEGIN
     SELECT node_topocoh INTO check_aux FROM value_state where NEW.state=id;
 
 -- TODO
-
+/*
+		IF THEN
         ELSE
 		RETURN audit_function(215,200); 
         END IF;
 
     END LOOP; 
 
-    RETURN NEW;
+    RETURN NEW;*/
     
 END; 
 $BODY$

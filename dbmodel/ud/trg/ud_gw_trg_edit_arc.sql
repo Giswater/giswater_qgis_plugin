@@ -79,9 +79,17 @@ BEGIN
             END IF;
         END IF;
 		
+	-- Verified
+        IF (NEW.verified IS NULL) THEN
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
+            IF (NEW.verified IS NULL) THEN
+                NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -89,20 +97,18 @@ BEGIN
 		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_vdefault FROM config);
+            NEW.workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
         END IF;
 		
-		-- Verified
-        IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
-            IF (NEW.verified IS NULL) THEN
-                NEW.verified := (SELECT id FROM value_verified limit 1);
-            END IF;
-        END IF;
-    
+
+		--Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+		END IF;    
+		
 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
@@ -145,7 +151,7 @@ BEGIN
         v_sql:= 'INSERT INTO '||man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
         EXECUTE v_sql;
         
-		PERFORM audit_function (1,760);
+		--PERFORM audit_function (1,760);
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -201,7 +207,7 @@ BEGIN
 		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, 
 		adress_03=NEW.adress_03, descript=NEW.descript,rotation=NEW.rotation, link=NEW.link, est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, 
 		the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end,
-		code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain
+		code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 		WHERE arc_id=OLD.arc_id;	
 
 		PERFORM audit_function (2,760);

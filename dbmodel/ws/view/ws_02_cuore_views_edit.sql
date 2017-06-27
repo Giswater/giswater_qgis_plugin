@@ -55,12 +55,12 @@ node.publish,
 node.inventory,
 node.end_date,
 dma.macrodma_id,
-exploitation.short_descript AS expl_name,
-node.parent_node_id
+node.expl_id,
+node.parent_node_id,
+node.hemisphere
 FROM expl_selector, node
 LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-JOIN exploitation ON node.expl_id=exploitation.expl_id
 WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -113,11 +113,10 @@ arc.publish,
 arc.inventory,
 arc.end_date,
 dma.macrodma_id,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -133,11 +132,10 @@ CREATE OR REPLACE VIEW ws_sample_dev.v_edit_link AS
     link.custom_length,
     connec.connecat_id,
     link.the_geom,
-    exploitation.short_descript AS expl_name
+    link.expl_id
    FROM ws_sample_dev.expl_selector,
     ws_sample_dev.link
      LEFT JOIN ws_sample_dev.connec ON connec.connec_id::text = link.connec_id::text
-     JOIN ws_sample_dev.exploitation ON link.expl_id = exploitation.expl_id
   WHERE link.expl_id::text = expl_selector.expl_id::text AND expl_selector.cur_user = "current_user"()::text;
 
 
@@ -191,12 +189,11 @@ arc.publish,
 arc.inventory,
 arc.end_date AS pipe_end_date,
 dma.macrodma_id,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
 JOIN man_pipe ON man_pipe.arc_id=arc.arc_id
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -249,12 +246,11 @@ arc.publish,
 arc.inventory,
 arc.end_date AS varc_end_date,
 dma.macrodma_id,
-exploitation.short_descript AS expl_name
+arc.expl_id
 FROM expl_selector,arc 
 LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
 LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
 JOIN man_varc ON man_varc.arc_id=arc.arc_id
-JOIN exploitation ON arc.expl_id=exploitation.expl_id
 WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -312,13 +308,13 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
 	node.inventory,
 	node.end_date AS hydrant_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere AS hydrant_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	 JOIN man_hydrant ON man_hydrant.node_id::text = node.node_id::text
-	 JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
   
@@ -371,13 +367,13 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 	node.inventory,
 	node.end_date AS junction_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as junction_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_junction ON node.node_id::text = man_junction.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
   
@@ -428,13 +424,13 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
 	node.inventory,
 	node.end_date AS manhole_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as manhole_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
     JOIN man_manhole ON node.node_id::text = man_manhole.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -486,13 +482,13 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
 	node.inventory,
 	node.end_date AS meter_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as meter_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_meter ON man_meter.node_id::text = node.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -544,13 +540,13 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	node.end_date AS pump_end_date,
 	dma.macrodma_id,
 	man_pump.elev_height,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as pump_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
     JOIN man_pump ON man_pump.node_id::text = node.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -604,13 +600,13 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
 	node.inventory,
 	node.end_date AS reduction_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as reduction_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_reduction ON man_reduction.node_id::text = node.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	 
@@ -661,13 +657,13 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
 	node.inventory,
 	node.end_date AS source_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as source_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_source ON node.node_id::text = man_source.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -740,13 +736,13 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	node.end_date AS valve_end_date,
 	dma.macrodma_id,
 	man_valve.cat_valve2 AS valve_cat_valve2,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as valve_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
     JOIN man_valve ON man_valve.node_id::text = node.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -797,13 +793,13 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
 	node.inventory,
 	node.end_date AS waterwell_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as waterwell_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_waterwell ON node.node_id::text = man_waterwell.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -855,13 +851,13 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
 	node.inventory,
 	node.end_date AS filter_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as filter_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_filter ON node.node_id::text = man_filter.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -911,14 +907,14 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	node.inventory,
 	node.end_date AS register_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
+	node.expl_id,
 	man_register.pol_id AS register_pol_id,
-	node.parent_node_id
+	node.parent_node_id,
+	node.hemisphere as register_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_register ON node.node_id::text = man_register.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -969,14 +965,14 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
 	node.inventory,
 	node.end_date AS register_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as register_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_register ON node.node_id::text = man_register.node_id::text
 	JOIN polygon ON polygon.pol_id::text = man_register.pol_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -1026,13 +1022,13 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	node.inventory,
 	node.end_date AS netwjoin_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as netwjoin_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_netwjoin ON node.node_id::text = man_netwjoin.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -1082,13 +1078,13 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
 	node.inventory,
 	node.end_date AS flexunion_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as flexunion_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_flexunion ON node.node_id::text = man_flexunion.node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -1138,13 +1134,13 @@ SELECT node.node_id,
 	node.inventory,
 	node.end_date AS exptank_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as exptank_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_expansiontank ON node.node_id::text = man_expansiontank .node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -1194,13 +1190,13 @@ SELECT node.node_id,
 	node.inventory,
 	node.end_date AS netsample_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as netsample_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_netsamplepoint ON node.node_id::text = man_netsamplepoint .node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 
@@ -1250,13 +1246,13 @@ SELECT node.node_id,
 	node.inventory,
 	node.end_date AS netelement_end_date,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name,
-	node.parent_node_id
+	node.expl_id,
+	node.parent_node_id,
+	node.hemisphere as netelement_hemisphere
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_netelement ON node.node_id::text = man_netelement .node_id::text
-	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	
@@ -1267,9 +1263,8 @@ CREATE VIEW v_edit_sector AS SELECT
 	sector.descript,
 	sector.the_geom,
 	sector.undelete,
-	exploitation.short_descript AS expl_name
+	sector.expl_id
 FROM expl_selector,sector 
-JOIN exploitation ON sector.expl_id=exploitation.expl_id
 WHERE ((sector.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1284,9 +1279,8 @@ CREATE VIEW v_edit_dma AS SELECT
 	dma.the_geom,
 	dma.undelete,
 	dma.macrodma_id,
-	exploitation.short_descript AS expl_name
+	dma.expl_id
 	FROM expl_selector, dma 
-	JOIN exploitation ON dma.expl_id=exploitation.expl_id
 WHERE ((dma.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
   
@@ -1297,9 +1291,8 @@ CREATE VIEW v_edit_macrodma AS SELECT
 	macrodma.descript,
 	macrodma.the_geom,
 	macrodma.undelete,
-	exploitation.short_descript AS expl_name
+	macrodma.expl_id
 FROM expl_selector, macrodma 
-JOIN exploitation ON macrodma.expl_id=exploitation.expl_id
 WHERE ((macrodma.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
   
@@ -1312,9 +1305,8 @@ CREATE VIEW v_edit_presszone AS SELECT
 	presszone.sector,
 	presszone.text,
 	presszone.undelete,
-	exploitation.short_descript AS expl_name
+	presszone.expl_id
 FROM expl_selector,presszone
-JOIN exploitation ON presszone.expl_id=exploitation.expl_id
 WHERE ((presszone.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1325,9 +1317,8 @@ CREATE VIEW v_edit_polygon AS SELECT
 	text,
 	polygon.the_geom,
 	polygon.undelete,
-	exploitation.short_descript AS expl_name
+	polygon.expl_id
 FROM expl_selector, polygon
-JOIN exploitation ON polygon.expl_id=exploitation.expl_id
 WHERE ((polygon.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1341,9 +1332,8 @@ CREATE VIEW v_edit_vnode AS SELECT
 	state,
 	annotation,
 	vnode.the_geom,
-	exploitation.short_descript AS expl_name
+	vnode.expl_id
 FROM expl_selector,vnode
-JOIN exploitation ON vnode.expl_id=exploitation.expl_id
 WHERE ((vnode.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1356,9 +1346,9 @@ CREATE VIEW v_edit_point AS SELECT
 	text,
 	link,
 	point.the_geom,
-	exploitation.short_descript AS expl_name
+	point.undelete,
+	point.expl_id
 FROM expl_selector,point
-JOIN exploitation ON point.expl_id=exploitation.expl_id
 WHERE ((point.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1369,9 +1359,8 @@ CREATE VIEW v_edit_pond AS SELECT
 	connec_id,
 	code_comercial,
 	pond.the_geom,
-	exploitation.short_descript AS expl_name
+	pond.expl_id
 FROM expl_selector,pond
-JOIN exploitation ON pond.expl_id=exploitation.expl_id
 WHERE ((pond.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1382,9 +1371,8 @@ CREATE VIEW v_edit_pool AS SELECT
 	connec_id,
 	code_comercial,
 	pool.the_geom,
-	exploitation.short_descript AS expl_name
+	pool.expl_id
 FROM expl_selector,pool
-JOIN exploitation ON pool.expl_id=exploitation.expl_id
 WHERE ((pool.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1406,9 +1394,8 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	dma_id2,
 	observations,
 	samplepoint.the_geom,
-	exploitation.short_descript AS expl_name
+	samplepoint.expl_id
 FROM expl_selector,samplepoint
-JOIN exploitation ON samplepoint.expl_id=exploitation.expl_id
 WHERE ((samplepoint.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
 
@@ -1433,9 +1420,8 @@ CREATE VIEW v_edit_element AS SELECT
 	workcat_id_end,
 	code,
 	element.the_geom,
-	exploitation.short_descript AS expl_name
+	element.expl_id
 FROM expl_selector,element
-JOIN exploitation ON element.expl_id=exploitation.expl_id
 WHERE ((element.expl_id)::text=(expl_selector.expl_id)::text
 AND expl_selector.cur_user="current_user"()::text);
  

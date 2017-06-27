@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+	SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- WARNING: SCHEMA_NAME IS NOT ONLY PRESENT ON THE HEADER OF THIS FILE. IT EXISTS ALSO INTO IT. PLEASE REVIEW IT BEFORE REPLACE....
 
 
@@ -260,10 +260,13 @@ DROP VIEW IF EXISTS "v_subcatchment" CASCADE;
 CREATE VIEW v_subcatchment AS SELECT   
 subc_id ,  node_id,  rg_id,  area,  imperv,  width,  slope,  clength,  snow_id ,  nimp,  nperv,  
 simp,  sperv,  zero,  routeto,  rted,  maxrate,  minrate,  decay,  drytime,  maxinfil,  suction,  conduct,  initdef, 
-curveno,  conduct_2,  drytime_2,  subcatchment.sector_id,  subcatchment.hydrology_id,  the_geom
-FROM subcatchment 
+curveno,  conduct_2,  drytime_2,  subcatchment.sector_id,  subcatchment.hydrology_id,  subcatchment.the_geom, 
+subcatchment.expl_id
+FROM expl_selector,subcatchment 
 JOIN inp_selector_hydrology ON inp_selector_hydrology.hydrology_id=subcatchment.hydrology_id
-JOIN inp_selector_sector ON inp_selector_sector.sector_id=subcatchment.sector_id;
+JOIN inp_selector_sector ON inp_selector_sector.sector_id=subcatchment.sector_id
+WHERE ((subcatchment.expl_id)::text=(expl_selector.expl_id)::text
+AND expl_selector.cur_user="current_user"()::text);
 
 
 

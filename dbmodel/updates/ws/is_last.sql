@@ -38,20 +38,6 @@ CREATE SEQUENCE pool_id_seq
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE sample_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE point_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
 CREATE SEQUENCE polygon_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -247,7 +233,8 @@ CREATE TABLE review_audit_connec
 -------------
 
 
-
+ALTER TABLE node ADD COLUMN hemisphere float;
+ALTER TABLE node_type ADD COLUMN choose_hemisphere boolean;
 
 ALTER TABLE anl_mincut_result_cat ADD COLUMN anl_cause character varying (30);
 ALTER TABLE anl_mincut_result_cat ADD COLUMN anl_the_geom public.geometry(POINT, SRID_VALUE);

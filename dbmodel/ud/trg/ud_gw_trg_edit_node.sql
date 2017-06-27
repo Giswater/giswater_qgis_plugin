@@ -80,46 +80,36 @@ BEGIN
             END IF;            
         END IF;
 
-		
--- Verified
+	-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
         END IF;
-		
-	--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
-        
-	-- State
-			IF (NEW."state" IS NULL) THEN
-				NEW."state" := (SELECT state_vdefault FROM config);
-				IF (NEW."state" IS NULL) THEN
-						NEW."state" := (SELECT id FROM value_state limit 1);
-				END IF;
-			END IF;
-					
-			-- Workcat_id
-			IF (NEW.workcat_id IS NULL) THEN
-				NEW.workcat_id := (SELECT workcat_vdefault FROM config);
-				IF (NEW.workcat_id IS NULL) THEN
-					NEW.workcat_id := (SELECT id FROM cat_work limit 1);
-				END IF;
-			END IF;
 
-			--Builtdate
-			IF (NEW.builtdate IS NULL) THEN
-				NEW.builtdate := (SELECT builtdate_vdefault FROM config);
-			END IF;
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
+            END IF;
+        END IF;
+		
+		-- Workcat_id
+        IF (NEW.workcat_id IS NULL) THEN
+            NEW.workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+            IF (NEW.workcat_id IS NULL) THEN
+                NEW.workcat_id := (SELECT id FROM cat_work limit 1);
+            END IF;
+        END IF;
+		
+
+		--Builtdate
+		IF (NEW.builtdate IS NULL) THEN
+			NEW.builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+		END IF;  
+		
         -- FEATURE INSERT
 
 INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,
@@ -146,7 +136,7 @@ INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sec
         v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
         EXECUTE v_sql;
             
-        PERFORM audit_function (1,810);
+     --   PERFORM audit_function (1,810);
         RETURN NEW;
 
 
@@ -208,7 +198,7 @@ INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sec
 			est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, workcat_id_end=NEW.workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation,the_geom=NEW.the_geom, 
 			code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
                 
 		PERFORM audit_function (2,810);

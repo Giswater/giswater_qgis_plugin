@@ -22,7 +22,7 @@ BEGIN
 	
 	
 	
-    RETURN;
+    RETURN NULL;
         
 END;
 $BODY$

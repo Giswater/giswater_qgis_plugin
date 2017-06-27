@@ -8,7 +8,29 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
+CREATE SEQUENCE sample_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+CREATE SEQUENCE point_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
+-- ----------------------------
+--URN
+-- ----------------------------
+CREATE SEQUENCE urn_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 -- ----------------------------
 -- STATE TOPOLOGYC COHERENCE
 -- ----------------------------
@@ -21,7 +43,6 @@ VALUES (190, 'gw_fct_node_state_update', 'trigger function', 'utils', null,null)
 
 INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
 VALUES (200, 'gw_fct_arc_state_update', 'trigger function', 'utils', null,null);
-
 
 
 
@@ -70,7 +91,13 @@ ALTER TABLE ws_sample.value_state ADD COLUMN arc_topology_coherence boolean;
 -- ----------------------------
 -- VDEFAULT STRATEGY
 -- ----------------------------
-
+CREATE TABLE config_vdefault (
+id serial PRIMARY KEY,
+"parameter" character varying (30),
+"value" character varying (30),
+"user" character varying (30)
+);
+/*
 ALTER TABLE config ADD COLUMN state_vdefault character varying(16);
 ALTER TABLE config ADD COLUMN workcat_vdefault character varying(30);
 ALTER TABLE config ADD COLUMN verified_vdefault character varying(20);
@@ -82,7 +109,7 @@ ALTER TABLE "config" ADD CONSTRAINT "config_verified_vdefault_fkey" FOREIGN KEY 
 
 ALTER TABLE "config" ADD CONSTRAINT "config_nodeinsert_catalog_vdefault_fkey" FOREIGN KEY ("nodeinsert_catalog_vdefault") REFERENCES "cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+*/
 -- ----------------------------
 -- EXPLOTITATION STRATEGY
 -- ----------------------------
@@ -202,74 +229,6 @@ CREATE TABLE om_visit_event_photo
       ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-
--- ----------------------------
--- QAD DIMENSION TABLES
--- ----------------------------
-CREATE SEQUENCE dim_symbol_id_seq
-    START WITH 1000000
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-	CREATE SEQUENCE dim_text_id_seq
-    START WITH 1000000
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-	CREATE SEQUENCE dim_line_id_seq
-    START WITH 1000000
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-
-CREATE TABLE dim_line
-(
-  line_type character varying(50),
-  color character varying(10),
-  type character varying(2),
-  id_parent bigint,
-   id integer NOT NULL DEFAULT nextval('"SCHEMA_NAME".dim_line_id_seq'::regclass),
-  the_geom geometry(LineString,SRID_VALUE),
-  CONSTRAINT dim_line_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE dim_symbol
-(
-  name character varying(50),
-  scale double precision,
-  rot double precision,
-  color character varying(10),
-  type character varying(2),
-  id_parent bigint,
-  id integer NOT NULL DEFAULT nextval('"SCHEMA_NAME".dim_symbol_id_seq'::regclass),
-  the_geom geometry(Point,SRID_VALUE),
-  CONSTRAINT dim_symbol_pkey PRIMARY KEY (id)
-  );
-
-  
-CREATE TABLE dim_text
-(
-  id integer NOT NULL DEFAULT nextval('"SCHEMA_NAME".dim_text_id_seq'::regclass),
-  text character varying(50) NOT NULL,
-  font character varying(50),
-  h_text double precision,
-  rot double precision,
-  color character varying(10),
-  dim_style character varying(50),
-  dim_type character varying(2),
-  dim_id bigint,
-  the_geom geometry(Point,SRID_VALUE),
-  CONSTRAINT dim_text_pkey PRIMARY KEY (id)
-);
-
-
 -- ----------------------------
 -- anl_arc_no_startend_node
 -- ----------------------------
@@ -279,3 +238,13 @@ ALTER TABLE anl_arc_no_startend_node ALTER COLUMN id SET NOT NULL;
 ALTER TABLE anl_arc_no_startend_node DROP CONSTRAINT anl_arc_no_startend_node_pkey;
 ALTER TABLE anl_arc_no_startend_node ADD CONSTRAINT anl_arc_no_startend_node_pkey PRIMARY KEY(id);
 ALTER TABLE anl_arc_no_startend_node ADD COLUMN the_geom_p geometry(Point,SRID_VALUE);
+
+
+-- ----------------------------
+-- new node_type fields
+-- ----------------------------
+ALTER TABLE node_type ADD COLUMN order_by integer;
+ALTER TABLE node_type ADD COLUMN active_type boolean;
+
+
+

@@ -34,15 +34,29 @@ BEGIN
         WHERE arc_id = OLD.arc_id;
 
         IF (epa_type = 'CONDUIT') THEN 
-            UPDATE inp_conduit SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage, custom_n=NEW.custom_n WHERE arc_id=OLD.arc_id;
+            UPDATE inp_conduit 
+			SET arc_id=NEW.arc_id,barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0,qmax=NEW.qmax, seepage=NEW.seepage, custom_n=NEW.custom_n 
+			WHERE arc_id=OLD.arc_id;
+			
         ELSIF (epa_type = 'PUMP') THEN 
-            UPDATE inp_pump SET arc_id=NEW.arc_id,curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff WHERE arc_id=OLD.arc_id;
+            UPDATE inp_pump 
+			SET arc_id=NEW.arc_id,curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff 
+			WHERE arc_id=OLD.arc_id;
+			
         ELSIF (epa_type = 'ORIFICE') THEN 
-            UPDATE inp_orifice SET arc_id=NEW.arc_id,ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 WHERE arc_id=OLD.arc_id;
+            UPDATE inp_orifice 
+			SET arc_id=NEW.arc_id,ori_type=NEW.ori_type,"offset"=NEW."offset",cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 
+			WHERE arc_id=OLD.arc_id;
+			
         ELSIF (epa_type = 'WEIR') THEN 
-            UPDATE inp_weir SET arc_id=NEW.arc_id,weir_type=NEW.weir_type,"offset"=NEW."offset",cd=NEW.cd,ec=NEW.ec,cd2=NEW.cd2,flap=NEW.flap,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4,surcharge=NEW.surcharge WHERE arc_id=OLD.arc_id;
+            UPDATE inp_weir 
+			SET arc_id=NEW.arc_id,weir_type=NEW.weir_type,"offset"=NEW."offset",cd=NEW.cd,ec=NEW.ec,cd2=NEW.cd2,flap=NEW.flap,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4,surcharge=NEW.surcharge 
+			WHERE arc_id=OLD.arc_id;
+			
         ELSIF (epa_type = 'OUTLET') THEN 
-            UPDATE inp_outlet SET arc_id=NEW.arc_id, outlet_type=NEW.outlet_type, "offset"=NEW."offset", curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap WHERE arc_id=OLD.arc_id;
+            UPDATE inp_outlet 
+			SET arc_id=NEW.arc_id, outlet_type=NEW.outlet_type, "offset"=NEW."offset", curve_id=NEW.curve_id, cd1=NEW.cd1,cd2=NEW.cd2,flap=NEW.flap 
+			WHERE arc_id=OLD.arc_id;
         END IF;
 
         PERFORM audit_function (2,790);

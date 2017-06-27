@@ -94,19 +94,19 @@ BEGIN
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
         END IF;
 
-			-- State
-			IF (NEW."state" IS NULL) THEN
-				NEW."state" := (SELECT state_vdefault FROM config);
-				IF (NEW."state" IS NULL) THEN
-						NEW."state" := (SELECT id FROM value_state limit 1);
-				END IF;
-			END IF;
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
+            END IF;
+        END IF;
 						
 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
@@ -123,7 +123,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.junction_workcat_id IS NULL) THEN
-				NEW.junction_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.junction_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.junction_workcat_id IS NULL) THEN
 					NEW.junction_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -131,7 +131,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.junction_builtdate IS NULL) THEN
-				NEW.junction_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.junction_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 				
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -150,7 +150,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.outfall_workcat_id IS NULL) THEN
-				NEW.outfall_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.outfall_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.outfall_workcat_id IS NULL) THEN
 					NEW.outfall_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -158,7 +158,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.outfall_builtdate IS NULL) THEN
-				NEW.outfall_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.outfall_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -176,7 +176,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.valve_workcat_id IS NULL) THEN
-				NEW.valve_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.valve_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.valve_workcat_id IS NULL) THEN
 					NEW.valve_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -184,7 +184,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.valve_builtdate IS NULL) THEN
-				NEW.valve_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.valve_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -201,7 +201,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.storage_workcat_id IS NULL) THEN
-				NEW.storage_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.storage_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.storage_workcat_id IS NULL) THEN
 					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -209,7 +209,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.storage_builtdate IS NULL) THEN
-				NEW.storage_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.storage_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -228,6 +228,7 @@ BEGIN
 				
 				INSERT INTO man_storage (node_id,pol_id,total_volume,util_volume,min_height,total_height,total_length,total_width,storage_name) VALUES(NEW.node_id, NEW.pol_id,
 				NEW.storage_total_volume,NEW.storage_util_volume,NEW.storage_min_height,NEW.storage_total_height,NEW.storage_total_length,NEW.storage_total_width,NEW.storage_name);
+				
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
@@ -239,7 +240,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.netgully_workcat_id IS NULL) THEN
-				NEW.netgully_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.netgully_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.netgully_workcat_id IS NULL) THEN
 					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -247,7 +248,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netgully_builtdate IS NULL) THEN
-				NEW.netgully_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.netgully_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -276,7 +277,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.storage_workcat_id IS NULL) THEN
-				NEW.storage_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.storage_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.storage_workcat_id IS NULL) THEN
 					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -284,7 +285,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.storage_builtdate IS NULL) THEN
-				NEW.storage_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.storage_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -311,7 +312,7 @@ BEGIN
 
 		-- Workcat_id
 			IF (NEW.netgully_workcat_id IS NULL) THEN
-				NEW.netgully_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.netgully_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.netgully_workcat_id IS NULL) THEN
 					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -319,7 +320,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netgully_builtdate IS NULL) THEN
-				NEW.netgully_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.netgully_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -347,7 +348,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.chamber_workcat_id IS NULL) THEN
-				NEW.chamber_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.chamber_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.chamber_workcat_id IS NULL) THEN
 					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -355,7 +356,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.chamber_builtdate IS NULL) THEN
-				NEW.chamber_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.chamber_builtdate:=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -386,7 +387,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.chamber_workcat_id IS NULL) THEN
-				NEW.chamber_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.chamber_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.chamber_workcat_id IS NULL) THEN
 					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -394,7 +395,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.chamber_builtdate IS NULL) THEN
-				NEW.chamber_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.chamber_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -421,7 +422,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.manhole_workcat_id IS NULL) THEN
-				NEW.manhole_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.manhole_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.manhole_workcat_id IS NULL) THEN
 					NEW.manhole_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -429,7 +430,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.manhole_builtdate IS NULL) THEN
-				NEW.manhole_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.manhole_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -448,7 +449,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.netinit_workcat_id IS NULL) THEN
-				NEW.netinit_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.netinit_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.netinit_workcat_id IS NULL) THEN
 					NEW.netinit_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -456,7 +457,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netinit_builtdate IS NULL) THEN
-				NEW.netinit_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.netinit_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -475,15 +476,13 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.wjump_workcat_id IS NULL) THEN
-				NEW.wjump_workcat_id := (SELECT workcat_vdefault FROM config);
-				IF (NEW.wjump_workcat_id IS NULL) THEN
+				NEW.wjump_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 					NEW.wjump_workcat_id := (SELECT id FROM cat_work limit 1);
-				END IF;
 			END IF;
-
+		
 			--Builtdate
 			IF (NEW.wjump_builtdate IS NULL) THEN
-				NEW.wjump_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.wjump_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -501,7 +500,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.wwtp_workcat_id IS NULL) THEN
-				NEW.wwtp_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.wwtp_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.wwtp_workcat_id IS NULL) THEN
 					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -509,7 +508,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.wwtp_builtdate IS NULL) THEN
-				NEW.wwtp_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.wwtp_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -536,7 +535,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.wwtp_workcat_id IS NULL) THEN
-				NEW.wwtp_workcat_id := (SELECT workcat_vdefault FROM config);
+				NEW.wwtp_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
 				IF (NEW.wwtp_workcat_id IS NULL) THEN
 					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -544,7 +543,7 @@ BEGIN
 
 				--Builtdate
 			IF (NEW.wwtp_builtdate IS NULL) THEN
-				NEW.wwtp_builtdate := (SELECT builtdate_vdefault FROM config);
+				NEW.wwtp_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 			END IF;
 			
 			INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
@@ -649,7 +648,7 @@ BEGIN
 			est_top_elev=NEW.junction_est_top_elev, est_ymax=NEW.junction_est_ymax, rotation=NEW.junction_rotation, link=NEW.junction_link, verified=NEW.verified, workcat_id_end=NEW.junction_workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.junction_label_x, label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation,the_geom=NEW.the_geom, 
 			code=NEW.junction_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.junction_end_date, uncertain=NEW.uncertain, xyz_date=NEW.junction_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 			
             UPDATE man_junction SET node_id=NEW.node_id
@@ -665,7 +664,7 @@ BEGIN
 			est_top_elev=NEW.netgully_est_top_elev, est_ymax=NEW.netgully_est_ymax, rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, workcat_id_end=NEW.netgully_workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, label_rotation=NEW.netgully_label_rotation, the_geom=NEW.the_geom, 
 			code=NEW.netgully_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netgully_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, 
-			unconnected=NEW.unconnected		
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.pol_id
@@ -682,7 +681,7 @@ BEGIN
 			descript=NEW.netgully_descript,est_top_elev=NEW.netgully_est_top_elev, est_ymax=NEW.netgully_est_ymax, rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, 
 			workcat_id_end=NEW.netgully_workcat_id_end, undelete=NEW.undelete,label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, label_rotation=NEW.netgully_label_rotation,
 			code=NEW.netgully_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netgully_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 			
 			IF (NEW.pol_id IS NULL) THEN
@@ -707,7 +706,7 @@ BEGIN
 			descript=NEW.outfall_descript,est_top_elev=NEW.outfall_est_top_elev, est_ymax=NEW.outfall_est_ymax, rotation=NEW.outfall_rotation, link=NEW.outfall_link, verified=NEW.verified, 
 			workcat_id_end=NEW.outfall_workcat_id_end, undelete=NEW.undelete, label_x=NEW.outfall_label_x, label_y=NEW.outfall_label_y, label_rotation=NEW.outfall_label_rotation, the_geom=NEW.the_geom,
 			code=NEW.outfall_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.outfall_end_date, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 			
 			UPDATE man_outfall SET node_id=NEW.node_id,outfall_name=NEW.outfall_name
@@ -723,7 +722,7 @@ BEGIN
 			est_top_elev=NEW.storage_est_top_elev, est_ymax=NEW.storage_est_ymax, rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, workcat_id_end=NEW.storage_workcat_id_end,	
 			undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, label_rotation=NEW.storage_label_rotation, the_geom=NEW.the_geom,
 			code=NEW.storage_code,  publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.storage_end_date, uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_storage SET node_id=NEW.node_id, pol_id=NEW.pol_id, total_volume=NEW.storage_total_volume,util_volume=NEW.storage_util_volume,min_height=NEW.storage_min_height,
@@ -741,7 +740,7 @@ BEGIN
 			est_top_elev=NEW.storage_est_top_elev, est_ymax=NEW.storage_est_ymax, rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, workcat_id_end=NEW.storage_workcat_id_end,
 			undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, label_rotation=NEW.storage_label_rotation,
 			code=NEW.storage_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.storage_end_date, uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			IF (NEW.pol_id IS NULL) THEN
@@ -768,7 +767,7 @@ BEGIN
 			est_top_elev=NEW.valve_est_top_elev, est_ymax=NEW.valve_est_ymax, rotation=NEW.valve_rotation, link=NEW.valve_link, verified=NEW.verified, workcat_id_end=NEW.valve_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.valve_label_x, label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, the_geom=NEW.the_geom,
 			code=NEW.valve_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.valve_end_date, uncertain=NEW.uncertain, xyz_date=NEW.valve_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_valve SET node_id=NEW.node_id, valve_name=NEW.valve_name
@@ -785,7 +784,7 @@ BEGIN
 			est_top_elev=NEW.chamber_est_top_elev, est_ymax=NEW.chamber_est_ymax, rotation=NEW.chamber_rotation, link=NEW.chamber_link, verified=NEW.verified, workcat_id_end=NEW.chamber_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.chamber_label_x, label_y=NEW.chamber_label_y, label_rotation=NEW.chamber_label_rotation, the_geom=NEW.the_geom,
 			code=NEW.chamber_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.chamber_end_date, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 			
 			UPDATE man_chamber SET node_id=NEW.node_id, pol_id=NEW.pol_id, total_volume=NEW.chamber_total_volume,total_height=NEW.chamber_total_height,total_length=NEW.chamber_total_length,total_width=NEW.chamber_total_width,chamber_name=NEW.chamber_name, inlet=NEW.chamber_inlet, bottom_channel=NEW.chamber_bottom_channel, accessibility=NEW.chamber_accessibility
@@ -802,7 +801,7 @@ BEGIN
 			est_top_elev=NEW.chamber_est_top_elev, est_ymax=NEW.chamber_est_ymax, rotation=NEW.chamber_rotation, link=NEW.chamber_link, verified=NEW.verified, workcat_id_end=NEW.chamber_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.chamber_label_x, label_y=NEW.chamber_label_y, label_rotation=NEW.chamber_label_rotation,
 			code=NEW.chamber_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.chamber_end_date, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			IF (NEW.pol_id IS NULL) THEN
@@ -831,7 +830,7 @@ BEGIN
 			est_top_elev=NEW.manhole_est_top_elev, est_ymax=NEW.manhole_est_ymax, rotation=NEW.manhole_rotation, link=NEW.manhole_link, verified=NEW.verified, workcat_id_end=NEW.manhole_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.manhole_label_x, label_y=NEW.manhole_label_y, label_rotation=NEW.manhole_label_rotation, the_geom=NEW.the_geom, 
 			code=NEW.manhole_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.manhole_end_date, uncertain=NEW.uncertain, xyz_date=NEW.manhole_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 			
 			UPDATE man_manhole SET node_id=NEW.node_id, sander_depth=NEW.manhole_sander_depth, prot_surface=NEW.manhole_prot_surface, inlet=NEW.manhole_inlet,
@@ -849,7 +848,7 @@ BEGIN
 			est_top_elev=NEW.netinit_est_top_elev, est_ymax=NEW.netinit_est_ymax, rotation=NEW.netinit_rotation, link=NEW.netinit_link, verified=NEW.verified, workcat_id_end=NEW.netinit_workcat_id_end, 
 			undelete=NEW.undelete, label_x=NEW.netinit_label_x, label_y=NEW.netinit_label_y, label_rotation=NEW.netinit_label_rotation, the_geom=NEW.the_geom,
 			code=NEW.netinit_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.netinit_end_date, uncertain=NEW.uncertain, xyz_date=NEW.netinit_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_netinit SET node_id=NEW.node_id, mheight=NEW.netinit_mheight,mlength=NEW.netinit_mlength,mwidth=NEW.netinit_mwidth, netinit_name=NEW.netinit_name, 
@@ -867,7 +866,7 @@ BEGIN
 			rotation=NEW.wjump_rotation, link=NEW.wjump_link, verified=NEW.verified, workcat_id_end=NEW.wjump_workcat_id_end, undelete=NEW.undelete, label_x=NEW.wjump_label_x,
 			label_y=NEW.wjump_label_y, label_rotation=NEW.wjump_label_rotation, the_geom=NEW.the_geom,
 			code=NEW.wjump_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wjump_end_date, uncertain=NEW.uncertain, xyz_date=NEW.wjump_xyz_date, 
-			unconnected=NEW.unconnected
+			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_wjump SET node_id=NEW.node_id, mheight=NEW.wjump_mheight,mlength=NEW.wjump_mlength,mwidth=NEW.wjump_mwidth,sander_length=NEW.wjump_sander_length,
@@ -884,7 +883,7 @@ BEGIN
 			adress_01=NEW.wwtp_adress_01,adress_02=NEW.wwtp_adress_02, adress_03=NEW.wwtp_adress_03, descript=NEW.wwtp_descript,est_top_elev=NEW.wwtp_est_top_elev, est_ymax=NEW.wwtp_est_ymax, 
 			rotation=NEW.wwtp_rotation, link=NEW.wwtp_link, verified=NEW.verified, workcat_id_end=NEW.wwtp_workcat_id_end, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,
 			label_rotation=NEW.wwtp_label_rotation, the_geom=NEW.the_geom, code=NEW.wwtp_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wwtp_end_date, 
-			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected
+			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_wwtp SET node_id=NEW.node_id, pol_id=NEW.pol_id, wwtp_name=NEW.wwtp_name
@@ -900,7 +899,7 @@ BEGIN
 			adress_01=NEW.wwtp_adress_01,adress_02=NEW.wwtp_adress_02, adress_03=NEW.wwtp_adress_03, descript=NEW.wwtp_descript,est_top_elev=NEW.wwtp_est_top_elev, est_ymax=NEW.wwtp_est_ymax, 
 			rotation=NEW.wwtp_rotation, 	link=NEW.wwtp_link, verified=NEW.verified, workcat_id_end=NEW.wwtp_workcat_id_end, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,
 			label_rotation=NEW.wwtp_label_rotation, code=NEW.wwtp_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.wwtp_end_date, 
-			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected
+			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
 		
 		

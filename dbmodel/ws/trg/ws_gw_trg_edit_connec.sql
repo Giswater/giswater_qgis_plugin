@@ -56,27 +56,27 @@ BEGIN
             END IF;
         END IF;
 		
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT state_vdefault FROM config);
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;
-		
 		-- Workcat_id
         IF (NEW.workcat_id IS NULL) THEN
-            NEW.workcat_id := (SELECT workcat_vdefault FROM config);
+            NEW.workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
             IF (NEW.workcat_id IS NULL) THEN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
         END IF;
 		
-		-- Verified
+-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT verified_vdefault FROM config);
+            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
+            END IF;
+        END IF;
+
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
 		
@@ -90,7 +90,11 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        
+  
+		-- Builtdate
+			IF (NEW.builtdate IS NULL) THEN
+				NEW.builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+			END IF;  
         
         -- FEATURE INSERT
 INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
@@ -122,7 +126,7 @@ UPDATE connec
 			buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, 
 			adress_03=NEW.adress_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript, link=NEW.link, verified=NEW.verified, 
 			the_geom=NEW.the_geom, undelete=NEW.undelete,workcat_id_end=NEW.workcat_id_end, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
-			 publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date
+			 publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
       
         PERFORM audit_function(2,350);     
