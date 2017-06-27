@@ -341,7 +341,7 @@ class DaoController():
     def get_layer_source_table_name(self, layer):
         ''' Get table or view name of selected layer '''
 
-        if leyer is None:
+        if layer is None:
             return None
         
         uri_table = None

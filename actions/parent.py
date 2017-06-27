@@ -122,12 +122,17 @@ class ParentAction():
         reg_name = "CurrentVersion"
         java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         
-        # Check if java version exists
+        # Check if java version exists (64 bits)
         if java_version is None:
-            message = "Cannot get current Java version from windows registry at: "+reg_path
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            return None
+            reg_path = "SOFTWARE\\Wow6432Node\\JavaSoft\\Java Runtime Environment" 
+            java_version = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)   
+            # Check if java version exists (32 bits)            
+            if java_version is None:
+                message = "Cannot get current Java version from windows registry at: "+reg_path
+                self.controller.show_warning(message, 10, context_name='ui_message')
+                return None
       
+        # Get java folder
         reg_path+= "\\"+java_version
         reg_name = "JavaHome"
         java_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
