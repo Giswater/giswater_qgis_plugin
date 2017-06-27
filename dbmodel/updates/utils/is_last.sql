@@ -26,7 +26,6 @@ VALUES (200, 'gw_fct_arc_state_update', 'trigger function', 'utils', null,null);
 
 
 
-
 -- ----------------------------
 -- CUSTOM FIELDS
 -- ----------------------------
@@ -61,8 +60,8 @@ CREATE UNIQUE INDEX man_selector_state_one_row ON man_selector_state((id IS NOT 
 
 
 --
-ALTER TABLE ws_sample.value_state ADD COLUMN node_topology_coherence boolean;
-ALTER TABLE ws_sample.value_state ADD COLUMN arc_topology_coherence boolean;
+ALTER TABLE value_state ADD COLUMN node_topology_coherence boolean;
+ALTER TABLE value_state ADD COLUMN arc_topology_coherence boolean;
 
 
 

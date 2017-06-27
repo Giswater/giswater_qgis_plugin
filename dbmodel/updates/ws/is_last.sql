@@ -120,6 +120,41 @@ CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
 );
 
 
+-- MINCUT
+
+
+
+-- ----------------------------
+-- MINCUT
+-- ----------------------------
+
+CREATE TABLE anl_mincut_valve_accesibility
+(
+  valve_id character varying(16) NOT NULL,
+  the_geom geometry(Point,25831),
+  CONSTRAINT anl_mincut_valve_accesibility_pkey PRIMARY KEY (valve_id),
+  CONSTRAINT anl_mincut_valve_accesibilityvalve_id_fkey FOREIGN KEY (valve_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+CREATE TABLE anl_mincut_result_valve_accesibility
+(
+  valve_id character varying(16) NOT NULL,
+  the_geom geometry(Point,25831),
+  CONSTRAINT anl_mincut_result_valve_accesibility_pkey PRIMARY KEY (valve_id),
+  CONSTRAINT anl_mincut_result_valve_accesibilityvalve_id_fkey FOREIGN KEY (valve_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+)
+WITH (
+  OIDS=FALSE
+);
+
 
  -- PHOTO
   
