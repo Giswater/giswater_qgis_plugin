@@ -55,14 +55,20 @@ DROP TABLE IF EXISTS man_custom_field_parameter;
 CREATE TABLE man_custom_field_parameter(
 field_id character varying (50) NOT NULL PRIMARY KEY,
 descript character varying (254),
-feature_type character varying (18) NOT NULL
+feature_type character varying (18) NOT NULL,
+data_type character varying (18) NOT NULL,
+not_null boolean,
+fk_table character varying (50),
+fk_key_field character varying (50),
+fk_value_field character varying (50)
 );
+
 
 DROP TABLE IF EXISTS man_custom_field;
 CREATE TABLE man_custom_field(
 id serial NOT NULL PRIMARY KEY,
-field_id character varying (50) NOT NULL,
 feature_id character varying (16),
+field_id character varying (50) NOT NULL,
 value character varying (50),
 tstamp timestamp default now()
 );
