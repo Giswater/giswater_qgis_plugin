@@ -56,6 +56,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,810);  
             END IF;      
+			NEW.nodecat_id:= (SELECT "value" FROM config_vdefault WHERE "parameter"='nodecat_vdefault' AND "user"="current_user"());
         END IF;
 
         -- Sector ID
@@ -79,7 +80,18 @@ BEGIN
                 RETURN audit_function(130,810);  
             END IF;            
         END IF;
-
+		
+	--Exploitation ID
+            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+                --PERFORM audit_function(125,340);
+				RETURN NULL;				
+            END IF;
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
+                --PERFORM audit_function(130,340);
+				RETURN NULL; 
+            END IF;
+			
 	-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
@@ -103,7 +115,7 @@ BEGIN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
         END IF;
-		
+	
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN

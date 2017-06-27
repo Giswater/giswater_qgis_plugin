@@ -67,6 +67,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,830);  
             END IF;      
+			NEW.nodecat_id:= (SELECT "value" FROM config_vdefault WHERE "parameter"='nodecat_vdefault' AND "user"="current_user"());
         END IF;
 
         -- Sector ID

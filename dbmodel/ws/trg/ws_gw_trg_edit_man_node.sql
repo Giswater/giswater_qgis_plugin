@@ -62,12 +62,15 @@ BEGIN
 
 
 	-- Node Catalog ID
+
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,430);  
 			END IF;
-
-			NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
+			NEW.nodecat_id:= (SELECT "value" FROM config_vdefault JOIN cat_node ON config_vdefault.value=cat_node.id WHERE "parameter"='nodecat_vdefault' AND "user"="current_user"() AND cat_node.nodetype_id=NEW.node_type);
+				IF (NEW.nodecat_id IS NULL) THEN
+					NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
+				END IF;
 		END IF;
 
      -- Sector ID

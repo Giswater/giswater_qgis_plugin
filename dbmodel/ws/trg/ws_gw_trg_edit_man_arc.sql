@@ -41,10 +41,13 @@ BEGIN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
 				RETURN audit_function(145,840); 
 			END IF; 
+			NEW.arccat_id:= (SELECT "value" FROM config_vdefault WHERE "parameter"='arccat_vdefault' AND "user"="current_user"());
+			IF (NEW.arccat_id IS NULL) THEN
 			NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			IF (NEW.arccat_id IS NULL) THEN
 				NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
 			END IF;       
+		END IF;
 		END IF;
         
         -- Sector ID
@@ -128,7 +131,7 @@ BEGIN
 					NEW.publish, NEW.inventory, NEW.pipe_end_date, expl_id_int);
 				
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
-		
+			RETURN NEW;				
 		ELSIF man_table='man_varc' THEN
 						
 				-- Workcat_id
@@ -171,7 +174,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;
      
-		PERFORM audit_function(1,340); 
+		--PERFORM audit_function(1,340); 
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -224,12 +227,12 @@ BEGIN
 			
 		END IF;
 		
-        PERFORM audit_function(2,340); 
+        --PERFORM audit_function(2,340); 
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN   
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
-        PERFORM audit_function(3,340); 
+        --PERFORM audit_function(3,340); 
         RETURN NULL;
      
      END IF;
