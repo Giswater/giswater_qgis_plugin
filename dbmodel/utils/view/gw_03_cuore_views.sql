@@ -99,4 +99,13 @@ JOIN element ON element.element_id::text = element_x_connec.element_id::text;
 
 
 
-
+CREATE OR REPLACE VIEW v_edit_dimensions AS 
+ SELECT dimensions.id,
+    dimensions.distance,
+    dimensions.depth,
+    dimensions.the_geom,
+    dimensions.coordx,
+    dimensions.coordy,
+    dimensions.feature_id,
+    dimensions.feature_type
+   FROM dimensions;

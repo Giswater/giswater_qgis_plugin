@@ -31,6 +31,28 @@ CREATE SEQUENCE urn_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
+	
+	-- ----------------------------
+--DIMENSIONS
+-- ----------------------------
+	CREATE SEQUENCE dimensions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+CREATE TABLE dimensions
+(
+  id bigserial NOT NULL,
+  distance double precision,
+  depth double precision,
+  the_geom geometry(LineString,SRID_VALUE),
+  coordx double precision,
+  coordy double precision,
+  feature_id character varying,
+  feature_type character varying,
+  CONSTRAINT id PRIMARY KEY (id));
 -- ----------------------------
 -- STATE TOPOLOGYC COHERENCE
 -- ----------------------------
