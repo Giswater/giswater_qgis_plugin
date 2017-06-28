@@ -30,6 +30,10 @@
     
 
     <message>
+	 <source>60_text</source>
+	 <translation>Botón de prueba</translation>
+    </message>
+    <message>
         <source>01_text</source>
         <translation>Insertar unión</translation>
     </message>      
