@@ -104,8 +104,14 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
     dimensions.distance,
     dimensions.depth,
     dimensions.the_geom,
-    dimensions.coordx,
-    dimensions.coordy,
+    dimensions.x_label,
+    dimensions.y_label,
+    dimensions.rotation_label,
+    dimensions.offset_label,
+    dimensions.direction_arrow,
+    dimensions.x_symbol,
+    dimensions.y_symbol,
     dimensions.feature_id,
     dimensions.feature_type
    FROM dimensions;
+   
