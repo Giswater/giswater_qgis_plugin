@@ -21,9 +21,8 @@ BEGIN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
-            SELECT max(connec_id::integer) INTO connec_id_seq FROM connec WHERE connec_id ~ '^\d+$';
-            PERFORM setval('connec_seq',connec_id_seq,true);
-            NEW.connec_id:= (SELECT nextval('connec_seq'));
+            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            NEW.connec_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
         -- connec Catalog ID

@@ -25,9 +25,8 @@ BEGIN
 
         -- gully ID
         IF (NEW.gully_id IS NULL) THEN
-            SELECT max(gully_id::integer) INTO gully_id_seq FROM gully WHERE gully_id ~ '^\d+$';
-            PERFORM setval('gully_seq',gully_id_seq,true);
-            NEW.gully_id:= (SELECT nextval('gully_seq'));
+            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            NEW.gully_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 		
         -- grate Catalog ID

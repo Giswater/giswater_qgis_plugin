@@ -33,11 +33,10 @@ BEGIN
             END IF;
 					
 	-- FEATURE INSERT      
-	
+
 			IF (NEW.pol_id IS NULL) THEN
-			SELECT max(pol_id::integer) INTO polygon_id_seq FROM polygon WHERE pol_id ~ '^\d+$';
-			PERFORM setval('polygon_id_seq',polygon_id_seq,true);
-			NEW.pol_id:= (SELECT nextval('polygon_id_seq'));
+				PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+				NEW.pol_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
 				
 			INSERT INTO polygon (pol_id, text, the_geom, undelete, expl_id)

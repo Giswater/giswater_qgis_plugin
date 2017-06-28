@@ -247,10 +247,12 @@ ALTER TABLE anl_arc_no_startend_node ADD COLUMN the_geom_p geometry(Point,SRID_V
 
 
 -- ----------------------------
--- new node_type fields
+-- new node_type/connec_type fields
 -- ----------------------------
 ALTER TABLE node_type ADD COLUMN order_by integer;
 ALTER TABLE node_type ADD COLUMN active_type boolean;
+ALTER TABLE node_type ADD COLUMN code_autofill boolean;
+ALTER TABLE connec_type ADD COLUMN code_autofill boolean;
 
 
 

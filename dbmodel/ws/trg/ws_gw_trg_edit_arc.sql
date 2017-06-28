@@ -23,9 +23,8 @@ BEGIN
     
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
-            SELECT max(arc_id::integer) INTO arc_id_seq FROM arc WHERE arc_id ~ '^\d+$';
-            PERFORM setval('arc_id_seq',arc_id_seq,true);
-            NEW.arc_id:= (SELECT nextval('arc_id_seq'));
+            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
         -- Arc type

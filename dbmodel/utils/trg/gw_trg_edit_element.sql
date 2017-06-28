@@ -46,9 +46,8 @@ BEGIN
 			
 --Element ID		
 		IF (NEW.element_id IS NULL) THEN
-			SELECT max(element_id::integer) INTO element_seq FROM element WHERE element_id ~ '^\d+$';
-			PERFORM setval('element_seq',element_seq,true);
-			NEW.element_id:= (SELECT nextval('element_seq'));
+			PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 
 -- FEATURE INSERT      

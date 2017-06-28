@@ -77,6 +77,11 @@ CREATE TABLE cat_feature
   CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE gully(
+  gully_id character varying(16) NOT NULL PRIMARY KEY,
+  text character varying(254)
+);
+
 -- ANALYSIS
 
 DROP TABLE IF EXISTS anl_node_topological_consistency CASCADE;

@@ -17,11 +17,10 @@ BEGIN
 
 -- INSERT
 	IF TG_OP = 'INSERT' THEN
-    -- Control insertions ID
+    -- link ID
 			IF (NEW.vnode_id IS NULL) THEN
-				SELECT max(vnode_id::integer) INTO vnode_seq FROM vnode WHERE vnode_id ~ '^\d+$';
-				PERFORM setval('vnode_seq',vnode_seq,true);
-				NEW.vnode_id:= (SELECT nextval('vnode_seq'));
+				PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
 				
 	        -- Sector ID

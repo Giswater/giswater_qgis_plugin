@@ -14,6 +14,12 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
 	
+	--sector id
+			IF (NEW.sector_id IS NULL) THEN
+				PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+				NEW.sector_id:= (SELECT nextval('urn_id_seq'));
+			END IF;
+			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);

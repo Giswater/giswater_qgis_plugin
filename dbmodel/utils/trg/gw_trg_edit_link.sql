@@ -14,6 +14,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
+	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
 
@@ -30,9 +31,10 @@ BEGIN
 	
 	
         -- link ID
-        IF (NEW.link_id IS NULL) THEN
-            NEW.link_id:= (SELECT nextval('link_seq'));
-        END IF;
+		IF (NEW.link_id IS NULL) THEN
+				PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+				NEW.link_id:= (SELECT nextval('urn_id_seq'));
+			END IF;
                
         INSERT INTO link (link_id, connec_id, vnode_id, custom_length, the_geom, expl_id)
 		VALUES (NEW.link_id, NEW.connec_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int);
