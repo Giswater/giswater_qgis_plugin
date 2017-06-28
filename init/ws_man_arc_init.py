@@ -109,9 +109,9 @@ class ManArcDialog(ParentDialog):
         self.btn_node_class1.clicked.connect(self.test)
 
         # QLineEdit
-        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         # ComboBox
-        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
+        #self.node_type = self.dialog.findChild(QComboBox, 'node_type')
 
 
 
@@ -126,8 +126,8 @@ class ManArcDialog(ParentDialog):
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
 
-        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtnodecat_id)
-        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtarccat_id)
+        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
 
         self.matcat_id = self.dlg_cat.findChild(QComboBox, "matcat_id")
         self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")
@@ -203,10 +203,10 @@ class ManArcDialog(ParentDialog):
             rows = self.controller.get_rows(sql)
             self.id.clear()
             utils_giswater.fillComboBox(self.id, rows)
-    def fillTxtnodecat_id(self):
+    def fillTxtarccat_id(self):
         self.dlg_cat.close()
-        self.nodecat_id.clear()
-        self.nodecat_id.setText(str(self.id.currentText()))
+        self.arccat_id.clear()
+        self.arccat_id.setText(str(self.id.currentText()))
     def test(self):
         QMessageBox.about(None, 'Ok', str("test"))
         #self.ManNodeDialog.init_config_form()

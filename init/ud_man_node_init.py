@@ -161,8 +161,8 @@ class ManNodeDialog(ParentDialog):
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
 
-        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtnodecat_id)
-        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtnodecat_id)
+        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
         self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
         self.shape = self.dlg_cat.findChild(QComboBox, "shape")
         self.geom1 = self.dlg_cat.findChild(QComboBox, "geom1")
