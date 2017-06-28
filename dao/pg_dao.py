@@ -117,8 +117,7 @@ class PgDao():
     def check_schema(self, schemaname):
         ''' Check if selected schema exists ''' 
         exists = True
-        sql = "SELECT schema_name FROM information_schema.schemata"
-        sql+= " WHERE schema_name = '"+schemaname+"'"    
+        sql = "SELECT nspname FROM pg_namespace WHERE nspname = '"+schemaname+"'";
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False

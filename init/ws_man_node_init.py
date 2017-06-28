@@ -85,7 +85,7 @@ class ManNodeDialog(ParentDialog):
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")  
         
         # Manage tab visibility
-        self.set_tabs_visibility(11)  
+        self.set_tabs_visibility(10)  
               
         # Load data from related tables
         self.load_data()

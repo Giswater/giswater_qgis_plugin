@@ -74,7 +74,7 @@ class ManConnecDialog(ParentDialog):
         self.tbl_hydrometer_value = self.dialog.findChild(QTableView, "tbl_hydrometer_value") 
 
         # Manage tab visibility
-        self.set_tabs_visibility(4)  
+        self.set_tabs_visibility(3)  
               
         # Load data from related tables
         self.load_data()

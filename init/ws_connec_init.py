@@ -12,7 +12,6 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.add_sum import Add_sum          # @UnresolvedImport
 
 
 def formOpen(dialog, layer, feature):
@@ -205,20 +204,6 @@ class ConnecDialog(ParentDialog):
         # Fill EPANET tab of hydrometer
         # Filter and fill table related with connec_id        
         self.set_model_to_table(widget, table_name, filter_) 
-
-        
-    def insert_records (self):
-        
-        # Create the dialog and signals
-        self.dlg_sum = Add_sum()
-        utils_giswater.setDialog(self.dlg_sum)
-        
-        # Set signals
-        self.dlg_sum.findChild(QPushButton, "btn_accept").clicked.connect(self.btn_accept_dae)
-        self.dlg_sum.findChild(QPushButton, "btn_close").clicked.connect(self.btn_close_dae)
-        
-        # Open the dialog
-        self.dlg_sum.exec_() 
            
     
     def btn_accept_dae(self):
