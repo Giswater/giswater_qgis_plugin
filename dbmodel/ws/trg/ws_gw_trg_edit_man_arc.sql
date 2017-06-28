@@ -26,7 +26,7 @@ BEGIN
     
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
-            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 

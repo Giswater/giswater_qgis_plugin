@@ -24,7 +24,7 @@ BEGIN
 
         -- gully ID
         IF (NEW.gully_id IS NULL) THEN
-            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.gully_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -161,7 +161,7 @@ BEGIN
 			WHERE gully_id = OLD.gully_id;
         END IF;  
                 
-		PERFORM audit_function (2,850);
+		--PERFORM audit_function (2,850);
         RETURN NEW;
     
 

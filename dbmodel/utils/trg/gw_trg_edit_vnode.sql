@@ -19,7 +19,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
     -- link ID
 			IF (NEW.vnode_id IS NULL) THEN
-				PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
 				

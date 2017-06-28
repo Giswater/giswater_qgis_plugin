@@ -32,7 +32,7 @@ BEGIN
 	
         -- link ID
 		IF (NEW.link_id IS NULL) THEN
-				PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				NEW.link_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
                

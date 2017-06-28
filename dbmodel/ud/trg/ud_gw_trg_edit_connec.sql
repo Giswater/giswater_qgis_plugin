@@ -21,7 +21,7 @@ BEGIN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
-            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.connec_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -124,14 +124,14 @@ BEGIN
 	    featurecat_id=NEW.featurecat_id,feature_id=NEW.feature_id, private_connecat_id=NEW.private_connecat_id, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
         WHERE connec_id = OLD.connec_id;
                 
-        PERFORM audit_function (2,770);
+        --PERFORM audit_function (2,770);
         RETURN NEW;
 
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-        PERFORM audit_function (3,770);
+        --PERFORM audit_function (3,770);
         RETURN NULL;
    
     END IF;

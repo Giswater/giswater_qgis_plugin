@@ -23,7 +23,7 @@ BEGIN
     
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
-            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -135,7 +135,7 @@ BEGIN
             EXECUTE v_sql;
         END IF;
      
-		PERFORM audit_function(1,340); 
+		--PERFORM audit_function(1,340); 
         RETURN NEW;
     
     ELSIF TG_OP = 'UPDATE' THEN
@@ -166,12 +166,12 @@ UPDATE arc
 				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date
 			WHERE arc_id=OLD.arc_id;
 
-        PERFORM audit_function(2,340); 
+        --PERFORM audit_function(2,340); 
         RETURN NEW;
 
      ELSIF TG_OP = 'DELETE' THEN   
         DELETE FROM arc WHERE arc_id = OLD.arc_id;
-        PERFORM audit_function(3,340); 
+        --PERFORM audit_function(3,340); 
         RETURN NULL;
      
      END IF;

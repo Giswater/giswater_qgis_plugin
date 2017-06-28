@@ -32,7 +32,7 @@ BEGIN
     
 -- Node ID
 		IF (NEW.node_id IS NULL) THEN
-			PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+			PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 
@@ -153,7 +153,7 @@ INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, se
             EXECUTE v_sql;
         END IF;
 
-        PERFORM audit_function(1,380); 
+        --PERFORM audit_function(1,380); 
         RETURN NEW;
 
 
@@ -234,13 +234,13 @@ INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, se
 		label_y=NEW.label_y, label_rotation=NEW.label_rotation, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
 		WHERE node_id = OLD.node_id;
             
-        PERFORM audit_function(2,380); 
+        --PERFORM audit_function(2,380); 
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id = OLD.node_id;
-        PERFORM audit_function(3,380); 
+        --PERFORM audit_function(3,380); 
         RETURN NULL;
    
     END IF;

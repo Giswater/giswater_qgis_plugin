@@ -41,7 +41,7 @@ BEGIN
 	
     -- Node ID	
 		IF (NEW.node_id IS NULL) THEN
-			PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+			PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 	
@@ -1047,7 +1047,7 @@ BEGIN
 	END IF;
 
             
-        PERFORM audit_function(2,430); 
+        --PERFORM audit_function(2,430); 
         RETURN NEW;
     
 
@@ -1072,7 +1072,7 @@ BEGIN
 			DELETE FROM node WHERE node_id = OLD.node_id;
 		
 		END IF;
-        PERFORM audit_function(3,430); 
+       -- PERFORM audit_function(3,430); 
         RETURN NULL;
    
     END IF;

@@ -19,7 +19,7 @@ BEGIN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
-            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.connec_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -104,7 +104,7 @@ INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sect
 		  NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, NEW.streetname, NEW.postnumber, 
 		  NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.workcat_id_end,NEW.label_x,NEW.label_y,NEW.label_rotation, 
 		  expl_id_int, NEW.publish, NEW.inventory, NEW.end_date );
-        PERFORM audit_function(1,350);     
+        --PERFORM audit_function(1,350);     
         RETURN NEW;
 
 
@@ -128,7 +128,7 @@ UPDATE connec
 			 publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date, expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
       
-        PERFORM audit_function(2,350);     
+       -- PERFORM audit_function(2,350);     
         RETURN NEW;
     
 
@@ -136,7 +136,7 @@ UPDATE connec
 
         DELETE FROM connec WHERE connec_id = OLD.connec_id;
 
-        PERFORM audit_function(3,350);     
+        --PERFORM audit_function(3,350);     
         RETURN NULL;
    
     END IF;

@@ -32,7 +32,7 @@ BEGIN
 
         -- Node ID
         IF (NEW.node_id IS NULL) THEN
-            PERFORM setval('urn_id_seq',PERFORM gw_fct_urn(),true);
+            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.node_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -211,14 +211,14 @@ INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sec
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id
 			WHERE node_id = OLD.node_id;
                 
-		PERFORM audit_function (2,810);
+	--	PERFORM audit_function (2,810);
         RETURN NEW;
     
 
     ELSIF TG_OP = 'DELETE' THEN
         DELETE FROM node WHERE node_id = OLD.node_id;
 
-		PERFORM audit_function (3,810);
+	--	PERFORM audit_function (3,810);
         RETURN NULL;
    
     END IF;

@@ -54,6 +54,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION ws_sample_dev.gw_fct_node_copy_attributes(character varying, character varying)
-  OWNER TO postgres;
 
