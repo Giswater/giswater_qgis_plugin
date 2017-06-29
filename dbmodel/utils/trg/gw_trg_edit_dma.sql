@@ -13,12 +13,6 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
 	
-	
-			--dma id
-				IF (NEW.dma_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
-				NEW.dma_id:= (SELECT nextval('urn_id_seq'));
-			END IF;
 			
 	        -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
