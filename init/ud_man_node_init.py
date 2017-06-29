@@ -20,6 +20,8 @@ from ui.gallery import Gallery          #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
 from ui.ud_catalog import UDcatalog                  # @UnresolvedImport
 
+import ExtendedQLabel
+
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
     
@@ -302,8 +304,8 @@ class ManNodeDialog(ParentDialog):
         #for i in range(0, len(selected_list)):
         row = selected_list[0].row()
         #id_ = self.tbl_event.model().record(row).value("visit_id")
-        visit_id = self.tbl_event.model().record(row).value("visit_id")
-        event_id = self.tbl_event.model().record(row).value("event_id")
+        self.visit_id = self.tbl_event.model().record(row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(row).value("event_id")
         picture = self.tbl_event.model().record(row).value("value")
         #inf_text+= str(id_)+", "
         #inf_text = inf_text[:-2]
@@ -313,7 +315,7 @@ class ManNodeDialog(ParentDialog):
 
         # Get all events | pictures for visit_id
         sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
-        sql +=" WHERE visit_id = '"+str(visit_id)+"'"
+        sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
         # Get absolute path
@@ -359,10 +361,10 @@ class ManNodeDialog(ParentDialog):
         '''
         
         txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
-        txt_visit_id.setText(str(visit_id))
+        txt_visit_id.setText(str(self.visit_id))
         
         txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
-        txt_event_id.setText(str(event_id))
+        txt_event_id.setText(str(self.event_id))
         # Add picture to gallery
         '''
         pic_file = "C:/Users/tasladmin/Desktop/img_pipe.png"
@@ -372,21 +374,39 @@ class ManNodeDialog(ParentDialog):
         '''
         self.img_path_list = [["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"] ,["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]]
         
-        
+        # List of pointers(in memory) of clicableLabels
+        self.list_widgetExtended=[]
+        self.list_labels=[]
         #for i in range(0, len(self.img_path_list)):
         for i in range(0, 9):
             # Set image to QLabel
+            
+
             pixmap = QPixmap(self.img_path_list[0][i])
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            #widget.mousePressEvent.connect(self.test)
-            widget.setPixmap(pixmap)
-            widget.show()
+
+            # Set QLabel like ExtendedQLabel(ClickableLabel)
+            self.widgetExtended=ExtendedQLabel.ExtendedQLabel(widget)
+
+            
+            self.widgetExtended.setPixmap(pixmap)
+            
+            # Set signal of ClickableLabel
+            widget.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[0][i])))
+            #widget.show()
+            #widgetExtended.clear()
+            #widgetExtended.setPixmap(pixmap)
+            self.list_widgetExtended.append(self.widgetExtended)
+            self.list_labels.append(widget)
+            
 
             # Add functionality to button of zooming picture
-            btn_widget_name = "btn_zoom_img_"+str(i)
-            btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
-            btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[0][i]))
+            #btn_widget_name = "btn_zoom_img_"+str(i)
+            #btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
+            #btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[0][i]))
       
         self.start_indx = 0
         self.end_indx = len(self.img_path_list)-1
@@ -395,18 +415,48 @@ class ManNodeDialog(ParentDialog):
         
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
- 
-        #label = self.dlg_gallery.findChild(QLabel, 'test')
-        #label_click = ClickableLabel(label)
-        #label_click.signalClicked.connec(self.test)
-        #pixmap = QPixmap("C:/Users/tasladmin/Desktop/events/img_pipe3.jpg")
-        #label.setPixmap(pixmap)
+        
+        '''
+        # Set QLabel like ExtendedQLabel(ClickableLabel)
+        img=self.dlg_gallery.findChild(QLabel, 'img_test')
+        self.ImageButton = ExtendedQLabel.ExtendedQLabel(img)
+
+        pixmap = QPixmap("C:/Users/tasladmin/Desktop/events/img_pipe2.jpg")
+        self.ImageButton.setPixmap(pixmap)
+        
+        # Set signal of ClickableLabel
+        img.connect(self.ImageButton, SIGNAL('clicked()'), (partial(self.zoom_img,"C:/Users/tasladmin/Desktop/events/img_pipe2.jpg")))
+
+
+        #message = str(type(self.ImageButton))
+        #self.controller.show_info(message)
+        '''
         
         self.dlg_gallery.exec_()
 
         
+        
     def next_gallery(self):
         self.start_indx = self.start_indx+1
+        
+        for i in self.list_widgetExtended:
+            i.clear()
+            
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+            
+            self.list_widgetExtended[i].setPixmap(pixmap)
+            #widget_name = "img_"+str(i)
+            #widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            #widget.clear()
+            
+            self.list_labels[i].connect( self.list_widgetExtended[i], SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[self.start_indx][i])))
+
+        '''
+        self.start_indx = self.start_indx+1
+        
         
         
         # First clear previous
@@ -415,8 +465,8 @@ class ManNodeDialog(ParentDialog):
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             widget.clear()
             # WIP : Add action to Label :on click zoom images
-                 
-
+    
+        
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
@@ -443,17 +493,26 @@ class ManNodeDialog(ParentDialog):
         # On last tab disable btn_next
         #if self.start_indx == (len(self.img_path_list)-1) :
         #    self.btn_next.setEnabled(False) 
-
+        '''
+        
     def zoom_img(self,img):
-        message = "zoom"
-        self.controller.show_warning(message, context_name='ui_message')
+        
+        
 
         self.dlg_gallery_zoom = GalleryZoom()
         pixmap = QPixmap(img)
+        #pixmap = pixmap.scaled(711,501,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
         lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
         lbl_img.setPixmap(pixmap)
-        lbl_img.show()
+        #lbl_img.show()
+            
+            
+        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
+        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id") 
+        
+        zoom_visit_id.setText(str(self.visit_id))
+        zoom_event_id.setText(str(self.event_id))
             
         self.dlg_gallery_zoom.exec_() 
     
@@ -548,22 +607,5 @@ class ManNodeDialog(ParentDialog):
         canvas.zoomToSelected(layer)
 
         
-''' Add click event for QLabel '''        
-        
-class ClickableLabel(QLabel):
-    '''Normal label, but emits an event if the label is left-clicked'''
-   
-    signalClicked = Signal()    # emitted whenever this label is left-clicked
-   
-    def __init__(self, text, parent=None):
-        super(ClickableLabel, self).__init__(text, parent)
-        self.setStyleSheet('''
-       QLabel {text-decoration:none}
-       QLabel:hover {color:white; background:grey;}
-       ''')
-        self.setFixedSize(self.sizeHint())
-   
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.signalClicked.emit()
+
     
