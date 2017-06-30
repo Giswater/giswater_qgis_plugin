@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_node_rotation_update()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_node_rotation_update()
   RETURNS trigger AS
 $BODY$
 DECLARE 
     rec_arc Record; 
     rec_node Record; 
-    hemisfere_rotation_bool boolean;
-    hemisfere_rotation_aux float;
+    hemisphere_rotation_bool boolean;
+    hemisphere_rotation_aux float;
     ang_aux float;
     count int2;
     azm_aux float;
@@ -28,8 +28,8 @@ BEGIN
 
 	FOR rec_node IN SELECT node_id, the_geom FROM node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 	LOOP
-		SELECT hemisfere_rotation INTO hemisfere_rotation_bool FROM node JOIN node_type on id=node_type;
-		SELECT hemisfere_rotation_dg INTO hemisfere_rotation_aux FROM node;
+		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node JOIN node_type on id=node_type;
+		SELECT hemisphere INTO hemisphere_rotation_aux FROM node;
 	
 		-- init variables
 		ang_aux=0;
@@ -58,8 +58,8 @@ BEGIN
 	
 		ang_aux=ang_aux/count;	
 		
-		IF hemisfere_rotation_bool IS true THEN
-			IF (hemisfere_rotation_aux-ang_aux) >0 or (hemisfere_rotation_aux-ang_aux) < 3.14159 THEN
+		IF hemisphere_rotation_bool IS true THEN
+			IF (hemisphere_rotation_aux-ang_aux) >0 or (hemisphere_rotation_aux-ang_aux) < 3.14159 THEN
 				ang_aux=ang_aux+3.1459/2;
 			ELSE
 				ang_aux=ang_aux+3.14159+3.14159/2;
@@ -78,8 +78,8 @@ BEGIN
 
 	FOR rec_node IN SELECT node_id, the_geom FROM node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 	LOOP
-		SELECT hemisfere_rotation INTO hemisfere_rotation_bool FROM node JOIN node_type on id=node_type;
-		SELECT hemisfere_rotation_dg INTO hemisfere_rotation_aux FROM node;
+		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node JOIN node_type on id=node_type;
+		SELECT hemisphere INTO hemisphere_rotation_aux FROM node;
 	
 		-- init variables
 		ang_aux=0;
@@ -108,8 +108,8 @@ BEGIN
 	
 		ang_aux=ang_aux/count;	
 		
-		IF hemisfere_rotation_bool IS true THEN
-			IF (hemisfere_rotation_aux-ang_aux) >0 or (hemisfere_rotation_aux-ang_aux) < 3.14159 THEN
+		IF hemisphere_rotation_bool IS true THEN
+			IF (hemisphere_rotation_aux-ang_aux) >0 or (hemisphere_rotation_aux-ang_aux) < 3.14159 THEN
 				ang_aux=ang_aux+3.1459/2;
 			ELSE
 				ang_aux=ang_aux+3.14159+3.14159/2;
@@ -127,8 +127,8 @@ BEGIN
    	
 	FOR rec_node IN SELECT node_id, the_geom FROM node WHERE OLD.node_1 = node_id OR OLD.node_2 = node_id
 	LOOP
-		SELECT hemisfere_rotation INTO hemisfere_rotation_bool FROM node JOIN node_type on id=node_type;
-		SELECT hemisfere_rotation_dg INTO hemisfere_rotation_aux FROM node;
+		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node JOIN node_type on id=node_type;
+		SELECT hemisphere INTO hemisphere_rotation_aux FROM node;
 	
 		-- init variables
 		ang_aux=0;
@@ -161,8 +161,8 @@ BEGIN
 			ang_aux=ang_aux/count;	
 		END IF;
 		
-		IF hemisfere_rotation_bool IS true THEN
-			IF (hemisfere_rotation_aux-ang_aux) >0 or (hemisfere_rotation_aux-ang_aux) < 3.14159 THEN
+		IF hemisphere_rotation_bool IS true THEN
+			IF (hemisphere_rotation_aux-ang_aux) >0 or (hemisphere_rotation_aux-ang_aux) < 3.14159 THEN
 				ang_aux=ang_aux+3.1459/2;
 			ELSE
 				ang_aux=ang_aux+3.14159+3.14159/2;
@@ -187,5 +187,5 @@ ALTER FUNCTION SCHEMA_NAME.gw_trg_arc_node_rotation_update()
   
 
   
-DROP TRIGGER IF EXISTS gw_trg_arc_node_rotation_update ON SCHEMA_NAME.arc;
-CREATE TRIGGER gw_trg_arc_node_rotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON SCHEMA_NAME.arc  FOR EACH ROW  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_arc_node_rotation_update();
+DROP TRIGGER IF EXISTS gw_trg_arc_node_rotation_update ON "SCHEMA_NAME".arc;
+CREATE TRIGGER gw_trg_arc_node_rotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc  FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_node_rotation_update();
