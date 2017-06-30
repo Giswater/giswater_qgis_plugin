@@ -18,6 +18,7 @@ DECLARE
 	old_man_table varchar;
     connec_id_seq int8;
 	expl_id_int integer;
+	code_autofill_bool boolean;
 
 BEGIN
 
@@ -93,6 +94,8 @@ BEGIN
 				RETURN NULL; 
             END IF;
 		
+		SELECT code_autofill INTO code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
+		
         -- FEATURE INSERT
 		IF man_table='man_greentap' THEN
 
@@ -109,6 +112,11 @@ BEGIN
 					NEW.greentap_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 
+		--Copy id to code field
+			IF (NEW.greentap_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.greentap_code=NEW.connec_id;
+			END IF;
+				
 		  INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
 		  workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete, workcat_id_end,label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, end_date) 
@@ -134,7 +142,11 @@ BEGIN
 				IF (NEW.fountain_builtdate IS NULL) THEN
 					NEW.fountain_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
-				
+		--Copy id to code field
+			IF (NEW.fountain_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.fountain_code=NEW.connec_id;
+			END IF;
+			
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
 		  workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete,workcat_id_end,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory, end_date) 
@@ -163,6 +175,11 @@ BEGIN
 					NEW.tap_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
 
+			--Copy id to code field
+			IF (NEW.tap_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.tap_code=NEW.connec_id;
+			END IF;
+				
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, 
 		  location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber,descript,link,verified, the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory, end_date) 
@@ -189,7 +206,12 @@ BEGIN
 				IF (NEW.wjoin_builtdate IS NULL) THEN
 					NEW.wjoin_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 				END IF;
-				
+	
+		--Copy id to code field
+			IF (NEW.wjoin_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.wjoin_code=NEW.connec_id;
+			END IF;
+			
 		  INSERT INTO connec(connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation, dma_id, soilcat_id, category_type, fluid_type, 
 		  location_type, workcat_id, buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, streetaxis_id, postnumber, descript, link,verified, the_geom,undelete, workcat_id_end,label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, end_date) 

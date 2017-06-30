@@ -24,6 +24,7 @@ DECLARE
     node_id_seq int8;
 	rec Record;
 	expl_id_int integer;
+	code_autofill_bool boolean;
 
 BEGIN
 
@@ -121,7 +122,8 @@ BEGIN
 				RETURN NULL; 
             END IF;
         
-
+		SELECT code_autofill INTO code_autofill_bool FROM node_type WHERE id=NEW.node_type;
+		
 -- FEATURE INSERT      
 	IF man_table='man_tank' THEN
 			
@@ -138,6 +140,11 @@ BEGIN
 			NEW.tank_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 
+		--Copy id to code field
+			IF (NEW.tank_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.tank_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01,adress_02, adress_03, descript, rotation, link, verified,workcat_id_end,undelete,label_x,label_y,label_rotation, code, expl_id, publish, inventory, end_date, the_geom, parent_node_id, hemisphere) 
 		VALUES (NEW.node_id, NEW.tank_elevation, NEW.tank_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, 
@@ -170,7 +177,12 @@ BEGIN
 		IF (NEW.tank_builtdate IS NULL) THEN				
 			NEW.tank_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-
+		
+		--Copy id to code field
+			IF (NEW.tank_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.tank_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01,adress_02, adress_03, descript, rotation, link, verified, workcat_id_end,undelete,label_x,label_y,label_rotation, code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
 		VALUES (NEW.node_id, NEW.tank_elevation, NEW.tank_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, 
@@ -202,7 +214,12 @@ BEGIN
 		IF (NEW.hydrant_builtdate IS NULL) THEN
 			NEW.hydrant_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+
+		--Copy id to code field
+			IF (NEW.hydrant_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.hydrant_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
 		VALUES (NEW.node_id, NEW.hydrant_elevation, NEW.hydrant_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.hydrant_annotation, NEW.hydrant_observ, NEW.hydrant_comment, 
@@ -226,7 +243,12 @@ BEGIN
 		IF (NEW.junction_builtdate IS NULL) THEN
 			NEW.junction_builtdate  :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+
+		--Copy id to code field
+			IF (NEW.junction_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.junction_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere)
 		VALUES (NEW.node_id, NEW.junction_elevation, NEW.junction_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.junction_annotation, NEW.junction_observ, 
@@ -251,6 +273,11 @@ BEGIN
 		IF (NEW.pump_builtdate IS NULL) THEN
 			NEW.pump_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
+
+		--Copy id to code field
+			IF (NEW.pump_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.pump_code=NEW.node_id;
+			END IF;
 			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, parent_node_id) 
@@ -275,7 +302,12 @@ BEGIN
 		IF (NEW.reduction_builtdate IS NULL) THEN
 			NEW.reduction_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+
+		--Copy id to code field
+			IF (NEW.reduction_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.reduction_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id,
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
 		VALUES (NEW.node_id, NEW.reduction_elevation, NEW.reduction_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.reduction_annotation, NEW.reduction_observ, 
@@ -300,7 +332,12 @@ BEGIN
 		IF (NEW.valve_builtdate IS NULL) THEN
 			NEW.valve_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+
+		--Copy id to code field
+			IF (NEW.valve_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.valve_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere)
 		VALUES (NEW.node_id, NEW.valve_elevation, NEW.valve_depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.valve_annotation, NEW.valve_observ, NEW.valve_comment, 
@@ -328,7 +365,12 @@ BEGIN
 		IF (NEW.manhole_builtdate IS NULL) THEN
 			NEW.manhole_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+
+		--Copy id to code field
+			IF (NEW.manhole_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.manhole_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere)
 		VALUES (NEW.node_id, 
@@ -353,7 +395,12 @@ BEGIN
 		IF (NEW.meter_builtdate IS NULL) THEN
 				NEW.meter_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;		
-		
+
+		--Copy id to code field
+			IF (NEW.meter_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.meter_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  
 		code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -379,6 +426,11 @@ BEGIN
 			NEW.source_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 
+				--Copy id to code field
+			IF (NEW.source_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.source_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory,
 		end_date, parent_node_id, hemisphere) 
@@ -403,7 +455,12 @@ BEGIN
 		IF (NEW.waterwell_builtdate IS NULL) THEN
 			NEW.waterwell_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.waterwell_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.waterwell_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -429,7 +486,12 @@ BEGIN
 		IF (NEW.filter_builtdate IS NULL) THEN
 			NEW.filter_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.filter_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.filter_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere)
@@ -455,7 +517,12 @@ BEGIN
 		IF (NEW.register_builtdate IS NULL) THEN
 			NEW.register_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+	
+		--Copy id to code field
+			IF (NEW.register_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.register_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -490,7 +557,12 @@ BEGIN
 		IF (NEW.register_builtdate IS NULL) THEN
 			NEW.register_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.register_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.register_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -524,7 +596,12 @@ BEGIN
 		IF (NEW.netwjoin_builtdate IS NULL) THEN
 			NEW.netwjoin_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.netwjoin_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.netwjoin_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -551,6 +628,11 @@ BEGIN
 			NEW.exptank_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
 		
+		--Copy id to code field
+			IF (NEW.exptank_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.exptank_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -576,7 +658,12 @@ BEGIN
 		IF (NEW.flexunion_builtdate IS NULL) THEN
 			NEW.flexunion_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.flexunion_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.flexunion_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -602,7 +689,12 @@ BEGIN
 		IF (NEW.netelement_builtdate IS NULL) THEN
 			NEW.netelement_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.netelement_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.netelement_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
@@ -628,7 +720,12 @@ BEGIN
 		IF (NEW.netsample_builtdate IS NULL) THEN
 			NEW.netsample_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-		
+
+		--Copy id to code field
+			IF (NEW.netsample_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.netsample_code=NEW.node_id;
+			END IF;
+			
 		INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
 		buildercat_id, builtdate,ownercat_id, adress_01, adress_02, adress_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, 
 		 code, expl_id, publish, inventory, end_date, parent_node_id, hemisphere) 
