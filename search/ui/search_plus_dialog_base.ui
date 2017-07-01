@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>267</width>
-    <height>87</height>
+    <width>281</width>
+    <height>108</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,14 +16,14 @@
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>2</y>
-     <width>247</width>
-     <height>77</height>
+     <x>6</x>
+     <y>8</y>
+     <width>269</width>
+     <height>95</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -32,9 +32,9 @@
     <widget class="SearchableComboBox" name="ppoint_field_zone_4">
      <property name="geometry">
       <rect>
-       <x>4</x>
-       <y>14</y>
-       <width>233</width>
+       <x>10</x>
+       <y>10</y>
+       <width>241</width>
        <height>20</height>
       </rect>
      </property>
@@ -43,21 +43,39 @@
      </property>
      <item>
       <property name="text">
-       <string>URN</string>
+       <string>Code</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="SearchableComboBox" name="ppoint_field_zone_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>243</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Type</string>
       </property>
      </item>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_5">
+   <widget class="QWidget" name="tab_4">
     <attribute name="title">
-     <string>Network</string>
+     <string>Hydrometer</string>
     </attribute>
-    <widget class="SearchableComboBox" name="ppoint_field_zone_2">
+    <widget class="SearchableComboBox" name="hydrometer_code">
      <property name="geometry">
       <rect>
-       <x>2</x>
-       <y>4</y>
-       <width>233</width>
+       <x>8</x>
+       <y>40</y>
+       <width>247</width>
        <height>20</height>
       </rect>
      </property>
@@ -66,16 +84,16 @@
      </property>
      <item>
       <property name="text">
-       <string>arc</string>
+       <string>Hydrometer</string>
       </property>
      </item>
     </widget>
-    <widget class="SearchableComboBox" name="ppoint_field_zone_3">
+    <widget class="SearchableComboBox" name="hydrometer_code_2">
      <property name="geometry">
       <rect>
-       <x>2</x>
-       <y>26</y>
-       <width>233</width>
+       <x>8</x>
+       <y>10</y>
+       <width>247</width>
        <height>20</height>
       </rect>
      </property>
@@ -84,21 +102,80 @@
      </property>
      <item>
       <property name="text">
-       <string>node</string>
+       <string>Connec</string>
+      </property>
+     </item>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Urban</string>
+    </attribute>
+    <widget class="SearchableComboBox" name="urban_properties_number">
+     <property name="geometry">
+      <rect>
+       <x>146</x>
+       <y>40</y>
+       <width>107</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Number</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_properties_zone">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>10</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Zone</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="SearchableComboBox" name="urban_properties_block">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Quadra</string>
       </property>
      </item>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
-     <string>Adress</string>
+     <string>Address</string>
     </attribute>
     <widget class="SearchableComboBox" name="adress_street">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>4</y>
-       <width>235</width>
+       <x>10</x>
+       <y>10</y>
+       <width>245</width>
        <height>20</height>
       </rect>
      </property>
@@ -114,9 +191,9 @@
     <widget class="SearchableComboBox" name="adress_number">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>26</y>
-       <width>235</width>
+       <x>10</x>
+       <y>40</y>
+       <width>245</width>
        <height>20</height>
       </rect>
      </property>
@@ -137,9 +214,9 @@
     <widget class="SearchableComboBox" name="ppoint_field_zone">
      <property name="geometry">
       <rect>
-       <x>2</x>
-       <y>4</y>
-       <width>233</width>
+       <x>10</x>
+       <y>10</y>
+       <width>243</width>
        <height>20</height>
       </rect>
      </property>
@@ -155,9 +232,9 @@
     <widget class="SearchableComboBox" name="ppoint_number">
      <property name="geometry">
       <rect>
-       <x>2</x>
-       <y>26</y>
-       <width>233</width>
+       <x>10</x>
+       <y>40</y>
+       <width>243</width>
        <height>20</height>
       </rect>
      </property>
@@ -167,106 +244,6 @@
      <item>
       <property name="text">
        <string>Number</string>
-      </property>
-     </item>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_2">
-    <attribute name="title">
-     <string>Urban</string>
-    </attribute>
-    <widget class="SearchableComboBox" name="urban_properties_number">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>24</y>
-       <width>107</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Number</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="SearchableComboBox" name="urban_properties_zone">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>2</y>
-       <width>235</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Zone</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="SearchableComboBox" name="urban_properties_block">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>24</y>
-       <width>121</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Quadra</string>
-      </property>
-     </item>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_4">
-    <attribute name="title">
-     <string>Connec</string>
-    </attribute>
-    <widget class="SearchableComboBox" name="hydrometer_code">
-     <property name="geometry">
-      <rect>
-       <x>6</x>
-       <y>26</y>
-       <width>229</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Hydrometer</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="SearchableComboBox" name="hydrometer_code_2">
-     <property name="geometry">
-      <rect>
-       <x>6</x>
-       <y>4</y>
-       <width>229</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Connec</string>
       </property>
      </item>
     </widget>
