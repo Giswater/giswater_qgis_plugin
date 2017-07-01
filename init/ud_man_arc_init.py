@@ -110,7 +110,7 @@ class ManArcDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
-        QMessageBox.about(None, 'Ok', str("test"))
+        #QMessageBox.about(None, 'Ok', str("test"))
         # Configuration of info table
         self.set_configuration(self.tbl_element, table_element)    
         
@@ -155,8 +155,8 @@ class ManArcDialog(ParentDialog):
         self.dlg_cat = UDcatalog()
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
-        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtarccat_id_id)
-        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtarccat_id_id)
+        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
         self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
         self.shape = self.dlg_cat.findChild(QComboBox, "shape")
         self.geom1 = self.dlg_cat.findChild(QComboBox, "geom1")

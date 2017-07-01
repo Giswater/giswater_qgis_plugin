@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QMessageBox, QComboBox, QLineEdit
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QMessageBox, QComboBox, QLineEdit, QDateEdit
 
 from qgis.gui import *
 from functools import partial
@@ -83,7 +83,8 @@ class ManNodeDialog(ParentDialog):
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")  
-        self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")  
+        self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
+        #self.x=self.dialog.findChild(QDateEdit,"junction_builtdate")
         
         # Manage tab visibility
         self.set_tabs_visibility(14)
@@ -215,8 +216,8 @@ class ManNodeDialog(ParentDialog):
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
 
-        self.dlg_cat.findChild(QPushButton, "pushButton").clicked.connect(self.fillTxtnodecat_id)
-        self.dlg_cat.findChild(QPushButton, "pushButton_2").clicked.connect(self.dlg_cat.close)
+        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtnodecat_id)
+        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
 
         self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
         self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")

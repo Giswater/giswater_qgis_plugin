@@ -703,15 +703,7 @@ class Mg():
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'config')
         self.dlg.exec_()
-    '''
-    def chec_checkbox(self, widget_chk, widget_cbx, state):
-        #QMessageBox.about(None, 'Ok', str(utils_giswater.isChecked(widget)))
-        if utils_giswater.isChecked(widget_chk)==True:
-            QMessageBox.about(None, 'Ok', str("true"))
-            self.insert_or_update(widget_cbx, state)
-        if utils_giswater.isChecked(widget_chk) == False:
-            QMessageBox.about(None, 'Ok', str("false"))
-    '''
+
     # Like def mf_config_get_date(....): but for multi user
     def new_mg_config_get_data(self,tablename):
         sql = 'SELECT * FROM ' + self.schema_name + "." + tablename +' WHERE "user"=current_user'
@@ -726,7 +718,6 @@ class Mg():
             utils_giswater.setWidgetText(str(i[1]), str(i[2]))
             utils_giswater.setChecked("chk_" + str(i[1]), True)
             columns.append(str(i[1]))
-
         return columns
 
     def test(self, text):
