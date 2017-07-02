@@ -4,9 +4,13 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut(character varying, character varying);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut(element_id_arg character varying, type_element_arg character varying, result_id character varying) RETURNS integer AS
+DROP FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying);
+DROP FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying, character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
+    element_id_arg character varying,
+    type_element_arg character varying,
+    result_id_arg character varying)
+  RETURNS integer AS
 $BODY$
 DECLARE
     node_1_aux		text;
@@ -28,6 +32,8 @@ BEGIN
     DELETE FROM "anl_mincut_arc";
     DELETE FROM "anl_mincut_valve";
     DELETE FROM "anl_mincut_polygon";
+    DELETE FROM "anl_mincut_connec";
+    DELETE FROM "anl_mincut_hydrometer";
 	
 	
 
@@ -48,25 +54,29 @@ BEGIN
             SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_anl_arc WHERE arc_id = element_id_arg;
 
             -- Check extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_1_aux AND (acessibility = TRUE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_1_aux AND (broken  = FALSE)  AND (opened = TRUE)
+	    AND node_id not in (select valve_id from anl_mincut_result_valve_unaccess where result_cat_id=result_id_arg) ;
+
             IF controlValue = 1 THEN
 
                 -- Select public.geometry
                 SELECT the_geom INTO node_aux FROM v_anl_node WHERE node_id = node_1_aux;
 
                 -- Insert valve id
-                INSERT INTO anl_mincut_valve VALUES(node_1_aux, node_aux);
+                INSERT INTO anl_mincut_valve VALUES(node_1_aux, node_aux, 1);
                 
             ELSE
 
                 -- Compute the tributary area using DFS
-                PERFORM gw_fct_mincut_recursive(node_1_aux);
+                PERFORM gw_fct_mincut_recursive(node_1_aux,result_id_arg);
 
             END IF;
 
 
             -- Check other extreme being a valve
-            SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_2_aux AND (acessibility = FALSE) AND (broken  = FALSE);
+            SELECT COUNT(*) INTO controlValue FROM v_edit_anl_valve WHERE node_id = node_1_aux AND (broken  = FALSE)  AND (opened = TRUE)
+	    AND node_id not in (select valve_id from anl_mincut_result_valve_unaccess where result_cat_id=result_id_arg) ;
+           
             IF controlValue = 1 THEN
 
                 -- Check if the valve is already computed
@@ -79,14 +89,14 @@ BEGIN
                     SELECT the_geom INTO node_aux FROM v_anl_node WHERE node_id = node_2_aux;
 
                     -- Insert valve id
-                    INSERT INTO anl_mincut_valve VALUES(node_2_aux, node_aux);
+                    INSERT INTO anl_mincut_valve VALUES(node_2_aux, node_aux, 1);
 
                 END IF;
                 
             ELSE
 
                 -- Compute the tributary area using DFS
-                PERFORM gw_fct_mincut_recursive(node_2_aux);
+                PERFORM gw_fct_mincut_recursive(node_2_aux,result_id_arg);
 
             END IF;
 
@@ -103,7 +113,7 @@ BEGIN
         IF controlValue = 1 THEN
 
             -- Compute the tributary area using DFS
-            PERFORM gw_fct_mincut_recursive(element_id_arg);
+            PERFORM gw_fct_mincut_recursive(element_id_arg,result_id_arg);
 
         -- The arc_id was not found
         ELSE 
@@ -132,13 +142,17 @@ BEGIN
     DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
     INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
 
-   UPDATE man_valve set mincut_anl=true;
-   UPDATE man_valve set mincut_anl=false where node_id in(select valve_id from anl_mincut_valve);
+    INSERT INTO anl_mincut_valve
+    SELECT node.node_id,the_geom, 0::integer as type FROM man_valve join node on node.node_id=man_valve.node_id 
+	WHERE opened IS FALSE and node.node_id not in (select valve_id from anl_mincut_valve);
 
-   PERFORM gw_fct_valveanalytics(result_id);
+   --UPDATE man_valve set mincut_anl=true;
+   --UPDATE man_valve set mincut_anl=false where node_id in(select valve_id from anl_mincut_valve);
+
+  -- PERFORM gw_fct_valveanalytics(result_id_arg);
     
     -- Insert into result catalog tables
-    -- PERFORM gw_fct_mincut_result_catalog();
+     PERFORM gw_fct_mincut_result_catalog(result_id_arg);
 
     RETURN audit_function(0,310);
 
@@ -147,4 +161,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

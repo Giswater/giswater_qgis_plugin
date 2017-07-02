@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_result_catalog(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_catalog(result_id character varying)
+CREATE OR REPLACE FUNCTION ws_sample_dev.gw_fct_mincut_result_catalog(result_id_arg character varying)
   RETURNS void AS
 $BODY$
 
 DECLARE
-	result_cat_id_aux	varchar;
+	result_cat_id_int	varchar;
 	polygon_rec			record;
 	arc_rec				record;
 	node_rec			record;
@@ -21,74 +21,81 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "ws_sample_dev", public;
 	
 	--Set the mincut_id
-	IF result_id IS NOT NULL THEN
+	IF result_id_arg IS NOT NULL THEN
 	
-			IF EXISTS (SELECT id FROM anl_mincut_result_cat WHERE id=result_id) THEN 
-				SELECT result_id INTO result_cat_id_aux;
-				
-				DELETE FROM anl_mincut_result_cat WHERE id=result_id;
-							
-				INSERT INTO anl_mincut_result_cat (id) VALUES (result_id);
-				 
+			IF EXISTS (SELECT id FROM anl_mincut_result_cat WHERE id=result_id_arg) THEN 
+				DELETE FROM anl_mincut_result_polygon WHERE mincut_result_cat_id=result_id_arg;
+				DELETE FROM anl_mincut_result_arc WHERE mincut_result_cat_id=result_id_arg;
+				DELETE FROM anl_mincut_result_node WHERE mincut_result_cat_id=result_id_arg;
+				DELETE FROM anl_mincut_result_valve WHERE mincut_result_cat_id=result_id_arg;
+				DELETE FROM anl_mincut_result_connec WHERE mincut_result_cat_id=result_id_arg;
+				DELETE FROM anl_mincut_result_hydrometer WHERE mincut_result_cat_id=result_id_arg;
+						 
 			ELSE 
-			
-				SELECT result_id INTO result_cat_id_aux;
-				INSERT INTO anl_mincut_result_cat (id) VALUES (result_id);
+				INSERT INTO anl_mincut_result_cat (id) VALUES (result_id_arg);
 				 
 			END IF;
 		
 	ELSE 
-	
-		 SELECT nextval ('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) INTO result_cat_id_aux ;
-		 INSERT INTO anl_mincut_result_cat (id) VALUES (result_cat_id_aux);
+	               SELECT max(id::integer) INTO result_id_arg FROM arc WHERE arc_id ~ '^\d+$';
+	               INSERT INTO anl_mincut_result_cat (id) VALUES (result_id_arg);
 		 
 	END IF;
 	 
 
     -- Insert polygon table
     SELECT * INTO polygon_rec FROM anl_mincut_polygon;
-    INSERT INTO anl_mincut_result_polygon (mincut_result_cat_id,polygon_id,the_geom) VALUES (result_cat_id_aux, polygon_rec.polygon_id, polygon_rec.the_geom);
+    INSERT INTO anl_mincut_result_polygon (mincut_result_cat_id,polygon_id,the_geom) VALUES (result_id_arg, polygon_rec.polygon_id, polygon_rec.the_geom);
 
     -- Insert arc table
     FOR arc_rec IN SELECT * FROM anl_mincut_arc
     LOOP
-        INSERT INTO anl_mincut_result_arc (mincut_result_cat_id, arc_id) VALUES (result_cat_id_aux, arc_rec.arc_id);
+        INSERT INTO anl_mincut_result_arc (mincut_result_cat_id, arc_id) VALUES (result_id_arg, arc_rec.arc_id);
     END LOOP;
     
     -- Insert node table
     FOR node_rec IN SELECT * FROM anl_mincut_node
     LOOP
-	INSERT INTO anl_mincut_result_node (mincut_result_cat_id, node_id) VALUES (result_cat_id_aux, node_rec.node_id);
+	INSERT INTO anl_mincut_result_node (mincut_result_cat_id, node_id) VALUES (result_id_arg, node_rec.node_id);
     END LOOP;
 
     -- Insert valve table
     FOR valve_rec IN SELECT * FROM anl_mincut_valve
     LOOP
-	INSERT INTO anl_mincut_result_valve (mincut_result_cat_id, valve_id) VALUES (result_cat_id_aux, valve_rec.valve_id);
+	INSERT INTO anl_mincut_result_valve (mincut_result_cat_id, valve_id, status_type) VALUES (result_id_arg, valve_rec.valve_id, valve_rec.status_type);
     END LOOP;
 
     -- Insert connec table
-    FOR connec_rec IN SELECT * FROM v_anl_mincut_connec
+    FOR connec_rec IN SELECT * FROM anl_mincut_connec
     LOOP
-	INSERT INTO anl_mincut_result_connec (mincut_result_cat_id, connec_id) VALUES (result_cat_id_aux, connec_rec.connec_id);
+	INSERT INTO anl_mincut_result_connec (mincut_result_cat_id, connec_id) VALUES (result_id_arg, connec_rec.connec_id);
     END LOOP;
 
     -- Insert hydrometer table
-    FOR hydrometer_rec IN SELECT * FROM v_anl_mincut_hydrometer
+    FOR hydrometer_rec IN SELECT * FROM anl_mincut_hydrometer
     LOOP
-	INSERT INTO anl_mincut_result_hydrometer (mincut_result_cat_id, hydrometer_id) VALUES (result_cat_id_aux, hydrometer_rec.hydrometer_id);
+	INSERT INTO anl_mincut_result_hydrometer (mincut_result_cat_id, hydrometer_id) VALUES (result_id_arg, hydrometer_rec.hydrometer_id);
     END LOOP;
 
+/*
+    -- Delete original tables
+	DELETE FROM anl_mincut_polygon;
+	DELETE FROM anl_mincut_arc;
+	DELETE FROM anl_mincut_node;
+	DELETE FROM anl_mincut_valve;
+	DELETE FROM anl_mincut_connec;
+	DELETE FROM anl_mincut_hydrometer;
+   
+*/
     -- Insert selector table
-    DELETE FROM anl_mincut_result_selector;
-    INSERT INTO anl_mincut_result_selector (id) VALUES (result_cat_id_aux);
+	DELETE FROM anl_mincut_result_selector;
+	INSERT INTO anl_mincut_result_selector (id) VALUES (result_id_arg);
 
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

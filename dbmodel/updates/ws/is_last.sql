@@ -104,11 +104,61 @@ CREATE TABLE anl_node_geometric_consistency(
 );
 
 
+-- mincut
+
 CREATE TABLE "anl_mincut_result_cat_cause" (
 id varchar(30) NOT NULL,
 descript text,
 CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
 );
+
+
+CREATE TABLE "anl_mincut_cat_status_type"(
+  id smallint NOT NULL,
+  descript text,
+  CONSTRAINT mincut_cat_status_type_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE "anl_mincut_connec" (
+  connec_id character varying(16) NOT NULL,
+  the_geom geometry(Point,25831),
+  CONSTRAINT anl_mincut_connec_pkey PRIMARY KEY (connec_id),
+  CONSTRAINT anl_mincut_connec_connec_id_fkey FOREIGN KEY (connec_id)
+      REFERENCES connec (connec_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE "anl_mincut_hydrometer"(
+  hydrometer_id character varying(16) NOT NULL,
+  CONSTRAINT anl_mincut_hydrometer_pkey PRIMARY KEY (hydrometer_id),
+  CONSTRAINT anl_mincut_hydrometer_hydrometer_id_fkey FOREIGN KEY (hydrometer_id)
+      REFERENCES rtc_hydrometer (hydrometer_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE "anl_mincut_result_valve_unaccess"(
+  id serial NOT NULL,
+  result_cat_id character varying(16) NOT NULL,
+  valve_id character varying(16) NOT NULL,
+  CONSTRAINT anl_mincut_valve_status_pkey PRIMARY KEY (id),
+  CONSTRAINT anl_mincut_valve_status_result_cat_id_fkey FOREIGN KEY (result_cat_id)
+      REFERENCES anl_mincut_result_cat (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT anl_mincut_valve_status_valve_id_fkey FOREIGN KEY (valve_id)
+      REFERENCES node (node_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+
+ALTER TABLE anl_mincut_result_valve ADD COLUMN status_type integer;
+ALTER TABLE anl_mincut_valve ADD COLUMN status_type integer;
+
+ALTER TABLE anl_mincut_valve  ADD CONSTRAINT anl_mincut_valve_status_type_fkey FOREIGN KEY (status_type)
+REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT
+
+ALTER TABLE anl_mincut_result_valve ADD CONSTRAINT anl_mincut_result_valve_status_type_fkey FOREIGN KEY (status_type)
+REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 
 
 

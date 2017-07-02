@@ -4,9 +4,12 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_recursive(character varying);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut_recursive(node_id_arg character varying) RETURNS void AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_recursive(character varying, character varying);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_recursive(
+    node_id_arg character varying,
+    result_id_arg character varying)
+  RETURNS void AS
 $BODY$
 DECLARE
     exists_id      character varying;
@@ -24,7 +27,8 @@ BEGIN
     SELECT the_geom INTO node_aux FROM v_anl_node  WHERE node_id = node_id_arg;
 
     -- Check v_anl_node  being a valve
-    SELECT node_id INTO exists_id FROM v_edit_anl_valve WHERE node_id = node_id_arg AND (acessibility = TRUE) AND (broken  = FALSE);
+    SELECT node_id INTO exists_id FROM v_edit_anl_valve WHERE node_id = node_id_arg AND (broken  = FALSE) 
+    AND node_id not in (select valve_id from anl_mincut_result_valve_unaccess where result_cat_id=result_id_arg) ;
     IF FOUND THEN
 
         -- Check if the v_anl_node  is already computed
@@ -34,7 +38,7 @@ BEGIN
         IF NOT FOUND THEN
 
             -- Insert valve id
-            INSERT INTO anl_mincut_valve VALUES(node_id_arg, node_aux);
+            INSERT INTO anl_mincut_valve VALUES(node_id_arg, node_aux, 1);
 
         END IF;
 
@@ -63,7 +67,7 @@ BEGIN
                 END IF;
 
                 -- Call recursive function weighting with the pipe capacity
-                PERFORM gw_fct_mincut_recursive(rec_table.node_1);
+                PERFORM gw_fct_mincut_recursive(rec_table.node_1, result_id_arg);
                 
             END LOOP;
 
@@ -81,7 +85,7 @@ BEGIN
                 END IF;
 
                 -- Call recursive function weighting with the pipe capacity
-                PERFORM gw_fct_mincut_recursive(rec_table.node_2);
+                PERFORM gw_fct_mincut_recursive(rec_table.node_2, result_id_arg);
 
             END LOOP;
 
