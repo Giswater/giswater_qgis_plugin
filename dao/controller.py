@@ -372,16 +372,6 @@ class DaoController():
     def get_project_user(self):
         ''' Set user '''
 
-        user = None
-        layer = self.iface.activeLayer()  
-        uri = layer.dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('user=')
-        pos_end_schema = uri.rfind('password=')
-        if pos_ini <> -1:
-            user = uri[pos_ini + 6:pos_end_schema-2]
-
-
         return self.user
-
 
     
