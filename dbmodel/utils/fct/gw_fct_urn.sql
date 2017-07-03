@@ -14,10 +14,24 @@ RETURNS integer AS
 $BODY$
 DECLARE 
 urn_id_seq integer;
-
+project_type_aux varchar;
 BEGIN 
 
+	SELECT wsoftware INTO project_type_aux FROM version;
+	IF project_type_aux='WS' THEN
+	SELECT GREATEST (
+		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
+		(SELECT max(arc_id::integer) FROM arc WHERE arc_id ~ '^\d+$'),
+		(SELECT max(connec_id::integer) FROM connec WHERE connec_id ~ '^\d+$'),
+		(SELECT max(link_id::integer) FROM link WHERE link_id ~ '^\d+$'),
+		(SELECT max(element_id::integer) FROM element WHERE element_id ~ '^\d+$'),
+		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$'),
+		(SELECT max(vnode_id::integer) FROM vnode WHERE vnode_id ~ '^\d+$')
+		) INTO urn_id_seq;
 
+		END IF;
+		
+	IF project_type_aux='UD' THEN
 	SELECT GREATEST (
 		(SELECT max(node_id::integer) FROM node WHERE node_id ~ '^\d+$'),
 		(SELECT max(arc_id::integer) FROM arc WHERE arc_id ~ '^\d+$'),
@@ -28,7 +42,8 @@ BEGIN
 		(SELECT max(pol_id::integer) FROM polygon WHERE pol_id ~ '^\d+$'),
 		(SELECT max(vnode_id::integer) FROM vnode WHERE vnode_id ~ '^\d+$')
 		) INTO urn_id_seq;
-		
+
+		END IF;
 	RETURN urn_id_seq;
 
 

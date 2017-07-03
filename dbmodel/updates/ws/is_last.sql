@@ -45,6 +45,10 @@ CREATE SEQUENCE polygon_id_seq
     NO MAXVALUE
     CACHE 1;
 
+CREATE TABLE cat_feature (
+  id character varying(50) NOT NULL,
+  CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
+);
   
 CREATE TABLE polygon(
   pol_id character varying(16) NOT NULL PRIMARY KEY,
@@ -77,10 +81,6 @@ CREATE TABLE cat_feature
   CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE gully(
-  gully_id character varying(16) NOT NULL PRIMARY KEY,
-  text character varying(254)
-);
 
 -- ANALYSIS
 

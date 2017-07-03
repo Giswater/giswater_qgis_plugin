@@ -58,6 +58,17 @@ CREATE TABLE dimensions
   feature_id character varying,
   feature_type character varying,
   CONSTRAINT id PRIMARY KEY (id));
+  
+  
+  -- ----------------------------
+--Link 
+-- ----------------------------
+ALTER TABLE link RENAME column connec_id TO feature_id;
+ALTER TABLE link ADD COLUMN featurecat_id character varying(50);
+ALTER TABLE link ADD COLUMN "state" character varying(16);
+
+ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
 -- ----------------------------
 -- STATE TOPOLOGYC COHERENCE
 -- ----------------------------

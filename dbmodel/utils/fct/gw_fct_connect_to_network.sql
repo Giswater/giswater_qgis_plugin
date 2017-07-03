@@ -5,39 +5,47 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(connec_array character varying[]) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(connec_array character varying[], featurecat_id character varying) RETURNS void AS $BODY$
 DECLARE
     connec_id_aux  varchar;
     arc_geom       public.geometry;
     candidate_line integer;
     connect_geom   public.geometry;
-    link           public.geometry;
-    vnode          public.geometry;
+    link_geom           public.geometry;
+    vnode_geom          public.geometry;
     vnode_id       integer;
     vnode_id_aux   varchar;
     arc_id_aux     varchar;
     userDefined    boolean;
     sector_aux     varchar;
+	expl_id_int integer;
+	link_id integer;
 
-
+	
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
-    
+
     -- Main loop
     FOREACH connec_id_aux IN ARRAY connec_array
     LOOP
 
         -- Control user defined
-        SELECT b.userdefined_pos, b.vnode_id INTO userDefined, vnode_id_aux FROM vnode AS b WHERE b.vnode_id IN (SELECT a.vnode_id FROM link AS a WHERE connec_id = connec_id_aux) LIMIT 1;
+        SELECT b.userdefined_pos, b.vnode_id INTO userDefined, vnode_id_aux FROM vnode AS b WHERE b.vnode_id IN (SELECT a.vnode_id FROM link AS a WHERE feature_id = connec_id_aux) LIMIT 1;
 
         IF NOT FOUND OR (FOUND AND NOT userDefined) THEN
-
-            -- Get connec geometry
-            SELECT the_geom INTO connect_geom FROM connec WHERE connec_id = connec_id_aux;
-
-            -- Improved version for curved lines (not perfect!)
+			
+		--	 Get connec or gully geometry
+			IF featurecat_id ='connec' THEN          
+				SELECT the_geom INTO connect_geom FROM connec WHERE connec_id = connec_id_aux;
+			END IF;
+			IF featurecat_id ='gully' THEN 
+				SELECT the_geom INTO connect_geom FROM gully WHERE gully_id = connec_id_aux;
+			END IF;
+			RAISE NOTICE 'connect_geom %', connect_geom;
+			
+			-- Improved version for curved lines (not perfect!)
             WITH index_query AS
             (
                 SELECT ST_Distance(the_geom, connect_geom) as d, arc_id FROM v_man_arc ORDER BY the_geom <-> connect_geom LIMIT 10
@@ -51,34 +59,42 @@ BEGIN
             IF arc_geom IS NOT NULL THEN
 
                 -- Link line
-                link := ST_ShortestLine(connect_geom, arc_geom);
+                link_geom := ST_ShortestLine(connect_geom, arc_geom);
 
                 -- Line end point
-                vnode := ST_EndPoint(link);
+                vnode_geom := ST_EndPoint(link_geom);
 
                 -- Delete old vnode
                 DELETE FROM vnode AS a WHERE a.vnode_id = vnode_id_aux;
 
                 -- Detect vnode sector
                 SELECT sector_id INTO sector_aux FROM sector WHERE (the_geom @ sector.the_geom) LIMIT 1;
-                
+            
+			-- New id
+				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+				link_id:= (SELECT nextval('urn_id_seq'));
+				vnode_id:= (SELECT nextval('urn_id_seq'));
+
+			--Exploitation ID
+				expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(connect_geom, exploitation.the_geom,0.001) LIMIT 1);
+				RAISE NOTICE 'expl_id_int %', expl_id_int;
+				
                 -- Insert new vnode
-                INSERT INTO vnode (sector_id, arc_id, vnode_type, userdefined_pos, the_geom) VALUES (sector_aux, arc_id_aux, 'connec', FALSE, vnode);
-                vnode_id := currval('vnode_seq');
-
+                INSERT INTO vnode (vnode_id,sector_id, arc_id, vnode_type, userdefined_pos, the_geom,expl_id) VALUES (vnode_id,sector_aux, arc_id_aux, featurecat_id, FALSE, vnode_geom,expl_id_int);
+			RAISE NOTICE 'featurecat_id %', featurecat_id;	
                 -- Delete old link
-                DELETE FROM link WHERE connec_id = connec_id_aux;
-                
+                DELETE FROM link WHERE feature_id = connec_id_aux;
+					
                 -- Insert new link
-                INSERT INTO link (the_geom, connec_id, vnode_id) VALUES (link, connec_id_aux, vnode_id);
-
+                INSERT INTO link (link_id, the_geom, feature_id, vnode_id,expl_id,featurecat_id) VALUES (link_id,link_geom, connec_id_aux, vnode_id,expl_id_int,featurecat_id);
+			RAISE NOTICE 'featurecat_id %', featurecat_id;	
             END IF;
             
         END IF;
 
     END LOOP;
 
-    PERFORM audit_function(0,70);
+    --PERFORM audit_function(0,70);
     RETURN;
 
 END;

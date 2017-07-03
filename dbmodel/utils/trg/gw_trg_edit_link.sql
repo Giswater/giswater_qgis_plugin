@@ -28,7 +28,14 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-	
+		
+		-- State
+        IF (NEW.state IS NULL) THEN
+            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            IF (NEW.state IS NULL) THEN
+                NEW.state := (SELECT id FROM value_state limit 1);
+            END IF;
+        END IF;
 	
         -- link ID
 		IF (NEW.link_id IS NULL) THEN
@@ -36,14 +43,14 @@ BEGIN
 				NEW.link_id:= (SELECT nextval('urn_id_seq'));
 			END IF;
                
-        INSERT INTO link (link_id, connec_id, vnode_id, custom_length, the_geom, expl_id)
-		VALUES (NEW.link_id, NEW.connec_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int);
+        INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
+		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
 		
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, connec_id=NEW.connec_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, expl_id=NEW.expl_id, featurecat_id=NEW.featurecat_id, "state"=NEW."state"
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;

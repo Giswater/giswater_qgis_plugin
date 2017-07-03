@@ -216,16 +216,15 @@ AND expl_selector.cur_user="current_user"()::text;
 DROP VIEW IF EXISTS v_edit_link CASCADE;
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT link.link_id,
-    link.connec_id,
+    link.featurecat_id,
+    link.feature_id,
     link.vnode_id,
     st_length2d(link.the_geom) AS gis_length,
     link.custom_length,
-    connec.connecat_id,
     link.the_geom,
-    link.expl_id
-   FROM expl_selector,
-    link
-     LEFT JOIN connec ON connec.connec_id::text = link.connec_id::text
+    link.expl_id,
+	link."state"
+   FROM expl_selector, link
   WHERE link.expl_id::text = expl_selector.expl_id::text AND expl_selector.cur_user = "current_user"()::text;
   
 
