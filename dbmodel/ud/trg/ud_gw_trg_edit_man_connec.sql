@@ -11,7 +11,7 @@ DECLARE
     v_sql varchar;
     connec_id_seq int8;
 	expl_id_int integer;
-
+	code_autofill_bool boolean;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -91,7 +91,14 @@ BEGIN
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
 		END IF;
-				
+
+		SELECT code_autofill INTO code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
+
+		--Copy id to code field
+			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
+				NEW.code=NEW.connec_id;
+			END IF;
+			
         -- FEATURE INSERT
         INSERT INTO connec (connec_id, top_elev, "ymax",connecat_id, sector_id,code, n_hydrometer, demand, "state", annotation, "observ", "comment", rotation, dma_id, soilcat_id, category_type, fluid_type, location_type,
 								workcat_id, buildercat_id, builtdate, ownercat_id, adress_01,adress_02,adress_03, streetaxis_id, postnumber, descript, link, verified, the_geom, workcat_id_end, y1, y2, undelete, featurecat_id,
