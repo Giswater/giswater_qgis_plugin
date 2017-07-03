@@ -95,6 +95,12 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_price_node = self.dialog.findChild(QTableView, "tbl_masterplan")
+        
+        manhole_builtdate = self.dialog.findChild(QDateEdit, "manhole_builtdate")
+        manhole_builtdate.setCalendarPopup(True)
+        #ui->dateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons)
+        #manhole_builtdate.setSpecialValueText(QAbstractSpinBox.)
+        
               
         # Load data from related tables
         self.load_data()
@@ -393,12 +399,12 @@ class ManNodeDialog(ParentDialog):
 
             
             self.widgetExtended.setPixmap(pixmap)
-            
+            message ="calling zoom image"
+            self.controller.show_info(message)
             # Set signal of ClickableLabel
             widget.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[0][i])))
-            #widget.show()
-            #widgetExtended.clear()
-            #widgetExtended.setPixmap(pixmap)
+ 
+ 
             self.list_widgetExtended.append(self.widgetExtended)
             self.list_labels.append(widget)
             
@@ -416,31 +422,20 @@ class ManNodeDialog(ParentDialog):
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
         
-        '''
-        # Set QLabel like ExtendedQLabel(ClickableLabel)
-        img=self.dlg_gallery.findChild(QLabel, 'img_test')
-        self.ImageButton = ExtendedQLabel.ExtendedQLabel(img)
-
-        pixmap = QPixmap("C:/Users/tasladmin/Desktop/events/img_pipe2.jpg")
-        self.ImageButton.setPixmap(pixmap)
-        
-        # Set signal of ClickableLabel
-        img.connect(self.ImageButton, SIGNAL('clicked()'), (partial(self.zoom_img,"C:/Users/tasladmin/Desktop/events/img_pipe2.jpg")))
-
-
-        #message = str(type(self.ImageButton))
-        #self.controller.show_info(message)
-        '''
-        
         self.dlg_gallery.exec_()
-
         
         
     def next_gallery(self):
+
         self.start_indx = self.start_indx+1
         
+        # Clear previous
         for i in self.list_widgetExtended:
             i.clear()
+            #i.clicked.disconnect(self.zoom_img) #this disconnect all!
+            
+       
+            
             
         # Add new 9 images
         for i in range(0, 9):
@@ -486,47 +481,87 @@ class ManNodeDialog(ParentDialog):
             self.controller.show_warning(message, context_name='ui_message')
             
             btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
-
+        '''
         if self.start_indx > 0 :
             self.btn_previous.setEnabled(True) 
             
         # On last tab disable btn_next
-        #if self.start_indx == (len(self.img_path_list)-1) :
-        #    self.btn_next.setEnabled(False) 
-        '''
+        if self.start_indx == (len(self.img_path_list)-1) :
+            self.btn_next.setEnabled(False) 
+            
+        
+        
         
     def zoom_img(self,img):
-        
-        
 
+        #myButton.clicked.disconnect(function_B) #this disconnect function_B
+        #self.list_labels[i].disconnect( partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
+        
+        
+        message ="zoom_img"
+        self.controller.show_info(message)
+        
         self.dlg_gallery_zoom = GalleryZoom()
         pixmap = QPixmap(img)
         #pixmap = pixmap.scaled(711,501,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+        
+        
+        message =str(img)
+        self.controller.show_info(message)
+        message =str(pixmap)
+        self.controller.show_info(message)
 
         lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
         lbl_img.setPixmap(pixmap)
         #lbl_img.show()
-            
             
         zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
         zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id") 
         
         zoom_visit_id.setText(str(self.visit_id))
         zoom_event_id.setText(str(self.event_id))
-            
-        self.dlg_gallery_zoom.exec_() 
     
-            
+        btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
+        btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
+        
+        btn_slidePrevious.clicked.connect(self.slide_previous)
+ 
+        self.dlg_gallery_zoom.exec_() 
+        
+        
+    def slide_previous(self):
+        pass
+        
+        
+
     def previous_gallery(self):
         #self.end_indx = self.end_indx-1
         self.start_indx = self.start_indx-1
 
         # First clear previous
+        for i in self.list_widgetExtended:
+            i.clear()
+        '''
         for i in range(0, 9):
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
             widget.clear()
+        '''
+        
+        
         # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+            
+            self.list_widgetExtended[i].setPixmap(pixmap)
+            #widget_name = "img_"+str(i)
+            #widget = self.dlg_gallery.findChild(QLabel, widget_name)
+            #widget.clear()
+            
+            self.list_labels[i].connect( self.list_widgetExtended[i], SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[self.start_indx][i])))
+        
+        '''
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             widget_name = "img_"+str(i)
@@ -537,16 +572,17 @@ class ManNodeDialog(ParentDialog):
             # Add functionality to button of zooming picture
             btn_widget_name = "btn_zoom_img_"+str(i)
             btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
-          
+        '''
+
         if self.start_indx == 0 :
             self.btn_previous.setEnabled(False)
         if self.start_indx < len(self.img_path_list) :
             self.btn_next.setEnabled(True)  
-              
-        
+  
         
     ''' ACTIONS TOOLBAR '''    
     def actionZoomOut(self):
+    
         feature = self.feature
 
         canvas = self.iface.mapCanvas()
@@ -556,13 +592,11 @@ class ManNodeDialog(ParentDialog):
         layer.setSelectedFeatures([feature.id()])
 
         canvas.zoomToSelected(layer)
-        canvas.zoomOut()
-        
+        canvas.zoomOut()  
         
         
     def actionZoom(self):
        
-        print "zoom"
         feature = self.feature
 
         canvas = self.iface.mapCanvas()

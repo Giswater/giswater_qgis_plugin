@@ -15,7 +15,7 @@
 from qgis.core import QgsPoint, QgsFeatureRequest, QgsMapLayer, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QListWidget
+from PyQt4.QtGui import QColor, QListWidget, QListWidgetItem
 
 
 from PyQt4.QtCore import *
@@ -103,6 +103,7 @@ class DrawProfiles(ParentMapTool):
             # Check Arc or Node
             for snapPoint in result:
                 exist=self.snapperManager.check_node_group(snapPoint.layer)
+                
                 if exist:
                     point = QgsPoint(result[0].snappedVertex)
                     # Add marker
@@ -151,7 +152,10 @@ class DrawProfiles(ParentMapTool):
                 # Show warning message
                     message = "Node "+node_id+" is alredy selected"
                     self.controller.show_info(message, context_name='ui_message')
-
+            
+            
+            message = str(len(self.nodes))
+            self.controller.show_info(message, context_name='ui_message')
             
             if len(self.nodes)==1:
                 start_point_id = self.list_of_selected_nodes[0]
@@ -229,9 +233,6 @@ class DrawProfiles(ParentMapTool):
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
         
-        print id
-        print start_point
-        print end_point
         
         # TO DO :Check if all data are entered
         if id == '' or start_point == '' or end_point == '':
@@ -262,8 +263,11 @@ class DrawProfiles(ParentMapTool):
         message = "Values has been updated"
         self.controller.show_info(message)
         
+        self.deactivate()
+        
         
     def load_profile(self):
+       
 
         self.dlg_load = LoadProfiles()
         utils_giswater.setDialog(self.dlg_load)
@@ -274,16 +278,17 @@ class DrawProfiles(ParentMapTool):
         self.tbl_profiles = self.dlg_load.findChild(QListWidget, "tbl_profiles") 
         sql = "SELECT DISTINCT(profile_id) FROM "+self.schema_name+".anl_arc_profile_value"
         row = self.controller.get_rows(sql)
+        
         m=len(row)
-       
-        for i in range(m):
-            item_arc = QListWidgetItem(row[i][0])
+  
+        for i in range(0,m):
+            item_arc = QListWidgetItem(str(row[i][0]))
             self.tbl_profiles.addItem(item_arc)
-            
          
         self.dlg_load.open()
         self.dlg.close()
         
+        self.deactivate()
         
     def open_profile(self):
     
@@ -365,7 +370,12 @@ class DrawProfiles(ParentMapTool):
         '''
         Parent function - Draw profiles
         '''
+        # Clear plot
         
+        plt.gcf().clear()
+        #plt.close('all')
+        #plt.clear()
+   
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id,node_id)
       
@@ -408,6 +418,7 @@ class DrawProfiles(ParentMapTool):
         mng = plt.get_current_fig_manager()
         mng.window.showMaximized()
         plt.show()
+        
 
         # Action on resizeing window
         cid = self.fig1.canvas.mpl_connect('resize_event',self.on_resize)
@@ -419,6 +430,7 @@ class DrawProfiles(ParentMapTool):
         
         # Set window name
         self.win = plt.gcf()
+
         self.win.canvas.set_window_title('Draw Profile')
 
         self.axes = plt.gca()
@@ -506,6 +518,10 @@ class DrawProfiles(ParentMapTool):
             self.parameters[2] = row[0][1]
             self.parameters[13] = row[0][2]
             nodecat_id = row[0][3]
+            
+            #if None in self.parameters:
+            #    message = "Some parameters are missing for node:"+str(node_id)+", table"+str()
+            
 
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
@@ -513,8 +529,10 @@ class DrawProfiles(ParentMapTool):
             sql = "SELECT z1,z2,cat_geom1,elevmax1,elevmax2, y1,y2,slope"
             # sql += " FROM " + self.schema_name + ".     "
             sql += " FROM "+self.schema_name+".v_edit_arc"
-            sql += " WHERE node_1='" + str(node_id) + "'"
+            sql += " WHERE node_1='" + str(node_id) + "' OR node_2='" + str(node_id) + "'"
             row = self.controller.get_rows(sql)
+            
+
             self.parameters[3] = row[0][0]
             self.parameters[4] = row[0][1]
             self.parameters[5] = row[0][2]
@@ -536,21 +554,24 @@ class DrawProfiles(ParentMapTool):
 
             # Set node_id in memory
             self.parameters[12] = node_id
+            
+            if None in self.parameters:
+                message = "Some parameters are missing for node:"
+                self.controller.show_info_box(message, "Info", node_id)
+                return
 
             self.memory.append(self.parameters)
 
             i = i + 1
 
         # Check if we have all data for drawing
-        '''
-        if 'None' in self.memory:
-            message = "Missing some data"
-            self.controller.show_info(message, context_name='ui_message')
-            return
-        '''
+        
+            
+        
+        message =str(self.memory)
+        self.controller.show_info(message)
 
-
-
+            
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1,indx):
         ''' Draw first node '''
 
@@ -1156,10 +1177,10 @@ class DrawProfiles(ParentMapTool):
             it = layer_node.getFeatures(QgsFeatureRequest(expr))
         
             # Build a list of feature id's from the previous result
-            id_list = [i.id() for i in it]
+            self.id_list = [i.id() for i in it]
 
             # Select features with these id's
-            layer_node.setSelectedFeatures(id_list)
+            layer_node.setSelectedFeatures(self.id_list)
         
         #layer = iface.activeLayer()
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
@@ -1180,14 +1201,42 @@ class DrawProfiles(ParentMapTool):
        
         
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paintEvent,self.arc_id,self.node_id))
+        self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
+        
 
+    def clear_profile(self):
+
+        # Clear list of nodes and arcs
+        self.list_of_selected_nodes=[]
+        self.list_of_selected_arcs=[]
+        self.nodes = []
+        self.arcs = []
+        
+        # Clear widgets
+        #self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
+        #self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
+        #self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point") 
         
         
+        Start_point = self.dlg.findChild(QLineEdit, "start_point")  
+        Start_point.clear()
         
-    
-            
-    
-    
+        End_point = self.dlg.findChild(QLineEdit, "end_point")  
+        End_point.clear()
         
+        Profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
+        Profile_id.clear()
+        
+        # Get data from DB for selected item| tbl_list_arc
+        tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
+        tbl_list_arc.clear()
+        
+        #Clear selection
+        can=self.iface.mapCanvas()    
+        for layer in can.layers():
+            layer.removeSelection()
+        can.refresh()
+        
+        self.deactivate()
 
             
