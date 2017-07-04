@@ -45,10 +45,6 @@ CREATE SEQUENCE polygon_id_seq
     NO MAXVALUE
     CACHE 1;
 
-CREATE TABLE cat_feature (
-  id character varying(50) NOT NULL,
-  CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
-);
   
 CREATE TABLE polygon(
   pol_id character varying(16) NOT NULL PRIMARY KEY,
@@ -81,6 +77,26 @@ CREATE TABLE cat_feature
   CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
 );
 
+-- ----------------------------
+-- EXPLOTITATION STRATEGY
+-- ----------------------------
+
+
+CREATE TABLE exploitation(
+expl_id integer  NOT NULL PRIMARY KEY,
+short_descript character varying(50) NOT NULL,
+descript character varying(100),
+the_geom geometry(POLYGON,SRID_VALUE),
+undelete boolean
+);
+
+
+CREATE TABLE expl_selector (
+expl_id integer NOT NULL PRIMARY KEY,
+cur_user text
+);
+
+ALTER TABLE ext_streetaxis ADD COLUMN expl_id integer;
 
 -- ANALYSIS
 
@@ -121,7 +137,7 @@ CREATE TABLE "anl_mincut_cat_status_type"(
 
 CREATE TABLE "anl_mincut_connec" (
   connec_id character varying(16) NOT NULL,
-  the_geom geometry(Point,25831),
+  the_geom geometry(Point,SRID_VALUE),
   CONSTRAINT anl_mincut_connec_pkey PRIMARY KEY (connec_id),
   CONSTRAINT anl_mincut_connec_connec_id_fkey FOREIGN KEY (connec_id)
       REFERENCES connec (connec_id) MATCH SIMPLE
@@ -155,26 +171,10 @@ ALTER TABLE anl_mincut_result_valve ADD COLUMN status_type integer;
 ALTER TABLE anl_mincut_valve ADD COLUMN status_type integer;
 
 ALTER TABLE anl_mincut_valve  ADD CONSTRAINT anl_mincut_valve_status_type_fkey FOREIGN KEY (status_type)
-REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT
+REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE anl_mincut_result_valve ADD CONSTRAINT anl_mincut_result_valve_status_type_fkey FOREIGN KEY (status_type)
-REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
-
-
-
- -- PHOTO
-  
- CREATE TABLE om_visit_event_photo
-(
-  id bigserial NOT NULL,
-  visit_id bigint NOT NULL,
-  event_id bigint NOT NULL,
-  tstamp timestamp(6) without time zone DEFAULT now(),
-  value text,
-  text text,
-  compass double precision,
-  CONSTRAINT om_visit_event_foto_pkey PRIMARY KEY (id),
-);
+REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 -- ----------------------------
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
@@ -326,18 +326,16 @@ ALTER TABLE element ADD COLUMN code varchar(30);
 ALTER TABLE node ADD COLUMN publish boolean;
 ALTER TABLE arc ADD COLUMN publish boolean;
 ALTER TABLE connec ADD COLUMN publish boolean;
-ALTER TABLE element ADD COLUMN publish boolean;
+
 
 ALTER TABLE node ADD COLUMN inventory boolean;
 ALTER TABLE arc ADD COLUMN inventory boolean;
 ALTER TABLE connec ADD COLUMN inventory boolean;
-ALTER TABLE element ADD COLUMN inventory boolean;
+
 
 ALTER TABLE node ADD COLUMN end_date date;
 ALTER TABLE arc ADD COLUMN end_date date;
 ALTER TABLE connec ADD COLUMN end_date date;
-
-ALTER TABLE element ADD COLUMN the_geom geometry(POINT,SRID_VALUE);
 
 ALTER TABLE man_pump ADD COLUMN elev_height numeric(12,4);
 
@@ -359,7 +357,7 @@ ALTER TABLE dma ADD COLUMN macrodma_id character varying(50);
 
 ALTER TABLE om_visit ADD COLUMN  webclient_id character varying(50);
 
-ALTER TABLE om_event ADD COLUMN  picture_id character varying(50);
+ALTER TABLE om_visit_event ADD COLUMN  picture_id character varying(50);
 
 ALTER TABLE cat_node ADD COLUMN active boolean;
 ALTER TABLE cat_arc ADD COLUMN active boolean;
@@ -404,6 +402,3 @@ ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_cause_an
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_type_mincut_result_type_fkey FOREIGN KEY (mincut_result_type) REFERENCES anl_mincut_result_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mincut_result_state_fkey FOREIGN KEY (mincut_result_state) REFERENCES anl_mincut_result_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
- CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)      REFERENCES om_visit_event (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
- CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
-  

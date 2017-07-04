@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_result_catalog();
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_mincut_result_catalog(character varying);
-CREATE OR REPLACE FUNCTION ws_sample_dev.gw_fct_mincut_result_catalog(result_id_arg character varying)
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_mincut_result_catalog(result_id_arg character varying)
   RETURNS void AS
 $BODY$
 
@@ -21,7 +21,7 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = "ws_sample_dev", public;
+    SET search_path = "SCHEMA_NAME", public;
 	
 	--Set the mincut_id
 	IF result_id_arg IS NOT NULL THEN

@@ -101,12 +101,11 @@ SELECT
 row_number() OVER (order by node_id) AS rid,
 node_id
 from node
-
+;
 
 
 DROP VIEW IF EXISTS v_anl_pgrouting_arc CASCADE;
 CREATE OR REPLACE VIEW v_anl_pgrouting_arc AS 
-SELECT 
  SELECT row_number() OVER (ORDER BY arc.arc_id) AS id,
     arc.arc_id,
     a.rid::integer AS source,
@@ -115,6 +114,6 @@ SELECT
 from arc
 JOIN v_anl_pgrouting_node a on node_1=a.node_id
 JOIN v_anl_pgrouting_node b on node_2=b.node_id 
-
+;
 
 

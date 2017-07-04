@@ -113,7 +113,7 @@ tstamp timestamp default now()
 
 
  ALTER TABLE man_custom_field ADD CONSTRAINT man_custom_field_man_custom_field_parameter_fkey FOREIGN KEY (field_id) REFERENCES man_custom_field_parameter (field_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-  ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (feature_type) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
  
 -- ----------------------------
 -- IMPROVE STATE TOPOLOGY COHERENCE TOOLS
@@ -126,8 +126,8 @@ CREATE UNIQUE INDEX man_selector_state_one_row ON man_selector_state((id IS NOT 
 
 
 --
-ALTER TABLE ws_sample.value_state ADD COLUMN node_topology_coherence boolean;
-ALTER TABLE ws_sample.value_state ADD COLUMN arc_topology_coherence boolean;
+ALTER TABLE value_state ADD COLUMN node_topology_coherence boolean;
+ALTER TABLE value_state ADD COLUMN arc_topology_coherence boolean;
 
 
 
@@ -154,35 +154,13 @@ ALTER TABLE "config" ADD CONSTRAINT "config_verified_vdefault_fkey" FOREIGN KEY 
 ALTER TABLE "config" ADD CONSTRAINT "config_nodeinsert_catalog_vdefault_fkey" FOREIGN KEY ("nodeinsert_catalog_vdefault") REFERENCES "cat_node" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 */
--- ----------------------------
--- EXPLOTITATION STRATEGY
--- ----------------------------
 
-
-CREATE TABLE exploitation(
-expl_id integer  NOT NULL PRIMARY KEY,
-short_descript character varying(50) NOT NULL,
-descript character varying(100),
-the_geom geometry(POLYGON,SRID_VALUE),
-undelete boolean
-);
-
-
-CREATE TABLE expl_selector (
-expl_id integer NOT NULL PRIMARY KEY,
-cur_user text
-);
-
-ALTER TABLE ext_streetaxis ADD COLUMN expl_id integer;
 
 -- ----------------------------
 -- ADDING GEOMETRY TO CATALOG OF WORKS
 -- ----------------------------
 
 ALTER TABLE cat_work ADD COLUMN the_geom public.geometry(MULTIPOLYGON, SRID_VALUE);
-
-
-
 
 -- ----------------------------
 -- TRACEABILITY
@@ -216,13 +194,13 @@ tstamp timestamp(6) without time zone,
   dv_value_column text,
   orderby_value boolean,
   allow_null boolean,
-  CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id),
+  CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id)/*,
   CONSTRAINT config_client_value_colum_id_fkey FOREIGN KEY (dv_table, dv_key_column)
       REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT config_client_value_origin_id_fkey FOREIGN KEY (table_id, column_id)
       REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT
+      ON UPDATE CASCADE ON DELETE RESTRICT*/
 );
 
 
@@ -292,5 +270,14 @@ ALTER TABLE node_type ADD COLUMN active_type boolean;
 ALTER TABLE node_type ADD COLUMN code_autofill boolean;
 ALTER TABLE connec_type ADD COLUMN code_autofill boolean;
 
+-- ----------------------------
+-- review rules
+-- ----------------------------
 
+DROP RULE IF EXISTS review_status ON review_audit_node;
+CREATE OR REPLACE RULE review_status AS ON INSERT TO review_audit_arc 
+DO UPDATE review_arc SET verified='REVISED' WHERE arc_id=NEW.arc_id AND field_checked='TRUE';
 
+DROP RULE IF EXISTS review_status ON review_audit_node;
+CREATE OR REPLACE RULE review_status AS ON INSERT TO review_audit_node
+DO UPDATE review_node SET verified='REVISED' WHERE node_id=NEW.node_id AND field_checked='TRUE';

@@ -95,7 +95,7 @@ CONSTRAINT piezometer_pkey PRIMARY KEY (piezo_id)
 
 CREATE TABLE "man_type_operation" (
 "id" serial,
-"short_descript" varchar(30)
+"short_descript" varchar(30),
 "observ" text,
 CONSTRAINT man_type_operation_pkey PRIMARY KEY (id)
 );
@@ -128,7 +128,7 @@ CONSTRAINT man_expansiontank_pkey PRIMARY KEY (node_id)
 CREATE TABLE "man_flexunion" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
-CONSTRAINT man_dilator_pkey PRIMARY KEY (node_id)
+CONSTRAINT man_flexunion_pkey PRIMARY KEY (node_id)
 );
 
 
@@ -150,7 +150,7 @@ CREATE TABLE "man_netelement"(
 CREATE TABLE "man_varc" (
 "arc_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
-CONSTRAINT man_varc_pkey PRIMARY KEY (arc_d)
+CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
 );
 
 
@@ -159,9 +159,9 @@ CONSTRAINT man_varc_pkey PRIMARY KEY (arc_d)
 
 CREATE TABLE "man_value_state" (
 "id" serial,
-"short_descript" varchar(30)
+"short_descript" varchar(30),
 "observ" text,
-CONSTRAINT man_value_state PRIMARY KEY (id)
+CONSTRAINT man_value_state_pkey PRIMARY KEY (id)
 );
 
 
@@ -169,27 +169,15 @@ CONSTRAINT man_value_state PRIMARY KEY (id)
 --THE PARENT NODE STRATEGY IT NOT MUST BE APPLIED TO TANKS AND TO REGISTERS...
 
 ALTER TABLE node ADD COLUMN parent_node_id character varying(16);
-ALTER TABLE node ADD CONSTRAINT node_parent_node_fkey FOREIGN KEY (parent_node_id) REFERENCES ws_sample_dev.node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE node ADD CONSTRAINT node_parent_node_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
   
-
-ALTER TABLE man_junction ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_hydrant ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_pump ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_filter ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_meter ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_manhole ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_reduction ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_source ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_waterwell ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-
 ALTER TABLE limnometer ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE piezometer ADD CONSTRAINT piezometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE man_register ADD CONSTRAINT man_register_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE man_netwjoin ADD CONSTRAINT man_netwjoin_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_pressdevice ADD CONSTRAINT man_pressdevice_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_dilator ADD CONSTRAINT man_dilator_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_expansiontank ADD CONSTRAINT man_expansiontank_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_flexunion ADD CONSTRAINT man_flexunion_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE man_varc ADD CONSTRAINT man_varc_fkey FOREIGN KEY (arc_id) REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
   

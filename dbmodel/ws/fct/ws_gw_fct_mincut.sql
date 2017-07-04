@@ -4,8 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying);
-DROP FUNCTION SCHEMA_NAME.gw_fct_mincut(character varying, character varying, character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut(
     element_id_arg character varying,
     type_element_arg character varying,

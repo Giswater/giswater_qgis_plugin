@@ -72,7 +72,7 @@ FROM expl_selector, connec
 JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
 LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
 LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+LEFT JOIN link ON connec.connec_id::text = link.feature_id::text
 LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
 LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
 WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
@@ -139,7 +139,7 @@ CREATE OR REPLACE VIEW v_edit_man_wjoin AS
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+     LEFT JOIN link ON connec.connec_id::text = link.feature_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
      JOIN man_wjoin ON man_wjoin.connec_id::text = connec.connec_id::text
@@ -217,7 +217,7 @@ CREATE OR REPLACE VIEW v_edit_man_tap AS
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+     LEFT JOIN link ON connec.connec_id::text = link.feature_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
      JOIN man_tap ON man_tap.connec_id::text = connec.connec_id::text
@@ -292,7 +292,7 @@ CREATE OR REPLACE VIEW v_edit_man_fountain AS
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+	 LEFT JOIN link ON connec.connec_id::text = link.feature_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
      JOIN man_fountain ON man_fountain.connec_id::text = connec.connec_id::text
@@ -357,7 +357,7 @@ CREATE OR REPLACE VIEW v_edit_man_greentap AS
      JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
      LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id::text = v_rtc_hydrometer_x_connec.connec_id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
-     LEFT JOIN link ON connec.connec_id::text = link.connec_id::text
+     LEFT JOIN link ON connec.connec_id::text = link.feature_id::text
      LEFT JOIN vnode ON vnode.vnode_id::text = link.vnode_id::text
      LEFT JOIN dma ON connec.dma_id::text = dma.dma_id::text
      JOIN man_greentap ON man_greentap.connec_id::text = connec.connec_id::text

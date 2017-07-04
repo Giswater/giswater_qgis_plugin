@@ -779,8 +779,7 @@ CREATE TABLE "element" (
 "link" character varying(512),
 "verified" varchar(20)   NOT NULL,
 "workcat_id_end" varchar(255),
-"link" varchar(512),
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"the_geom" public.geometry (POINT, SRID_VALUE),
 "publish" boolean,
 "inventory" boolean,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)

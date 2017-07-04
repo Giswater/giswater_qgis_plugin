@@ -28,6 +28,26 @@ CREATE SEQUENCE doc_x_tag_seq
     NO MAXVALUE
     CACHE 1;
 
+-- ----------------------------
+-- EXPLOTITATION STRATEGY
+-- ----------------------------
+
+
+CREATE TABLE exploitation(
+expl_id integer  NOT NULL PRIMARY KEY,
+short_descript character varying(50) NOT NULL,
+descript character varying(100),
+the_geom geometry(POLYGON,SRID_VALUE),
+undelete boolean
+);
+
+
+CREATE TABLE expl_selector (
+expl_id integer NOT NULL PRIMARY KEY,
+cur_user text
+);
+
+ALTER TABLE ext_streetaxis ADD COLUMN expl_id integer;
 
 -------------
 -- NEW TABLES
@@ -78,26 +98,9 @@ the_geom public.geometry (POINT, SRID_VALUE),
 CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
 );
 
-
 CREATE INDEX anl_node_sink_index ON anl_node_sink USING GIST (the_geom);
 
   
-  -- PHOTO
- 
- 
- CREATE TABLE om_visit_event_photo
-(
-  id bigserial NOT NULL,
-  visit_id bigint NOT NULL,
-  event_id bigint NOT NULL,
-  tstamp timestamp(6) without time zone DEFAULT now(),
-  value text,
-  text text,
-  compass double precision,
-  CONSTRAINT om_visit_event_foto_pkey PRIMARY KEY (id),
-
-);
-
   
 -- ----------------------------
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
@@ -138,7 +141,7 @@ CREATE TABLE review_node
 DROP TABLE IF EXISTS review_connec;
 CREATE TABLE review_connec
 ( connec_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,25831),
+  the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   connec_type character varying(18),
@@ -154,7 +157,7 @@ CREATE TABLE review_connec
 DROP TABLE IF EXISTS review_gully;
 CREATE TABLE review_gully
 ( gully_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,25831),
+  the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   matcat_id character varying(30),
@@ -217,7 +220,7 @@ CREATE TABLE review_audit_node
 DROP TABLE IF EXISTS review_audit_connec;
 CREATE TABLE review_audit_connec
 (  connec_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,25831),
+  the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   connec_type character varying(18),
@@ -237,7 +240,7 @@ CREATE TABLE review_audit_connec
  DROP TABLE IF EXISTS  review_audit_gully;
  CREATE TABLE review_audit_gully
 (  gully_id character varying(16) NOT NULL,
-  the_geom geometry(POINT,25831),
+  the_geom geometry(POINT,SRID_VALUE),
   top_elev numeric(12,3),
   ymax numeric(12,3),
   matcat_id character varying(30),
@@ -301,13 +304,13 @@ ALTER TABLE node ADD COLUMN publish boolean;
 ALTER TABLE arc ADD COLUMN publish boolean;
 ALTER TABLE connec ADD COLUMN publish boolean;
 ALTER TABLE gully ADD COLUMN publish boolean;
-ALTER TABLE element ADD COLUMN publish boolean;
+
 
 ALTER TABLE node ADD COLUMN inventory boolean;
 ALTER TABLE arc ADD COLUMN inventory boolean;
 ALTER TABLE connec ADD COLUMN inventory boolean;
 ALTER TABLE gully ADD COLUMN inventory boolean;
-ALTER TABLE element ADD COLUMN inventory boolean;
+
 
 ALTER TABLE node ADD COLUMN end_date date;
 ALTER TABLE arc ADD COLUMN end_date date;
@@ -324,8 +327,6 @@ ALTER TABLE node ADD COLUMN unconnected boolean;
 ALTER TABLE gully ADD COLUMN streetaxis_id character varying(16);
 ALTER TABLE gully ADD COLUMN postnumber character varying(16);
 
-ALTER TABLE element ADD COLUMN the_geom geometry(Point,25831);
-
 ALTER TABLE cat_work ADD COLUMN workid_key1 character varying(30);
 ALTER TABLE cat_work ADD COLUMN workid_key2 character varying(30);
 ALTER TABLE cat_work ADD COLUMN builtdate date;
@@ -334,7 +335,7 @@ ALTER TABLE dma ADD COLUMN macrodma_id character varying(50);
 
 ALTER TABLE om_visit ADD COLUMN  webclient_id character varying(50);
 
-ALTER TABLE om_event ADD COLUMN  picture_id character varying(50);
+ALTER TABLE om_visit_event ADD COLUMN  picture_id character varying(50);
 
 ALTER TABLE cat_grate ADD COLUMN madeby character varying(100);
 ALTER TABLE cat_grate ADD COLUMN model character varying(100);

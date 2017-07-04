@@ -13,7 +13,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, NULL, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1, NULL, NULL, NULL);
+INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proximity, arc_toporepair, nodeinsert_arcendpoint, nodeinsert_catalog_vdefault, orphannode_delete, vnode_update_tolerance, nodetype_change_enabled, 
+	samenode_init_end_control, node_proximity_control, connec_proximity_control, node_duplicated_tolerance, connec_duplicated_tolerance, audit_function_control, arc_searchnodes_control, insert_double_geometry, buffer_value)
+  VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, NULL, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
 
 INSERT INTO config_param_bool VALUES ('slope_arc_direction', true, NULL, NULL, NULL, NULL);
 

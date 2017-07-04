@@ -58,7 +58,6 @@ CREATE TABLE "anl_selector_state" (
 
 
 CREATE INDEX anl_node_orphan_index ON anl_node_orphan USING GIST (the_geom);
-CREATE INDEX anl_node_sink_index ON anl_node_sink USING GIST (the_geom);
 CREATE INDEX anl_node_duplicated_index ON anl_node_duplicated USING GIST (the_geom);
 CREATE INDEX anl_connec_duplicated_index ON anl_connec_duplicated USING gist (the_geom);
 CREATE INDEX anl_arc_same_startend_index ON anl_arc_same_startend USING gist (the_geom);
