@@ -22,6 +22,8 @@ from ui.ud_catalog import UDcatalog                  # @UnresolvedImport
 
 import ExtendedQLabel
 
+import numpy as np
+
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
     
@@ -324,47 +326,62 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
+        #message = str(rows)
+        #self.controller.show_warning(message)
+        
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-
+        
+        #message = str(row)
+        #self.controller.show_warning(message)
+        
+        n = int((len(rows)/9)+1)
+        message = str(n)
+        self.controller.show_warning(message)
+        
+        self.img_path_list = []
+        self.img_path_list1D = []
+        # Creates a list containing 5 lists, each of 8 items, all set to 0
+        
+ 
+        #To initialize a two-dimensional array in Python:
+        #a = [[x for x in range(columns)] for y in range(rows)]
+        
+        #self.img_path_list = [[] for y in range(n)]
+        
+        
+        # Fill 1D array with full path
         if row is None:
             message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
             self.dao.show_warning(message, context_name='ui_message')
             return
         else:
-            print "full path"
-            # Full path= path + value from row
-            #self.full_path =row[0]+self.path
+            for value in rows:
+                full_path = str(row[0])+str(value[0])
+                #self.img_path_list.append(full_path)
+                self.img_path_list1D.append(full_path)
+         
+        '''    
+        for uy in range(0,5):
+            self.img_path_list1D.append(None)
             
-            # rows - list of relativ paths
-            # for each relative path make apsolute path
-            '''
-            for i in rows:
-                # Full path= path + value from row
-                self.full_path =row[0]+self.path
-                # list of paths of pictures
-                list.append(self.full_path)
+        message = str(self.img_path_list1D)
+        self.controller.show_warning(message)
             
-            # set picture
-            '''
+        
+        one = np.array(self.img_path_list1D)
+        self.img_path_list = one.reshape(9,1)
+        message = str(one)
+        self.controller.show_warning(message)
+        message = str(self.img_path_list)
+        self.controller.show_warning(message)
+        '''
         
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
-        
-        '''
-        img_0 = self.dlg_gallery.findChild(QLabel, 'img_0')
-        img_1 = self.dlg_gallery.findChild(QLabel, 'img_1')
-        img_2 = self.dlg_gallery.findChild(QLabel, 'img_2')
-        img_3 = self.dlg_gallery.findChild(QLabel, 'img_3')
-        img_4 = self.dlg_gallery.findChild(QLabel, 'img_4')
-        img_5 = self.dlg_gallery.findChild(QLabel, 'img_5')
-        img_6 = self.dlg_gallery.findChild(QLabel, 'img_6')
-        img_7 = self.dlg_gallery.findChild(QLabel, 'img_7')
-        img_8 = self.dlg_gallery.findChild(QLabel, 'img_8')
-        '''
         
         txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
         txt_visit_id.setText(str(self.visit_id))
@@ -372,23 +389,25 @@ class ManNodeDialog(ParentDialog):
         txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
         txt_event_id.setText(str(self.event_id))
         # Add picture to gallery
-        '''
-        pic_file = "C:/Users/tasladmin/Desktop/img_pipe.png"
-        pixmap = QPixmap(pic_file)
-        self.img_1.setPixmap(pixmap)
-        self.img_1.show()  
-        '''
+      
+        
         self.img_path_list = [["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"] ,["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]]
+        
+
+        self.img_path_list1D = ["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]
+   
+
         
         # List of pointers(in memory) of clicableLabels
         self.list_widgetExtended=[]
         self.list_labels=[]
+
+        
         #for i in range(0, len(self.img_path_list)):
         for i in range(0, 9):
             # Set image to QLabel
             
-
-            pixmap = QPixmap(self.img_path_list[0][i])
+            pixmap = QPixmap(str(self.img_path_list[0][i]))
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
             widget_name = "img_"+str(i)
@@ -396,26 +415,18 @@ class ManNodeDialog(ParentDialog):
 
             # Set QLabel like ExtendedQLabel(ClickableLabel)
             self.widgetExtended=ExtendedQLabel.ExtendedQLabel(widget)
-
-            
+ 
             self.widgetExtended.setPixmap(pixmap)
-            message ="calling zoom image"
-            self.controller.show_info(message)
-            # Set signal of ClickableLabel
-            widget.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[0][i])))
- 
- 
+            self.start_indx = 0
+            # Set signal of ClickableLabel   
+
+            self.dlg_gallery.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
+  
             self.list_widgetExtended.append(self.widgetExtended)
             self.list_labels.append(widget)
-            
-
-            # Add functionality to button of zooming picture
-            #btn_widget_name = "btn_zoom_img_"+str(i)
-            #btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
-            #btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[0][i]))
       
         self.start_indx = 0
-        self.end_indx = len(self.img_path_list)-1
+        #self.end_indx = len(self.img_path_list)-1
         self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
         self.btn_next.clicked.connect(self.next_gallery)
         
@@ -433,86 +444,36 @@ class ManNodeDialog(ParentDialog):
         for i in self.list_widgetExtended:
             i.clear()
             #i.clicked.disconnect(self.zoom_img) #this disconnect all!
-            
-       
-            
-            
+  
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
             
             self.list_widgetExtended[i].setPixmap(pixmap)
-            #widget_name = "img_"+str(i)
-            #widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            #widget.clear()
-            
-            self.list_labels[i].connect( self.list_widgetExtended[i], SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[self.start_indx][i])))
 
-        '''
-        self.start_indx = self.start_indx+1
-        
-        
-        
-        # First clear previous
-        for i in range(0, 9):
-            widget_name = "img_"+str(i)
-            widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            widget.clear()
-            # WIP : Add action to Label :on click zoom images
-    
-        
-        # Add new 9 images
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            widget_name = "img_"+str(i)
-            widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            #Define clicable label
-            #self.label=ClickableLabel(widget)
-            #self.label.signalClicked.connec(self.test) 
-            widget.setPixmap(pixmap)
-            widget.show()
-
-            # Add functionality to button of zooming picture
-            btn_widget_name = "btn_zoom_img_"+str(i)
-            btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
-            
-            message = "btn_clicked"
-            self.controller.show_warning(message, context_name='ui_message')
-            
-            btn_widget.clicked.connect(partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
-        '''
         if self.start_indx > 0 :
             self.btn_previous.setEnabled(True) 
             
         # On last tab disable btn_next
         if self.start_indx == (len(self.img_path_list)-1) :
             self.btn_next.setEnabled(False) 
-            
+    
         
-        
-        
-    def zoom_img(self,img):
+    def zoom_img(self,i):
 
         #myButton.clicked.disconnect(function_B) #this disconnect function_B
         #self.list_labels[i].disconnect( partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
         
-        
-        message ="zoom_img"
-        self.controller.show_info(message)
+        handelerIndex=i    
         
         self.dlg_gallery_zoom = GalleryZoom()
-        pixmap = QPixmap(img)
+        #pixmap = QPixmap(img)
+        pixmap = QPixmap(self.img_path_list[self.start_indx][i])
         #pixmap = pixmap.scaled(711,501,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-        
-        
-        message =str(img)
-        self.controller.show_info(message)
-        message =str(pixmap)
-        self.controller.show_info(message)
-
-        lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
-        lbl_img.setPixmap(pixmap)
+  
+        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
+        self.lbl_img.setPixmap(pixmap)
         #lbl_img.show()
             
         zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
@@ -521,63 +482,79 @@ class ManNodeDialog(ParentDialog):
         zoom_visit_id.setText(str(self.visit_id))
         zoom_event_id.setText(str(self.event_id))
     
-        btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
-        btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
+        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
+        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
         
-        btn_slidePrevious.clicked.connect(self.slide_previous)
- 
+        self.i=i
+        self.btn_slidePrevious.clicked.connect(self.slide_previous)
+        self.btn_slideNext.clicked.connect(self.slide_next)
+        
         self.dlg_gallery_zoom.exec_() 
+        
+        # Controling start index
+        if handelerIndex != i:
+            self.start_indx = self.start_indx+1
         
         
     def slide_previous(self):
-        pass
-        
-        
 
+        
+        #indx=self.i-1
+        indx=(self.start_indx*9)+self.i-1
+        message = str(indx)
+        self.controller.show_warning(message)
+        
+        
+        pixmap = QPixmap(self.img_path_list1D[indx])
+
+        self.lbl_img.setPixmap(pixmap)
+        
+        self.i=self.i-1
+        
+        if self.i == 0 :
+            self.btn_slidePrevious.setEnabled(False) 
+
+        
+    def slide_next(self):
+
+        message = str(self.start_indx)
+        self.controller.show_warning(message)
+  
+        #indx=self.i+1 
+        indx=(self.start_indx*9)+self.i+1
+        message = str(indx)
+        self.controller.show_warning(message)
+        
+        pixmap = QPixmap(self.img_path_list1D[indx])
+
+        self.lbl_img.setPixmap(pixmap)
+        
+        self.i=self.i+1
+        
+        if self.i > 0 :
+            self.btn_slidePrevious.setEnabled(True) 
+
+        
     def previous_gallery(self):
         #self.end_indx = self.end_indx-1
         self.start_indx = self.start_indx-1
-
+        
+        
         # First clear previous
         for i in self.list_widgetExtended:
             i.clear()
-        '''
-        for i in range(0, 9):
-            widget_name = "img_"+str(i)
-            widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            widget.clear()
-        '''
-        
-        
+
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
             
             self.list_widgetExtended[i].setPixmap(pixmap)
-            #widget_name = "img_"+str(i)
-            #widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            #widget.clear()
-            
-            self.list_labels[i].connect( self.list_widgetExtended[i], SIGNAL('clicked()'), (partial(self.zoom_img,self.img_path_list[self.start_indx][i])))
-        
-        '''
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            widget_name = "img_"+str(i)
-            widget = self.dlg_gallery.findChild(QLabel, widget_name)
-            widget.setPixmap(pixmap)
-            widget.show()  
-            
-            # Add functionality to button of zooming picture
-            btn_widget_name = "btn_zoom_img_"+str(i)
-            btn_widget = self.dlg_gallery.findChild(QPushButton, btn_widget_name)
-        '''
 
-        if self.start_indx == 0 :
+        if self.start_indx == 0 and self.i == 0 :
             self.btn_previous.setEnabled(False)
-        if self.start_indx < len(self.img_path_list) :
-            self.btn_next.setEnabled(True)  
+        #if self.i < len(self.img_path_list) :
+        #    self.btn_next.setEnabled(True)  
   
         
     ''' ACTIONS TOOLBAR '''    

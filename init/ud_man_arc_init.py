@@ -264,8 +264,7 @@ class ManArcDialog(ParentDialog):
         self.controller.show_warning(message, context_name='ui_message')
         
         expr = QgsExpression(aux)
-        message = "test 2"
-        self.controller.show_warning(message, context_name='ui_message')
+
         '''
         if expr.hasParserError():
             message = "Expression Error: " + str(expr.parserErrorString())
@@ -275,8 +274,7 @@ class ManArcDialog(ParentDialog):
 
         it = layer.getFeatures(QgsFeatureRequest(expr))
         #feature = layer.getFeature(id_node1)
-        message = "test3"
-        self.controller.show_warning(message, context_name='ui_message')
+        
         # Build a list of feature id's from the previous result
 
         
@@ -304,8 +302,13 @@ class ManArcDialog(ParentDialog):
         currentTool = self.iface.mapCanvas().mapTool()
         message = str(currentTool)
         self.controller.show_warning(message, context_name='ui_message')
-        
-
+        #tool = PointTool(qgis.iface.mapCanvas())
+        #qgis.iface.mapCanvas().setMapTool(tool)
+        layer = self.iface.activeLayer()
+        QgsMapToolIdentify(self.iface)
+        QgsMapToolIdentify.identify(100,100) 
+        message = "QgsMapToolIdentify"
+        self.controller.show_warning(message, context_name='ui_message')
         
         #canvas = self.iface.mapCanvas()
         # Get the active layer (must be a vector layer)
@@ -317,8 +320,7 @@ class ManArcDialog(ParentDialog):
         # Add this features to the selected list
         #layer.setSelectedFeatures([feature.id()])
         canvas = self.iface.mapCanvas()
-        message = "test11df1"
-        self.controller.show_warning(message, context_name='ui_message')
+        
         
         # Build a list of feature id's from the previous result
         id_list = [i.id() for i in it]
@@ -330,8 +332,7 @@ class ManArcDialog(ParentDialog):
         # activate map tool QgsMapToolIdentify 
         # provide canvas to map tool
         currentTool = QgsMapToolIdentify(canvas)
-        message = "test2244"
-        self.controller.show_warning(message, context_name='ui_message')
+
         currentTool.deactivate()
         
         
@@ -341,8 +342,7 @@ class ManArcDialog(ParentDialog):
         
         currentTool = QgsMapToolPan(canvas)
         currentTool.activate()
-        message = "test22"
-        self.controller.show_warning(message, context_name='ui_message')
+ 
         
         #self.toolIdentify = QgsMapToolIdentify(self.canvas) 
         
