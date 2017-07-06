@@ -270,7 +270,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>15</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -912,8 +912,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1130,8 +1130,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1664,8 +1664,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1690,8 +1690,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>571</width>
+         <height>281</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1763,7 +1763,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>15</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1780,7 +1780,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1799,7 +1799,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>15</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1897,7 +1897,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>45</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1933,13 +1933,68 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>45</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_tank_act_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="tank_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -1972,8 +2027,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2436,8 +2491,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2504,8 +2559,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3038,8 +3093,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3075,7 +3130,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>15</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3209,7 +3264,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>15</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3226,7 +3281,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3245,7 +3300,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>45</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3258,7 +3313,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>45</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3290,6 +3345,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_pump_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="pump_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -3314,8 +3424,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3778,8 +3888,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4312,8 +4422,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4349,7 +4459,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4483,7 +4593,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4500,7 +4610,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -4519,7 +4629,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -4532,7 +4642,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -4550,6 +4660,61 @@
         </property>
         <property name="text">
          <string>Hemisphere:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="source_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_source_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -4588,8 +4753,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5052,8 +5217,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5586,8 +5751,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5623,7 +5788,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>25</y>
+          <y>55</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5757,7 +5922,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>26</y>
+          <y>56</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5774,7 +5939,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5793,7 +5958,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>55</y>
+          <y>85</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5806,7 +5971,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>55</y>
+          <y>85</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5838,6 +6003,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_meter_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>25</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="meter_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>25</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -5862,8 +6082,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6427,8 +6647,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6961,8 +7181,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6987,8 +7207,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7024,7 +7244,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -7158,7 +7378,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7175,7 +7395,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -7194,7 +7414,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -7207,7 +7427,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -7239,6 +7459,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_junction_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="junction_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -7263,8 +7538,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7727,8 +8002,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8261,8 +8536,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>339</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8419,7 +8694,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>10</y>
+          <y>40</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8436,7 +8711,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -8455,7 +8730,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>10</y>
+          <y>40</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8468,7 +8743,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>40</y>
+          <y>70</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8481,7 +8756,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>40</y>
+          <y>70</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8513,6 +8788,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_waterwell_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>10</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="waterwell_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>10</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -8537,8 +8867,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9004,8 +9334,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9127,8 +9457,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9661,8 +9991,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9819,7 +10149,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9836,7 +10166,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -9855,7 +10185,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9868,7 +10198,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9881,7 +10211,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9913,6 +10243,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_reduction_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="reduction_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -9937,8 +10322,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10404,8 +10789,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10891,8 +11276,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11425,8 +11810,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11462,7 +11847,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11596,7 +11981,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11613,7 +11998,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -11632,7 +12017,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11645,7 +12030,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11677,6 +12062,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_hydrant_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="hydrant_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -11701,8 +12141,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12246,8 +12686,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13050,8 +13490,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13584,8 +14024,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13595,7 +14035,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13612,7 +14052,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -13667,7 +14107,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13791,7 +14231,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13804,7 +14244,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13836,6 +14276,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_valve_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="valve_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -13860,8 +14355,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14324,8 +14819,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14858,8 +15353,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14895,7 +15390,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15029,7 +15524,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15046,7 +15541,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -15065,7 +15560,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15078,7 +15573,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15110,6 +15605,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_manhole_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="manhole_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -15134,8 +15684,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15601,8 +16151,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16135,8 +16685,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16172,7 +16722,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16306,7 +16856,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -16323,7 +16873,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -16342,7 +16892,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16355,7 +16905,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -16387,6 +16937,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_filter_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="filter_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -16411,8 +17016,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16927,8 +17532,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17461,8 +18066,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17498,7 +18103,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -17632,7 +18237,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -17649,7 +18254,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -17668,7 +18273,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -17681,7 +18286,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -17711,6 +18316,61 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_register_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="register_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -18204,8 +18864,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18738,8 +19398,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18775,7 +19435,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -18909,7 +19569,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -18926,7 +19586,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -18945,7 +19605,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -18958,7 +19618,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -18988,6 +19648,61 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netwjoin_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="netwjoin_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -19481,8 +20196,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20015,8 +20730,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -20051,8 +20766,8 @@
        <widget class="QLineEdit" name="netelement_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>385</x>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -20185,8 +20900,8 @@
        <widget class="QLabel" name="label_netelement_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>285</x>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -20203,7 +20918,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -20221,8 +20936,8 @@
        <widget class="QLineEdit" name="netelement_hemisphere">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>50</y>
+          <x>385</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -20234,8 +20949,8 @@
        <widget class="QLabel" name="label_netelement_hemisphere">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>50</y>
+          <x>285</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -20265,6 +20980,61 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netelement_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>285</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="netelement_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>385</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -20758,8 +21528,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21292,8 +22062,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21328,8 +22098,8 @@
        <widget class="QLineEdit" name="netsample_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>385</x>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -21462,8 +22232,8 @@
        <widget class="QLabel" name="label_netsample_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>285</x>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -21480,7 +22250,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -21498,8 +22268,8 @@
        <widget class="QLineEdit" name="netsample_hemisphere">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>50</y>
+          <x>385</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -21511,8 +22281,8 @@
        <widget class="QLabel" name="label_netsample_hemisphere">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>50</y>
+          <x>285</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -21542,6 +22312,61 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netsample_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>285</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="netsample_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>385</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -22035,8 +22860,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -22569,8 +23394,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -22606,7 +23431,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -22740,7 +23565,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -22757,7 +23582,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -22776,7 +23601,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -22789,7 +23614,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -22821,6 +23646,61 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QLabel" name="label_exptank_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="exptank_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -22845,8 +23725,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23312,8 +24192,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23846,8 +24726,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>335</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23883,7 +24763,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>20</y>
+          <y>50</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -24017,7 +24897,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>20</y>
+          <y>50</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -24034,7 +24914,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -24053,7 +24933,7 @@
         <property name="geometry">
          <rect>
           <x>380</x>
-          <y>50</y>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -24066,7 +24946,7 @@
         <property name="geometry">
          <rect>
           <x>280</x>
-          <y>50</y>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -24096,6 +24976,61 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_flexunion_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="flexunion_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="maxVisibleItems">
+         <number>8</number>
+        </property>
+        <property name="frame">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
