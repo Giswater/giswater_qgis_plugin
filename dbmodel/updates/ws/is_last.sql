@@ -287,6 +287,12 @@ CREATE TABLE review_audit_connec
 -- ALTER TABLES
 -------------
 
+ALTER TABLE pond ADD COLUMN "state" character varying(16);
+ALTER TABLE pool ADD COLUMN "state" character varying(16);
+
+ALTER TABLE pond ADD CONSTRAINT pond_state_fkey FOREIGN KEY (state)  REFERENCES value_state (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pool ADD CONSTRAINT pool_state_fkey FOREIGN KEY (state)  REFERENCES value_state (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+
 
 ALTER TABLE node ADD COLUMN hemisphere float;
 ALTER TABLE node_type ADD COLUMN choose_hemisphere boolean;
