@@ -296,7 +296,7 @@ ALTER TABLE pool ADD CONSTRAINT pool_state_fkey FOREIGN KEY (state)  REFERENCES 
 
 ALTER TABLE node ADD COLUMN hemisphere float;
 ALTER TABLE node_type ADD COLUMN choose_hemisphere boolean;
-ALTER TABLE node_type ADD COLUMN shortcut_key text;
+
 
 
 ALTER TABLE anl_mincut_result_cat ADD COLUMN anl_cause character varying (30);
