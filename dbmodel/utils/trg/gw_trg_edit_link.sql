@@ -9,7 +9,11 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_link() RETURNS trigger LANG
 DECLARE 
     v_sql varchar;
 	expl_id_int integer;
-	
+	vnode_end public.geometry;
+	vnode_start public.geometry;
+	arc_geom_start public.geometry;
+	arc_geom_end public.geometry;
+	link_geom public.geometry;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -36,14 +40,38 @@ BEGIN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
-	
+		
+			--vnode id
+		IF (NEW.vnode_id IS NULL) THEN
+				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
+			END IF;               
+			
         -- link ID
 		IF (NEW.link_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+				PERFORM setval('urn_id_seq', gw_fct_urn()+1,true);
 				NEW.link_id:= (SELECT nextval('urn_id_seq'));
-			END IF;
-               
-        INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
+			END IF;			
+		
+		link_geom:=NEW.the_geom;
+		--RAISE NOTICE 'link_geom %',link_geom; 
+		vnode_start:=ST_StartPoint(link_geom);
+		vnode_end:=ST_EndPoint(link_geom);
+		
+		SELECT the_geom INTO arc_geom_start FROM arc WHERE ST_DWithin(vnode_start, arc.the_geom,0.001) LIMIT 1;
+		SELECT the_geom INTO arc_geom_end FROM arc WHERE ST_DWithin(vnode_end, arc.the_geom,0.001) LIMIT 1;
+		--RAISE EXCEPTION 'arc_geom_start %', arc_geom_start;
+		--RAISE EXCEPTION 'arc_geom_end %', arc_geom_end;
+		
+		IF arc_geom_start IS NOT NULL THEN
+			INSERT INTO vnode (vnode_id, the_geom) VALUES (NEW.vnode_id, vnode_start);
+		END IF;
+
+		IF arc_geom_end IS NOT NULL THEN
+			INSERT INTO vnode (vnode_id, the_geom) VALUES (NEW.vnode_id, vnode_end);
+		END IF;
+		
+		INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
 		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
 		
         RETURN NEW;
