@@ -169,6 +169,21 @@ CONSTRAINT man_value_state_pkey PRIMARY KEY (id)
 --THE PARENT NODE STRATEGY IT NOT MUST BE APPLIED TO TANKS AND TO REGISTERS...
 
 ALTER TABLE node ADD COLUMN parent_node_id character varying(16);
+
+
+ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_parent_node_fkey";
+
+ALTER TABLE limnometer DROP CONSTRAINT IF EXISTS "limnometer_fkey";
+ALTER TABLE piezometer DROP CONSTRAINT IF EXISTS "piezometer_fkey";
+
+ALTER TABLE man_register DROP CONSTRAINT IF EXISTS "man_register_fkey";
+ALTER TABLE man_netwjoin DROP CONSTRAINT IF EXISTS "man_netwjoin_fkey";
+ALTER TABLE man_expansiontank DROP CONSTRAINT IF EXISTS "man_expansiontank_fkey";
+ALTER TABLE man_flexunion DROP CONSTRAINT IF EXISTS "man_flexunion_fkey";
+
+ALTER TABLE man_varc DROP CONSTRAINT IF EXISTS "man_varc_fkey";
+
+
 ALTER TABLE node ADD CONSTRAINT node_parent_node_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
   
 ALTER TABLE limnometer ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

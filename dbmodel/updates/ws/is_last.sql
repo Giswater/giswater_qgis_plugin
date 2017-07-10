@@ -167,14 +167,15 @@ CREATE TABLE "anl_mincut_result_valve_unaccess"(
 
 
 
+
 ALTER TABLE anl_mincut_result_valve ADD COLUMN status_type integer;
 ALTER TABLE anl_mincut_valve ADD COLUMN status_type integer;
 
-ALTER TABLE anl_mincut_valve  ADD CONSTRAINT anl_mincut_valve_status_type_fkey FOREIGN KEY (status_type)
-REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE anl_mincut_valve DROP CONSTRAINT IF EXISTS "anl_mincut_valve_status_type_fkey";
+ALTER TABLE anl_mincut_valve  ADD CONSTRAINT anl_mincut_valve_status_type_fkey FOREIGN KEY (status_type) REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE anl_mincut_result_valve ADD CONSTRAINT anl_mincut_result_valve_status_type_fkey FOREIGN KEY (status_type)
-REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE anl_mincut_result_valve DROP CONSTRAINT IF EXISTS "anl_mincut_result_valve_status_type_fkey";
+ALTER TABLE anl_mincut_result_valve ADD CONSTRAINT anl_mincut_result_valve_status_type_fkey FOREIGN KEY (status_type) REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 -- ----------------------------
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
@@ -290,7 +291,9 @@ CREATE TABLE review_audit_connec
 ALTER TABLE pond ADD COLUMN "state" character varying(16);
 ALTER TABLE pool ADD COLUMN "state" character varying(16);
 
+ALTER TABLE pond DROP CONSTRAINT IF EXISTS "pond_state_fkey";
 ALTER TABLE pond ADD CONSTRAINT pond_state_fkey FOREIGN KEY (state)  REFERENCES value_state (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pool DROP CONSTRAINT IF EXISTS "pool_state_fkey";
 ALTER TABLE pool ADD CONSTRAINT pool_state_fkey FOREIGN KEY (state)  REFERENCES value_state (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
@@ -379,6 +382,38 @@ ALTER TABLE cat_element ADD COLUMN madeby character varying(100);
 ALTER TABLE cat_element ADD COLUMN model character varying(100);
 
 ALTER TABLE man_tank ADD COLUMN pol_id character varying(16);
+
+
+
+ALTER TABLE doc_x_tag DROP CONSTRAINT IF EXISTS "doc_x_tag_tag_id_fkey";
+ALTER TABLE doc_x_tag DROP CONSTRAINT IF EXISTS "doc_x_tag_doc_id_fkey";
+
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS "arc_expl_id_fkey";
+ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_expl_id_fkey";
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_expl_id_fkey";
+
+ALTER TABLE polygon DROP CONSTRAINT IF EXISTS "polygon_expl_id_fkey";
+ALTER TABLE vnode DROP CONSTRAINT IF EXISTS "vnode_expl_id_fkey";
+ALTER TABLE link DROP CONSTRAINT IF EXISTS "link_expl_id_fkey";
+ALTER TABLE point DROP CONSTRAINT IF EXISTS "point_expl_id_fkey";
+ALTER TABLE pond DROP CONSTRAINT IF EXISTS "pond_expl_id_fkey";
+ALTER TABLE pool DROP CONSTRAINT IF EXISTS "pool_expl_id_fkey";
+ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_expl_id_fkey";
+ALTER TABLE om_visit DROP CONSTRAINT IF EXISTS "om_visit_expl_id_fkey";
+ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
+
+ALTER TABLE man_valve DROP CONSTRAINT IF EXISTS "cat_node_cat_valve2_fkey";
+ALTER TABLE man_tap DROP CONSTRAINT IF EXISTS "cat_node_cat_valve2_fkey";
+ALTER TABLE man_wjoin DROP CONSTRAINT IF EXISTS "cat_node_cat_valve2_fkey";
+
+ALTER TABLE man_fountain DROP CONSTRAINT IF EXISTS "connec_linked_connec_fkey";
+ALTER TABLE man_tap DROP CONSTRAINT IF EXISTS "connec_linked_connec_fkey";
+ALTER TABLE man_greentap DROP CONSTRAINT IF EXISTS "connec_linked_connec_fkey";
+
+ALTER TABLE anl_mincut_result_cat DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_cause_anl_cause_fkey";
+ALTER TABLE anl_mincut_result_cat DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_type_mincut_result_type_fkey";
+ALTER TABLE anl_mincut_result_cat DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_state_mincut_result_state_fkey";
+
 
 ALTER TABLE doc_x_tag ADD CONSTRAINT doc_x_tag_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES cat_tag (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE doc_x_tag ADD CONSTRAINT doc_x_tag_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

@@ -365,6 +365,37 @@ ALTER TABLE cat_element ADD COLUMN model character varying(100);
 
 ALTER TABLE cat_feature ADD feature_type character varying (18);
 
+
+ALTER TABLE doc_x_tag DROP CONSTRAINT IF EXISTS "doc_x_tag_tag_id_fkey";
+ALTER TABLE doc_x_tag DROP CONSTRAINT IF EXISTS "doc_x_tag_doc_id_fkey";
+
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS "arc_expl_id_fkey";
+ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_expl_id_fkey";
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_expl_id_fkey";
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_expl_id_fkey";
+
+ALTER TABLE polygon DROP CONSTRAINT IF EXISTS "polygon_expl_id_fkey";
+ALTER TABLE vnode DROP CONSTRAINT IF EXISTS "vnode_expl_id_fkey";
+ALTER TABLE link DROP CONSTRAINT IF EXISTS "link_expl_id_fkey";
+ALTER TABLE point DROP CONSTRAINT IF EXISTS "point_expl_id_fkey";
+ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_expl_id_fkey";
+ALTER TABLE om_visit DROP CONSTRAINT IF EXISTS "om_visit_expl_id_fkey";
+ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
+ALTER TABLE raingage DROP CONSTRAINT IF EXISTS "raingage_expl_id_fkey";
+ALTER TABLE catchment DROP CONSTRAINT IF EXISTS "catchment_expl_id_fkey";
+ALTER TABLE subcatchment DROP CONSTRAINT IF EXISTS "subcatchment_expl_id_fkey";
+
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_streetaxis_id_fkey";
+
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS "arc_macrodma_id_fkey";
+ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_macrodma_id_fkey";
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_macrodma_id_fkey";
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_macrodma_id_fkey";
+
+ALTER TABLE om_visit_event_photo DROP CONSTRAINT IF EXISTS "om_visit_event_foto_event_id_fkey";
+ALTER TABLE om_visit_event_photo DROP CONSTRAINT IF EXISTS "om_visit_event_foto_visit_id_fkey";
+
+
 ALTER TABLE doc_x_tag ADD CONSTRAINT doc_x_tag_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES cat_tag (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE doc_x_tag ADD CONSTRAINT doc_x_tag_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -392,9 +423,9 @@ ALTER TABLE connec  ADD CONSTRAINT connec_macrodma_id_fkey FOREIGN KEY (macrodma
 ALTER TABLE gully ADD CONSTRAINT gully_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma_selector (macrodma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
- CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)      REFERENCES om_visit_event (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
- CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
+ ALTER TABLE om_visit_event_photo ADD CONSTRAINT om_visit_event_foto_event_id_fkey FOREIGN KEY (event_id)      REFERENCES om_visit_event (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
+ ALTER TABLE om_visit_event_photo ADD CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
  
- ALTER TABLE link DROP CONSTRAINT link_connec_id_fkey;
+ ALTER TABLE link DROP CONSTRAINT IF EXISTS link_connec_id_fkey;
   
 

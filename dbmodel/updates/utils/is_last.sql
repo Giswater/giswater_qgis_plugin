@@ -67,6 +67,7 @@ ALTER TABLE link RENAME column connec_id TO feature_id;
 ALTER TABLE link ADD COLUMN featurecat_id character varying(50);
 ALTER TABLE link ADD COLUMN "state" character varying(16);
 
+ALTER TABLE link DROP CONSTRAINT IF EXISTS "link_featurecat_id_fkey";
 ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 -- ----------------------------
@@ -111,6 +112,9 @@ value character varying (50),
 tstamp timestamp default now()
 );
 
+
+ALTER TABLE man_custom_field DROP CONSTRAINT IF EXISTS "man_custom_field_man_custom_field_parameter_fkey";
+ALTER TABLE man_custom_field_parameter DROP CONSTRAINT IF EXISTS "man_custom_field_parameter_cat_feature_fkey";
 
  ALTER TABLE man_custom_field ADD CONSTRAINT man_custom_field_man_custom_field_parameter_fkey FOREIGN KEY (field_id) REFERENCES man_custom_field_parameter (field_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
  ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -225,11 +229,8 @@ CREATE TABLE om_visit_cat
 
 ALTER TABLE om_visit ADD COLUMN visitcat_id integer;
 
-
-ALTER TABLE om_visit
-  ADD CONSTRAINT om_visit_om_visit_cat_id_fkey FOREIGN KEY (visitcat_id)
-      REFERENCES om_visit_cat (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE om_visit DROP CONSTRAINT IF EXISTS "om_visit_om_visit_cat_id_fkey";
+ALTER TABLE om_visit   ADD CONSTRAINT om_visit_om_visit_cat_id_fkey FOREIGN KEY (visitcat_id) REFERENCES om_visit_cat (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
  
