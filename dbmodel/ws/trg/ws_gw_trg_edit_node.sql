@@ -161,7 +161,7 @@ INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, se
 
 
     -- UPDATE EPA values
-        IF (NEW.epa_type <> OLD.epa_type) THEN    
+        IF (NEW.epa_type != OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';            
@@ -180,6 +180,8 @@ INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, se
                 v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
                 EXECUTE v_sql;
             END IF;
+			inp_table := NULL;
+
 
             IF (NEW.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';   
