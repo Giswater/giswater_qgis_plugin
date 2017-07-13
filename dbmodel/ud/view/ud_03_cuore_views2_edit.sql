@@ -1049,6 +1049,7 @@ CREATE OR REPLACE VIEW v_edit_man_chamber AS
 	man_chamber.inlet AS chamber_inlet,
 	man_chamber.bottom_channel AS chamber_bottom_channel,
 	man_chamber.accessibility AS chamber_accessibility,
+	man_chamber.sandbox AS chamber_sandbox,
 	node.expl_id
    FROM expl_selector, node
     JOIN man_chamber ON man_chamber.node_id::text = node.node_id::text
@@ -1333,6 +1334,8 @@ DROP VIEW IF EXISTS v_edit_man_siphon CASCADE;
 
 CREATE OR REPLACE VIEW v_edit_man_siphon AS 
  SELECT arc.arc_id,
+     arc.node_1 AS siphon_node_1,
+    arc.node_2 AS siphon_node_2,
     arc.y1 AS siphon_y1,
 	arc.est_y1 AS siphon_est_y1,
 	arc.elev1 AS siphon_elev1,
@@ -1409,6 +1412,8 @@ CREATE OR REPLACE VIEW v_edit_man_siphon AS
 DROP VIEW IF EXISTS v_edit_man_waccel CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_waccel AS 
  SELECT arc.arc_id,
+    arc.node_1 AS waccel_node_1,
+    arc.node_2 AS waccel_node_2,
     arc.y1 AS waccel_y1,
 	arc.est_y1 AS waccel_est_y1,
 	arc.elev1 AS waccel_elev1,
@@ -1487,6 +1492,8 @@ CREATE OR REPLACE VIEW v_edit_man_waccel AS
 DROP VIEW IF EXISTS v_edit_man_varc CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_varc AS 
  SELECT arc.arc_id,
+     arc.node_1 AS varc_node_1,
+    arc.node_2 AS varc_node_2,
     arc.y1 AS varc_y1,
 	arc.est_y1 AS varc_est_y1,
 	arc.elev1 AS varc_elev1,

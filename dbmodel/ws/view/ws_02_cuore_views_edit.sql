@@ -532,7 +532,7 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	node.inventory,
 	node.end_date AS pump_end_date,
 	dma.macrodma_id,
-	man_pump.elev_height,
+	man_pump.elev_height AS pump_elev_height,,
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as pump_hemisphere
