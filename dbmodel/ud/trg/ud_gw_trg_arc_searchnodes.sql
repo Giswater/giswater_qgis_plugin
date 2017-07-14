@@ -5,48 +5,57 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes() RETURNS trigger AS
-
+CREATE OR REPLACE FUNCTION ud_sample.gw_trg_arc_searchnodes()
+  RETURNS trigger AS
 $BODY$
 DECLARE 
     nodeRecord1 Record; 
     nodeRecord2 Record;
     optionsRecord Record;
     rec Record;
-    slope_arc_direction_bool boolean;
     z1 double precision;
     z2 double precision;
     z_aux double precision;
     vnoderec Record;
     newPoint public.geometry;    
     connecPoint public.geometry;
-    check_aux boolean;
-   
-	
+    value1 boolean;
+    value2 boolean;
+
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
-	
-    -- Get data from config table
-    SELECT * INTO rec FROM config;
-    SELECT value INTO slope_arc_direction_bool FROM config_param_bool where id='slope_arc_direction';    
-	SELECT arc_topocoh INTO check_aux FROM value_state where NEW.state=id;
 
-   SELECT * INTO nodeRecord1 FROM node WHERE (ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes) AND ((check_aux IS true AND NEW.state=node.state) OR check_aux IS false))
+    -- Init variables
+    value1:= true;
+    value2:= true;
+    
+    -- Get data from config table
+    SELECT * INTO rec FROM config;    
+
+    SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
-	
-	SELECT * INTO nodeRecord2 FROM node WHERE (ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes) AND ((check_aux IS true AND NEW.state=node.state) OR check_aux IS false))
+
+    SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes)
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
     SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
+
+    IF NEW.y1 IS NULL then 
+	NEW.y1=0;
+	value1:=false;
+    END IF;
+    IF NEW.y2 IS NULL then 
+	NEW.y2=0;
+	value2:=false;
+    END IF;
 
     -- Control of start/end node
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 
         -- Control de lineas de longitud 0
         IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (rec.samenode_init_end_control IS TRUE) THEN
-            RETURN audit_function (180,750);
+            PERFORM audit_function (180,750);
             
         ELSE
             -- Update coordinates
@@ -61,25 +70,31 @@ BEGIN
                     z2 := NEW.y2;
             END IF;
 
-            IF (z1 > z2) AND (NEW.inverted_slope is not true) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
+            IF value1 is false then NEW.y1:= null; 
+            END IF;
+                
+            IF value2 is false then NEW.y2:= null; 
+            END IF;
+
+
+            IF ((z1 > z2) AND NEW.inverted_slope is not true) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
                 NEW.node_1 := nodeRecord1.node_id; 
                 NEW.node_2 := nodeRecord2.node_id;
+               
+                                
             ELSE 
 
-		IF (slope_arc_direction_bool IS TRUE) THEN 
-			-- Update conduit direction
-			NEW.the_geom := ST_reverse(NEW.the_geom);
-			z_aux := NEW.y1;
-			NEW.y1 := NEW.y2;
-			NEW.y2 := z_aux;
-			NEW.node_1 := nodeRecord2.node_id;
-			NEW.node_2 := nodeRecord1.node_id;
-		ELSE 
-			NEW.node_1 := nodeRecord1.node_id; 
-			NEW.node_2 := nodeRecord2.node_id;
-		
-		END IF;
+                -- Update conduit direction
+                NEW.the_geom := ST_reverse(NEW.the_geom);
+                z_aux := NEW.y1;
+                NEW.y1 := NEW.y2;
+                NEW.y2 := z_aux;
+                NEW.node_1 := nodeRecord2.node_id;
+                NEW.node_2 := nodeRecord1.node_id;                             
                 RETURN NEW;
+
+
+                
             END IF;
 
             -- Update vnode/link
@@ -126,17 +141,14 @@ BEGIN
                 
         RETURN NEW;
 
-    -- Error, no existing nodes or there is an inchoerence of states
-    ELSIF (check_aux IS true AND (nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) THEN
-		RETURN audit_function (210,750);
-		
+
+    -- Error, no existing nodes
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
-        RETURN audit_function (182,750);
-		
+        PERFORM audit_function (182,750);
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
         RETURN NEW;
     ELSE
-        RETURN audit_function (182,750);
+        PERFORM audit_function (182,750);
     END IF;
     
 END;  
