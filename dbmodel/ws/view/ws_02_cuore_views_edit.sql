@@ -535,7 +535,9 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	man_pump.elev_height AS pump_elev_height,,
 	node.expl_id,
 	node.parent_node_id,
-	node.hemisphere as pump_hemisphere
+	node.hemisphere as pump_hemisphere,
+	man_pump.flow AS pump_flow,
+	man_pump."power" AS pump_power
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
