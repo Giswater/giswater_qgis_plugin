@@ -310,7 +310,7 @@ class Giswater(QObject):
         self.iface.setActiveLayer(layer)
         
         # Find the layer to edit
-        layer = self.iface.activeLayer()
+        #layer = self.iface.activeLayer()
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
