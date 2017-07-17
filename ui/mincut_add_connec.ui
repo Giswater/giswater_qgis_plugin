@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>10</y>
+     <y>40</y>
      <width>211</width>
      <height>251</height>
     </rect>
@@ -35,40 +35,6 @@
      </rect>
     </property>
    </widget>
-  </widget>
-  <widget class="QPushButton" name="pushButton_plus">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>265</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_minus">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>265</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-   </property>
   </widget>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
@@ -94,6 +60,50 @@
    </property>
    <property name="text">
     <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="hydrometer_id">
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>15</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_insert">
+   <property name="geometry">
+    <rect>
+     <x>175</x>
+     <y>10</y>
+     <width>25</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_delete">
+   <property name="geometry">
+    <rect>
+     <x>205</x>
+     <y>10</y>
+     <width>25</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
    </property>
   </widget>
  </widget>

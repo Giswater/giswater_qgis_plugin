@@ -419,6 +419,58 @@
       <string/>
      </property>
     </widget>
+    <widget class="QCheckBox" name="chk_workcat_vdefault">
+     <property name="geometry">
+      <rect>
+       <x>155</x>
+       <y>60</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chk_cverified_vdefault">
+     <property name="geometry">
+      <rect>
+       <x>155</x>
+       <y>90</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chk_state_vdefault">
+     <property name="geometry">
+      <rect>
+       <x>155</x>
+       <y>30</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chk_builtdate_vdefault">
+     <property name="geometry">
+      <rect>
+       <x>155</x>
+       <y>120</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
