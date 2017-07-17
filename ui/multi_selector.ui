@@ -28,19 +28,6 @@
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
-  <widget class="QPushButton" name="btn_accept">
-   <property name="geometry">
-    <rect>
-     <x>65</x>
-     <y>250</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Ok</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
@@ -95,7 +82,6 @@
   <tabstop>btn_insert</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl</tabstop>
-  <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>

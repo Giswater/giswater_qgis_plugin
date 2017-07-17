@@ -56,29 +56,6 @@ class ManArcDialog(ParentDialog):
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
-
-        # Restoring layers from Qgs memory
-        proj = QgsProject.instance()
-        myint=proj.readNumEntry("myplugin","myint",123)[0]
-        message = str(myint)
-        self.controller.show_warning(message, context_name='ui_message')
-        
-        
-        
-        
-        '''
-        self.settings=QSettings()  
-        size = self.settings.beginReadArray("layer_node_man_UD")
-        
-        message = str(size)
-        self.controller.show_warning(message, context_name='ui_message')
-        for i in range(0, size):
-            self.settings.setArrayIndex(i)
-            layer_node_man_UD[i]=settings.value("layer_node_man_UD")
-            message = "test settings"
-            self.controller.show_warning(message, context_name='ui_message')
-        self.settings.endArray()   
-        '''
     
         table_element = "v_ui_element_x_arc" 
         table_document = "v_ui_doc_x_arc"   
@@ -135,8 +112,8 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
 
-        #self.layer_node_man= self.SnappingConfigManager.get_layer_node()
-        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(self.go_child)
+        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(partial(self.go_child,1))
+        self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child,2))
 
         # QLineEdit
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
@@ -144,12 +121,12 @@ class ManArcDialog(ParentDialog):
         # Manage 'cat_shape'
         self.setImage("label_image_ud_shape")
         
-        
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
+
 
     def catalog(self):
         self.dlg_cat = UDcatalog()
@@ -241,18 +218,16 @@ class ManArcDialog(ParentDialog):
         self.arccat_id.clear()
         self.arccat_id.setText(str(self.id.currentText()))
 
-    def go_child(self):
-   
-        self.conduit_node_1 = self.dialog.findChild(QLineEdit,"conduit_node_1")
-        self.node_id= self.conduit_node_1.text()
-       
         
-        layer = QgsMapLayerRegistry.instance().mapLayersByName( "Manhole" )[0]
-        self.iface.setActiveLayer(layer)
-        message = "tes11t"
-        self.controller.show_warning(message, context_name='ui_message')
-        #feature = layer.getFeature(id_node1)
+    def go_child(self,idx):
         
+        # Get name of selected layer 
+        selected_layer = self.layer.name()
+        widget = str(selected_layer.lower())+"_node_"+str(idx)     
+            
+        self.node_widget = self.dialog.findChild(QLineEdit,widget)
+        self.node_id= self.node_widget.text()
+
         # get pointer of node by ID
         n=len(self.node_id)
         aux = "\"node_id\" = "
@@ -260,10 +235,12 @@ class ManArcDialog(ParentDialog):
         aux += "'" + str(self.node_id) + "', "
         aux = aux[:-2] 
         
-        message = aux
-        self.controller.show_warning(message, context_name='ui_message')
-        
         expr = QgsExpression(aux)
+
+        nodes = ["Manhole","Junction","Chamber","Storage","Netgully","Netinit","Wjump","Wwtp","Outfall","Valve"]    
+        layers =[]
+        for node in nodes:
+            layers.append( QgsMapLayerRegistry.instance().mapLayersByName( node )[0])
 
         '''
         if expr.hasParserError():
@@ -271,87 +248,13 @@ class ManArcDialog(ParentDialog):
             self.controller.show_warning(message, context_name='ui_message')
             return
         '''
-
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        #feature = layer.getFeature(id_node1)
-        
-        # Build a list of feature id's from the previous result
-
-        
-        #--->id_list = it.id()
-        
-        #message =str(id_list)
-        #self.controller.show_warning(message, context_name='ui_message')
-
-        # Select features with these id's
-        #layer.setSelectedFeatures("11225")
-        
-        
-        message = "test55"
-        self.controller.show_warning(message, context_name='ui_message')
-        '''
-        for layer in self.layer_node_man:
-            feature = layer.getFeature(id_node1)
-            message = layer.name()
-            self.controller.show_warning(message, context_name='ui_message')
-            if feature != None:
-                print layer.name()
-                self.iface.setActiveLayer(layer)
-        '''
-        #QgsMapToolIdentify 
-        currentTool = self.iface.mapCanvas().mapTool()
-        message = str(currentTool)
-        self.controller.show_warning(message, context_name='ui_message')
-        #tool = PointTool(qgis.iface.mapCanvas())
-        #qgis.iface.mapCanvas().setMapTool(tool)
-        layer = self.iface.activeLayer()
-        QgsMapToolIdentify(self.iface)
-        QgsMapToolIdentify.identify(100,100) 
-        message = "QgsMapToolIdentify"
-        self.controller.show_warning(message, context_name='ui_message')
-        
-        #canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        #layer = self.iface.activeLayer()
-        #layer.setSelectedFeatures([feature.id()])
-        
-        
-        # set selected feature
-        # Add this features to the selected list
-        #layer.setSelectedFeatures([feature.id()])
-        canvas = self.iface.mapCanvas()
-        
-        
-        # Build a list of feature id's from the previous result
-        id_list = [i.id() for i in it]
-
-        # Select features with these id's
-        layer.setSelectedFeatures(id_list)
- 
-
-        # activate map tool QgsMapToolIdentify 
-        # provide canvas to map tool
-        currentTool = QgsMapToolIdentify(canvas)
-
-        currentTool.deactivate()
-        
-        
-        # QgsMapTool 
-        currentTool = QgsMapTool(canvas)
-        currentTool.activate()
-        
-        currentTool = QgsMapToolPan(canvas)
-        currentTool.activate()
- 
-        
-        #self.toolIdentify = QgsMapToolIdentify(self.canvas) 
-        
-        
-        
-        #init.ud_man_node_init.test()
-        #message = "test66"
-        #init.ud_man_node_init.formOpen()
-        #self.controller.show_warning(message, context_name='ui_message')
+        for layer in layers:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            if it != None :
+                id_list = [i for i in it]
+                # Open form 
+                self.iface.openFeatureForm(layer,id_list[0]) 
+                return
         
         
     def actionZoomOut(self):
@@ -366,11 +269,9 @@ class ManArcDialog(ParentDialog):
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
         
-        
-        
+               
     def actionZoom(self):
        
-        print "zoom"
         feature = self.feature
 
         canvas = self.iface.mapCanvas()
@@ -381,6 +282,7 @@ class ManArcDialog(ParentDialog):
 
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
+        
     
     def actionEnabled(self):
         #btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
@@ -407,13 +309,13 @@ class ManArcDialog(ParentDialog):
             self.layer.rollBack()
 
     def actionCentered(self):
+    
         feature = self.feature
         canvas = self.iface.mapCanvas()
         # Get the active layer (must be a vector layer)
         layer = self.iface.activeLayer()
 
         layer.setSelectedFeatures([feature.id()])
-
         canvas.zoomToSelected(layer)
     
     

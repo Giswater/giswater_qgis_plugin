@@ -97,12 +97,7 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_price_node = self.dialog.findChild(QTableView, "tbl_masterplan")
-        
-        manhole_builtdate = self.dialog.findChild(QDateEdit, "manhole_builtdate")
-        manhole_builtdate.setCalendarPopup(True)
-        #ui->dateEdit->setButtonSymbols(QAbstractSpinBox::NoButtons)
-        #manhole_builtdate.setSpecialValueText(QAbstractSpinBox.)
-        
+                
               
         # Load data from related tables
         self.load_data()
@@ -162,10 +157,11 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         
         # Event
-        
         self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
-
+        
+        
+        
     def catalog(self):
         self.dlg_cat = UDcatalog()
         utils_giswater.setDialog(self.dlg_cat)
@@ -260,7 +256,8 @@ class ManNodeDialog(ParentDialog):
 
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
-        
+        message = "54353"
+        self.controller.show_warning(message, context_name='ui_message')
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         # Get selected rows
         selected_list = self.tbl_event.selectionModel().selectedRows()    
@@ -268,46 +265,8 @@ class ManNodeDialog(ParentDialog):
             message = "Any record selected"
             self.controller.show_warning(message, context_name='ui_message' ) 
             return
-        '''
-        inf_text = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = self.tbl_event.model().record(row).value("value")
-            inf_text+= str(id_)+", "
-        inf_text = inf_text[:-2]
-        self.path = inf_text 
 
-        
-        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
-        sql +=" WHERE id = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
-        if row is None:
-            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-        else:
-            # Full path= path + value from row
-            self.full_path =row[0]+self.path
-           
-            # Parse a URL into components
-            url=urlparse.urlsplit(self.full_path)
-    
-            # Check if path is URL
-            if url.scheme=="http":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found:"+self.full_path 
-                    self.controller.show_warning(message, context_name='ui_message')
-                       
-                else:
-                    # Open the document
-                    os.startfile(self.full_path) 
-        '''
-        #message = str(selected_list[0])
-        #self.controller.show_warning(message, context_name='ui_message' ) 
+
         inf_text = ""
         #for i in range(0, len(selected_list)):
         row = selected_list[0].row()
@@ -318,40 +277,23 @@ class ManNodeDialog(ParentDialog):
         #inf_text+= str(id_)+", "
         #inf_text = inf_text[:-2]
         #self.visit_id = inf_text 
-
-
-
+        
         # Get all events | pictures for visit_id
         sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        #message = str(rows)
-        #self.controller.show_warning(message)
-        
         # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        
-        #message = str(row)
-        #self.controller.show_warning(message)
-        
         n = int((len(rows)/9)+1)
-        message = str(n)
-        self.controller.show_warning(message)
-        
+
         self.img_path_list = []
         self.img_path_list1D = []
         # Creates a list containing 5 lists, each of 8 items, all set to 0
-        
- 
-        #To initialize a two-dimensional array in Python:
-        #a = [[x for x in range(columns)] for y in range(rows)]
-        
-        #self.img_path_list = [[] for y in range(n)]
-        
-        
+
+
         # Fill 1D array with full path
         if row is None:
             message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
@@ -363,22 +305,6 @@ class ManNodeDialog(ParentDialog):
                 #self.img_path_list.append(full_path)
                 self.img_path_list1D.append(full_path)
          
-        '''    
-        for uy in range(0,5):
-            self.img_path_list1D.append(None)
-            
-        message = str(self.img_path_list1D)
-        self.controller.show_warning(message)
-            
-        
-        one = np.array(self.img_path_list1D)
-        self.img_path_list = one.reshape(9,1)
-        message = str(one)
-        self.controller.show_warning(message)
-        message = str(self.img_path_list)
-        self.controller.show_warning(message)
-        '''
-        
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
@@ -388,25 +314,47 @@ class ManNodeDialog(ParentDialog):
         
         txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
         txt_event_id.setText(str(self.event_id))
+        
         # Add picture to gallery
-      
+       
+        # Fill one-dimensional array till the end with "0"
+        self.num_events = len(self.img_path_list1D) 
         
-        self.img_path_list = [["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"] ,["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg"],["C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]]
-        
+        limit = self.num_events%9
+        for k in range(0,limit):
+            self.img_path_list1D.append(0)
 
-        self.img_path_list1D = ["C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe2.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg","C:/Users/tasladmin/Desktop/events/img_pipe3.jpg"]
-   
+        # Inicialization of two-dimensional array
+        rows = self.num_events/9+1
+        columns = 9 
+        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]
+        message = str(self.img_path_list)
+        self.controller.show_warning(message, context_name='ui_message')
+        # Convert one-dimensional array to two-dimensional array
+        idx=0
+        '''
+        for h in range(0,rows):
+            for r in range(0,columns):
+                self.img_path_list[h][r]=self.img_path_list1D[idx]    
+                idx=idx+1
+        '''     
+        if rows == 1:
+            for br in range(0,len(self.img_path_list1D)):
+                self.img_path_list[0][br]=self.img_path_list1D[br]
+        else :
+            for h in range(0,rows):
+                for r in range(0,columns):
+                    self.img_path_list[h][r]=self.img_path_list1D[idx]    
+                    idx=idx+1
 
-        
         # List of pointers(in memory) of clicableLabels
         self.list_widgetExtended=[]
         self.list_labels=[]
-
         
-        #for i in range(0, len(self.img_path_list)):
+        
         for i in range(0, 9):
             # Set image to QLabel
-            
+
             pixmap = QPixmap(str(self.img_path_list[0][i]))
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
@@ -452,13 +400,17 @@ class ManNodeDialog(ParentDialog):
             
             self.list_widgetExtended[i].setPixmap(pixmap)
 
+        # Control sliding buttons
         if self.start_indx > 0 :
             self.btn_previous.setEnabled(True) 
             
-        # On last tab disable btn_next
-        if self.start_indx == (len(self.img_path_list)-1) :
-            self.btn_next.setEnabled(False) 
-    
+        if self.start_indx == 0 :
+            self.btn_previous.setEnabled(False)
+     
+        control = len(self.img_path_list1D)/9
+        if self.start_indx == (control-1):
+            self.btn_next.setEnabled(False)
+            
         
     def zoom_img(self,i):
 
@@ -501,38 +453,39 @@ class ManNodeDialog(ParentDialog):
         
         #indx=self.i-1
         indx=(self.start_indx*9)+self.i-1
-        message = str(indx)
-        self.controller.show_warning(message)
-        
-        
+
         pixmap = QPixmap(self.img_path_list1D[indx])
 
         self.lbl_img.setPixmap(pixmap)
         
         self.i=self.i-1
         
-        if self.i == 0 :
+        # Control sliding buttons
+        if indx == 0 :
             self.btn_slidePrevious.setEnabled(False) 
+            
+        if indx < (self.num_events-1):
+            self.btn_slideNext.setEnabled(True) 
 
         
     def slide_next(self):
 
-        message = str(self.start_indx)
-        self.controller.show_warning(message)
   
         #indx=self.i+1 
         indx=(self.start_indx*9)+self.i+1
-        message = str(indx)
-        self.controller.show_warning(message)
         
         pixmap = QPixmap(self.img_path_list1D[indx])
 
         self.lbl_img.setPixmap(pixmap)
         
         self.i=self.i+1
-        
-        if self.i > 0 :
+    
+        # Control sliding buttons
+        if indx > 0 :
             self.btn_slidePrevious.setEnabled(True) 
+            
+        if indx == (self.num_events-1):
+            self.btn_slideNext.setEnabled(False) 
 
         
     def previous_gallery(self):
@@ -551,10 +504,16 @@ class ManNodeDialog(ParentDialog):
             
             self.list_widgetExtended[i].setPixmap(pixmap)
 
-        if self.start_indx == 0 and self.i == 0 :
+        # Control sliding buttons
+        if self.start_indx == 0 :
             self.btn_previous.setEnabled(False)
-        #if self.i < len(self.img_path_list) :
-        #    self.btn_next.setEnabled(True)  
+
+            
+        control = len(self.img_path_list1D)/9
+        if self.start_indx < (control-1):
+            self.btn_next.setEnabled(True)
+        
+
   
         
     ''' ACTIONS TOOLBAR '''    

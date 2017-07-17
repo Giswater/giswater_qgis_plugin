@@ -8,6 +8,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
+from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
+from qgis.core import * 
+
 
 import os.path
 import sys  
@@ -23,20 +26,23 @@ from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
-from map_tools.valve_analytics import ValveAnalytics
+#from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
+from map_tools.dimensions import Dimensions
 
 
 from search.search_plus import SearchPlus
-from qgis.core import QgsExpressionContextUtils,QgsVectorLayer,QgsProject
 
-from xml.dom import minidom
+#from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
+from qgis.gui import *
+
+from init.ud_man_node_init import ManNodeDialog                                  # @UnresolvedImport
 
 
-class Giswater(QObject):
-   
+class Giswater(QObject):  
+    
     def __init__(self, iface):
         ''' Constructor 
         :param iface: An interface instance that will be passed to this class
@@ -45,8 +51,7 @@ class Giswater(QObject):
         :type iface: QgsInterface
         '''
         super(Giswater, self).__init__()
-        
-      
+
         # Initialize instance attributes
         self.iface = iface
         self.legend = iface.legendInterface()    
@@ -62,11 +67,11 @@ class Giswater(QObject):
         self.plugin_name = os.path.basename(self.plugin_dir)   
         self.icon_folder = self.plugin_dir+'/icons/'    
 
-        # initialize svg giswater directory
+        # Initialize svg giswater directory
         self.svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
         QgsExpressionContextUtils.setProjectVariable('svg_path',self.svg_plugin_dir)   
 
-        # initialize locale
+        # Initialize locale
         locale = QSettings().value('locale/userLocale')
         locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
         # If user locale not exists, load English
@@ -113,9 +118,7 @@ class Giswater(QObject):
         # Set default encoding 
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable
-        
-      
-        
+       
                
     def set_signals(self): 
         ''' Define widget and event signals '''
@@ -134,7 +137,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01,19, 21, 23, 24, 25,27,41,28,99):
+                if int(index_action) in (01,02,19, 21, 23, 24, 25,27,41,28,99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -156,8 +159,6 @@ class Giswater(QObject):
         
         schema_name=self.controller.get_schema_name()
 
-        
-        
         if parent is None:
             parent = self.iface.mainWindow()
 
@@ -172,134 +173,119 @@ class Giswater(QObject):
         else:
             action = QAction(icon, text, parent)  
             if index_action == '01':
+                # Button add_node   
                 # Add drop down menu to button in toolbar
                 self.menu=QMenu()
-                self.sub_menu=QMenu()
-               
+                self.menu.clear()
+             
+   
+                # Get translated type
+                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".node_type_cat_type "    
+                row_id = self.dao.get_rows(sql) 
                 
-                #self.menu_values
-                #self.sub_menu.setTitle(self.menu_values[0])
-                sql = "SELECT DISTINCT(type) FROM "+schema_name+".node_type "    
-                row = self.dao.get_rows(sql) 
+                # Get shortcut
+                #sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type WHERE id='"+str(row_id[j][0])+"'"    
+                #sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type_cat_type "    
+                #row_shortcut = self.dao.get_rows(sql) 
                 
-                '''
-                for i in range(0, len(row)):
-                    self.sub_menu=QMenu()
-                    self.sub_menu.setTitle(row[i])
-                    self.menu.addMenu(self.sub_menu)
-                '''
-                self.sub_menu=QMenu()
-                self.sub_menu.setTitle(row[0][0])
-                self.menu.addMenu(self.sub_menu)
-                
-                self.sub_menu1 = QMenu()
-                self.sub_menu1.setTitle(row[1][0])
-                self.menu.addMenu(self.sub_menu1)
-                
-                self.sub_menu2 = QMenu()
-                self.sub_menu2.setTitle(row[2][0])
-                self.menu.addMenu(self.sub_menu2)
-                
-                self.sub_menu3 = QMenu()
-                self.sub_menu3.setTitle(row[3][0])
-                self.menu.addMenu(self.sub_menu3)
-                
-                self.sub_menu4 = QMenu()
-                self.sub_menu4.setTitle(row[4][0])
-                self.menu.addMenu(self.sub_menu4)
-                
-                self.sub_menu5 = QMenu()
-                self.sub_menu5.setTitle(row[5][0])
-                self.menu.addMenu(self.sub_menu5)
-                
-                
-                self.sub_menu6 = QMenu()
-                self.sub_menu6.setTitle(row[6][0])
-                self.menu.addMenu(self.sub_menu6)
-                
-                self.sub_menu7 = QMenu()
-                self.sub_menu7.setTitle(row[7][0])
-                self.menu.addMenu(self.sub_menu7)
-                
-                self.sub_menu8 = QMenu()
-                self.sub_menu8.setTitle(row[8][0])
-                self.menu.addMenu(self.sub_menu8)
-                
-                self.sub_menu9 = QMenu()
-                self.sub_menu9.setTitle(row[9][0])
-                self.menu.addMenu(self.sub_menu9)
-                
+                for i in range(0, len(row_id)):
+                    # Get shortcut 
+                    sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type_cat_type WHERE i18n='"+str(row_id[i][0])+"'" 
+                    row_shortcut = self.dao.get_rows(sql)
+                    obj_action = QAction(str(row_id[i][0]),self)
+                    obj_action.setShortcut(str(row_shortcut[0][0]))
+                    self.menu.addAction(obj_action)
+                    obj_action.triggered.connect( partial(self.menu_activate,str(row_id[i][0])))
                 
                 action.setMenu(self.menu)
-     
                 
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[0][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu.addAction(row1[i][0],self.test) 
+            if index_action == '02':
+            
+                # Button add_arc 
+                # Add drop down menu to button in toolbar
+                self.menu_arc=QMenu()
+                self.menu_arc.clear()
+
+                # Get translated type
+                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".arc_type_cat_type "    
+                row_id = self.dao.get_rows(sql) 
+               
+
+                for i in range(0, len(row_id)):
+                    # Get shortcut 
+                    sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".arc_type_cat_type WHERE i18n='"+str(row_id[i][0])+"'" 
+                    row_shortcut = self.dao.get_rows(sql)
+                    obj_action = QAction(str(row_id[i][0]),self)
+                    obj_action.setShortcut(str(row_shortcut[0][0]))
+                    self.menu_arc.addAction(obj_action)
+                    obj_action.triggered.connect( partial(self.menu_activate,str(row_id[i][0])))
                 
-                
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[1][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu1.addAction(row1[i][0],self.test) 
-                    
-                    
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[2][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu2.addAction(row1[i][0],self.test) 
-                    
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[3][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu3.addAction(row1[i][0],self.test) 
-                    
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[4][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu4.addAction(row1[i][0],self.test) 
-                    
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[5][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu5.addAction(row1[i][0],self.test)
-
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[6][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu6.addAction(row1[i][0],self.test) 
-                    
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[7][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu7.addAction(row1[i][0],self.test)     
-                    
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[8][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu8.addAction(row1[i][0],self.test)
-
-                sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE type= '"+row[9][0]+"'"    
-                row1 = self.dao.get_rows(sql)
-                for i in range(0, len(row1)):
-                    self.sub_menu9.addAction(row1[i][0],self.test) 
-
-                #self.sub_menu.addAction("action 1",self.test)  
-    
+                action.setMenu(self.menu_arc)
                 '''
-                for row in rows:       
-                    elem = row[0]
-                    # If not exist in table _selector_state isert to menu
-                    # Check if we already have data with selected id
-                    #sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
-                    #row = self.dao.get_row(sql)  
-                    #if row == None:
-                    self.sub_menu.setTitle(elem)
-                    self.menu.addMenu(self.sub_menu)
+                self.sub_menu=QMenu()
+                
+                list = [] 
+                
+                for i in range(0, len(row)):
+                    sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE i18n='"+str(row[i][0])+"'"    
+                    row_id = self.dao.get_rows(sql) 
+   
+                    list.append(QMenu(self.sub_menu))
+                    #self.sub_menu=QMenu()
+                    list[i].setTitle(row[i][0])
+                    self.menu.addMenu(list[i])
+
+                    for j in range(0, len(row_id)):                 
+                        # Get shortcut
+                        sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type WHERE id='"+str(row_id[j][0])+"'"    
+                        row_shortcut = self.dao.get_rows(sql) 
+
+                        obj_action = QAction(str(row_id[j][0]),self)
+                        obj_action.setShortcut(str(row_shortcut[0][0]))
+                        list[i].addAction( obj_action )
+                        # Provide node_type and node_type_id
+                        obj_action.triggered.connect( partial(self.menu_activate,str(row[i][0])))
+
+                action.setMenu(self.menu)
                 '''
- 
-                                    
+            
+            '''    
+            if index_action == '02':
+            # Button add_arc
+                # Add drop down menu to button in toolbar
+                self.menu_arc=QMenu()
+                #self.sub_menu=QMenu()
+                self.menu_arc.clear()
+                # Get translated type
+                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".arc_type "    
+                row = self.dao.get_rows(sql) 
+                
+                self.sub_menu_arc=QMenu()
+                
+                list = [] 
+                
+                for i in range(0, len(row)):
+                    sql = "SELECT DISTINCT(id) FROM "+schema_name+".arc_type WHERE i18n='"+str(row[i][0])+"'"    
+                    row_id = self.dao.get_rows(sql) 
+   
+                    list.append(QMenu(self.sub_menu_arc))
+                    #self.sub_menu=QMenu()
+                    list[i].setTitle(row[i][0])
+                    self.menu_arc.addMenu(list[i])
+
+                    for j in range(0, len(row_id)):                 
+                        # Get shortcut
+                        sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".arc_type WHERE id='"+str(row_id[j][0])+"'"    
+                        row_shortcut = self.dao.get_rows(sql) 
+
+                        obj_action = QAction(str(row_id[j][0]),self)
+                        obj_action.setShortcut(str(row_shortcut[0][0]))
+                        list[i].addAction( obj_action )
+                        obj_action.triggered.connect( partial(self.menu_activate,str(row[i][0]) ))
+                           
+                action.setMenu(self.menu_arc)
+            '''          
+                  
         if toolbar is not None:
             toolbar.addAction(action)  
              
@@ -311,19 +297,24 @@ class Giswater(QObject):
         else:
             self.actions[text] = action
                                      
-        action.setCheckable(is_checkable)   
-                                           
+        action.setCheckable(is_checkable)                         
         self.manage_action(index_action, function_name)
             
         return action
-            
-        return action
-          
           
         
-    def test(self):
-        print ""
-          
+    def menu_activate(self,node_type):
+        
+        # Set active layer
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)[0]
+        self.iface.setActiveLayer(layer)
+        
+        # Find the layer to edit
+        layer = self.iface.activeLayer()
+        layer.startEditing()
+        # Implement the Add Feature button
+        self.iface.actionAddFeature().trigger()
+
     
     def add_action(self, index_action, toolbar, parent):
         ''' Add new action into specified toolbar 
@@ -344,7 +335,7 @@ class Giswater(QObject):
                             
             if int(index_action) in (3, 5, 13):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) in (1, 2, 4, 10, 11, 12, 14, 15, 8, 29):
+            elif int(index_action) in (1, 4, 10, 11, 12, 14, 15, 8, 29):
                 map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
             elif int(index_action) == 16:
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.srid)
@@ -356,6 +347,8 @@ class Giswater(QObject):
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 39:
+                map_tool = Dimensions(self.iface, self.settings, action, index_action)
             #elif int(index_action) == 27:
             #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
@@ -390,9 +383,6 @@ class Giswater(QObject):
         self.table_gully = self.settings.value('db/table_gully', 'v_edit_gully') 
         self.table_pgully = self.settings.value('db/table_pgully', 'v_edit_pgully')   
         self.table_version = self.settings.value('db/table_version', 'version') 
-        
-        #self.table_man_arc = self.settings.value('db/table_arc', 'v_edit_man_arc')        
-        #self.table_man_node = self.settings.value('db/table_node', 'v_edit_man_node')   
 
         self.table_man_connec = self.settings.value('db/table_man_connec', 'v_edit_man_connec')  
         self.table_man_gully = self.settings.value('db/table_man_gully', 'v_edit_man_gully')       
@@ -471,7 +461,7 @@ class Giswater(QObject):
         # Set an action list for every toolbar    
         self.list_actions_ud = ['02','04','05']
         self.list_actions_ws = ['10','11','12','14','15','08','29','13']
-        self.list_actions_mg = ['01','16','17','18','19','20','21','22','23','24','25','26','27','28','41','43','99','56','57']
+        self.list_actions_mg = ['01','02','16','17','18','19','20','21','22','23','24','25','26','27','28','39','41','43','99','56','57']
         self.list_actions_ed = ['30','31','32','33','34','35','36','52']
                 
         # UD toolbar   
@@ -501,11 +491,6 @@ class Giswater(QObject):
         # Disable and hide all toolbars
         self.enable_actions(False)
         self.hide_toolbars() 
-        
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')          
-        self.giswater_jar = self.settings.value('files/giswater_jar')          
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')      
                          
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
@@ -579,9 +564,8 @@ class Giswater(QObject):
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
-          
+                self.mg.project_type = wsoftware.lower()
                 if wsoftware.lower() == 'ws':
-                    self.mg.project_type = 'ws'
                     self.actions['26'].setVisible(True)
                     self.actions['27'].setVisible(True)
                     self.actions['56'].setVisible(False)
@@ -591,7 +575,6 @@ class Giswater(QObject):
                     if self.toolbar_ws_enabled:
                         self.toolbar_ws.setVisible(True)                            
                 elif wsoftware.lower() == 'ud':
-                    self.mg.project_type = 'ud'
                     self.actions['26'].setVisible(False)
                     self.actions['27'].setVisible(False)
                     self.actions['56'].setVisible(True)
@@ -626,13 +609,11 @@ class Giswater(QObject):
         if len(layers) == 0:
             return    
         
-        
         # Initialize variables
         self.layer_arc = None
         self.layer_arc_man_UD = []
         self.layer_arc_man_WS = []
 
-        
         self.layer_node = None
         self.layer_node_man_UD = []
         self.layer_node_man_WS = []
@@ -649,6 +630,8 @@ class Giswater(QObject):
         self.layer_man_pgully = None
         
         self.layer_version = None
+        #exists_version = False
+        #exists_man_junction = False
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
@@ -714,12 +697,11 @@ class Giswater(QObject):
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_flexunion' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
-                    
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
                 
-                if 'v_edit_man_connec' == uri_table or 'v_edit_connec' == uri_table:
+                if self.table_man_connec == uri_table or self.table_connec == uri_table:
                     self.layer_connec_man_UD.append(cur_layer)
                 if 'v_edit_man_greentap' == uri_table :
                     self.layer_connec_man_WS.append(cur_layer)
@@ -761,22 +743,9 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-        
-        '''        
-        self.settings.beginWriteArray("layer_node_man_UD")
-        for i in range(0, len(self.layer_node_man_UD)):
-            self.settings.setArrayIndex(i)
-            self.settings.setValue("layer_node_man_UD",self.layer_node_man_UD[i])
-        self.settings.endArray()    
-        '''
-
-        # Saving layers from Qgs memory
-        #QStringList
-        #QString
-    
+            
         proj = QgsProject.instance()
         proj.writeEntry("myplugin","myint",10)
-        
         
         # Check if table 'version' and man_junction exists
         exists = False
@@ -802,10 +771,7 @@ class Giswater(QObject):
         if self.schema_name is None or not self.dao.check_schema(schema_name):
             self.controller.show_warning("Schema not found: "+self.schema_name)            
             return
-            
-            
-        
-        
+
         # Set schema_name in controller and in config file
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name)   
@@ -820,13 +786,9 @@ class Giswater(QObject):
             self.srid = row[0]   
             self.controller.plugin_settings_set_value("srid", self.srid)  
 
-            
-        
         # Search project type in table 'version'
         self.search_project_type()
         
-
-            
         self.controller.set_actions(self.actions)
 
         # Set layer custom UI form and init function   
@@ -881,7 +843,6 @@ class Giswater(QObject):
             if self.layer_man_pgully is not None:       
                 self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
 
-
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
@@ -892,11 +853,11 @@ class Giswater(QObject):
         self.set_map_tool('mg_flow_trace')
         self.set_map_tool('mg_flow_exit')
         self.set_map_tool('mg_connec_tool')
-        #self.set_map_tool('mg_analytics')
         self.set_map_tool('mg_extract_raster_value')
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
-        
+        self.set_map_tool('mg_mincut')
+        self.set_map_tool('mg_dimensions')
 
         # Set SearchPlus object
         self.set_search_plus()
@@ -933,7 +894,6 @@ class Giswater(QObject):
             if map_tool_name == 'mg_extract_raster_value':
                 map_tool.set_config_action(self.actions['99'])                
 
-            
        
     def set_search_plus(self):
         ''' Set SearchPlus object '''
@@ -960,7 +920,6 @@ class Giswater(QObject):
 
         # Disable all actions (buttons)
         self.enable_actions(False)
-        
         self.custom_enable_actions()     
         
         if layer is None:
@@ -1049,9 +1008,7 @@ class Giswater(QObject):
             elif self.table_expansiontank in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_flexunion in uri_table:  
-                setting_name = 'buttons_node' 
-
- 
+                setting_name = 'buttons_node'
             elif self.table_varc in uri_table:  
                 setting_name = 'buttons_arc'  
             elif self.table_siphon in uri_table:  
@@ -1062,7 +1019,6 @@ class Giswater(QObject):
                 setting_name = 'buttons_arc'     
             elif self.table_pipe in uri_table:  
                 setting_name = 'buttons_arc'    
-   
         
         if setting_name is not None:
             try:
@@ -1087,6 +1043,7 @@ class Giswater(QObject):
         
         # Enable MG toolbar
         self.enable_actions(True, 1, 27)
+        self.enable_action(True, 29)
         self.enable_action(False, 22)            
         
         # Enable ED toolbar
@@ -1134,61 +1091,17 @@ class Giswater(QObject):
             self.controller.show_warning("AttributeError: "+str(e))            
         except KeyError as e:
             self.controller.show_warning("KeyError: "+str(e))              
-
-
-    def set_fieldRelation(self, layer_element, project_type):
-        # Parametrization of path 
-
-        element = layer_element.name()
-        if project_type == 'ws':
-            path = os.path.join(self.plugin_dir, 'xml','WS_valueRelation'+element+'.xml')
-        elif project_type == 'ud':
-            path = os.path.join(self.plugin_dir, 'xml','UD_valueRelation'+element+'.xml')
-  
-        xmldoc = minidom.parse(path)
-        itemlist = xmldoc.getElementsByTagName('edittype')
-        itemlist_detail = xmldoc.getElementsByTagName('widgetv2config')
-        index = 0
-        for s in itemlist:
-            widgetv2type = s.attributes['widgetv2type'].value
-            if widgetv2type == 'ValueRelation' :
-                layer_element.setEditType(index,QgsVectorLayer.ValueRelation)
-                layer = itemlist_detail[index].attributes['Layer'].value 
-                key = itemlist_detail[index].attributes['Key'].value 
-                value = itemlist_detail[index].attributes['Value'].value 
-                layer_element.valueRelation(index).mLayer = layer 
-                layer_element.valueRelation(index).mKey = key 
-                layer_element.valueRelation(index).mValue = value 
-            index = index+1
-        
+       
         
     def delete_pyc_files(self):
+        ''' Delete python compiled files '''
         
         filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
         for f in filelist:
             os.remove(f)
             
-        
-    def layer_inventory(self):
-        ''' Create layer inventoory '''
-        
-        # Layer inventory
-        # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
-        sql = "DELETE FROM "+self.schema_name+".db_cat_clientlayer"
-        self.controller.execute_sql(sql) 
-        for layer in layers:
-
-            # layer_alias
-            layer_alias = layer.name()
-
-            # Layer_id
-            qgis_layer_id = layer.id()
-
-            # layer name in DB
-            cat_table_id = self.controller.get_layer_source_table_name(layer)
+'''
+class Global_type():
+    x = 0
+'''     
             
-            sql = "INSERT INTO "+self.schema_name+".db_cat_clientlayer (qgis_layer_id,db_cat_table_id, layer_alias)"
-            sql+= " VALUES ('"+qgis_layer_id+"','"+cat_table_id+"', '"+layer_alias+"')"
-            self.controller.execute_sql(sql)  
-

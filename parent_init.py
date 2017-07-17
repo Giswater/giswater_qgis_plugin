@@ -148,6 +148,10 @@ class ParentDialog(object):
         self.dialog.accept()
         self.close()     
         
+        #Save new element_id
+        layer = self.iface.activeLayer()
+        layer.commitChanges()
+        
         
     def close(self):
         ''' Close form without saving ''' 

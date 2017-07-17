@@ -131,6 +131,7 @@ class SnappingConfigManager():
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
+        
 
 
     def snapToLayer(self, Layer):

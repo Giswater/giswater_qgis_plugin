@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
-    <height>344</height>
+    <width>253</width>
+    <height>363</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>10</y>
+     <y>55</y>
      <width>211</width>
      <height>251</height>
     </rect>
@@ -25,7 +25,7 @@
    <property name="title">
     <string>Hydrometer</string>
    </property>
-   <widget class="QListWidget" name="tbl_mincut_connec">
+   <widget class="QTableView" name="tbl">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -36,11 +36,11 @@
     </property>
    </widget>
   </widget>
-  <widget class="QPushButton" name="pushButton_plus">
+  <widget class="QPushButton" name="btn_insert">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>265</y>
+     <x>180</x>
+     <y>20</y>
      <width>25</width>
      <height>25</height>
     </rect>
@@ -50,14 +50,14 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
+     <normaloff>../../../../../Desktop/giswater/icons/111.png</normaloff>../../../../../Desktop/giswater/icons/111.png</iconset>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_minus">
+  <widget class="QPushButton" name="btn_delete">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>265</y>
+     <x>210</x>
+     <y>20</y>
      <width>25</width>
      <height>25</height>
     </rect>
@@ -67,14 +67,14 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
+     <normaloff>../../../../../Desktop/giswater/icons/112.png</normaloff>../../../../../Desktop/giswater/icons/112.png</iconset>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>305</y>
+     <y>320</y>
      <width>70</width>
      <height>23</height>
     </rect>
@@ -87,13 +87,23 @@
    <property name="geometry">
     <rect>
      <x>85</x>
-     <y>305</y>
+     <y>320</y>
      <width>70</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="hydrometer_id">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

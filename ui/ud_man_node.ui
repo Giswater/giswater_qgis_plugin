@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
-    <height>658</height>
+    <width>630</width>
+    <height>684</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,7 +119,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>10</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -143,7 +143,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -839,8 +839,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1214,8 +1214,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1748,8 +1748,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1807,8 +1807,8 @@
        <widget class="QLabel" name="label_chamber_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -1840,11 +1840,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_chamber_rotation">
+       <widget class="QLineEdit" name="chamber_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1902,7 +1902,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_chamber_svg_rotation">
+       <widget class="QLabel" name="label_chamber_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -1923,7 +1923,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1943,6 +1943,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_chamber_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="chamber_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -1976,7 +2025,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>320</height>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2684,8 +2733,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3218,8 +3267,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3277,8 +3326,8 @@
        <widget class="QLabel" name="label_junction_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -3310,11 +3359,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_junction_rotation">
+       <widget class="QLineEdit" name="junction_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -3372,7 +3421,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_junction_svg_rotation">
+       <widget class="QLabel" name="label_junction_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -3393,7 +3442,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3421,6 +3470,55 @@
          <string/>
         </property>
        </widget>
+       <widget class="QLineEdit" name="junction_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_junction_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -3446,7 +3544,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4179,8 +4277,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4386,8 +4484,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4920,8 +5018,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4979,8 +5077,8 @@
        <widget class="QLabel" name="label_manhole_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -5015,8 +5113,8 @@
        <widget class="QLineEdit" name="manhole_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -5074,7 +5172,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_manhole_svg_rotation">
+       <widget class="QLabel" name="label_manhole_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -5123,6 +5221,55 @@
          <string/>
         </property>
        </widget>
+       <widget class="QLabel" name="label_manhole_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="manhole_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </widget>
      </widget>
     </widget>
@@ -5148,7 +5295,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>320</height>
+         <height>308</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5844,8 +5991,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6378,8 +6525,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6437,8 +6584,8 @@
        <widget class="QLabel" name="label_netgully_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -6473,8 +6620,8 @@
        <widget class="QLineEdit" name="netgully_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6532,7 +6679,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_netgully_svg_rotation">
+       <widget class="QLabel" name="label_netgully_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -6553,7 +6700,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -6573,6 +6720,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netgully_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netgully_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -6606,7 +6802,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7302,8 +7498,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7622,8 +7818,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8156,8 +8352,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8215,8 +8411,8 @@
        <widget class="QLabel" name="label_netinit_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -8251,8 +8447,8 @@
        <widget class="QLineEdit" name="netinit_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8310,7 +8506,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_netinit_svg_rotation">
+       <widget class="QLabel" name="label_netinit_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -8331,7 +8527,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -8351,6 +8547,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_netinit_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="netinit_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -8384,7 +8629,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9080,8 +9325,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9148,8 +9393,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9682,8 +9927,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9741,8 +9986,8 @@
        <widget class="QLabel" name="label_outfall_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -9774,11 +10019,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_outfall_rotation">
+       <widget class="QLineEdit" name="outfall_labell_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9836,7 +10081,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_outfall_svg_rotation">
+       <widget class="QLabel" name="label_outfall_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -9857,7 +10102,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -9877,6 +10122,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_outfall_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="outfall_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -9910,7 +10204,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10606,8 +10900,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11013,8 +11307,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11547,8 +11841,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11606,8 +11900,8 @@
        <widget class="QLabel" name="label_storage_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -11639,11 +11933,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_storage_rotation">
+       <widget class="QLineEdit" name="storage_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11701,7 +11995,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_storage_svg_rotation">
+       <widget class="QLabel" name="label_storage_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -11722,7 +12016,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -11742,6 +12036,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_storage_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="storage_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -11775,7 +12118,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>325</height>
+         <height>313</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12471,8 +12814,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13005,8 +13348,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13064,8 +13407,8 @@
        <widget class="QLabel" name="label_valve_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -13100,8 +13443,8 @@
        <widget class="QLineEdit" name="valve_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13159,7 +13502,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_valve_svg_rotation">
+       <widget class="QLabel" name="label_valve_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -13180,7 +13523,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -13200,6 +13543,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_valve_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="valve_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -13233,7 +13625,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13929,8 +14321,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14449,8 +14841,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14983,8 +15375,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15042,8 +15434,8 @@
        <widget class="QLabel" name="label_wjump_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -15075,11 +15467,11 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="label_wjump_rotation">
+       <widget class="QLineEdit" name="wjump_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15137,7 +15529,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wjump_svg_rotation">
+       <widget class="QLabel" name="label_wjump_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -15158,7 +15550,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -15178,6 +15570,55 @@
          <rect>
           <x>380</x>
           <y>50</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_wjump_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wjump_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -15211,7 +15652,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>298</height>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15907,8 +16348,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15975,8 +16416,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16509,8 +16950,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16568,8 +17009,8 @@
        <widget class="QLabel" name="label_wwtp_label_rotation">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>20</y>
+          <x>10</x>
+          <y>80</y>
           <width>90</width>
           <height>22</height>
          </rect>
@@ -16604,8 +17045,8 @@
        <widget class="QLineEdit" name="wwtp_label_rotation">
         <property name="geometry">
          <rect>
-          <x>380</x>
-          <y>20</y>
+          <x>110</x>
+          <y>80</y>
           <width>160</width>
           <height>20</height>
          </rect>
@@ -16663,7 +17104,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_wwtp_svg_rotation">
+       <widget class="QLabel" name="label_wwtp_rotation">
         <property name="geometry">
          <rect>
           <x>280</x>
@@ -16684,7 +17125,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Svg rotation:</string>
+         <string>Symbol rotation:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -16711,6 +17152,395 @@
         <property name="text">
          <string/>
         </property>
+       </widget>
+       <widget class="QLabel" name="label_wwtp_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>20</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Svg catalog:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="wwtp_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_15">
+     <attribute name="title">
+      <string>Flow regulator</string>
+     </attribute>
+     <widget class="QToolBox" name="tb">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>560</width>
+        <height>401</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>3</number>
+      </property>
+      <widget class="QWidget" name="page_73">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>560</width>
+         <height>277</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Pump</string>
+       </attribute>
+       <widget class="QTableView" name="tbl_inp_pump">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>40</y>
+          <width>531</width>
+          <height>231</height>
+         </rect>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_delete_pump">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_add_pump">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add </string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_20">
+       <attribute name="label">
+        <string>Orifice</string>
+       </attribute>
+       <widget class="QTableView" name="tbl_inp_orifice">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>40</y>
+          <width>531</width>
+          <height>231</height>
+         </rect>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_add_orifice">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_delete_orifice">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_19">
+       <attribute name="label">
+        <string>Outlet</string>
+       </attribute>
+       <widget class="QTableView" name="tbl_inp_outlet">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>40</y>
+          <width>531</width>
+          <height>231</height>
+         </rect>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_add_outlet">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add </string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_delete_otulet">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_74">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>560</width>
+         <height>277</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Weir</string>
+       </attribute>
+       <widget class="QPushButton" name="btn_view_nodechild_4">
+        <property name="geometry">
+         <rect>
+          <x>354</x>
+          <y>8</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete node</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_view_nodechild_5">
+        <property name="geometry">
+         <rect>
+          <x>244</x>
+          <y>8</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete node</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_delete_nodechild_3">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>8</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete node</string>
+        </property>
+       </widget>
+       <widget class="QToolBox" name="toolBox_27">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>-70</y>
+          <width>560</width>
+          <height>391</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="page_77">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>100</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Pump</string>
+         </attribute>
+         <widget class="QTableView" name="tbl_nodechild_4">
+          <property name="geometry">
+           <rect>
+            <x>16</x>
+            <y>42</y>
+            <width>541</width>
+            <height>301</height>
+           </rect>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_delete_nodechild_4">
+          <property name="geometry">
+           <rect>
+            <x>460</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Delete</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_view_nodechild_6">
+          <property name="geometry">
+           <rect>
+            <x>346</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>View</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_view_nodechild_7">
+          <property name="geometry">
+           <rect>
+            <x>236</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Add </string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="page_78">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>560</width>
+           <height>329</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Feature graphic design</string>
+         </attribute>
+         <widget class="QTableView" name="tbl_inp_weir">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>541</width>
+            <height>241</height>
+           </rect>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_add_weir">
+          <property name="geometry">
+           <rect>
+            <x>350</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Add </string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_delete_weir">
+          <property name="geometry">
+           <rect>
+            <x>460</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Delete</string>
+          </property>
+         </widget>
+        </widget>
        </widget>
       </widget>
      </widget>
@@ -16743,37 +17573,6 @@
       </property>
       <property name="text">
        <string>Unlink element</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_15">
-     <attribute name="title">
-      <string>Flow regulator</string>
-     </attribute>
-     <widget class="QPushButton" name="btn_delete_flow_regulator">
-      <property name="geometry">
-       <rect>
-        <x>445</x>
-        <y>14</y>
-        <width>121</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Delete flow regulator</string>
-      </property>
-     </widget>
-     <widget class="QTableView" name="tbl_flow_regulator">
-      <property name="geometry">
-       <rect>
-        <x>18</x>
-        <y>50</y>
-        <width>550</width>
-        <height>361</height>
-       </rect>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
       </property>
      </widget>
     </widget>

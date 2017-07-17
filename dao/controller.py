@@ -15,6 +15,9 @@ from functools import partial
 
 from pg_dao import PgDao
 
+from PyQt4.QtCore import Qt
+
+
 
 class DaoController():
     
@@ -171,7 +174,8 @@ class DaoController():
         if title is not None:
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
-            msg_box.setInformativeText(inf_text);        
+            msg_box.setInformativeText(inf_text);    
+        msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)        
         msg_box.exec_()                      
@@ -187,7 +191,8 @@ class DaoController():
         if inf_text is not None:
             msg_box.setInformativeText(inf_text);        
         msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg_box.setDefaultButton(QMessageBox.No)        
+        msg_box.setDefaultButton(QMessageBox.No)  
+        msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = msg_box.exec_()
         if ret == QMessageBox.Ok:
             return True
@@ -200,6 +205,7 @@ class DaoController():
 
         msg_box = QMessageBox()
         msg_box.setText(self.tr(text, context_name))
+        msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         if title is not None:
             msg_box.setWindowTitle(title);        
         if inf_text is not None:

@@ -499,8 +499,11 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="inputMask">
+      <string>    ; </string>
+     </property>
      <property name="text">
-      <string/>
+      <string>    </string>
      </property>
     </widget>
     <widget class="QLabel" name="label_label_x_4">
@@ -554,8 +557,11 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="inputMask">
+      <string>    ; </string>
+     </property>
      <property name="text">
-      <string/>
+      <string>    </string>
      </property>
     </widget>
     <widget class="QLabel" name="label_label_x_5">
@@ -922,6 +928,9 @@
    </property>
   </action>
   <action name="actionCustomMincut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/123.png</normaloff>../icons/123.png</iconset>

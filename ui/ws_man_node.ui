@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>615</width>
-    <height>674</height>
+    <width>618</width>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -270,7 +270,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>21</number>
     </property>
     <widget class="QWidget" name="tab_68">
      <attribute name="title">
@@ -291,15 +291,15 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="page_39">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>571</width>
-         <height>281</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1978,7 +1978,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="tank_cat_svg">
+       <widget class="QLineEdit" name="tank_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -1987,14 +1987,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -3093,8 +3087,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3381,7 +3375,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="pump_cat_svg">
+       <widget class="QLineEdit" name="pump_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -3390,14 +3384,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -4422,8 +4410,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4674,25 +4662,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="source_cat_svg">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>20</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_source_cat_svg">
         <property name="geometry">
          <rect>
@@ -4727,6 +4696,19 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="source_cat_svg">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>20</y>
+          <width>160</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -5751,8 +5733,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6039,7 +6021,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="meter_cat_svg">
+       <widget class="QLineEdit" name="meter_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -6048,14 +6030,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -7207,8 +7183,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7495,7 +7471,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="junction_cat_svg">
+       <widget class="QLineEdit" name="junction_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -7504,14 +7480,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -8536,8 +8506,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>339</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8824,7 +8794,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="waterwell_cat_svg">
+       <widget class="QLineEdit" name="waterwell_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -8833,14 +8803,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -9991,8 +9955,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10279,7 +10243,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="reduction_cat_svg">
+       <widget class="QLineEdit" name="reduction_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -10288,14 +10252,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -11810,8 +11768,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12098,7 +12056,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="hydrant_cat_svg">
+       <widget class="QLineEdit" name="hydrant_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -12107,14 +12065,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -14024,8 +13976,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>308</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14312,7 +14264,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="valve_cat_svg">
+       <widget class="QLineEdit" name="valve_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -14321,14 +14273,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -15353,8 +15299,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15641,7 +15587,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="manhole_cat_svg">
+       <widget class="QLineEdit" name="manhole_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -15650,14 +15596,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -16685,8 +16625,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16973,7 +16913,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="filter_cat_svg">
+       <widget class="QLineEdit" name="filter_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -16982,14 +16922,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -18066,8 +18000,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -18354,7 +18288,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="register_cat_svg">
+       <widget class="QLineEdit" name="register_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -18363,14 +18297,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -19398,8 +19326,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -19686,7 +19614,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="netwjoin_cat_svg">
+       <widget class="QLineEdit" name="netwjoin_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -19695,14 +19623,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -20730,8 +20652,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -21018,7 +20940,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="netelement_cat_svg">
+       <widget class="QLineEdit" name="netelement_cat_svg">
         <property name="geometry">
          <rect>
           <x>385</x>
@@ -21027,14 +20949,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -22062,8 +21978,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -22350,7 +22266,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="netsample_cat_svg">
+       <widget class="QLineEdit" name="netsample_cat_svg">
         <property name="geometry">
          <rect>
           <x>385</x>
@@ -22359,14 +22275,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -23394,8 +23304,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -23682,7 +23592,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="exptank_cat_svg">
+       <widget class="QLineEdit" name="exptank_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -23691,14 +23601,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -24726,8 +24630,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>335</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -25014,7 +24918,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QComboBox" name="flexunion_cat_svg">
+       <widget class="QLineEdit" name="flexunion_cat_svg">
         <property name="geometry">
          <rect>
           <x>380</x>
@@ -25023,14 +24927,8 @@
           <height>20</height>
          </rect>
         </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="maxVisibleItems">
-         <number>8</number>
-        </property>
-        <property name="frame">
-         <bool>false</bool>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </widget>
@@ -25078,6 +24976,271 @@
       <property name="text">
        <string>Delete node</string>
       </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_8">
+     <attribute name="title">
+      <string>Flow regulator</string>
+     </attribute>
+     <widget class="QToolBox" name="toolBox_25">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>560</width>
+        <height>416</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page_73">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>560</width>
+         <height>362</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Pump</string>
+       </attribute>
+       <widget class="QTableView" name="tbl_inp_pump">
+        <property name="geometry">
+         <rect>
+          <x>16</x>
+          <y>42</y>
+          <width>541</width>
+          <height>301</height>
+         </rect>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_delete_pump">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_add_pump">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>10</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add </string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_74">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>100</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string> Valve</string>
+       </attribute>
+       <widget class="QPushButton" name="btn_view_nodechild_4">
+        <property name="geometry">
+         <rect>
+          <x>354</x>
+          <y>8</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete node</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_view_nodechild_5">
+        <property name="geometry">
+         <rect>
+          <x>244</x>
+          <y>8</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete node</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="btn_delete_nodechild_3">
+        <property name="geometry">
+         <rect>
+          <x>468</x>
+          <y>8</y>
+          <width>100</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Delete node</string>
+        </property>
+       </widget>
+       <widget class="QTableView" name="tbl_nodechild_3">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>40</y>
+          <width>541</width>
+          <height>301</height>
+         </rect>
+        </property>
+        <property name="sortingEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QToolBox" name="toolBox_26">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>-70</y>
+          <width>560</width>
+          <height>416</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="page_77">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>100</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Pump</string>
+         </attribute>
+         <widget class="QTableView" name="tbl_nodechild_4">
+          <property name="geometry">
+           <rect>
+            <x>16</x>
+            <y>42</y>
+            <width>541</width>
+            <height>301</height>
+           </rect>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_delete_nodechild_4">
+          <property name="geometry">
+           <rect>
+            <x>460</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Delete</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_view_nodechild_6">
+          <property name="geometry">
+           <rect>
+            <x>346</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>View</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_view_nodechild_7">
+          <property name="geometry">
+           <rect>
+            <x>236</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Add </string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="page_78">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>560</width>
+           <height>362</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Feature graphic design</string>
+         </attribute>
+         <widget class="QTableView" name="tbl_inp_valve">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>541</width>
+            <height>301</height>
+           </rect>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_add_valve">
+          <property name="geometry">
+           <rect>
+            <x>350</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Add </string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btn_delete_valve">
+          <property name="geometry">
+           <rect>
+            <x>460</x>
+            <y>10</y>
+            <width>100</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Delete</string>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_management_2">
@@ -25602,6 +25765,19 @@
       </property>
       <property name="calendarPopup">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_open_event">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>70</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Open Event</string>
       </property>
      </widget>
     </widget>

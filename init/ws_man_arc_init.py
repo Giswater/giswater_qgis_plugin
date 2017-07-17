@@ -7,14 +7,22 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction,QMessageBox,QComboBox
-from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction,QMessageBox,QComboBox, QLabel
+from PyQt4.QtCore import Qt, QSettings
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from init.ws_man_node_init import ManNodeDialog
+#from init.ws_man_node_init import ManNodeDialog
 from ui.ws_catalog import WScatalog                  # @UnresolvedImport
+
+from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
+
+import init.ws_man_node_init
+
+
+
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -106,14 +114,15 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
-        self.btn_node_class1.clicked.connect(self.test)
+
 
         # QLineEdit
         self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
         # ComboBox
         #self.node_type = self.dialog.findChild(QComboBox, 'node_type')
 
-
+        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(partial(self.go_child,1))
+        self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child,2))
 
         # Toolbar actions
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
@@ -121,6 +130,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
 
+        
     def catalog(self):
         self.dlg_cat = WScatalog()
         utils_giswater.setDialog(self.dlg_cat)
@@ -157,6 +167,8 @@ class ManArcDialog(ParentDialog):
         sql = "SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_arc"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
+    
+    
     def fillCbxpnom(self,index):
         if index == -1:
             return
@@ -170,6 +182,7 @@ class ManArcDialog(ParentDialog):
         utils_giswater.fillComboBox(self.pnom, rows)
         self.fillCbxdnom()
 
+        
     def fillCbxdnom(self,index):
         if index == -1:
             return
@@ -185,6 +198,7 @@ class ManArcDialog(ParentDialog):
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)
 
+        
     def fillCbxCatalod_id(self,index):    #@UnusedVariable
 
         self.id = self.dlg_cat.findChild(QComboBox, "id")
@@ -203,14 +217,14 @@ class ManArcDialog(ParentDialog):
             rows = self.controller.get_rows(sql)
             self.id.clear()
             utils_giswater.fillComboBox(self.id, rows)
+    
+    
     def fillTxtarccat_id(self):
         self.dlg_cat.close()
         self.arccat_id.clear()
         self.arccat_id.setText(str(self.id.currentText()))
-    def test(self):
-        QMessageBox.about(None, 'Ok', str("test"))
-        #self.ManNodeDialog.init_config_form()
-
+        
+        
     def actionZoomOut(self):
         feature = self.feature
 
@@ -238,12 +252,14 @@ class ManArcDialog(ParentDialog):
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
 
+        
     def actionEnabled(self):
         # btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
         self.actionEnable = self.dialog.findChild(QAction, "actionEnable")
         status = self.layer.startEditing()
         self.set_icon(self.actionEnable, status)
 
+        
     def set_icon(self, widget, status):
 
         # initialize plugin directory
@@ -260,6 +276,7 @@ class ManArcDialog(ParentDialog):
         if status == False:
             self.layer.rollBack()
 
+            
     def actionCentered(self):
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -269,6 +286,7 @@ class ManArcDialog(ParentDialog):
         layer.setSelectedFeatures([feature.id()])
 
         canvas.zoomToSelected(layer)
+   
    
     def fill_costs(self):
         ''' Fill tab costs '''
@@ -519,3 +537,50 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
         
+    def go_child(self,idx):
+        
+        # Get name of selected layer 
+        selected_layer = self.layer.name()
+        widget = str(selected_layer.lower())+"_node_"+str(idx) 
+        
+    
+            
+        self.node_widget = self.dialog.findChild(QLineEdit,widget)
+        self.node_id= self.node_widget.text()
+        
+
+
+        # get pointer of node by ID
+        n=len(self.node_id)
+        aux = "\"node_id\" = "
+        # Get a featureIterator from this expression:
+        aux += "'" + str(self.node_id) + "', "
+        aux = aux[:-2] 
+         
+        expr = QgsExpression(aux)
+
+        nodes = ["Manhole","Junction","Valve", "Filter", "Reduction", "Waterwell", "Hydrant", "Tank", "Meter", "Pump", "Source", "Register", "Netwjoin", "Expantank", "Flexunion", "Netelement", "Netsamplepoint"]    
+        layers =[]
+        
+        for node in nodes:
+            layers.append( QgsMapLayerRegistry.instance().mapLayersByName( node )[0])
+
+        message = "passs"
+        self.controller.show_warning(message, context_name='ui_message')    
+        '''
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        '''
+        for layer in layers:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            message = str(it)
+            self.controller.show_warning(message, context_name='ui_message')  
+            if it != None : 
+                id_list = [i for i in it]
+                message = str(id_list)
+                self.controller.show_warning(message, context_name='ui_message') 
+                # Open form 
+                self.iface.openFeatureForm(layer,id_list[0]) 
+                return

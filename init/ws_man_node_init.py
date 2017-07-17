@@ -15,6 +15,10 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 
+
+from ui.gallery import Gallery          #@UnresolvedImport
+from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
+
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
     
@@ -148,6 +152,10 @@ class ManNodeDialog(ParentDialog):
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         # ComboBox
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
+        
+        # Event
+        self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
+        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
     def actionZoomOut(self):
         feature = self.feature
@@ -328,3 +336,265 @@ class ManNodeDialog(ParentDialog):
         self.dlg_cat.close()
         self.nodecat_id.clear()
         self.nodecat_id.setText(str(self.id.currentText()))
+        
+        
+        
+    def open_selected_event_from_table(self):
+        ''' Button - Open EVENT | gallery from table event '''
+        message = "54353"
+        self.controller.show_warning(message, context_name='ui_message')
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
+        # Get selected rows
+        selected_list = self.tbl_event.selectionModel().selectedRows()    
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' ) 
+            return
+
+
+        inf_text = ""
+        #for i in range(0, len(selected_list)):
+        row = selected_list[0].row()
+        #id_ = self.tbl_event.model().record(row).value("visit_id")
+        self.visit_id = self.tbl_event.model().record(row).value("visit_id")
+        self.event_id = self.tbl_event.model().record(row).value("event_id")
+        picture = self.tbl_event.model().record(row).value("value")
+        #inf_text+= str(id_)+", "
+        #inf_text = inf_text[:-2]
+        #self.visit_id = inf_text 
+        
+        # Get all events | pictures for visit_id
+        sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
+        sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
+        rows = self.controller.get_rows(sql)
+
+        # Get absolute path
+        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
+        sql +=" WHERE id = 'doc_absolute_path'"
+        row = self.dao.get_row(sql)
+        n = int((len(rows)/9)+1)
+
+        self.img_path_list = []
+        self.img_path_list1D = []
+        # Creates a list containing 5 lists, each of 8 items, all set to 0
+
+
+        # Fill 1D array with full path
+        if row is None:
+            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
+            self.dao.show_warning(message, context_name='ui_message')
+            return
+        else:
+            for value in rows:
+                full_path = str(row[0])+str(value[0])
+                #self.img_path_list.append(full_path)
+                self.img_path_list1D.append(full_path)
+         
+        # Create the dialog and signals
+        self.dlg_gallery = Gallery()
+        utils_giswater.setDialog(self.dlg_gallery)
+        
+        txt_visit_id = self.dlg_gallery.findChild(QLineEdit, 'visit_id')
+        txt_visit_id.setText(str(self.visit_id))
+        
+        txt_event_id = self.dlg_gallery.findChild(QLineEdit, 'event_id')
+        txt_event_id.setText(str(self.event_id))
+        
+        # Add picture to gallery
+       
+        # Fill one-dimensional array till the end with "0"
+        self.num_events = len(self.img_path_list1D) 
+        
+        limit = self.num_events%9
+        for k in range(0,limit):
+            self.img_path_list1D.append(0)
+
+        # Inicialization of two-dimensional array
+        rows = self.num_events/9+1
+        columns = 9 
+        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]
+        message = str(self.img_path_list)
+        self.controller.show_warning(message, context_name='ui_message')
+        # Convert one-dimensional array to two-dimensional array
+        idx=0
+        '''
+        for h in range(0,rows):
+            for r in range(0,columns):
+                self.img_path_list[h][r]=self.img_path_list1D[idx]    
+                idx=idx+1
+        '''     
+        if rows == 1:
+            for br in range(0,len(self.img_path_list1D)):
+                self.img_path_list[0][br]=self.img_path_list1D[br]
+        else :
+            for h in range(0,rows):
+                for r in range(0,columns):
+                    self.img_path_list[h][r]=self.img_path_list1D[idx]    
+                    idx=idx+1
+
+        # List of pointers(in memory) of clicableLabels
+        self.list_widgetExtended=[]
+        self.list_labels=[]
+        
+        
+        for i in range(0, 9):
+            # Set image to QLabel
+
+            pixmap = QPixmap(str(self.img_path_list[0][i]))
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+
+            widget_name = "img_"+str(i)
+            widget = self.dlg_gallery.findChild(QLabel, widget_name)
+
+            # Set QLabel like ExtendedQLabel(ClickableLabel)
+            self.widgetExtended=ExtendedQLabel.ExtendedQLabel(widget)
+ 
+            self.widgetExtended.setPixmap(pixmap)
+            self.start_indx = 0
+            # Set signal of ClickableLabel   
+
+            self.dlg_gallery.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
+  
+            self.list_widgetExtended.append(self.widgetExtended)
+            self.list_labels.append(widget)
+      
+        self.start_indx = 0
+        #self.end_indx = len(self.img_path_list)-1
+        self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
+        self.btn_next.clicked.connect(self.next_gallery)
+        
+        self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
+        self.btn_previous.clicked.connect(self.previous_gallery)
+        
+        self.dlg_gallery.exec_()
+        
+        
+    def next_gallery(self):
+
+        self.start_indx = self.start_indx+1
+        
+        # Clear previous
+        for i in self.list_widgetExtended:
+            i.clear()
+            #i.clicked.disconnect(self.zoom_img) #this disconnect all!
+  
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+            
+            self.list_widgetExtended[i].setPixmap(pixmap)
+
+        # Control sliding buttons
+        if self.start_indx > 0 :
+            self.btn_previous.setEnabled(True) 
+            
+        if self.start_indx == 0 :
+            self.btn_previous.setEnabled(False)
+     
+        control = len(self.img_path_list1D)/9
+        if self.start_indx == (control-1):
+            self.btn_next.setEnabled(False)
+            
+        
+    def zoom_img(self,i):
+
+        #myButton.clicked.disconnect(function_B) #this disconnect function_B
+        #self.list_labels[i].disconnect( partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
+        
+        handelerIndex=i    
+        
+        self.dlg_gallery_zoom = GalleryZoom()
+        #pixmap = QPixmap(img)
+        pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+        #pixmap = pixmap.scaled(711,501,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+  
+        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
+        self.lbl_img.setPixmap(pixmap)
+        #lbl_img.show()
+            
+        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
+        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id") 
+        
+        zoom_visit_id.setText(str(self.visit_id))
+        zoom_event_id.setText(str(self.event_id))
+    
+        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
+        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
+        
+        self.i=i
+        self.btn_slidePrevious.clicked.connect(self.slide_previous)
+        self.btn_slideNext.clicked.connect(self.slide_next)
+        
+        self.dlg_gallery_zoom.exec_() 
+        
+        # Controling start index
+        if handelerIndex != i:
+            self.start_indx = self.start_indx+1
+        
+        
+    def slide_previous(self):
+
+        
+        #indx=self.i-1
+        indx=(self.start_indx*9)+self.i-1
+
+        pixmap = QPixmap(self.img_path_list1D[indx])
+
+        self.lbl_img.setPixmap(pixmap)
+        
+        self.i=self.i-1
+        
+        # Control sliding buttons
+        if indx == 0 :
+            self.btn_slidePrevious.setEnabled(False) 
+            
+        if indx < (self.num_events-1):
+            self.btn_slideNext.setEnabled(True) 
+
+        
+    def slide_next(self):
+
+  
+        #indx=self.i+1 
+        indx=(self.start_indx*9)+self.i+1
+        
+        pixmap = QPixmap(self.img_path_list1D[indx])
+
+        self.lbl_img.setPixmap(pixmap)
+        
+        self.i=self.i+1
+    
+        # Control sliding buttons
+        if indx > 0 :
+            self.btn_slidePrevious.setEnabled(True) 
+            
+        if indx == (self.num_events-1):
+            self.btn_slideNext.setEnabled(False) 
+
+        
+    def previous_gallery(self):
+        #self.end_indx = self.end_indx-1
+        self.start_indx = self.start_indx-1
+        
+        
+        # First clear previous
+        for i in self.list_widgetExtended:
+            i.clear()
+
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+            
+            self.list_widgetExtended[i].setPixmap(pixmap)
+
+        # Control sliding buttons
+        if self.start_indx == 0 :
+            self.btn_previous.setEnabled(False)
+
+            
+        control = len(self.img_path_list1D)/9
+        if self.start_indx < (control-1):
+            self.btn_next.setEnabled(True)
+        
