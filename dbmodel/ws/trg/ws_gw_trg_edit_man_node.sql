@@ -286,7 +286,7 @@ BEGIN
 		NEW.pump_descript, NEW.pump_rotation, NEW.pump_link, NEW.verified, NEW.the_geom,NEW.pump_workcat_id_end, NEW.undelete,NEW.pump_label_x,NEW.pump_label_y,NEW.pump_label_rotation, NEW.pump_code, expl_id_int, NEW.publish, 
 		NEW.inventory, NEW.pump_end_date, NEW.parent_node_id, NEW.pump_hemisphere);
 		
-		INSERT INTO man_pump (node_id, elev_height) VALUES(NEW.node_id, NEW.elev_height);
+		INSERT INTO man_pump (node_id, elev_height, flow, "power") VALUES(NEW.node_id, NEW.pump_elev_height, pump_flow, pump_power);
 		
 	ELSIF man_table='man_reduction' THEN
 				
@@ -909,7 +909,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_pump 
-		SET node_id=NEW.node_id, elev_height=NEW.elev_height
+		SET node_id=NEW.node_id, elev_height=NEW.pump_elev_height, flow=NEW.pump_flow, "power"=NEW.pump_power
 		WHERE node_id=OLD.node_id;
 
 	ELSIF man_table ='man_manhole' THEN

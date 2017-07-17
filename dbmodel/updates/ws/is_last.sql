@@ -288,6 +288,9 @@ CREATE TABLE review_audit_connec
 -- ALTER TABLES
 -------------
 
+ALTER TABLE man_pump ADD COLUMN flow numeric(12,4);
+ALTER TABLE man_pump ADD COLUMN "power" numeric(12,4);
+
 ALTER TABLE pond ADD COLUMN "state" character varying(16);
 ALTER TABLE pool ADD COLUMN "state" character varying(16);
 
