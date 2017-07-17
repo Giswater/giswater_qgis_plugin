@@ -707,6 +707,8 @@ class MincutMapTool(ParentMapTool):
 
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))  
 
+        btn_cancel=self.dlg_multi.findChild(QPushButton,"btn_cancel")
+        btn_cancel.pressed.connect(self.dlg_multi.close)
         # Open form
         self.dlg_multi.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_config.close()
@@ -720,6 +722,9 @@ class MincutMapTool(ParentMapTool):
         self.menu_valve=QMenu()
         #self.menu_valve.clear()
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu,table)) 
+        
+        btn_cancel=self.dlg_multi.findChild(QPushButton,"btn_cancel")
+        btn_cancel.pressed.connect(self.dlg_multi.close)
         #self.menu=QMenu()
         #self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
@@ -957,6 +962,7 @@ class MincutMapTool(ParentMapTool):
         # set status
         self.state.setText(str(self.state_values[2][0]))
         
+        self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
         # Open the dialog
         self.dlg_fin.show()
         
