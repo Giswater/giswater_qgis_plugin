@@ -51,15 +51,6 @@ BEGIN
     END IF;
 
 
-    IF NEW.y1 IS NULL then 
-	NEW.y1=0;
-	value1:=false;
-    END IF;
-    IF NEW.y2 IS NULL then 
-	NEW.y2=0;
-	value2:=false;
-    END IF;
-
     -- Control of start/end node
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
 
@@ -86,12 +77,6 @@ BEGIN
                 
             IF value2 is false 
 				then NEW.y2:= null; 
-            END IF;
-
-            IF value1 is false then NEW.y1:= null; 
-            END IF;
-                
-            IF value2 is false then NEW.y2:= null; 
             END IF;
 
 
