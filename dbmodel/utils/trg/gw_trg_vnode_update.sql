@@ -31,10 +31,16 @@ BEGIN
     FOR linkrec IN SELECT * FROM link WHERE vnode_id = NEW.vnode_id
     LOOP
         -- Update link
-        connecPoint := (SELECT the_geom FROM connec WHERE connec_id = linkrec.connec_id);
-        UPDATE link 
-        SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
-
+        featurecat_aux := (SELECT featurecat_id FROM link WHERE vnode_id = linkrec.vnode_id);
+                  
+        IF (featurecat_aux = 'connec') THEN 
+			connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = linkrec.vnode_id));
+			UPDATE link SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
+		ELSE
+			connecPoint := (SELECT the_geom FROM gully WHERE gully_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = linkrec.vnode_id));
+			UPDATE link SET the_geom = ST_MakeLine(connecPoint, NEW.the_geom) WHERE link_id = linkrec.link_id;
+		END IF;
+		
     END LOOP;
 
     RETURN NEW;

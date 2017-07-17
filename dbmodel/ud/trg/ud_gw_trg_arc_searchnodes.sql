@@ -40,6 +40,16 @@ BEGIN
     ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
     SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
+		    
+	IF NEW.y1 IS NULL then 
+		NEW.y1=0;
+		value1:=false;
+    END IF;
+    IF NEW.y2 IS NULL then 
+		NEW.y2=0;
+		value2:=false;
+    END IF;
+
 
     -- Control of start/end node
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN	
@@ -59,6 +69,14 @@ BEGIN
                 ELSE
                     z1 := NEW.y1;
                     z2 := NEW.y2;
+            END IF;
+			
+			IF value1 is false 
+				then NEW.y1:= null; 
+            END IF;
+                
+            IF value2 is false 
+				then NEW.y2:= null; 
             END IF;
 
             IF (z1 > z2) AND (NEW.inverted_slope is not true) OR ((z1 < z2) AND NEW.inverted_slope is true) THEN
@@ -93,10 +111,17 @@ BEGIN
                     newPoint := ST_LineInterpolatePoint(NEW.the_geom, ST_LineLocatePoint(OLD.the_geom, vnoderec.the_geom));
                     UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
 
-                    -- Update link
-                    connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
-                    UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
-
+					-- Update link
+                    featurecat_aux := (SELECT featurecat_id FROM link WHERE vnode_id = vnoderec.vnode_id);
+                    
+                    IF (featurecat_aux = 'connec') THEN 
+						connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+						UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+					ELSE
+						connecPoint := (SELECT the_geom FROM gully WHERE gully_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+						UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
+					END IF;	
+					
                 END LOOP; 
             END IF;
             RETURN NEW;

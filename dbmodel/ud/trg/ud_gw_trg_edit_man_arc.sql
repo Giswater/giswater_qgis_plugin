@@ -320,7 +320,7 @@
 			
 			ELSIF man_table='man_waccel' THEN
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.waccel_y1, y2=NEW.waccel_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.waccel_state, 
+				SET arc_id=NEW.arc_id, y1=NEW.waccel_y1, y2=NEW.waccel_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.waccel_annotation, "observ"=NEW.waccel_observ,"comment"=NEW.waccel_comment, inverted_slope=NEW.waccel_inverted_slope, custom_length=NEW.waccel_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.waccel_soilcat_id, category_type=NEW.waccel_category_type, fluid_type=NEW.waccel_fluid_type,location_type=NEW.waccel_location_type, workcat_id=NEW.waccel_workcat_id, 
 				buildercat_id=NEW.waccel_buildercat_id, builtdate=NEW.waccel_builtdate,ownercat_id=NEW.waccel_ownercat_id, adress_01=NEW.waccel_adress_01, adress_02=NEW.waccel_adress_02, adress_03=NEW.waccel_adress_03, 
