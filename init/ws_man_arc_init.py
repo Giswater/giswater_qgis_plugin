@@ -20,27 +20,18 @@ from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureReq
 
 import init.ws_man_node_init
 
-from PyQt4 import QtGui, uic
-import os
-from qgis.core import QgsMessageLog
-from PyQt4.QtGui import QSizePolicy
 
 
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a arc is identified in the map '''
-    feature_dialog = ManArcDialog(dialog, layer, feature)
-    #dialog.parent().setFixedWidth(625)
-    #dialog.parent().setFixedHeight(690)
-    #dialog.parent().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-	
+    ''' Function called when a connec is identified in the map '''
+    
     global feature_dialog
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
+    feature_dialog = ManArcDialog(dialog, layer, feature)
     init_config()
-	
-  
 
     
 def init_config():
@@ -550,11 +541,15 @@ class ManArcDialog(ParentDialog):
         
         # Get name of selected layer 
         selected_layer = self.layer.name()
-        widget = "pipe_node_"+str(idx) 
-         
+        widget = str(selected_layer.lower())+"_node_"+str(idx) 
+        
+    
+            
         self.node_widget = self.dialog.findChild(QLineEdit,widget)
         self.node_id= self.node_widget.text()
-   
+        
+
+
         # get pointer of node by ID
         n=len(self.node_id)
         aux = "\"node_id\" = "
@@ -562,9 +557,6 @@ class ManArcDialog(ParentDialog):
         aux += "'" + str(self.node_id) + "', "
         aux = aux[:-2] 
          
-        message = str(aux)
-        self.controller.show_warning(message, context_name='ui_message')    
-
         expr = QgsExpression(aux)
 
         nodes = ["Manhole","Junction","Valve", "Filter", "Reduction", "Waterwell", "Hydrant", "Tank", "Meter", "Pump", "Source", "Register", "Netwjoin", "Expantank", "Flexunion", "Netelement", "Netsamplepoint"]    
@@ -573,14 +565,22 @@ class ManArcDialog(ParentDialog):
         for node in nodes:
             layers.append( QgsMapLayerRegistry.instance().mapLayersByName( node )[0])
 
-
+        message = "passs"
+        self.controller.show_warning(message, context_name='ui_message')    
+        '''
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        '''
         for layer in layers:
             it = layer.getFeatures(QgsFeatureRequest(expr))
-  
+            message = str(it)
+            self.controller.show_warning(message, context_name='ui_message')  
             if it != None : 
                 id_list = [i for i in it]
-
+                message = str(id_list)
+                self.controller.show_warning(message, context_name='ui_message') 
                 # Open form 
-				
                 self.iface.openFeatureForm(layer,id_list[0]) 
                 return
