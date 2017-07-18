@@ -164,7 +164,7 @@ class ManArcDialog(ParentDialog):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
-        sql = "SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_arc"
+        sql = "SELECT DISTINCT(dnom) as x, dint  FROM ws_sample_dev.cat_arc ORDER BY dint"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
     
@@ -189,11 +189,12 @@ class ManArcDialog(ParentDialog):
 
         mats=self.matcat_id.currentText()
         pnom=self.pnom.currentText()
-        sql="SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_arc"
+        sql="SELECT dnom FROM ws_sample_dev.cat_arc"
         if (str(mats)!=""):
             sql += " WHERE matcat_id='"+str(mats)+"'"
         if(str(pnom)!= ""):
             sql +=" and pnom='"+str(pnom)+"'"
+        sql += " ORDER BY dint"
         rows = self.controller.get_rows(sql)
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)
