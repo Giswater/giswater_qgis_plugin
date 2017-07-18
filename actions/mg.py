@@ -77,6 +77,12 @@ class Mg():
         self.dlg = TopologyTools()
         if self.project_type == 'ws':
             self.dlg.check_node_sink.setEnabled(False)
+            self.dlg.check_node_flow_regulator.setEnabled(False)
+            self.dlg.check_node_exit_upper_node_entry.setEnabled(False)
+            self.dlg.check_arc_intersection_without_node.setEnabled(False)
+            self.dlg.check_inverted_arcs.setEnabled(False)
+        if self.project_type == 'ud':
+            self.dlg.check_topology_coherence.setEnabled(False)
 
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
@@ -92,6 +98,7 @@ class Mg():
     def mg_arc_topo_repair_accept(self):
         ''' Button 19. Executes functions that are selected '''
 
+        #Review/Utils
         if self.dlg.check_node_orphan.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
             self.controller.execute_sql(sql)
@@ -100,21 +107,53 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"
             self.controller.execute_sql(sql)
 
-        if self.dlg.check_connec_duplicated.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"
+        if self.dlg.check_node_state_coherence.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_state_coherence();"
             self.controller.execute_sql(sql)
 
         if self.dlg.check_arc_same_startend.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"
             self.controller.execute_sql(sql)
 
-        if self.dlg.check_topology_repair.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_arc_topology();"
+        if self.dlg.check_arcs_without_nodes_start_end.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_no_startend_node();"
             self.controller.execute_sql(sql)
 
+        if self.dlg.check_connec_duplicated.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"
+            self.controller.execute_sql(sql)
+
+        # Review/WS
+        if self.dlg.check_topology_coherence.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();"
+            self.controller.execute_sql(sql)
+
+        # Review/UD
         if self.dlg.check_node_sink.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
             self.controller.execute_sql(sql)
+        if self.dlg.check_node_flow_regulator.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_flowregulator();"
+            self.controller.execute_sql(sql)
+        if self.dlg.check_node_exit_upper_node_entry.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_exit_upper_intro();"
+            self.controller.execute_sql(sql)
+        if self.dlg.check_arc_intersection_without_node.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
+            self.controller.execute_sql(sql)
+        if self.dlg.check_inverted_arcs.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
+            self.controller.execute_sql(sql)
+
+        #Builder
+        if self.dlg.create_nodes_from_arcs.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
+            self.controller.execute_sql(sql)
+        '''
+        if self.dlg.check_topology_repair.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_arc_topology();"
+            self.controller.execute_sql(sql)
+        '''
 
         # Close the dialog
         self.close_dialog()
