@@ -665,15 +665,19 @@ class Mg():
 
         # QDateEdit
         self.builtdate_vdefault = self.dlg.findChild(QDateEdit, "builtdate_vdefault")
-        #self.builtdate_vdefault.setDate(QDate.currentDate())
         sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'builtdate_vdefault'"
         row = self.dao.get_row(sql)
-        utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
-        #date = datetime.strptime(row[0], '%Y-%m-%d')
-        #utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(date))
+        if row!= None:
+            utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
+        else:
+            self.builtdate_vdefault.setDate(QDate.currentDate())
+
 
         # QCheckBox
-
+        self.chk_state_vdefault = self.dlg.findChild(QCheckBox, 'chk_state_vdefault')
+        self.chk_workcat_vdefault = self.dlg.findChild(QCheckBox, 'chk_workcat_vdefault')
+        self.chk_cverified_vdefault = self.dlg.findChild(QCheckBox, 'chk_cverified_vdefault')
+        self.chk_builtdate_vdefault = self.dlg.findChild(QCheckBox, 'chk_builtdate_vdefault')
         self.chk_arccat_vdefault = self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault')
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
         self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
@@ -849,11 +853,24 @@ class Mg():
         # Show message, insert in DB and close form
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message' )
+        if utils_giswater.isChecked(self.chk_state_vdefault) == True:
+            self.insert_or_update(self.state_vdefault, "state_vdefault")
+        else:
+            self.delete_row("state_vdefault")
+        if utils_giswater.isChecked(self.chk_workcat_vdefault) == True:
+            self.insert_or_update(self.workcat_vdefault, "workcat_vdefault")
+        else:
+            self.delete_row("workcat_vdefault")
+        if utils_giswater.isChecked(self.chk_cverified_vdefault) == True:
+            self.insert_or_update(self.verified_vdefault, "verified_vdefault")
+        else:
+            self.delete_row("verified_vdefault")
+        #self.insert_or_update(self.builtdate_vdefault, "builtdate_vdefault")
 
-        self.insert_or_update(self.state_vdefault, "state_vdefault")
-        self.insert_or_update(self.workcat_vdefault, "workcat_vdefault")
-        self.insert_or_update(self.verified_vdefault, "verified_vdefault")
-        self.insert_or_update(self.builtdate_vdefault, "builtdate_vdefault")
+        if utils_giswater.isChecked(self.chk_builtdate_vdefault) == True:
+            self.insert_or_update(self.builtdate_vdefault, "builtdate_vdefault")
+        else:
+            self.delete_row("builtdate_vdefault")
 
         if utils_giswater.isChecked(self.chk_arccat_vdefault) == True:
             self.insert_or_update(self.arccat_vdefault, "arccat_vdefault")
