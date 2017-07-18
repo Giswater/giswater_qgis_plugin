@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>616</width>
-    <height>685</height>
+    <height>697</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
    <widget class="QCheckBox" name="publish">
     <property name="geometry">
      <rect>
-      <x>545</x>
+      <x>530</x>
       <y>586</y>
       <width>79</width>
       <height>17</height>
@@ -120,14 +120,14 @@
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
-      <x>461</x>
+      <x>450</x>
       <y>586</y>
       <width>77</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Undelete</string>
+     <string>Undel.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_arccat_id">
@@ -387,7 +387,7 @@
     <property name="geometry">
      <rect>
       <x>445</x>
-      <y>610</y>
+      <y>620</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -424,7 +424,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -448,7 +448,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>365</height>
+         <height>353</height>
         </rect>
        </property>
        <attribute name="label">
@@ -676,7 +676,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated y1:</string>
+         <string>Est. y1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -730,7 +730,7 @@
          <rect>
           <x>280</x>
           <y>300</y>
-          <width>91</width>
+          <width>191</width>
           <height>17</height>
          </rect>
         </property>
@@ -834,7 +834,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Geometry length:</string>
+         <string>Geom. length:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1052,7 +1052,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation 1:</string>
+         <string>Elev. 1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1099,7 +1099,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation 2:</string>
+         <string>Elev. 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1153,7 +1153,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated y2:</string>
+         <string>Est. y2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1190,7 +1190,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated elevation 1:</string>
+         <string>Est. elev. 1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1230,7 +1230,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated elevation 2:</string>
+         <string>Est. elev 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1356,7 +1356,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>System elevation 1:</string>
+         <string>Sys. elev. 1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -1433,7 +1433,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>System elevation 2:</string>
+         <string>Sys. elev 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -3303,7 +3303,7 @@
          <rect>
           <x>280</x>
           <y>300</y>
-          <width>91</width>
+          <width>161</width>
           <height>17</height>
          </rect>
         </property>
@@ -4806,8 +4806,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>338</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5243,7 +5243,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation 2:</string>
+         <string>Elev 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5277,7 +5277,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Elevation 1:</string>
+         <string>Elev 1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5335,7 +5335,7 @@
          <rect>
           <x>280</x>
           <y>295</y>
-          <width>91</width>
+          <width>161</width>
           <height>17</height>
          </rect>
         </property>
@@ -5348,7 +5348,7 @@
          <rect>
           <x>280</x>
           <y>265</y>
-          <width>90</width>
+          <width>91</width>
           <height>22</height>
          </rect>
         </property>
@@ -5442,7 +5442,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Geometry length:</string>
+         <string>Geom. length:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5679,7 +5679,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated y2:</string>
+         <string>Est. y2</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5713,7 +5713,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated y1:</string>
+         <string>Est. y1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5733,7 +5733,7 @@
          <rect>
           <x>280</x>
           <y>145</y>
-          <width>66</width>
+          <width>91</width>
           <height>31</height>
          </rect>
         </property>
@@ -5750,7 +5750,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>System elevation 2:</string>
+         <string>Syst. elev. 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5811,7 +5811,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>System elevation 1:</string>
+         <string>Sys. elev 1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5864,7 +5864,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated elevation 2:</string>
+         <string>Est. elev. 2:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -5901,7 +5901,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Estimated elevation 1:</string>
+         <string>Est. elev. 1:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -7137,8 +7137,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>338</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7773,7 +7773,7 @@
          <rect>
           <x>280</x>
           <y>295</y>
-          <width>91</width>
+          <width>171</width>
           <height>17</height>
          </rect>
         </property>
@@ -13148,7 +13148,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Inventory</string>
+     <string>Invent.</string>
     </property>
    </widget>
    <widget class="QComboBox" name="verified">

@@ -697,6 +697,7 @@ class Giswater(QObject):
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_flexunion' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
+					
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer

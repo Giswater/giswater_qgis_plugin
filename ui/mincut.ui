@@ -500,10 +500,10 @@
       </rect>
      </property>
      <property name="inputMask">
-      <string>    ; </string>
+      <string/>
      </property>
      <property name="text">
-      <string>    </string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="label_label_x_4">
@@ -558,10 +558,10 @@
       </rect>
      </property>
      <property name="inputMask">
-      <string>    ; </string>
+      <string/>
      </property>
      <property name="text">
-      <string>    </string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="label_label_x_5">

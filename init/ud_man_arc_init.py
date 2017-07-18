@@ -18,6 +18,11 @@ from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
 import init.ud_man_node_init
 from ui.ud_catalog import UDcatalog
 
+from PyQt4 import QtGui, uic
+import os
+from qgis.core import QgsMessageLog
+from PyQt4.QtGui import QSizePolicy
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -26,6 +31,9 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManArcDialog(dialog, layer, feature)
+    #dialog.parent().setFixedWidth(625)
+    #dialog.parent().setFixedHeight(720)
+    #dialog.parent().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     init_config()
 
     
@@ -83,7 +91,7 @@ class ManArcDialog(ParentDialog):
         self.load_data()
         
         # Manage tab visibility
-        self.set_tabs_visibility(4)  
+        self.set_tabs_visibility(3)  
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)

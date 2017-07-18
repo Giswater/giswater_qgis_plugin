@@ -934,7 +934,7 @@ class Mg():
         self.btn_unselect.pressed.connect(self.unselection)
 
         self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
-        self.dlg_multiexp.btn_accept.pressed.connect(self.accept_dialog_multiexp)
+        
 
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
         #self.tbl_all_explot.hideColumn(0)
@@ -983,8 +983,6 @@ class Mg():
         row_index = row_index[:-2]
         expl_id = expl_id[:-2]
 
-        print row_index
-        print expl_id
 
         table_name_select = "exploitation"
 
@@ -1012,7 +1010,7 @@ class Mg():
 
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         #refresh
-        #self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
+        self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
         self.iface.mapCanvas().refresh()
 
 
@@ -1046,34 +1044,14 @@ class Mg():
         sql = "DELETE FROM "+self.schema_name+"."+table_name_unselect
         sql+= " WHERE expl_id IN ("+expl_id+")"
         self.controller.execute_sql(sql)
-        #self.tbl_all_explot.model().select()
+        self.tbl_all_explot.model().select()
 
         # Refresh
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         self.iface.mapCanvas().refresh()
 
 
-    def accept_dialog_multiexp(self):
-        print "test button accept"
-        '''
-        layerlist = []
-        print self.schema_name
-        for row in self.rowsss:
-            print row[1]
-            layerlist.append(row)
-        '''
-        #self.tbl_selected_explot.addItem(layerlist)
 
-    '''
-    def close_dialog_multiexp(self, dlg=None):
-
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg_multiexp
-        try:
-            dlg.close()
-        except AttributeError:
-            pass
-    '''
 
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu'''

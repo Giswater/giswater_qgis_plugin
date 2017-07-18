@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>630</width>
-    <height>684</height>
+    <height>693</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -114,12 +114,12 @@
      <rect>
       <x>15</x>
       <y>50</y>
-      <width>601</width>
+      <width>611</width>
       <height>446</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>10</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -135,7 +135,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_37">
        <property name="geometry">
@@ -839,8 +839,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>581</width>
+         <height>282</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17382,8 +17382,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>293</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17510,8 +17510,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>560</width>
-           <height>337</height>
+           <width>98</width>
+           <height>28</height>
           </rect>
          </property>
          <attribute name="label">
@@ -18536,7 +18536,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Unconn.</string>
+     <string>Uncon.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_nodecat_id">
@@ -18657,7 +18657,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Ucertain</string>
+     <string>Ucert.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_macrodma">
@@ -18708,7 +18708,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Inventory</string>
+     <string>Invent.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_sector">
@@ -18772,7 +18772,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Undelete</string>
+     <string>Undel.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_dma">
@@ -18817,7 +18817,7 @@
     <property name="geometry">
      <rect>
       <x>455</x>
-      <y>585</y>
+      <y>600</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -18836,7 +18836,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Publish</string>
+     <string>Publ.</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="expl_name">

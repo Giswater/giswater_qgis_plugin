@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>557</width>
-    <height>317</height>
+    <width>732</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>15</x>
      <y>15</y>
-     <width>526</width>
-     <height>256</height>
+     <width>681</width>
+     <height>451</height>
     </rect>
    </property>
    <property name="title">
@@ -28,7 +28,7 @@
    <widget class="QLabel" name="label_label_x_7">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>400</x>
       <y>20</y>
       <width>90</width>
       <height>22</height>
@@ -64,7 +64,7 @@
    <widget class="QComboBox" name="state_edit">
     <property name="geometry">
      <rect>
-      <x>365</x>
+      <x>510</x>
       <y>20</y>
       <width>146</width>
       <height>20</height>
@@ -76,8 +76,8 @@
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>506</width>
-      <height>191</height>
+      <width>651</width>
+      <height>381</height>
      </rect>
     </property>
     <property name="sortingEnabled">
@@ -88,8 +88,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>280</y>
+     <x>630</x>
+     <y>490</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -101,8 +101,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>280</y>
+     <x>550</x>
+     <y>490</y>
      <width>75</width>
      <height>23</height>
     </rect>

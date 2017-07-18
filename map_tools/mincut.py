@@ -21,7 +21,7 @@
 from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit, QMenu,  QTableView, QCompleter,QStringListModel
+from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit, QMenu,  QTableView, QCompleter,QStringListModel, QPixmap, QIcon
 from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
 
 from map_tools.parent import ParentMapTool
@@ -41,6 +41,9 @@ import utils_giswater
 from functools import partial
 
 from PyQt4.Qt import  QDate, QTime
+
+
+import os
 
 class MincutMapTool(ParentMapTool):
     ''' Button 17. User select one node.
@@ -514,6 +517,7 @@ class MincutMapTool(ParentMapTool):
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table))
         
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
+
         self.hydro_ids = []
         self.btn_insert_hydro.pressed.connect(partial(self.fill_table,self.tbl, self.schema_name+"."+table))
         
@@ -603,13 +607,7 @@ class MincutMapTool(ParentMapTool):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
-        '''
-        if answer:
-            sql = "DELETE FROM "+self.schema_name+"."+table_name
-            sql+= " WHERE id IN ("+list_id+")"
-            self.controller.execute_sql(sql)
-            widget.model().select()
-        '''
+
         if answer:
             #self.hydro_ids.append(hydro_id)
             #if b exists in array
@@ -619,7 +617,6 @@ class MincutMapTool(ParentMapTool):
                 del self.hydro_ids[self.hydro_ids.index(str(inf_text)):]
             '''
             if str(inf_text) in self.hydro_ids:
-
                 del self.hydro_ids[self.hydro_ids.index(str(inf_text)):]
 
         # Reload table
@@ -632,6 +629,7 @@ class MincutMapTool(ParentMapTool):
         widget.model().setFilter(expr)
         widget.model().select()
       
+	  
     def exec_hydro(self):
         # delete * from anl_mincut_hydrometer
         sql = "DELETE FROM "+self.schema_name+".anl_mincut_result_hydrometer"
@@ -981,5 +979,18 @@ class MincutMapTool(ParentMapTool):
         self.cbx_hours_end.setTime(timeend)
 
         self.dlg_fin.close()
+		
+		
+    def setIcon(widget,icon_indx):
+
+        plugin_dir = os.path.dirname(__file__)    
+        pic_file = os.path.join(plugin_dir, 'icons', icon_indx+'.png') 
+		
+        message = str(pic_file)
+        self.controller.show_info(message, context_name='ui_message' ) 
+		
+        pixmap = QPixmap(pic_file)
+        widget.setPixmap(QIcon(pixmap))
+        widget.show()  
            
  

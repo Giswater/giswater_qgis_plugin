@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>603</width>
-    <height>637</height>
+    <width>613</width>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,7 +111,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -804,7 +804,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1356,7 +1356,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3127,7 +3127,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>407</height>
+         <height>399</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5881,7 +5881,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Inventory</string>
+     <string>Inven.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_arccat_id">
@@ -5926,7 +5926,7 @@
     <property name="geometry">
      <rect>
       <x>435</x>
-      <y>560</y>
+      <y>570</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -5945,7 +5945,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Publish</string>
+     <string>Publ.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_pressurezone">
@@ -6194,7 +6194,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Undelete</string>
+     <string>Undel</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="macrodma_id">

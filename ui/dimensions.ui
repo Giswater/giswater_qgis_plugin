@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
-    <height>555</height>
+    <width>307</width>
+    <height>561</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -25,8 +25,8 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>80</y>
+     <x>20</x>
+     <y>70</y>
      <width>261</width>
      <height>141</height>
     </rect>
@@ -37,7 +37,7 @@
    <widget class="QLineEdit" name="depth">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>40</y>
       <width>151</width>
       <height>20</height>
@@ -47,7 +47,7 @@
    <widget class="QPushButton" name="btn_snapping">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>10</y>
       <width>31</width>
       <height>23</height>
@@ -60,7 +60,7 @@
    <widget class="QLineEdit" name="depth_2">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>70</y>
       <width>151</width>
       <height>20</height>
@@ -70,7 +70,7 @@
    <widget class="QLineEdit" name="depth_3">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>100</y>
       <width>151</width>
       <height>20</height>
@@ -120,8 +120,8 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>20</y>
+     <x>20</x>
+     <y>10</y>
      <width>261</width>
      <height>51</height>
     </rect>
@@ -132,7 +132,7 @@
    <widget class="QLineEdit" name="distance">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>20</y>
       <width>151</width>
       <height>20</height>
@@ -156,8 +156,8 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>240</y>
+     <x>20</x>
+     <y>230</y>
      <width>261</width>
      <height>301</height>
     </rect>
@@ -168,7 +168,7 @@
    <widget class="QLineEdit" name="distance_3">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>90</y>
       <width>151</width>
       <height>20</height>
@@ -183,7 +183,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>121</width>
+      <width>141</width>
       <height>16</height>
      </rect>
     </property>
@@ -207,7 +207,7 @@
    <widget class="QLineEdit" name="distance_2">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>60</y>
       <width>151</width>
       <height>20</height>
@@ -233,7 +233,7 @@
    <widget class="QPushButton" name="btn_snapping_2">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>220</x>
       <y>30</y>
       <width>31</width>
       <height>23</height>
@@ -248,7 +248,7 @@
      <rect>
       <x>20</x>
       <y>130</y>
-      <width>141</width>
+      <width>171</width>
       <height>16</height>
      </rect>
     </property>
@@ -259,7 +259,7 @@
    <widget class="QLineEdit" name="distance_4">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>210</y>
       <width>151</width>
       <height>20</height>
@@ -272,7 +272,7 @@
    <widget class="QLineEdit" name="distance_5">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>180</y>
       <width>151</width>
       <height>20</height>
@@ -285,7 +285,7 @@
    <widget class="QLineEdit" name="distance_6">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>240</y>
       <width>151</width>
       <height>20</height>
@@ -298,7 +298,7 @@
    <widget class="QLineEdit" name="distance_7">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>270</y>
       <width>151</width>
       <height>20</height>
@@ -365,12 +365,12 @@
      <rect>
       <x>150</x>
       <y>150</y>
-      <width>91</width>
+      <width>111</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Reverse arrow</string>
+     <string>Rev. arrow</string>
     </property>
    </widget>
   </widget>

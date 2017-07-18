@@ -233,10 +233,7 @@ class DaoController():
     def get_rows(self, sql):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
-        rows = self.dao.get_rows(sql)      
-        if rows is None:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))     
-            return False
+        rows = self.dao.get_rows(sql)   		
 
         return rows  
     

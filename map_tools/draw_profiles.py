@@ -1084,7 +1084,7 @@ class DrawProfiles(ParentMapTool):
         # Clear list of arcs and nodes - preparing for new profile
             
         #sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_test_arc'," + start_point + "," +end_point + ",false)"
-        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc'," + str(rstart_point) + "," +str(rend_point) + ",false,false)"
+        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc'," + str(rstart_point) + "," +str(rend_point) + ",false)"
 
         rows = self.controller.get_rows(sql)
         
@@ -1097,8 +1097,8 @@ class DrawProfiles(ParentMapTool):
             #self.node_id.append(str(rows[i]['node']))
             #self.arc_id.append(str(rows[i]['edge']))
             
-            self.rnode_id.append(str(rows[i][1]))
-            self.rarc_id.append(str(rows[i][2]))
+            self.rnode_id.append(str(rows[i][2]))
+            self.rarc_id.append(str(rows[i][3]))
 
         self.rarc_id.pop()
             

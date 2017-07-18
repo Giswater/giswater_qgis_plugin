@@ -31,6 +31,9 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManNodeDialog(dialog, layer, feature)
+    #dialog.parent().setFixedWidth(650)
+    #dialog.parent().setFixedHeight(700)
+    #dialog.parent().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     init_config()
 
     

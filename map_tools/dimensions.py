@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor
 
 from map_tools.parent import ParentMapTool
-from ..ui.dimensions import DimensionsForm
+#from ..ui.dimensions import DimensionsForm
 
 from PyQt4.QtGui import QPushButton
 

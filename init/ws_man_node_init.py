@@ -91,7 +91,7 @@ class ManNodeDialog(ParentDialog):
         #self.x=self.dialog.findChild(QDateEdit,"junction_builtdate")
         
         # Manage tab visibility
-        self.set_tabs_visibility(14)
+        self.set_tabs_visibility(16)
               
         # Load data from related tables
         self.load_data()
@@ -154,8 +154,8 @@ class ManNodeDialog(ParentDialog):
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
-        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+        #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
+        #self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
     def actionZoomOut(self):
         feature = self.feature
