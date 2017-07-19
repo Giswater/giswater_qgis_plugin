@@ -30,7 +30,7 @@ from map_tools.connec import ConnecMapTool
 from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
-from map_tools.dimensions import Dimensions
+#from map_tools.dimensions import Dimensions
 
 
 from search.search_plus import SearchPlus
@@ -137,7 +137,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01,02,19, 21, 23, 24, 25,27,41,28,99):
+                if int(index_action) in (01,02,19, 21, 23, 24, 25,27,39,41,28,99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -347,8 +347,8 @@ class Giswater(QObject):
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 39:
-                map_tool = Dimensions(self.iface, self.settings, action, index_action)
+            #elif int(index_action) == 39:
+            #    map_tool = Dimensions(self.iface, self.settings, action, index_action)
             #elif int(index_action) == 27:
             #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
@@ -858,7 +858,7 @@ class Giswater(QObject):
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
         self.set_map_tool('mg_mincut')
-        self.set_map_tool('mg_dimensions')
+        #self.set_map_tool('mg_dimensions')
 
         # Set SearchPlus object
         self.set_search_plus()

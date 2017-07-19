@@ -9,6 +9,8 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
+
 
 from PyQt4.Qt import  QDate, QTime
 from datetime import datetime, date
@@ -1518,4 +1520,32 @@ class Mg():
         except AttributeError:
             pass
         '''
+        
+    def mg_dimensions(self):
+        '''
+        # Set active layer
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
+        self.iface.setActiveLayer(layer)
+        
+        # Find the layer to edit
+        #layer = self.iface.activeLayer()
+        layer.startEditing()
+        # Implement the Add Feature button
+        #self.iface.actionAddFeature().trigger()
+        '''
+
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
+        self.iface.setActiveLayer(layer)
+        
+        # Find the layer to edit
+        #layer = self.iface.activeLayer()
+        layer.startEditing()
+        # Implement the Add Feature button
+        self.iface.actionAddFeature().trigger()
+        message = "tes1 dimensions "
+        self.controller.show_info(message, context_name='ui_message')
+        
+
+ 
+
 

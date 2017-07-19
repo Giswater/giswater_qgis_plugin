@@ -246,23 +246,13 @@ class ManArcDialog(ParentDialog):
         expr = QgsExpression(aux)
 
         nodes = ["Manhole","Junction","Chamber","Storage","Netgully","Netinit","Wjump","Wwtp","Outfall","Valve"]    
-        layers =[]
-        for node in nodes:
-            layers.append( QgsMapLayerRegistry.instance().mapLayersByName( node )[0])
-
-        '''
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-        '''
-        for layer in layers:
+        for i in range(0,len(nodes)):
+            layer = QgsMapLayerRegistry.instance().mapLayersByName( nodes[i] )[0]
+            # Get a featureIterator from this expression:
             it = layer.getFeatures(QgsFeatureRequest(expr))
-            if it != None :
-                id_list = [i for i in it]
-                # Open form 
-                self.iface.openFeatureForm(layer,id_list[0]) 
-                return
+            id_list = [i for i in it]
+            if id_list != []:
+                self.iface.openFeatureForm(layer,id_list[0])
         
         
     def actionZoomOut(self):

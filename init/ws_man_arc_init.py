@@ -570,12 +570,11 @@ class ManArcDialog(ParentDialog):
         row = self.dao.get_rows(sql)
         numrows = len(row)
         
-        message = str(nodes)
-        self.controller.show_info(message, context_name='ui_message')
-                        
+        '''
         for l in row:
-            nodes.append(l)
-                     
+            nodes.append(str(l[0]))
+        '''
+      
         for i in range(0,len(nodes)):
             layer = QgsMapLayerRegistry.instance().mapLayersByName( nodes[i] )[0]
             # Get a featureIterator from this expression:

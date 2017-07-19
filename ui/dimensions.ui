@@ -230,7 +230,7 @@
      <string>x:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_snapping_2">
+   <widget class="QPushButton" name="btn_orientation">
     <property name="geometry">
      <rect>
       <x>220</x>
