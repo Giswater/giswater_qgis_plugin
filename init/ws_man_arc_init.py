@@ -19,7 +19,10 @@ from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
 
 import init.ws_man_node_init
-
+from PyQt4 import QtGui, uic
+import os
+from qgis.core import QgsMessageLog
+from PyQt4.QtGui import QSizePolicy
 
 
 
@@ -29,10 +32,9 @@ def formOpen(dialog, layer, feature):
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
-    # Create class to manage Feature Form interaction  
+    # Create class to manage Feature Form interaction    
     feature_dialog = ManArcDialog(dialog, layer, feature)
     init_config()
-
     
 def init_config():
      
@@ -45,12 +47,17 @@ def init_config():
     # utils_giswater.setSelectedItem("state", state)   
     pass
      
+     
 class ManArcDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
+        
+        dialog.setFixedWidth(625)
+        dialog.setFixedHeight(675)
+        dialog.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         
         
     def init_config_form(self):
@@ -545,46 +552,45 @@ class ManArcDialog(ParentDialog):
         
         # Get name of selected layer 
         selected_layer = self.layer.name()
-        widget = str(selected_layer.lower())+"_node_"+str(idx) 
-        
-    
-            
+        #widget = "pipe_node_"+str(idx) 
+        selected_layer = self.layer.name()
+        widget = str(selected_layer.lower())+"_node_"+str(idx)  
+  
         self.node_widget = self.dialog.findChild(QLineEdit,widget)
         self.node_id= self.node_widget.text()
-        
-
-
+   
         # get pointer of node by ID
         n=len(self.node_id)
         aux = "\"node_id\" = "
-        # Get a featureIterator from this expression:
         aux += "'" + str(self.node_id) + "', "
         aux = aux[:-2] 
          
         expr = QgsExpression(aux)
-
+        nodes=[]
+        # List of nodes from node_type_cat_type - nodes which we are using
         nodes = ["Manhole","Junction","Valve", "Filter", "Reduction", "Waterwell", "Hydrant", "Tank", "Meter", "Pump", "Source", "Register", "Netwjoin", "Expantank", "Flexunion", "Netelement", "Netsamplepoint"]    
-        layers =[]
+        sql = "SELECT i18n FROM "+self.schema_name+".node_type_cat_type" 
+        row = self.dao.get_rows(sql)
+        numrows = len(row)
         
-        for node in nodes:
-            layers.append( QgsMapLayerRegistry.instance().mapLayersByName( node )[0])
-
-        message = "passs"
-        self.controller.show_warning(message, context_name='ui_message')    
-        '''
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-        '''
-        for layer in layers:
+        message = str(nodes)
+        self.controller.show_info(message, context_name='ui_message')
+                        
+        for l in row:
+            nodes.append(l)
+                     
+        for i in range(0,len(nodes)):
+            layer = QgsMapLayerRegistry.instance().mapLayersByName( nodes[i] )[0]
+            # Get a featureIterator from this expression:
             it = layer.getFeatures(QgsFeatureRequest(expr))
-            message = str(it)
-            self.controller.show_warning(message, context_name='ui_message')  
-            if it != None : 
-                id_list = [i for i in it]
-                message = str(id_list)
-                self.controller.show_warning(message, context_name='ui_message') 
-                # Open form 
-                self.iface.openFeatureForm(layer,id_list[0]) 
-                return
+            id_list = [i for i in it]
+            if id_list != []:
+                self.iface.openFeatureForm(layer,id_list[0])
+            
+
+                
+                
+         
+                
+                
+                
