@@ -163,15 +163,15 @@ class ManArcDialog(ParentDialog):
         self.matcat_id.clear()
         self.pnom.clear()
         self.dnom.clear()
-        sql = "SELECT DISTINCT(matcat_id) FROM ws_sample_dev.cat_arc"
+        sql = "SELECT DISTINCT(matcat_id) as matcat_id FROM ws_sample_dev.cat_arc ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-        sql = "SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_arc"
+        sql = "SELECT DISTINCT(pnom) as pnom FROM ws_sample_dev.cat_arc ORDER BY pnom"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
-        sql = "SELECT DISTINCT(dnom) as x, dint  FROM ws_sample_dev.cat_arc ORDER BY dint"
+        sql = "SELECT DISTINCT(dnom), (trim('mm' from dnom)::int)as x, dnom FROM ws_sample_dev.cat_arc ORDER BY x"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
     
@@ -181,10 +181,12 @@ class ManArcDialog(ParentDialog):
             return
         mats=self.matcat_id.currentText()
 
-        sql="SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_arc"
+        sql="SELECT DISTINCT(pnom)as pnom FROM ws_sample_dev.cat_arc"
         if (str(mats)!=""):
             sql += " WHERE matcat_id='"+str(mats)+"'"
+        sql += " ORDER BY pnom"
         rows = self.controller.get_rows(sql)
+
         self.pnom.clear()
         utils_giswater.fillComboBox(self.pnom, rows)
         self.fillCbxdnom()
@@ -196,12 +198,12 @@ class ManArcDialog(ParentDialog):
 
         mats=self.matcat_id.currentText()
         pnom=self.pnom.currentText()
-        sql="SELECT dnom FROM ws_sample_dev.cat_arc"
+        sql="SELECT DISTINCT(dnom), (trim('mm' from dnom)::int)as x, dnom FROM ws_sample_dev.cat_arc"
         if (str(mats)!=""):
             sql += " WHERE matcat_id='"+str(mats)+"'"
         if(str(pnom)!= ""):
             sql +=" and pnom='"+str(pnom)+"'"
-        sql += " ORDER BY dint"
+        sql += " ORDER BY x"
         rows = self.controller.get_rows(sql)
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)
@@ -215,13 +217,14 @@ class ManArcDialog(ParentDialog):
             mats = self.matcat_id.currentText()
             pnom = self.pnom.currentText()
             dnom = self.dnom.currentText()
-            sql = "SELECT DISTINCT(id) FROM ws_sample_dev.cat_arc"
+            sql = "SELECT DISTINCT(id) as id FROM ws_sample_dev.cat_arc"
             if (str(mats)!=""):
                 sql += " WHERE matcat_id='"+str(mats)+"'"
             if (str(pnom) != ""):
                 sql += " and pnom='"+str(pnom)+"'"
             if (str(dnom) != ""):
                 sql += " and dnom='" + str(dnom) + "'"
+            sql += " ORDER BY id"
             rows = self.controller.get_rows(sql)
             self.id.clear()
             utils_giswater.fillComboBox(self.id, rows)
