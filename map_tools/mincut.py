@@ -202,6 +202,8 @@ class MincutMapTool(ParentMapTool):
                     # Execute SQL function
                     function_name = "gw_fct_mincut"
                     sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(elem_id)+"', '"+self.elem_type+"', '"+self.id_text+"');"
+                    message = str(sql)
+                    self.controller.show_info(message, context_name='ui_message')
                     hold_elem_id = elem_id
                     hold_elem_type = self.elem_type
                     hold_id_text = self.id_text
@@ -239,7 +241,8 @@ class MincutMapTool(ParentMapTool):
                     function_name = "gw_fct_mincut"
                     # Use elem id of previous element - repeatin automatic mincut
                     sql = "SELECT "+self.schema_name+"."+function_name+"('"+str(hold_elem_id)+"', '"+hold_elem_type+"', '"+hold_id_text+"');"
-      
+                    message = str(sql)
+                    self.controller.show_info(message, context_name='ui_message')
                     status = self.controller.execute_sql(sql)
       
                     # Refresh map canvas
