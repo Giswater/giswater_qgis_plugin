@@ -257,7 +257,8 @@ class ManNodeDialog(ParentDialog):
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
 
-        sql= "SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "'"
+        #sql= "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "' ORDER BY split_part(dnom,'-', 1)::int"
+        sql = "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='" + node_type + "' ORDER BY dint"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
 
@@ -286,13 +287,14 @@ class ManNodeDialog(ParentDialog):
         nodetype = self.node_type.currentText()
         mats=self.matcat_id.currentText()
         pnom=self.pnom.currentText()
-        sql="SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_node"
+        sql="SELECT dnom FROM ws_sample_dev.cat_node"
         if(str(nodetype)!= ""):
             sql += " WHERE nodetype_id='"+nodetype+"'"
         if (str(mats)!=""):
             sql += " and matcat_id='"+str(mats)+"'"
         if(str(pnom)!= ""):
             sql +=" and pnom='"+str(pnom)+"'"
+        sql +=" ORDER BY dint"
         rows = self.controller.get_rows(sql)
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)

@@ -241,7 +241,7 @@
        <property name="title">
         <string>Topology Review</string>
        </property>
-       <widget class="QCheckBox" name="check_arc_exit_upper_arc_entry">
+       <widget class="QCheckBox" name="check_node_exit_upper_node_entry">
         <property name="geometry">
          <rect>
           <x>18</x>

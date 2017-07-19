@@ -220,7 +220,7 @@ class ManConnecDialog(ParentDialog):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
-        sql = "SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_connec"
+        sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from dnom)) as x FROM ws_sample_dev.cat_connec order by x"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
 
@@ -243,11 +243,12 @@ class ManConnecDialog(ParentDialog):
 
         mats=self.matcat_id.currentText()
         pnom=self.pnom.currentText()
-        sql="SELECT DISTINCT(dnom) FROM ws_sample_dev.cat_connec"
+        sql="SELECT DISTINCT(TRIM(TRAILING ' ' from dnom)) as x  FROM ws_sample_dev.cat_connec"
         if (str(mats)!=""):
             sql += " WHERE matcat_id='"+str(mats)+"'"
         if(str(pnom)!= ""):
             sql +=" and pnom='"+str(pnom)+"'"
+        sql += " ORDER BY x"
         rows = self.controller.get_rows(sql)
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)

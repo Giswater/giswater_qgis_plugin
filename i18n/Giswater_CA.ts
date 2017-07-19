@@ -3172,7 +3172,7 @@
     </message>
     <message>
         <source>check_node_sink</source>
-        <translation>     Sink node identifier (only for ud projects)</translation>
+        <translation>Sink node identifier</translation>
     </message>
     
 
