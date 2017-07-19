@@ -57,6 +57,7 @@ class Mg():
 
     def close_dialog(self, dlg=None):
         ''' Close dialog '''
+
         dlg.close()
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg

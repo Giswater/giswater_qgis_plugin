@@ -256,7 +256,7 @@ class ManNodeDialog(ParentDialog):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
-
+        #SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x FROM ws_sample_dev.cat_node ORDER BY x
         #sql= "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "' ORDER BY split_part(dnom,'-', 1)::int"
         sql = "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='" + node_type + "' ORDER BY dint"
         rows = self.controller.get_rows(sql)

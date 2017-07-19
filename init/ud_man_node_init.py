@@ -190,15 +190,15 @@ class ManNodeDialog(ParentDialog):
         self.shape.clear()
         self.geom1.clear()
 
-        sql= "SELECT DISTINCT(matcat_id) FROM ud_sample_dev.cat_node"
+        sql= "SELECT DISTINCT(matcat_id) as matcat_id FROM ud_sample_dev.cat_node ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-        sql= "SELECT DISTINCT(shape) FROM ud_sample_dev.cat_node"
+        sql= "SELECT DISTINCT(shape) as shape FROM ud_sample_dev.cat_node ORDER BY shape"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.shape, rows)
 
-        sql= "SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_node"
+        sql= "SELECT DISTINCT(geom1)as geom1 FROM ud_sample_dev.cat_node ORDER BY geom1"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.geom1, rows)
 
@@ -208,9 +208,10 @@ class ManNodeDialog(ParentDialog):
             return
         mats=self.matcat_id.currentText()
 
-        sql="SELECT DISTINCT(shape) FROM ud_sample_dev.cat_node"
+        sql="SELECT DISTINCT(shape) as shape FROM ud_sample_dev.cat_node"
         if (str(mats)!=""):
             sql += " WHERE matcat_id='"+str(mats)+"'"
+        sql += " ORDER BY shape"
         rows = self.controller.get_rows(sql)
         self.shape.clear()
         utils_giswater.fillComboBox(self.shape, rows)
@@ -222,12 +223,13 @@ class ManNodeDialog(ParentDialog):
             return
         mats=self.matcat_id.currentText()
         shape=self.shape.currentText()
-        sql="SELECT DISTINCT(geom1) FROM ud_sample_dev.cat_node"
+        sql="SELECT DISTINCT(geom1) as geom1 FROM ud_sample_dev.cat_node"
 
         if (str(mats)!=""):
             sql += " WHERE matcat_id='"+str(mats)+"'"
         if(str(shape)!= ""):
             sql +=" and shape='"+str(shape)+"'"
+        sql += " ORDER BY geom1"
         rows = self.controller.get_rows(sql)
         self.geom1.clear()
         utils_giswater.fillComboBox(self.geom1, rows)
@@ -239,13 +241,14 @@ class ManNodeDialog(ParentDialog):
             mats = self.matcat_id.currentText()
             shape = self.shape.currentText()
             geom1 = self.geom1.currentText()
-            sql = "SELECT DISTINCT(id) FROM ud_sample_dev.cat_node"
+            sql = "SELECT DISTINCT(id) as id FROM ud_sample_dev.cat_node"
             if (str(mats)!=""):
                 sql += " WHERE matcat_id='"+str(mats)+"'"
             if (str(shape) != ""):
                 sql += " and shape='"+str(shape)+"'"
             if (str(geom1) != ""):
                 sql += " and geom1='" + str(geom1) + "'"
+            sql += " ORDER BY id"
             rows = self.controller.get_rows(sql)
             self.id.clear()
             utils_giswater.fillComboBox(self.id, rows)
