@@ -48,4 +48,5 @@ i18n/lrelease.exe
 .idea/modules.xml
 .idea/vcs.xml
 .idea/workspace.xml
+.idea/
 actions/parent.py
