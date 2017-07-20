@@ -257,8 +257,9 @@ class ManNodeDialog(ParentDialog):
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
         #SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x FROM ws_sample_dev.cat_node ORDER BY x
+        sql = "SELECT dnom FROM  (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM ws_sample_dev.cat_node ORDER BY x)as dnom"
         #sql= "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "' ORDER BY split_part(dnom,'-', 1)::int"
-        sql = "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='" + node_type + "' ORDER BY dint"
+        #sql = "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='" + node_type + "' ORDER BY dint"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
 
@@ -287,14 +288,14 @@ class ManNodeDialog(ParentDialog):
         nodetype = self.node_type.currentText()
         mats=self.matcat_id.currentText()
         pnom=self.pnom.currentText()
-        sql="SELECT dnom FROM ws_sample_dev.cat_node"
+        sql="SELECT dnom FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM ws_sample_dev.cat_node"
         if(str(nodetype)!= ""):
             sql += " WHERE nodetype_id='"+nodetype+"'"
         if (str(mats)!=""):
             sql += " and matcat_id='"+str(mats)+"'"
         if(str(pnom)!= ""):
             sql +=" and pnom='"+str(pnom)+"'"
-        sql +=" ORDER BY dint"
+        sql +=" ORDER BY x) as dnom"
         rows = self.controller.get_rows(sql)
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)
@@ -308,7 +309,7 @@ class ManNodeDialog(ParentDialog):
             mats = self.matcat_id.currentText()
             pnom = self.pnom.currentText()
             dnom = self.dnom.currentText()
-            sql = "SELECT DISTINCT(id) FROM ws_sample_dev.cat_node"
+            sql = "SELECT DISTINCT(id) as id FROM ws_sample_dev.cat_node"
             if(str(nodetype)!= ""):
                 sql += " WHERE nodetype_id='"+nodetype+"'"
             if (str(mats)!=""):
@@ -317,6 +318,7 @@ class ManNodeDialog(ParentDialog):
                 sql += " and pnom='"+str(pnom)+"'"
             if (str(dnom) != ""):
                 sql += " and dnom='" + str(dnom) + "'"
+            sql += " ORDER BY id"
             rows = self.controller.get_rows(sql)
             self.id.clear()
             utils_giswater.fillComboBox(self.id, rows)
