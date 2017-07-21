@@ -17,11 +17,11 @@ from PyQt4.Qt import QDate
 import inspect
 import os
 
-
+from PyQt4.QtCore import Qt
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
- 
+    
 
 def fillComboBox(widget, rows, allow_nulls=True):
 

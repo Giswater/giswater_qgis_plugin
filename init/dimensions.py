@@ -29,6 +29,11 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from qgis.gui import QgsMapCanvasSnapper
 
+from PyQt4.QtCore import Qt
+from qgis.core import QgsMapLayerRegistry
+
+
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -39,8 +44,7 @@ def formOpen(dialog, layer, feature):
     feature_dialog = Dimensions(dialog, layer, feature)
     init_config()
     
-    
-    
+
 def init_config():
      
     # Manage 'arccat_id'
@@ -53,6 +57,7 @@ def init_config():
     pass
      
      
+     
 class Dimensions(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
@@ -62,64 +67,122 @@ class Dimensions(ParentDialog):
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         
-        #QgsMapTool.__init__(self, QgisInterface.mapCanvas())
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
+        #self.dialog.setWindowFlags(Qt.WindowStaysOnTopHint)
         
         btn_orientation = self.dialog.findChild(QPushButton, "btn_orientation")
         btn_orientation.clicked.connect(self.orientation)
         
-        #canvas = self.iface.mapCanvas()
+        btn_snapping = self.dialog.findChild(QPushButton, "btn_snapping")
+        btn_snapping.clicked.connect(self.snapping)
         
         mapCanvas=self.iface.mapCanvas()
 		# Create the appropriate map tool and connect the gotPoint() signal.
         self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
         mapCanvas.setMapTool(self.emitPoint)
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButton)
+ 
+        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButton)
 
         
     def orientation(self):
-        pass
+        # Disconnect previous snapping
+        QObject.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonOrientation)
         
         
-    def clickButton(self,point,btn):
+    def snapping(self):
+        # Disconnect previous snapping
+        QObject.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonOrientation)
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
+        
+        
+    def clickButtonOrientation(self,point,btn):
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
+        self.iface.setActiveLayer(layer)
+        
+        # Find the layer to edit
+        #layer = self.iface.activeLayer()
+        layer.startEditing()
+
+        self.canvas=self.iface.mapCanvas()
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+        self.x_symbol=self.dialog.findChild(QLineEdit, "x_symbol")
+        self.x_symbol.setText(str(point.x()))
+                
+        self.y_symbol=self.dialog.findChild(QLineEdit, "y_symbol")
+        self.y_symbol.setText(str(point.y()))
+        
+
+    def clickButtonSnapping(self,point,btn):
+    
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
+        self.iface.setActiveLayer(layer)
+        
+        # Find the layer to edit
+        #layer = self.iface.activeLayer()
+        layer.startEditing()
+        
+        node_group = ["Junction","Valve","Reduction","Tank","Meter","Manhole","Source"]
+        connec_group = ["Wjoin","Fountain"]
+        arc_group = ["Pipe"]
         self.canvas=self.iface.mapCanvas()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
-        
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
         eventPoint = QPoint(x, y)
+                     
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-        message = str(result)
-        self.controller.show_info(message, context_name='ui_message')
-        
+            
         # That's the snapped point
         if result <> []:
 
             # Check feature
             for snapPoint in result:
-                x = snapPoint.layer.name()
                 
-                message = str(x)
-                self.controller.show_info(message, context_name='ui_message')
+                element_type = snapPoint.layer.name()
                 
+                if element_type in node_group:
+                    feat_type = 'node'
+                if element_type in connec_group:
+                    feat_type = 'connec'
+                if element_type in arc_group:
+                    feat_type = 'arc'
+                
+                        
                 # Get the point
                 point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
                 snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                 feature = snappFeat
-                node_id = feature.attribute('node_id')
-                
-                message = str(node_id)
-                self.controller.show_info(message, context_name='ui_message')
-        
+                element_id = feature.attribute(feat_type+'_id')
+ 
                 # LEAVE SELECTION
                 result[0].layer.select([result[0].snappedAtGeometry])
+           
+                # Get depth of feature
+                sql = "SELECT depth FROM "+self.schema_name+"."+feat_type+" WHERE "+feat_type+"_id = '"+element_id+"'"  
+                message = str(sql)
+                self.controller.show_info(message, context_name='ui_message' )
+                
+                rows = self.controller.get_rows(sql) 
+                
+                message = str(rows)
+                self.controller.show_info(message, context_name='ui_message' )
+                
+                self.depth=self.dialog.findChild(QLineEdit, "depth")
+                self.depth.setText(str(rows[0][0]))
+                self.feature_id =self.dialog.findChild(QLineEdit, "feature_id")
+                self.feature_id.setText(str(element_id))
+                self.feature_type =self.dialog.findChild(QLineEdit, "feature_type")
+                self.feature_type.setText(str(element_type))
+                
+                # Reset snapping
+                point = []
                 break
-        
-        
-      
-        
+                        
+  

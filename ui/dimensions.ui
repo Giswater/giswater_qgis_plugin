@@ -57,7 +57,7 @@
      <string>...</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="depth_2">
+   <widget class="QLineEdit" name="feature_id">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -67,7 +67,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="depth_3">
+   <widget class="QLineEdit" name="feature_type">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -165,7 +165,7 @@
    <property name="title">
     <string>Symbology</string>
    </property>
-   <widget class="QLineEdit" name="distance_3">
+   <widget class="QLineEdit" name="y_symbol">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -204,7 +204,7 @@
      <string>y:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="distance_2">
+   <widget class="QLineEdit" name="x_symbol">
     <property name="geometry">
      <rect>
       <x>100</x>
