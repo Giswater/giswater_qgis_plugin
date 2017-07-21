@@ -1140,11 +1140,20 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	dma.macrodma_id,
 	node.expl_id,
 	node.parent_node_id,
-	node.hemisphere as netwjoin_hemisphere
+	node.hemisphere as netwjoin_hemisphere,
+	netwjoin.demand as netwjoin_demand,
+	netwjoin.streetaxis_id as netwjoin_streetaxis_id,
+	ext_streetaxis.name as netwjoin_streetname,
+	netwjoin.postnumber AS netwjoin_postnumber,
+	netwjoin.top_floor AS netwjoin_top_floor,
+	netwjoin.lead_verified AS netwjoin_lead_verified,
+	netwjoin.lead_facade AS netwjoin_lead_facade,
+	netwjoin.cat_valve2 AS netwjoin_cat_valve2
 FROM expl_selector, node
 	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
 	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
 	JOIN man_netwjoin ON node.node_id::text = man_netwjoin.node_id::text
+	JOIN ext_streetaxis ON man_netwjoin.streetaxis_id::text=ext_streetaxis.id::text
 	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
 	AND expl_selector.cur_user="current_user"()::text);
 	

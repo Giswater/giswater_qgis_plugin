@@ -114,6 +114,13 @@ CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
 CREATE TABLE "man_netwjoin" (
 "node_id" varchar(16) NOT NULL,
 "add_info" varchar(255),
+demand numeric(12,8),
+streetaxis_id character varying(16),
+postnumber character varying(16),
+top_floor integer,
+lead_verified date,
+lead_facade character varying(254),,
+cat_valve2 character varying(30),
 CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
 );
 

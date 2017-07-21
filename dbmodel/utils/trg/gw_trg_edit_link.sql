@@ -64,11 +64,11 @@ BEGIN
 		--RAISE EXCEPTION 'arc_geom_end %', arc_geom_end;
 		
 		IF arc_geom_start IS NOT NULL THEN
-			INSERT INTO vnode (vnode_id, the_geom) VALUES (NEW.vnode_id, vnode_start);
+			INSERT INTO vnode (vnode_id, the_geom, expl_id) VALUES (NEW.vnode_id, vnode_start,expl_id_int);
 		END IF;
 
 		IF arc_geom_end IS NOT NULL THEN
-			INSERT INTO vnode (vnode_id, the_geom) VALUES (NEW.vnode_id, vnode_end);
+			INSERT INTO vnode (vnode_id, the_geom,expl_id) VALUES (NEW.vnode_id, vnode_end,expl_id_int);
 		END IF;
 		
 		INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
