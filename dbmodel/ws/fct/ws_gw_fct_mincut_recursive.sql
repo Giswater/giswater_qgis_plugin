@@ -28,7 +28,7 @@ BEGIN
 
     -- Check v_anl_node  being a valve
     SELECT node_id INTO exists_id FROM v_edit_anl_valve WHERE node_id = node_id_arg AND (broken  = FALSE) 
-    AND node_id not in (select valve_id from anl_mincut_result_valve_unaccess where result_cat_id=result_id_arg) ;
+    AND node_id not in (select valve_id from anl_mincut_result_valve_unaccess where mincut_result_cat_id=result_id_arg) ;
     IF FOUND THEN
 
         -- Check if the v_anl_node  is already computed
