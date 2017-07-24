@@ -17,6 +17,8 @@ DECLARE
 	gully_geom_end public.geometry;
 	link_geom public.geometry;
 	man_table varchar;
+	connec_geom_start public.geometry;
+	connec_geom_end public.geometry;
 	
 BEGIN
 
@@ -68,20 +70,48 @@ BEGIN
 				SELECT the_geom INTO arc_geom_end FROM arc WHERE ST_DWithin(vnode_end, arc.the_geom,0.001) LIMIT 1;
 				SELECT the_geom INTO gully_geom_start FROM gully WHERE ST_DWithin(vnode_start, gully.the_geom,0.001) LIMIT 1;
 				SELECT the_geom INTO gully_geom_end FROM gully WHERE ST_DWithin(vnode_end, gully.the_geom,0.001) LIMIT 1;
-
+				SELECT the_geom INTO connec_geom_start FROM connec WHERE ST_DWithin(vnode_start, connec.the_geom,0.001) LIMIT 1;
+				SELECT the_geom INTO connec_geom_end FROM connec WHERE ST_DWithin(vnode_end, connec.the_geom,0.001) LIMIT 1;
+				
 				IF arc_geom_start IS NOT NULL THEN
+				
+					IF NEW.feature_id IS NULL AND gully_geom_end IS NOT NULL  THEN
+						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_end, gully.the_geom,0.001));
+						NEW.featurecat_id='gully';
+					END IF;
+
+					IF NEW.feature_id IS NULL AND connec_geom_end IS NOT NULL THEN
+						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_end, connec.the_geom,0.001));
+						NEW.featurecat_id='connec';
+					END IF;
+					
 					INSERT INTO vnode (vnode_id, the_geom, expl_id) VALUES (NEW.vnode_id, vnode_start,expl_id_int);			
 					INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id, featurecat_id, "state")
 					VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
 				END IF;
 
-					IF arc_geom_end IS NOT NULL THEN			
+					IF arc_geom_end IS NOT NULL THEN		
+
+					IF NEW.feature_id IS NULL AND gully_geom_start IS NOT NULL THEN
+						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
+						NEW.featurecat_id='gully';
+					END IF;
+					IF NEW.feature_id IS NULL AND connec_geom_start IS NOT NULL THEN
+						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001));
+						NEW.featurecat_id='connec';
+					END IF;
+					
 						INSERT INTO vnode (vnode_id, the_geom,expl_id) VALUES (NEW.vnode_id, vnode_end,expl_id_int);
 						INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
 						VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
 					END IF;
 					
 				IF gully_geom_end IS NOT NULL AND gully_geom_start IS NOT NULL THEN
+					IF NEW.feature_id IS NULL THEN
+						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
+						NEW.featurecat_id='gully';
+					END IF;
+					
 					INSERT INTO link (link_id, feature_id, custom_length, the_geom, expl_id,featurecat_id, "state")
 					VALUES (NEW.link_id, NEW.feature_id,  NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
 				END IF;	

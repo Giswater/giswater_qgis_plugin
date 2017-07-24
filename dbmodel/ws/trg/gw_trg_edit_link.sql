@@ -14,7 +14,7 @@ DECLARE
 	arc_geom_start public.geometry;
 	arc_geom_end public.geometry;
 	link_geom public.geometry;
-	
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -71,6 +71,11 @@ BEGIN
 			INSERT INTO vnode (vnode_id, the_geom,expl_id) VALUES (NEW.vnode_id, vnode_end,expl_id_int);
 		END IF;
 		
+		IF NEW.feature_id IS NULL THEN
+			NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001) OR ST_DWithin(vnode_end, connec.the_geom,0.001));
+			NEW.featurecat_id=(SELECT connec_type FROM connec WHERE connec_id=NEW.feature_id);
+		END IF;
+
 		INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
 		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
 		
