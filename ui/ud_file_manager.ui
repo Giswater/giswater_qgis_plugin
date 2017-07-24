@@ -7,23 +7,23 @@
     <x>0</x>
     <y>0</y>
     <width>586</width>
-    <height>415</height>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="btn_accept">
+  <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>500</x>
-     <y>380</y>
-     <width>71</width>
+     <x>490</x>
+     <y>410</y>
+     <width>81</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>OK</string>
+    <string>Cancel</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_sector_selection">
@@ -31,51 +31,38 @@
     <rect>
      <x>20</x>
      <y>50</y>
-     <width>131</width>
-     <height>23</height>
+     <width>171</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>Sector Selection</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_times">
+  <widget class="QPushButton" name="btn_report">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>400</x>
      <y>50</y>
-     <width>131</width>
-     <height>23</height>
+     <width>171</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Times</string>
+    <string>Report</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_options">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>210</x>
      <y>50</y>
-     <width>131</width>
-     <height>23</height>
+     <width>171</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>Options</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_state_selection">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>50</y>
-     <width>131</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>State selection</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_file_inp">
@@ -96,7 +83,7 @@
     <rect>
      <x>20</x>
      <y>140</y>
-     <width>70</width>
+     <width>111</width>
      <height>17</height>
     </rect>
    </property>
@@ -122,7 +109,7 @@
     <rect>
      <x>20</x>
      <y>240</y>
-     <width>131</width>
+     <width>171</width>
      <height>17</height>
     </rect>
    </property>
@@ -161,7 +148,7 @@
     <rect>
      <x>20</x>
      <y>330</y>
-     <width>101</width>
+     <width>131</width>
      <height>17</height>
     </rect>
    </property>
@@ -185,9 +172,9 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>80</x>
      <y>350</y>
-     <width>71</width>
+     <width>81</width>
      <height>20</height>
     </rect>
    </property>
@@ -252,6 +239,19 @@
      <width>331</width>
      <height>61</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_accept_2">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>410</y>
+     <width>81</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Accept</string>
    </property>
   </widget>
  </widget>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>718</width>
-    <height>540</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,68 +16,22 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>30</y>
-     <width>681</width>
-     <height>451</height>
+     <x>15</x>
+     <y>15</y>
+     <width>691</width>
+     <height>471</height>
     </rect>
    </property>
    <property name="title">
-    <string>Select mincut</string>
+    <string>Psector</string>
    </property>
-   <widget class="QLabel" name="label_label_x_7">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::NoFrame</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="text">
-     <string>State:</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="scaledContents">
-     <bool>false</bool>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
-    <property name="margin">
-     <number>3</number>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="state_edit">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>40</y>
-      <width>146</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QTableView" name="tbl_mincut_edit">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>70</y>
       <width>651</width>
-      <height>361</height>
+      <height>381</height>
      </rect>
     </property>
     <property name="sortingEnabled">
@@ -87,7 +41,7 @@
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
      <rect>
-      <x>560</x>
+      <x>570</x>
       <y>40</y>
       <width>101</width>
       <height>23</height>
@@ -95,6 +49,16 @@
     </property>
     <property name="text">
      <string>Delete</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="txt_short_descript">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>191</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>

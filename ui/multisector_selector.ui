@@ -29,7 +29,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QTableView" name="all_psector">
+  <widget class="QTableView" name="all_sector">
    <property name="geometry">
     <rect>
      <x>25</x>
@@ -39,7 +39,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTableView" name="selected_psector">
+  <widget class="QTableView" name="selected_sector">
    <property name="geometry">
     <rect>
      <x>315</x>
@@ -87,7 +87,7 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>all_psector</tabstop>
+  <tabstop>all_sector</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>

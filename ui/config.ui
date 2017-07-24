@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -58,8 +58,8 @@
     <widget class="QLabel" name="label_workcat_id">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>60</y>
+       <x>20</x>
+       <y>80</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -94,7 +94,7 @@
     <widget class="QLabel" name="label_state">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>30</y>
        <width>141</width>
        <height>22</height>
@@ -130,8 +130,8 @@
     <widget class="QLabel" name="label_workcat_id_end">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>90</y>
+       <x>20</x>
+       <y>110</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -166,8 +166,8 @@
     <widget class="QLabel" name="label_workcat_id_end_2">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>120</y>
+       <x>20</x>
+       <y>140</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -202,7 +202,7 @@
     <widget class="QComboBox" name="state_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
+       <x>230</x>
        <y>30</y>
        <width>251</width>
        <height>22</height>
@@ -212,8 +212,8 @@
     <widget class="QComboBox" name="workcat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>60</y>
+       <x>230</x>
+       <y>80</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -222,8 +222,8 @@
     <widget class="QComboBox" name="verified_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>90</y>
+       <x>230</x>
+       <y>110</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -232,8 +232,8 @@
     <widget class="QDateEdit" name="builtdate_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>120</y>
+       <x>230</x>
+       <y>140</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -245,7 +245,7 @@
     <widget class="QLabel" name="label_workcat_id_2">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>190</y>
        <width>141</width>
        <height>22</height>
@@ -281,7 +281,7 @@
     <widget class="QComboBox" name="arccat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
+       <x>230</x>
        <y>190</y>
        <width>251</width>
        <height>22</height>
@@ -291,7 +291,7 @@
     <widget class="QLabel" name="label_workcat_id_3">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>220</y>
        <width>141</width>
        <height>22</height>
@@ -327,7 +327,7 @@
     <widget class="QComboBox" name="nodecat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
+       <x>230</x>
        <y>220</y>
        <width>251</width>
        <height>22</height>
@@ -337,7 +337,7 @@
     <widget class="QLabel" name="label_workcat_id_4">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>20</x>
        <y>250</y>
        <width>141</width>
        <height>22</height>
@@ -373,7 +373,7 @@
     <widget class="QComboBox" name="connecat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
+       <x>230</x>
        <y>250</y>
        <width>251</width>
        <height>22</height>
@@ -383,7 +383,7 @@
     <widget class="QCheckBox" name="chk_arccat_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>205</x>
        <y>190</y>
        <width>20</width>
        <height>21</height>
@@ -396,7 +396,7 @@
     <widget class="QCheckBox" name="chk_nodecat_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>205</x>
        <y>220</y>
        <width>20</width>
        <height>21</height>
@@ -409,7 +409,7 @@
     <widget class="QCheckBox" name="chk_connecat_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>205</x>
        <y>250</y>
        <width>20</width>
        <height>21</height>
@@ -422,8 +422,8 @@
     <widget class="QCheckBox" name="chk_workcat_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>60</y>
+       <x>205</x>
+       <y>80</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -435,8 +435,8 @@
     <widget class="QCheckBox" name="chk_cverified_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>90</y>
+       <x>205</x>
+       <y>110</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -448,7 +448,7 @@
     <widget class="QCheckBox" name="chk_state_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>205</x>
        <y>30</y>
        <width>20</width>
        <height>21</height>
@@ -461,8 +461,8 @@
     <widget class="QCheckBox" name="chk_builtdate_vdefault">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>120</y>
+       <x>205</x>
+       <y>140</y>
        <width>20</width>
        <height>21</height>
       </rect>
