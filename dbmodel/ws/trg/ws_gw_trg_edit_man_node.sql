@@ -779,7 +779,7 @@ BEGIN
 
 
 -- EPA UPDATE
-        IF (NEW.epa_type <> OLD.epa_type) THEN    
+        IF (NEW.epa_type != OLD.epa_type) THEN    
          
             IF (OLD.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';            
@@ -798,6 +798,7 @@ BEGIN
                 v_sql:= 'DELETE FROM '||inp_table||' WHERE node_id = '||quote_literal(OLD.node_id);
                 EXECUTE v_sql;
             END IF;
+			inp_table := NULL;
 
             IF (NEW.epa_type = 'JUNCTION') THEN
                 inp_table:= 'inp_junction';   
