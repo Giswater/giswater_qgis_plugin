@@ -28,6 +28,16 @@ CREATE SEQUENCE doc_x_tag_seq
     NO MAXVALUE
     CACHE 1;
 
+	
+
+-- ----------------------------
+--STATE
+-- ----------------------------
+ALTER TABLE gully RENAME state TO _state;
+ALTER TABLE gully ADD COLUMN state int2;
+	
+	
+	
 -- ----------------------------
 -- EXPLOTITATION STRATEGY
 -- ----------------------------
@@ -52,6 +62,7 @@ ALTER TABLE ext_streetaxis ADD COLUMN expl_id integer;
 -------------
 -- NEW TABLES
 -------------
+
 
 -- ADDING MACRODMA
 
@@ -100,7 +111,30 @@ CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
 
 CREATE INDEX anl_node_sink_index ON anl_node_sink USING GIST (the_geom);
 
-  
+ 
+ -- ----------------------------
+-- BUG ON CONTROLS / RULES
+-- ----------------------------
+
+ALTER TABLE inp_controls RENAME TO _inp_controls
+
+
+CREATE TABLE "inp_controls_x_node" (
+"id" serial,
+"node_id" varchar(16),
+"text" text,
+ CONSTRAINT id PRIMARY KEY (id));
+);
+
+
+CREATE TABLE "inp_controls_x_arc" (
+"id" serial,
+"arc_id" varchar(16),
+"text" text,
+ CONSTRAINT id PRIMARY KEY (id));
+);
+ 
+
   
 -- ----------------------------
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
@@ -427,5 +461,15 @@ ALTER TABLE gully ADD CONSTRAINT gully_macrodma_id_fkey FOREIGN KEY (macrodma_id
  ALTER TABLE om_visit_event_photo ADD CONSTRAINT om_visit_event_foto_visit_id_fkey FOREIGN KEY (visit_id)      REFERENCES om_visit (id) MATCH SIMPLE      ON UPDATE CASCADE ON DELETE RESTRICT;
  
  ALTER TABLE link DROP CONSTRAINT IF EXISTS link_connec_id_fkey;
+ 
+  
+ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey"
+ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey"
+ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ 
+ 
   
 

@@ -177,6 +177,56 @@ ALTER TABLE anl_mincut_valve  ADD CONSTRAINT anl_mincut_valve_status_type_fkey F
 ALTER TABLE anl_mincut_result_valve DROP CONSTRAINT IF EXISTS "anl_mincut_result_valve_status_type_fkey";
 ALTER TABLE anl_mincut_result_valve ADD CONSTRAINT anl_mincut_result_valve_status_type_fkey FOREIGN KEY (status_type) REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+
+-- ----------------------------
+-- BUG ON CONTROLS / RULES
+-- ----------------------------
+
+ALTER TABLE inp_controls RENAME TO _inp_controls
+ALTER TABLE inp_rules RENAME TO _inp_rules
+
+
+CREATE TABLE "inp_controls_x_node" (
+"id" serial,
+"node_id" varchar(16),
+"text" text,
+ CONSTRAINT id PRIMARY KEY (id));
+);
+
+
+CREATE TABLE "inp_rules_x_node" (
+"id" serial,
+"node_id" varchar(16),
+"text" text,
+ CONSTRAINT id PRIMARY KEY (id));
+);
+
+
+CREATE TABLE "inp_controls_x_arc" (
+"id" serial,
+"arc_id" varchar(16),
+"text" text,
+ CONSTRAINT id PRIMARY KEY (id));
+);
+
+
+CREATE TABLE "inp_rules_x_arc" (
+"id" serial,
+"arc_id" varchar(16),
+"text" text,
+ CONSTRAINT id PRIMARY KEY (id));
+);
+
+
+
+
+
+
+
+
+
+
+
 -- ----------------------------
 -- REVIEW AND UPDATE DATA ON WEB/MOBILE CLIENT
 -- ----------------------------
@@ -447,4 +497,20 @@ ALTER TABLE man_greentap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_cause_anl_cause_fkey FOREIGN KEY (anl_cause) REFERENCES anl_mincut_result_cat_cause (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_type_mincut_result_type_fkey FOREIGN KEY (mincut_result_type) REFERENCES anl_mincut_result_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mincut_result_state_fkey FOREIGN KEY (mincut_result_state) REFERENCES anl_mincut_result_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey"
+ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "inp_rules_x_node" DROP CONSTRAINT IF EXISTS "inp_rules_x_node_id_fkey"
+ALTER TABLE "inp_rules_x_node" ADD CONSTRAINT "inp_rules_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey"
+ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "inp_rules_x_arc" DROP CONSTRAINT IF EXISTS "inp_rules_x_arc_id_fkey"
+ALTER TABLE "inp_rules_x_arc" ADD CONSTRAINT "inp_rules_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
 

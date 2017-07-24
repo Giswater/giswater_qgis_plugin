@@ -31,8 +31,76 @@ CREATE SEQUENCE urn_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-	
-	-- ----------------------------
+
+
+-- ----------------------------
+--IMPROVE STATE STRATEGY
+-- ----------------------------
+
+ALTER TABLE arc RENAME state TO _state;
+ALTER TABLE node RENAME state TO _state;
+ALTER TABLE connec RENAME state TO _state;
+ALTER TABLE vnode RENAME state TO _state;
+--ALTER TABLE link RENAME state TO _state;
+--ALTER TABLE point RENAME state TO _state;
+ALTER TABLE samplepoint RENAME state TO _state;
+ALTER TABLE element RENAME state TO _state;
+
+
+ALTER TABLE arc ADD COLUMN state int2;
+ALTER TABLE node ADD COLUMN state int2;
+ALTER TABLE connec ADD COLUMN state int2;
+ALTER TABLE polygon ADD COLUMN state int2;
+ALTER TABLE vnode ADD COLUMN state int2;
+--ALTER TABLE link ADD COLUMN state int2;
+ALTER TABLE point ADD COLUMN state int2;
+ALTER TABLE samplepoint ADD COLUMN state int2;
+ALTER TABLE element ADD COLUMN state int2;
+
+ALTER TABLE value_state RENAME id TO _id;
+ALTER TABLE value_state ADD COLUMN id int2;
+
+
+-- fill values on new filled id
+UPDATE value_state c SET id=c2.seqnum FROM (SELECT c2.*, row_number()OVER () as seqnum FROM ws_sample_dev.value_state c2) c2 where c2._id=c._id;
+
+-- Changing pk
+ALTER TABLE value_state DROP CONSTRAINT value_state_pkey CASCADE;
+ALTER TABLE value_state ADD CONSTRAINT value_state_pkey  PRIMARY KEY(id);
+
+
+
+-- ----------------------------
+--GLOBAL STATE/PSECTOR SELECTION
+-- ----------------------------
+
+CREATE TABLE selector_state
+(
+  state_id smallint NOT NULL,
+  cur_user text,
+  CONSTRAINT state_selector_pkey PRIMARY KEY (state_id)
+);
+
+
+
+CREATE TABLE selector_psector
+(
+  psector_id varchar(16) NOT NULL,
+  cur_user text,
+  CONSTRAINT psector_selector_pkey PRIMARY KEY (psector_id)
+);
+
+
+ALTER TABLE plan_arc_x_psector ADD COLUMN state smallint;
+ALTER TABLE plan_arc_x_psector ADD COLUMN node_1 varchar(16);
+ALTER TABLE plan_arc_x_psector ADD COLUMN node_2 varchar(16);
+
+ALTER TABLE plan_node_x_psector ADD COLUMN state smallint;
+
+
+
+
+-- ----------------------------
 --DIMENSIONS
 -- ----------------------------
 	CREATE SEQUENCE dimensions_id_seq
@@ -65,7 +133,7 @@ CREATE TABLE dimensions
 -- ----------------------------
 ALTER TABLE link RENAME column connec_id TO feature_id;
 ALTER TABLE link ADD COLUMN featurecat_id character varying(50);
-ALTER TABLE link ADD COLUMN "state" character varying(16);
+ALTER TABLE link ADD COLUMN "state" int2;
 
 ALTER TABLE link DROP CONSTRAINT IF EXISTS "link_featurecat_id_fkey";
 ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

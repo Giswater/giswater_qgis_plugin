@@ -45,7 +45,7 @@ arc.the_geom,
 arc.expl_id
 FROM expl_selector,arc
 JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
+WHERE arc.expl_id=expl_selector.expl_id
 AND expl_selector.cur_user="current_user"()::text);
 
 
