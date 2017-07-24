@@ -32,6 +32,25 @@ CREATE SEQUENCE urn_id_seq
     NO MAXVALUE
     CACHE 1;
 
+	
+-------------------------------
+-- Topo analysis
+
+RENAME TABLE anl_arc_no_startend_node to _anl_arc_no_startend_node;
+RENAME CONSTRAINT anl_arc_no_startend_node_pkey to _anl_arc_no_startend_node_pkey;
+RENAME INDEX anl_arc_no_startend_node_index to ON _anl_arc_no_startend_node_index;
+
+ 
+CREATE TABLE "anl_arc_no_startend_node"(
+id serial not null,
+arc_id character varying(16),
+the_geom geometry(LINESTRING,SRID_VALUE),
+the_geom_p geometry(POINT,SRID_VALUE),
+CONSTRAINT anl_arc_no_startend_node_pkey PRIMARY KEY (arc_id)
+);
+
+CREATE INDEX anl_arc_no_startend_node_index ON anl_arc_no_startend_node USING GIST (the_geom);
+
 
 -- ----------------------------
 --IMPROVE STATE STRATEGY
@@ -62,7 +81,7 @@ ALTER TABLE value_state ADD COLUMN id int2;
 
 
 -- fill values on new filled id
-UPDATE value_state c SET id=c2.seqnum FROM (SELECT c2.*, row_number()OVER () as seqnum FROM ws_sample_dev.value_state c2) c2 where c2._id=c._id;
+--UPDATE value_state c SET id=c2.seqnum FROM (SELECT c2.*, row_number()OVER () as seqnum FROM ws_sample_dev.value_state c2) c2 where c2._id=c._id;
 
 -- Changing pk
 ALTER TABLE value_state DROP CONSTRAINT value_state_pkey CASCADE;
@@ -138,6 +157,7 @@ ALTER TABLE link ADD COLUMN "state" int2;
 ALTER TABLE link DROP CONSTRAINT IF EXISTS "link_featurecat_id_fkey";
 ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+
 -- ----------------------------
 -- STATE TOPOLOGYC COHERENCE
 -- ----------------------------
@@ -150,7 +170,6 @@ VALUES (190, 'gw_fct_node_state_update', 'trigger function', 'utils', null,null)
 
 INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
 VALUES (200, 'gw_fct_arc_state_update', 'trigger function', 'utils', null,null);
-
 
 
 

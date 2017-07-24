@@ -29,7 +29,7 @@ BEGIN
 
         -- Arc type
         IF (NEW.cat_arctype_id IS NULL) THEN
-            NEW.cat_arctype_id := (SELECT id FROM arc_type WHERE epa_default = 'PIPE');
+            NEW.cat_arctype_id := (SELECT id FROM arc_type WHERE epa_default = 'PIPE' LIMIT 1);
         END IF;
         
         -- Arc catalog ID

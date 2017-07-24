@@ -44,6 +44,7 @@ the_geom geometry(LINESTRING,SRID_VALUE),
 CONSTRAINT anl_arc_same_startend_pkey PRIMARY KEY (arc_id)
 );
 
+
 CREATE TABLE "anl_arc_no_startend_node"(
 arc_id character varying(16),
 the_geom geometry(LINESTRING,SRID_VALUE),
