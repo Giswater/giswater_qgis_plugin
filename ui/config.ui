@@ -59,7 +59,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>110</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -131,7 +131,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>110</y>
+       <y>140</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -167,7 +167,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>140</y>
+       <y>170</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -213,7 +213,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>80</y>
+       <y>110</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -223,7 +223,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>110</y>
+       <y>140</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -233,7 +233,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>140</y>
+       <y>170</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -246,7 +246,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>190</y>
+       <y>220</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -282,7 +282,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>190</y>
+       <y>220</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -292,7 +292,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>220</y>
+       <y>250</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -328,7 +328,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>220</y>
+       <y>250</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -338,7 +338,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>250</y>
+       <y>280</y>
        <width>141</width>
        <height>22</height>
       </rect>
@@ -374,7 +374,7 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>250</y>
+       <y>280</y>
        <width>251</width>
        <height>22</height>
       </rect>
@@ -383,8 +383,8 @@
     <widget class="QCheckBox" name="chk_arccat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>190</y>
+       <x>200</x>
+       <y>220</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -396,8 +396,8 @@
     <widget class="QCheckBox" name="chk_nodecat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>220</y>
+       <x>200</x>
+       <y>250</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -409,8 +409,8 @@
     <widget class="QCheckBox" name="chk_connecat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>250</y>
+       <x>200</x>
+       <y>280</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -422,8 +422,8 @@
     <widget class="QCheckBox" name="chk_workcat_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>80</y>
+       <x>200</x>
+       <y>110</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -435,8 +435,8 @@
     <widget class="QCheckBox" name="chk_cverified_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>110</y>
+       <x>200</x>
+       <y>140</y>
        <width>20</width>
        <height>21</height>
       </rect>
@@ -448,7 +448,7 @@
     <widget class="QCheckBox" name="chk_state_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
+       <x>200</x>
        <y>30</y>
        <width>20</width>
        <height>21</height>
@@ -461,8 +461,67 @@
     <widget class="QCheckBox" name="chk_builtdate_vdefault">
      <property name="geometry">
       <rect>
-       <x>205</x>
-       <y>140</y>
+       <x>200</x>
+       <y>170</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="psector_vdefault">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>60</y>
+       <width>251</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_psector">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>141</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Psector (alternative)</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chk_psector_vdefault">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>60</y>
        <width>20</width>
        <height>21</height>
       </rect>
