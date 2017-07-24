@@ -32,7 +32,8 @@ from qgis.gui import QgsMapCanvasSnapper
 from PyQt4.QtCore import Qt
 from qgis.core import QgsMapLayerRegistry
 
-
+from qgis.gui import QgsVertexMarker
+from PyQt4.QtGui import QCursor
 
 
 def formOpen(dialog, layer, feature):
@@ -84,7 +85,16 @@ class Dimensions(ParentDialog):
         mapCanvas.setMapTool(self.emitPoint)
  
         #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButton)
-
+        
+        #canvas.xyCoordinates.connect( self.canvasMoveEvent )
+        
+        self.canvas=self.iface.mapCanvas()
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        #QObject.connect(self.canvas, SIGNAL("renderComplete(QPainter *)"),self.checkLayers)
+        #QObject.connect(self.canvas, SIGNAL("mouseMoveEvent(const QgsPoint)"), self.test)
+        #cursor = QCursor()
+        #cursor.setShape(Qt.WhatsThisCursor)
+        #setTextCursor(self.cursor)
         
     def orientation(self):
         # Disconnect previous snapping
@@ -93,12 +103,19 @@ class Dimensions(ParentDialog):
         
         
     def snapping(self):
+  
         # Disconnect previous snapping
         QObject.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonOrientation)
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
         
+        # Track mouse movement
+        self.canvas.xyCoordinates.connect( self.canvasMoveEvent )
+
+
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
+
         
     def clickButtonOrientation(self,point,btn):
+    
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
         
@@ -117,6 +134,11 @@ class Dimensions(ParentDialog):
         
 
     def clickButtonSnapping(self,point,btn):
+    
+        # Deactivate mouse tracking
+        # Track mouse movement
+        self.canvas.xyCoordinates.disconnect( self.canvasMoveEvent )        
+    
     
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
@@ -185,4 +207,40 @@ class Dimensions(ParentDialog):
                 point = []
                 break
                         
+                        
+    def canvasMoveEvent(self,point):
+        #message = str(point)
+        #self.controller.show_info(message, context_name='ui_message' )
+        
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+        
+        # Change cursor
+        # Change map tool cursor
+        #self.cursor = QCursor()
+        #self.cursor.setShape(Qt.WhatsThisCursor)
+        #self.setTextCursor(self.cursor)
+        
+                   
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+          
+        #message = str(result)
+        #self.controller.show_info(message, context_name='ui_message' )        
+        # That's the snapped point
+        if result <> []:
+
+            # Check feature
+            for snapPoint in result:
+                        
+                # Get the point
+                point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                feature = snappFeat
+                element_id = feature.attribute('reduction_depth')
+                message = str(element_id)
+                self.controller.show_info(message, context_name='ui_message' )
+      
   

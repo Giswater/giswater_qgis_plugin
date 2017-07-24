@@ -19,6 +19,7 @@ from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 from ui.gallery import Gallery          #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
 
+
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
     
@@ -146,7 +147,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-
+        self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.actionRotation)
 
         # QLineEdit
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
@@ -218,6 +219,8 @@ class ManNodeDialog(ParentDialog):
         layer.setSelectedFeatures([feature.id()])
 
         canvas.zoomToSelected(layer)
+        
+        
 
     def catalog(self):
         self.dlg_cat=WScatalog()
@@ -601,4 +604,11 @@ class ManNodeDialog(ParentDialog):
         control = len(self.img_path_list1D)/9
         if self.start_indx < (control-1):
             self.btn_next.setEnabled(True)
+            
+            
+            
+            
+            
+    def actionRotation(self):
+        pass
         
