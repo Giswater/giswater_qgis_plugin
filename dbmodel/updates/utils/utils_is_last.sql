@@ -364,13 +364,6 @@ ALTER TABLE cat_node ADD COLUMN model character varying(30);
 ALTER TABLE node_type ADD COLUMN order_by integer;
 ALTER TABLE node_type ADD COLUMN active_type boolean;
 ALTER TABLE node_type ADD COLUMN code_autofill boolean;
-ALTER TABLE node_type ADD COLUMN i18n character varying(30);
-ALTER TABLE node_type ADD COLUMN shortcut_key text;
-
-ALTER TABLE arc_type ADD COLUMN i18n character varying(30);
-
-ALTER TABLE connec_type ADD COLUMN i18n character varying(30);
-
 
 
 
