@@ -3156,19 +3156,19 @@
 
     <message>
         <source>check_node_orphan</source>
-        <translation>     Orphan node identifier check</translation>
+        <translation>Orphan node identifier check</translation>
     </message>
      <message>
         <source>check_node_duplicated</source>
-        <translation>     Duplicated node identifier</translation>
+        <translation>Duplicated node identifier</translation>
     </message>
     <message>
         <source>check_connec_duplicated</source>
-        <translation>     Duplicated connec identifier</translation>
+        <translation>Duplicated connec identifier</translation>
     </message>
      <message>
         <source>check_arc_same_startend</source>
-        <translation>     Arc with the same start-end identifier</translation>
+        <translation>Arc with the same start-end identifier</translation>
     </message>
     <message>
         <source>check_node_sink</source>
