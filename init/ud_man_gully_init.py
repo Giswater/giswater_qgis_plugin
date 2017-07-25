@@ -41,6 +41,7 @@ class ManGullyDialog(ParentDialog):
         ''' Constructor class '''
         super(ManGullyDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
+        dialog.parent().setFixedSize(625, 660)
         
         
     def init_config_form(self):

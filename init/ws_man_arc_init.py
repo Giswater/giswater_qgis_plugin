@@ -55,11 +55,10 @@ class ManArcDialog(ParentDialog):
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         
-        dialog.setFixedWidth(625)
-        dialog.setFixedHeight(675)
-        dialog.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        
-        
+
+        dialog.parent().setFixedSize(625,685)
+        #dialog.parent().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
     def init_config_form(self):
         ''' Custom form initial configuration '''
       

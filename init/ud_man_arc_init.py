@@ -60,7 +60,7 @@ class ManArcDialog(ParentDialog):
         ''' Constructor class '''
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        
+        dialog.parent().setFixedSize(630, 720)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
