@@ -354,6 +354,7 @@ ALTER TABLE gully ADD COLUMN end_date date;
 ALTER TABLE node ADD COLUMN uncertain boolean;
 ALTER TABLE arc ADD COLUMN uncertain boolean;
 ALTER TABLE connec ADD COLUMN uncertain boolean;
+ALTER TABLE gully ADD COLUMN uncertain boolean;
 
 ALTER TABLE node ADD COLUMN xyz_date date;
 ALTER TABLE node ADD COLUMN unconnected boolean;

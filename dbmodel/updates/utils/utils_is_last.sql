@@ -349,6 +349,14 @@ ALTER TABLE anl_arc_no_startend_node DROP CONSTRAINT anl_arc_no_startend_node_pk
 ALTER TABLE anl_arc_no_startend_node ADD CONSTRAINT anl_arc_no_startend_node_pkey PRIMARY KEY(id);
 ALTER TABLE anl_arc_no_startend_node ADD COLUMN the_geom_p geometry(Point,SRID_VALUE);
 
+-- ----------------------------
+-- new node_cat fields
+-- ----------------------------
+ALTER TABLE cat_node ADD COLUMN "type" character varying(30);
+ALTER TABLE cat_node ADD COLUMN brand character varying(30);
+ALTER TABLE cat_node ADD COLUMN model character varying(30);
+
+
 
 -- ----------------------------
 -- new node_type/arc_type/connec_type fields

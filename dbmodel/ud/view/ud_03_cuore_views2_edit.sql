@@ -281,7 +281,8 @@ ext_streetaxis.name AS streetname,
 gully.postnumber,
 gully.expl_id,
 gully.connec_length,
-gully.connec_depth 
+gully.connec_depth,
+gully.uncertain
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
@@ -345,7 +346,8 @@ gully.streetaxis_id,
 gully.postnumber,
 gully.expl_id,
 gully.connec_length,
-gully.connec_depth 
+gully.connec_depth,
+gully.uncertain
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
@@ -1683,7 +1685,8 @@ ext_streetaxis.name AS streetname,
 gully.postnumber,
 gully.expl_id,
 gully.connec_length,
-gully.connec_depth 
+gully.connec_depth,
+gully.uncertain
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
 LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
@@ -1744,12 +1747,15 @@ gully.inventory,
 gully.end_date,
 dma.macrodma_id,
 gully.streetaxis_id,
+ext_streetaxis.name AS streetname,
 gully.postnumber,
 gully.expl_id,
 gully.connec_length,
-gully.connec_depth 
+gully.connec_depth,
+gully.uncertain
 FROM expl_selector, gully 
 LEFT JOIN cat_grate ON (((gully.gratecat_id)::text = (cat_grate.id)::text))
+LEFT JOIN ext_streetaxis ON gully.streetaxis_id::text = ext_streetaxis.id::text
 LEFT JOIN dma ON (((gully.dma_id)::text = (dma.dma_id)::text))
 WHERE gully.the_geom_pol is not null
 AND (gully.expl_id)::text=(expl_selector.expl_id)::text
