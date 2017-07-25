@@ -660,6 +660,7 @@ class Mg():
 
         # QComboBox
         self.state_vdefault=self.dlg.findChild(QComboBox,"state_vdefault")
+        self.psector_vdefault = self.dlg.findChild(QComboBox, "psector_vdefault")
         self.workcat_vdefault=self.dlg.findChild(QComboBox,"workcat_vdefault")
         self.verified_vdefault = self.dlg.findChild(QComboBox, "verified_vdefault")
         self.arccat_vdefault = self.dlg.findChild(QComboBox, "arccat_vdefault")
@@ -678,6 +679,7 @@ class Mg():
 
         # QCheckBox
         self.chk_state_vdefault = self.dlg.findChild(QCheckBox, 'chk_state_vdefault')
+        self.chk_psector_vdefault = self.dlg.findChild(QCheckBox, 'chk_psector_vdefault')
         self.chk_workcat_vdefault = self.dlg.findChild(QCheckBox, 'chk_workcat_vdefault')
         self.chk_cverified_vdefault = self.dlg.findChild(QCheckBox, 'chk_cverified_vdefault')
         self.chk_builtdate_vdefault = self.dlg.findChild(QCheckBox, 'chk_builtdate_vdefault')
@@ -716,6 +718,9 @@ class Mg():
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
+        sql="SELECT DISTINCT(psector_id) FROM" +self.schema_name+".plan_psector ORDER BY psector_id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_vdefault", rows)
 
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
         rows = self.dao.get_rows(sql)
@@ -723,9 +728,9 @@ class Mg():
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
-
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
         rows = self.dao.get_rows(sql)
+
         utils_giswater.fillComboBox("arccat_vdefault", rows)
         sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
         rows = self.dao.get_rows(sql)
@@ -860,6 +865,10 @@ class Mg():
             self.insert_or_update(self.state_vdefault, "state_vdefault")
         else:
             self.delete_row("state_vdefault")
+        if utils_giswater.isChecked(self.chk_psector_vdefault) == True:
+            self.insert_or_update(self.psector_vdefault, "psector_vdefault")
+        else:
+            self.delete_row("psector_vdefault")
         if utils_giswater.isChecked(self.chk_workcat_vdefault) == True:
             self.insert_or_update(self.workcat_vdefault, "workcat_vdefault")
         else:
