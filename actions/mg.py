@@ -22,6 +22,7 @@ import webbrowser
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
+from parent_init import ParentDialog
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config import Config                                  # @UnresolvedImport
@@ -1179,7 +1180,32 @@ class Mg():
             self.controller.execute_sql(sql)
             widget.model().select()
 
+    def delete_records_with_params(self, widget, table_name, column_id):
+        ''' Delete selected elements of the table '''
 
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' )
+            return
+
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(column_id))
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+
+        if answer:
+            sql = "DELETE FROM "+self.schema_name+"."+table_name
+            sql+= " WHERE "+column_id+" IN ("+list_id+")"
+            self.controller.execute_sql(sql)
+            widget.model().select()
     def close_dialog_multi(self, dlg=None):
         ''' Close dialog '''
         if dlg is None or type(dlg) is bool:
@@ -1645,18 +1671,27 @@ class Mg():
         # Create the dialog and signals
         self.dlg_psector_mangement = Psector_management()
         utils_giswater.setDialog(self.dlg_psector_mangement)
+        table_document="plan_psector"
+        column_id="psector_id"
+        # Tables
+        self.tbl_psm=self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
         # Buttons
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.pressbtn)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
-        self.dlg_psector_mangement.btn_delete.pressed.connect(self.pressbtn)
+        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.delete_records_with_params, self.tbl_psm, table_document,column_id))
         # LineEdit
-        self.txt_short_descript_psm=self.dlg_psector_mangement.findChild(QLineEdit,"txt_short_descript_psm")
-        # Tables
-        self.tbl_psm=self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
+        self.dlg_psector_mangement.txt_short_descript_psm.textChanged.connect(partial(self.filter_by_psector_id, self.tbl_psm))
+        #self.txt_short_descript_psm.
 
 
-
+        self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
 
+    def filter_by_psector_id(self,widget):
+        result_select = utils_giswater.getWidgetText("txt_short_descript_psm")
+        expr = " psector_id LIKE '%"+result_select+"%'"
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))
