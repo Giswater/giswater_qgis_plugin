@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction,QMessageBox,QComboBox, QLabel
-from PyQt4.QtCore import Qt, QSettings,QObject
+from PyQt4.QtCore import Qt, QSettings,QObject,QTimer
 from functools import partial
 
 import utils_giswater
@@ -22,9 +22,9 @@ import init.ws_man_node_init
 from PyQt4 import QtGui, uic
 import os
 from qgis.core import QgsMessageLog
-from PyQt4.QtGui import QSizePolicy
+from PyQt4.QtGui import QSizePolicy, QTextCursor
 
-from qgis.gui import QgsMapToolEmitPoint
+from qgis.gui import QgsMapToolEmitPoint,QgsMapTip
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from qgis.gui import QgsMapCanvasSnapper
@@ -34,6 +34,14 @@ from qgis.core import QgsMapLayerRegistry
 
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtGui import QCursor
+
+from PyQt4.QtGui import QApplication
+
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+
+from qgis.gui import QgsMapTip
+
 
 
 def formOpen(dialog, layer, feature):
@@ -90,11 +98,10 @@ class Dimensions(ParentDialog):
         
         self.canvas=self.iface.mapCanvas()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
-        #QObject.connect(self.canvas, SIGNAL("renderComplete(QPainter *)"),self.checkLayers)
-        #QObject.connect(self.canvas, SIGNAL("mouseMoveEvent(const QgsPoint)"), self.test)
-        #cursor = QCursor()
-        #cursor.setShape(Qt.WhatsThisCursor)
-        #setTextCursor(self.cursor)
+
+        #self.createMapTips()
+        self.createMapTips()
+        
         
     def orientation(self):
         # Disconnect previous snapping
@@ -103,22 +110,23 @@ class Dimensions(ParentDialog):
         
         
     def snapping(self):
-  
+        
         # Disconnect previous snapping
         QObject.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonOrientation)
         
         # Track mouse movement
-        self.canvas.xyCoordinates.connect( self.canvasMoveEvent )
-
+        #self.canvas.xyCoordinates.connect( self.canvasMoveEvent )
 
         QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
-
+        
+        #self.canvas.xyCoordinates.disconnect( self.canvasMoveEvent )
+        
         
     def clickButtonOrientation(self,point,btn):
     
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
-        
+
         # Find the layer to edit
         #layer = self.iface.activeLayer()
         layer.startEditing()
@@ -134,10 +142,10 @@ class Dimensions(ParentDialog):
         
 
     def clickButtonSnapping(self,point,btn):
-    
+        
         # Deactivate mouse tracking
         # Track mouse movement
-        self.canvas.xyCoordinates.disconnect( self.canvasMoveEvent )        
+        #self.canvas.xyCoordinates.disconnect( self.canvasMoveEvent )        
     
     
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
@@ -207,7 +215,7 @@ class Dimensions(ParentDialog):
                 point = []
                 break
                         
-                        
+    '''                 
     def canvasMoveEvent(self,point):
         #message = str(point)
         #self.controller.show_info(message, context_name='ui_message' )
@@ -216,14 +224,8 @@ class Dimensions(ParentDialog):
         x = map_point.x()
         y = map_point.y()
         eventPoint = QPoint(x, y)
+
         
-        # Change cursor
-        # Change map tool cursor
-        #self.cursor = QCursor()
-        #self.cursor.setShape(Qt.WhatsThisCursor)
-        #self.setTextCursor(self.cursor)
-        
-                   
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
           
@@ -242,5 +244,41 @@ class Dimensions(ParentDialog):
                 element_id = feature.attribute('reduction_depth')
                 message = str(element_id)
                 self.controller.show_info(message, context_name='ui_message' )
+    '''
+    
+    
+    def createMapTips( self ):
+        
+        """ Create MapTips on the map """
+        self.timerMapTips = QTimer( self.canvas )
+        self.mapTip = QgsMapTip()
+        self.canvas.connect( self.canvas, SIGNAL( "xyCoordinates(const QgsPoint&)" ),
+            self.mapTipXYChanged )
+        self.canvas.connect( self.timerMapTips, SIGNAL( "timeout()" ),
+            self.showMapTip )
+
+            
+    def mapTipXYChanged( self, p ):
+        """ SLOT. Initialize the Timer to show MapTips on the map """
+        if self.canvas.underMouse(): # Only if mouse is over the map
+            # Here you could check if your custom MapTips button is active or sth
+            self.lastMapPosition = QgsPoint( p.x(), p.y() )
+            self.mapTip.clear( self.canvas )
+            self.timerMapTips.start( 750 ) # time in milliseconds
+
+            
+    def showMapTip( self ):
+        """ SLOT. Show  MapTips on the map """
+        self.timerMapTips.stop()
+        
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("nodes")[0]
+        #self.iface.setActiveLayer(layer)
+
+        if self.canvas.underMouse(): 
+            # Here you could check if your custom MapTips button is active or sth
+            pointQgs = self.lastMapPosition
+            pointQt = self.canvas.mouseLastXY()
+            self.mapTip.showMapTip( layer, pointQgs, pointQt,
+                self.canvas )
       
   
