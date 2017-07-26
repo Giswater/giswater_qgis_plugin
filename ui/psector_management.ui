@@ -25,7 +25,7 @@
    <property name="title">
     <string>Psector</string>
    </property>
-   <widget class="QTableView" name="tbl_mincut_edit">
+   <widget class="QTableView" name="tbl_psm">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -51,7 +51,7 @@
      <string>Delete</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="txt_short_descript">
+   <widget class="QLineEdit" name="txt_short_descript_psm">
     <property name="geometry">
      <rect>
       <x>20</x>

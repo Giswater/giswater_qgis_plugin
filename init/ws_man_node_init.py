@@ -18,7 +18,7 @@ from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 
 from ui.gallery import Gallery          #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
-
+from PyQt4.QtGui import QSizePolicy
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -48,7 +48,9 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        
+
+        dialog.parent().setFixedSize(625,720)
+        #dialog.parent().setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Expanding)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''

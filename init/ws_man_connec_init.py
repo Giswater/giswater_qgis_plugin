@@ -13,10 +13,11 @@ from functools import partial
 import utils_giswater
 from parent_init import ParentDialog
 from ui.ws_catalog import WScatalog                  # @UnresolvedImport
+from PyQt4.QtGui import QSizePolicy
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
-    
+
     global feature_dialog
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
@@ -39,13 +40,18 @@ class ManConnecDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-        super(ManConnecDialog, self).__init__(dialog, layer, feature)      
+
+        super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
-        
+
+        dialog.parent().setFixedSize(620,675)
+        #dialog.parent().setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+
+
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
-      
+
         table_element = "v_ui_element_x_connec" 
         table_document = "v_ui_doc_x_connec" 
         table_event_connec = "v_ui_om_visit_x_connec"
