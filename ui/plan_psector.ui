@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -488,9 +488,6 @@
         </property>
        </widget>
       </widget>
-      <zorder>gb_planified</zorder>
-      <zorder>groupBox_8</zorder>
-      <zorder>gb_deprecated</zorder>
      </widget>
      <widget class="QWidget" name="Node">
       <attribute name="title">
@@ -1492,7 +1489,7 @@
     <string>Accept</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_close">
+  <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
      <x>430</x>

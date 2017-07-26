@@ -34,6 +34,9 @@ from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImp
 from ..ui.mincut_edit import Mincut_edit          # @UnresolvedImport
 from ..ui.mincut_fin import Mincut_fin
 from ..ui.mincut import Mincut
+from ..ui.multipsector_selector import Multipsector_selector        # @UnresolvedImport
+from ..ui.plan_psector import Plan_psector        # @UnresolvedImport
+from ..ui.psector_management import Psector_management        # @UnresolvedImport
 
 from functools import partial
 
@@ -1556,6 +1559,104 @@ class Mg():
         self.controller.show_info(message, context_name='ui_message')
         
 
- 
+    # Button 45
+    def mg_psector_selector(self):
+        # Create the dialog and signals
+        self.dlg_psector_sel = Multipsector_selector()
+        utils_giswater.setDialog(self.dlg_psector_sel)
+        # Buttons
+        self.dlg_psector_sel.btn_accept.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
+        self.dlg_psector_sel.btn_select_state.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_unselect_state.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_select_psector.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_unselect_psector.pressed.connect(self.pressbtn)
+
+        # Tables
+        self.tbl_all_state=self.dlg_psector_sel.findChild(QTableView, "all_state")
+        self.tbl_selected_state = self.dlg_psector_sel.findChild(QTableView, "selected_state")
+        self.tbl_all_psector = self.dlg_psector_sel.findChild(QTableView, "all_psector")
+        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_psector")
+
+        # LineEdit
+        self.pss_txt_short_descript=self.dlg_psector_sel.findChild(QLineEdit,"txt_short_descript")
+
+        self.dlg_psector_sel.exec_()
 
 
+    # Button 46
+    def mg_new_psector(self):
+        # Create the dialog and signals
+        self.dlg_new_psector = Plan_psector()
+        utils_giswater.setDialog(self.dlg_new_psector)
+        # Buttons
+        self.dlg_new_psector.btn_accept.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
+        # tab Networks elements
+        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_arc_dep.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_arc_dep.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_node_dep.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_node_dep.pressed.connect(self.pressbtn)
+
+        # LineEdit
+        # tab Networks elements
+        self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
+        self.priority = self.dlg_new_psector.findChild(QLineEdit, "priority")
+        self.descript = self.dlg_new_psector.findChild(QLineEdit, "descript")
+        self.text1 = self.dlg_new_psector.findChild(QLineEdit, "text1")
+        self.text2 = self.dlg_new_psector.findChild(QLineEdit, "text2")
+        self.observ = self.dlg_new_psector.findChild(QLineEdit, "observ")
+        # tab Bugdet
+        self.sum_v_plan_other_x_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_other_x_psector")
+        self.sum_v_plan_x_arc_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_x_arc_psector")
+        self.sum_v_plan_x_node_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_x_node_psector")
+        self.sum_expenses = self.dlg_new_psector.findChild(QLineEdit, "sum_expenses")
+        self.other = self.dlg_new_psector.findChild(QLineEdit, "other")
+        self.other_cost = self.dlg_new_psector.findChild(QLineEdit, "other_cost")
+        self.sum_oexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_oexpenses")
+        self.gexpenses = self.dlg_new_psector.findChild(QLineEdit, "gexpenses")
+        self.gexpenses_cost = self.dlg_new_psector.findChild(QLineEdit, "gexpenses_cost")
+        self.sum_gexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_gexpenses")
+        self.vat = self.dlg_new_psector.findChild(QLineEdit, "vat")
+        self.vat_cost = self.dlg_new_psector.findChild(QLineEdit, "vat_cost")
+        self.sum_vexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_vexpenses")
+        # tab Other
+        self.scale = self.dlg_new_psector.findChild(QTableView, "scale")
+        self.rotation = self.dlg_new_psector.findChild(QTableView, "rotation")
+        self.atlas_id=self.dlg_new_psector.findChild(QTableView, "atlas_id")
+
+        # Tables
+        # tab Networks elements
+        self.tbl_arc_plan = self.dlg_new_psector.findChild(QTableView, "tbl_arc_plan")
+        self.tbl_arc_dep = self.dlg_new_psector.findChild(QTableView, "tbl_arc_dep")
+        self.tbl_node_plan=self.dlg_new_psector.findChild(QTableView, "tbl_node_plan")
+        self.tbl_node_dep = self.dlg_new_psector.findChild(QTableView, "tbl_node_dep")
+        # tab Bugdet
+        self.tbl_v_plan_other_x_psector = self.dlg_new_psector.findChild(QTableView, "tbl_v_plan_other_x_psector")
+
+        self.dlg_new_psector.exec_()
+    # Button 47
+    def mg_psector_mangement(self):
+        'psm es abreviacion de psector_management'
+        # Create the dialog and signals
+        self.dlg_psector_mangement = Psector_management()
+        utils_giswater.setDialog(self.dlg_psector_mangement)
+        # Buttons
+        self.dlg_psector_mangement.btn_accept.pressed.connect(self.pressbtn)
+        self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
+        self.dlg_psector_mangement.btn_delete.pressed.connect(self.pressbtn)
+        # LineEdit
+        self.txt_short_descript_psm=self.dlg_psector_mangement.findChild(QLineEdit,"txt_short_descript_psm")
+        # Tables
+        self.tbl_psm=self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
+
+
+
+        self.dlg_psector_mangement.exec_()
+
+    def pressbtn(self):
+        QMessageBox.about(None, 'Ok', str('btn pressed'))
