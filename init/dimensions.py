@@ -7,40 +7,23 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction,QMessageBox,QComboBox, QLabel
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction,QMessageBox,QComboBox, QLabel, QSizePolicy, QCursor, QApplication
 from PyQt4.QtCore import Qt, QSettings,QObject,QTimer
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-#from init.ws_man_node_init import ManNodeDialog
 from ui.ws_catalog import WScatalog                  # @UnresolvedImport
 
-from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
+from qgis.core import QgsProject, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsMessageLog
 
-import init.ws_man_node_init
 from PyQt4 import QtGui, uic
 import os
-from qgis.core import QgsMessageLog
-from PyQt4.QtGui import QSizePolicy, QTextCursor
 
-from qgis.gui import QgsMapToolEmitPoint,QgsMapTip
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-from qgis.gui import QgsMapCanvasSnapper
-
-from PyQt4.QtCore import Qt
-from qgis.core import QgsMapLayerRegistry
-
-from qgis.gui import QgsVertexMarker
-from PyQt4.QtGui import QCursor
-
-from PyQt4.QtGui import QApplication
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapTip, QgsVertexMarker, QgsMapCanvasSnapper
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-
-from qgis.gui import QgsMapTip
 
 
 
@@ -196,13 +179,8 @@ class Dimensions(ParentDialog):
            
                 # Get depth of feature
                 sql = "SELECT depth FROM "+self.schema_name+"."+feat_type+" WHERE "+feat_type+"_id = '"+element_id+"'"  
-                message = str(sql)
-                self.controller.show_info(message, context_name='ui_message' )
                 
                 rows = self.controller.get_rows(sql) 
-                
-                message = str(rows)
-                self.controller.show_info(message, context_name='ui_message' )
                 
                 self.depth=self.dialog.findChild(QLineEdit, "depth")
                 self.depth.setText(str(rows[0][0]))
@@ -248,8 +226,8 @@ class Dimensions(ParentDialog):
     
     
     def createMapTips( self ):
+        ''' Create MapTips on the map '''
         
-        """ Create MapTips on the map """
         self.timerMapTips = QTimer( self.canvas )
         self.mapTip = QgsMapTip()
         self.canvas.connect( self.canvas, SIGNAL( "xyCoordinates(const QgsPoint&)" ),
@@ -259,26 +237,26 @@ class Dimensions(ParentDialog):
 
             
     def mapTipXYChanged( self, p ):
-        """ SLOT. Initialize the Timer to show MapTips on the map """
+        ''' SLOT. Initialize the Timer to show MapTips on the map '''
+        
         if self.canvas.underMouse(): # Only if mouse is over the map
             # Here you could check if your custom MapTips button is active or sth
             self.lastMapPosition = QgsPoint( p.x(), p.y() )
             self.mapTip.clear( self.canvas )
-            self.timerMapTips.start( 750 ) # time in milliseconds
+            self.timerMapTips.start( 100 ) # time in milliseconds
 
             
     def showMapTip( self ):
-        """ SLOT. Show  MapTips on the map """
+        ''' SLOT. Show  MapTips on the map '''
+        
         self.timerMapTips.stop()
         
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("nodes")[0]
-        #self.iface.setActiveLayer(layer)
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
 
         if self.canvas.underMouse(): 
             # Here you could check if your custom MapTips button is active or sth
             pointQgs = self.lastMapPosition
             pointQt = self.canvas.mouseLastXY()
-            self.mapTip.showMapTip( layer, pointQgs, pointQt,
-                self.canvas )
+            self.mapTip.showMapTip( layer, pointQgs, pointQt, self.canvas )
       
   

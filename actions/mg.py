@@ -680,7 +680,6 @@ class Mg():
         else:
             self.builtdate_vdefault.setDate(QDate.currentDate())
 
-
         # QCheckBox
         self.chk_state_vdefault = self.dlg.findChild(QCheckBox, 'chk_state_vdefault')
         self.chk_psector_vdefault = self.dlg.findChild(QCheckBox, 'chk_psector_vdefault')
@@ -690,13 +689,6 @@ class Mg():
         self.chk_arccat_vdefault = self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault')
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
         self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
-
-        #self.arc_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox,self.arc_vdef_enabled, self.arccat_vdefault, "arccat_vdefault"))
-        #self.node_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.node_vdef_enabled, self.nodecat_vdefault))
-        #self.connec_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.connec_vdef_enabled, self.connecat_vdefault))
-        #self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault').stateChanged.connect(partial(self.test, "check"))
-        #self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault').stateChanged.connect(partial(self.test, "check"))
-        #self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault').stateChanged.connect(partial(self.test, "check"))
 
 
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
@@ -759,8 +751,10 @@ class Mg():
         self.controller.translate_form(self.dlg, 'config')
         self.dlg.exec_()
 
-    # Like def mf_config_get_date(....): but for multi user
+
     def new_mg_config_get_data(self,tablename):
+        # Like def mf_config_get_date(....): but for multi user
+        
         sql = 'SELECT * FROM ' + self.schema_name + "." + tablename +' WHERE "user"=current_user'
         rows = self.dao.get_rows(sql)
         if not rows:
@@ -775,9 +769,11 @@ class Mg():
             columns.append(str(i[1]))
         return columns
 
+        
     def test(self, text):
         QMessageBox.about(None, 'Ok', str(text))
 
+        
     def open_file_dialog(self, widget):
         ''' Open File Dialog '''
 
@@ -903,10 +899,15 @@ class Mg():
 
         self.close_dialog(self.dlg)
 
+        
     def delete_row(self,  parameter):
+    
         sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
         self.controller.execute_sql(sql)
+        
+        
     def insert_or_update(self, widget, parameter):
+    
         sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
         rows=self.controller.get_rows(sql)
         self.exist = False
@@ -1001,13 +1002,11 @@ class Mg():
         sql = "SELECT * FROM " + self.schema_name + ".exploitation WHERE short_descript LIKE '"
         self.txt_short_descript.textChanged.connect(partial(self.filter_all_explot, sql, self.txt_short_descript))
 
-
         self.btn_select.pressed.connect(self.selection)
         self.btn_unselect.pressed.connect(self.unselection)
 
         self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
         
-
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
         #self.tbl_all_explot.hideColumn(0)
         self.tbl_all_explot.hideColumn(2)
@@ -1016,7 +1015,6 @@ class Mg():
         self.tbl_all_explot.setColumnWidth(0,98)
         self.tbl_all_explot.setColumnWidth(1,99)
 
-
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         self.tbl_selected_explot.hideColumn(1)
         self.tbl_selected_explot.setColumnWidth(0,197)
@@ -1024,12 +1022,12 @@ class Mg():
         self.dlg_multiexp.exec_()
 
     def filter_all_explot(self,sql, widget):
+    
         sql += widget.text()+"%'"
         model = QSqlQueryModel()
         model.setQuery(sql)
         self.tbl_all_explot.setModel(model)
         self.tbl_all_explot.show()
-
 
 
     def selection(self):
@@ -1079,7 +1077,6 @@ class Mg():
                 sql+= " VALUES ('"+expl_id[i]+"', '"+cur_user+"')"
                 self.controller.execute_sql(sql)
 
-
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         #refresh
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
@@ -1109,9 +1106,6 @@ class Mg():
         row_index = row_index[:-2]
         expl_id = expl_id[:-2]
 
-        print row_index
-        print expl_id
-
         table_name_unselect = "expl_selector"
         sql = "DELETE FROM "+self.schema_name+"."+table_name_unselect
         sql+= " WHERE expl_id IN ("+expl_id+")"
@@ -1122,9 +1116,7 @@ class Mg():
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         self.iface.mapCanvas().refresh()
 
-
-
-
+        
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu'''
 
@@ -1141,7 +1133,6 @@ class Mg():
             row = self.dao.get_row(sql)
             if row == None:
                 self.menu.addAction(elem,partial(self.insert, elem,table))
-
 
 
     def insert(self, id_action, table):
@@ -1180,6 +1171,7 @@ class Mg():
             self.controller.execute_sql(sql)
             widget.model().select()
 
+            
     def delete_records_with_params(self, widget, table_name, column_id):
         ''' Delete selected elements of the table '''
 
@@ -1206,8 +1198,11 @@ class Mg():
             sql+= " WHERE "+column_id+" IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()
+            
+            
     def close_dialog_multi(self, dlg=None):
         ''' Close dialog '''
+        
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg_multi
         try:
@@ -1234,9 +1229,8 @@ class Mg():
         widget.setModel(model)
 
 
-
     def mg_mincut_edit(self):
-        # Button 27. mincut edit
+        # Button_27 : mincut edit
 
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
@@ -1275,6 +1269,7 @@ class Mg():
         widget.model().setFilter(expr)
         widget.model().select()
 
+        
     def accept_min(self):
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
@@ -1286,9 +1281,8 @@ class Mg():
         id = self.tbl_mincut_edit.model().record(row).value("id")
 
         sql = "SELECT * FROM "+self.schema_name+".anl_mincut_result_cat WHERE id = '"+id+"'"
-        print sql
+
         rows = self.dao.get_row(sql)
-        print rows
 
         #self.dlg_min_edit.close()
 
@@ -1314,7 +1308,6 @@ class Mg():
         self.exploitation = self.dlg_mincut.findChild(QComboBox, "exploitation")
         self.type = self.dlg_mincut.findChild(QComboBox, "type")
         self.cause = self.dlg_mincut.findChild(QComboBox ,"cause")
-
 
         self.cbx_date_end = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end")
         self.cbx_hours_end = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end")
@@ -1434,8 +1427,6 @@ class Mg():
         self.btn_accept.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
 
-
-
         #self.btn_cancel.clicked.connect()
 
         # Set values mincut and address
@@ -1454,7 +1445,9 @@ class Mg():
         # Open the dialog
         self.dlg_fin.show()
 
+        
     def accept(self):
+    
         # reach end_date and end_hour from mincut_fin dialog
         datestart=self.cbx_date_start_fin.date()
         timestart=self.cbx_hours_start_fin.time()
@@ -1469,6 +1462,7 @@ class Mg():
 
         #self.dlg_fin.close()
 
+        
     def real_start(self):
 
         self.date_start = QDate.currentDate()
@@ -1479,6 +1473,7 @@ class Mg():
 
 
     def accept_update(self):
+    
         mincut_result_state = self.state.text()
         id = self.id.text()
         #exploitation =
@@ -1548,6 +1543,7 @@ class Mg():
         '''
         self.dlg_mincut.close()
 
+        
     def close(self, dlg = None):
         ''' Close dialog '''
         dlg.close()
@@ -1560,18 +1556,9 @@ class Mg():
             pass
         '''
         
-    def mg_dimensions(self):
-        '''
-        # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
-        self.iface.setActiveLayer(layer)
         
-        # Find the layer to edit
-        #layer = self.iface.activeLayer()
-        layer.startEditing()
-        # Implement the Add Feature button
-        #self.iface.actionAddFeature().trigger()
-        '''
+    def mg_dimensions(self):
+        ''' Button_39: Dimensioning ''' 
 
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
@@ -1581,12 +1568,11 @@ class Mg():
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
-        message = "tes1 dimensions "
-        self.controller.show_info(message, context_name='ui_message')
-        
 
-    # Button 45
+        
     def mg_psector_selector(self):
+        ''' Button_45 : Psector selector '''
+        
         # Create the dialog and signals
         self.dlg_psector_sel = Multipsector_selector()
         utils_giswater.setDialog(self.dlg_psector_sel)
@@ -1609,9 +1595,10 @@ class Mg():
 
         self.dlg_psector_sel.exec_()
 
-
-    # Button 46
+    
     def mg_new_psector(self):
+        ''' Button_46 : New psector '''
+        
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
@@ -1665,8 +1652,11 @@ class Mg():
         self.tbl_v_plan_other_x_psector = self.dlg_new_psector.findChild(QTableView, "tbl_v_plan_other_x_psector")
 
         self.dlg_new_psector.exec_()
-    # Button 47
+        
+        
     def mg_psector_mangement(self):
+        ''' Button_47 : Psector management '''
+        
         'psm es abreviacion de psector_management'
         # Create the dialog and signals
         self.dlg_psector_mangement = Psector_management()
@@ -1683,15 +1673,17 @@ class Mg():
         self.dlg_psector_mangement.txt_short_descript_psm.textChanged.connect(partial(self.filter_by_psector_id, self.tbl_psm))
         #self.txt_short_descript_psm.
 
-
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
 
+        
     def filter_by_psector_id(self,widget):
         result_select = utils_giswater.getWidgetText("txt_short_descript_psm")
         expr = " psector_id LIKE '%"+result_select+"%'"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
+        
+        
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))

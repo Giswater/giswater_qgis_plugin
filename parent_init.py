@@ -75,8 +75,8 @@ class ParentDialog(object):
              
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
-        self.schema_name = self.controller.schema_name    
-        
+        self.schema_name = self.controller.schema_name  
+       
         
     def set_signals(self):
         

@@ -20,6 +20,13 @@ from ui.gallery import Gallery          #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
 from PyQt4.QtGui import QSizePolicy
 
+from PyQt4.QtCore import Qt,QObject
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+
+from qgis.gui import QgsMapToolEmitPoint,QgsMapCanvasSnapper
+
+
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
     
@@ -286,6 +293,7 @@ class ManNodeDialog(ParentDialog):
         utils_giswater.fillComboBox(self.pnom, rows)
         self.fillCbxdnom()
 
+        
     def fillCbxdnom(self,index):
         if index == -1:
             return
@@ -305,6 +313,7 @@ class ManNodeDialog(ParentDialog):
         self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)
 
+        
     def fillCbxCatalod_id(self,index):    #@UnusedVariable
 
         self.id = self.dlg_cat.findChild(QComboBox, "id")
@@ -329,24 +338,11 @@ class ManNodeDialog(ParentDialog):
             utils_giswater.fillComboBox(self.id, rows)
 
 
-
-
-    '''
-    # QMessageBox.about(None, 'Ok', str(nodetype))
-    def initfillcbxnodecat_id(self):
-        sql = "SELECT DISTINCT(id) FROM ws_sample_dev.cat_node"
-        sql += " WHERE nodetype_id='" + self.node_type.currentText() + "'"
-        rows = self.controller.get_rows(sql)
-        self.nodecat_id.clear()
-        utils_giswater.fillComboBox(self.nodecat_id,rows)
-    '''
-
     def fillTxtnodecat_id(self):
         self.dlg_cat.close()
         self.nodecat_id.clear()
         self.nodecat_id.setText(str(self.id.currentText()))
-        
-        
+             
         
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
@@ -543,8 +539,7 @@ class ManNodeDialog(ParentDialog):
         
         
     def slide_previous(self):
-
-        
+    
         #indx=self.i-1
         indx=(self.start_indx*9)+self.i-1
 
@@ -564,7 +559,6 @@ class ManNodeDialog(ParentDialog):
         
     def slide_next(self):
 
-  
         #indx=self.i+1 
         indx=(self.start_indx*9)+self.i+1
         
@@ -583,6 +577,7 @@ class ManNodeDialog(ParentDialog):
 
         
     def previous_gallery(self):
+    
         #self.end_indx = self.end_indx-1
         self.start_indx = self.start_indx-1
         
@@ -607,10 +602,59 @@ class ManNodeDialog(ParentDialog):
         if self.start_indx < (control-1):
             self.btn_next.setEnabled(True)
             
-            
-            
-            
-            
+     
     def actionRotation(self):
-        pass
+        mapCanvas=self.iface.mapCanvas()
+        self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
+        mapCanvas.setMapTool(self.emitPoint)
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.get_coordinates)
+        
+        
+    def get_coordinates(self,point,btn):
+
+        canvas=self.iface.mapCanvas()
+        self.snapper = QgsMapCanvasSnapper(canvas)
+       
+        x =(str(point.x()))
+        y =(str(point.y()))
+        
+        message = str(x)
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        message = str(y)
+        self.controller.show_warning(message, context_name='ui_message')
+ 
+        message = str(self.id)
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        '''
+        # Set SRID from table node
+        #self.table_node = self.settings.value('db/table_node', 'v_edit_man_junction')  
+        self.table_node = "v_edit_man_junction"  
+        sql = "SELECT Find_SRID('"+self.schema_name+"', '"+self.table_node+"', 'the_geom');"
+        sql = "SELECT Find_SRID(ws_sample_dev, v_edit_man_junction, the_geom);"
+        message = str(sql)
+        self.controller.show_warning(message, context_name='ui_message')
+        row2 = self.controller.get_rows(sql)
+        message = str(row2)
+        self.controller.show_warning(message, context_name='ui_message')
+        row = self.dao.get_row(sql)
+        message = str(row)
+        self.controller.show_warning(message, context_name='ui_message')
+        
+        if row:
+            self.srid = row[0]   
+            #self.controller.plugin_settings_set_value("srid", self.srid)  
+        
+        # Update geometry element with selected coordinates
+        #the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";
+        
+        #sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
+        #sql+= " VALUES ('"+elem_type_id+"', '"+epa_default+"', "+the_geom+")" 
+        #sql+= " RETURNING node_id;";
+        #row = self.dao.get_row(sql)
+        #self.dao.commit()
+        '''
+        
+        
         

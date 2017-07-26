@@ -36,6 +36,7 @@ def formOpen(dialog, layer, feature):
     feature_dialog = ManArcDialog(dialog, layer, feature)
     init_config()
     
+    
 def init_config():
      
     # Manage 'arccat_id'
