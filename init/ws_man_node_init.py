@@ -615,46 +615,34 @@ class ManNodeDialog(ParentDialog):
         canvas=self.iface.mapCanvas()
         self.snapper = QgsMapCanvasSnapper(canvas)
        
-        x =(str(point.x()))
-        y =(str(point.y()))
+        x =point.x()
+        y =point.y()
         
-        message = str(x)
-        self.controller.show_warning(message, context_name='ui_message')
+        layer = self.iface.activeLayer().name()
+        table = "v_edit_man_"+str(layer.lower())
         
-        message = str(y)
-        self.controller.show_warning(message, context_name='ui_message')
- 
-        message = str(self.id)
-        self.controller.show_warning(message, context_name='ui_message')
+        sql = "SELECT ST_X(the_geom),ST_Y(the_geom) FROM "+self.schema_name+"."+table+" WHERE node_id = '"+self.id+"'"
+        rows = self.controller.get_rows(sql)
         
-        '''
-        # Set SRID from table node
-        #self.table_node = self.settings.value('db/table_node', 'v_edit_man_junction')  
-        self.table_node = "v_edit_man_junction"  
-        sql = "SELECT Find_SRID('"+self.schema_name+"', '"+self.table_node+"', 'the_geom');"
-        sql = "SELECT Find_SRID(ws_sample_dev, v_edit_man_junction, the_geom);"
-        message = str(sql)
-        self.controller.show_warning(message, context_name='ui_message')
-        row2 = self.controller.get_rows(sql)
-        message = str(row2)
-        self.controller.show_warning(message, context_name='ui_message')
-        row = self.dao.get_row(sql)
-        message = str(row)
-        self.controller.show_warning(message, context_name='ui_message')
+        existing_point_x = rows[0][0]
+        existing_point_y = rows[0][1]
+        existing_point = str(QPoint(existing_point_x,existing_point_y))
+   
+        # coordinates of existing node , coordinates of new selection
+        #sql = "SELECT degrees(ST_Azimuth(ST_Point(25, 45), ST_Point(75, 100)))" 
+        #hemisphere = "SELECT degrees(ST_Azimuth(ST_Point("+str(x)+","+str(y)+"), ST_Point("+str(existing_point_x)+","+str(existing_point_y)+")))" 
         
-        if row:
-            self.srid = row[0]   
-            #self.controller.plugin_settings_set_value("srid", self.srid)  
         
-        # Update geometry element with selected coordinates
-        #the_geom = "ST_GeomFromText('POINT("+str(x)+" "+str(y)+")', "+str(self.srid)+")";
+        #sql = "UPDATE '"+self.schema_name+"'.node SET hemisphere='"+str(hemisphere)+"' WHERE node_id ='"+str(self.id)+"'" 
+        sql = "UPDATE "+self.schema_name+".node SET hemisphere =(SELECT degrees(ST_Azimuth(ST_Point("+str(x)+","+str(y)+"), ST_Point("+str(existing_point_x)+","+str(existing_point_y)+")))) WHERE node_id ='"+str(self.id)+"'"
+
+        status = self.controller.execute_sql(sql)
         
-        #sql = "INSERT INTO "+self.schema_name+"."+self.table_node+" (node_type, epa_type, the_geom)"
-        #sql+= " VALUES ('"+elem_type_id+"', '"+epa_default+"', "+the_geom+")" 
-        #sql+= " RETURNING node_id;";
-        #row = self.dao.get_row(sql)
-        #self.dao.commit()
-        '''
+        if status : 
+        
+            message = "Hemisphere is updated for node "+str(self.id)
+            self.controller.show_info(message, context_name='ui_message' )
+        
         
         
         

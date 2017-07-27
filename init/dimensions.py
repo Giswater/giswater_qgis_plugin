@@ -48,7 +48,7 @@ def init_config():
     # utils_giswater.setSelectedItem("state", state)   
     pass
      
-     
+      
      
 class Dimensions(ParentDialog):
     
@@ -59,6 +59,7 @@ class Dimensions(ParentDialog):
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         
+        dialog.parent().setFixedSize(320,410)
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
