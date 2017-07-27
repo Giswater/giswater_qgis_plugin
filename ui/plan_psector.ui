@@ -118,31 +118,6 @@
        <enum>QLineEdit::Normal</enum>
       </property>
      </widget>
-     <widget class="QLineEdit" name="priority">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>80</y>
-        <width>321</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <italic>true</italic>
-       </font>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="maxLength">
-       <number>16</number>
-      </property>
-     </widget>
      <widget class="QLabel" name="observ_label">
       <property name="geometry">
        <rect>
@@ -330,6 +305,16 @@
       </property>
       <property name="text">
        <string>Descript:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="priority">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>75</y>
+        <width>321</width>
+        <height>22</height>
+       </rect>
       </property>
      </widget>
     </widget>

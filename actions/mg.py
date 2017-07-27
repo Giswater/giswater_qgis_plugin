@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
 
@@ -1570,40 +1570,28 @@ class Mg():
         self.iface.actionAddFeature().trigger()
 
         
-    def mg_psector_selector(self):
-        ''' Button_45 : Psector selector '''
-        
-        # Create the dialog and signals
-        self.dlg_psector_sel = Multipsector_selector()
-        utils_giswater.setDialog(self.dlg_psector_sel)
-        # Buttons
-        self.dlg_psector_sel.btn_accept.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
-        self.dlg_psector_sel.btn_select_state.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_unselect_state.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_select_psector.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_unselect_psector.pressed.connect(self.pressbtn)
 
-        # Tables
-        self.tbl_all_state=self.dlg_psector_sel.findChild(QTableView, "all_state")
-        self.tbl_selected_state = self.dlg_psector_sel.findChild(QTableView, "selected_state")
-        self.tbl_all_psector = self.dlg_psector_sel.findChild(QTableView, "all_psector")
-        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_psector")
-
-        # LineEdit
-        self.pss_txt_short_descript=self.dlg_psector_sel.findChild(QLineEdit,"txt_short_descript")
-
-        self.dlg_psector_sel.exec_()
 
     
     def mg_new_psector(self):
-        ''' Button_46 : New psector '''
-        
+        ''' Button_45 : New psector '''
+        '''
+        layer = self.iface.activeLayer()
+        QMessageBox.about(None, 'Ok', str(layer.name()))
+        # Get selected features (nodes)
+        features = layer.selectedFeatures()
+        QMessageBox.about(None, 'Ok', str(features))
+        feature = features[0]
+        QMessageBox.about(None, 'Ok', str(feature))
+        # Get node_id form current node
+        self.node_id = feature.attribute('node_id')
+        QMessageBox.about(None, 'Ok', str(self.node_id))
+        '''
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
         # Buttons
-        self.dlg_new_psector.btn_accept.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_accept.pressed.connect(self.insert_mg_newp)
         self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
         # tab Networks elements
         self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
@@ -1616,9 +1604,13 @@ class Mg():
         self.dlg_new_psector.btn_del_node_dep.pressed.connect(self.pressbtn)
 
         # LineEdit
-        # tab Networks elements
+        # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
-        self.priority = self.dlg_new_psector.findChild(QLineEdit, "priority")
+        self.priority = self.dlg_new_psector.findChild(QComboBox, "priority")
+        sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("priority", rows,False)
+
         self.descript = self.dlg_new_psector.findChild(QLineEdit, "descript")
         self.text1 = self.dlg_new_psector.findChild(QLineEdit, "text1")
         self.text2 = self.dlg_new_psector.findChild(QLineEdit, "text2")
@@ -1653,9 +1645,19 @@ class Mg():
 
         self.dlg_new_psector.exec_()
         
-        
+    def insert_mg_newp(self):
+
+        if self.psector_id.text()=='':
+            self.test("Field psector_id needed")
+        else:
+            sql = "INSERT INTO " + self.schema_name + ".plan_psector (psector_id, descript, priority, text1, text2, observ)"
+            sql += " VALUES ('" + self.psector_id.text()+ "', '" + self.descript.text()+ "', '" + self.priority.text()+ "', '" + self.text1.text() + "', '" + self.text2.text() +"', '" + self.observ.text()+  "')"
+            self.controller.execute_sql(sql)
+            self.test("saved")
+
+
     def mg_psector_mangement(self):
-        ''' Button_47 : Psector management '''
+        ''' Button_46 : Psector management '''
         
         'psm es abreviacion de psector_management'
         # Create the dialog and signals
@@ -1665,8 +1667,9 @@ class Mg():
         column_id="psector_id"
         # Tables
         self.tbl_psm=self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
+        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows) #Select by rows instead of individual cells
         # Buttons
-        self.dlg_psector_mangement.btn_accept.pressed.connect(self.pressbtn)
+        self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.delete_records_with_params, self.tbl_psm, table_document,column_id))
         # LineEdit
@@ -1675,15 +1678,55 @@ class Mg():
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
+    def charge_psector(self):
+        selected_list = self.tbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' )
+            return
+        row = selected_list[0].row()
+        psector_id = self.tbl_psm.model().record(row).value("psector_id")
 
-        
+        sql = "SELECT * FROM "+self.schema_name+".plan_psector WHERE id = '"+psector_id+"'"
+
+        #rows = self.dao.get_row(sql)
+        QMessageBox.about(None, 'Ok', str(id))
+
+
     def filter_by_psector_id(self,widget):
         result_select = utils_giswater.getWidgetText("txt_short_descript_psm")
+
+        if result_select=='null':
+            result_select=""
+
         expr = " psector_id LIKE '%"+result_select+"%'"
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
-        
-        
+
+    def mg_psector_selector(self):
+        ''' Button_47 : Psector selector '''
+
+        # Create the dialog and signals
+        self.dlg_psector_sel = Multipsector_selector()
+        utils_giswater.setDialog(self.dlg_psector_sel)
+        # Buttons
+        self.dlg_psector_sel.btn_accept.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
+        self.dlg_psector_sel.btn_select_state.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_unselect_state.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_select_psector.pressed.connect(self.pressbtn)
+        self.dlg_psector_sel.btn_unselect_psector.pressed.connect(self.pressbtn)
+
+        # Tables
+        self.tbl_all_state = self.dlg_psector_sel.findChild(QTableView, "all_state")
+        self.tbl_selected_state = self.dlg_psector_sel.findChild(QTableView, "selected_state")
+        self.tbl_all_psector = self.dlg_psector_sel.findChild(QTableView, "all_psector")
+        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_psector")
+
+        # LineEdit
+        self.pss_txt_short_descript = self.dlg_psector_sel.findChild(QLineEdit, "txt_short_descript")
+
+        self.dlg_psector_sel.exec_()
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))
