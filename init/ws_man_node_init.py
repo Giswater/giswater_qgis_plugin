@@ -21,11 +21,21 @@ from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
 from PyQt4.QtGui import QSizePolicy
 
 from PyQt4.QtCore import Qt,QObject
+
+
+from qgis.gui import QgsMapToolEmitPoint,QgsMapCanvasSnapper
+from qgis.core import QgsExpression,QgsFeatureRequest
+
+from qgis.gui import *
+from qgis.core import *
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-from qgis.gui import QgsMapToolEmitPoint,QgsMapCanvasSnapper
 
+
+from qgis.core import QgsProject, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsMessageLog
+from qgis.core import *
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -157,6 +167,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.actionRotation)
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.actionCopyPaste)
 
         # QLineEdit
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
@@ -346,8 +357,7 @@ class ManNodeDialog(ParentDialog):
         
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
-        message = "54353"
-        self.controller.show_warning(message, context_name='ui_message')
+
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         # Get selected rows
         selected_list = self.tbl_event.selectionModel().selectedRows()    
@@ -604,6 +614,7 @@ class ManNodeDialog(ParentDialog):
             
      
     def actionRotation(self):
+    
         mapCanvas=self.iface.mapCanvas()
         self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
         mapCanvas.setMapTool(self.emitPoint)
@@ -631,17 +642,113 @@ class ManNodeDialog(ParentDialog):
         # coordinates of existing node , coordinates of new selection
         #sql = "SELECT degrees(ST_Azimuth(ST_Point(25, 45), ST_Point(75, 100)))" 
         #hemisphere = "SELECT degrees(ST_Azimuth(ST_Point("+str(x)+","+str(y)+"), ST_Point("+str(existing_point_x)+","+str(existing_point_y)+")))" 
-        
-        
+             
         #sql = "UPDATE '"+self.schema_name+"'.node SET hemisphere='"+str(hemisphere)+"' WHERE node_id ='"+str(self.id)+"'" 
         sql = "UPDATE "+self.schema_name+".node SET hemisphere =(SELECT degrees(ST_Azimuth(ST_Point("+str(x)+","+str(y)+"), ST_Point("+str(existing_point_x)+","+str(existing_point_y)+")))) WHERE node_id ='"+str(self.id)+"'"
-
         status = self.controller.execute_sql(sql)
         
         if status : 
         
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message' )
+        
+        
+        
+        
+    def actionCopyPaste(self):
+        
+        # Activate snapping
+        mapCanvas=self.iface.mapCanvas()
+        self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
+        mapCanvas.setMapTool(self.emitPoint)
+
+        self.canvas=self.iface.mapCanvas()
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+        
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
+ 
+      
+      
+    def clickButtonSnapping(self,point,btn):
+     
+        #currentTool = self.iface.mapCanvas().mapTool()
+        # Get node of snapping
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+                     
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+        # That's the snapped point
+        if result <> []:
+
+            # Check feature
+            for snapPoint in result:
+                
+                if snapPoint.layer.name() == self.iface.activeLayer().name():
+                
+                    # Get the point
+                    point = QgsPoint(snapPoint.snappedVertex)   #@UnusedVariable
+                    snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                    feature = snappFeat
+                    
+                    #element_id = feature.attribute('state')
+                    element_id = feature.attribute('node_id')
+                    feature_attributes = feature.attributes()
+                    
+                    # LEAVE SELECTION
+                    snapPoint.layer.select([snapPoint.snappedAtGeometry])
+
+                    break
+                    
+        
+        '''
+        # Copy
+        #self.iface.actionCopyFeatures().trigger()
+        layer = self.iface.activeLayer()
+        #self.iface.setActiveLayer( layer )
+        #layer.startEditing()
+        
+        provider = layer.dataProvider()
+        # Fields of attribute table
+        fields = provider.fields()
+        for field in fields:
+            message = str(field.name())
+            #self.controller.show_info(message, context_name='ui_message' )
+            
+
+        '''
+        # Get feature for the form 
+        # Get pointer of node by ID
+
+        aux = "\"node_id\" = "
+        aux += "'" + str(self.id) + "', "
+        aux = aux[:-2] 
+         
+        expr = QgsExpression(aux)
+        layer = self.iface.activeLayer()
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i for i in it]
+        
+        if id_list != []:
+            
+            # id_list[0]: pointer on current feature
+            id_current=id_list[0].attribute('node_id')
+            
+            #---------------------
+            id_list[0].setAttributes(feature_attributes)
+            
+            layer.commitChanges()
+            message = str(id_list[0].attributes())
+            self.controller.show_info(message, context_name='ui_message' )
+
+            # Get attributes
+            #x = id_list[0].attributes()
+
+   
+
         
         
         
