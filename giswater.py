@@ -26,9 +26,8 @@ from map_tools.connec import ConnecMapTool
 from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
 from search.search_plus import SearchPlus
-from qgis.core import QgsExpressionContextUtils,QgsVectorLayer
+from qgis.core import QgsExpressionContextUtils   #@UnresolvedImport
 
-from xml.dom import minidom
 
 
 class Giswater(QObject):
@@ -200,9 +199,9 @@ class Giswater(QObject):
             if int(index_action) in (3, 5, 13):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) in (1, 2, 4, 10, 11, 12, 14, 15, 8, 29):
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
+                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller)   
             elif int(index_action) == 16:
-                map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.srid)
+                map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 17:
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 18:
