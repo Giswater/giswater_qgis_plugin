@@ -208,20 +208,21 @@ def setWidgetVisible(widget, visible=True):
         widget.setVisible(visible)
         
 
-def setImage(widget,cat_shape):
+def setImage(widget, cat_shape):
     ''' Set pictures for UD'''
     
-    element = cat_shape.lower()
-    if type(widget) is str:
-        widget = _dialog.findChild(QWidget, widget)  
-    if not widget:
-        return
-    if type(widget) is QLabel:
-        plugin_dir = os.path.dirname(__file__)    
-        pic_file = os.path.join(plugin_dir, 'png', 'ud_section_'+element+'.png') 
-        pixmap = QPixmap(pic_file)
-        widget.setPixmap(pixmap)
-        widget.show()  
+    if cat_shape is not None:   
+        element = cat_shape.lower()
+        if type(widget) is str:
+            widget = _dialog.findChild(QWidget, widget)  
+        if not widget:
+            return
+        if type(widget) is QLabel:
+            plugin_dir = os.path.dirname(__file__)    
+            pic_file = os.path.join(plugin_dir, 'png', 'ud_section_'+element+'.png') 
+            pixmap = QPixmap(pic_file)
+            widget.setPixmap(pixmap)
+            widget.show()  
 
 
 def get_reg(reg_hkey, reg_path, reg_name):
