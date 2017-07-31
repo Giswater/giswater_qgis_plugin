@@ -57,7 +57,7 @@ BEGIN
                     UPDATE vnode SET the_geom = newPoint WHERE vnode_id = vnoderec.vnode_id;
 
                     -- Update link
-                    connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.connec_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
+                    connecPoint := (SELECT the_geom FROM connec WHERE connec_id IN (SELECT a.feature_id FROM link AS a WHERE a.vnode_id = vnoderec.vnode_id));
                     UPDATE link SET the_geom = ST_MakeLine(connecPoint, newPoint) WHERE vnode_id = vnoderec.vnode_id;
 
                 END LOOP; 
