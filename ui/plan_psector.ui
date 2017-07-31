@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -509,7 +509,7 @@
      <property name="title">
       <string>Map details</string>
      </property>
-     <widget class="QLineEdit" name="atlas_id_3">
+     <widget class="QLineEdit" name="atlas_id">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -576,7 +576,7 @@
        <string>Atlas id:</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="rotation_3">
+     <widget class="QLineEdit" name="rotation">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -622,7 +622,7 @@
        <string>Rotation:</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="scale_3">
+     <widget class="QLineEdit" name="scale">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -722,7 +722,7 @@
       <attribute name="title">
        <string>Node</string>
       </attribute>
-      <widget class="QTableView" name="tbl_arc_plan_2">
+      <widget class="QTableView" name="tbl_node_plan">
        <property name="geometry">
         <rect>
          <x>10</x>
