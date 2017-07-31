@@ -243,6 +243,7 @@ class ManNodeDialog(ParentDialog):
         
 
     def catalog(self):
+    
         self.dlg_cat=WScatalog()
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
@@ -698,28 +699,30 @@ class ManNodeDialog(ParentDialog):
                     element_id = feature.attribute('node_id')
                     feature_attributes = feature.attributes()
                     
+                    
+                    #Delete firts element : node_id because we dont want to copy id 
+                    
+                    #feature_attributes.pop(0)
+
                     # LEAVE SELECTION
                     snapPoint.layer.select([snapPoint.snappedAtGeometry])
 
                     break
                     
         
-        '''
-        # Copy
-        #self.iface.actionCopyFeatures().trigger()
-        layer = self.iface.activeLayer()
-        #self.iface.setActiveLayer( layer )
-        #layer.startEditing()
         
+        # Copy
+        layer = self.iface.activeLayer()
+
         provider = layer.dataProvider()
         # Fields of attribute table
         fields = provider.fields()
-        for field in fields:
-            message = str(field.name())
-            #self.controller.show_info(message, context_name='ui_message' )
-            
+        #for field in fields:
+        #    message = str(field.name())
+        #    self.controller.show_info(message, context_name='ui_message' )
+         
 
-        '''
+        
         # Get feature for the form 
         # Get pointer of node by ID
 
@@ -729,27 +732,47 @@ class ManNodeDialog(ParentDialog):
          
         expr = QgsExpression(aux)
         layer = self.iface.activeLayer()
+        layer.startEditing()
+        
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
         
+        n = len(fields)
+        message = ""
         if id_list != []:
+            
             
             # id_list[0]: pointer on current feature
             id_current=id_list[0].attribute('node_id')
+            # Replace id 
+            feature_attributes[0]=id_current
             
-            #---------------------
-            id_list[0].setAttributes(feature_attributes)
-            
-            layer.commitChanges()
-            message = str(id_list[0].attributes())
+            '''
+            message = "Do you want to update these values for node" + str(self.id) + str(feature_attributes)
             self.controller.show_info(message, context_name='ui_message' )
+            '''
+            
+            # Show message before executing
+            for i in range(0,n):
+                message += str(fields[i].name())+":" +str(feature_attributes[i]) + "\n" 
+            #self.controller.ask_question(message, context_name='ui_message' )
+            answer = self.controller.ask_question(message, "Update records", None)
 
+            # If ok execute and refresh form 
+            # If cancel return
+            if answer:
+                id_list[0].setAttributes(feature_attributes)
+                layer.updateFeature(id_list[0])
+                layer.commitChanges()
+                # Restart forms 
+                self.close()
+                self.iface.openFeatureForm(layer,id_list[0])
+                #self.layer.reload()
+                #self.canvas.refresh()
+                #self.iface.refresh()
+                
             # Get attributes
             #x = id_list[0].attributes()
-
-   
-
-        
-        
-        
-        
+                #self.dialog.exec_()
+                message = "test"
+                self.controller.show_warning(message, context_name='ui_message' )
