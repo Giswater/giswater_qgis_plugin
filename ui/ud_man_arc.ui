@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>530</x>
-      <y>586</y>
+      <y>596</y>
       <width>79</width>
       <height>17</height>
      </rect>
@@ -44,7 +44,7 @@
     <property name="geometry">
      <rect>
       <x>142</x>
-      <y>528</y>
+      <y>538</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -82,7 +82,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>528</y>
+      <y>538</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -121,7 +121,7 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>586</y>
+      <y>596</y>
       <width>77</width>
       <height>17</height>
      </rect>
@@ -251,7 +251,7 @@
     <property name="geometry">
      <rect>
       <x>142</x>
-      <y>546</y>
+      <y>556</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -267,7 +267,7 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>586</y>
+      <y>596</y>
       <width>79</width>
       <height>17</height>
      </rect>
@@ -280,7 +280,7 @@
     <property name="geometry">
      <rect>
       <x>272</x>
-      <y>546</y>
+      <y>556</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -312,7 +312,7 @@
     <property name="geometry">
      <rect>
       <x>145</x>
-      <y>566</y>
+      <y>576</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -348,7 +348,7 @@
     <property name="geometry">
      <rect>
       <x>282</x>
-      <y>528</y>
+      <y>538</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -415,7 +415,7 @@
       <x>15</x>
       <y>47</y>
       <width>586</width>
-      <height>481</height>
+      <height>491</height>
      </rect>
     </property>
     <property name="font">
@@ -448,7 +448,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>353</height>
+         <height>365</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1667,8 +1667,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2026,8 +2026,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2624,8 +2624,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>365</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3895,8 +3895,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4254,8 +4254,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4806,8 +4806,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>338</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6045,8 +6045,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6404,8 +6404,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6582,8 +6582,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7137,8 +7137,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>338</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8386,8 +8386,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8745,8 +8745,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9088,8 +9088,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10149,7 +10149,7 @@
         <x>4</x>
         <y>10</y>
         <width>560</width>
-        <height>493</height>
+        <height>451</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -10160,8 +10160,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>397</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10171,7 +10171,7 @@
         <property name="geometry">
          <rect>
           <x>416</x>
-          <y>-3</y>
+          <y>-5</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -10207,8 +10207,8 @@
        <widget class="QLineEdit" name="m3excess_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>181</y>
+          <x>341</x>
+          <y>159</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10220,8 +10220,8 @@
        <widget class="QLineEdit" name="cost">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>344</y>
+          <x>425</x>
+          <y>322</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -10233,8 +10233,8 @@
        <widget class="QLabel" name="label_cost_trenchlining">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>205</y>
+          <x>-3</x>
+          <y>183</y>
           <width>65</width>
           <height>22</height>
          </rect>
@@ -10270,8 +10270,8 @@
        <widget class="QLineEdit" name="arc_cost_2">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>38</y>
+          <x>485</x>
+          <y>27</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10284,7 +10284,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>130</y>
+          <y>113</y>
           <width>61</width>
           <height>22</height>
          </rect>
@@ -10321,7 +10321,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>38</y>
+          <y>27</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -10357,8 +10357,8 @@
        <widget class="QLineEdit" name="m2trenchl_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>205</y>
+          <x>341</x>
+          <y>183</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10370,8 +10370,8 @@
        <widget class="QLineEdit" name="pav_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>309</y>
+          <x>485</x>
+          <y>287</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10383,8 +10383,8 @@
        <widget class="QLineEdit" name="trenchl_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>205</y>
+          <x>485</x>
+          <y>183</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10397,7 +10397,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>88</y>
+          <y>77</y>
           <width>61</width>
           <height>22</height>
          </rect>
@@ -10434,7 +10434,7 @@
         <property name="geometry">
          <rect>
           <x>352</x>
-          <y>-3</y>
+          <y>-5</y>
           <width>61</width>
           <height>22</height>
          </rect>
@@ -10470,8 +10470,8 @@
        <widget class="QLineEdit" name="budget">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>392</y>
+          <x>425</x>
+          <y>370</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -10483,8 +10483,8 @@
        <widget class="QLineEdit" name="protec_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>88</y>
+          <x>485</x>
+          <y>77</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10496,8 +10496,8 @@
        <widget class="QLineEdit" name="exc_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>130</y>
+          <x>485</x>
+          <y>110</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10509,8 +10509,8 @@
        <widget class="QLabel" name="label_cost_length">
         <property name="geometry">
          <rect>
-          <x>342</x>
-          <y>368</y>
+          <x>339</x>
+          <y>346</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -10548,8 +10548,8 @@
        <widget class="QLineEdit" name="m2pavement_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>309</y>
+          <x>341</x>
+          <y>287</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10562,7 +10562,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>155</y>
+          <y>138</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -10598,8 +10598,8 @@
        <widget class="QLabel" name="label_cost_budget">
         <property name="geometry">
          <rect>
-          <x>340</x>
-          <y>392</y>
+          <x>337</x>
+          <y>370</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -10637,8 +10637,8 @@
        <widget class="QLabel" name="label_cost_excess">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>180</y>
+          <x>-3</x>
+          <y>158</y>
           <width>61</width>
           <height>22</height>
          </rect>
@@ -10674,8 +10674,8 @@
        <widget class="QLineEdit" name="m3exc_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>129</y>
+          <x>340</x>
+          <y>112</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10688,7 +10688,7 @@
         <property name="geometry">
          <rect>
           <x>476</x>
-          <y>-3</y>
+          <y>-5</y>
           <width>85</width>
           <height>22</height>
          </rect>
@@ -10724,8 +10724,8 @@
        <widget class="QLineEdit" name="base_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>63</y>
+          <x>485</x>
+          <y>52</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10737,8 +10737,8 @@
        <widget class="QLineEdit" name="m3protec_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>88</y>
+          <x>340</x>
+          <y>75</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10750,8 +10750,8 @@
        <widget class="QLineEdit" name="arc_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>38</y>
+          <x>340</x>
+          <y>27</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10766,8 +10766,8 @@
        <widget class="QLabel" name="label_cost_total_price">
         <property name="geometry">
          <rect>
-          <x>340</x>
-          <y>344</y>
+          <x>337</x>
+          <y>322</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -10805,8 +10805,8 @@
        <widget class="QLineEdit" name="fill_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>155</y>
+          <x>485</x>
+          <y>135</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10818,8 +10818,8 @@
        <widget class="QLineEdit" name="m3fill_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>153</y>
+          <x>340</x>
+          <y>136</y>
           <width>45</width>
           <height>21</height>
          </rect>
@@ -10834,8 +10834,8 @@
        <widget class="QLineEdit" name="excess_cost">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>180</y>
+          <x>485</x>
+          <y>158</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -10847,8 +10847,8 @@
        <widget class="QLineEdit" name="m2bottom_cost">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>62</y>
+          <x>340</x>
+          <y>51</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -10861,7 +10861,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>63</y>
+          <y>52</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -10897,8 +10897,8 @@
        <widget class="QLineEdit" name="cost_unit">
         <property name="geometry">
          <rect>
-          <x>396</x>
-          <y>38</y>
+          <x>395</x>
+          <y>27</y>
           <width>29</width>
           <height>20</height>
          </rect>
@@ -10913,8 +10913,8 @@
        <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>368</y>
+          <x>425</x>
+          <y>346</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -10927,7 +10927,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>18</y>
+          <y>12</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -10967,7 +10967,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>106</y>
+          <y>95</y>
           <width>51</width>
           <height>22</height>
          </rect>
@@ -11005,8 +11005,8 @@
        <widget class="QLineEdit" name="m2mlbottom">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>63</y>
+          <x>425</x>
+          <y>52</y>
           <width>51</width>
           <height>20</height>
          </rect>
@@ -11021,8 +11021,8 @@
        <widget class="QLineEdit" name="m3mlprotec">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>88</y>
+          <x>425</x>
+          <y>77</y>
           <width>51</width>
           <height>20</height>
          </rect>
@@ -11037,8 +11037,8 @@
        <widget class="QLineEdit" name="m3mlfill">
         <property name="geometry">
          <rect>
-          <x>430</x>
-          <y>155</y>
+          <x>425</x>
+          <y>135</y>
           <width>49</width>
           <height>20</height>
          </rect>
@@ -11053,8 +11053,8 @@
        <widget class="QLineEdit" name="m3mlexc">
         <property name="geometry">
          <rect>
-          <x>430</x>
-          <y>129</y>
+          <x>425</x>
+          <y>112</y>
           <width>49</width>
           <height>20</height>
          </rect>
@@ -11069,8 +11069,8 @@
        <widget class="QLineEdit" name="m3mlexcess">
         <property name="geometry">
          <rect>
-          <x>430</x>
-          <y>180</y>
+          <x>427</x>
+          <y>158</y>
           <width>49</width>
           <height>20</height>
          </rect>
@@ -11085,8 +11085,8 @@
        <widget class="QLineEdit" name="m2mltrenchl">
         <property name="geometry">
          <rect>
-          <x>429</x>
-          <y>205</y>
+          <x>426</x>
+          <y>183</y>
           <width>49</width>
           <height>20</height>
          </rect>
@@ -11101,8 +11101,8 @@
        <widget class="QLineEdit" name="m2mlpavement">
         <property name="geometry">
          <rect>
-          <x>429</x>
-          <y>309</y>
+          <x>426</x>
+          <y>287</y>
           <width>51</width>
           <height>20</height>
          </rect>
@@ -11118,7 +11118,7 @@
         <property name="geometry">
          <rect>
           <x>394</x>
-          <y>62</y>
+          <y>51</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11155,7 +11155,7 @@
         <property name="geometry">
          <rect>
           <x>394</x>
-          <y>88</y>
+          <y>77</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11192,7 +11192,7 @@
         <property name="geometry">
          <rect>
           <x>392</x>
-          <y>129</y>
+          <y>112</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11229,7 +11229,7 @@
         <property name="geometry">
          <rect>
           <x>392</x>
-          <y>157</y>
+          <y>140</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11265,8 +11265,8 @@
        <widget class="QLabel" name="label_cost_euro_5">
         <property name="geometry">
          <rect>
-          <x>392</x>
-          <y>181</y>
+          <x>389</x>
+          <y>159</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11302,8 +11302,8 @@
        <widget class="QLabel" name="label_cost_euro_6">
         <property name="geometry">
          <rect>
-          <x>392</x>
-          <y>205</y>
+          <x>389</x>
+          <y>183</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11339,8 +11339,8 @@
        <widget class="QLabel" name="label_cost_euro_7">
         <property name="geometry">
          <rect>
-          <x>393</x>
-          <y>309</y>
+          <x>390</x>
+          <y>287</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11376,8 +11376,8 @@
        <widget class="QLineEdit" name="arc_element">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>38</y>
+          <x>70</x>
+          <y>27</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11392,8 +11392,8 @@
        <widget class="Line" name="line">
         <property name="geometry">
          <rect>
-          <x>4</x>
-          <y>329</y>
+          <x>1</x>
+          <y>307</y>
           <width>553</width>
           <height>16</height>
          </rect>
@@ -11405,8 +11405,8 @@
        <widget class="QLabel" name="label_cost_pavement">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>289</y>
+          <x>-3</x>
+          <y>267</y>
           <width>65</width>
           <height>22</height>
          </rect>
@@ -11444,8 +11444,8 @@
        <widget class="QLineEdit" name="arc_bottom">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>62</y>
+          <x>70</x>
+          <y>51</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11460,8 +11460,8 @@
        <widget class="QLineEdit" name="arc_protection">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>86</y>
+          <x>70</x>
+          <y>75</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11476,8 +11476,8 @@
        <widget class="QLineEdit" name="soil_excavation">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>129</y>
+          <x>70</x>
+          <y>112</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11492,8 +11492,8 @@
        <widget class="QLineEdit" name="soil_filling">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>153</y>
+          <x>70</x>
+          <y>136</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11508,8 +11508,8 @@
        <widget class="QLineEdit" name="soil_excess">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>181</y>
+          <x>70</x>
+          <y>159</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11524,8 +11524,8 @@
        <widget class="QLineEdit" name="soil_trenchlining">
         <property name="geometry">
          <rect>
-          <x>68</x>
-          <y>205</y>
+          <x>70</x>
+          <y>183</y>
           <width>269</width>
           <height>21</height>
          </rect>
@@ -11541,7 +11541,7 @@
         <property name="geometry">
          <rect>
           <x>64</x>
-          <y>-3</y>
+          <y>-5</y>
           <width>65</width>
           <height>22</height>
          </rect>
@@ -11578,7 +11578,7 @@
         <property name="geometry">
          <rect>
           <x>68</x>
-          <y>10</y>
+          <y>6</y>
           <width>269</width>
           <height>16</height>
          </rect>
@@ -11591,7 +11591,7 @@
         <property name="geometry">
          <rect>
           <x>344</x>
-          <y>10</y>
+          <y>6</y>
           <width>77</width>
           <height>16</height>
          </rect>
@@ -11604,7 +11604,7 @@
         <property name="geometry">
          <rect>
           <x>428</x>
-          <y>10</y>
+          <y>6</y>
           <width>49</width>
           <height>16</height>
          </rect>
@@ -11617,7 +11617,7 @@
         <property name="geometry">
          <rect>
           <x>488</x>
-          <y>10</y>
+          <y>6</y>
           <width>65</width>
           <height>16</height>
          </rect>
@@ -11630,7 +11630,7 @@
         <property name="geometry">
          <rect>
           <x>440</x>
-          <y>34</y>
+          <y>23</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11666,8 +11666,8 @@
        <widget class="QLabel" name="label_cost_total_pavement">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>309</y>
+          <x>-3</x>
+          <y>287</y>
           <width>329</width>
           <height>22</height>
          </rect>
@@ -11703,8 +11703,8 @@
        <widget class="QLabel" name="label_cost_pavement_2">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>225</y>
+          <x>-3</x>
+          <y>203</y>
           <width>65</width>
           <height>22</height>
          </rect>
@@ -11742,8 +11742,8 @@
        <widget class="QLabel" name="label_cost_trenchlining_2">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>245</y>
+          <x>-3</x>
+          <y>223</y>
           <width>313</width>
           <height>22</height>
          </rect>
@@ -11779,8 +11779,8 @@
        <widget class="QLabel" name="label_cost_trenchlining_3">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>265</y>
+          <x>-3</x>
+          <y>243</y>
           <width>325</width>
           <height>22</height>
          </rect>
@@ -11816,8 +11816,8 @@
        <widget class="QLineEdit" name="base_cost_2">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>245</y>
+          <x>485</x>
+          <y>223</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -11829,8 +11829,8 @@
        <widget class="QLabel" name="label_cost_euro_8">
         <property name="geometry">
          <rect>
-          <x>394</x>
-          <y>244</y>
+          <x>391</x>
+          <y>222</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11866,8 +11866,8 @@
        <widget class="QLineEdit" name="m2bottom_cost_2">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>244</y>
+          <x>341</x>
+          <y>222</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -11879,8 +11879,8 @@
        <widget class="QLineEdit" name="m2mlbottom_3">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>245</y>
+          <x>425</x>
+          <y>223</y>
           <width>51</width>
           <height>20</height>
          </rect>
@@ -11895,8 +11895,8 @@
        <widget class="QLineEdit" name="base_cost_3">
         <property name="geometry">
          <rect>
-          <x>488</x>
-          <y>269</y>
+          <x>485</x>
+          <y>247</y>
           <width>69</width>
           <height>20</height>
          </rect>
@@ -11908,8 +11908,8 @@
        <widget class="QLabel" name="label_cost_euro_9">
         <property name="geometry">
          <rect>
-          <x>394</x>
-          <y>268</y>
+          <x>391</x>
+          <y>246</y>
           <width>29</width>
           <height>22</height>
          </rect>
@@ -11945,8 +11945,8 @@
        <widget class="QLineEdit" name="m2bottom_cost_3">
         <property name="geometry">
          <rect>
-          <x>344</x>
-          <y>268</y>
+          <x>341</x>
+          <y>246</y>
           <width>45</width>
           <height>20</height>
          </rect>
@@ -11958,8 +11958,8 @@
        <widget class="QLineEdit" name="m2mlbottom_4">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>269</y>
+          <x>425</x>
+          <y>247</y>
           <width>51</width>
           <height>20</height>
          </rect>
@@ -11977,8 +11977,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>397</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11988,7 +11988,7 @@
         <property name="geometry">
          <rect>
           <x>36</x>
-          <y>158</y>
+          <y>149</y>
           <width>37</width>
           <height>22</height>
          </rect>
@@ -12020,8 +12020,8 @@
        <widget class="QLineEdit" name="rec_y">
         <property name="geometry">
          <rect>
-          <x>472</x>
-          <y>110</y>
+          <x>450</x>
+          <y>107</y>
           <width>41</width>
           <height>16</height>
          </rect>
@@ -12058,7 +12058,7 @@
         <property name="geometry">
          <rect>
           <x>64</x>
-          <y>118</y>
+          <y>109</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12094,8 +12094,8 @@
        <widget class="QLineEdit" name="b">
         <property name="geometry">
          <rect>
-          <x>390</x>
-          <y>356</y>
+          <x>376</x>
+          <y>333</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12131,8 +12131,8 @@
        <widget class="QLineEdit" name="m2mltrenchl_2">
         <property name="geometry">
          <rect>
-          <x>100</x>
-          <y>318</y>
+          <x>95</x>
+          <y>300</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12169,8 +12169,8 @@
        <widget class="QLineEdit" name="m3mlexc_2">
         <property name="geometry">
          <rect>
-          <x>100</x>
-          <y>258</y>
+          <x>95</x>
+          <y>240</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12207,8 +12207,8 @@
        <widget class="QLineEdit" name="geom1">
         <property name="geometry">
          <rect>
-          <x>468</x>
-          <y>234</y>
+          <x>448</x>
+          <y>213</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12244,8 +12244,8 @@
        <widget class="QLineEdit" name="thickness">
         <property name="geometry">
          <rect>
-          <x>472</x>
-          <y>54</y>
+          <x>450</x>
+          <y>51</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12281,8 +12281,8 @@
        <widget class="QLineEdit" name="z1">
         <property name="geometry">
          <rect>
-          <x>468</x>
-          <y>314</y>
+          <x>448</x>
+          <y>293</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12318,8 +12318,8 @@
        <widget class="QLabel" name="label_cost_excav">
         <property name="geometry">
          <rect>
-          <x>22</x>
-          <y>256</y>
+          <x>17</x>
+          <y>238</y>
           <width>73</width>
           <height>22</height>
          </rect>
@@ -12352,17 +12352,17 @@
        <widget class="QLabel" name="label_image_ud_shape">
         <property name="geometry">
          <rect>
-          <x>108</x>
+          <x>110</x>
           <y>14</y>
-          <width>441</width>
-          <height>385</height>
+          <width>411</width>
+          <height>361</height>
          </rect>
         </property>
         <property name="text">
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>ud_shape.png</pixmap>
+         <pixmap>../png/ud_section_circular.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -12371,8 +12371,8 @@
        <widget class="QLabel" name="label_cost_fill">
         <property name="geometry">
          <rect>
-          <x>26</x>
-          <y>276</y>
+          <x>21</x>
+          <y>258</y>
           <width>73</width>
           <height>22</height>
          </rect>
@@ -12405,8 +12405,8 @@
        <widget class="QLabel" name="label_cost_exc">
         <property name="geometry">
          <rect>
-          <x>18</x>
-          <y>298</y>
+          <x>13</x>
+          <y>280</y>
           <width>73</width>
           <height>22</height>
          </rect>
@@ -12439,8 +12439,8 @@
        <widget class="QLineEdit" name="width">
         <property name="geometry">
          <rect>
-          <x>264</x>
-          <y>356</y>
+          <x>255</x>
+          <y>335</y>
           <width>49</width>
           <height>16</height>
          </rect>
@@ -12476,7 +12476,7 @@
        <widget class="QLineEdit" name="m2mlpav">
         <property name="geometry">
          <rect>
-          <x>264</x>
+          <x>255</x>
           <y>10</y>
           <width>51</width>
           <height>16</height>
@@ -12513,8 +12513,8 @@
        <widget class="QLineEdit" name="m3mlfill_2">
         <property name="geometry">
          <rect>
-          <x>100</x>
-          <y>278</y>
+          <x>95</x>
+          <y>260</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12551,8 +12551,8 @@
        <widget class="QLabel" name="label_cost_b_right">
         <property name="geometry">
          <rect>
-          <x>404</x>
-          <y>338</y>
+          <x>390</x>
+          <y>315</y>
           <width>17</width>
           <height>22</height>
          </rect>
@@ -12584,8 +12584,8 @@
        <widget class="QLineEdit" name="b_2">
         <property name="geometry">
          <rect>
-          <x>138</x>
-          <y>356</y>
+          <x>140</x>
+          <y>333</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12621,8 +12621,8 @@
        <widget class="QLabel" name="label_cost_b_left">
         <property name="geometry">
          <rect>
-          <x>156</x>
-          <y>338</y>
+          <x>158</x>
+          <y>315</y>
           <width>17</width>
           <height>22</height>
          </rect>
@@ -12654,8 +12654,8 @@
        <widget class="QLineEdit" name="m2mlbottom_2">
         <property name="geometry">
          <rect>
-          <x>262</x>
-          <y>386</y>
+          <x>250</x>
+          <y>365</y>
           <width>53</width>
           <height>16</height>
          </rect>
@@ -12692,7 +12692,7 @@
         <property name="geometry">
          <rect>
           <x>8</x>
-          <y>192</y>
+          <y>183</y>
           <width>73</width>
           <height>22</height>
          </rect>
@@ -12724,8 +12724,8 @@
        <widget class="QLineEdit" name="total_y">
         <property name="geometry">
          <rect>
-          <x>520</x>
-          <y>182</y>
+          <x>495</x>
+          <y>170</y>
           <width>39</width>
           <height>16</height>
          </rect>
@@ -12761,8 +12761,8 @@
        <widget class="QLabel" name="label_cost_width">
         <property name="geometry">
          <rect>
-          <x>272</x>
-          <y>338</y>
+          <x>260</x>
+          <y>317</y>
           <width>53</width>
           <height>22</height>
          </rect>
@@ -12794,8 +12794,8 @@
        <widget class="QLabel" name="label_cost_trench">
         <property name="geometry">
          <rect>
-          <x>8</x>
-          <y>316</y>
+          <x>3</x>
+          <y>298</y>
           <width>87</width>
           <height>22</height>
          </rect>
@@ -12828,8 +12828,8 @@
        <widget class="QLineEdit" name="bulk_bottom">
         <property name="geometry">
          <rect>
-          <x>420</x>
-          <y>286</y>
+          <x>400</x>
+          <y>265</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12865,8 +12865,8 @@
        <widget class="QLabel" name="label_cost_bulk_bottom">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>270</y>
+          <x>408</x>
+          <y>249</y>
           <width>39</width>
           <height>22</height>
          </rect>
@@ -12899,7 +12899,7 @@
         <property name="geometry">
          <rect>
           <x>12</x>
-          <y>114</y>
+          <y>105</y>
           <width>53</width>
           <height>22</height>
          </rect>
@@ -12932,7 +12932,7 @@
         <property name="geometry">
          <rect>
           <x>64</x>
-          <y>194</y>
+          <y>185</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -12968,8 +12968,8 @@
        <widget class="QLineEdit" name="z2">
         <property name="geometry">
          <rect>
-          <x>472</x>
-          <y>158</y>
+          <x>450</x>
+          <y>155</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -13005,8 +13005,8 @@
        <widget class="QLineEdit" name="m3mlexcess_2">
         <property name="geometry">
          <rect>
-          <x>100</x>
-          <y>298</y>
+          <x>95</x>
+          <y>280</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -13044,7 +13044,7 @@
         <property name="geometry">
          <rect>
           <x>64</x>
-          <y>162</y>
+          <y>153</y>
           <width>41</width>
           <height>15</height>
          </rect>
@@ -13077,6 +13077,37 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
+       <zorder>label_image_ud_shape</zorder>
+       <zorder>label_cost_bulk</zorder>
+       <zorder>rec_y</zorder>
+       <zorder>y_param</zorder>
+       <zorder>b</zorder>
+       <zorder>m2mltrenchl_2</zorder>
+       <zorder>m3mlexc_2</zorder>
+       <zorder>geom1</zorder>
+       <zorder>thickness</zorder>
+       <zorder>z1</zorder>
+       <zorder>label_cost_excav</zorder>
+       <zorder>label_cost_fill</zorder>
+       <zorder>label_cost_exc</zorder>
+       <zorder>width</zorder>
+       <zorder>m2mlpav</zorder>
+       <zorder>m3mlfill_2</zorder>
+       <zorder>label_cost_b_right</zorder>
+       <zorder>b_2</zorder>
+       <zorder>label_cost_b_left</zorder>
+       <zorder>m2mlbottom_2</zorder>
+       <zorder>label_cost_area</zorder>
+       <zorder>total_y</zorder>
+       <zorder>label_cost_width</zorder>
+       <zorder>label_cost_trench</zorder>
+       <zorder>bulk_bottom</zorder>
+       <zorder>label_cost_bulk_bottom</zorder>
+       <zorder>label_cost_y_param</zorder>
+       <zorder>area</zorder>
+       <zorder>z2</zorder>
+       <zorder>m3mlexcess_2</zorder>
+       <zorder>bulk</zorder>
       </widget>
      </widget>
     </widget>
@@ -13123,7 +13154,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>546</y>
+      <y>556</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -13142,7 +13173,7 @@
     <property name="geometry">
      <rect>
       <x>369</x>
-      <y>586</y>
+      <y>596</y>
       <width>71</width>
       <height>17</height>
      </rect>
@@ -13155,7 +13186,7 @@
     <property name="geometry">
      <rect>
       <x>145</x>
-      <y>586</y>
+      <y>596</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -13165,7 +13196,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>528</y>
+      <y>538</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -13206,7 +13237,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>546</y>
+      <y>556</y>
       <width>191</width>
       <height>20</height>
      </rect>
@@ -13248,7 +13279,7 @@
     <property name="geometry">
      <rect>
       <x>14</x>
-      <y>565</y>
+      <y>575</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -13284,7 +13315,7 @@
     <property name="geometry">
      <rect>
       <x>14</x>
-      <y>585</y>
+      <y>595</y>
       <width>119</width>
       <height>20</height>
      </rect>
