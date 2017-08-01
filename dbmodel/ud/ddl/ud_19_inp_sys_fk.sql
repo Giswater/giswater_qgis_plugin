@@ -139,9 +139,10 @@ ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_node_id_fkey"
 ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_sector_id_fkey";
 ALTER TABLE "subcatchment" DROP CONSTRAINT IF EXISTS "subcatchment_hydrology_id_fkey";
 
-ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey"
-ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey"
+ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey";
+ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey";
 
+ALTER TABLE subcatchment  DROP CONSTRAINT IF EXISTS subcatchment_expl_id_fkey;
 
 
 
@@ -269,4 +270,4 @@ ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_hydrology_id_fkey" FOREI
 ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
- 
+ALTER TABLE subcatchment  ADD CONSTRAINT subcatchment_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

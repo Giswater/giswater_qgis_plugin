@@ -413,6 +413,7 @@ CREATE TABLE "raingage" (
 "fname" varchar(254)  ,
 "sta" varchar(12)  ,
 "units" varchar(3)  ,
+"expl_id" integer,
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
 

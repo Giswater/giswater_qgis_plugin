@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
 ALTER TABLE "om_visit_x_gully" DROP CONSTRAINT IF EXISTS "om_visit_x_gully_visit_id_fkey";
 ALTER TABLE "om_visit_x_gully" DROP CONSTRAINT IF EXISTS "om_visit_x_gully_gully_id_fkey";
 

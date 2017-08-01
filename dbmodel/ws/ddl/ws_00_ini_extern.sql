@@ -41,6 +41,7 @@ expl_id integer
 
 
 -- Urban_structure
+CREATE TABLE "ext_plot"(
 "id" integer PRIMARY KEY NOT NULL,
 "plot_code" varchar(30),
 "streetaxis" varchar(16),

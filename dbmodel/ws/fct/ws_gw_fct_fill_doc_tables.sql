@@ -14,7 +14,7 @@ $BODY$DECLARE
  rec_node   record;
  rec_arc   record;
  rec_connec   record;
- rec_gully   record;
+
 
 
 BEGIN

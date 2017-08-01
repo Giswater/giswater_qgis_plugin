@@ -55,7 +55,6 @@ CREATE TABLE "doc" (
 "doc_type" varchar(30),
 "path" varchar(512),
 "observ" varchar(512),
-"tagcat_id" varchar(16),
 "date" timestamp(6) DEFAULT now(),
 "user_name" varchar(50) DEFAULT user,
 CONSTRAINT doc_pkey PRIMARY KEY (id)

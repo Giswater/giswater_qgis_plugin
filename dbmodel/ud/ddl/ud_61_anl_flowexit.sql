@@ -12,17 +12,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 
 CREATE TABLE "anl_flow_exit_node" (
+id serial NOT NULL PRIMARY KEY,
+cur_user varchar (30) NOT NULL, 
 node_id varchar (16) NOT NULL,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_flow_exit_node_pkey PRIMARY KEY (node_id)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_flow_exit_arc" (
+id serial NOT NULL PRIMARY KEY,
+cur_user varchar (30) NOT NULL, 
 arc_id varchar (16) NOT NULL,
-the_geom public.geometry (LINESTRING, SRID_VALUE),
-CONSTRAINT anl_flow_exit_arc_pkey PRIMARY KEY (arc_id)
+cur_user varchar (30) NOT NULL, 
+the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
+
 
 
 -- ----------------------------
@@ -31,16 +35,18 @@ CONSTRAINT anl_flow_exit_arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "anl_flow_trace_node" (
+id serial NOT NULL PRIMARY KEY,
+cur_user varchar (30) NOT NULL, 
 node_id varchar (16) NOT NULL,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_flow_trace_node_pkey PRIMARY KEY (node_id)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_flow_trace_arc" (
+id serial NOT NULL PRIMARY KEY,
+cur_user varchar (30) NOT NULL, 
 arc_id varchar (16) NOT NULL,
-the_geom public.geometry (LINESTRING, SRID_VALUE),
-CONSTRAINT anl_flow_trace_arc_pkey PRIMARY KEY (arc_id)
+the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
 
