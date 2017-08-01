@@ -189,17 +189,20 @@ BEGIN
 					WHERE node_id=node_id_aux;
 
 
-	IF to_arc_aux ='INVERT' THEN
+	SELECT arc_id INTO arc_id_aux FROM arc WHERE (ST_DWithin(ST_endpoint(record_new_arc.the_geom), arc.the_geom, rec.arc_searchnodes))
+    ORDER BY ST_Distance(arc.the_geom, ST_endpoint(record_new_arc.the_geom)) LIMIT 1;
 
-		record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
-		record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
-	
-	ELSIF to_arc_aux ISNULL or to_arc_aux = 'NONE' THEN
+    IF arc_id_aux=to_arc_aux THEN
 
-		record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
-		record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
-		
-	END IF;
+        record_new_arc.node_1 := concat(node_id_aux, '_n2a_1');
+        record_new_arc.node_2 := concat(node_id_aux, '_n2a_2');
+
+    ELSE
+
+        record_new_arc.node_2 := concat(node_id_aux, '_n2a_1');
+        record_new_arc.node_1 := concat(node_id_aux, '_n2a_2');
+
+    END IF; 
 
 
         --Print insert data

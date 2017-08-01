@@ -1381,6 +1381,72 @@ CREATE TABLE "inp_value_yesno" (
 -- Table structure RPT
 -- --------------------------
 
+
+CREATE TABLE "temp_node" (
+"node_id" varchar(16) NOT NULL PRIMARY KEY, 
+"top_elev" numeric(12,3),
+"elev" numeric(12,3),
+"node_type" varchar(18)  ,
+"nodecat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (POINT, SRID_VALUE)
+);
+
+
+CREATE TABLE "temp_arc" (
+"arc_id" varchar(16) NOT NULL PRIMARY KEY, 
+"node_1" varchar(16) ,
+"node_2" varchar(16) ,
+"elevmax1" numeric(12,3),
+"elevmax2" numeric(12,3),
+"arc_type" varchar(18)  ,
+"arccat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+CREATE TABLE "rpt_input_node" (
+"id" serial PRIMARY KEY NOT NULL,
+"result_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL,
+"top_elev" numeric(12,3),
+"elev" numeric(12,3),
+"node_type" varchar(18)  ,
+"nodecat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (POINT, SRID_VALUE)
+);
+
+
+CREATE TABLE "rpt_input_arc" (
+"id" serial PRIMARY KEY NOT NULL,
+"result_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) ,
+"node_1" varchar(16) ,
+"node_2" varchar(16) ,
+"elevmax1" numeric(12,3),
+"elevmax2" numeric(12,3),
+"arc_type" varchar(18)  ,
+"arccat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+
 CREATE TABLE "rpt_arcflow_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_arcflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,

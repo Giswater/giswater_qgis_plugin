@@ -11,13 +11,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Sequences
 -- --------------------------
 
-CREATE SEQUENCE dimensions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
 
 CREATE SEQUENCE sample_id_seq
     START WITH 1
@@ -42,13 +35,6 @@ CREATE SEQUENCE urn_id_seq
     NO MAXVALUE
     CACHE 1;
 
-
-CREATE SEQUENCE "version_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 CREATE SEQUENCE "cat_node_seq"
     START WITH 1
@@ -158,6 +144,7 @@ CREATE SEQUENCE polygon_id_seq
 CREATE TABLE cat_feature(
 id character varying(30) NOT NULL,
 feature_type character varying(30),
+"descript" text,
 CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
 );
 
@@ -170,6 +157,7 @@ CREATE TABLE "arc_type" (
 "epa_table" varchar(18)   NOT NULL,
 "active" boolean,
 "code_autofill" boolean,
+"descript" text,
 CONSTRAINT arc_type_pkey PRIMARY KEY (id)
 );
 
@@ -182,8 +170,9 @@ CREATE TABLE "node_type" (
 "epa_table" varchar(18)   NOT NULL,
 "active" boolean,
 "code_autofill" boolean,
-"descript" text,
 "num_arcs" integer,
+"choose_hemisphere" boolean,
+"descript" text,
 CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
@@ -226,11 +215,10 @@ CONSTRAINT point_type_pkey PRIMARY KEY (id)
 CREATE TABLE arc_type_cat_type
 (
   id character varying(18) NOT NULL,
-  descript text,
-  shortcut_key text,
+  shortcut_key varchar(30) ,
   order by int2,
-  choose_hemisphere boolean,
   i18n character varying(30),
+  descript text,
   CONSTRAINT arc_type_cat_type_pkey PRIMARY KEY (id)
 )
 
@@ -238,11 +226,10 @@ CREATE TABLE arc_type_cat_type
 CREATE TABLE node_type_cat_type
 (
   id character varying(18) NOT NULL,
-  descript text,
-  shortcut_key text,
+  shortcut_key varchar(30),
   order by int2,
-  choose_hemisphere boolean,
   i18n character varying(30),
+  descript text,
   CONSTRAINT node_type_cat_type_pkey PRIMARY KEY (id)
 )
 
@@ -576,30 +563,6 @@ CREATE TABLE "element_x_connec" (
 );
 
 
-
--- ----------------------------------
--- Table: Dimensions
--- ----------------------------------
-
-
-
-CREATE TABLE dimensions
-(
-  id bigserial NOT NULL,
-  distance numeric(12,4),
-  depth numeric(12,4),
-  the_geom geometry(LineString,SRID_VALUE),
-  x_label double precision,
-  y_label double precision,
-  rotation_label double precision,
-  offset_label double precision,
-  direction_arrow boolean,
-  x_symbol double precision,
-  y_symbol double precision,
-  feature_id character varying,
-  feature_type character varying,
-  CONSTRAINT id PRIMARY KEY (id));
-  
 
 
 -- ----------------------------------

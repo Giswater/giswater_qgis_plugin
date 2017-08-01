@@ -116,88 +116,6 @@ CREATE SEQUENCE "temp_arc_seq"
 
 
 
--- ----------------------------
--- Table structure INP temporal
--- ----------------------------
-
-
-CREATE TABLE temp_node
-(
-  node_id character varying(16) NOT NULL,
-  elevation numeric(12,4),
-  depth numeric(12,4),
-  node_type character varying(30),
-  nodecat_id character varying(30),
-  epa_type character varying(16),
-  sector_id character varying(30),
-  state character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  comment character varying(254),
-  dma_id character varying(30),
-  soilcat_id character varying(16),
-  category_type character varying(18),
-  fluid_type character varying(18),
-  location_type character varying(18),
-  workcat_id character varying(255),
-  buildercat_id character varying(30),
-  builtdate date,
-  ownercat_id character varying(30),
-  adress_01 character varying(50),
-  adress_02 character varying(50),
-  adress_03 character varying(50),
-  descript character varying(254),
-  rotation numeric(6,3),
-  link character varying(512),
-  verified character varying(16),
-  the_geom public.geometry (POINT, SRID_VALUE),
-  undelete boolean,
-  workcat_id_end character varying(255),
-  label_x character varying(30),
-  label_y character varying(30),
-  label_rotation numeric(6,3),
-  CONSTRAINT temp_node_pkey PRIMARY KEY (node_id)
-)
-;
-
-
-CREATE TABLE temp_arc
-(
-  arc_id character varying(16) NOT NULL,
-  node_1 character varying(16),
-  node_2 character varying(16),
-  arccat_id character varying(30),
-  epa_type character varying(16),
-  sector_id character varying(30),
-  state character varying(16),
-  annotation character varying(254),
-  observ character varying(254),
-  comment character varying(254),
-  custom_length numeric(12,2),
-  dma_id character varying(30),
-  soilcat_id character varying(16),
-  category_type character varying(18),
-  fluid_type character varying(18),
-  location_type character varying(18),
-  workcat_id character varying(255),
-  buildercat_id character varying(30),
-  builtdate date,
-  ownercat_id character varying(30),
-  adress_01 character varying(50),
-  adress_02 character varying(50),
-  adress_03 character varying(50),
-  descript character varying(254),
-  rotation numeric(6,3),
-  link character varying(512),
-  verified character varying(16),
-  the_geom public.geometry (LINESTRING, SRID_VALUE),
-  undelete boolean,
-  workcat_id_end character varying(255),
-  label_x character varying(30),
-  label_y character varying(30),
-  label_rotation numeric(6,3),
-  CONSTRAINT temp_arc_pkey PRIMARY KEY (arc_id));
-
 
 -- ----------------------------
 -- Table structure INP
@@ -413,13 +331,16 @@ CREATE TABLE "inp_project_id" (
 
 
 CREATE TABLE "inp_pump" (
+"id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16)   NOT NULL,
 "power" varchar  ,
 "curve_id" varchar  ,
 "speed" numeric(12,6),
 "pattern" varchar  ,
 "status" varchar(12),
-"to_arc" varchar(16)
+"to_arc" varchar(16),
+"is_flowreg" boolean,
+"flowreg_id" int2
 );
 
 
@@ -479,12 +400,6 @@ CREATE TABLE "inp_reservoir" (
 );
 
 
-CREATE TABLE "inp_rules" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_rules_id_seq'::regclass) NOT NULL,
-"text" varchar(254)  
-);
-
-
 
 CREATE TABLE "inp_rules_x_node" (
 "id" serial NOT NULL PRIMARY KEY,
@@ -498,8 +413,6 @@ CREATE TABLE "inp_rules_x_arc" (
 "arc_id" varchar(16) NOT NULL,
 "text" text NOT NULL
 );
-
-
 
 
 CREATE TABLE "inp_source" (
@@ -543,6 +456,7 @@ CREATE TABLE "inp_times" (
 
 
 CREATE TABLE "inp_valve" (
+"id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16)   NOT NULL,
 "valv_type" varchar(18)  ,
 "pressure" numeric(12,4),
@@ -552,7 +466,10 @@ CREATE TABLE "inp_valve" (
 "curve_id" int4,
 "minorloss" numeric(12,4),
 "status" varchar(12),
-"to_arc" varchar(16)
+"to_arc" varchar(16),
+"is_flowreg" boolean,
+"flowreg_id" int2
+
 );
 
 
@@ -688,6 +605,69 @@ CREATE TABLE "inp_value_plan" (
 -- Table structure for rpt
 -- ----------------------------
 
+
+CREATE TABLE "temp_node" (
+"node_id" varchar(16) NOT NULL PRIMARY KEY, 
+"elev" numeric(12,3),
+"depth" numeric(12,3),
+"node_type" varchar(18)  ,
+"nodecat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (POINT, SRID_VALUE)
+);
+
+
+CREATE TABLE "temp_arc" (
+"arc_id" varchar(16) NOT NULL PRIMARY KEY, 
+"node_1" varchar(16) ,
+"node_2" varchar(16) ,
+"arc_type" varchar(18)  ,
+"arccat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+
+CREATE TABLE "rpt_input_node" (
+"id" serial PRIMARY KEY NOT NULL,
+"result_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL,
+"elev" numeric(12,3),
+"depth" numeric(12,3),
+"node_type" varchar(18)  ,
+"nodecat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (POINT, SRID_VALUE)
+);
+
+
+CREATE TABLE "rpt_input_arc" (
+"id" serial PRIMARY KEY NOT NULL,
+"result_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) ,
+"node_1" varchar(16) ,
+"node_2" varchar(16) ,
+"arc_type" varchar(18)  ,
+"arccat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,,
+"annotation" character varying(254),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+
 CREATE TABLE "rpt_arc" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arc_id_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
@@ -816,7 +796,6 @@ ALTER TABLE "inp_options" ADD PRIMARY KEY ("units");
 ALTER TABLE "inp_pattern" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_pipe" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
-ALTER TABLE "inp_pump" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_quality" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_report" ADD PRIMARY KEY ("pagesize");
 ALTER TABLE "inp_reservoir" ADD PRIMARY KEY ("node_id");
@@ -845,7 +824,6 @@ ALTER TABLE "inp_value_reactions_gl" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_times" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_yesno" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_yesnofull" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_valve" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "rpt_selector_result" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_selector_compare" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_cat_result" ADD PRIMARY KEY ("result_id");
@@ -857,6 +835,6 @@ ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
 
 
 
-CREATE INDEX temp_arc_index ON temp_arc USING GIST (the_geom);
-CREATE INDEX temp_node_index ON temp_node USING GIST (the_geom);
+CREATE INDEX rpt_input_arc_index ON rpt_input_arc USING GIST (the_geom);
+CREATE INDEX rpt_input_node_index ON rpt_input_node USING GIST (the_geom);
 
