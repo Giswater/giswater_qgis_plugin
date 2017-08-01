@@ -8,34 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE TABLE "version" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".version_seq'::regclass) NOT NULL,
-"giswater" varchar(16)  ,
-"wsoftware" varchar(16)  ,
-"postgres" varchar(512)  ,
-"postgis" varchar(512)  ,
-"date" timestamp(6) DEFAULT now(),
-"language" varchar (50),
-"epsg" int4,
-CONSTRAINT version_pkey PRIMARY KEY (id)
-);
-
-
-
-
-CREATE TABLE om_traceability (
-id serial PRIMARY KEY NOT NULL,
-type character varying(50) NOT NULL,
-arc_id character varying(16) NOT NULL,
-arc_id1 character varying(16) NOT NULL ,
-arc_id2 character varying(16) NOT NULL,
-node_id character varying(16) NOT NULL,
-tstamp timestamp(6) without time zone,
-"user" character varying(50)
-);
-
-
-
 
 CREATE TABLE "config" (
 "id" varchar(18) NOT NULL,
@@ -70,22 +42,10 @@ CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name")
 );
 
 
-CREATE TABLE "config_extract_raster_value" (
-"id" varchar(18) NOT NULL,
-"raster_layer" varchar (30),
-"raster_band_value" varchar (30),
-"vector_layer" varchar (30),
-"vector_field_value" varchar (30),
-CONSTRAINT "config_extract_raster_value_pkey" PRIMARY KEY ("id"),
-CONSTRAINT "config_extract_raster_value_check" CHECK(id = '1')
-);
-
 
 CREATE TABLE "config_ui_forms" (
 "id" serial NOT NULL,
-"ui_form" varchar (50),
 "ui_table" varchar (50),
-"ui_column" varchar (50),
 "status" boolean,
 "width" int4,
 "column_index" int2,
@@ -109,8 +69,6 @@ CREATE TABLE "config_param_int" (
 "id" varchar (50) NOT NULL,
 "value" int4 NOT NULL,
 "context" varchar (50),
-"from_version" varchar (50), 
-"to_version" varchar (50), 
 "descript" text,
 CONSTRAINT "config_param_int_pkey" PRIMARY KEY ("id")
 );
@@ -119,8 +77,6 @@ CREATE TABLE "config_param_text" (
 "id" varchar (50) NOT NULL,
 "value" text NOT NULL,
 "context" varchar (50),
-"from_version" varchar (50), 
-"to_version" varchar (50), 
 "descript" text,
 CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
 );
@@ -129,8 +85,6 @@ CREATE TABLE "config_param_float" (
 "id" varchar (50) NOT NULL,
 "value" double precision NOT NULL,
 "context" varchar (50),
-"from_version" varchar (50), 
-"to_version" varchar (50), 
 "descript" text,
 CONSTRAINT "config_param_float_pkey" PRIMARY KEY ("id")
 );
@@ -139,18 +93,25 @@ CREATE TABLE "config_param_bool" (
 "id" varchar (50) NOT NULL,
 "value" boolean NOT NULL,
 "context" varchar (50),
-"from_version" varchar (50), 
-"to_version" varchar (50), 
 "descript" text,
 CONSTRAINT "config_param_bool_pkey" PRIMARY KEY ("id")
 );
 
 
-CREATE TABLE config_vdefault (
-id serial PRIMARY KEY,
-"parameter" character varying (30),
-"value" character varying (30),
-"user" character varying (30)
+CREATE TABLE "config_vdefault" (
+"id" serial PRIMARY KEY,
+"parameter" character varying (50),
+"value" text,
+"context" varchar (50),
+"user" character varying (30),
+"descript" text
+);
+
+CREATE TABLE "config_searchplus" (
+"id" serial NOT NULL PRIMARY KEY,
+"context"  varchar (50),
+"parameter"  varchar (50),
+"value"  varchar (50),
 );
 
 
@@ -174,32 +135,5 @@ id serial PRIMARY KEY,
 );
 
 
-----------------
--- TABLE: Config Search plus
-----------------
-
-CREATE TABLE "config_search_plus" (
-"id" varchar(18) NOT NULL,
-"ppoint_layer" varchar (30),
-"ppoint_field_zone" varchar (30),
-"ppoint_field_number" varchar (30),
-"urban_propierties_layer" varchar (30),
-"urban_propierties_field_pzone" varchar (30),
-"urban_propierties_field_block" varchar (30),
-"urban_propierties_field_number" varchar (30),
-"street_layer" varchar (30),
-"street_field_code" varchar (30),
-"street_field_name" varchar (30),
-"portal_layer" varchar (30),
-"portal_field_code" varchar (30),
-"portal_field_number" varchar (30),
-"hydrometer_urban_propierties_layer" varchar (30),
-"hydrometer_urban_propierties_field_code" varchar (30),
-"hydrometer_layer" varchar (30),
-"hydrometer_field_code" varchar (30),
-"hydrometer_field_urban_propierties_code" varchar (30),
-CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id"),
-CONSTRAINT "config_search_plus_check" CHECK(id = '1')
-);
 
 
