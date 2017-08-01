@@ -877,7 +877,6 @@ class Mg():
             self.insert_or_update_config_vdefault(self.verified_vdefault, "verified_vdefault")
         else:
             self.delete_row("verified_vdefault")
-        #self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
 
         if utils_giswater.isChecked(self.chk_builtdate_vdefault) == True:
             self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
@@ -899,7 +898,7 @@ class Mg():
 
         self.close_dialog(self.dlg)
 
-        
+
     def delete_row(self,  parameter):
 
         sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
@@ -1590,14 +1589,7 @@ class Mg():
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
-        # Buttons
-        self.dlg_new_psector.btn_accept.pressed.connect(self.insert_mg_newp)
-        self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
-        # tab Networks elements
-        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
+        update=False # if false: insert; if true: update
         # LineEdit
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
@@ -1605,7 +1597,7 @@ class Mg():
         self.priority = self.dlg_new_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("priority", rows,False)
+        utils_giswater.fillComboBox("priority", rows, False)
 
         self.descript = self.dlg_new_psector.findChild(QLineEdit, "descript")
         self.text1 = self.dlg_new_psector.findChild(QLineEdit, "text1")
@@ -1647,7 +1639,7 @@ class Mg():
         self.dlg_new_psector.vat_cost.textChanged.connect(partial(self.sum_total, self.sum_gexpenses, self.vat_cost, self.sum_vexpenses))
 
         # Tables
-        # tab Networks elements
+        # tab Elements
         self.tbl_arc_plan = self.dlg_new_psector.findChild(QTableView, "tbl_arc_plan")
         self.tbl_arc_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
@@ -1656,16 +1648,27 @@ class Mg():
         self.tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_node_plan, self.schema_name + ".plan_node_x_psector")
 
+        self.tbl_other_plan = self.dlg_new_psector.findChild(QTableView, "tbl_other_plan")
+        self.tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.fill_table(self.tbl_other_plan, self.schema_name + ".plan_other_x_psector")
+
         # tab Bugdet
         self.tbl_v_plan_other_x_psector = self.dlg_new_psector.findChild(QTableView, "tbl_v_plan_other_x_psector")
         self.fill_table(self.tbl_v_plan_other_x_psector, self.schema_name + ".v_plan_other_x_psector")
         self.tbl_v_plan_other_x_psector.hideColumn(0)
 
+        # tab Elements
+        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_other_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_other_plan.pressed.connect(self.pressbtn)
         # if a row is selected from mg_psector_mangement(button 46)
-        if psector_id!=True:
-            sql = "SELECT * FROM " + self.schema_name + ".plan_psector  WHERE psector_id = '" + psector_id + "'"
+        if not isinstance(psector_id, bool):
+            sql = "SELECT * FROM " + self.schema_name + ".plan_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
-            self.psector_id.setText(row[0])
+            self.psector_id.setText(str(row[0]))
             self.short_descript.setText(row[15])
             index = self.priority.findText(row[2], Qt.MatchFixedString)
             if index >= 0:
@@ -1674,32 +1677,37 @@ class Mg():
             self.text1.setText(row[3])
             self.text2.setText(row[4])
             self.observ.setText(row[5])
-            self.scale.setText(str(row[7]))
             self.atlas_id.setText(row[9])
-            self.rotation.setText(str(row[6]))
-            expr = " psector_id LIKE '%" + psector_id + "%'"
+            self.test(row[7])
+            if row[7]!=None:
+                self.scale.setText(str(row[7]))
+            if row[6] != None:
+                self.rotation.setText(str(row[6]))
+
+            expr = " psector_id = "+ str(psector_id)
             # Refresh model with selected filter
             self.tbl_arc_plan.model().setFilter(expr)
             self.tbl_arc_plan.model().select()
-            expr = " psector_id LIKE '%" + psector_id + "%'"
+            expr = " psector_id = " + str(psector_id)
             # Refresh model with selected filter
             self.tbl_node_plan.model().setFilter(expr)
             self.tbl_node_plan.model().select()
 
-            expr = " psector_id LIKE '%" + psector_id + "%'"
+            expr = " psector_id = " + str(psector_id)
             self.tbl_v_plan_other_x_psector.model().setFilter(expr)
             self.tbl_v_plan_other_x_psector.model().select()
 
             # Total other Prices:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector  WHERE psector_id = '" + psector_id + "'"
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
+
             if not row[0]:
                 total_other_price=0
             else:
                 total_other_price=row[0]
             self.sum_v_plan_other_x_psector.setText(str(total_other_price))
             #Total arcs:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector  WHERE psector_id = '" + psector_id + "'"
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
             if not row[0]:
                 total_arcs=0
@@ -1707,7 +1715,7 @@ class Mg():
                 total_arcs=row[0]
             self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
             # Total nnodes:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = '" + psector_id + "'"
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
             if not row[0]:
                 total_nodes=0
@@ -1717,36 +1725,58 @@ class Mg():
 
             sum_expenses=total_other_price+total_arcs+total_nodes
             self.sum_expenses.setText(str(sum_expenses))
-            '''
-
-
-
-            self.sum_oexpenses.setText("30")
-
-            self.vat_cost.setText("40")
-            self.sum_vexpenses.setText("q50")
-
-            sum_expenses=float(self.sum_expenses.text())
-            other=float(self.other.text())
-            other_cost=sum_expenses*other*100
-            '''
-
-        '''
-        expr = " psector_id LIKE '%"+psector_id+"%'"
-        # Refresh model with selected filter
-        self.tbl_node_plan.model().setFilter(expr)
-        self.tbl_node_plan.model().select()
-        '''
-        #self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
-
+            update=True
+        # Buttons
+        self.dlg_new_psector.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector,update,'plan_psector') )
+        self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
         self.dlg_new_psector.exec_()
+
+    def insert_or_update_new_psector(self, update,table):
+        self.test(update)
+        if update:
+            sql = "UPDATE " + self.schema_name + "."+table+" SET descript='" + self.descript.text()+"'"
+            sql += ", priority='"+self.priority.currentText()+"'"
+            sql += ", text1='" + self.text1.text() + "'"
+            sql += ", text2='" + self.text2.text() + "'"
+            sql += ", observ='" + self.observ.text() + "'"
+            sql += ", scale='" + self.scale.text() + "'"
+            sql += ", atlas_id='" + self.atlas_id.text() + "'"
+            sql += ", rotation='" + self.rotation.text() + "'"
+            sql += ", short_descript='" + self.short_descript.text() + "'"
+
+            sql += " WHERE psector_id = '"+self.psector_id.text() +"'"
+        else:
+            '''
+            fields=""
+            values=""
+            self.test(self.descript.text())
+            if self.short_descript.text()!="":
+                fields="short_descript"
+                values="'"+self.short_descript.text()+"'" or None
+            if self.descript.text()!="":
+                fields+=", descript"
+                values+=", '"+self.descript.text()+"'" or None
+            if self.priority.currentText()!="":
+                fields += ", priority"
+                values += ", '"+self.priority.currentText()+"'" or None
+
+
+
+            sql = "INSERT INTO " + self.schema_name + "."+table+"("+fields+")"
+            sql += " VALUES (" +values+")"
+            '''
+            #, text1, text2, observ, scale, atlas_id, rotation, short_descript
+            sql = "INSERT INTO " + self.schema_name + "." + table + "(descript, priority, text1)"
+            sql += " VALUES (" + str(self.descript.text()) +","+str(self.priority.currentText())+","+str(self.text1.text())+ ")"
+            self.test(sql)
+        self.controller.execute_sql(sql)
 
     def cal_percent(self,widged_total, widged_percent, wided_result):
         wided_result.setText(str((float(widged_total.text())*float(widged_percent.text())/100)))
 
     def sum_total(self, widget_total, widged_percent, wided_result):
         wided_result.setText(str((float(widget_total.text()) + float(widged_percent.text()))))
-        
+    '''
     def insert_mg_newp(self):
 
         if self.psector_id.text()=='':
@@ -1756,7 +1786,7 @@ class Mg():
             sql += " VALUES ('" + self.psector_id.text()+ "', '" + self.descript.text()+ "', '" + self.priority.text()+ "', '" + self.text1.text() + "', '" + self.text2.text() +"', '" + self.observ.text()+  "')"
             self.controller.execute_sql(sql)
             self.test("saved")
-
+    '''
 
     def mg_psector_mangement(self):
         ''' Button_46 : Psector management '''
@@ -1789,16 +1819,10 @@ class Mg():
             return
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
-
-        #1ql = "SELECT * FROM "+self.schema_name+".plan_psector WHERE id = '"+psector_id+"'"
-
-        #rows = self.dao.get_row(sql)
-
         self.dlg_psector_mangement.close()
-        #self.dlg_psector_sel = Multipsector_selector()
-        #utils_giswater.setDialog(self.dlg_psector_sel)
-
         self.mg_new_psector(psector_id)
+
+
     def filter_by_text(self,table,txt):
         result_select = utils_giswater.getWidgetText(txt)
         if result_select=='null':
