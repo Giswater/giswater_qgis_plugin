@@ -380,3 +380,13 @@ DO UPDATE review_arc SET verified='REVISED' WHERE arc_id=NEW.arc_id AND field_ch
 DROP RULE IF EXISTS review_status ON review_audit_node;
 CREATE OR REPLACE RULE review_status AS ON INSERT TO review_audit_node
 DO UPDATE review_node SET verified='REVISED' WHERE node_id=NEW.node_id AND field_checked='TRUE';
+
+-- ----------------------------
+-- value priority
+-- ----------------------------
+CREATE TABLE value_priority
+(
+  id character varying(16) NOT NULL PRIMARY KEY,
+  observ character varying(254));
+
+  ALTER TABLE "plan_psector" ADD CONSTRAINT "plan_psector_priority_fkey" FOREIGN KEY ("priority") REFERENCES "value_priority" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
