@@ -152,3 +152,10 @@ VALUES (850, 'gw_trg_edit_man_gully', 'trigger function', 'ud', NULL, NULL);
 
 INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
 VALUES (860, 'gw_trg_edit_man_connec', 'trigger function', 'ud', NULL, NULL);
+
+INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
+VALUES (190, 'gw_fct_node_state_update', 'trigger function', 'utils', null,null);
+
+INSERT INTO audit_cat_function (id, name, function_type, context, input_params, return_type) 
+VALUES (200, 'gw_fct_arc_state_update', 'trigger function', 'utils', null,null);
+

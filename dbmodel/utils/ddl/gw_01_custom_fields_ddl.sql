@@ -21,6 +21,22 @@ CONSTRAINT version_pkey PRIMARY KEY (id)
 );
 
 
+
+
+CREATE TABLE om_traceability (
+id serial PRIMARY KEY NOT NULL,
+type character varying(50) NOT NULL,
+arc_id character varying(16) NOT NULL,
+arc_id1 character varying(16) NOT NULL ,
+arc_id2 character varying(16) NOT NULL,
+node_id character varying(16) NOT NULL,
+tstamp timestamp(6) without time zone,
+"user" character varying(50)
+);
+
+
+
+
 CREATE TABLE "config" (
 "id" varchar(18) NOT NULL,
 "node_proximity" double precision,
@@ -127,6 +143,63 @@ CREATE TABLE "config_param_bool" (
 "to_version" varchar (50), 
 "descript" text,
 CONSTRAINT "config_param_bool_pkey" PRIMARY KEY ("id")
+);
+
+
+CREATE TABLE config_vdefault (
+id serial PRIMARY KEY,
+"parameter" character varying (30),
+"value" character varying (30),
+"user" character varying (30)
+);
+
+
+  CREATE TABLE config_client_dvalue
+(
+  id serial NOT NULL,
+  table_id text,
+  column_id text,
+  dv_table text,
+  dv_key_column text,
+  dv_value_column text,
+  orderby_value boolean,
+  allow_null boolean,
+  CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id)/*,
+  CONSTRAINT config_client_value_colum_id_fkey FOREIGN KEY (dv_table, dv_key_column)
+      REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT config_client_value_origin_id_fkey FOREIGN KEY (table_id, column_id)
+      REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT*/
+);
+
+
+----------------
+-- TABLE: Config Search plus
+----------------
+
+CREATE TABLE "config_search_plus" (
+"id" varchar(18) NOT NULL,
+"ppoint_layer" varchar (30),
+"ppoint_field_zone" varchar (30),
+"ppoint_field_number" varchar (30),
+"urban_propierties_layer" varchar (30),
+"urban_propierties_field_pzone" varchar (30),
+"urban_propierties_field_block" varchar (30),
+"urban_propierties_field_number" varchar (30),
+"street_layer" varchar (30),
+"street_field_code" varchar (30),
+"street_field_name" varchar (30),
+"portal_layer" varchar (30),
+"portal_field_code" varchar (30),
+"portal_field_number" varchar (30),
+"hydrometer_urban_propierties_layer" varchar (30),
+"hydrometer_urban_propierties_field_code" varchar (30),
+"hydrometer_layer" varchar (30),
+"hydrometer_field_code" varchar (30),
+"hydrometer_field_urban_propierties_code" varchar (30),
+CONSTRAINT "config_search_plus_pkey" PRIMARY KEY ("id"),
+CONSTRAINT "config_search_plus_check" CHECK(id = '1')
 );
 
 

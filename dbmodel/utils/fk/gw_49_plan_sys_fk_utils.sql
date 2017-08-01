@@ -44,6 +44,9 @@ ALTER TABLE "price_simple" DROP CONSTRAINT IF EXISTS "price_simple_unit_fkey";
 ALTER TABLE "plan_selector_psector" DROP CONSTRAINT IF EXISTS "plan_selector_psector_id_fkey";
 ALTER TABLE "plan_selector_state" DROP CONSTRAINT IF EXISTS "plan_selector_state_id_fkey";
 
+ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
+
+
 
 
 
@@ -84,4 +87,7 @@ ALTER TABLE "price_simple" ADD CONSTRAINT "price_simple_unit_fkey" FOREIGN KEY (
 
 ALTER TABLE "plan_selector_psector" ADD CONSTRAINT "plan_selector_psector_id_fkey" FOREIGN KEY ("id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "plan_selector_state" ADD CONSTRAINT "plan_selector_state_id_fkey" FOREIGN KEY ("id") REFERENCES "value_state" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE plan_psector  ADD CONSTRAINT plan_psector_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
 

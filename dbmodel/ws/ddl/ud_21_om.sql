@@ -25,7 +25,6 @@ CREATE TABLE om_visit_cat
 );
 
 
-
  
 CREATE TABLE "om_visit_parameter_type" (
 "id" varchar(30)   NOT NULL,
@@ -58,7 +57,6 @@ CREATE TABLE "om_visit" (
 "startdate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
-"webclient_id" character varying(50),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );

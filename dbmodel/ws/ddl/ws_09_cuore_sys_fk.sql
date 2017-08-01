@@ -137,7 +137,49 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_fkey
 ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_workcat_id_end_fkey";
 
 
---ALTER TABLE "db_cat_table_x_column" DROP CONSTRAINT IF EXISTS db_cat_table_x_column_db_cat_table_fkey;
+ALTER TABLE "db_cat_table_x_column" DROP CONSTRAINT IF EXISTS db_cat_table_x_column_db_cat_table_fkey;
+
+ALTER TABLE man_register DROP CONSTRAINT IF EXISTS "man_register_fkey";
+ALTER TABLE man_netwjoin DROP CONSTRAINT IF EXISTS "man_netwjoin_fkey";
+ALTER TABLE man_expansiontank DROP CONSTRAINT IF EXISTS "man_expansiontank_fkey";
+ALTER TABLE man_flexunion DROP CONSTRAINT IF EXISTS "man_flexunion_fkey";
+
+ALTER TABLE man_varc DROP CONSTRAINT IF EXISTS "man_varc_fkey";
+
+ALTER TABLE link DROP CONSTRAINT IF EXISTS "link_featurecat_id_fkey";
+
+
+ALTER TABLE man_custom_field DROP CONSTRAINT IF EXISTS "man_custom_field_man_custom_field_parameter_fkey";
+ALTER TABLE man_custom_field_parameter DROP CONSTRAINT IF EXISTS "man_custom_field_parameter_cat_feature_fkey";
+
+ALTER TABLE pond DROP CONSTRAINT IF EXISTS "pond_state_fkey";
+
+ALTER TABLE pool DROP CONSTRAINT IF EXISTS "pool_state_fkey";
+
+
+
+
+ALTER TABLE man_valve DROP CONSTRAINT IF EXISTS "cat_node_cat_valve2_fkey";
+ALTER TABLE man_tap DROP CONSTRAINT IF EXISTS "cat_node_cat_valve2_fkey";
+ALTER TABLE man_wjoin DROP CONSTRAINT IF EXISTS "cat_node_cat_valve2_fkey";
+ALTER TABLE man_fountain DROP CONSTRAINT IF EXISTS "connec_linked_connec_fkey";
+ALTER TABLE man_tap DROP CONSTRAINT IF EXISTS "connec_linked_connec_fkey";
+ALTER TABLE man_greentap DROP CONSTRAINT IF EXISTS "connec_linked_connec_fkey";
+
+
+ALTER TABLE point DROP CONSTRAINT IF EXISTS "point_dma_id_fkey";
+ALTER TABLE pond DROP CONSTRAINT IF EXISTS "pond_dma_id_fkey";
+ALTER TABLE pool DROP CONSTRAINT IF EXISTS "pool_dma_id_fkey";
+ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_dma_id_fkey";
+
+
+
+
+-- CREATE---
+
+
+ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_type_fkey";
+ALTER TABLE "node_type" DROP CONSTRAINT IF EXISTS "node_type_type_fkey";
 
 
 ALTER TABLE "cat_arc" ADD CONSTRAINT "cat_arc_matcat_id_fkey" FOREIGN KEY ("matcat_id") REFERENCES "cat_mat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -262,8 +304,42 @@ ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_fkey" FOREIGN K
 ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_workcat_id_end_fkey" FOREIGN KEY ("workcat_id_end") REFERENCES "cat_work" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
---ALTER TABLE db_cat_table_x_column ADD CONSTRAINT db_cat_table_x_column_db_cat_table_fkey FOREIGN KEY (table_id) REFERENCES db_cat_table (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE db_cat_table_x_column ADD CONSTRAINT db_cat_table_x_column_db_cat_table_fkey FOREIGN KEY (table_id) REFERENCES db_cat_table (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "arc_type_cat_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "node_type_cat_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
+-- TODO: CONSTRAINTS ON arc_type & node_type man_table & epa_table
+
+ALTER TABLE man_register ADD CONSTRAINT man_register_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_netwjoin ADD CONSTRAINT man_netwjoin_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_expansiontank ADD CONSTRAINT man_expansiontank_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE man_flexunion ADD CONSTRAINT man_flexunion_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE man_varc ADD CONSTRAINT man_varc_fkey FOREIGN KEY (arc_id) REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE man_custom_field ADD CONSTRAINT man_custom_field_man_custom_field_parameter_fkey FOREIGN KEY (field_id) REFERENCES man_custom_field_parameter (field_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE pond DROP CONSTRAINT IF EXISTS "pond_state_fkey";
+ALTER TABLE pond ADD CONSTRAINT pond_state_fkey FOREIGN KEY (state)  REFERENCES value_state (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pool DROP CONSTRAINT IF EXISTS "pool_state_fkey";
+ALTER TABLE pool ADD CONSTRAINT pool_state_fkey FOREIGN KEY (state)  REFERENCES value_state (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+  
 
 
+ALTER TABLE man_valve  ADD CONSTRAINT cat_node_cat_valve2_fkey FOREIGN KEY (cat_valve2) REFERENCES cat_node (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_tap  ADD CONSTRAINT cat_node_cat_valve2_fkey FOREIGN KEY (cat_valve2) REFERENCES cat_node (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_wjoin  ADD CONSTRAINT cat_node_cat_valve2_fkey FOREIGN KEY (cat_valve2) REFERENCES cat_node (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_fountain  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_tap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE man_greentap  ADD CONSTRAINT connec_linked_connec_fkey FOREIGN KEY (linked_connec) REFERENCES connec (connec_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+ALTER TABLE point  ADD CONSTRAINT point_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pond  ADD CONSTRAINT pond_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pool  ADD CONSTRAINT pool_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (dma_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE samplepoint  ADD CONSTRAINT samplepoint_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

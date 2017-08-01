@@ -19,6 +19,10 @@ ALTER TABLE "anl_mincut_arc" ADD CONSTRAINT "anl_mincut_arc_arc_id_fkey" FOREIGN
 ALTER TABLE "anl_mincut_valve" ADD CONSTRAINT "anl_mincut_valve_valve_id_fkey" FOREIGN KEY ("valve_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
+
+
+
+
 -- ----------------------------
 -- MINCUT CATALOG
 -- ----------------------------
@@ -37,6 +41,13 @@ ALTER TABLE "anl_mincut_result_hydrometer" DROP CONSTRAINT IF EXISTS "anl_mincut
 ALTER TABLE "anl_mincut_result_selector" DROP CONSTRAINT IF EXISTS "anl_mincut_result_selector_id_fkey";
 ALTER TABLE "anl_mincut_result_selector_compare" DROP CONSTRAINT IF EXISTS "anl_mincut_result_selector_compare_id_fkey";
 
+ALTER TABLE anl_mincut_valve DROP CONSTRAINT IF EXISTS "anl_mincut_valve_status_type_fkey";
+ALTER TABLE anl_mincut_valve  ADD CONSTRAINT anl_mincut_valve_status_type_fkey FOREIGN KEY (status_type) REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE anl_mincut_result_valve DROP CONSTRAINT IF EXISTS "anl_mincut_result_valve_status_type_fkey";
+ALTER TABLE anl_mincut_result_valve ADD CONSTRAINT anl_mincut_result_valve_status_type_fkey FOREIGN KEY (status_type) REFERENCES anl_mincut_cat_status_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
 
 ALTER TABLE "anl_mincut_result_node" ADD CONSTRAINT "anl_mincut_result_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_mincut_result_arc" ADD CONSTRAINT "anl_mincut_result_arc_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -52,4 +63,13 @@ ALTER TABLE "anl_mincut_result_hydrometer" ADD CONSTRAINT "anl_mincut_result_hyd
 
 ALTER TABLE "anl_mincut_result_selector" ADD CONSTRAINT "anl_mincut_result_selector_id_fkey" FOREIGN KEY ("id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "anl_mincut_result_selector_compare" ADD CONSTRAINT "anl_mincut_result_selector_compare_id_fkey" FOREIGN KEY ("id") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE anl_mincut_result_cat DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_cause_anl_cause_fkey";
+ALTER TABLE anl_mincut_result_cat DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_type_mincut_result_type_fkey";
+ALTER TABLE anl_mincut_result_cat DROP CONSTRAINT IF EXISTS "anl_mincut_result_cat_state_mincut_result_state_fkey";
+
+ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_cause_anl_cause_fkey FOREIGN KEY (anl_cause) REFERENCES anl_mincut_result_cat_cause (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_type_mincut_result_type_fkey FOREIGN KEY (mincut_result_type) REFERENCES anl_mincut_result_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mincut_result_state_fkey FOREIGN KEY (mincut_result_state) REFERENCES anl_mincut_result_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+
 

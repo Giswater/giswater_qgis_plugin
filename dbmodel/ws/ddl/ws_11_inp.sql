@@ -19,12 +19,6 @@ CREATE SEQUENCE "inp_backdrop_id_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "inp_controls_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 CREATE SEQUENCE "inp_curve_id_seq"
     START WITH 1
@@ -54,12 +48,6 @@ CREATE SEQUENCE "inp_pattern_id_seq"
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "inp_rules_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 CREATE SEQUENCE "inp_sector_id_seq"
     START WITH 1
@@ -259,10 +247,19 @@ CREATE TABLE "inp_backdrop" (
 );
 
 
-CREATE TABLE "inp_controls" (
-"id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_controls_id_seq'::regclass) NOT NULL,
-"text" varchar(254)  
+CREATE TABLE "inp_controls_x_node" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16) NOT NULL,
+"text" text NOT NULL
 );
+
+
+CREATE TABLE "inp_controls_x_arc" (
+"id" serial NOT NULL PRIMARY KEY,
+"arc_id" varchar(16) NOT NULL,
+"text" text NOT NULL
+);
+
 
 
 CREATE TABLE "inp_curve" (
@@ -486,6 +483,23 @@ CREATE TABLE "inp_rules" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".inp_rules_id_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
+
+
+
+CREATE TABLE "inp_rules_x_node" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16) NOT NULL,
+"text" text NOT NULL
+);
+
+
+CREATE TABLE "inp_rules_x_arc" (
+"id" serial NOT NULL PRIMARY KEY,
+"arc_id" varchar(16) NOT NULL,
+"text" text NOT NULL
+);
+
+
 
 
 CREATE TABLE "inp_source" (

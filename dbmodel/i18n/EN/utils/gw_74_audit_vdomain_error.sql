@@ -45,6 +45,9 @@ INSERT INTO audit_cat_error VALUES ('182', 'One or more arcs was not inserted be
 INSERT INTO audit_cat_error VALUES ('185', 'Exists one o more connecs closer than minimum configured,', 'Please, check your project or modify the configuration propierties', '2', 't', null);
 INSERT INTO audit_cat_error VALUES ('190', 'Exists one o more nodes closer than minimum configured,', 'Please, check your project or modify the configuration propierties', '2', 't', null);
 INSERT INTO audit_cat_error VALUES ('200', 'Elev is not an updatable column', 'Please use top_elev or ymax to modify this value', '2', 't', null);
+INSERT INTO audit_cat_error VALUES ('205', 'Is not possible to update the state of the node. There are one or more arcs with state incompatible', 'Review your data', '2', 't', null);
+INSERT INTO audit_cat_error VALUES ('210', 'One or more arcs was not inserted because it has not start/end node perharps due the diferent state of its', 'Review state of nodes or/and tolerence of arc searching nodes', '2', 't', null);
+INSERT INTO audit_cat_error VALUES ('215', 'Is not possible to update the state of the arc. Nodes initial or end have incompatible state', 'Review your data', '2', 't', null);
 
 
 -- Function messages (audit_cat_error.id between 501 and 998)

@@ -8,38 +8,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
-
-DROP TABLE IF EXISTS anl_topological_consistency CASCADE;
-CREATE TABLE anl_topological_consistency
-(
+DROP TABLE IF EXISTS anl_node_topological_consistency CASCADE;
+CREATE TABLE anl_node_topological_consistency (
   node_id character varying(16) NOT NULL,
   node_type character varying(30),
   num_arcs integer,  
   the_geom geometry(Point,SRID_VALUE),
-  CONSTRAINT anl_topological_consistency_pkey PRIMARY KEY (node_id)
-)
-WITH (
-  OIDS=FALSE
+  CONSTRAINT anl_node_topological_consistency_pkey PRIMARY KEY (node_id)
 );
 
 
 
-DROP TABLE IF EXISTS anl_geometrical_consistency CASCADE;
-CREATE TABLE anl_geometrical_consistency
-(
+DROP TABLE IF EXISTS anl_node_geometric_consistency CASCADE;
+CREATE TABLE anl_node_geometric_consistency(
   node_id character varying(16) NOT NULL,
   node_type character varying(30),
-  node_dnom character varying(30),
-  num_arcs int2,
-  arc_dnom1 character varying(30),
-  arc_dnom2 character varying(30),
-  arc_dnom3 character varying(30),
-  arc_dnom4 character varying(30),
   the_geom geometry(Point,SRID_VALUE),
-  CONSTRAINT anl_geometrical_consistency_pkey PRIMARY KEY (node_id)
-)
-WITH (
-  OIDS=FALSE
+  CONSTRAINT anl_node_topological_geometric_pkey PRIMARY KEY (node_id)
 );
-
 

@@ -37,14 +37,6 @@ CREATE SEQUENCE "inp_backdrop_seq"
   CACHE 1;
 
   
-CREATE SEQUENCE "inp_controls_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-  
 CREATE SEQUENCE "inp_curve_seq"
   START WITH 1
   INCREMENT BY 1
@@ -493,10 +485,9 @@ CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
 CREATE TABLE "inp_giswater_config" (
 "id" varchar(16) NOT NULL,
 "giswater_file_path" text,
-"giswater_software_path" text,
 "inp_file_path" text,
 "rpt_file_path" text,
-"rpt_result_id" text,
+"curr_user" text,
 CONSTRAINT inp_giswater_conf PRIMARY KEY (id)
 );
 
@@ -572,9 +563,17 @@ CREATE TABLE "inp_conduit" (
 );
 
 
-CREATE TABLE "inp_controls" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_controls_seq'::regclass) NOT NULL,
-"text" varchar(254)  
+CREATE TABLE "inp_controls_x_node" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16) NOT NULL,
+"text" text NOT NULL
+);
+
+
+CREATE TABLE "inp_controls_x_arc" (
+"id" serial NOT NULL PRIMARY KEY,
+"arc_id" varchar(16) NOT NULL,,
+"text" text NOT NULL,
 );
 
 
@@ -1227,6 +1226,7 @@ CREATE TABLE "inp_value_buildup" (
 
 CREATE TABLE "inp_value_catarc" (
 "id" varchar(18)   NOT NULL,
+"i18n" varchar(18),
 CONSTRAINT inp_value_catarc_pkey PRIMARY KEY (id)
 );
 
@@ -1833,7 +1833,6 @@ ALTER TABLE "inp_aquifer" ADD PRIMARY KEY ("aquif_id");
 ALTER TABLE "inp_backdrop" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_buildup_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
 ALTER TABLE "inp_conduit" ADD PRIMARY KEY ("arc_id");
-ALTER TABLE "inp_controls" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_coverage_land_x_subc" ADD PRIMARY KEY ("subc_id", "landus_id");
 ALTER TABLE "inp_curve" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_curve_id" ADD PRIMARY KEY ("id");

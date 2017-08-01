@@ -44,7 +44,7 @@ CONSTRAINT doc_type_pkey PRIMARY KEY (id)
   
 
 CREATE TABLE "cat_tag" (
-"id" varchar(16)   NOT NULL,
+"id" varchar(30)   NOT NULL,
 "comment" varchar(512)  ,
 CONSTRAINT cat_tag_pkey PRIMARY KEY (id)
 );
@@ -84,5 +84,13 @@ CREATE TABLE "doc_x_connec" (
 "connec_id" varchar(16)  ,
 CONSTRAINT doc_x_connec_pkey PRIMARY KEY (id)
 );
+
+
+CREATE TABLE doc_x_tag(
+  id serial8 PRIMARY KEY,
+  doc_id character varying(30),
+  tag_id character varying(30)
+);
+
 
 

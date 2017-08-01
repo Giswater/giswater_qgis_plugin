@@ -101,67 +101,6 @@ CONSTRAINT man_type_operation_pkey PRIMARY KEY (id)
 );
 
 
--- node topologic features
-
-CREATE TABLE "man_register" (
-"node_id" varchar(16) NOT NULL,
-"pol_id" varchar(16),
-"add_info" varchar(255),
-CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_netwjoin" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-demand numeric(12,8),
-streetaxis_id character varying(16),
-postnumber character varying(16),
-top_floor integer,
-lead_verified date,
-lead_facade character varying(254),,
-cat_valve2 character varying(30),
-CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_expansiontank" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_expansiontank_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_flexunion" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_flexunion_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_netsamplepoint"(
-"node_id" varchar(16) NOT NULL,
- code_lab character varying(30),
-"add_info" varchar(255)
-); 
-
-
-CREATE TABLE "man_netelement"(
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255)
-); 
-
--- arc topologic features
-
-
-CREATE TABLE "man_varc" (
-"arc_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
-);
-
-
-
 -- value state
 
 CREATE TABLE "man_value_state" (
@@ -180,26 +119,6 @@ ALTER TABLE node ADD COLUMN parent_node_id character varying(16);
 
 ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_parent_node_fkey";
 
-ALTER TABLE limnometer DROP CONSTRAINT IF EXISTS "limnometer_fkey";
-ALTER TABLE piezometer DROP CONSTRAINT IF EXISTS "piezometer_fkey";
-
-ALTER TABLE man_register DROP CONSTRAINT IF EXISTS "man_register_fkey";
-ALTER TABLE man_netwjoin DROP CONSTRAINT IF EXISTS "man_netwjoin_fkey";
-ALTER TABLE man_expansiontank DROP CONSTRAINT IF EXISTS "man_expansiontank_fkey";
-ALTER TABLE man_flexunion DROP CONSTRAINT IF EXISTS "man_flexunion_fkey";
-
-ALTER TABLE man_varc DROP CONSTRAINT IF EXISTS "man_varc_fkey";
 
 
-ALTER TABLE node ADD CONSTRAINT node_parent_node_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-  
-ALTER TABLE limnometer ADD CONSTRAINT limnometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE piezometer ADD CONSTRAINT piezometer_fkey FOREIGN KEY (parent_node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE man_register ADD CONSTRAINT man_register_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_netwjoin ADD CONSTRAINT man_netwjoin_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_expansiontank ADD CONSTRAINT man_expansiontank_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE man_flexunion ADD CONSTRAINT man_flexunion_fkey FOREIGN KEY (node_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE man_varc ADD CONSTRAINT man_varc_fkey FOREIGN KEY (arc_id) REFERENCES arc (arc_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
   

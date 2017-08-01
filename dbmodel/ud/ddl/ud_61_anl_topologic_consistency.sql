@@ -6,3 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+
+
+ -- ANALYSIS
+ 
+ CREATE TABLE "anl_node_sink" (
+node_id varchar (16) NOT NULL,
+num_arcs integer,
+the_geom public.geometry (POINT, SRID_VALUE),
+CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
+);
+
+CREATE INDEX anl_node_sink_index ON anl_node_sink USING GIST (the_geom);
+
+ 
