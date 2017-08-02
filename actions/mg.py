@@ -939,7 +939,6 @@ class Mg():
 
     def mg_config_accept_table(self, tablename, columns):
         ''' Update values of selected 'tablename' with the content of 'columns' '''
-
         if columns is not None:
             sql = "UPDATE "+self.schema_name+"."+tablename+" SET "
             for column_name in columns:
@@ -1678,7 +1677,7 @@ class Mg():
             self.text2.setText(row[4])
             self.observ.setText(row[5])
             self.atlas_id.setText(row[9])
-            self.test(row[7])
+
             if row[7]!=None:
                 self.scale.setText(str(row[7]))
             if row[6] != None:
@@ -1714,7 +1713,7 @@ class Mg():
             else:
                 total_arcs=row[0]
             self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
-            # Total nnodes:
+            # Total nodes:
             sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
             if not row[0]:
@@ -1731,43 +1730,65 @@ class Mg():
         self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
         self.dlg_new_psector.exec_()
 
-    def insert_or_update_new_psector(self, update,table):
+    def insert_or_update_new_psector(self, update,tablename):
         self.test(update)
+        sql = "SELECT *"
+        sql += " FROM " + self.schema_name + "." + tablename
+        row = self.dao.get_row(sql)
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            columns.append(column_name)
         if update:
-            sql = "UPDATE " + self.schema_name + "."+table+" SET descript='" + self.descript.text()+"'"
-            sql += ", priority='"+self.priority.currentText()+"'"
-            sql += ", text1='" + self.text1.text() + "'"
-            sql += ", text2='" + self.text2.text() + "'"
-            sql += ", observ='" + self.observ.text() + "'"
-            sql += ", scale='" + self.scale.text() + "'"
-            sql += ", atlas_id='" + self.atlas_id.text() + "'"
-            sql += ", rotation='" + self.rotation.text() + "'"
-            sql += ", short_descript='" + self.short_descript.text() + "'"
+            if columns is not None:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+                for column_name in columns:
+                    if column_name != 'psector_id':
+                        widget_type = utils_giswater.getWidgetType(column_name)
+                        if widget_type is QCheckBox:
+                            value = utils_giswater.isChecked(column_name)
+                        elif widget_type is QDateEdit:
+                            date = self.dlg.findChild(QDateEdit, str(column_name))
+                            value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
+                        else:
+                            value = utils_giswater.getWidgetText(column_name)
+                        if value is None or value == 'null':
+                            sql += column_name + " = null, "
+                        else:
+                            if type(value) is not bool:
+                                value = value.replace(",", ".")
+                            sql += column_name + " = '" + str(value) + "', "
+                sql = sql[:len(sql) -2]
+                sql += " WHERE psector_id = '" + self.psector_id.text() + "'"
 
-            sql += " WHERE psector_id = '"+self.psector_id.text() +"'"
         else:
-            '''
-            fields=""
-            values=""
-            self.test(self.descript.text())
-            if self.short_descript.text()!="":
-                fields="short_descript"
-                values="'"+self.short_descript.text()+"'" or None
-            if self.descript.text()!="":
-                fields+=", descript"
-                values+=", '"+self.descript.text()+"'" or None
-            if self.priority.currentText()!="":
-                fields += ", priority"
-                values += ", '"+self.priority.currentText()+"'" or None
-
-
-
-            sql = "INSERT INTO " + self.schema_name + "."+table+"("+fields+")"
-            sql += " VALUES (" +values+")"
-            '''
-            #, text1, text2, observ, scale, atlas_id, rotation, short_descript
-            sql = "INSERT INTO " + self.schema_name + "." + table + "(descript, priority, text1)"
-            sql += " VALUES (" + str(self.descript.text()) +","+str(self.priority.currentText())+","+str(self.text1.text())+ ")"
+            values="VALUES("
+            if columns is not None:
+                sql = "INSERT INTO " + self.schema_name + "." + tablename+" ("
+                for column_name in columns:
+                    if column_name != 'psector_id':
+                        widget_type = utils_giswater.getWidgetType(column_name)
+                        #self.test(widget_type)
+                        if widget_type is not None:
+                            if widget_type is QCheckBox:
+                                values += utils_giswater.isChecked(column_name)+", "
+                            elif widget_type is QDateEdit:
+                                date = self.dlg.findChild(QDateEdit, str(column_name))
+                                values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss')+", "
+                            else:
+                                value =utils_giswater.getWidgetText(column_name)
+                            if value is None or value == 'null':
+                                sql += column_name + ", "
+                                values += "null, "
+                            else:
+                                if isinstance(value, str):
+                                    values += "'" + value + "',"
+                                else:
+                                    values += "'" + value + "',"
+                            sql += column_name + ", "
+                sql = sql[:len(sql) - 2]+") "
+                values = values[:len(values)-1] +")"
+                sql+=values
             self.test(sql)
         self.controller.execute_sql(sql)
 
