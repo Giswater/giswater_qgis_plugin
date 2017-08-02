@@ -1377,6 +1377,83 @@ CREATE TABLE "inp_value_yesno" (
 
 
 
+
+-- ----------------------------
+-- Table structure flow regulator
+-- --------------------------
+
+CREATE TABLE "inp_flow_regulator_type"(
+id character varying(16),
+table_id character varying(50),
+CONSTRAINT inp_flow_regulator_type_pkey PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE "inp_flwreg_orifice" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16)   NOT NULL,
+"to_arc" varchar(16) ,
+"flwreg_id" int2,
+"ori_type" varchar(18)  ,
+"offset" numeric(12,4),
+"cd" numeric(12,4),
+"orate" numeric(12,4),
+"flap" varchar(3)  ,
+"shape" varchar(18)  ,
+"geom1" numeric(12,4),
+"geom2" numeric(12,4) DEFAULT 0.00,
+"geom3" numeric(12,4) DEFAULT 0.00,
+"geom4" numeric(12,4) DEFAULT 0.00
+);
+
+
+
+CREATE TABLE "inp_flwreg_outlet" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16)   NOT NULL,
+"to_arc" varchar(16)  ,
+"flwreg_id" int2,
+"outlet_type" varchar(16)  ,
+"offset" numeric(12,4),
+"curve_id" varchar(16)  ,
+"cd1" numeric(12,4),
+"cd2" numeric(12,4),
+"flap" varchar(3) 
+);
+
+
+CREATE TABLE "inp_flwreg_pump" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16)   NOT NULL,
+"to_arc" varchar(16)  ,
+"flwreg_id" int2,
+"curve_id" varchar(16)  ,
+"status" varchar(3)  ,
+"startup" numeric(12,4),
+"shutoff" numeric(12,4),
+);
+
+
+CREATE TABLE "inp_flwreg_weir" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16)   NOT NULL,
+"to_arc" varchar(16)  ,
+"flwreg_id" int2,
+"weir_type" varchar(18)  ,
+"offset" numeric(12,4),
+"cd" numeric(12,4),
+"ec" numeric(12,4),
+"cd2" numeric(12,4),
+"flap" varchar(3)  ,
+"geom1" numeric(12,4),
+"geom2" numeric(12,4) DEFAULT 0.00,
+"geom3" numeric(12,4) DEFAULT 0.00,
+"geom4" numeric(12,4) DEFAULT 0.00,
+"surcharge" varchar (3)
+);
+
+
 -- ----------------------------
 -- Table structure RPT
 -- --------------------------
@@ -1467,6 +1544,9 @@ CREATE TABLE "rpt_arcflow_sum" (
 "day_min" varchar(10)  ,
  "time_min" varchar(10)  
 );
+
+
+
 
 
 

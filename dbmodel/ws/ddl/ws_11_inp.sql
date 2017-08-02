@@ -469,7 +469,6 @@ CREATE TABLE "inp_valve" (
 "to_arc" varchar(16),
 "is_flowreg" boolean,
 "flowreg_id" int2
-
 );
 
 
@@ -599,6 +598,48 @@ CREATE TABLE "inp_value_plan" (
 "observ" varchar(254)  
 
 );
+
+
+
+-- ----------------------------
+-- Table structure flow regulator
+-- --------------------------
+
+CREATE TABLE "inp_flow_regulator_type"(
+id character varying(16),
+table_id character varying(50),
+CONSTRAINT inp_flow_regulator_type_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "inp_flwreg_valve" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16) NOT NULL,
+"flwreg_id" int2,
+"valv_type" varchar(18)  ,
+"pressure" numeric(12,4),
+"diameter" numeric(12,4),
+"flow" numeric(12,4),
+"coef_loss" numeric(12,4),
+"curve_id" int4,
+"minorloss" numeric(12,4),
+"status" varchar(12),
+"to_arc" varchar(16)
+);
+
+
+CREATE TABLE "inp_flwreg_pump" (
+"id" serial NOT NULL PRIMARY KEY,
+"node_id" varchar(16) NOT NULL,
+"flwreg_id" int2
+"power" varchar  ,
+"curve_id" varchar  ,
+"speed" numeric(12,6),
+"pattern" varchar  ,
+"status" varchar(12),
+"to_arc" varchar(16)
+);
+
 
 
 -- ----------------------------

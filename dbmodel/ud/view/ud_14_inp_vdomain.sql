@@ -14,6 +14,17 @@ INSERT INTO inp_options VALUES ('CMS', 'DYNWAVE', 'DEPTH', 'H-W', 'NO', 'NO', 'N
 
 
 -- ----------------------------
+-- Records of inp_flow_regulator_type
+-- ----------------------------
+
+INSERT INTO inp_flow_regulator_type VALUES ('WEIR', 'inp_flreg_weir');
+INSERT INTO inp_flow_regulator_type VALUES ('ORIFICE', 'inp_flreg_orifice');
+INSERT INTO inp_flow_regulator_type VALUES ('OUTLET', 'inp_flreg_outlet');
+INSERT INTO inp_flow_regulator_type VALUES ('PUMP', 'inp_flreg_pump');
+
+
+
+-- ----------------------------
 -- Records of inp_report
 -- ----------------------------
  
