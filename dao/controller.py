@@ -147,14 +147,14 @@ class DaoController():
     def show_info(self, text, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.show_message(text, 0, duration, context_name)
-        QMessageBox.information(None, 'Info', str(text))
+        #self.show_message(text, 0, duration, context_name)
+        QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
     def show_warning(self, text, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.show_message(text, 1, duration, context_name)
-        QMessageBox.warning(None, 'Warning', str(text))
+        #self.show_message(text, 1, duration, context_name)
+        QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
 
     def show_warning_detail(self, text, detail_text, context_name=None):
         ''' Show warning message with a button to show more details '''  

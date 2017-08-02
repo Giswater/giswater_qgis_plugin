@@ -3373,8 +3373,15 @@
     <message>
         <source>Any table has been selected</source>
         <translation>Any table has been selected</translation>
-    </message>   
-
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>Info</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Warning</translation>
+    </message>
 
 </context>
 

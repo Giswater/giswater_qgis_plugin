@@ -3280,7 +3280,7 @@
     </message>
     <message>
         <source>Values has been updated</source>
-        <translation>Values has been updated</translation>
+        <translation>Valors actualitzats</translation>
     </message>
     <message>
         <source>You have to select at least one feature!</source>
@@ -3369,6 +3369,14 @@
     <message>
         <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
         <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>Informació</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Advertència</translation>
     </message>
    
 
