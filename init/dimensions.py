@@ -139,9 +139,9 @@ class Dimensions(ParentDialog):
         #layer = self.iface.activeLayer()
         layer.startEditing()
         
-        node_group = ["Junction","Valve","Reduction","Tank","Meter","Manhole","Source"]
+        node_group = ["Junction","Valve","Reduction","Tank","Meter","Manhole","Source","Hydrant"]
         connec_group = ["Wjoin","Fountain"]
-        arc_group = ["Pipe"]
+        
         self.canvas=self.iface.mapCanvas()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
@@ -160,23 +160,22 @@ class Dimensions(ParentDialog):
             for snapPoint in result:
                 
                 element_type = snapPoint.layer.name()
+                message = str(element_type)
+                self.controller.show_info(message, context_name='ui_message' )
                 
                 if element_type in node_group:
                     feat_type = 'node'
                 if element_type in connec_group:
                     feat_type = 'connec'
-                if element_type in arc_group:
-                    feat_type = 'arc'
-                
                         
                 # Get the point
-                point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                point = QgsPoint(snapPoint.snappedVertex)   #@UnusedVariable
+                snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
                 feature = snappFeat
                 element_id = feature.attribute(feat_type+'_id')
  
                 # LEAVE SELECTION
-                result[0].layer.select([result[0].snappedAtGeometry])
+                snapPoint.layer.select([snapPoint.snappedAtGeometry])
            
                 # Get depth of feature
                 sql = "SELECT depth FROM "+self.schema_name+"."+feat_type+" WHERE "+feat_type+"_id = '"+element_id+"'"  
@@ -192,49 +191,16 @@ class Dimensions(ParentDialog):
                 
                 # Reset snapping
                 point = []
-                break
+                #break
                         
-    '''                 
-    def canvasMoveEvent(self,point):
-        #message = str(point)
-        #self.controller.show_info(message, context_name='ui_message' )
-        
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        eventPoint = QPoint(x, y)
-
-        
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
-          
-        #message = str(result)
-        #self.controller.show_info(message, context_name='ui_message' )        
-        # That's the snapped point
-        if result <> []:
-
-            # Check feature
-            for snapPoint in result:
-                        
-                # Get the point
-                point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                feature = snappFeat
-                element_id = feature.attribute('reduction_depth')
-                message = str(element_id)
-                self.controller.show_info(message, context_name='ui_message' )
-    '''
-    
     
     def createMapTips( self ):
         ''' Create MapTips on the map '''
         
         self.timerMapTips = QTimer( self.canvas )
         self.mapTip = QgsMapTip()
-        self.canvas.connect( self.canvas, SIGNAL( "xyCoordinates(const QgsPoint&)" ),
-            self.mapTipXYChanged )
-        self.canvas.connect( self.timerMapTips, SIGNAL( "timeout()" ),
-            self.showMapTip )
+        self.canvas.connect( self.canvas, SIGNAL( "xyCoordinates(const QgsPoint&)" ), self.mapTipXYChanged )
+        self.canvas.connect( self.timerMapTips, SIGNAL( "timeout()" ),self.showMapTip )
 
             
     def mapTipXYChanged( self, p ):
@@ -252,12 +218,14 @@ class Dimensions(ParentDialog):
         
         self.timerMapTips.stop()
         
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
+        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
+        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")[0]
 
         if self.canvas.underMouse(): 
             # Here you could check if your custom MapTips button is active or sth
             pointQgs = self.lastMapPosition
             pointQt = self.canvas.mouseLastXY()
-            self.mapTip.showMapTip( layer, pointQgs, pointQt, self.canvas )
+            self.mapTip.showMapTip( layer_node, pointQgs, pointQt, self.canvas )
+            self.mapTip.showMapTip( layer_connec, pointQgs, pointQt, self.canvas )
       
   

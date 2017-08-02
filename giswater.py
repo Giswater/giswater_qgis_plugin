@@ -630,6 +630,7 @@ class Giswater(QObject):
         self.layer_man_pgully = None
         
         self.layer_version = None
+        self.layer_dimensions = None
         #exists_version = False
         #exists_man_junction = False
 
@@ -729,6 +730,9 @@ class Giswater(QObject):
                     self.layer_arc_man_WS.append(cur_layer)
                 if 'v_edit_man_varc' == uri_table:
                     self.layer_arc_man_WS.append(cur_layer)
+                    
+                if 'v_edit_dimensions' == uri_table:
+                    self.layer_dimensions = cur_layer
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
@@ -843,6 +847,9 @@ class Giswater(QObject):
                 self.set_layer_custom_form(self.layer_gully, 'gully')
             if self.layer_man_pgully is not None:       
                 self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
+            
+            # Set cstom for layer dimensions 
+            self.set_layer_custom_form_dimensions(self.layer_dimensions)     
 
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
@@ -880,6 +887,26 @@ class Giswater(QObject):
         layer.editFormConfig().setInitFilePath(file_init)           
         layer.editFormConfig().setInitFunction(name_function) 
         
+        
+    def set_layer_custom_form_dimensions(self, layer):
+ 
+        name_ui = 'dimensions.ui'
+        name_init = 'dimensions.py'
+        name_function = 'formOpen'
+        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
+        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
+        layer.editFormConfig().setUiForm(file_ui) 
+        layer.editFormConfig().setInitCodeSource(1)
+        layer.editFormConfig().setInitFilePath(file_init)           
+        layer.editFormConfig().setInitFunction(name_function)
+        
+        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
+        layer_node.setDisplayField('[% "depth" %]')
+        
+        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")[0]
+        layer_connec.setDisplayField('[% "depth" %]')
+
+
     
     def set_map_tool(self, map_tool_name):
         ''' Set objects for map tools classes '''  
