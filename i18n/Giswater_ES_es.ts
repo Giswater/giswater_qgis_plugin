@@ -5,7 +5,7 @@
 
 <context>
 
-     <name>giswater</name>
+    <name>giswater</name>
     
     <message>
         <source>menu_name</source>
@@ -79,15 +79,15 @@
     </message>   
     <message>
         <source>16_text</source>
-        <translation>Moure node  partint arc</translation>
+        <translation>Move unconnected node to split a pipe</translation>
     </message>      
     <message>
         <source>17_text</source>
-        <translation>Esborrar node dins arc</translation>
+        <translation>Delete node in pipe midpoint</translation>
     </message>      
     <message>
         <source>18_text</source>
-        <translation>Capturar cota raster</translation>
+        <translation>Capture raster elevation</translation>
     </message>      
     <message>
         <source>19_text</source>
@@ -95,11 +95,11 @@
     </message>      
     <message>
         <source>20_text</source>
-        <translation>Escomeses</translation>
+        <translation>Connec tool</translation>
     </message>      
     <message>
         <source>21_text</source>
-        <translation>Importar CSV</translation>
+        <translation>Import CSV</translation>
     </message>      
     <message>
         <source>22_text</source>
@@ -115,23 +115,23 @@
     </message>      
     <message>
         <source>25_text</source>
-        <translation>Selector resultats</translation>
+        <translation>Result selector</translation>
     </message>      
     <message>
         <source>26_text</source>
-        <translation>Tancament</translation>
+        <translation>Arc/Node minimum cut</translation>
     </message>
     <message>
         <source>27_text</source>
-        <translation>Ajust de tancament</translation>
+        <translation>Valves configuration analysis</translation>
     </message>
     <message>
         <source>56_text</source>
-        <translation>Anàlisis aigües amunt</translation>
+        <translation>Select upstream nodes</translation>
     </message>
     <message>
         <source>57_text</source>
-        <translation>Anàlisis aigües avall</translation>
+        <translation>Select downstream nodes</translation>
     </message>
     <message>
         <source>28_text</source>
@@ -147,19 +147,19 @@
     </message> 
     <message>
         <source>32_text</source>
-        <translation>Cercador</translation>
+        <translation>Search plus</translation>
     </message> 
     <message>
         <source>33_text</source>
-        <translation>Afegir element</translation>
+        <translation>Add element</translation>
     </message> 
     <message>
         <source>34_text</source>
-        <translation>Afegir fitxer</translation>
+        <translation>Add file</translation>
     </message> 
     <message>
         <source>35_text</source>
-        <translation>Afegir event</translation>
+        <translation>Event</translation>
     </message>
 	<message>
         <source>36_text</source>
@@ -171,7 +171,7 @@
     </message>    	
 	<message>
         <source>99_text</source>
-        <translation>Configuració</translation>
+        <translation>Project configuration</translation>
     </message>   
     
 	<message>
@@ -3280,7 +3280,7 @@
     </message>
     <message>
         <source>Values has been updated</source>
-        <translation>Values has been updated</translation>
+        <translation>Valores actualizados</translation>
     </message>
     <message>
         <source>You have to select at least one feature!</source>
@@ -3370,8 +3370,14 @@
         <source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
         <translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
     </message>
-   
-
+    <message>
+        <source>Info</source>
+        <translation>Información</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Advertencia</translation>
+    </message>
 
 </context>
 
