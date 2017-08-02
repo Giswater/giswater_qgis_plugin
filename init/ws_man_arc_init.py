@@ -139,6 +139,7 @@ class ManArcDialog(ParentDialog):
 
         
     def catalog(self):
+    
         self.dlg_cat = WScatalog()
         utils_giswater.setDialog(self.dlg_cat)
         self.dlg_cat.open()
@@ -251,7 +252,6 @@ class ManArcDialog(ParentDialog):
 
     def actionZoom(self):
 
-        print "zoom"
         feature = self.feature
 
         canvas = self.iface.mapCanvas()
@@ -275,7 +275,7 @@ class ManArcDialog(ParentDialog):
 
         # initialize plugin directory
         user_folder = os.path.expanduser("~")
-        self.plugin_name = 'iw2pg'
+        self.plugin_name = 'giswater'
         self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
 
         self.layer = self.iface.activeLayer()
@@ -552,7 +552,7 @@ class ManArcDialog(ParentDialog):
         
         # Get name of selected layer 
         selected_layer = self.layer.name()
-        #widget = "pipe_node_"+str(idx) 
+        # widget = "pipe_node_"+str(idx) 
         selected_layer = self.layer.name()
         widget = str(selected_layer.lower())+"_node_"+str(idx)  
   
@@ -573,11 +573,6 @@ class ManArcDialog(ParentDialog):
         row = self.dao.get_rows(sql)
         numrows = len(row)
         
-        '''
-        for l in row:
-            nodes.append(str(l[0]))
-        '''
-      
         for i in range(0,len(nodes)):
             layer = QgsMapLayerRegistry.instance().mapLayersByName( nodes[i] )[0]
             # Get a featureIterator from this expression:

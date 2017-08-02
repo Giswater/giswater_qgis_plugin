@@ -158,16 +158,23 @@ class ManNodeDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog,'node'))
 
+        feature = self.feature
+        canvas = self.iface.mapCanvas()
+        # Get the active layer (must be a vector layer)
+        layer = self.iface.activeLayer()
+        
+        action = self.dialog.findChild(QAction, "actionEnable")
 
         # Toolbar actions
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.actionZoom,feature,canvas,layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.actionCentered,feature,canvas,layer))
+        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.actionEnabled,action,layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.actionZoomOut,feature,canvas,layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.actionRotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.actionCopyPaste)
+        
 
         # QLineEdit
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
@@ -177,183 +184,9 @@ class ManNodeDialog(ParentDialog):
         # Event
         #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
         #self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
-
-    def actionZoomOut(self):
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomOut()
         
-        
-    def actionZoom(self):
-       
-        feature = self.feature
 
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
     
-    
-    def actionEnabled(self):
-        #btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
-        self.actionEnable = self.dialog.findChild(QAction, "actionEnable")
-        status = self.layer.startEditing()
-        self.set_icon(self.actionEnable, status)
-
-
-    def set_icon(self, widget, status):
-
-        # initialize plugin directory
-        user_folder = os.path.expanduser("~")
-        self.plugin_name = 'iw2pg'
-        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
-
-        self.layer = self.iface.activeLayer()
-        if status == True:
-
-            self.layer.startEditing()
-
-            widget.setActive(True)
-
-        if status == False:
-            self.layer.rollBack()
-
-            
-    def actionCentered(self):
-        feature = self.feature
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        
-        
-
-    def catalog(self):
-    
-        self.dlg_cat=WScatalog()
-        utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-
-        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtnodecat_id)
-        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
-
-        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
-        self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")
-        self.dnom = self.dlg_cat.findChild(QComboBox, "dnom")
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxpnom)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxdnom)
-
-        self.pnom.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.pnom.currentIndexChanged.connect(self.fillCbxdnom)
-
-        self.dnom.currentIndexChanged.connect(self.fillCbxCatalod_id)
-
-
-        self.matcat_id.clear()
-        self.pnom.clear()
-        self.dnom.clear()
-
-        node_type = self.node_type.currentText()
-        sql= "SELECT DISTINCT(matcat_id) FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "'"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
-
-
-        sql= "SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "'"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
-
-        #SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x FROM ws_sample_dev.cat_node ORDER BY x
-        sql = "SELECT dnom FROM  (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM ws_sample_dev.cat_node ORDER BY x)as dnom"
-        #sql= "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='"+node_type+ "' ORDER BY split_part(dnom,'-', 1)::int"
-        #sql = "SELECT dnom FROM ws_sample_dev.cat_node WHERE nodetype_id='" + node_type + "' ORDER BY dint"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
-
-
-    def fillCbxpnom(self,index):
-        if index == -1:
-            return
-
-        nodetype = self.node_type.currentText()
-        mats=self.matcat_id.currentText()
-
-        sql="SELECT DISTINCT(pnom) FROM ws_sample_dev.cat_node"
-        if(str(nodetype)!= ""):
-            sql += " WHERE nodetype_id='"+nodetype+"'"
-        if (str(mats)!=""):
-            sql += " and matcat_id='"+str(mats)+"'"
-        rows = self.controller.get_rows(sql)
-        self.pnom.clear()
-        utils_giswater.fillComboBox(self.pnom, rows)
-        self.fillCbxdnom()
-
-        
-    def fillCbxdnom(self,index):
-        if index == -1:
-            return
-
-        nodetype = self.node_type.currentText()
-        mats=self.matcat_id.currentText()
-        pnom=self.pnom.currentText()
-        sql="SELECT dnom FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM ws_sample_dev.cat_node"
-        if(str(nodetype)!= ""):
-            sql += " WHERE nodetype_id='"+nodetype+"'"
-        if (str(mats)!=""):
-            sql += " and matcat_id='"+str(mats)+"'"
-        if(str(pnom)!= ""):
-            sql +=" and pnom='"+str(pnom)+"'"
-        sql +=" ORDER BY x) as dnom"
-        rows = self.controller.get_rows(sql)
-        self.dnom.clear()
-        utils_giswater.fillComboBox(self.dnom, rows)
-
-        
-    def fillCbxCatalod_id(self,index):    #@UnusedVariable
-
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-
-        if self.id!='null':
-            nodetype = self.node_type.currentText()
-            mats = self.matcat_id.currentText()
-            pnom = self.pnom.currentText()
-            dnom = self.dnom.currentText()
-            sql = "SELECT DISTINCT(id) as id FROM ws_sample_dev.cat_node"
-            if(str(nodetype)!= ""):
-                sql += " WHERE nodetype_id='"+nodetype+"'"
-            if (str(mats)!=""):
-                sql += " and matcat_id='"+str(mats)+"'"
-            if (str(pnom) != ""):
-                sql += " and pnom='"+str(pnom)+"'"
-            if (str(dnom) != ""):
-                sql += " and dnom='" + str(dnom) + "'"
-            sql += " ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            self.id.clear()
-            utils_giswater.fillComboBox(self.id, rows)
-
-
-    def fillTxtnodecat_id(self):
-        self.dlg_cat.close()
-        self.nodecat_id.clear()
-        self.nodecat_id.setText(str(self.id.currentText()))
              
         
     def open_selected_event_from_table(self):
@@ -515,9 +348,7 @@ class ManNodeDialog(ParentDialog):
         
     def zoom_img(self,i):
 
-        #myButton.clicked.disconnect(function_B) #this disconnect function_B
-        #self.list_labels[i].disconnect( partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
-        
+            
         handelerIndex=i    
         
         self.dlg_gallery_zoom = GalleryZoom()
@@ -653,9 +484,7 @@ class ManNodeDialog(ParentDialog):
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message' )
         
-        
-        
-        
+             
     def actionCopyPaste(self):
         
         # Activate snapping
@@ -667,7 +496,6 @@ class ManNodeDialog(ParentDialog):
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         
         QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
- 
       
       
     def clickButtonSnapping(self,point,btn):
@@ -708,9 +536,7 @@ class ManNodeDialog(ParentDialog):
                     snapPoint.layer.select([snapPoint.snappedAtGeometry])
 
                     break
-                    
-        
-        
+
         # Copy
         layer = self.iface.activeLayer()
 
@@ -718,10 +544,6 @@ class ManNodeDialog(ParentDialog):
         # Fields of attribute table
         fields = provider.fields()
         #for field in fields:
-        #    message = str(field.name())
-        #    self.controller.show_info(message, context_name='ui_message' )
-         
-
         
         # Get feature for the form 
         # Get pointer of node by ID
@@ -771,8 +593,4 @@ class ManNodeDialog(ParentDialog):
                 #self.canvas.refresh()
                 #self.iface.refresh()
                 
-            # Get attributes
-            #x = id_list[0].attributes()
-                #self.dialog.exec_()
-                message = "test"
-                self.controller.show_warning(message, context_name='ui_message' )
+
