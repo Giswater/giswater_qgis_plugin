@@ -41,9 +41,9 @@
    <widget class="QPushButton" name="btn_delete">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>560</x>
       <y>40</y>
-      <width>101</width>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -59,6 +59,19 @@
       <width>191</width>
       <height>20</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_delete_2">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>40</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Current Psector</string>
     </property>
    </widget>
   </widget>
