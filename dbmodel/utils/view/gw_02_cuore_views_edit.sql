@@ -153,7 +153,7 @@ CREATE VIEW v_edit_element AS SELECT
 	buildercat_id,
 	builtdate,
 	ownercat_id,
-	enddate AS end_date,
+	enddate AS enddate,
 	rotation,
 	link,
 	verified,

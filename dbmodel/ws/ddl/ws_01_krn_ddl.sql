@@ -34,8 +34,6 @@ CREATE TABLE "cat_mat_arc" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 CONSTRAINT cat_mat_arc_pkey PRIMARY KEY (id)
 );
 
@@ -43,8 +41,6 @@ CREATE TABLE "cat_mat_node" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 );
 
@@ -59,10 +55,7 @@ CREATE TABLE "cat_arc" (
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
 "brand" varchar(30)  ,
-"type" varchar(30)  ,
 "model" varchar(30)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 "svg" varchar(50)  ,
 "z1" numeric (12,2),
 "z2" numeric (12,2),
@@ -86,14 +79,12 @@ CREATE TABLE "cat_node" (
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
 "dint" numeric(12,5),
-"geometry" varchar(30)  ,
+"dext" numeric(12,5),
+"shape" character varying(50),
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
 "brand" varchar(30)  ,
-"type" varchar(30)  ,
 "model" varchar(30)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 "svg" varchar(50)  ,
 "estimated_depth" numeric (12,2),
 "cost_unit" varchar (3),
@@ -107,46 +98,56 @@ CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
 "connectype_id" varchar(18)  ,
 "matcat_id" varchar(16)  ,
-"brand" varchar(30)  ,
-"type" varchar(30)  ,
-"model" varchar(30)  ,
 "pnom" varchar(16)  ,
 "dnom" varchar(16)  ,
-"geometry" varchar(30)  ,
+"dint" numeric(12,5),
+"dext" numeric(12,5),
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
 "brand" varchar(30)  ,
-"type" varchar(30)  ,
 "model" varchar(30)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 "svg" varchar(50),
 "active" boolean,
 CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 );
-
 
  
  CREATE TABLE "cat_presszone" (
 "id" varchar (30),
 "descript" text,
 "link" varchar(512)  ,
-"picture" varchar(512),
  CONSTRAINT cat_presszone_pkey PRIMARY KEY (id)
  );
 
- 
 
 
 -- ----------------------------
 -- Table: GIS features
 -- ----------------------------
 
+CREATE TABLE macrodma(
+macrodma_id integer NOT NULL PRIMARY KEY,
+name character varying(50)NOT NULL,
+expl_id integer NOT NULL,
+descript character varying(100),
+undelete boolean,
+the_geom geometry(POLYGON,SRID_VALUE)
+);
+
 CREATE TABLE "dma" (
 "dma_id" integer NOT NULL PRIMARY KEY,
-"short_descript" character varying(30)NOT NULL,
+"name" character varying(30)NOT NULL,
+"expl_id" integer NOT NULL,
 "macrodma_id" integer NOT NULL,
-"presszonecat_id" varchar(30),
+"descript" text,
+"undelete" boolean,
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+);
+
+
+CREATE TABLE "sector" (
+"sector_id" integer NOT NULL PRIMARY KEY,
+"name" character varying(50)NOT NULL,
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
@@ -158,21 +159,25 @@ CREATE TABLE "node" (
 "code" varchar (30) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
-"nodecat_id" varchar(30) NOT NULL,,
-"epa_type" varchar(16) NOT NULL,,
+"nodecat_id" varchar(30) NOT NULL,
+"epa_type" varchar(16) NOT NULL,
 "sector_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "annotation" text,
 "observ" text,
+"comment" text,
 "dma_id" integer NOT NULL,
+"presszonecat_id" varchar(30),
 "soilcat_id" varchar(30)  ,
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
 "fluid_type" varchar(50)  ,
 "location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
+"workcat_id_end" character varying(255),
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
+"enddate" date,
 "ownercat_id" varchar(30)  ,
 "address_01" varchar(50)  ,
 "address_02" varchar(50)  ,
@@ -183,11 +188,13 @@ CREATE TABLE "node" (
 "rotation" numeric (6,3),
 "the_geom" public.geometry (POINT, SRID_VALUE) NOT NULL,,
 "undelete" boolean,
-"workcat_id_end" character varying(255)
 "label_x" character varying(30),
 "label_y" character varying(30),
 "label_rotation" numeric(6,3),
+"publish" boolean,
+"inventory" boolean,
 "hemisphere" float,
+"expl_id" integer,
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -203,16 +210,20 @@ CREATE TABLE "arc" (
 "state" int2  NOT NULL,,
 "annotation" text,
 "observ" text,
+"comment" text,
 "custom_length" numeric (12,2),
-"dma_id" integer NOT NULL,		
+"dma_id" integer NOT NULL,	
+"presszonecat_id" varchar(30),	
 "soilcat_id" varchar(30)  ,
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
 "fluid_type" varchar(50)  ,
 "location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
+"workcat_id_end" character varying(255),
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
+"enddate" date,
 "ownercat_id" varchar(30)  ,
 "address_01" varchar(50)  ,
 "address_02" varchar(50)  ,
@@ -222,13 +233,12 @@ CREATE TABLE "arc" (
 "verified" varchar(30)  ,
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)  NOT NULL,,
 "undelete" boolean,
-"workcat_id_end" character varying(255),
-"end_date" date,
 "label_x" character varying(30),
 "label_y" character varying(30),
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
+"expl_id" integer,
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -239,25 +249,27 @@ CREATE TABLE "connec" (
 "code" varchar (30) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
-"connec_type" character varying(30),
 "connecat_id" varchar(30) NOT NULL,
 "sector_id" integer NOT NULL,
-"crm_code" varchar(30),
-"n_hydrometer" int4,
-"state" int2 NOT NULL
+"customer_code" varchar(30),
+"state" int2 NOT NULL,
+"connec_arccat_id" varchar(18)  ,
+"connec_length" numeric(12,3),
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"rotation" numeric (6,3),
 "dma_id" integer NOT NULL,
+"presszonecat_id" varchar(30),
 "soilcat_id" varchar(16),
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
 "fluid_type" varchar(50)  ,
 "location_type" varchar(50)  ,
 "workcat_id" varchar(255)  ,
+"workcat_id_end" character varying(255),
 "buildercat_id" varchar(30)  ,
 "builtdate" date ,
+"enddate" date,
 "ownercat_id" varchar(30)  ,
 "address_01" varchar(50)  ,
 "address_02" varchar(50)  ,
@@ -267,15 +279,15 @@ CREATE TABLE "connec" (
 "descript" varchar(254)  ,
 "link" character varying(512),
 "verified" varchar(20)  ,
+"rotation" numeric (6,3),
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
-"workcat_id_end" character varying(255),
-"end_date" date,
 "label_x" character varying(30),
 "label_y" character varying(30),
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
+"expl_id" integer,
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -287,6 +299,7 @@ CREATE TABLE "pond"(
 "dma_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "the_geom" geometry(Point,SRID_VALUE),
+"expl_id" integer,
 CONSTRAINT man_pond_pkey PRIMARY KEY (pond_id)
 );
 
@@ -297,6 +310,7 @@ CREATE TABLE "pool"(
 "dma_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "the_geom" geometry(Point,SRID_VALUE),
+"expl_id" integer,
 CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
   );
   
@@ -309,42 +323,35 @@ CONSTRAINT man_pool_pkey PRIMARY KEY (pool_id)
 -- -----------------------------------
 
 CREATE TABLE "man_junction" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
+"node_id" varchar(16) PRIMARY KEY
 );
 
 
 CREATE TABLE "man_tank" (
-"node_id" varchar(16)   NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "pol_id" varchar(16),
 "vmax" numeric (12,4),
+"vutil" numeric (12,4),
 "area" numeric (12,4),
-"add_info" varchar(255),
 "chlorination" character varying(255),
 "function" character varying(255),
-CONSTRAINT man_tank_pkey PRIMARY KEY (node_id)
+"name" varchar (50)
 );
 
 
 CREATE TABLE "man_hydrant" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
+"fire_code" varchar(30) NOT NULL,
 "communication" character varying(254),
 "valve" character varying(100),
 "valve_diam" numeric(12,3),
-"distance_left" numeric(12,3),
-"distance_right" numeric(12,3),
-"distance_perpendicular" numeric(12,3),
 "location" character varying(254),
-"location_sign" character varying(254),
 CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_valve" (
 "node_id" varchar(16) NOT NULL,
-"type" varchar(18),
 "opened" boolean DEFAULT true,
 "broken" boolean DEFAULT true,
 "buried" character varying(16),
@@ -359,9 +366,7 @@ CREATE TABLE "man_valve" (
 "exit_type" character varying(100),
 "exit_code" integer,
 "drive_type" character varying(100),
-"location" character varying(254),
 "valve_diam" numeric(12,3),
-"valve" character varying(30),
 "cat_valve2" character varying(30),
 "arc_id" character varying(16),
 CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
@@ -371,64 +376,108 @@ CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_pump" (
 "node_id" varchar(16) NOT NULL,
-"flow" numeric(12,4),
+"max_flow" numeric(12,4),
+"min_flow" numeric(12,4),
+"nom_flow" numeric(12,4),
 "power" numeric(12,4),
+"pressure" numeric(12,4),
 "elev_height" numeric(12,4),
-"add_info" varchar(255),
+"name" varchar (50),
 CONSTRAINT man_pump_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_filter" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 CONSTRAINT man_filter_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_meter" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 CONSTRAINT man_meter_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_pipe" (
 "arc_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 CONSTRAINT man_pipe_pkey PRIMARY KEY (arc_id)
 );
 
   CREATE TABLE "man_manhole"(
 "node_id" character varying(16) NOT NULL,
-"add_info" character varying(255),
+"name" varchar (50),
 CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id)
 );
 
 CREATE TABLE "man_reduction"(
 "node_id" character varying(16) NOT NULL,
-"diam_initial" numeric(12,3),
-"diam_final" numeric(12,3),
-"add_info" character varying(255),
+"diam1" numeric(12,3),
+"diam2" numeric(12,3),
 CONSTRAINT man_reduction_pkey PRIMARY KEY (node_id)
   );
 
 CREATE TABLE "man_source"(
 "node_id" character varying(16) NOT NULL,
-"add_info" character varying(255),
-  CONSTRAINT man_source_pkey PRIMARY KEY (node_id)
+"name" varchar (50),
+CONSTRAINT man_source_pkey PRIMARY KEY (node_id)
   );
   
 CREATE TABLE "man_waterwell"(
 "node_id" character varying(16) NOT NULL,
-"add_info" character varying(255),
+"name" varchar (50),
 CONSTRAINT man_waterwell_pkey PRIMARY KEY (node_id)
 );
 
 
+CREATE TABLE "man_register" (
+"node_id" varchar(16) NOT NULL,
+"pol_id" varchar(16),
+CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_netwjoin" (
+"node_id" varchar(16) NOT NULL,
+"streetaxis_id" character varying(16),
+"postnumber" character varying(16),
+"top_floor" integer,
+"cat_valve" character varying(30),
+CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_expansiontank" (
+"node_id" varchar(16) NOT NULL PRIMARY KEY
+);
+
+
+CREATE TABLE "man_flexunion" (
+"node_id" varchar(16) NOT NULL PRIMARY KEY
+);
+
+
+CREATE TABLE "man_netsamplepoint"(
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
+"lab_code" character varying(30)
+); 
+
+
+CREATE TABLE "man_netelement"(
+"node_id" varchar(16) NOT NULL PRIMARY KEY
+); 
+
+
+CREATE TABLE "man_varc" (
+"arc_id" varchar(16) NOT NULL,
+CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
+);
+
+
+
 CREATE TABLE "man_fountain"(
 "connec_id" character varying(16) NOT NULL,
-"pol_id" character varying(16)
+"pol_id" character varying(16),
 "linked_connec" character varying(16),
 "vmax" numeric(12,3),
 "vtotal" numeric(12,3),
@@ -436,18 +485,16 @@ CREATE TABLE "man_fountain"(
 "pump_number" integer,
 "power" numeric(12,3),
 "regulation_tank" character varying(150),
-"name" character varying(254),
 "connection" character varying(100),
 "chlorinator" character varying(100),
-"add_info" varchar(255),
-  CONSTRAINT man_fountain_pkey PRIMARY KEY (connec_id)
+"name" character varying(254),
+ CONSTRAINT man_fountain_pkey PRIMARY KEY (connec_id)
  );
   
   
-  CREATE TABLE "man_greentap"(
+ CREATE TABLE "man_greentap"(
 "connec_id" character varying(16) NOT NULL,
 "linked_connec" character varying(16),
-"add_info" character varying(255),
 CONSTRAINT man_greentap_pkey PRIMARY KEY (connec_id)
  );
   
@@ -455,92 +502,25 @@ CONSTRAINT man_greentap_pkey PRIMARY KEY (connec_id)
 CREATE TABLE "man_tap"(
 "connec_id" character varying(16) NOT NULL,
 "linked_connec" character varying(16)
-"type" character varying(100),
-"connection" character varying(100),
-"continous" character varying(100),
-"shutvalve_type" character varying(100),
-"shutvalve_diam" numeric(12,3),
-"shutvalve_number" character varying(100),
+"cat_valve" character varying(30),
 "drain_diam" numeric(12,3),
 "drain_exit" character varying(100),
 "drain_gully" character varying(100),
 "drain_distance" numeric(12,3),
-"arquitect_patrimony" character varying(254),
-"communication" character varying(254),
-"cat_valve2" character varying(30),
-"add_info" varchar(255),
+"arq_patrimony" boolean,
+"com_state" character varying(254),
 CONSTRAINT man_tap_pkey PRIMARY KEY (connec_id)
 );
   
-  CREATE TABLE "man_wjoin"(
+  
+CREATE TABLE "man_wjoin"(
 "connec_id" character varying(16) NOT NULL,
-"arc_id" character varying(16),
-"zone" integer,
-"length" numeric(12,3),
 "top_floor" integer,
-"lead_verified" date,
-"lead_facade" character varying(254),
-"cat_valve2" character varying(30),
-"add_info" varchar(255),
+"cat_valve" character varying(30),
 CONSTRAINT man_wjoin_pkey PRIMARY KEY (connec_id)
 );
 
 
-CREATE TABLE "man_register" (
-"node_id" varchar(16) NOT NULL,
-"pol_id" varchar(16),
-"add_info" varchar(255),
-CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_netwjoin" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-"demand numeric"(12,8),
-"streetaxis_id" character varying(16),
-"postnumber" character varying(16),
-"top_floor" integer,
-"lead_verified" date,
-"lead_facade" character varying(254),
-"cat_valve2" character varying(30),
-"add_info" varchar(255),
-CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_expansiontank" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_expansiontank_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_flexunion" (
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_flexunion_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "man_netsamplepoint"(
-"node_id" varchar(16) NOT NULL,
-"code_lab" character varying(30),
-"add_info" varchar(255)
-); 
-
-
-CREATE TABLE "man_netelement"(
-"node_id" varchar(16) NOT NULL,
-"add_info" varchar(255)
-); 
-
-
-CREATE TABLE "man_varc" (
-"arc_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
-);
  
  
 -- ----------------------------------

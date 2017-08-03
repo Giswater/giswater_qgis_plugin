@@ -114,12 +114,12 @@ BEGIN
     
         -- FEATURE INSERT
     		INSERT INTO arc (arc_id, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, soilcat_id, category_type, fluid_type, location_type,
-					workcat_id, buildercat_id, builtdate,ownercat_id, adress_01,adress_02,adress_03,descript,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
-					publish, inventory, end_date, expl_id)
+					workcat_id, buildercat_id, builtdate,ownercat_id, address_01,address_02,address_03,descript,link,verified,the_geom,undelete,workcat_id_end,label_x,label_y,label_rotation, 
+					publish, inventory, enddate, expl_id)
 					VALUES (NEW.arc_id, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id,NEW.soilcat_id, 
-					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.adress_01, NEW.adress_02, NEW.adress_03, 
+					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, 
 					NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.workcat_id_end, NEW.label_x,NEW.label_y,NEW.label_rotation, 
-					NEW.publish, NEW.inventory, NEW.end_date, expl_id_int);
+					NEW.publish, NEW.inventory, NEW.enddate, expl_id_int);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'PIPE') THEN 
@@ -163,9 +163,9 @@ UPDATE arc
 			SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, annotation= NEW.annotation, "observ"=NEW.observ, 
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
 				location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,
-				ownercat_id=NEW.ownercat_id, adress_01=NEW.adress_01, adress_02=NEW.adress_02, adress_03=NEW.adress_03, descript=NEW.descript,
+				ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
 				link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end,undelete=NEW.undelete, label_x=NEW.label_x,
-				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.end_date
+				label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate
 			WHERE arc_id=OLD.arc_id;
 
         --PERFORM audit_function(2,340); 

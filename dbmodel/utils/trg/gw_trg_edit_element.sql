@@ -54,7 +54,7 @@ BEGIN
 
 				INSERT INTO element (element_id, elementcat_id, state, annotation, observ, comment, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, enddate, rotation, link, verified, workcat_id_end, code, 
 				the_geom, expl_id)
-				VALUES (NEW.element_id, NEW.elementcat_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, NEW.end_date, 
+				VALUES (NEW.element_id, NEW.elementcat_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, NEW.enddate, 
 				NEW.rotation, NEW.link, NEW.verified, NEW.workcat_id_end, NEW.code, NEW.the_geom, expl_id_int);
 		
 	
@@ -68,7 +68,7 @@ BEGIN
 
 		UPDATE element
 		SET element_id=NEW.element_id, elementcat_id=NEW.elementcat_id, state=NEW.state, annotation=NEW.annotation, observ=NEW.observ, comment=NEW.comment, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
-		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, ownercat_id=NEW.ownercat_id, enddate=NEW.end_date, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, workcat_id_end=NEW.workcat_id_end, 
+		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, ownercat_id=NEW.ownercat_id, enddate=NEW.enddate, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, workcat_id_end=NEW.workcat_id_end, 
 		code=NEW.code, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 		WHERE element_id=OLD.element_id;
 
