@@ -22,8 +22,9 @@ import webbrowser
 import utils_giswater
 from dao.controller import DaoController
 from init.add_sum import Add_sum          #@UnresolvedImport
+from ui.ws_catalog import WScatalog                  # @UnresolvedImport
         
-        
+
 class ParentDialog(object):   
     
     def __init__(self, dialog, layer, feature):
@@ -827,3 +828,150 @@ class ParentDialog(object):
             else :
                 self.tab_main.removeTab(4)  
     
+    
+    def actionCentered(self,feature,canvas,layer):
+        
+        layer.setSelectedFeatures([feature.id()])
+        canvas.zoomToSelected(layer)
+        
+    
+    def actionZoom(self,feature,canvas,layer):
+        
+        layer.setSelectedFeatures([feature.id()])
+        canvas.zoomToSelected(layer)
+        canvas.zoomIn()  
+
+
+    def actionZoomOut(self,feature,canvas,layer):
+
+        layer.setSelectedFeatures([feature.id()])
+        canvas.zoomToSelected(layer)
+        canvas.zoomOut()
+        
+      
+    def actionEnabled(self,action,layer):
+        
+        status = layer.startEditing()
+        self.change_status(action, status,layer)
+
+
+    def change_status(self, action, status,layer):
+
+        if status == True:
+            layer.startEditing()
+            action.setActive(True)
+
+        if status == False:
+            layer.rollBack()
+
+            
+    def catalog(self,type):
+
+        self.dlg_cat = WScatalog()
+        utils_giswater.setDialog(self.dlg_cat)
+        self.dlg_cat.open()
+        
+        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(partial(self.fillTxtnodecat_id,type))
+        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
+
+        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
+        self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")
+        self.dnom = self.dlg_cat.findChild(QComboBox, "dnom")
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxCatalod_id,type))
+        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxpnom,type))
+        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxdnom,type))
+
+        self.pnom.currentIndexChanged.connect(partial(self.fillCbxCatalod_id,type))
+        self.pnom.currentIndexChanged.connect(partial(self.fillCbxdnom,type))
+
+        self.dnom.currentIndexChanged.connect(partial(self.fillCbxCatalod_id,type))
+
+        self.matcat_id.clear()
+        self.pnom.clear()
+        self.dnom.clear()
+
+        node_type = self.node_type.currentText()
+        sql= "SELECT DISTINCT(matcat_id) FROM "+self.schema_name+".cat_"+type+ " WHERE "+type+"type_id='"+node_type+ "'"
+  
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
+
+
+        sql= "SELECT DISTINCT(pnom) FROM "+self.schema_name+".cat_"+type+ " WHERE "+type+"type_id='"+node_type+ "'"
+        
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
+
+        sql = "SELECT dnom FROM  (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM "+self.schema_name+".cat_"+type+ " ORDER BY x)as dnom"
+
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
+
+        
+    def fillCbxpnom(self,type):
+
+     
+        nodetype = self.node_type.currentText()
+        mats=self.matcat_id.currentText()
+
+        sql="SELECT DISTINCT(pnom) FROM "+self.schema_name+".cat_"+type+ ""
+        if(str(nodetype)!= ""):
+            sql += " WHERE "+type+"type_id='"+nodetype+"'"
+        if (str(mats)!=""):
+            sql += " and matcat_id='"+str(mats)+"'"
+        rows = self.controller.get_rows(sql)
+        self.pnom.clear()
+        utils_giswater.fillComboBox(self.pnom, rows)
+        self.fillCbxdnom(type)
+
+        
+    def fillCbxdnom(self,type):
+        message = str(type)
+        self.controller.show_info(message, context_name='ui_message' )
+
+        nodetype = self.node_type.currentText()
+        mats=self.matcat_id.currentText()
+        pnom=self.pnom.currentText()
+        sql="SELECT dnom FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM "+self.schema_name+".cat_"+type+ ""
+        if(str(nodetype)!= ""):
+            sql += " WHERE "+type+"type_id='"+nodetype+"'"
+        if (str(mats)!=""):
+            sql += " and matcat_id='"+str(mats)+"'"
+        if(str(pnom)!= ""):
+            sql +=" and pnom='"+str(pnom)+"'"
+        sql +=" ORDER BY x) as dnom"
+        rows = self.controller.get_rows(sql)
+        self.dnom.clear()
+        utils_giswater.fillComboBox(self.dnom, rows)
+
+        
+    def fillCbxCatalod_id(self,type):    #@UnusedVariable
+
+        self.id = self.dlg_cat.findChild(QComboBox, "id")
+
+        if self.id!='null':
+            nodetype = self.node_type.currentText()
+            mats = self.matcat_id.currentText()
+            pnom = self.pnom.currentText()
+            dnom = self.dnom.currentText()
+            sql = "SELECT DISTINCT(id) as id FROM "+self.schema_name+".cat_node"
+            if (str(nodetype)!= ""):
+                sql += " WHERE "+type+"type_id='"+nodetype+"'"
+            if (str(mats)!=""):
+                sql += " and matcat_id='"+str(mats)+"'"
+            if (str(pnom) != ""):
+                sql += " and pnom='"+str(pnom)+"'"
+            if (str(dnom) != ""):
+                sql += " and dnom='" + str(dnom) + "'"
+            sql += " ORDER BY id"
+            rows = self.controller.get_rows(sql)
+            self.id.clear()
+            utils_giswater.fillComboBox(self.id, rows)
+
+
+    def fillTxtnodecat_id(self,type):
+        self.dlg_cat.close()
+        self.nodecat_id.clear()
+        self.nodecat_id.setText(str(self.id.currentText()))
