@@ -86,7 +86,7 @@ CREATE VIEW "v_inp_options" AS
     inp_options.skip_steady_state,
     inp_options.start_date,
     inp_options.start_time,
-    inp_options.end_date,
+    inp_options.enddate,
     inp_options.end_time,
     inp_options.report_start_date,
     inp_options.report_start_time,

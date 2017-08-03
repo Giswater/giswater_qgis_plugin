@@ -20,14 +20,6 @@ CREATE SEQUENCE sample_id_seq
     CACHE 1;
 
 	
-CREATE SEQUENCE point_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-	
 CREATE SEQUENCE urn_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -50,36 +42,6 @@ CREATE SEQUENCE "cat_arc_seq"
     NO MAXVALUE
     CACHE 1;
 
-
-CREATE SEQUENCE "node_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "arc_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE SEQUENCE "connec_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-
-CREATE SEQUENCE "element_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 CREATE SEQUENCE "element_x_arc_seq"
@@ -104,15 +66,6 @@ CREATE SEQUENCE "element_x_connec_seq"
     NO MAXVALUE
     CACHE 1;
 
-	
-		
-CREATE SEQUENCE pol_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-  
   
 CREATE SEQUENCE pond_id_seq
     START WITH 1
@@ -128,15 +81,8 @@ CREATE SEQUENCE pool_id_seq
     NO MAXVALUE
     CACHE 1;
 
-	/*
-CREATE SEQUENCE polygon_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
-	*/
+	
 -- ----------------------------
 -- Table: system structure 
 -- ----------------------------
@@ -151,10 +97,10 @@ CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
  
 CREATE TABLE "arc_type" (
 "id" varchar(30)   NOT NULL,
-"type" varchar(18)   NOT NULL,
-"epa_default" varchar(18)   NOT NULL,
-"man_table" varchar(18)   NOT NULL,
-"epa_table" varchar(18)   NOT NULL,
+"type" varchar(30)   NOT NULL,
+"epa_default" varchar(30)   NOT NULL,
+"man_table" varchar(30)   NOT NULL,
+"epa_table" varchar(30)   NOT NULL,
 "active" boolean,
 "code_autofill" boolean,
 "descript" text,
@@ -164,10 +110,10 @@ CONSTRAINT arc_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "node_type" (
 "id" varchar(30)   NOT NULL,
-"type" varchar(18)   NOT NULL,
-"epa_default" varchar(18)   NOT NULL,
-"man_table" varchar(18)   NOT NULL,
-"epa_table" varchar(18)   NOT NULL,
+"type" varchar(30)   NOT NULL,
+"epa_default" varchar(30)   NOT NULL,
+"man_table" varchar(30)   NOT NULL,
+"epa_table" varchar(30)   NOT NULL,
 "active" boolean,
 "code_autofill" boolean,
 "num_arcs" integer,
@@ -179,7 +125,7 @@ CONSTRAINT node_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "element_type" (
 "id" varchar(30)   NOT NULL,
-"type" varchar(18),
+"type" varchar(30),
 "active" boolean,
 "code_autofill" boolean,
 "descript" text,
@@ -189,20 +135,12 @@ CONSTRAINT element_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE "connec_type" (
 "id" varchar(30)   NOT NULL,
-"type" character varying(18) NOT NULL,
-"man_table" character varying(18) NOT NULL,
+"type" character varying(30) NOT NULL,
+"man_table" character varying(30) NOT NULL,
 "active" boolean,
 "code_autofill" boolean,
 "descript" text,
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "point_type" (
-"id" varchar(30)   NOT NULL,
-"text" text,
-"descript" text,
-CONSTRAINT point_type_pkey PRIMARY KEY (id)
 );
 
 
@@ -214,7 +152,7 @@ CONSTRAINT point_type_pkey PRIMARY KEY (id)
 
 CREATE TABLE arc_type_cat_type
 (
-  id character varying(18) NOT NULL,
+  id character varying(30) NOT NULL,
   shortcut_key varchar(30) ,
   order by int2,
   i18n character varying(30),
@@ -225,7 +163,7 @@ CREATE TABLE arc_type_cat_type
 
 CREATE TABLE node_type_cat_type
 (
-  id character varying(18) NOT NULL,
+  id character varying(30) NOT NULL,
   shortcut_key varchar(30),
   order by int2,
   i18n character varying(30),
@@ -239,21 +177,17 @@ CREATE TABLE node_type_cat_type
 -- Table: Catalogs
 -- ----------------------------
 
-
-
 CREATE TABLE "cat_mat_element" (
 "id" varchar(30)  ,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 CONSTRAINT cat_mat_element_pkey PRIMARY KEY (id)
 );
 
 
 CREATE TABLE "cat_element" (
 "id" varchar(30)   NOT NULL,
-"elementtype_id" varchar(18)  ,
+"elementtype_id" varchar(30)  ,
 "matcat_id" varchar(30)  ,
 "geometry" varchar(30)  ,
 "descript" varchar(512)  ,
@@ -261,21 +195,16 @@ CREATE TABLE "cat_element" (
 "brand" varchar(30)  ,
 "type" varchar(30)  ,
 "model" varchar(30)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 "svg" varchar(50),
 "active" boolean,
 CONSTRAINT cat_element_pkey PRIMARY KEY (id)
 );
 
 
-
 CREATE TABLE "cat_soil" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512),
 "link" varchar(512),
-"url" varchar(512),
-"picture" varchar(512),
 "y_param" numeric(5,2),
 "b" numeric(5,2),
 "trenchlining" numeric(3,2),
@@ -291,8 +220,6 @@ CREATE TABLE "cat_builder" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
-"url" varchar(512)  ,
-"picture" varchar(512)  ,
 CONSTRAINT cat_builder_pkey PRIMARY KEY (id)
 );
 
@@ -301,7 +228,6 @@ CREATE TABLE "cat_work" (
 "id" varchar(30) NOT NULL,
 "descript" varchar(512),
 "link" varchar(512),
-"picture" varchar(512),
 workid_key1 character varying(30),
 workid_key2 character varying(30),
 builtdate date,
@@ -314,52 +240,34 @@ CREATE TABLE "cat_owner" (
 "id" varchar(30)   NOT NULL,
 "descript" varchar(512)  ,
 "link" varchar(512)  ,
-"picture" varchar(512)  ,
 CONSTRAINT cat_owner_pkey PRIMARY KEY (id)
 );
-
 
 
 CREATE TABLE "cat_pavement" (
 id varchar (30),
 "descript" text,
 "link" varchar(512)  ,
-"picture" varchar(512)  ,
 "thickness" numeric(12,2) DEFAULT 0.00,
 "m2_cost" varchar (16),
  CONSTRAINT cat_pavement_pkey PRIMARY KEY (id)
  );
  
-  
- 
- CREATE TABLE "cat_type" (
-"id" varchar (30),
-"descript" text,
-"link" varchar(512)  ,
-"picture" varchar(512),
- CONSTRAINT cat_type_pkey PRIMARY KEY (id)
- );
- 
- 
+
  CREATE TABLE "cat_brand" (
 "id" varchar (30),
 "descript" text,
-"link" varchar(512)  ,
-"picture" varchar(512),
+"link" varchar(512),
  CONSTRAINT cat_brand_pkey PRIMARY KEY (id)
  );
 
- 
- CREATE TABLE "cat_brand_type" (
+ CREATE TABLE "cat_brand_model" (
 "id" varchar (30),
 "catbrand_id" varchar (30) NOT NULL,
 "descript" text,
 "link" varchar(512)  ,
-"picture" varchar(512),
  CONSTRAINT cat_brand_type_pkey PRIMARY KEY (id)
  );
- 
- 
  
 
 
@@ -367,15 +275,17 @@ id varchar (30),
 -- Table: value domain (type)
 -----------
 
+
 CREATE TABLE "man_type_function" (
 "id" varchar(50) NOT NULL,
+"featurecat_id" varchar(30),
 "observ" varchar(50),
 CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
 );
 
-
 CREATE TABLE "man_type_category" (
 "id" varchar(50) NOT NULL,
+"featurecat_id" varchar(30),
 "observ" varchar(50),
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 );
@@ -383,6 +293,7 @@ CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 
 CREATE TABLE "man_type_fluid" (
 "id" varchar(50) NOT NULL,
+"featurecat_id" varchar(30),
 "observ" varchar(50),
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 );
@@ -390,6 +301,7 @@ CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 
 CREATE TABLE "man_type_location" (
 "id" varchar(50) NOT NULL,
+"featurecat_id" varchar(30),
 "observ" varchar(50),
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
@@ -404,31 +316,10 @@ CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 
 CREATE TABLE exploitation(
 expl_id integer  NOT NULL PRIMARY KEY,
-short_descript character varying(30) NOT NULL,
+name character varying(50) NOT NULL,
 descript text,
 undelete boolean,
 the_geom geometry(POLYGON,SRID_VALUE)
-);
-
-
-CREATE TABLE macrodma(
-macrodma_id integer NOT NULL PRIMARY KEY,
-short_descript character varying(30)NOT NULL,
-expl_id integer NOT NULL,
-descript character varying(100),
-undelete boolean,
-the_geom geometry(POLYGON,SRID_VALUE)
-);
-
-
-
-CREATE TABLE "sector" (
-"sector_id" integer NOT NULL PRIMARY KEY,
-"short_descript" character varying(30)NOT NULL,
-"expl_id" integer NOT NULL,
-"descript" text,
-"undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
@@ -442,13 +333,10 @@ undelete boolean
 );
 
 
-
 CREATE TABLE "vnode" (
 "vnode_id" serial NOT NULL PRIMARY KEY,
 "arc_id" varchar(16),
-"vnode_type" varchar(18),
-"dma_id" integer NOT NULL,  
-"state" int2 NOT NULL, 
+"vnode_type" varchar(30),
 "annotation" varchar(254),
 "userdefined_pos" bool,
 "the_geom" public.geometry (POINT, SRID_VALUE)
@@ -460,45 +348,28 @@ link_id serial NOT NULL PRIMARY KEY,
 feature_id varchar(16),
 featurecat_id varchar(30), 
 vnode_id integer NOT NULL,
-custom_length numeric (12,3),
 the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
 
-
-CREATE TABLE "point" (
-"point_id" varchar(30)   NOT NULL,
-"point_type" varchar(18),
-"dma_id" integer,
-"state" int2 NOT NULL,
-"observ" character varying(512),
-"text" text,
-"link" text,
-"the_geom" public.geometry (POINT, SRID_VALUE),
-"undelete" boolean,
-CONSTRAINT point_pkey PRIMARY KEY (point_id)
-);
-
-
- 
   
 CREATE TABLE "samplepoint"(
 "sample_id" character varying(16) NOT NULL,
-"samplepoint_state" character varying(150),
-"rotation" numeric(12,3),
-"code_lab" integer,
+"lab_code" integer,
 "feature_id" varchar (16),
 "featurecat_id" varchar (30),
+"dma_id" integer,
+"state" int2,
 "workcat_id" character varying(255),
 "workcat_id_end" character varying(255),
+"rotation" numeric(12,3),
 "street1" character varying(254),
 "street2" character varying(254),
 "place_name" character varying(254),
 "cabinet" character varying(150),
-"dma_id" integer,
-"state" int2,
 "observations" character varying(254),
 "the_geom" geometry(Point,SRID_VALUE),
+"expl_id" integer,
 CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 );
 
@@ -518,6 +389,7 @@ CREATE TABLE "element" (
 "state" int2 NOT NULL,
 "annotation" character varying(254),
 "observ" character varying(254),
+"comment" character varying(254),
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
 "fluid_type" varchar(50)  ,
@@ -526,18 +398,18 @@ CREATE TABLE "element" (
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
 "ownercat_id" varchar(30)  ,
-"enddate" date,
 "rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(20),
 "workcat_id_end" varchar(30),
-"end_date" date,
+"enddate" date,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "label_x" character varying(30),
 "label_y" character varying(30),
 "label_rotation" numeric(6,3),
 "publish" boolean,
 "inventory" boolean,
+"expl_id" integer,
 CONSTRAINT element_pkey PRIMARY KEY (element_id)
 );
 
@@ -571,7 +443,7 @@ CREATE TABLE "element_x_connec" (
 
 CREATE TABLE "value_state" (
 "id" int2 NOT NULL PRIMARY KEY, 
-short_descript varchar(30) NOT NULL,
+name varchar(30) NOT NULL,
 "observ" text
 );
 
@@ -593,18 +465,21 @@ CREATE TABLE "value_yesno" (
 -- ----------------------------------
 
 
-CREATE TABLE expl_selector (
-expl_id integer NOT NULL PRIMARY KEY,
+CREATE TABLE selector_expl (
+id serial PRIMARY KEY,
+expl_id integer,
 cur_user text
 );
 
 CREATE TABLE selector_psector (
-psector_id integer NOT NULL PRIMARY KEY,
+id serial PRIMARY KEY,
+psector_id integer,
 cur_user text
-)
+);
 
 CREATE TABLE selector_state (
-expl_id integer NOT NULL PRIMARY KEY,
+id serial PRIMARY KEY,
+expl_id integer,
 cur_user text
 );
 

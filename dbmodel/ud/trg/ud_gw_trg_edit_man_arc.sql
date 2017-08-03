@@ -128,13 +128,13 @@
 				END IF;
 		
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
-				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
-				label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
+				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, address_01, address_02, address_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
+				label_rotation, code, expl_id, publish, inventory, enddate, uncertain) 
 				VALUES (NEW.arc_id, null, null, NEW.conduit_y1, NEW.conduit_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.conduit_annotation, NEW.conduit_observ, NEW.conduit_comment, 
 				NEW.conduit_inverted_slope, NEW.conduit_custom_length, NEW.dma_id, NEW.conduit_soilcat_id, NEW.conduit_category_type, NEW.conduit_fluid_type, NEW.conduit_location_type, NEW.conduit_workcat_id,
-				NEW.conduit_buildercat_id, NEW.conduit_builtdate, NEW.conduit_ownercat_id, NEW.conduit_adress_01, NEW.conduit_adress_02, NEW.conduit_adress_03, NEW.conduit_descript, NEW.conduit_est_y1, NEW.conduit_est_y2,
+				NEW.conduit_buildercat_id, NEW.conduit_builtdate, NEW.conduit_ownercat_id, NEW.conduit_address_01, NEW.conduit_address_02, NEW.conduit_address_03, NEW.conduit_descript, NEW.conduit_est_y1, NEW.conduit_est_y2,
 				NEW.conduit_link, NEW.verified, NEW.the_geom,NEW.conduit_workcat_id_end,NEW.undelete,NEW.conduit_label_x,NEW.conduit_label_y, NEW.conduit_label_rotation, 
-				NEW.conduit_code, expl_id_int, NEW.publish, NEW.inventory, NEW.conduit_end_date, NEW.uncertain);
+				NEW.conduit_code, expl_id_int, NEW.publish, NEW.inventory, NEW.conduit_enddate, NEW.uncertain);
 				
 				INSERT INTO man_conduit (arc_id) VALUES (NEW.arc_id);
 			
@@ -154,13 +154,13 @@
 				END IF;
 				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
-				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,
-				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
+				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, address_01, address_02, address_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,
+				label_x,label_y, label_rotation, code, expl_id, publish, inventory, enddate, uncertain) 
 				VALUES (NEW.arc_id, null, null, NEW.siphon_y1, NEW.siphon_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.siphon_annotation, NEW.siphon_observ, NEW.siphon_comment,
 				NEW.siphon_inverted_slope, NEW.siphon_custom_length, NEW.dma_id, NEW.siphon_soilcat_id, NEW.siphon_category_type, NEW.siphon_fluid_type, NEW.siphon_location_type, NEW.siphon_workcat_id,
-				NEW.siphon_buildercat_id, NEW.siphon_builtdate, NEW.siphon_ownercat_id, NEW.siphon_adress_01, NEW.siphon_adress_02, NEW.siphon_adress_03, NEW.siphon_descript, NEW.siphon_est_y1, NEW.siphon_est_y2, 
+				NEW.siphon_buildercat_id, NEW.siphon_builtdate, NEW.siphon_ownercat_id, NEW.siphon_address_01, NEW.siphon_address_02, NEW.siphon_address_03, NEW.siphon_descript, NEW.siphon_est_y1, NEW.siphon_est_y2, 
 				NEW.siphon_link, NEW.verified, NEW.the_geom,NEW.siphon_workcat_id_end,NEW.undelete,NEW.siphon_label_x,NEW.siphon_label_y, NEW.siphon_label_rotation,
-				NEW.siphon_code, expl_id_int, NEW.publish, NEW.inventory, NEW.siphon_end_date, NEW.uncertain);
+				NEW.siphon_code, expl_id_int, NEW.publish, NEW.inventory, NEW.siphon_enddate, NEW.uncertain);
 				
 				INSERT INTO man_siphon (arc_id,security_bar,steps,siphon_name) VALUES (NEW.arc_id, NEW.siphon_security_bar, NEW.siphon_steps,NEW.siphon_name);
 				
@@ -180,13 +180,13 @@
 				END IF;
 				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
-				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,
-				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain)
+				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, address_01, address_02, address_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,
+				label_x,label_y, label_rotation, code, expl_id, publish, inventory, enddate, uncertain)
 				VALUES (NEW.arc_id, null, null, NEW.waccel_y1, NEW.waccel_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.waccel_annotation, NEW.waccel_observ, NEW.waccel_comment,
 				NEW.waccel_inverted_slope, NEW.waccel_custom_length, NEW.dma_id, NEW.waccel_soilcat_id, NEW.waccel_category_type, NEW.waccel_fluid_type, NEW.waccel_location_type, NEW.waccel_workcat_id, 
-				NEW.waccel_buildercat_id, NEW.waccel_builtdate, NEW.waccel_ownercat_id, NEW.waccel_adress_01, NEW.waccel_adress_02, NEW.waccel_adress_03, NEW.waccel_descript, NEW.waccel_est_y1, NEW.waccel_est_y2, 
+				NEW.waccel_buildercat_id, NEW.waccel_builtdate, NEW.waccel_ownercat_id, NEW.waccel_address_01, NEW.waccel_address_02, NEW.waccel_address_03, NEW.waccel_descript, NEW.waccel_est_y1, NEW.waccel_est_y2, 
 				NEW.waccel_link, NEW.verified, NEW.the_geom,NEW.waccel_workcat_id_end,NEW.undelete,NEW.waccel_label_x,NEW.waccel_label_y, NEW.waccel_label_rotation,
-				NEW.waccel_code, expl_id_int, NEW.publish, NEW.inventory, NEW.waccel_end_date, NEW.uncertain);
+				NEW.waccel_code, expl_id_int, NEW.publish, NEW.inventory, NEW.waccel_enddate, NEW.uncertain);
 				
 				INSERT INTO man_waccel (arc_id, sander_length,sander_depth,security_bar,steps,prot_surface,waccel_name) 
 				VALUES (NEW.arc_id, NEW.waccel_sander_length, NEW.waccel_sander_depth,NEW.waccel_security_bar, NEW.waccel_steps,NEW.waccel_prot_surface,NEW.waccel_name);
@@ -207,13 +207,13 @@
 				END IF;
 				
 				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, 
-				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, adress_01, adress_02, adress_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,
-				label_x,label_y, label_rotation, code, expl_id, publish, inventory, end_date, uncertain) 
+				fluid_type, location_type, workcat_id, buildercat_id, builtdate, ownercat_id, address_01, address_02, address_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,
+				label_x,label_y, label_rotation, code, expl_id, publish, inventory, enddate, uncertain) 
 				VALUES (NEW.arc_id, null, null, NEW.varc_y1, NEW.varc_y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, 
 				NEW.varc_inverted_slope, NEW.varc_custom_length, NEW.dma_id, NEW.varc_soilcat_id, NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_buildercat_id, 
-				NEW.varc_builtdate, NEW.varc_ownercat_id, NEW.varc_adress_01, NEW.varc_adress_02, NEW.varc_adress_03, NEW.varc_descript, NEW.varc_est_y1, NEW.varc_est_y2, NEW.varc_link, 
+				NEW.varc_builtdate, NEW.varc_ownercat_id, NEW.varc_address_01, NEW.varc_address_02, NEW.varc_address_03, NEW.varc_descript, NEW.varc_est_y1, NEW.varc_est_y2, NEW.varc_link, 
 				NEW.verified, NEW.the_geom,NEW.varc_workcat_id_end,NEW.undelete,NEW.varc_label_x,NEW.varc_label_y, NEW.varc_label_rotation,
-				NEW.varc_code, expl_id_int, NEW.publish, NEW.inventory, NEW.varc_end_date, NEW.uncertain);
+				NEW.varc_code, expl_id_int, NEW.publish, NEW.inventory, NEW.varc_enddate, NEW.uncertain);
 				
 				INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 				
@@ -294,10 +294,10 @@
 				SET arc_id=NEW.arc_id, y1=NEW.conduit_y1, y2=NEW.conduit_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.conduit_annotation, "observ"=NEW.conduit_observ,"comment"=NEW.conduit_comment, inverted_slope=NEW.conduit_inverted_slope, custom_length=NEW.conduit_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.conduit_soilcat_id, category_type=NEW.conduit_category_type, fluid_type=NEW.conduit_fluid_type,location_type=NEW.conduit_location_type, workcat_id=NEW.conduit_workcat_id, 
-				buildercat_id=NEW.conduit_buildercat_id, builtdate=NEW.conduit_builtdate,ownercat_id=NEW.conduit_ownercat_id, adress_01=NEW.conduit_adress_01, adress_02=NEW.conduit_adress_02, 
-				adress_03=NEW.conduit_adress_03, descript=NEW.conduit_descript, link=NEW.conduit_link, est_y1=NEW.conduit_est_y1, est_y2=NEW.conduit_est_y2, verified=NEW.verified, 
+				buildercat_id=NEW.conduit_buildercat_id, builtdate=NEW.conduit_builtdate,ownercat_id=NEW.conduit_ownercat_id, address_01=NEW.conduit_address_01, address_02=NEW.conduit_address_02, 
+				address_03=NEW.conduit_address_03, descript=NEW.conduit_descript, link=NEW.conduit_link, est_y1=NEW.conduit_est_y1, est_y2=NEW.conduit_est_y2, verified=NEW.verified, 
 				the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.conduit_label_x,label_y=NEW.conduit_label_y, label_rotation=NEW.conduit_label_rotation,workcat_id_end=NEW.conduit_workcat_id_end,
-				code=NEW.conduit_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.conduit_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				code=NEW.conduit_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.conduit_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 			
 			
@@ -309,10 +309,10 @@
 				SET arc_id=NEW.arc_id, y1=NEW.siphon_y1, y2=NEW.siphon_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.siphon_annotation, "observ"=NEW.siphon_observ,"comment"=NEW.siphon_comment, inverted_slope=NEW.siphon_inverted_slope, custom_length=NEW.siphon_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.siphon_soilcat_id, category_type=NEW.siphon_category_type, fluid_type=NEW.siphon_fluid_type,location_type=NEW.siphon_location_type, workcat_id=NEW.siphon_workcat_id, 
-				buildercat_id=NEW.siphon_buildercat_id, builtdate=NEW.siphon_builtdate,ownercat_id=NEW.siphon_ownercat_id, adress_01=NEW.siphon_adress_01, adress_02=NEW.siphon_adress_02, adress_03=NEW.siphon_adress_03, 
+				buildercat_id=NEW.siphon_buildercat_id, builtdate=NEW.siphon_builtdate,ownercat_id=NEW.siphon_ownercat_id, address_01=NEW.siphon_address_01, address_02=NEW.siphon_address_02, address_03=NEW.siphon_address_03, 
 				descript=NEW.siphon_descript, link=NEW.siphon_link, est_y1=NEW.siphon_est_y1, est_y2=NEW.siphon_est_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
 				label_x=NEW.siphon_label_x,label_y=NEW.siphon_label_y, label_rotation=NEW.siphon_label_rotation,workcat_id_end=NEW.siphon_workcat_id_end,
-				code=NEW.siphon_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.siphon_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				code=NEW.siphon_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.siphon_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 				
 				UPDATE man_siphon SET arc_id=NEW.arc_id,security_bar=NEW.siphon_security_bar, steps=NEW.siphon_steps,siphon_name=NEW.siphon_name
@@ -323,10 +323,10 @@
 				SET arc_id=NEW.arc_id, y1=NEW.waccel_y1, y2=NEW.waccel_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.waccel_annotation, "observ"=NEW.waccel_observ,"comment"=NEW.waccel_comment, inverted_slope=NEW.waccel_inverted_slope, custom_length=NEW.waccel_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.waccel_soilcat_id, category_type=NEW.waccel_category_type, fluid_type=NEW.waccel_fluid_type,location_type=NEW.waccel_location_type, workcat_id=NEW.waccel_workcat_id, 
-				buildercat_id=NEW.waccel_buildercat_id, builtdate=NEW.waccel_builtdate,ownercat_id=NEW.waccel_ownercat_id, adress_01=NEW.waccel_adress_01, adress_02=NEW.waccel_adress_02, adress_03=NEW.waccel_adress_03, 
+				buildercat_id=NEW.waccel_buildercat_id, builtdate=NEW.waccel_builtdate,ownercat_id=NEW.waccel_ownercat_id, address_01=NEW.waccel_address_01, address_02=NEW.waccel_address_02, address_03=NEW.waccel_address_03, 
 				descript=NEW.waccel_descript, link=NEW.waccel_link, est_y1=NEW.waccel_est_y1, est_y2=NEW.waccel_est_y2, verified=NEW.verified, the_geom=NEW.the_geom, 
 				undelete=NEW.undelete,label_x=NEW.waccel_label_x,label_y=NEW.waccel_label_y, label_rotation=NEW.waccel_label_rotation,workcat_id_end=NEW.waccel_workcat_id_end,
-				code=NEW.waccel_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.waccel_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				code=NEW.waccel_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.waccel_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;	
 				
 				UPDATE man_waccel SET arc_id=NEW.arc_id, sander_length=NEW.waccel_sander_length, sander_depth=NEW.waccel_sander_depth,security_bar=NEW.waccel_security_bar,
@@ -338,10 +338,10 @@
 				SET arc_id=NEW.arc_id, y1=NEW.varc_y1, y2=NEW.varc_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 				annotation= NEW.varc_annotation, "observ"=NEW.varc_observ,"comment"=NEW.varc_comment, inverted_slope=NEW.varc_inverted_slope, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.varc_soilcat_id, category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type,location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, 
-				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,ownercat_id=NEW.varc_ownercat_id, adress_01=NEW.varc_adress_01, adress_02=NEW.varc_adress_02, adress_03=NEW.varc_adress_03, 
+				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,ownercat_id=NEW.varc_ownercat_id, address_01=NEW.varc_address_01, address_02=NEW.varc_address_02, address_03=NEW.varc_address_03, 
 				descript=NEW.varc_descript, link=NEW.varc_link, est_y1=NEW.varc_est_y1, est_y2=NEW.varc_est_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
 				label_x=NEW.varc_label_x,label_y=NEW.varc_label_y, label_rotation=NEW.varc_label_rotation,workcat_id_end=NEW.varc_workcat_id_end,
-				code=NEW.varc_code, publish=NEW.publish, inventory=NEW.inventory, end_date=NEW.varc_end_date, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+				code=NEW.varc_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.varc_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 				
 				UPDATE man_varc SET arc_id=NEW.arc_id

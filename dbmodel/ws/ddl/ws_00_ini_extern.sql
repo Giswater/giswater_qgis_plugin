@@ -217,7 +217,7 @@ CREATE TABLE ext_rtc_hydrometer(
 "code" text,
 "hydrometer_category" text,
 "client_name"  text,
-"adress"	text,
+"address"	text,
 "house_number" text,
 "id_number" text,
 "cat_hydrometer_id" text,
