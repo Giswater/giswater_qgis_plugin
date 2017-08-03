@@ -94,11 +94,12 @@ CREATE TABLE "om_visit_event" (
 "xcoord" float,
 "ycoord" float,
 "compass" float,
-"geom1" float;
-"geom2" float;
-"geom3" float; 
-"status" float;
+"geom1" float,
+"geom2" float,
+"geom3" float,
+"status" float,
 "status_event_id" float,
+"ext_code" varchar(16)
 -- picture_id character varying(50)¿?¿?
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
