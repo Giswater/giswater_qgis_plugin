@@ -42,14 +42,6 @@ CONSTRAINT doc_type_pkey PRIMARY KEY (id)
 );
   
   
-
-CREATE TABLE "cat_tag" (
-"id" varchar(30)   NOT NULL,
-"comment" varchar(512)  ,
-CONSTRAINT cat_tag_pkey PRIMARY KEY (id)
-);
-
-
 CREATE TABLE "doc" (
 "id" varchar(30) DEFAULT nextval ('"SCHEMA_NAME".doc_seq'::regclass) NOT NULL,
 "doc_type" varchar(30),
@@ -83,13 +75,5 @@ CREATE TABLE "doc_x_connec" (
 "connec_id" varchar(16)  ,
 CONSTRAINT doc_x_connec_pkey PRIMARY KEY (id)
 );
-
-
-CREATE TABLE doc_x_tag(
-  id serial8 PRIMARY KEY,
-  doc_id character varying(30),
-  tag_id character varying(30)
-);
-
 
 

@@ -47,7 +47,7 @@ CREATE SEQUENCE "price_simple_value_seq"
 
 CREATE TABLE "plan_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
-"short_descript" varchar (50) NOT NULL,
+"name" varchar (50) NOT NULL,
 "descript" text COLLATE "default",
 "expl_id" integer,
 "priority" varchar(16) COLLATE "default",
@@ -110,19 +110,7 @@ CREATE TABLE "plan_value_ps_priority" (
 "observ" varchar(254) COLLATE "default"
 );
 
-/*
--- Used to filter features by planning issues
-CREATE TABLE "plan_selector_state" (
-  "id" character varying(16) PRIMARY KEY NOT NULL
-);
 
-
--- Used to filter show a defined range of psector features on map composer
-CREATE TABLE "plan_selector_psector" (
-  "id" character varying(16) PRIMARY KEY NOT NULL,
-);
-
-*/
 
 ----------------------------------------------
 -- TABLE SCTRUCTURE FOR PRICE

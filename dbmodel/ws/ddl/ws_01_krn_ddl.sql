@@ -252,6 +252,7 @@ CREATE TABLE "connec" (
 "connecat_id" varchar(30) NOT NULL,
 "sector_id" integer NOT NULL,
 "customer_code" varchar(30),
+"demand" numeric(12,3),
 "state" int2 NOT NULL,
 "connec_arccat_id" varchar(18)  ,
 "connec_length" numeric(12,3),

@@ -183,8 +183,6 @@ CREATE TABLE "sector" (
 
 
 
-
-
 CREATE TABLE "node" (
 "node_id" varchar(16) NOT NULL,
 "code" varchar (30) NOT NULL,
@@ -304,8 +302,10 @@ CREATE TABLE "connec" (
 "customer_code" varchar(30),
 "demand" numeric(12,8),
 "state" int2  NOT NULL,
-"connec_arccat_id" varchar(18)  ,
+"connec_arccat_id" varchar(18),
+"connec_depth" numeric(12,3),
 "connec_length" numeric(12,3),
+"arc_id" varchar(16)  ,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
@@ -405,39 +405,35 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 
 
 
-
-
 -- ----------------------------
 -- Table: Add info feature 
 -- ----------------------------
 
-
 CREATE TABLE "man_netinit" (
 "node_id" varchar(16) NOT NULL,
-"mheight" numeric(12,3),
-"mlength" numeric(12,3),
+"length" numeric(12,3),
+"width" numeric(12,3),
 "mwidth" numeric(12,3),
-"add_info" varchar(255),
-"netinit_name" varchar(255),
 "inlet" boolean,
 "bottom_channel" boolean,
 "accessibility" varchar(16),
+"name" varchar(50)
 CONSTRAINT man_netinit_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_junction" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_manhole" (
 "node_id" varchar(16) NOT NULL,
+"length" numeric(12,3),
+"width" numeric(12,3),
 "sander_depth" numeric(12,3),
 "prot_surface" bool,
-"add_info" varchar(255),
 "inlet" boolean,
 "bottom_channel" boolean,
 "accessibility" varchar(16),
@@ -447,96 +443,96 @@ CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_wjump" (
 "node_id" varchar(16) NOT NULL,
-"mheight" numeric(12,3),
-"mlength" numeric(12,3),
-"mwidth" numeric(12,3),
-"sander_length" numeric(12,3),
+"length" numeric(12,3),
+"width" numeric(12,3),
 "sander_depth" numeric(12,3),
-"security_bar" bool,
-"steps" bool,
 "prot_surface" bool,
-"add_info" varchar(255),
-"wjump_name" varchar(255),
+"accessibility" varchar(16),
+"name" varchar(255),
 CONSTRAINT man_wjump_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_valve" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-"valve_name" varchar(255),
+"name" varchar(255),
 CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_outfall" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-"outfall_name" varchar(255),
+"name" varchar(255),
+CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
+);
+
+
+CREATE TABLE "man_netelement" (
+"node_id" varchar(16) NOT NULL,
 CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_netgully" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 "pol_id" character varying(16),
+"sander_depth" numeric(12,4),
+"gratecat_id" varchar(18)  ,
+"units" int2,
+"groove" boolean  ,
+"siphon" boolean  ,
+"streetaxis_id" varchar (16)  ,
+"postnumber" varchar (16)  ,
 CONSTRAINT man_netgully_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_chamber" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 "pol_id" character varying(16),
-"total_volume" numeric(12,3),
-"total_height" numeric(12,3),
-"total_length" numeric(12,3),
-"total_width" numeric(12,3),
-"chamber_name" varchar(255),
+"length" numeric(12,3),
+"width" numeric(12,3),
+"max_volume" numeric(12,3),
+"util_volume" numeric(12,3),
 "inlet" boolean,
 "bottom_channel" boolean,
 "accessibility" varchar(16),
+"name" varchar(255),
 CONSTRAINT man_chamber_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_storage" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 "pol_id" character varying(16),
-"total_volume" numeric(12,3),
+"length" numeric(12,3),
+"width" numeric(12,3),
+"custom_area" numeric (12,3),
+"max_volume" numeric(12,3),
 "util_volume" numeric(12,3),
 "min_height" numeric(12,3),
-"total_height" numeric(12,3),
-"total_length" numeric(12,3),
-"total_width" numeric(12,3),
-"storage_name" varchar(255),
+"accessibility" varchar(16),
+"name" varchar(255),
 CONSTRAINT man_storage_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_wwtp" (
 "node_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 "pol_id" character varying(16),
-"wwtp_name" varchar(255),
+"name" varchar(255),
 CONSTRAINT man_wwtp_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_conduit" (
 "arc_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
 CONSTRAINT man_conduit_pkey PRIMARY KEY (arc_id)
 );
 
 CREATE TABLE "man_siphon" (
 "arc_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
-"security_bar" bool,
-"steps" bool,
-"siphon_name" varchar(255),
+"name" varchar(255),
 CONSTRAINT man_siphon_pkey PRIMARY KEY (arc_id)
 );
 
@@ -546,16 +542,14 @@ CREATE TABLE "man_waccel" (
 "add_info" varchar(255),
 "sander_length" numeric(12,3),
 "sander_depth" numeric(12,3),
-"security_bar" bool,
-"steps" bool,
 "prot_surface" bool,
-"waccel_name" varchar(255),
+"accessibility" varchar(16),
+"name" varchar(255),
 CONSTRAINT man_waccel_pkey PRIMARY KEY (arc_id)
 );
 
 CREATE TABLE "man_varc"(
 "arc_id" character varying(16) NOT NULL,
-"add_info" character varying(255),
 CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
 );
 

@@ -99,7 +99,6 @@ CREATE TABLE "om_visit_event" (
 "geom3" float; 
 "status" float;
 "status_event_id" float,
--- picture_id character varying(50)¿?¿?
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
 
