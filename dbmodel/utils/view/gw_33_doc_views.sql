@@ -1,9 +1,9 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
 
 DROP VIEW IF EXISTS v_ui_doc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_ui_doc_x_node AS 
@@ -14,7 +14,6 @@ doc_x_node.doc_id,
 doc.doc_type,
 doc.path,
 doc.observ,
-doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_node
@@ -30,7 +29,6 @@ doc_x_arc.doc_id,
 doc.doc_type,
 doc.path,
 doc.observ,
-doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_arc
@@ -46,7 +44,6 @@ doc_x_connec.doc_id,
 doc.doc_type,
 doc.path,
 doc.observ,
-doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_connec
