@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,27 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 CREATE SEQUENCE doc_seq
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-CREATE SEQUENCE doc_x_node_seq
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-CREATE SEQUENCE doc_x_arc_seq
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
-
-CREATE SEQUENCE doc_x_connec_seq
   START WITH 1
   INCREMENT BY 1
   NO MINVALUE
@@ -54,26 +33,23 @@ CONSTRAINT doc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "doc_x_node" (
-"id" int8 DEFAULT nextval ('"SCHEMA_NAME".doc_x_node_seq'::regclass) NOT NULL,
+"id" serial NOT NULL PRIMARY KEY,
 "doc_id" varchar(30),
-"node_id" varchar(16)  ,
-CONSTRAINT doc_x_node_pkey PRIMARY KEY (id)
+"node_id" varchar(16)
 );
 
 
 CREATE TABLE "doc_x_arc" (
-"id" int8 DEFAULT nextval ('"SCHEMA_NAME".doc_x_arc_seq'::regclass) NOT NULL,
+"id" serial NOT NULL PRIMARY KEY,
 "doc_id" varchar(30),
-"arc_id" varchar(16)  ,
-CONSTRAINT doc_x_arc_pkey PRIMARY KEY (id)
+"arc_id" varchar(16)
 );
 
 
 CREATE TABLE "doc_x_connec" (
-"id" int8 DEFAULT nextval ('"SCHEMA_NAME".doc_x_connec_seq'::regclass) NOT NULL,
+"id" serial NOT NULL PRIMARY KEY,
 "doc_id" varchar(30),
-"connec_id" varchar(16)  ,
-CONSTRAINT doc_x_connec_pkey PRIMARY KEY (id)
+"connec_id" varchar(16) 
 );
 
 

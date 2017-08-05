@@ -1,11 +1,36 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
+
+
+
+-- ----------------------------------
+-- Table: selector
+-- ----------------------------------
+
+
+CREATE TABLE selector_expl (
+id serial PRIMARY KEY,
+expl_id integer,
+cur_user text
+);
+
+CREATE TABLE selector_psector (
+id serial PRIMARY KEY,
+psector_id integer,
+cur_user text
+);
+
+CREATE TABLE selector_state (
+id serial PRIMARY KEY,
+state_id integer,
+cur_user text
+);
 
 
 
@@ -22,7 +47,7 @@ CREATE TABLE "version" (
 "postgis" varchar(512)  ,
 "date" timestamp(6) DEFAULT now(),
 "language" varchar (50),
-"epsg" int4,
+"epsg" int4
 );
 
 
@@ -54,7 +79,7 @@ CREATE TABLE dimensions(
 id bigserial NOT NULL PRIMARY KEY,
 distance numeric(12,4),
 depth numeric(12,4),
-the_geom geometry(LineString,SRID_VALUE),
+the_geom geometry(LineString,25831),
 x_label double precision,
 y_label double precision,
 rotation_label double precision,
@@ -63,7 +88,9 @@ direction_arrow boolean,
 x_symbol double precision,
 y_symbol double precision,
 feature_id character varying,
-feature_type character varying
+feature_type character varying,
+state int2,
+expl_id integer
 );
   
 

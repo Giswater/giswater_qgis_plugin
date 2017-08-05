@@ -17,8 +17,8 @@ SELECT
   (CASE WHEN (price_compost.price IS  NOT NULL) THEN price_compost.price::numeric(14,2) 
   ELSE (sum(price_simple.price*price_compost_value.value))::numeric(14,2) END) AS price 
 FROM (price_compost
-LEFT JOIN price_compost_value ON (((price_compost.id)::text = (price_compost_value.compost_id)::text))
-LEFT JOIN price_simple ON (((price_simple.id)::text = (price_compost_value.simple_id)::text)))
+LEFT JOIN price_compost_value ON (((price_compost.id) = (price_compost_value.compost_id)))
+LEFT JOIN price_simple ON (((price_simple.id) = (price_compost_value.simple_id))))
 GROUP BY price_compost.id, price_compost.unit, price_compost.descript;
 
 
@@ -31,7 +31,7 @@ SELECT
   cat_soil.trenchlining,
   v_price_compost.price AS m3exc_cost
 FROM (cat_soil
-JOIN v_price_compost ON (((cat_soil."m3exc_cost")::text = (v_price_compost.id)::text)));
+JOIN v_price_compost ON (((cat_soil."m3exc_cost") = (v_price_compost.id))));
 
 
 DROP VIEW IF EXISTS "v_price_x_catsoil2" CASCADE;
@@ -40,7 +40,7 @@ SELECT
   cat_soil.id,
   v_price_compost.price AS m3fill_cost
 FROM (cat_soil
-JOIN v_price_compost ON (((cat_soil."m3fill_cost")::text = (v_price_compost.id)::text)));
+JOIN v_price_compost ON (((cat_soil."m3fill_cost") = (v_price_compost.id))));
 
 
 DROP VIEW IF EXISTS "v_price_x_catsoil3" CASCADE;
@@ -49,7 +49,7 @@ SELECT
   cat_soil.id,
   v_price_compost.price AS m3excess_cost
 FROM (cat_soil
-JOIN v_price_compost ON (((cat_soil."m3excess_cost")::text = (v_price_compost.id)::text)));
+JOIN v_price_compost ON (((cat_soil."m3excess_cost") = (v_price_compost.id))));
 
 
 DROP VIEW IF EXISTS "v_price_x_catsoil4" CASCADE;
@@ -58,8 +58,8 @@ SELECT
   cat_soil.id,
    v_price_compost.price AS m2trenchl_cost
 FROM (cat_soil
-JOIN v_price_compost ON (((cat_soil."m2trenchl_cost")::text = (v_price_compost.id)::text)))
-WHERE (((cat_soil.m2trenchl_cost)::text = (v_price_compost.id)::text)  OR  (cat_soil.m2trenchl_cost)::text = null);
+JOIN v_price_compost ON (((cat_soil."m2trenchl_cost") = (v_price_compost.id))))
+WHERE (((cat_soil.m2trenchl_cost) = (v_price_compost.id))  OR  (cat_soil.m2trenchl_cost) = null);
 
 
 DROP VIEW IF EXISTS "v_price_x_catsoil" CASCADE;
@@ -74,9 +74,9 @@ SELECT
   v_price_x_catsoil3.m3excess_cost,
   v_price_x_catsoil4.m2trenchl_cost
 FROM (v_price_x_catsoil1
-LEFT JOIN v_price_x_catsoil2 ON (((v_price_x_catsoil2.id)::text = (v_price_x_catsoil1.id)::text))
-LEFT JOIN v_price_x_catsoil3 ON (((v_price_x_catsoil3.id)::text = (v_price_x_catsoil1.id)::text))
-LEFT JOIN v_price_x_catsoil4 ON (((v_price_x_catsoil4.id)::text = (v_price_x_catsoil1.id)::text))
+LEFT JOIN v_price_x_catsoil2 ON (((v_price_x_catsoil2.id) = (v_price_x_catsoil1.id)))
+LEFT JOIN v_price_x_catsoil3 ON (((v_price_x_catsoil3.id) = (v_price_x_catsoil1.id)))
+LEFT JOIN v_price_x_catsoil4 ON (((v_price_x_catsoil4.id) = (v_price_x_catsoil1.id)))
 );
 
 
@@ -89,10 +89,10 @@ SELECT
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'element'::text AS identif
+ 'element' AS identif
    FROM arc
-   JOIN cat_arc ON cat_arc.id::text = arc.arccat_id
-   JOIN v_price_compost ON cat_arc.cost::text = v_price_compost.id::text
+   JOIN cat_arc ON cat_arc.id = arc.arccat_id
+   JOIN v_price_compost ON cat_arc.cost = v_price_compost.id
 UNION
  SELECT
  arc_id,
@@ -101,10 +101,10 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm2bottom'::text AS identif
+ 'm2bottom' AS identif
    FROM arc
-   JOIN cat_arc ON cat_arc.id::text = arc.arccat_id
-   JOIN v_price_compost ON cat_arc.m2bottom_cost::text = v_price_compost.id::text
+   JOIN cat_arc ON cat_arc.id = arc.arccat_id
+   JOIN v_price_compost ON cat_arc.m2bottom_cost = v_price_compost.id
 UNION
  SELECT
  arc_id,
@@ -113,10 +113,10 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3protec'::text AS identif
+ 'm3protec' AS identif
    FROM arc
-   JOIN cat_arc ON cat_arc.id::text = arc.arccat_id
-   JOIN v_price_compost ON cat_arc.m3protec_cost::text = v_price_compost.id::text
+   JOIN cat_arc ON cat_arc.id = arc.arccat_id
+   JOIN v_price_compost ON cat_arc.m3protec_cost = v_price_compost.id
 UNION
   SELECT
  arc_id,
@@ -125,10 +125,10 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3exc'::text AS identif
+ 'm3exc' AS identif
    FROM arc
-   JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
-   JOIN v_price_compost ON cat_soil.m3exc_cost::text = v_price_compost.id::text
+   JOIN cat_soil ON cat_soil.id = arc.soilcat_id
+   JOIN v_price_compost ON cat_soil.m3exc_cost = v_price_compost.id
 UNION
   SELECT
  arc_id,
@@ -137,10 +137,10 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3fill'::text AS identif
+ 'm3fill' AS identif
    FROM arc
-   JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
-   JOIN v_price_compost ON cat_soil.m3fill_cost::text = v_price_compost.id::text
+   JOIN cat_soil ON cat_soil.id = arc.soilcat_id
+   JOIN v_price_compost ON cat_soil.m3fill_cost = v_price_compost.id
 UNION
   SELECT
  arc_id,
@@ -149,10 +149,10 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm3excess'::text AS identif
+ 'm3excess' AS identif
    FROM arc
-   JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
-   JOIN v_price_compost ON cat_soil.m3excess_cost::text = v_price_compost.id::text
+   JOIN cat_soil ON cat_soil.id = arc.soilcat_id
+   JOIN v_price_compost ON cat_soil.m3excess_cost = v_price_compost.id
 UNION
   SELECT
  arc_id,
@@ -161,10 +161,10 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'm2trenchl'::text AS identif
+ 'm2trenchl' AS identif
    FROM arc
-   JOIN cat_soil ON cat_soil.id::text = arc.soilcat_id
-   JOIN v_price_compost ON cat_soil.m2trenchl_cost::text = v_price_compost.id::text
+   JOIN cat_soil ON cat_soil.id = arc.soilcat_id
+   JOIN v_price_compost ON cat_soil.m2trenchl_cost = v_price_compost.id
 UNION
  SELECT
  arc.arc_id,
@@ -173,11 +173,11 @@ UNION
  v_price_compost.unit,
  v_price_compost.descript,
  v_price_compost.price AS cost,
- 'pavement'::text AS identif
+ 'pavement' AS identif
    FROM arc
    JOIN plan_arc_x_pavement ON plan_arc_x_pavement.arc_id=arc.arc_id
-   JOIN cat_pavement ON cat_pavement.id::text = plan_arc_x_pavement.pavcat_id
-   JOIN v_price_compost ON cat_pavement.m2_cost::text = v_price_compost.id::text
+   JOIN cat_pavement ON cat_pavement.id = plan_arc_x_pavement.pavcat_id
+   JOIN v_price_compost ON cat_pavement.m2_cost = v_price_compost.id
 
    order by arc_id,catalog_id
 

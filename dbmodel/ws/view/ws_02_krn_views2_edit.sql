@@ -5,9 +5,56 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 ----------------------------
 --    GIS EDITING VIEWS
 ----------------------------
+
+
+DROP VIEW IF EXISTS v_edit_macrodma CASCADE;
+CREATE VIEW v_edit_macrodma AS SELECT
+	macrodma.macrodma_id,
+	macrodma.name,
+	macrodma.descript,
+	macrodma.the_geom,
+	macrodma.undelete,
+	macrodma.expl_id
+FROM selector_expl, macrodma 
+WHERE ((macrodma.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+  
+
+  
+DROP VIEW IF EXISTS v_edit_dma CASCADE;
+CREATE VIEW v_edit_dma AS SELECT
+	dma.dma_id,
+	dma.name,
+	dma.macrodma_id,
+	dma.descript,
+	dma.observ,
+	dma.the_geom,
+	dma.undelete,
+	dma.expl_id
+	FROM selector_expl, dma 
+WHERE ((dma.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+  
+
+
+DROP VIEW IF EXISTS v_edit_sector CASCADE;
+CREATE VIEW v_edit_sector AS SELECT
+	sector.sector_id,
+	sector.name,
+	sector.descript,
+	sector.the_geom,
+	sector.undelete,
+	sector.expl_id
+FROM selector_expl,sector 
+WHERE ((sector.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
+
+
+
 
 DROP VIEW IF EXISTS v_edit_node CASCADE;
 CREATE OR REPLACE VIEW v_edit_node AS
@@ -58,11 +105,11 @@ dma.macrodma_id,
 node.expl_id,
 node.parent_node_id,
 node.hemisphere
-FROM expl_selector, node
-LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_arc CASCADE;
@@ -112,11 +159,11 @@ arc.inventory,
 arc.enddate,
 dma.macrodma_id,
 arc.expl_id
-FROM expl_selector,arc 
-LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,arc 
+LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
+LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 
@@ -168,12 +215,12 @@ arc.inventory,
 arc.enddate AS pipe_enddate,
 dma.macrodma_id,
 arc.expl_id
-FROM expl_selector,arc 
-LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
+FROM selector_expl,arc 
+LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
+LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
 JOIN man_pipe ON man_pipe.arc_id=arc.arc_id
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 
@@ -224,12 +271,12 @@ arc.inventory,
 arc.enddate AS varc_enddate,
 dma.macrodma_id,
 arc.expl_id
-FROM expl_selector,arc 
-LEFT JOIN cat_arc ON (((arc.arccat_id)::text = (cat_arc.id)::text))
-LEFT JOIN dma ON (((arc.dma_id)::text = (dma.dma_id)::text))
+FROM selector_expl,arc 
+LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
+LEFT JOIN dma ON (((arc.dma_id) = (dma.dma_id)))
 JOIN man_varc ON man_varc.arc_id=arc.arc_id
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 
@@ -289,12 +336,12 @@ CREATE OR REPLACE VIEW v_edit_man_hydrant AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere AS hydrant_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	 JOIN man_hydrant ON man_hydrant.node_id::text = node.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	 JOIN man_hydrant ON man_hydrant.node_id = node.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
   
     
 	 
@@ -348,12 +395,12 @@ CREATE OR REPLACE VIEW v_edit_man_junction AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as junction_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_junction ON node.node_id::text = man_junction.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_junction ON node.node_id = man_junction.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
   
 
 	 
@@ -405,12 +452,12 @@ CREATE OR REPLACE VIEW v_edit_man_manhole AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as manhole_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-    JOIN man_manhole ON node.node_id::text = man_manhole.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+    JOIN man_manhole ON node.node_id = man_manhole.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 
 
@@ -463,12 +510,12 @@ CREATE OR REPLACE VIEW v_edit_man_meter AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as meter_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_meter ON man_meter.node_id::text = node.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_meter ON man_meter.node_id = node.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 
 	 
@@ -523,12 +570,12 @@ CREATE OR REPLACE VIEW v_edit_man_pump AS
 	node.hemisphere as pump_hemisphere,
 	man_pump.flow AS pump_flow,
 	man_pump."power" AS pump_power
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-    JOIN man_pump ON man_pump.node_id::text = node.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+    JOIN man_pump ON man_pump.node_id = node.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 
 	
@@ -583,12 +630,12 @@ CREATE OR REPLACE VIEW v_edit_man_reduction AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as reduction_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_reduction ON man_reduction.node_id::text = node.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_reduction ON man_reduction.node_id = node.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	 
 
 
@@ -640,12 +687,12 @@ CREATE OR REPLACE VIEW v_edit_man_source AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as source_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_source ON node.node_id::text = man_source.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_source ON node.node_id = man_source.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
  
 	 
@@ -719,12 +766,12 @@ CREATE OR REPLACE VIEW v_edit_man_valve AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as valve_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-    JOIN man_valve ON man_valve.node_id::text = node.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+    JOIN man_valve ON man_valve.node_id = node.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 
 	 
@@ -776,12 +823,12 @@ CREATE OR REPLACE VIEW v_edit_man_waterwell AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as waterwell_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_waterwell ON node.node_id::text = man_waterwell.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_waterwell ON node.node_id = man_waterwell.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
    
 DROP VIEW IF EXISTS v_edit_man_tank CASCADE;
@@ -837,12 +884,12 @@ CREATE OR REPLACE VIEW v_edit_man_tank AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as tank_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
-     LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
-     JOIN man_tank ON man_tank.node_id::text = node.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON node.nodecat_id = cat_node.id
+     LEFT JOIN dma ON node.dma_id = dma.dma_id
+     JOIN man_tank ON man_tank.node_id = node.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 	
 	DROP VIEW IF EXISTS v_edit_man_tank_pol CASCADE;
@@ -898,13 +945,13 @@ CREATE OR REPLACE VIEW v_edit_man_tank_pol AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as tank_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
-     LEFT JOIN dma ON node.dma_id::text = dma.dma_id::text
-     JOIN man_tank ON man_tank.node_id::text = node.node_id::text
+FROM selector_expl, node
+	LEFT JOIN cat_node ON node.nodecat_id = cat_node.id
+     LEFT JOIN dma ON node.dma_id = dma.dma_id
+     JOIN man_tank ON man_tank.node_id = node.node_id
 	 JOIN polygon ON polygon.pol_id=man_tank.pol_id
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 
 DROP VIEW IF EXISTS v_edit_man_filter CASCADE;
@@ -955,12 +1002,12 @@ CREATE OR REPLACE VIEW v_edit_man_filter AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as filter_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_filter ON node.node_id::text = man_filter.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_filter ON node.node_id = man_filter.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 	
 DROP VIEW IF EXISTS v_edit_man_register CASCADE;
@@ -1012,12 +1059,12 @@ CREATE OR REPLACE VIEW v_edit_man_register AS
 	man_register.pol_id AS register_pol_id,
 	node.parent_node_id,
 	node.hemisphere as register_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_register ON node.node_id::text = man_register.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_register ON node.node_id = man_register.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 	
 	DROP VIEW IF EXISTS v_edit_man_register_pol CASCADE;
@@ -1069,13 +1116,13 @@ CREATE OR REPLACE VIEW v_edit_man_register_pol AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as register_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_register ON node.node_id::text = man_register.node_id::text
-	JOIN polygon ON polygon.pol_id::text = man_register.pol_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_register ON node.node_id = man_register.node_id
+	JOIN polygon ON polygon.pol_id = man_register.pol_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 	
 	DROP VIEW IF EXISTS v_edit_man_netwjoin CASCADE;
@@ -1134,13 +1181,13 @@ CREATE OR REPLACE VIEW v_edit_man_netwjoin AS
 	netwjoin.lead_verified AS netwjoin_lead_verified,
 	netwjoin.lead_facade AS netwjoin_lead_facade,
 	netwjoin.cat_valve2 AS netwjoin_cat_valve2
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_netwjoin ON node.node_id::text = man_netwjoin.node_id::text
-	JOIN ext_streetaxis ON man_netwjoin.streetaxis_id::text=ext_streetaxis.id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_netwjoin ON node.node_id = man_netwjoin.node_id
+	JOIN ext_streetaxis ON man_netwjoin.streetaxis_id=ext_streetaxis.id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 	
 	DROP VIEW IF EXISTS v_edit_man_flexunion CASCADE;
@@ -1191,12 +1238,12 @@ CREATE OR REPLACE VIEW v_edit_man_flexunion AS
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as flexunion_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_flexunion ON node.node_id::text = man_flexunion.node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_flexunion ON node.node_id = man_flexunion.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 	
 	DROP VIEW IF EXISTS v_edit_man_expansiontank CASCADE;
@@ -1247,12 +1294,12 @@ SELECT node.node_id,
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as exptank_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_expansiontank ON node.node_id::text = man_expansiontank .node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_expansiontank ON node.node_id = man_expansiontank .node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 
 DROP VIEW IF EXISTS v_edit_man_netsamplepoint CASCADE;
@@ -1303,12 +1350,12 @@ SELECT node.node_id,
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as netsample_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_netsamplepoint ON node.node_id::text = man_netsamplepoint .node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_netsamplepoint ON node.node_id = man_netsamplepoint .node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_man_netelement CASCADE;
@@ -1359,12 +1406,12 @@ SELECT node.node_id,
 	node.expl_id,
 	node.parent_node_id,
 	node.hemisphere as netelement_hemisphere
-FROM expl_selector, node
-	LEFT JOIN cat_node ON ((node.nodecat_id)::text = (cat_node.id)::text)
-	LEFT JOIN dma ON (((node.dma_id)::text = (dma.dma_id)::text))
-	JOIN man_netelement ON node.node_id::text = man_netelement .node_id::text
-	WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-	AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_netelement ON node.node_id = man_netelement .node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 
 
@@ -1375,9 +1422,9 @@ CREATE VIEW v_edit_pond AS SELECT
 	code_comercial,
 	pond.the_geom,
 	pond.expl_id
-FROM expl_selector,pond
-WHERE ((pond.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,pond
+WHERE ((pond.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_edit_pool CASCADE;
@@ -1387,67 +1434,8 @@ CREATE VIEW v_edit_pool AS SELECT
 	code_comercial,
 	pool.the_geom,
 	pool.expl_id
-FROM expl_selector,pool
-WHERE ((pool.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,pool
+WHERE ((pool.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
-
-
- 
- --REVIEW VIEWS
- 
-DROP VIEW IF EXISTS v_edit_review_node CASCADE;
-CREATE VIEW v_edit_review_node AS 
- SELECT review_audit_node.node_id,
-	node.nodecat_id,
-    node.elevation,
-    node."depth",
-	node."state",
-	review_audit_node.nodecat_id AS field_nodecat_id,
-    review_audit_node.elevation AS field_elevation,
-    review_audit_node."depth" AS field_depth,
-    review_audit_node.annotation,
-    review_audit_node.observ,
-	review_audit_node.moved_geom,
-    review_audit_node.office_checked,
-	review_audit_node.the_geom	
-   FROM node
-     RIGHT JOIN review_audit_node ON node.node_id::text = review_audit_node.node_id::text
-  WHERE review_audit_node.field_checked IS TRUE AND review_audit_node.office_checked IS NOT TRUE;
-  
-
-CREATE OR REPLACE VIEW v_edit_review_arc AS 
- SELECT review_audit_arc.arc_id,
-    arc.arccat_id,
-	arc."state",
-    review_audit_arc.arccat_id AS field_arccat_id,
-    review_audit_arc.annotation,
-    review_audit_arc.observ,
-    review_audit_arc.moved_geom,
-    review_audit_arc.office_checked,
-    review_audit_arc.the_geom
-   FROM arc
-     RIGHT JOIN review_audit_arc ON arc.arc_id::text = review_audit_arc.arc_id::text
-  WHERE review_audit_arc.field_checked IS TRUE AND review_audit_arc.office_checked IS NOT TRUE;
-  
-  
-  CREATE OR REPLACE VIEW v_edit_review_connec AS 
-	SELECT review_audit_connec.connec_id,
-	 connec.elevation,
-	 connec."depth",
-	 connec.connec_type,
-	 connec.connecat_id,
-	 connec."state",
-	 review_audit_connec.elevation as field_elevation,
-	 review_audit_connec."depth" AS field_depth,
-	 review_audit_connec.connec_type AS field_connec_type,
-	 review_audit_connec.connecat_id AS field_connecat_id,
-	 review_audit_connec.annotation,
-	 review_audit_connec.observ,
-	 review_audit_connec.moved_geom,
-	 review_audit_connec.office_checked,
-	 review_audit_connec.the_geom
-	 FROM connec
-		RIGHT JOIN review_audit_connec ON connec.connec_id::text = review_audit_connec.connec_id::text
-  WHERE review_audit_connec.field_checked IS TRUE AND review_audit_connec.office_checked IS NOT TRUE;

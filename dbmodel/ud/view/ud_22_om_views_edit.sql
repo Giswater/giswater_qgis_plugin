@@ -16,6 +16,6 @@ CREATE VIEW v_edit_om_visit AS SELECT
 	om_visit.the_geom,
 	webclient_id,
 	om_visit.expl_id
-FROM expl_selector,om_visit
-WHERE ((om_visit.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,om_visit
+WHERE ((om_visit.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());

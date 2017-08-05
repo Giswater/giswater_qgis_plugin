@@ -9,8 +9,45 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- FLOWTRACE
 -- ----------------------------
 
+DROP VIEW IF EXISTS v_anl_flowtrace_arc;
+CREATE OR REPLACE VIEW v_anl_flowtrace_arc AS 
+SELECT
+arc_id,
+the_geom
+FROM anl_flow_trace_arc
 
-DROP VIEW IF EXISTS v_anl_flow_trace_connec;
+;
+
+DROP VIEW IF EXISTS v_anl_flowtrace_node;
+CREATE OR REPLACE VIEW v_anl_flowtrace_node AS 
+SELECT
+node_id,
+the_geom
+FROM anl_flow_trace_node
+
+;
+
+DROP VIEW IF EXISTS v_anl_flowexit_arc;
+CREATE OR REPLACE VIEW v_anl_flowexit_arc AS 
+SELECT
+arc_id,
+the_geom
+FROM anl_flow_trace_arc
+
+;
+
+DROP VIEW IF EXISTS v_anl_flowtrace_node;
+CREATE OR REPLACE VIEW v_anl_flowtrace_node AS 
+SELECT
+node_id,
+the_geom
+FROM anl_flow_trace_node
+
+;
+
+
+
+DROP VIEW IF EXISTS v_anl_flowtrace_connec;
 CREATE OR REPLACE VIEW v_anl_flowtrace_connec AS 
 SELECT
 connec_id,
@@ -39,8 +76,8 @@ CREATE OR REPLACE VIEW v_anl_dwf_connec AS
     anl_dwf_connec_x_uses_value.m3dia,
     connec.the_geom
    FROM connec
-     JOIN anl_dwf_connec_x_uses_value ON anl_dwf_connec_x_uses_value.connec_id::text = connec.connec_id::text
-     JOIN anl_dwf_selector_scenario ON anl_dwf_selector_scenario.scenario_id::text = anl_dwf_connec_x_uses_value.scenario_id::text;
+     JOIN anl_dwf_connec_x_uses_value ON anl_dwf_connec_x_uses_value.connec_id = connec.connec_id
+     JOIN anl_dwf_selector_scenario ON anl_dwf_selector_scenario.scenario_id = anl_dwf_connec_x_uses_value.scenario_id;
  
 	 
 DROP VIEW IF EXISTS v_anl_node_sink CASCADE;
@@ -50,10 +87,10 @@ anl_node_sink.node_id,
 anl_node_sink.num_arcs,
 anl_node_sink.the_geom,
 node.expl_id
-FROM expl_selector, anl_node_sink
+FROM selector_expl, anl_node_sink
 JOIN node ON node.node_id=anl_node_sink.node_id
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 _exit_node CASCADE;
@@ -62,10 +99,10 @@ SELECT
 anl_flow_exit_node.node_id,
 anl_flow_exit_node.the_geom,
 node.expl_id
-FROM expl_selector, anl_flow_exit_node
+FROM selector_expl, anl_flow_exit_node
 JOIN node ON node.node_id=anl_flow_exit_node.node_id
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_anl_flow_exit_arc CASCADE;
@@ -74,10 +111,10 @@ SELECT
 anl_flow_exit_arc.arc_id,
 anl_flow_exit_arc.the_geom,
 arc.expl_id
-FROM expl_selector, anl_flow_exit_arc
+FROM selector_expl, anl_flow_exit_arc
 JOIN arc ON arc.arc_id=anl_flow_exit_arc.arc_id
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_anl_flow_trace_node CASCADE;
@@ -86,10 +123,10 @@ SELECT
 anl_flow_trace_node.node_id,
 anl_flow_trace_node.the_geom,
 node.expl_id
-FROM expl_selector, anl_flow_trace_node
+FROM selector_expl, anl_flow_trace_node
 JOIN node ON node.node_id=anl_flow_trace_node.node_id
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_anl_flow_trace_arc CASCADE;
@@ -98,7 +135,7 @@ SELECT
 anl_flow_trace_arc.arc_id,
 anl_flow_trace_arc.the_geom,
 arc.expl_id
-FROM expl_selector, anl_flow_trace_arc
+FROM selector_expl, anl_flow_trace_arc
 JOIN arc ON arc.arc_id=anl_flow_trace_arc.arc_id
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());

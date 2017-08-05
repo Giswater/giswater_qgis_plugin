@@ -16,7 +16,7 @@ SELECT
 gully_id,
 the_geom
 FROM gully
-JOIN man_selector_state ON gully.state=man_selector_state.id
+JOIN man_selector_state ON gully.state=man_selector_state.state_id
 ;
 
 
@@ -34,7 +34,7 @@ element.comment,
 element.builtdate,
 element.enddate
 FROM element_x_gully
-JOIN element ON element.element_id::text = element_x_gully.element_id::text;
+JOIN element ON element.element_id = element_x_gully.element_id;
 
 
 

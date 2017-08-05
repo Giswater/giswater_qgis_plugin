@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -111,27 +111,24 @@ CREATE TABLE "config_searchplus" (
 "id" serial NOT NULL PRIMARY KEY,
 "context"  varchar (50),
 "parameter"  varchar (50),
-"value"  varchar (50),
+"value"  varchar (50)
 );
 
 
-  CREATE TABLE config_client_dvalue
-(
-  id serial NOT NULL,
-  table_id text,
-  column_id text,
-  dv_table text,
-  dv_key_column text,
-  dv_value_column text,
-  orderby_value boolean,
-  allow_null boolean,
-  CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id)/*,
-  CONSTRAINT config_client_value_colum_id_fkey FOREIGN KEY (dv_table, dv_key_column)
-      REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT,
-  CONSTRAINT config_client_value_origin_id_fkey FOREIGN KEY (table_id, column_id)
-      REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE RESTRICT*/
+CREATE TABLE config_client_dvalue(
+id serial NOT NULL,
+table_id text,
+column_id text,
+dv_table text,
+dv_key_column text,
+dv_value_column text,
+orderby_value boolean,
+allow_null boolean,
+CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id)/*,
+CONSTRAINT config_client_value_colum_id_fkey FOREIGN KEY (dv_table, dv_key_column) 
+ REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
+CONSTRAINT config_client_value_origin_id_fkey FOREIGN KEY (table_id, column_id)
+ REFERENCES db_cat_table_x_column (db_cat_table_id, column_name) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT*/
 );
 
 

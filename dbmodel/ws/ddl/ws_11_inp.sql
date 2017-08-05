@@ -671,6 +671,7 @@ CREATE TABLE "temp_arc" (
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,,
 "annotation" character varying(254),
+"length" numeric(12,3),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)
 );
 
@@ -704,6 +705,7 @@ CREATE TABLE "rpt_input_arc" (
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,,
 "annotation" character varying(254),
+"length" numeric(12,3),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)
 );
 
@@ -808,16 +810,10 @@ CREATE TABLE "rpt_selector_compare" (
 "cur_user" text
 );
 
-CREATE TABLE "inp_selector_sector" (
-"sector_id" varchar(30)   NOT NULL
-);
-
-
-CREATE TABLE "inp_selector_state" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
-CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
-);
+CREATE TABLE inp_selector_sector(
+id serial NOT NULL PRIMARY KEY,
+sector_id integer,
+cur_user text
 
 
 

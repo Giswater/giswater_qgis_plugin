@@ -1,11 +1,11 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
 
 -- ----------------------------
 -- Base map
@@ -15,7 +15,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 CREATE TABLE "ext_type_street" (
 "id" varchar(20) PRIMARY KEY NOT NULL,
-"observ" varchar(50)  ,
+"observ" varchar(50)
 );
 
 
@@ -24,7 +24,7 @@ CREATE TABLE "ext_streetaxis" (
 "type" varchar(18),
 "name" varchar(100),
 "text" text,
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"the_geom" public.geometry (LINESTRING, 25831),
 "expl_id" integer
 );
 
@@ -35,7 +35,7 @@ id character varying(16) PRIMARY KEY NOT NULL,
 streetaxis character varying(16),
 postnumber character varying(16),
 urban_properties_id character varying(16),
-the_geom geometry(Point,SRID_VALUE),
+the_geom geometry(Point,25831),
 expl_id integer
   );
 
@@ -51,7 +51,7 @@ CREATE TABLE "ext_plot"(
 "square" varchar(16),
 "observ" text,
 "text" text,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
+"the_geom" public.geometry (MULTIPOLYGON, 25831),
 "expl_id" integer
 );
 

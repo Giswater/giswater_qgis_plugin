@@ -30,7 +30,7 @@ ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
 arc.the_geom,
  arc.expl_id
 FROM arc
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text;
+JOIN cat_arc ON arc.arccat_id = cat_arc.id;
 
 
 DROP VIEW IF EXISTS v_node CASCADE;
@@ -59,8 +59,8 @@ node.depth AS depth1,
 (cat_arc.dext)/1000 AS dext, 
 node.depth - (cat_arc.dext)/1000 AS r1
 FROM arc
-JOIN node ON arc.node_1::text = node.node_id::text
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+JOIN node ON arc.node_1 = node.node_id
+JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
 
 
 DROP VIEW IF EXISTS v_arc_x_node2 CASCADE;
@@ -71,8 +71,8 @@ node.depth AS depth2,
 (cat_arc.dext)/1000 AS dext, 
 node.depth - (cat_arc.dext)/1000 AS r2
 FROM arc
-JOIN node ON arc.node_2::text = node.node_id::text
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+JOIN node ON arc.node_2 = node.node_id
+JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
 
 
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
@@ -91,11 +91,11 @@ arc."state",
 arc.sector_id,
 arc.the_geom,
 arc.expl_id
-FROM expl_selector, v_arc_x_node1
-JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
-JOIN arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);;
+FROM selector_expl, v_arc_x_node1
+JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
+JOIN arc ON v_arc_x_node2.arc_id = arc.arc_id
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());;
 
 
 
@@ -113,6 +113,6 @@ CREATE OR REPLACE VIEW v_value_cat_connec AS
     cat_connec.type as connec_type,
     connec_type.type
    FROM cat_connec
-     JOIN connec_type ON connec_type.id::text = cat_connec.type::text;
+     JOIN connec_type ON connec_type.id = cat_connec.type;
 
 

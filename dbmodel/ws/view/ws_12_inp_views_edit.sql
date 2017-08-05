@@ -30,10 +30,10 @@ node.the_geom,
 inp_junction.demand, 
 inp_junction.pattern_id,
 node.expl_id
-FROM expl_selector,node
-JOIN inp_junction ON ((inp_junction.node_id)::text = (node.node_id)::text)
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,node
+JOIN inp_junction ON ((inp_junction.node_id) = (node.node_id))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_reservoir" CASCADE;
@@ -55,10 +55,10 @@ node.the_geom,
 inp_reservoir.head,
 inp_reservoir.pattern_id,
 node.expl_id
-FROM expl_selector, node
-JOIN inp_reservoir ON ((inp_reservoir.node_id)::text = (node.node_id)::text)
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+JOIN inp_reservoir ON ((inp_reservoir.node_id) = (node.node_id))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_tank" CASCADE;
@@ -85,10 +85,10 @@ inp_tank.diameter,
 inp_tank.minvol, 
 inp_tank.curve_id,
 node.expl_id
-FROM expl_selector, node
-JOIN inp_tank ON ((inp_tank.node_id)::text = (node.node_id)::text)
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+JOIN inp_tank ON ((inp_tank.node_id) = (node.node_id))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_pump" CASCADE;
@@ -115,10 +115,10 @@ inp_pump.pattern,
 inp_pump.to_arc, 
 inp_pump.status,
 node.expl_id
-FROM expl_selector, node 
-JOIN inp_pump ON ((node.node_id)::text = (inp_pump.node_id)::text)
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node 
+JOIN inp_pump ON ((node.node_id) = (inp_pump.node_id))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_valve" CASCADE;
@@ -147,10 +147,10 @@ inp_valve.minorloss,
 inp_valve.to_arc,
 inp_valve.status,
 node.expl_id
-FROM expl_selector, node 
-JOIN inp_valve ON ((node.node_id)::text = (inp_valve.node_id)::text)
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node 
+JOIN inp_valve ON ((node.node_id) = (inp_valve.node_id))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_shortpipe" CASCADE;
@@ -174,10 +174,10 @@ inp_shortpipe.minorloss,
 inp_shortpipe.to_arc, 
 inp_shortpipe.status,
 node.expl_id
-FROM expl_selector,node 
-JOIN inp_shortpipe ON ((inp_shortpipe.node_id)::text = (node.node_id)::text)
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,node 
+JOIN inp_shortpipe ON ((inp_shortpipe.node_id) = (node.node_id))
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_pipe" CASCADE;
@@ -201,7 +201,7 @@ inp_pipe.status,
 inp_pipe.custom_roughness, 
 inp_pipe.custom_dint,
 arc.expl_id
-FROM expl_selector, arc 
-JOIN inp_pipe ON ((inp_pipe.arc_id)::text = (arc.arc_id)::text)
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, arc 
+JOIN inp_pipe ON ((inp_pipe.arc_id) = (arc.arc_id))
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());

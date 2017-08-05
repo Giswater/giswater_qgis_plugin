@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -150,26 +150,24 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 
-CREATE TABLE arc_type_cat_type
-(
+CREATE TABLE arc_type_cat_type (
   id character varying(30) NOT NULL,
   shortcut_key varchar(30) ,
-  order by int2,
+  orderby int2,
   i18n character varying(30),
   descript text,
   CONSTRAINT arc_type_cat_type_pkey PRIMARY KEY (id)
-)
+);
 
 
-CREATE TABLE node_type_cat_type
-(
+CREATE TABLE node_type_cat_type (
   id character varying(30) NOT NULL,
   shortcut_key varchar(30),
-  order by int2,
+  orderby int2,
   i18n character varying(30),
   descript text,
   CONSTRAINT node_type_cat_type_pkey PRIMARY KEY (id)
-)
+);
 
 
 
@@ -333,25 +331,6 @@ undelete boolean
 );
 
 
-CREATE TABLE "vnode" (
-"vnode_id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16),
-"vnode_type" varchar(30),
-"annotation" varchar(254),
-"userdefined_pos" bool,
-"the_geom" public.geometry (POINT, SRID_VALUE)
-);
-
-
-CREATE TABLE "link" (
-link_id serial NOT NULL PRIMARY KEY,
-feature_id varchar(16),
-featurecat_id varchar(30), 
-vnode_id integer NOT NULL,
-the_geom public.geometry (LINESTRING, SRID_VALUE)
-);
-
-
   
 CREATE TABLE "samplepoint"(
 "sample_id" character varying(16) NOT NULL,
@@ -382,7 +361,7 @@ CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 -- ----------------------------------
 
 CREATE TABLE "element" (
-"element_id" varchar(16) DEFAULT nextval('"SCHEMA_NAME".element_seq'::regclass) NOT NULL,
+"element_id" varchar(16) NOT NULL,
 "code" varchar(30) NOT NULL,
 "elementcat_id" varchar(30),
 "dma_id" integer,
@@ -394,7 +373,7 @@ CREATE TABLE "element" (
 "category_type" varchar(50)  ,
 "fluid_type" varchar(50)  ,
 "location_type" varchar(50)  ,
-"workcat_id" varchar(30), ,
+"workcat_id" varchar(30), 
 "buildercat_id" varchar(30)  ,
 "builtdate" date,
 "ownercat_id" varchar(30)  ,
@@ -460,30 +439,6 @@ CREATE TABLE "value_yesno" (
 );
 
 
--- ----------------------------------
--- Table: selector
--- ----------------------------------
-
-
-CREATE TABLE selector_expl (
-id serial PRIMARY KEY,
-expl_id integer,
-cur_user text
-);
-
-CREATE TABLE selector_psector (
-id serial PRIMARY KEY,
-psector_id integer,
-cur_user text
-);
-
-CREATE TABLE selector_state (
-id serial PRIMARY KEY,
-expl_id integer,
-cur_user text
-);
-
-
 
 
 -- ----------------------------------
@@ -493,12 +448,8 @@ cur_user text
 
 
 CREATE INDEX exploitation_index ON exploitation USING GIST (the_geom);
-CREATE INDEX macrodma_index ON macrodma USING GIST (the_geom);
-CREATE INDEX dma_index ON dma USING GIST (the_geom);
-CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
 CREATE INDEX link_index ON link USING GIST (the_geom);
-CREATE INDEX point_index ON point USING GIST (the_geom);
 CREATE INDEX element_index ON element USING GIST (the_geom);
 
 

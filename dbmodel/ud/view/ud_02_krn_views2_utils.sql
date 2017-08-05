@@ -1,10 +1,10 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
 
 -- ----------------------------
 -- View structure for v_arc_x_node
@@ -43,10 +43,11 @@ WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- fi
 ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
 arc.the_geom,
 arc.expl_id
-FROM expl_selector,arc
-JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
-WHERE arc.expl_id=expl_selector.expl_id
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,arc
+JOIN cat_arc ON arc.arccat_id = cat_arc.id
+JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
+WHERE arc.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"();
 
 
 DROP VIEW IF EXISTS v_node CASCADE;
@@ -72,9 +73,10 @@ node.dma_id,
 node.state,
 node.the_geom,
 node.expl_id
-FROM expl_selector, node
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl, node
+JOIN v_state_node ON node.node_id=v_state_node.node_id
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
    
@@ -95,8 +97,8 @@ SELECT arc.arc_id,
     cat_arc.geom1,
     arc.y1 - cat_arc.geom1 AS r1
    FROM v_arc arc
-     JOIN v_node node ON arc.node_1::text = node.node_id::text
-     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+     JOIN v_node node ON arc.node_1 = node.node_id
+     JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
 
 
 	 
@@ -118,8 +120,8 @@ SELECT arc.arc_id,
     cat_arc.geom1,
     arc.y2 - cat_arc.geom1 AS r2
    FROM v_arc arc
-     JOIN v_node node ON arc.node_2::text = node.node_id::text
-     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text AND arc.arccat_id::text = cat_arc.id::text;
+     JOIN v_node node ON arc.node_2 = node.node_id
+     JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
 
 	 
 	 
@@ -159,8 +161,8 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
     arc.sector_id,
     arc.the_geom
    FROM v_arc_x_node1
-     JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id::text = v_arc_x_node2.arc_id::text
-     JOIN v_arc arc ON v_arc_x_node2.arc_id::text = arc.arc_id::text;
+     JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
+     JOIN v_arc arc ON v_arc_x_node2.arc_id = arc.arc_id;
 
 
 

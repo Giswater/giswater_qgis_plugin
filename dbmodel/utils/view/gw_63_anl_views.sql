@@ -17,7 +17,7 @@ node_2,
 epa_type,
 the_geom
 FROM arc
-JOIN anl_selector_state ON arc.state=anl_selector_state.id
+JOIN anl_selector_state ON arc.state=anl_selector_state.state_id
 ;
 
 DROP VIEW IF EXISTS v_anl_node CASCADE;
@@ -27,7 +27,7 @@ node_id,
 epa_type,
 the_geom
 FROM node
-JOIN anl_selector_state ON node.state=anl_selector_state.id
+JOIN anl_selector_state ON node.state=anl_selector_state.state_id
 ;
 
 DROP VIEW IF EXISTS v_anl_connec CASCADE;
@@ -36,7 +36,7 @@ SELECT
 connec_id,
 the_geom
 FROM connec
-JOIN anl_selector_state ON connec.state=anl_selector_state.id
+JOIN anl_selector_state ON connec.state=anl_selector_state.state_id
 ;
 
 DROP VIEW IF EXISTS v_anl_node_orphan CASCADE;
@@ -46,11 +46,11 @@ anl_node_orphan.node_id,
 anl_node_orphan.node_type,
 anl_node_orphan.the_geom,
 exploitation.short_descript AS expl_name
-FROM expl_selector, anl_node_orphan
+FROM selector_expl, anl_node_orphan
 JOIN node ON node.node_id=anl_node_orphan.node_id
 JOIN exploitation ON node.expl_id=exploitation.expl_id
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 DROP VIEW IF EXISTS v_anl_node_duplicated CASCADE;
 CREATE OR REPLACE VIEW v_anl_node_duplicated AS
@@ -59,11 +59,11 @@ anl_node_duplicated.node_id,
 anl_node_duplicated.node_conserv,
 anl_node_duplicated.the_geom,
 exploitation.short_descript AS expl_name
-FROM expl_selector, anl_node_duplicated
+FROM selector_expl, anl_node_duplicated
 JOIN node ON node.node_id=anl_node_duplicated.node_id
 JOIN exploitation ON node.expl_id=exploitation.expl_id
-WHERE ((node.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((node.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_anl_connec_duplicated CASCADE;
@@ -73,11 +73,11 @@ anl_connec_duplicated.connec_id,
 anl_connec_duplicated.connec_conserv,
 anl_connec_duplicated.the_geom,
 exploitation.short_descript AS expl_name
-FROM expl_selector, anl_connec_duplicated
+FROM selector_expl, anl_connec_duplicated
 JOIN connec ON connec.connec_id=anl_connec_duplicated.connec_id
 JOIN exploitation ON connec.expl_id=exploitation.expl_id
-WHERE ((connec.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((connec.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS v_anl_arc_same_startend CASCADE;
@@ -87,11 +87,11 @@ anl_arc_same_startend.arc_id,
 anl_arc_same_startend.length,
 anl_arc_same_startend.the_geom,
 exploitation.short_descript AS expl_name
-FROM expl_selector, anl_arc_same_startend
+FROM selector_expl, anl_arc_same_startend
 JOIN arc ON arc.arc_id=anl_arc_same_startend.arc_id
 JOIN exploitation ON arc.expl_id=exploitation.expl_id
-WHERE ((arc.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+WHERE ((arc.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());
 
 -- pgrouting views
 

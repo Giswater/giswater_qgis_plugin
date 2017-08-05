@@ -18,7 +18,7 @@ doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_node
-JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
+JOIN doc ON doc.id = doc_x_node.doc_id;
 
 
 DROP VIEW IF EXISTS v_ui_doc_x_arc CASCADE;
@@ -34,7 +34,7 @@ doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_arc
-JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
+JOIN doc ON doc.id = doc_x_arc.doc_id;
 
 
 DROP VIEW IF EXISTS v_ui_doc_x_connec CASCADE;
@@ -50,5 +50,5 @@ doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_connec
-JOIN doc ON doc.id::text = doc_x_connec.doc_id::text;
+JOIN doc ON doc.id = doc_x_connec.doc_id;
 

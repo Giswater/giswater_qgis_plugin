@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
 
   
 -- ----------------------------
@@ -83,13 +83,6 @@ CREATE SEQUENCE "inp_lid_control_seq"
   NO MAXVALUE
   CACHE 1;
 
-
-CREATE SEQUENCE "inp_node_x_sector_seq"
-  START WITH 1
-  INCREMENT BY 1
-  NO MINVALUE
-  NO MAXVALUE
-  CACHE 1;
 
   
 CREATE SEQUENCE "inp_mapdim_seq"
@@ -414,7 +407,7 @@ CREATE TABLE "raingage" (
 "sta" varchar(12)  ,
 "units" varchar(3)  ,
 "expl_id" integer,
-"the_geom" public.geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, 25831)
 );
 
 
@@ -446,9 +439,9 @@ CREATE TABLE "subcatchment" (
 "curveno" numeric(12,4),
 "conduct_2" numeric(12,4),
 "drytime_2" numeric(12,4),
-"sector_id" varchar(30)  ,
+"sector_id" integer ,
 "hydrology_id" varchar(20),
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, 25831)
 );
 
 
@@ -496,7 +489,7 @@ CONSTRAINT inp_giswater_conf PRIMARY KEY (id)
 
 
 CREATE TABLE "inp_adjustments" (
-"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".inp_adjustments_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"ud30".inp_adjustments_seq'::regclass) NOT NULL,
 "adj_type" varchar(16)   NOT NULL,
 "value_1" numeric(12,4),
 "value_2" numeric(12,4),
@@ -515,7 +508,7 @@ CONSTRAINT inp_adjustments_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "inp_aquifer" (
-"aquif_id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".inp_aquifer_seq'::regclass) NOT NULL,
+"aquif_id" varchar(16) DEFAULT nextval ('"ud30".inp_aquifer_seq'::regclass) NOT NULL,
 "por" numeric(12,4),
 "wp" numeric(12,4),
 "fc" numeric(12,4),
@@ -533,7 +526,7 @@ CREATE TABLE "inp_aquifer" (
 
 
 CREATE TABLE "inp_backdrop" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_backdrop_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_backdrop_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
@@ -573,8 +566,8 @@ CREATE TABLE "inp_controls_x_node" (
 
 CREATE TABLE "inp_controls_x_arc" (
 "id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16) NOT NULL,,
-"text" text NOT NULL,
+"arc_id" varchar(16) NOT NULL,
+"text" text NOT NULL
 );
 
 
@@ -586,7 +579,7 @@ CREATE TABLE "inp_coverage_land_x_subc" (
 
 
 CREATE TABLE "inp_curve" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_curve_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_curve_seq'::regclass) NOT NULL,
 "curve_id" varchar(16)  ,
 "x_value" numeric(18,6),
 "y_value" numeric(18,6)
@@ -614,7 +607,7 @@ CREATE TABLE "inp_divider" (
 
 
 CREATE TABLE "inp_dwf" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_dwf_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_dwf_seq'::regclass) NOT NULL,
 "node_id" varchar(50)  ,
 "value" numeric(12,7),
 "pat1" varchar(16)  ,
@@ -669,7 +662,7 @@ CREATE TABLE "inp_evaporation" (
 
 
 CREATE TABLE "inp_files" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_files_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_files_seq'::regclass) NOT NULL,
 "actio_type" varchar(18)  ,
 "file_type" varchar(18)  ,
 "fname" varchar(254)  
@@ -694,13 +687,13 @@ CREATE TABLE "inp_groundwater" (
 
 
 CREATE TABLE "inp_hydrograph" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_hydrograph_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_hydrograph_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
 
 CREATE TABLE "inp_inflows" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_inflows_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_inflows_seq'::regclass) NOT NULL,
 "node_id" varchar(50)  ,
 "timser_id" varchar(16)  ,
 "sfactor" numeric(12,4),
@@ -750,7 +743,7 @@ CREATE TABLE "inp_landuses" (
 
 
 CREATE TABLE "inp_lid_control" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_lid_control_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_lid_control_seq'::regclass) NOT NULL,
 "lidco_id" varchar(16)  ,
 "lidco_type" varchar(10)  ,
 "value_2" numeric(12,4),
@@ -795,14 +788,6 @@ CREATE TABLE "inp_mapdim" (
 CREATE TABLE "inp_mapunits" (
 "type_units" varchar(18)  ,
 "map_type" varchar(18)  
-);
-
-
-CREATE TABLE "inp_node_x_sector" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_node_x_sector_seq'::regclass) NOT NULL,
-"node_id" varchar(16),
-"sector_id" varchar(16),
-"epa_type" varchar(16)
 );
 
 
@@ -1056,7 +1041,7 @@ CREATE TABLE "inp_temperature" (
 
 
 CREATE TABLE "inp_timeseries" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_timeseries_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_timeseries_seq'::regclass) NOT NULL,
 "timser_id" varchar(16)  ,
 "date" varchar(12)  ,
 "hour" varchar(10)  ,
@@ -1076,7 +1061,7 @@ CREATE TABLE "inp_timser_id" (
 
 
 CREATE TABLE "inp_transects" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".inp_transects_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".inp_transects_seq'::regclass) NOT NULL,
 "text" varchar(254)  
 );
 
@@ -1227,7 +1212,6 @@ CREATE TABLE "inp_value_buildup" (
 
 CREATE TABLE "inp_value_catarc" (
 "id" varchar(18)   NOT NULL,
-"i18n" varchar(18),
 CONSTRAINT inp_value_catarc_pkey PRIMARY KEY (id)
 );
 
@@ -1431,7 +1415,7 @@ CREATE TABLE "inp_flwreg_pump" (
 "curve_id" varchar(16)  ,
 "status" varchar(3)  ,
 "startup" numeric(12,4),
-"shutoff" numeric(12,4),
+"shutoff" numeric(12,4)
 );
 
 
@@ -1467,9 +1451,9 @@ CREATE TABLE "temp_node" (
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
-"the_geom" public.geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, 25831)
 );
 
 
@@ -1483,9 +1467,10 @@ CREATE TABLE "temp_arc" (
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+"length" numeric(12,3),
+"the_geom" public.geometry (LINESTRING, 25831)
 );
 
 
@@ -1499,9 +1484,9 @@ CREATE TABLE "rpt_input_node" (
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
-"the_geom" public.geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, 25831)
 );
 
 
@@ -1517,15 +1502,16 @@ CREATE TABLE "rpt_input_arc" (
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+"length" numeric(12,3),
+"the_geom" public.geometry (LINESTRING, 25831)
 );
 
 
 
 CREATE TABLE "rpt_arcflow_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_arcflow_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_arcflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "arc_type" varchar(18)  ,
@@ -1551,7 +1537,7 @@ CREATE TABLE "rpt_arcflow_sum" (
 
 
 CREATE TABLE "rpt_arcpolload_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_arcpolload_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_arcpolload_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
@@ -1561,7 +1547,7 @@ CONSTRAINT "rpt_arcpolload_pkey" PRIMARY KEY ("id")
 
 
 CREATE TABLE "rpt_condsurcharge_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_condsurcharge_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_condsurcharge_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "both_ends" numeric(12,4),
@@ -1574,7 +1560,7 @@ CREATE TABLE "rpt_condsurcharge_sum" (
 
 
 CREATE TABLE "rpt_continuity_errors" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_continuity_errors_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_continuity_errors_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1582,7 +1568,7 @@ CREATE TABLE "rpt_continuity_errors" (
 
 
 CREATE TABLE "rpt_critical_elements" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_critical_elements_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_critical_elements_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1590,7 +1576,7 @@ CREATE TABLE "rpt_critical_elements" (
 
 
 CREATE TABLE "rpt_flowclass_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_flowclass_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_flowclass_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "length" numeric(12,4),
@@ -1609,7 +1595,7 @@ CREATE TABLE "rpt_flowclass_sum" (
 
 
 CREATE TABLE "rpt_flowrouting_cont" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_flowrouting_cont_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_flowrouting_cont_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "dryw_inf" numeric(12,4),
 "wetw_inf" numeric(12,4),
@@ -1629,7 +1615,7 @@ CREATE TABLE "rpt_flowrouting_cont" (
 
 
 CREATE TABLE "rpt_groundwater_cont" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_groundwater_cont_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_groundwater_cont_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "init_stor" numeric(12,4),
 "infilt" numeric(12,4),
@@ -1644,7 +1630,7 @@ CREATE TABLE "rpt_groundwater_cont" (
 
 
 CREATE TABLE "rpt_high_conterrors" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_high_conterrors_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_high_conterrors_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1652,7 +1638,7 @@ CREATE TABLE "rpt_high_conterrors" (
 
 
 CREATE TABLE "rpt_high_flowinest_ind" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_high_flowinest_ind_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_high_flowinest_ind_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1660,7 +1646,7 @@ CREATE TABLE "rpt_high_flowinest_ind" (
 
 
 CREATE TABLE "rpt_instability_index" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_instability_index_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_instability_index_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1668,7 +1654,7 @@ CREATE TABLE "rpt_instability_index" (
 
 
 CREATE TABLE "rpt_lidperformance_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_lidperformance_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_lidperformance_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "subc_id" varchar(16)  ,
 "lidco_id" varchar(16)  ,
@@ -1685,7 +1671,7 @@ CREATE TABLE "rpt_lidperformance_sum" (
 
 
 CREATE TABLE "rpt_nodedepth_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodedepth_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_nodedepth_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
@@ -1699,7 +1685,7 @@ CREATE TABLE "rpt_nodedepth_sum" (
 
 
 CREATE TABLE "rpt_nodeflooding_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodeflooding_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_nodeflooding_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "hour_flood" numeric(12,4),
@@ -1713,7 +1699,7 @@ CREATE TABLE "rpt_nodeflooding_sum" (
 
 
 CREATE TABLE "rpt_nodeinflow_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodeinflow_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_nodeinflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
@@ -1730,7 +1716,7 @@ CREATE TABLE "rpt_nodeinflow_sum" (
 
 
 CREATE TABLE "rpt_nodesurcharge_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodesurcharge_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_nodesurcharge_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
@@ -1742,7 +1728,7 @@ CREATE TABLE "rpt_nodesurcharge_sum" (
 
 
 CREATE TABLE "rpt_outfallflow_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_outfallflow_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_outfallflow_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "flow_freq" numeric(12,4),
@@ -1754,7 +1740,7 @@ CREATE TABLE "rpt_outfallflow_sum" (
 
 
 CREATE TABLE "rpt_outfallload_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_outfallload_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_outfallload_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 "node_id" varchar(50)  ,
@@ -1764,7 +1750,7 @@ CREATE TABLE "rpt_outfallload_sum" (
 
 
 CREATE TABLE "rpt_pumping_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_pumping_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_pumping_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "arc_id" varchar(50)  ,
 "percent" numeric(12,4),
@@ -1781,7 +1767,7 @@ CREATE TABLE "rpt_pumping_sum" (
 
 
 CREATE TABLE "rpt_qualrouting_cont" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_qualrouting_cont_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_qualrouting_cont_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 "dryw_inf" numeric(12,4),
@@ -1800,7 +1786,7 @@ CREATE TABLE "rpt_qualrouting_cont" (
 
 
 CREATE TABLE "rpt_rainfall_dep" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_rainfall_dep_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_rainfall_dep_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "sewer_rain" numeric(12,4),
 "rdiip_prod" numeric(12,4),
@@ -1810,7 +1796,7 @@ CREATE TABLE "rpt_rainfall_dep" (
 
 
 CREATE TABLE "rpt_cat_result" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_cat_result_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_cat_result_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "flow_units" varchar(3)  ,
 "rain_runof" varchar(3)  ,
@@ -1837,7 +1823,7 @@ CREATE TABLE "rpt_cat_result" (
 
 
 CREATE TABLE "rpt_routing_timestep" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_routing_timestep_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_routing_timestep_seq'::regclass) NOT NULL,
 "result_id" varchar(254)  ,
 "text" varchar(255)  
 );
@@ -1845,7 +1831,7 @@ CREATE TABLE "rpt_routing_timestep" (
 
 
 CREATE TABLE "rpt_runoff_qual" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_runoff_qual_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_runoff_qual_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 "init_buil" numeric(12,4),
@@ -1862,7 +1848,7 @@ CREATE TABLE "rpt_runoff_qual" (
 
 
 CREATE TABLE "rpt_runoff_quant" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_runoff_quant_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_runoff_quant_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "initsw_co" numeric(12,4),
 "total_prec" numeric(12,4),
@@ -1879,7 +1865,7 @@ CREATE TABLE "rpt_runoff_quant" (
 
 
 CREATE TABLE "rpt_storagevol_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_storagevol_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_storagevol_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "aver_vol" numeric(12,4),
@@ -1895,7 +1881,7 @@ CREATE TABLE "rpt_storagevol_sum" (
 
 
 CREATE TABLE "rpt_subcatchwashoff_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_subcatchwashoff_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_subcatchwashoff_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)   NOT NULL,
 "subc_id" varchar(16)   NOT NULL,
 "poll_id" varchar(16)   NOT NULL,
@@ -1905,7 +1891,7 @@ CREATE TABLE "rpt_subcatchwashoff_sum" (
 
 
 CREATE TABLE "rpt_subcathrunoff_sum" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_subcathrunoff_sum_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_subcathrunoff_sum_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "subc_id" varchar(16)  ,
 "tot_precip" numeric(12,4),
@@ -1926,7 +1912,7 @@ CREATE TABLE "rpt_subcathrunoff_sum" (
 
 
 CREATE TABLE "rpt_timestep_critelem" (
-"id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_timestep_critelem_seq'::regclass) NOT NULL,
+"id" int4 DEFAULT nextval ('"ud30".rpt_timestep_critelem_seq'::regclass) NOT NULL,
 "result_id" varchar(16)  ,
 "text" varchar(255)  
 );
@@ -1951,25 +1937,18 @@ CREATE TABLE "rpt_selector_compare" (
 );
 
 
-CREATE TABLE "inp_selector_sector" (
-"sector_id" varchar(30)   NOT NULL
-);
+
+CREATE TABLE inp_selector_sector(
+id serial NOT NULL PRIMARY KEY,
+sector_id integer,
+cur_user text
 
 
 
-CREATE TABLE "inp_selector_state" (
-"id" varchar(16)   NOT NULL,
-"observ" varchar(254)  ,
-CONSTRAINT inp_selector_state_pkey PRIMARY KEY (id)
-);
-
-
-
-CREATE TABLE "inp_selector_hydrology" (
-"hydrology_id" varchar(20)   NOT NULL,
-CONSTRAINT "inp_selector_hydrology_pkey" PRIMARY KEY ("hydrology_id")
-);
-
+CREATE TABLE inp_selector_hydrology(
+id serial NOT NULL PRIMARY KEY,
+hydrology_id varchar(20),
+cur_user text
 
 
 
@@ -1998,7 +1977,6 @@ ALTER TABLE "inp_landuses" ADD PRIMARY KEY ("landus_id");
 ALTER TABLE "inp_lid_control" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_lidusage_subc_x_lidco" ADD PRIMARY KEY ("subc_id", "lidco_id");
 ALTER TABLE "inp_loadings_pol_x_subc" ADD PRIMARY KEY ("poll_id", "subc_id");
-ALTER TABLE "inp_node_x_sector" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_options" ADD PRIMARY KEY ("flow_units");
 ALTER TABLE "inp_orifice" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_outfall" ADD PRIMARY KEY ("node_id");

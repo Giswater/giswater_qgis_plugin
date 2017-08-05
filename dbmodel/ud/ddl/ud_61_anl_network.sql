@@ -1,48 +1,43 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
 
 
 
  -- ANALYSIS
  
  CREATE TABLE "anl_node_sink" (
-node_id varchar (16) NOT NULL,
+node_id varchar (16) NOT NULL PRIMARY KEY,
 num_arcs integer,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_sink_pkey PRIMARY KEY (node_id)
+the_geom public.geometry (POINT, 25831)
 );
 
 
 CREATE TABLE "anl_node_flowregulator" (
-  node_id character varying(16) NOT NULL,
-  the_geom geometry(Point,SRID_VALUE),
-  CONSTRAINT anl_node_floregulator_pkey PRIMARY KEY (node_id)
+node_id character varying(16) NOT NULL PRIMARY KEY,
+the_geom geometry(Point,25831)
 );
 
 
 CREATE TABLE "anl_node_exit_upper_intro"(
-arc_id character varying(16),
-the_geom geometry(LINESTRING,SRID_VALUE),
-CONSTRAINT anl_node_exit_upper_intro_pkey PRIMARY KEY (node_id)
+arc_id character varying(16) NOT NULL PRIMARY KEY,
+the_geom geometry(LINESTRING,25831)
 );
 
 
 CREATE TABLE "anl_arc_intersection"(
-arc_id character varying(16),
-the_geom geometry(LINESTRING,SRID_VALUE),
-CONSTRAINT anl_arc_intersection_pkey PRIMARY KEY (arc_id)
+arc_id character varying(16) NOT NULL PRIMARY KEY,
+the_geom geometry(LINESTRING,25831)
 );
 
 
- CREATE TABLE "anl_arc_inverted"(
-arc_id character varying(16),
-the_geom geometry(LINESTRING,SRID_VALUE),
-CONSTRAINT anl_arc_inverted_pkey PRIMARY KEY (arc_id)
+CREATE TABLE "anl_arc_inverted"(
+arc_id character varying(16) NOT NULL PRIMARY KEY,
+the_geom geometry(LINESTRING,25831)
 );
 
 

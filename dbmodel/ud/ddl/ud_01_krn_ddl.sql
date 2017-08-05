@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+SET search_path = "ud30", public, pg_catalog;
 
 -- -----------------------------
 -- SEQUENCES
@@ -48,9 +48,10 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_arc" (
-"id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
+"id" varchar (30) DEFAULT nextval ('"ud30".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
-"shape" varchar(16)  ,
+"shape" varchar(16),
+"custom_shape" varchar(30),
 "tsect_id" varchar(16)  ,
 "curve_id" varchar(16)  ,
 "geom1" numeric(12,4),
@@ -83,7 +84,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_node" (
-"id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
+"id" varchar (30) DEFAULT nextval ('"ud30".cat_node_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" character varying(50),
 "geom1" numeric (12,2),
@@ -159,7 +160,7 @@ CREATE TABLE "dma" (
 "expl_id" integer NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, 25831)
 );
 
 
@@ -168,7 +169,7 @@ CREATE TABLE "macrosector" (
 "name" character varying(50)NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, 25831)
 );
 
 
@@ -178,7 +179,7 @@ CREATE TABLE "sector" (
 "macrosector_id" integer NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (MULTIPOLYGON, 25831)
 );
 
 
@@ -196,11 +197,11 @@ CREATE TABLE "node" (
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"dma_id" integer NOT NULL
+"dma_id" integer NOT NULL,
 "soilcat_id" varchar(16)  ,
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
@@ -219,7 +220,7 @@ CREATE TABLE "node" (
 "rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(20) ,
-"the_geom" public.geometry (POINT, SRID_VALUE),
+"the_geom" public.geometry (POINT, 25831),
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -252,13 +253,13 @@ CREATE TABLE "arc" (
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
 "inverted_slope" boolean,
 "custom_length" numeric (12,2),
-"dma_id" integer NOT NULL
+"dma_id" integer NOT NULL,
 "soilcat_id" varchar(16)  ,
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
@@ -276,7 +277,7 @@ CREATE TABLE "arc" (
 "descript" varchar(254)  ,
 "link" character varying(512),
 "verified" varchar(20),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE),
+"the_geom" public.geometry (LINESTRING, 25831),
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -291,7 +292,7 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "connec" (
-"connec_id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
+"connec_id" varchar (30) NOT NULL,
 "code" varchar (30) NOT NULL,
 "top_elev" numeric(12,4),
 "y1" numeric(12,4),
@@ -309,7 +310,7 @@ CREATE TABLE "connec" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"dma_id" integer NOT NULL
+"dma_id" integer NOT NULL,
 "soilcat_id" varchar(16)  ,
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
@@ -330,7 +331,7 @@ CREATE TABLE "connec" (
 "link" character varying(512),
 "verified" varchar(20)  , 
 "rotation" numeric (6,3),
-"the_geom" public.geometry (POINT, SRID_VALUE),
+"the_geom" public.geometry (POINT, 25831),
 "undelete" boolean,
 "featurecat_id" character varying(50),
 "feature_id" character varying(16),
@@ -368,7 +369,7 @@ CREATE TABLE "gully" (
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
-"dma_id" integer NOT NULL
+"dma_id" integer NOT NULL,
 "soilcat_id" varchar(16)  ,
 "function_type" varchar(50)  ,
 "category_type" varchar(50)  ,
@@ -389,8 +390,8 @@ CREATE TABLE "gully" (
 "link" character varying(512),
 "verified" varchar(20),
 "rotation" numeric (6,3),
-"the_geom" public.geometry (POINT, SRID_VALUE),
-"the_geom_pol" public.geometry (POLYGON, SRID_VALUE),
+"the_geom" public.geometry (POINT, 25831),
+"the_geom_pol" public.geometry (POLYGON, 25831),
 "undelete" boolean,
 "featurecat_id" character varying(50),
 "feature_id" character varying(16),
@@ -400,8 +401,34 @@ CREATE TABLE "gully" (
 "publish" boolean,
 "inventory" boolean,
 "uncertain" boolean,
+"expl_id" integer,
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
+
+
+CREATE TABLE "vnode" (
+"vnode_id" serial NOT NULL PRIMARY KEY,
+"arc_id" varchar(16),
+"vnode_type" varchar(30),
+"annotation" varchar(254),
+"userdefined_pos" bool,
+"sector_id" integer,
+"dma_id" integer,
+"state" int2,
+"expl_id" integer,
+"the_geom" public.geometry (POINT, 25831)
+);
+
+
+
+CREATE TABLE "link" (
+link_id serial NOT NULL PRIMARY KEY,
+feature_id varchar(16),
+featurecat_id varchar(30), 
+vnode_id integer NOT NULL,
+the_geom public.geometry (LINESTRING, 25831)
+);
+
 
 
 
@@ -410,71 +437,63 @@ CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 -- ----------------------------
 
 CREATE TABLE "man_netinit" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "length" numeric(12,3),
 "width" numeric(12,3),
-"mwidth" numeric(12,3),
 "inlet" boolean,
 "bottom_channel" boolean,
 "accessibility" varchar(16),
 "name" varchar(50)
-CONSTRAINT man_netinit_pkey PRIMARY KEY (node_id)
 );
 
 
 CREATE TABLE "man_junction" (
-"node_id" varchar(16) NOT NULL,
-CONSTRAINT man_junction_pkey PRIMARY KEY (node_id)
+"node_id" varchar(16) NOT NULL PRIMARY KEY
 );
 
 
 CREATE TABLE "man_manhole" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "length" numeric(12,3),
 "width" numeric(12,3),
 "sander_depth" numeric(12,3),
 "prot_surface" bool,
 "inlet" boolean,
 "bottom_channel" boolean,
-"accessibility" varchar(16),
-CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id)
+"accessibility" varchar(16)
 );
 
 
 CREATE TABLE "man_wjump" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "length" numeric(12,3),
 "width" numeric(12,3),
 "sander_depth" numeric(12,3),
 "prot_surface" bool,
 "accessibility" varchar(16),
-"name" varchar(255),
-CONSTRAINT man_wjump_pkey PRIMARY KEY (node_id)
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_valve" (
-"node_id" varchar(16) NOT NULL,
-"name" varchar(255),
-CONSTRAINT man_valve_pkey PRIMARY KEY (node_id)
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_outfall" (
-"node_id" varchar(16) NOT NULL,
-"name" varchar(255),
-CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_netelement" (
-"node_id" varchar(16) NOT NULL,
-CONSTRAINT man_outfall_pkey PRIMARY KEY (node_id)
+"node_id" varchar(16) NOT NULL PRIMARY KEY
 );
 
 
 CREATE TABLE "man_netgully" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "pol_id" character varying(16),
 "sander_depth" numeric(12,4),
 "gratecat_id" varchar(18)  ,
@@ -482,28 +501,27 @@ CREATE TABLE "man_netgully" (
 "groove" boolean  ,
 "siphon" boolean  ,
 "streetaxis_id" varchar (16)  ,
-"postnumber" varchar (16)  ,
-CONSTRAINT man_netgully_pkey PRIMARY KEY (node_id)
+"postnumber" varchar (16)
 );
 
 
 CREATE TABLE "man_chamber" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "pol_id" character varying(16),
 "length" numeric(12,3),
 "width" numeric(12,3),
+"sander_depth" numeric(12,3),
 "max_volume" numeric(12,3),
 "util_volume" numeric(12,3),
 "inlet" boolean,
 "bottom_channel" boolean,
 "accessibility" varchar(16),
-"name" varchar(255),
-CONSTRAINT man_chamber_pkey PRIMARY KEY (node_id)
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_storage" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "pol_id" character varying(16),
 "length" numeric(12,3),
 "width" numeric(12,3),
@@ -512,45 +530,38 @@ CREATE TABLE "man_storage" (
 "util_volume" numeric(12,3),
 "min_height" numeric(12,3),
 "accessibility" varchar(16),
-"name" varchar(255),
-CONSTRAINT man_storage_pkey PRIMARY KEY (node_id)
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_wwtp" (
-"node_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "pol_id" character varying(16),
-"name" varchar(255),
-CONSTRAINT man_wwtp_pkey PRIMARY KEY (node_id)
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_conduit" (
-"arc_id" varchar(16) NOT NULL,
-CONSTRAINT man_conduit_pkey PRIMARY KEY (arc_id)
+"arc_id" varchar(16) NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE "man_siphon" (
-"arc_id" varchar(16) NOT NULL,
-"name" varchar(255),
-CONSTRAINT man_siphon_pkey PRIMARY KEY (arc_id)
+"arc_id" varchar(16) NOT NULL PRIMARY KEY,
+"name" varchar(255)
 );
 
 
 CREATE TABLE "man_waccel" (
-"arc_id" varchar(16) NOT NULL,
-"add_info" varchar(255),
+"arc_id" varchar(16) NOT NULL PRIMARY KEY,
 "sander_length" numeric(12,3),
 "sander_depth" numeric(12,3),
 "prot_surface" bool,
 "accessibility" varchar(16),
-"name" varchar(255),
-CONSTRAINT man_waccel_pkey PRIMARY KEY (arc_id)
+"name" varchar(255)
 );
 
 CREATE TABLE "man_varc"(
-"arc_id" character varying(16) NOT NULL,
-CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
+"arc_id" character varying(16) NOT NULL PRIMARY KEY
 );
 
 
@@ -562,7 +573,7 @@ CONSTRAINT man_varc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "element_x_gully" (
-"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_x_gully_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"ud30".element_x_gully_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "gully_id" varchar(16),
 CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
@@ -576,7 +587,9 @@ CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
 ----------------
 -- SPATIAL INDEX
 ----------------
-
+CREATE INDEX macrosector_index ON macrosector USING GIST (the_geom);
+CREATE INDEX dma_index ON dma USING GIST (the_geom);
+CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX arc_index ON arc USING GIST (the_geom);
 CREATE INDEX node_index ON node USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);

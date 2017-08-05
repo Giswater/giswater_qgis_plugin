@@ -21,7 +21,7 @@ BEGIN
         CONSTRAINT outfile_pkey PRIMARY KEY (index));
 
     -- Dump node coordinates for every polygon
-    FOR row_id IN SELECT subc_id FROM subcatchment
+    FOR row_id IN SELECT subc_id FROM v_edit_subcatchment
     LOOP
 
         -- Get the geom and remain fields

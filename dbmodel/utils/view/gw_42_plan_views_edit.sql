@@ -23,6 +23,6 @@ CREATE VIEW v_edit_plan_psector AS SELECT
 	other,
 	plan_psector.the_geom,
 	plan_psector.expl_id
-FROM expl_selector,plan_psector
-WHERE ((plan_psector.expl_id)::text=(expl_selector.expl_id)::text
-AND expl_selector.cur_user="current_user"()::text);
+FROM selector_expl,plan_psector
+WHERE ((plan_psector.expl_id)=(selector_expl.expl_id)
+AND selector_expl.cur_user="current_user"());

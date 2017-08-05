@@ -19,4 +19,4 @@ doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_gully
-JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;
+JOIN doc ON doc.id = doc_x_gully.doc_id;

@@ -37,9 +37,6 @@ ALTER TABLE "inp_inflows_pol_x_node" DROP CONSTRAINT IF EXISTS "inp_inflows_pol_
 
 ALTER TABLE "inp_junction" DROP CONSTRAINT IF EXISTS "inp_junction_node_id_fkey";
 
-ALTER TABLE "inp_node_x_sector" DROP CONSTRAINT IF EXISTS "inp_node_x_sector_node_id_fkey";
-ALTER TABLE "inp_node_x_sector" DROP CONSTRAINT IF EXISTS "inp_node_x_sector_sector_id_fkey";
-
 ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_arc_id_fkey";
 ALTER TABLE "inp_orifice" DROP CONSTRAINT IF EXISTS "inp_orifice_node_id_fkey";
 
@@ -163,9 +160,6 @@ ALTER TABLE "inp_inflows" ADD CONSTRAINT "inp_inflows_node_id_fkey" FOREIGN KEY 
 ALTER TABLE "inp_inflows_pol_x_node" ADD CONSTRAINT "inp_inflows_pol_x_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_junction" ADD CONSTRAINT "inp_junction_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE "inp_node_x_sector" ADD CONSTRAINT "inp_node_x_sector_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "inp_node_x_sector" ADD CONSTRAINT "inp_node_x_sector_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "inp_orifice" ADD CONSTRAINT "inp_orifice_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;

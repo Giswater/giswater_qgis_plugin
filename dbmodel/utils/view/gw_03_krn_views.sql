@@ -8,37 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP VIEW IF EXISTS v_man_arc CASCADE;
-CREATE VIEW v_man_arc AS 
-SELECT
-arc_id,
-node_1,
-node_2,
-the_geom
-FROM arc
-JOIN man_selector_state ON arc.state=man_selector_state.id
-;
-
-DROP VIEW IF EXISTS v_man_node CASCADE;
-CREATE VIEW v_man_node AS 
-SELECT
-node_id,
-the_geom
-FROM node
-JOIN man_selector_state ON node.state=man_selector_state.id
-;
-
-DROP VIEW IF EXISTS v_man_connec CASCADE;
-CREATE VIEW v_man_connec AS 
-SELECT
-connec_id,
-the_geom
-FROM connec
-JOIN man_selector_state ON connec.state=man_selector_state.id
-;
-
-
-
 DROP VIEW IF EXISTS v_ui_element_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_ui_element_x_arc AS
 SELECT
@@ -55,7 +24,7 @@ element.link,
 element.publish,
 element.inventory
 FROM element_x_arc
-JOIN element ON element.element_id::text = element_x_arc.element_id::text;
+JOIN element ON element.element_id = element_x_arc.element_id;
 
 
 
@@ -75,7 +44,7 @@ element.link,
 element.publish,
 element.inventory
 FROM element_x_node
-JOIN element ON element.element_id::text = element_x_node.element_id::text;
+JOIN element ON element.element_id = element_x_node.element_id;
 
 
 
@@ -95,23 +64,7 @@ element.link,
 element.publish,
 element.inventory
 FROM element_x_connec
-JOIN element ON element.element_id::text = element_x_connec.element_id::text;
+JOIN element ON element.element_id = element_x_connec.element_id;
 
 
-
-CREATE OR REPLACE VIEW v_edit_dimensions AS 
- SELECT dimensions.id,
-    dimensions.distance,
-    dimensions.depth,
-    dimensions.the_geom,
-    dimensions.x_label,
-    dimensions.y_label,
-    dimensions.rotation_label,
-    dimensions.offset_label,
-    dimensions.direction_arrow,
-    dimensions.x_symbol,
-    dimensions.y_symbol,
-    dimensions.feature_id,
-    dimensions.feature_type
-   FROM dimensions;
    

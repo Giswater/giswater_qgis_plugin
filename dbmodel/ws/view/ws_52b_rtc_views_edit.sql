@@ -20,7 +20,7 @@ ext_rtc_hydrometer_x_data.cat_period_id,
 sum,
 custom_sum
 FROM ext_rtc_hydrometer_x_data
-JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text=ext_rtc_hydrometer.hydrometer_id::text
-LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id::text
+JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id=ext_rtc_hydrometer.hydrometer_id
+LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id = ext_rtc_hydrometer.cat_hydrometer_id
 JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id=ext_rtc_hydrometer_x_data.hydrometer_id;
 

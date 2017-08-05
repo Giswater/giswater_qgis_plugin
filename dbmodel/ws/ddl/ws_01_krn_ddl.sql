@@ -293,6 +293,26 @@ CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
 
+CREATE TABLE "vnode" (
+"vnode_id" serial NOT NULL PRIMARY KEY,
+"arc_id" varchar(16),
+"vnode_type" varchar(30),
+"annotation" varchar(254),
+"userdefined_pos" bool,
+"the_geom" public.geometry (POINT, SRID_VALUE)
+);
+
+
+CREATE TABLE "link" (
+link_id serial NOT NULL PRIMARY KEY,
+feature_id varchar(16),
+featurecat_id varchar(30), 
+vnode_id integer NOT NULL,
+the_geom public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+
 
 CREATE TABLE "pond"(
 "pond_id" character varying(16) NOT NULL,
@@ -539,6 +559,9 @@ CREATE TABLE man_selector_valve (
 -- SPATIAL INDEX
 ----------------
 
+CREATE INDEX macrodma_index ON macrodma USING GIST (the_geom);
+CREATE INDEX dma_index ON dma USING GIST (the_geom);
+CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX arc_index ON arc USING GIST (the_geom);
 CREATE INDEX node_index ON node USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);

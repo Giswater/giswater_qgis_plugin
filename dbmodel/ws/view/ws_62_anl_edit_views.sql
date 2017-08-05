@@ -22,6 +22,6 @@ man_valve.mincut_anl,
 man_valve.hydraulic_anl,
 node.the_geom
 FROM node
-JOIN cat_node ON node.nodecat_id::text=cat_node.id::text
-JOIN man_valve ON node.node_id::text=man_valve.node_id::text
-JOIN man_selector_valve ON cat_node.nodetype_id::text=man_selector_valve.id::text;
+JOIN cat_node ON node.nodecat_id=cat_node.id
+JOIN man_valve ON node.node_id=man_valve.node_id
+JOIN man_selector_valve ON cat_node.nodetype_id=man_selector_valve.id;
