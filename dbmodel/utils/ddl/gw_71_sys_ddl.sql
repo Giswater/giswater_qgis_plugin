@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
@@ -79,7 +79,7 @@ CREATE TABLE dimensions(
 id bigserial NOT NULL PRIMARY KEY,
 distance numeric(12,4),
 depth numeric(12,4),
-the_geom geometry(LineString,25831),
+the_geom geometry(LineString,SRID_VALUE),
 x_label double precision,
 y_label double precision,
 rotation_label double precision,

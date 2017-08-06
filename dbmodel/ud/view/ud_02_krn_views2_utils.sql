@@ -4,7 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
 
 -- ----------------------------
 -- View structure for v_arc_x_node
@@ -35,19 +36,16 @@ cat_arc.matcat_id,																	-- field to customize de source of the data m
 arc.arc_type,
 arc.epa_type,
 arc.sector_id,
-arc.dma_id,
 arc.state,
-arc.soilcat_id,
+arc.annotation,
 (CASE 
 WHEN (arc.custom_length IS NOT NULL) THEN custom_length::numeric (12,3)				-- field to use length/customized_length
 ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
-arc.the_geom,
-arc.expl_id
-FROM selector_expl,arc
-JOIN cat_arc ON arc.arccat_id = cat_arc.id
-JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
-WHERE arc.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"();
+arc.the_geom
+FROM arc
+	JOIN cat_arc ON arc.arccat_id = cat_arc.id
+	JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
+
 
 
 DROP VIEW IF EXISTS v_node CASCADE;
@@ -71,13 +69,10 @@ node.epa_type,
 node.sector_id,
 node.dma_id,
 node.state,
-node.the_geom,
-node.expl_id
-FROM selector_expl, node
+node.annotation,
+node.the_geom
+FROM node
 JOIN v_state_node ON node.node_id=v_state_node.node_id
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
-
 
    
    
@@ -99,7 +94,6 @@ SELECT arc.arc_id,
    FROM v_arc arc
      JOIN v_node node ON arc.node_1 = node.node_id
      JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
-
 
 	 
 	 
@@ -128,7 +122,8 @@ SELECT arc.arc_id,
 
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
- SELECT v_arc_x_node1.arc_id,
+ SELECT 
+    v_arc_x_node1.arc_id,
     v_arc_x_node1.node_1,
     v_arc_x_node1.top_elev1,
     v_arc_x_node1.ymax1,
@@ -157,12 +152,14 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
             WHEN ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(arc.the_geom)) > 1::double precision THEN NULL::numeric(6,4)
             ELSE ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(arc.the_geom))::numeric(6,4)
         END AS slope,
-    arc.state,
-    arc.sector_id,
-    arc.the_geom
-   FROM v_arc_x_node1
+    v_arc.state,
+    v_arc.sector_id,
+	v_arc.annotation,
+	v_arc.length,
+    v_arc.the_geom
+	FROM v_arc_x_node1
      JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
-     JOIN v_arc arc ON v_arc_x_node2.arc_id = arc.arc_id;
+     JOIN v_arc ON v_arc_x_node2.arc_id = arc.arc_id;
 
 
 

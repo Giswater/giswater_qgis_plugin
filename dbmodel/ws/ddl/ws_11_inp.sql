@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -631,7 +631,7 @@ CREATE TABLE "inp_flwreg_valve" (
 CREATE TABLE "inp_flwreg_pump" (
 "id" serial NOT NULL PRIMARY KEY,
 "node_id" varchar(16) NOT NULL,
-"flwreg_id" int2
+"flwreg_id" int2 ,
 "power" varchar  ,
 "curve_id" varchar  ,
 "speed" numeric(12,6),
@@ -655,7 +655,8 @@ CREATE TABLE "temp_node" (
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
+"builtdate" date,
 "annotation" character varying(254),
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
@@ -669,8 +670,10 @@ CREATE TABLE "temp_arc" (
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
+"roughness" numeric (12,6),
+"builtdate" date,
 "length" numeric(12,3),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)
 );
@@ -687,7 +690,7 @@ CREATE TABLE "rpt_input_node" (
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
 "the_geom" public.geometry (POINT, SRID_VALUE)
 );
@@ -703,8 +706,10 @@ CREATE TABLE "rpt_input_arc" (
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" character varying(254),
+"roughness" numeric (12,6),
+"builtdate" date,
 "length" numeric(12,3),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)
 );
@@ -795,34 +800,10 @@ CREATE TABLE "rpt_cat_result" (
 
 
 -- ----------------------------
--- Table structure for SELECTORS
--- ----------------------------
-
-CREATE TABLE "rpt_selector_result" (
-"id" serial NOT NULL, 
-"result_id" varchar(16)   NOT NULL,
-"cur_user" text
-);
-
-CREATE TABLE "rpt_selector_compare" (
-"id" serial NOT NULL,
-"result_id" varchar(16)   NOT NULL,
-"cur_user" text
-);
-
-CREATE TABLE inp_selector_sector(
-id serial NOT NULL PRIMARY KEY,
-sector_id integer,
-cur_user text
-
-
-
--- ----------------------------
 -- Primary Key structure
 -- ----------------------------
 
 ALTER TABLE "inp_backdrop" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_controls" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_curve_id" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_demand" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_emitter" ADD PRIMARY KEY ("node_id");
@@ -836,7 +817,6 @@ ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
 ALTER TABLE "inp_quality" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_report" ADD PRIMARY KEY ("pagesize");
 ALTER TABLE "inp_reservoir" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "inp_rules" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_source" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_tags" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_tank" ADD PRIMARY KEY ("node_id");
@@ -861,14 +841,11 @@ ALTER TABLE "inp_value_reactions_gl" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_times" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_yesno" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_value_yesnofull" ADD PRIMARY KEY ("id");
-ALTER TABLE "rpt_selector_result" ADD PRIMARY KEY ("id");
-ALTER TABLE "rpt_selector_compare" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_cat_result" ADD PRIMARY KEY ("result_id");
 ALTER TABLE "rpt_arc" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_energy_usage" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_hydraulic_status" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_node" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
 
 
 

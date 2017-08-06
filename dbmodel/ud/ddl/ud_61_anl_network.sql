@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
@@ -13,31 +13,31 @@ SET search_path = "ud30", public, pg_catalog;
  CREATE TABLE "anl_node_sink" (
 node_id varchar (16) NOT NULL PRIMARY KEY,
 num_arcs integer,
-the_geom public.geometry (POINT, 25831)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_node_flowregulator" (
 node_id character varying(16) NOT NULL PRIMARY KEY,
-the_geom geometry(Point,25831)
+the_geom geometry(Point,SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_node_exit_upper_intro"(
 arc_id character varying(16) NOT NULL PRIMARY KEY,
-the_geom geometry(LINESTRING,25831)
+the_geom geometry(LINESTRING,SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_arc_intersection"(
 arc_id character varying(16) NOT NULL PRIMARY KEY,
-the_geom geometry(LINESTRING,25831)
+the_geom geometry(LINESTRING,SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_arc_inverted"(
 arc_id character varying(16) NOT NULL PRIMARY KEY,
-the_geom geometry(LINESTRING,25831)
+the_geom geometry(LINESTRING,SRID_VALUE)
 );
 
 

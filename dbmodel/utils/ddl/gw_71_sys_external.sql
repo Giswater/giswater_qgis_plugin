@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- ----------------------------
 -- Base map
@@ -24,7 +24,7 @@ CREATE TABLE "ext_streetaxis" (
 "type" varchar(18),
 "name" varchar(100),
 "text" text,
-"the_geom" public.geometry (LINESTRING, 25831),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "expl_id" integer
 );
 
@@ -35,7 +35,7 @@ id character varying(16) PRIMARY KEY NOT NULL,
 streetaxis character varying(16),
 postnumber character varying(16),
 urban_properties_id character varying(16),
-the_geom geometry(Point,25831),
+the_geom geometry(Point,SRID_VALUE),
 expl_id integer
   );
 
@@ -51,7 +51,7 @@ CREATE TABLE "ext_plot"(
 "square" varchar(16),
 "observ" text,
 "text" text,
-"the_geom" public.geometry (MULTIPOLYGON, 25831),
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE),
 "expl_id" integer
 );
 

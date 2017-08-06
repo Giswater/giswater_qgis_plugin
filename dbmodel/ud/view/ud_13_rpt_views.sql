@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "ud30", public, pg_catalog;
--- WARNING: ud30 IS NOT ONLY PRESENT ON THE HEADER OF THIS FILE. IT EXISTS ALSO INTO IT. PLEASE REVIEW IT BEFORE REPLACE....
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+-- WARNING: SCHEMA_NAME IS NOT ONLY PRESENT ON THE HEADER OF THIS FILE. IT EXISTS ALSO INTO IT. PLEASE REVIEW IT BEFORE REPLACE....
 
 
 

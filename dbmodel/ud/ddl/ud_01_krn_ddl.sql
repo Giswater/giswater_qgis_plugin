@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- -----------------------------
 -- SEQUENCES
@@ -48,7 +48,7 @@ CONSTRAINT cat_mat_node_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_arc" (
-"id" varchar (30) DEFAULT nextval ('"ud30".cat_arc_seq'::regclass) NOT NULL,
+"id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" varchar(16),
 "custom_shape" varchar(30),
@@ -84,7 +84,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "cat_node" (
-"id" varchar (30) DEFAULT nextval ('"ud30".cat_node_seq'::regclass) NOT NULL,
+"id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" character varying(50),
 "geom1" numeric (12,2),
@@ -160,7 +160,7 @@ CREATE TABLE "dma" (
 "expl_id" integer NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, 25831)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
@@ -169,7 +169,7 @@ CREATE TABLE "macrosector" (
 "name" character varying(50)NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, 25831)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
@@ -179,7 +179,7 @@ CREATE TABLE "sector" (
 "macrosector_id" integer NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, 25831)
+"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
@@ -220,7 +220,7 @@ CREATE TABLE "node" (
 "rotation" numeric (6,3),
 "link" character varying(512),
 "verified" varchar(20) ,
-"the_geom" public.geometry (POINT, 25831),
+"the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -277,7 +277,7 @@ CREATE TABLE "arc" (
 "descript" varchar(254)  ,
 "link" character varying(512),
 "verified" varchar(20),
-"the_geom" public.geometry (LINESTRING, 25831),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -331,7 +331,7 @@ CREATE TABLE "connec" (
 "link" character varying(512),
 "verified" varchar(20)  , 
 "rotation" numeric (6,3),
-"the_geom" public.geometry (POINT, 25831),
+"the_geom" public.geometry (POINT, SRID_VALUE),
 "undelete" boolean,
 "featurecat_id" character varying(50),
 "feature_id" character varying(16),
@@ -390,8 +390,8 @@ CREATE TABLE "gully" (
 "link" character varying(512),
 "verified" varchar(20),
 "rotation" numeric (6,3),
-"the_geom" public.geometry (POINT, 25831),
-"the_geom_pol" public.geometry (POLYGON, 25831),
+"the_geom" public.geometry (POINT, SRID_VALUE),
+"the_geom_pol" public.geometry (POLYGON, SRID_VALUE),
 "undelete" boolean,
 "featurecat_id" character varying(50),
 "feature_id" character varying(16),
@@ -416,7 +416,7 @@ CREATE TABLE "vnode" (
 "dma_id" integer,
 "state" int2,
 "expl_id" integer,
-"the_geom" public.geometry (POINT, 25831)
+"the_geom" public.geometry (POINT, SRID_VALUE)
 );
 
 
@@ -426,7 +426,7 @@ link_id serial NOT NULL PRIMARY KEY,
 feature_id varchar(16),
 featurecat_id varchar(30), 
 vnode_id integer NOT NULL,
-the_geom public.geometry (LINESTRING, 25831)
+the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
 
@@ -573,7 +573,7 @@ CREATE TABLE "man_varc"(
 
 
 CREATE TABLE "element_x_gully" (
-"id" varchar(16) DEFAULT nextval ('"ud30".element_x_gully_seq'::regclass) NOT NULL,
+"id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".element_x_gully_seq'::regclass) NOT NULL,
 "element_id" varchar(16),
 "gully_id" varchar(16),
 CONSTRAINT element_x_gully_pkey PRIMARY KEY (id)
@@ -594,4 +594,6 @@ CREATE INDEX arc_index ON arc USING GIST (the_geom);
 CREATE INDEX node_index ON node USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);
 CREATE INDEX gully_index ON gully USING GIST (the_geom);
+CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
+CREATE INDEX link_index ON link USING GIST (the_geom);
 

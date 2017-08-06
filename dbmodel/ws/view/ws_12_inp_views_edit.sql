@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -20,20 +20,13 @@ node.nodecat_id,
 node.sector_id, 
 node."state", 
 node.annotation, 
-node.observ, 
-node.comment, 
-node.dma_id, 
-node.rotation, 
-node.link, 
-node.verified, 
 node.the_geom,
 inp_junction.demand, 
-inp_junction.pattern_id,
-node.expl_id
-FROM selector_expl,node
+inp_junction.pattern_id
+FROM inp_selector_sector,v_node node
 JOIN inp_junction ON ((inp_junction.node_id) = (node.node_id))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_reservoir" CASCADE;
@@ -44,21 +37,14 @@ node.elevation,
 node."depth", node.nodecat_id, 
 node.sector_id, 
 node."state", 
-node.annotation, 
-node.observ, 
-node.comment, 
-node.dma_id, 
-node.rotation, 
-node.link, 
-node.verified, 
+node.annotation,
 node.the_geom,
 inp_reservoir.head,
-inp_reservoir.pattern_id,
-node.expl_id
-FROM selector_expl, node
+inp_reservoir.pattern_id
+FROM inp_selector_sector,v_node node
 JOIN inp_reservoir ON ((inp_reservoir.node_id) = (node.node_id))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_tank" CASCADE;
@@ -70,25 +56,18 @@ node."depth",
 node.nodecat_id, 
 node.sector_id,
 node."state", 
-node.annotation, 
-node.observ, 
-node.comment, 
-node.dma_id, 
-node.rotation, 
-node.link,
-node.verified, 
+node.annotation,
 node.the_geom,
 inp_tank.initlevel, 
 inp_tank.minlevel, 
 inp_tank.maxlevel, 
 inp_tank.diameter,
 inp_tank.minvol, 
-inp_tank.curve_id,
-node.expl_id
-FROM selector_expl, node
+inp_tank.curve_id
+FROM inp_selector_sector,v_node node
 JOIN inp_tank ON ((inp_tank.node_id) = (node.node_id))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_pump" CASCADE;
@@ -100,25 +79,18 @@ node."depth",
 node.nodecat_id, 
 node.sector_id, 
 node."state", 
-node.annotation, 
-node.observ, 
-node.comment,
-node.dma_id, 
-node.rotation, 
-node.link, 
-node.verified, 
+node.annotation,
 node.the_geom,
 inp_pump.power, 
 inp_pump.curve_id, 
 inp_pump.speed, 
 inp_pump.pattern, 
 inp_pump.to_arc, 
-inp_pump.status,
-node.expl_id
-FROM selector_expl, node 
+inp_pump.status
+FROM inp_selector_sector,v_node node 
 JOIN inp_pump ON ((node.node_id) = (inp_pump.node_id))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_valve" CASCADE;
@@ -130,13 +102,7 @@ node."depth",
 node.nodecat_id, 
 node.sector_id, 
 node."state", 
-node.annotation, 
-node.observ, 
-node.comment, 
-node.dma_id, 
-node.rotation, 
-node.link, 
-node.verified, 
+node.annotation,
 node.the_geom,
 inp_valve.valv_type, 
 inp_valve.pressure, 
@@ -145,12 +111,11 @@ inp_valve.coef_loss,
 inp_valve.curve_id, 
 inp_valve.minorloss, 
 inp_valve.to_arc,
-inp_valve.status,
-node.expl_id
-FROM selector_expl, node 
+inp_valve.status
+FROM inp_selector_sector,v_node node 
 JOIN inp_valve ON ((node.node_id) = (inp_valve.node_id))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_shortpipe" CASCADE;
@@ -162,22 +127,15 @@ node."depth",
 node.nodecat_id, 
 node.sector_id, 
 node."state", 
-node.annotation, 
-node.observ, 
-node.comment, 
-node.dma_id, 
-node.rotation, 
-node.link, 
-node.verified, 
+node.annotation,
 node.the_geom,
 inp_shortpipe.minorloss, 
 inp_shortpipe.to_arc, 
-inp_shortpipe.status,
-node.expl_id
-FROM selector_expl,node 
+inp_shortpipe.status
+FROM inp_selector_sector,v_node node
 JOIN inp_shortpipe ON ((inp_shortpipe.node_id) = (node.node_id))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_pipe" CASCADE;
@@ -188,20 +146,13 @@ arc.arccat_id,
 arc.sector_id, 
 arc."state", 
 arc.annotation, 
-arc.observ, 
-arc.comment, 
-arc.dma_id, 
 arc.custom_length, 
-arc.rotation, 
-arc.link, 
-arc.verified, 
 arc.the_geom,
 inp_pipe.minorloss, 
 inp_pipe.status, 
 inp_pipe.custom_roughness, 
-inp_pipe.custom_dint,
-arc.expl_id
-FROM selector_expl, arc 
+inp_pipe.custom_dint
+FROM inp_selector_sector, v_arc_x_node arc
 JOIN inp_pipe ON ((inp_pipe.arc_id) = (arc.arc_id))
-WHERE ((arc.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id)
+	AND inp_selector_sector.cur_user="current_user"());

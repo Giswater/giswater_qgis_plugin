@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = "ud30", public, pg_catalog;
--- WARNING: ud30 IS NOT ONLY PRESENT ON THE HEADER OF THIS FILE. IT EXISTS ALSO INTO IT. PLEASE REVIEW IT BEFORE REPLACE....
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+-- WARNING: SCHEMA_NAME IS NOT ONLY PRESENT ON THE HEADER OF THIS FILE. IT EXISTS ALSO INTO IT. PLEASE REVIEW IT BEFORE REPLACE....
 
 
 
@@ -18,16 +18,17 @@ inp_buildup_land_x_pol.c2, inp_buildup_land_x_pol.c3, inp_buildup_land_x_pol.per
 FROM inp_buildup_land_x_pol;
 
 
+
 DROP VIEW IF EXISTS "v_inp_controls" CASCADE;
 CREATE VIEW "v_inp_controls" AS 
 SELECT inp_controls_x_arc.id, text 
 FROM inp_selector_sector, inp_controls_x_arc
-	JOIN v_arc on inp_controls_x_arc.arc_id=v_arc.arc_id
-	WHERE ((v_arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
+	JOIN temp_arc on inp_controls_x_arc.arc_id=v_arc.arc_id
+	WHERE ((temp_arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
 UNION
 SELECT inp_controls_x_node.id, text FROM inp_selector_sector, inp_controls_x_node 
-	JOIN v_node on inp_controls_x_node.node_id=v_node.node_id
-	WHERE ((v_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
+	JOIN temp_node on inp_controls_x_node.node_id=v_node.node_id
+	WHERE ((temp_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
 ORDER BY id;
 
 
@@ -1026,7 +1027,7 @@ FROM temp_node
 DROP VIEW IF EXISTS v_inp_vertice CASCADE;
 CREATE OR REPLACE VIEW v_inp_vertice AS 
  SELECT 
- nextval('"ud30".inp_vertice_seq'::regclass) AS id,
+ nextval('"SCHEMA_NAME".inp_vertice_seq'::regclass) AS id,
  arc.arc_id,
  st_x(arc.point)::numeric(16,3) AS xcoord,
  st_y(arc.point)::numeric(16,3) AS ycoord
@@ -1039,7 +1040,7 @@ CREATE OR REPLACE VIEW v_inp_vertice AS
             arc_1.arc_id
 	FROM temp_arc arc_1) arc
   WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
-  ORDER BY nextval('"ud30".inp_vertice_seq'::regclass);
+  ORDER BY nextval('"SCHEMA_NAME".inp_vertice_seq'::regclass);
 
 
 

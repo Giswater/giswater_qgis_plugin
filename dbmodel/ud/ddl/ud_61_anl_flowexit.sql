@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- ----------------------------
@@ -15,7 +15,7 @@ CREATE TABLE "anl_flow_exit_node" (
 id serial NOT NULL PRIMARY KEY,
 cur_user varchar (30) NOT NULL, 
 node_id varchar (16) NOT NULL,
-the_geom public.geometry (POINT, 25831)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
@@ -23,7 +23,7 @@ CREATE TABLE "anl_flow_exit_arc" (
 id serial NOT NULL PRIMARY KEY,
 cur_user varchar (30) NOT NULL, 
 arc_id varchar (16) NOT NULL,
-the_geom public.geometry (LINESTRING, 25831)
+the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
 
@@ -37,7 +37,7 @@ CREATE TABLE "anl_flow_trace_node" (
 id serial NOT NULL PRIMARY KEY,
 cur_user varchar (30) NOT NULL, 
 node_id varchar (16) NOT NULL,
-the_geom public.geometry (POINT, 25831)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
@@ -45,7 +45,7 @@ CREATE TABLE "anl_flow_trace_arc" (
 id serial NOT NULL PRIMARY KEY,
 cur_user varchar (30) NOT NULL, 
 arc_id varchar (16) NOT NULL,
-the_geom public.geometry (LINESTRING, 25831)
+the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
 

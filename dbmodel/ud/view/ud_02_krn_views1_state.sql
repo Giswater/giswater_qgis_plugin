@@ -1,4 +1,4 @@
-﻿SET search_path = "ud30", public, pg_catalog;
+﻿SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- COMMON SQL (WS & UD)
 

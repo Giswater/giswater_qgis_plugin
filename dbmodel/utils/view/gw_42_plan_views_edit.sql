@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 DROP VIEW IF EXISTS v_edit_plan_psector CASCADE;
 CREATE VIEW v_edit_plan_psector AS SELECT

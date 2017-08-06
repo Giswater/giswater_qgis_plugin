@@ -37,7 +37,7 @@ CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE TABLE IF NOT EXISTS SCHEMA_NAME.log_actions (
     id bigserial PRIMARY KEY,
     tstamp_tx TIMESTAMP WITH TIME ZONE NOT NULL,    
-    schema_name text not null,
+    SCHEMA_NAME text not null,
     table_name text not null,
     relid oid not null,
     user_name text,
@@ -54,7 +54,7 @@ REVOKE ALL ON SCHEMA_NAME.log_actions FROM public;
 
 COMMENT ON TABLE SCHEMA_NAME.log_actions IS 'History of auditable actions on audited tables, from SCHEMA_NAME.gw_trg_if_modified_func()';
 COMMENT ON COLUMN SCHEMA_NAME.log_actions.id IS 'Unique identifier for each auditable event';
-COMMENT ON COLUMN SCHEMA_NAME.log_actions.schema_name IS 'Database schema audited table for this event is in';
+COMMENT ON COLUMN SCHEMA_NAME.log_actions.SCHEMA_NAME IS 'Database schema audited table for this event is in';
 COMMENT ON COLUMN SCHEMA_NAME.log_actions.table_name IS 'Non-schema-qualified table name of table event occured in';
 COMMENT ON COLUMN SCHEMA_NAME.log_actions.relid IS 'Table OID. Changes with drop/create. Get with ''tablename''::regclass';
 COMMENT ON COLUMN SCHEMA_NAME.log_actions.user_name IS 'Login / session user whose statement caused the audited event';

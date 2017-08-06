@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- ----------------------------
@@ -51,7 +51,7 @@ CREATE TABLE "om_visit" (
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
 "webclient_id" character varying(50),
-"the_geom" public.geometry (POINT, 25831),
+"the_geom" public.geometry (POINT, SRID_VALUE),
 "expl_id" integer NOT NULL,
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );

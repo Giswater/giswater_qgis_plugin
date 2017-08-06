@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION gw_fct_util_owner_all(    schema_name character varying,    cur_owner character varying,    new_owner character varying)
+CREATE OR REPLACE FUNCTION gw_fct_util_owner_all(    SCHEMA_NAME character varying,    cur_owner character varying,    new_owner character varying)
   RETURNS boolean AS
 $BODY$
 DECLARE
@@ -18,20 +18,20 @@ BEGIN
 	-- Tables
 	FOR rec_object IN 
 		SELECT * FROM pg_tables 
-		WHERE schemaname = schema_name 
+		WHERE schemaname = SCHEMA_NAME 
 		AND tableowner = cur_owner
 		ORDER BY tablename 
 	LOOP
-        EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.tablename)||' OWNER TO '||quote_ident(new_owner);
+        EXECUTE 'ALTER TABLE '||SCHEMA_NAME||'.'||quote_ident(rec_object.tablename)||' OWNER TO '||quote_ident(new_owner);
 	END LOOP;
 	
 	-- Views
 	FOR rec_object IN 
 		SELECT * FROM pg_views 
-		WHERE schemaname = schema_name 
+		WHERE schemaname = SCHEMA_NAME 
 		AND viewowner = cur_owner
 	LOOP
-        EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.viewname)||' OWNER TO '|| quote_ident(new_owner);
+        EXECUTE 'ALTER TABLE '||SCHEMA_NAME||'.'||quote_ident(rec_object.viewname)||' OWNER TO '|| quote_ident(new_owner);
 	END LOOP;
 
 	-- Sequences
@@ -42,7 +42,7 @@ BEGIN
 			AND n.oid = c.relnamespace
 			AND c.relkind = 'S' 
 			AND u.usename = cur_owner
-			AND n.nspname = schema_name
+			AND n.nspname = SCHEMA_NAME
 			AND relnamespace IN (
 					SELECT oid
 					FROM pg_namespace
@@ -50,7 +50,7 @@ BEGIN
 					AND nspname != 'information_schema'
 				)
 	LOOP
-        EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.relname)||' OWNER TO '|| quote_ident(new_owner);
+        EXECUTE 'ALTER TABLE '||SCHEMA_NAME||'.'||quote_ident(rec_object.relname)||' OWNER TO '|| quote_ident(new_owner);
 	END LOOP;
   
 	RETURN TRUE;

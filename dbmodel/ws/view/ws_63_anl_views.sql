@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -12,32 +12,13 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 DROP VIEW IF EXISTS v_anl_topological_consistency CASCADE;
 CREATE OR REPLACE VIEW v_anl_topological_consistency AS
 SELECT
-anl_topological_consistency.node_id,
-anl_topological_consistency.node_type,
-anl_topological_consistency.num_arcs,
-anl_topological_consistency.the_geom,
+anl_node_topological_consistency.node_id,
+node_type,
+num_arcs,
+anl_node_topological_consistency.the_geom,
 node.expl_id
-FROM selector_expl, anl_topological_consistency
-JOIN node ON node.node_id=anl_topological_consistency.node_id
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
-
-
-DROP VIEW IF EXISTS v_anl_geometrical_consistency CASCADE;
-CREATE OR REPLACE VIEW v_anl_geometrical_consistency AS
-SELECT
-anl_geometrical_consistency.node_id,
-anl_geometrical_consistency.node_type,
-anl_geometrical_consistency.node_dnom,
-anl_geometrical_consistency.num_arcs,
-anl_geometrical_consistency.arc_dnom1,
-anl_geometrical_consistency.arc_dnom2,
-anl_geometrical_consistency.arc_dnom3,
-anl_geometrical_consistency.arc_dnom4,
-anl_geometrical_consistency.the_geom,
-node.expl_id
-FROM selector_expl, anl_geometrical_consistency
-JOIN node ON node.node_id=anl_geometrical_consistency.node_id
+FROM selector_expl, anl_node_topological_consistency
+JOIN node ON node.node_id=anl_node_topological_consistency.node_id
 WHERE ((node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 

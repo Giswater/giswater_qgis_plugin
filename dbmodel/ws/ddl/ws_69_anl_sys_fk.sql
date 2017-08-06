@@ -72,4 +72,6 @@ ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_cause_an
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_type_mincut_result_type_fkey FOREIGN KEY (mincut_result_type) REFERENCES anl_mincut_result_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mincut_result_state_fkey FOREIGN KEY (mincut_result_state) REFERENCES anl_mincut_result_cat_state (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE anl_mincut_valve_status ADD CONSTRAINT anl_mincut_valve_status_result_cat_id_fkey FOREIGN KEY (result_cat_id) REFERENCES anl_mincut_result_cat (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE anl_mincut_valve_status ADD CONSTRAINT anl_mincut_valve_status_valve_id_fkey FOREIGN KEY (valve_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 

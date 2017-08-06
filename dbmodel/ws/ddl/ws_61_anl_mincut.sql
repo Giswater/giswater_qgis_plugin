@@ -1,10 +1,41 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
+
+
+
+-- ----------------------------
+-- MINCUT CATALOG
+-- ----------------------------
+CREATE SEQUENCE "anl_mincut_result_cat_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+	
+CREATE SEQUENCE "anl_mincut_result_selector_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+	
+CREATE SEQUENCE "anl_mincut_result_selector_compare_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
 
 
 -- ----------------------------
@@ -39,20 +70,6 @@ the_geom public.geometry (POINT, SRID_VALUE),
 CONSTRAINT anl_mincut_valve_pkey PRIMARY KEY (valve_id)
 );
 
-
-CREATE TABLE "anl_mincut_result_cat_cause" (
-id varchar(30) NOT NULL,
-descript text,
-CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "anl_mincut_cat_status_type"(
-  id smallint NOT NULL,
-  descript text,
-  CONSTRAINT mincut_cat_status_type_pkey PRIMARY KEY (id)
-);
-
 CREATE TABLE "anl_mincut_connec" (
   connec_id character varying(16) NOT NULL,
   the_geom geometry(Point,SRID_VALUE),
@@ -70,59 +87,9 @@ CREATE TABLE "anl_mincut_hydrometer"(
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE "anl_mincut_result_valve_unaccess"(
-  id serial NOT NULL,
-  result_cat_id character varying(16) NOT NULL,
-  valve_id character varying(16) NOT NULL,
-  CONSTRAINT anl_mincut_valve_status_pkey PRIMARY KEY (id),
-  CONSTRAINT anl_mincut_valve_status_result_cat_id_fkey FOREIGN KEY (result_cat_id)
-      REFERENCES anl_mincut_result_cat (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT anl_mincut_valve_status_valve_id_fkey FOREIGN KEY (valve_id)
-      REFERENCES node (node_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
-);
 
 
 
-
--- ----------------------------
--- MINCUT CATALOG
--- ----------------------------
-CREATE SEQUENCE "anl_mincut_result_cat_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-	
-CREATE SEQUENCE "anl_mincut_result_selector_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-CREATE SEQUENCE "anl_mincut_result_selector_compare_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE "anl_mincut_result_cat_type" (
-id varchar(30) NOT NULL,
-descript text,
-CONSTRAINT mincut_result_cat_type_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "anl_mincut_result_cat_state" (
-id varchar(30) NOT NULL,
-descript text,
-CONSTRAINT mincut_result_cat_state_pkey PRIMARY KEY (id)
-);
 
 
 CREATE TABLE "anl_mincut_result_cat" (
@@ -140,12 +107,12 @@ exec_start timestamp,
 exec_end timestamp,
 exec_user varchar(30),
 exec_descript text,
-exec_the_geom public.geometry(POINT, SRID_VALUE)
-exec_depth float;
-exec_limit_distance float;
-exec_appropiate boolean;	
-received_date date;	
-address_num character varying (30);
+exec_the_geom public.geometry(POINT, SRID_VALUE),
+exec_depth float,
+exec_limit_distance float,
+exec_appropiate boolean,	
+received_date date,
+address_num character varying (30),
 CONSTRAINT mincut_result_cat_pkey PRIMARY KEY (id)
 );
 
@@ -215,6 +182,50 @@ CREATE TABLE "anl_mincut_result_selector_compare" (
 CONSTRAINT anl_mincut_result_selector_compare_pkey PRIMARY KEY (id)
 );
 
+
+
+
+
+-- ----------------------------
+-- DVALUES
+-- ----------------------------
+
+
+CREATE TABLE "anl_mincut_result_cat_cause" (
+id varchar(30) NOT NULL,
+descript text,
+CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "anl_mincut_cat_status_type"(
+  id smallint NOT NULL,
+  descript text,
+  CONSTRAINT mincut_cat_status_type_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "anl_mincut_result_valve_unaccess"(
+  id serial NOT NULL PRIMARY KEY,
+  result_cat_id character varying(16) NOT NULL,
+  valve_id character varying(16) NOT NULL
+);
+
+
+
+CREATE TABLE "anl_mincut_result_cat_type" (
+id varchar(30) NOT NULL,
+descript text,
+CONSTRAINT mincut_result_cat_type_pkey PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE "anl_mincut_result_cat_state" (
+id varchar(30) NOT NULL,
+descript text,
+CONSTRAINT mincut_result_cat_state_pkey PRIMARY KEY (id)
+);
 
 
 

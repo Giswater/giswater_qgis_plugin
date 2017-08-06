@@ -26,7 +26,7 @@ BEGIN
     audit_row = ROW(
         nextval('"SCHEMA_NAME".log_actions_id_seq'),    -- id
         date_trunc('second', current_timestamp),            -- action_tstamp_tx        
-        TG_TABLE_SCHEMA::text,                              -- schema_name
+        TG_TABLE_SCHEMA::text,                              -- SCHEMA_NAME
         TG_TABLE_NAME::text,                                -- table_name
         TG_RELID,                                           -- relation OID for much quicker searches
         session_user::text,                                 -- session_user_name
@@ -160,7 +160,7 @@ $BODY$;
 
 
 -- Function to audit all tables of selected schema
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_schema(schema_name varchar) RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_schema(SCHEMA_NAME varchar) RETURNS void AS $BODY$
 DECLARE
     table_name text;
     registro  record;
@@ -170,9 +170,9 @@ BEGIN
 
     FOR registro IN 
         SELECT * FROM pg_tables 
-        WHERE schemaname = schema_name 
+        WHERE schemaname = SCHEMA_NAME 
         AND tablename NOT LIKE 'log_%' LOOP
-        table_name:= schema_name || '.' || quote_ident(registro.tablename);
+        table_name:= SCHEMA_NAME || '.' || quote_ident(registro.tablename);
         PERFORM audit_table(table_name, BOOLEAN 't', BOOLEAN 't');
     END LOOP;
 END;
@@ -180,7 +180,7 @@ $BODY$
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_schema_start(schema_name varchar) RETURNS "pg_catalog"."void" AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_schema_start(SCHEMA_NAME varchar) RETURNS "pg_catalog"."void" AS $BODY$
 DECLARE
     aux text;
     rec record;
@@ -190,9 +190,9 @@ BEGIN
 
     FOR rec IN 
         SELECT * FROM pg_tables 
-        WHERE schemaname = schema_name 
+        WHERE schemaname = SCHEMA_NAME 
         AND tablename NOT LIKE 'log_%' LOOP
-        aux:= schema_name||'.'||quote_ident(rec.tablename);
+        aux:= SCHEMA_NAME||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' ENABLE trigger audit_trigger_row';
     END LOOP;
 END;
@@ -200,7 +200,7 @@ $BODY$
 LANGUAGE 'plpgsql' VOLATILE COST 100;
   
   
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_schema_stop(schema_name varchar) RETURNS "pg_catalog"."void" AS $BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.audit_schema_stop(SCHEMA_NAME varchar) RETURNS "pg_catalog"."void" AS $BODY$
 DECLARE
     aux text;
     rec record;
@@ -210,9 +210,9 @@ BEGIN
     
     FOR rec IN 
         SELECT * FROM pg_tables 
-        WHERE schemaname = schema_name 
+        WHERE schemaname = SCHEMA_NAME 
         AND tablename NOT LIKE 'log_%' LOOP
-        aux:= schema_name||'.'||quote_ident(rec.tablename);
+        aux:= SCHEMA_NAME||'.'||quote_ident(rec.tablename);
         EXECUTE 'ALTER TABLE '||aux||' DISABLE trigger audit_trigger_row';
     END LOOP;
 END;

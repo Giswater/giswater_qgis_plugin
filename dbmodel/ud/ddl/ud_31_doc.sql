@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = "ud30", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 
@@ -18,7 +18,7 @@ CREATE SEQUENCE doc_x_gully_seq
   
 
 CREATE TABLE "doc_x_gully" (
-"id" int8 DEFAULT nextval ('"ud30".doc_x_gully_seq'::regclass) NOT NULL,
+"id" int8 DEFAULT nextval ('"SCHEMA_NAME".doc_x_gully_seq'::regclass) NOT NULL,
 "doc_id" varchar(30),
 "gully_id" varchar(16)  ,
 CONSTRAINT doc_x_gully_pkey PRIMARY KEY (id)

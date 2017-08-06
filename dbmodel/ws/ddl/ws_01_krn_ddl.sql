@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,8 +7,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-  
-  
+ 
+
 CREATE SEQUENCE pond_id_seq
     START WITH 1
     INCREMENT BY 1
@@ -186,7 +186,7 @@ CREATE TABLE "node" (
 "link" character varying(512),
 "verified" varchar(30),
 "rotation" numeric (6,3),
-"the_geom" public.geometry (POINT, SRID_VALUE) NOT NULL,,
+"the_geom" public.geometry (POINT, SRID_VALUE) NOT NULL,
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -207,7 +207,7 @@ CREATE TABLE "arc" (
 "arccat_id" varchar(30)  NOT NULL,
 "epa_type" varchar(16)   NOT NULL,
 "sector_id" integer NOT NULL,
-"state" int2  NOT NULL,,
+"state" int2  NOT NULL,
 "annotation" text,
 "observ" text,
 "comment" text,
@@ -231,7 +231,7 @@ CREATE TABLE "arc" (
 "descript" varchar(254)  ,
 "link" character varying(512),
 "verified" varchar(30)  ,
-"the_geom" public.geometry (LINESTRING, SRID_VALUE)  NOT NULL,,
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)  NOT NULL,
 "undelete" boolean,
 "label_x" character varying(30),
 "label_y" character varying(30),
@@ -245,7 +245,7 @@ CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 
 
 CREATE TABLE "connec" (
-"connec_id" varchar (16) DEFAULT nextval('"SCHEMA_NAME".connec_seq'::regclass) NOT NULL,
+"connec_id" varchar (16) NOT NULL,
 "code" varchar (30) NOT NULL,
 "elevation" numeric(12,4),
 "depth" numeric(12,4),
@@ -355,7 +355,6 @@ CREATE TABLE "man_tank" (
 "vutil" numeric (12,4),
 "area" numeric (12,4),
 "chlorination" character varying(255),
-"function" character varying(255),
 "name" varchar (50)
 );
 
@@ -462,6 +461,7 @@ CREATE TABLE "man_netwjoin" (
 "node_id" varchar(16) NOT NULL,
 "streetaxis_id" character varying(16),
 "postnumber" character varying(16),
+"demand" numeric (12,6),
 "top_floor" integer,
 "cat_valve" character varying(30),
 CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)
@@ -522,7 +522,7 @@ CONSTRAINT man_greentap_pkey PRIMARY KEY (connec_id)
   
 CREATE TABLE "man_tap"(
 "connec_id" character varying(16) NOT NULL,
-"linked_connec" character varying(16)
+"linked_connec" character varying(16),
 "cat_valve" character varying(30),
 "drain_diam" numeric(12,3),
 "drain_exit" character varying(100),
@@ -565,4 +565,6 @@ CREATE INDEX sector_index ON sector USING GIST (the_geom);
 CREATE INDEX arc_index ON arc USING GIST (the_geom);
 CREATE INDEX node_index ON node USING GIST (the_geom);
 CREATE INDEX connec_index ON connec USING GIST (the_geom);
+CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
+CREATE INDEX link_index ON link USING GIST (the_geom);
 

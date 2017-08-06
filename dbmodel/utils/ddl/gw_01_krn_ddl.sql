@@ -66,20 +66,6 @@ CREATE SEQUENCE "element_x_connec_seq"
     NO MAXVALUE
     CACHE 1;
 
-  
-CREATE SEQUENCE pond_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-CREATE SEQUENCE pool_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 	
@@ -448,8 +434,6 @@ CREATE TABLE "value_yesno" (
 
 
 CREATE INDEX exploitation_index ON exploitation USING GIST (the_geom);
-CREATE INDEX vnode_index ON vnode USING GIST (the_geom);
-CREATE INDEX link_index ON link USING GIST (the_geom);
 CREATE INDEX element_index ON element USING GIST (the_geom);
 
 
