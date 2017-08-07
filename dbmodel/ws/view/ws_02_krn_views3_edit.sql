@@ -1422,7 +1422,8 @@ node.publish,
 node.inventory,
 dma.macrodma_id,
 node.expl_id,
-node.hemisphere as netelement_hemisphere
+node.hemisphere as netelement_hemisphere,
+netelement.serial_number
 FROM selector_expl, node
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))

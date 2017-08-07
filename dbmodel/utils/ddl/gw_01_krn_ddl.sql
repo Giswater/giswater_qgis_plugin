@@ -350,6 +350,7 @@ CREATE TABLE "element" (
 "element_id" varchar(16) NOT NULL,
 "code" varchar(30) NOT NULL,
 "elementcat_id" varchar(30),
+"serial_number" varchar(30),
 "dma_id" integer,
 "state" int2 NOT NULL,
 "annotation" character varying(254),

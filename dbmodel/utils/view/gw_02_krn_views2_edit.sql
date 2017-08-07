@@ -39,6 +39,8 @@ DROP VIEW IF EXISTS v_edit_element CASCADE;
 CREATE VIEW v_edit_element AS SELECT
 	element_id,
 	elementcat_id,
+	code,
+	serial_number,
 	state,
 	annotation,
 	observ,
@@ -53,7 +55,6 @@ CREATE VIEW v_edit_element AS SELECT
 	link,
 	verified,
 	workcat_id_end,
-	code,
 	the_geom,
 	element.expl_id
 FROM selector_expl,element

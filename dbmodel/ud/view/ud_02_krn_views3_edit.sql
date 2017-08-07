@@ -1394,7 +1394,8 @@ node.uncertain,
 node.xyz_date AS netel_xyz_date,
 node.unconnected,
 sector.macrosector_id,
-node.expl_id
+node.expl_id,
+netelement.serial_number
 FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id

@@ -127,7 +127,7 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 
 CREATE TABLE macrodma(
 macrodma_id integer NOT NULL PRIMARY KEY,
-name character varying(50)NOT NULL,
+name character varying(50),
 expl_id integer NOT NULL,
 descript character varying(100),
 undelete boolean,
@@ -136,9 +136,9 @@ the_geom geometry(POLYGON,SRID_VALUE)
 
 CREATE TABLE "dma" (
 "dma_id" integer NOT NULL PRIMARY KEY,
-"name" character varying(30)NOT NULL,
+"name" character varying(30),
 "expl_id" integer NOT NULL,
-"macrodma_id" integer NOT NULL,
+"macrodma_id" integer,
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
@@ -147,7 +147,7 @@ CREATE TABLE "dma" (
 
 CREATE TABLE "sector" (
 "sector_id" integer NOT NULL PRIMARY KEY,
-"name" character varying(50)NOT NULL,
+"name" character varying(50),
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
@@ -486,6 +486,7 @@ CREATE TABLE "man_netsamplepoint"(
 
 CREATE TABLE "man_netelement"(
 "node_id" varchar(16) NOT NULL PRIMARY KEY
+"serial_number" varchar(30)
 ); 
 
 

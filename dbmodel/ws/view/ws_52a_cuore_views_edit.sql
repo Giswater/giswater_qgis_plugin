@@ -450,3 +450,36 @@ FROM selector_expl, connec
 	WHERE ((connec.expl_id)=(selector_expl.expl_id)
  	AND selector_expl.cur_user="current_user"());
 
+
+CREATE VIEW v_edit_vnode AS SELECT
+vnode.vnode_id,
+vnode.arc_id,
+vnode_type,
+vnode.annotation,
+userdefined_pos,
+vnode.the_geom,
+connec.sector_id,
+connec.dma_id,
+connec.state,
+connec.expl_id
+FROM vnode
+JOIN link on link.vnode_id=vnode.vnode_id
+JOIN connec ON link.connec_id=connec.connec_id;
+
+
+
+DROP VIEW IF EXISTS v_edit_link CASCADE;
+CREATE OR REPLACE VIEW v_edit_link AS 
+SELECT 
+link.link_id,
+link.featurecat_id,
+link.feature_id,
+link.vnode_id,
+link.the_geom,
+connec.sector_id,
+connec.dma_id,
+connec.state,
+st_length2d(link.the_geom) AS gis_length,
+connec.expl_id
+FROM link
+JOIN connec ON link.connec_id=connec_connec_id;

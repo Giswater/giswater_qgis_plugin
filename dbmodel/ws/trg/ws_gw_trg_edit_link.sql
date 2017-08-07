@@ -26,27 +26,6 @@ BEGIN
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-
-			--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
-                --PERFORM audit_function(125,340);
-				RETURN NULL;				
-            END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-            IF (expl_id_int IS NULL) THEN
-                --PERFORM audit_function(130,340);
-				RETURN NULL; 
-            END IF;
-		/*
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
-            IF (NEW.state IS NULL) THEN
-                NEW.state := (SELECT id FROM value_state limit 1);
-            END IF;
-        END IF;
-		*/
-		
 		
 			--vnode id
 		IF (NEW.vnode_id IS NULL) THEN
@@ -73,15 +52,14 @@ BEGIN
 		IF NEW.feature_id IS NULL THEN
 			NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001) OR ST_DWithin(vnode_end, connec.the_geom,0.001));
 			NEW.featurecat_id=(SELECT connec_type FROM connec WHERE connec_id=NEW.feature_id);
-			sector_id_varchar=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 		END IF;
 		
 		IF arc_geom_start IS NOT NULL THEN
-			INSERT INTO vnode (vnode_id, the_geom, expl_id, sector_id, vnode_type, arc_id) VALUES (NEW.vnode_id, vnode_start,expl_id_int, sector_id_varchar, NEW.featurecat_id, arc_id_start );
+			INSERT INTO vnode (vnode_id, the_geom, vnode_type, arc_id) VALUES (NEW.vnode_id, vnode_start,  NEW.featurecat_id, arc_id_start );
 		END IF;
 
 		IF arc_geom_end IS NOT NULL THEN
-			INSERT INTO vnode (vnode_id, the_geom,expl_id, sector_id, vnode_type, arc_id ) VALUES (NEW.vnode_id, vnode_end,expl_id_int, sector_id_varchar, NEW.featurecat_id,arc_id_end);
+			INSERT INTO vnode (vnode_id, the_geom, vnode_type, arc_id ) VALUES (NEW.vnode_id, vnode_end, NEW.featurecat_id,arc_id_end);
 		END IF;
 		
 		SELECT connec_id INTO connec_counter FROM v_edit_connec WHERE connec_id=NEW.feature_id AND arc_id IS NOT NULL;
@@ -89,14 +67,14 @@ BEGIN
 			RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 		END IF;
 		
-		INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
-		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
+		INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, featurecat_id)
+		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, NEW.featurecat_id, );
 		
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, expl_id=NEW.expl_id, featurecat_id=NEW.featurecat_id, "state"=NEW."state"
+		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, featurecat_id=NEW.featurecat_id
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;

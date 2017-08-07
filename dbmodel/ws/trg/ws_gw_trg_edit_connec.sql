@@ -96,14 +96,14 @@ BEGIN
 			END IF;  
         
         -- FEATURE INSERT
-INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sector_id, code, n_hydrometer, demand, "state", annotation, observ, "comment",rotation,dma_id, soilcat_id, category_type, fluid_type, location_type, 
-		  workcat_id, buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, link,verified, the_geom, undelete, workcat_id_end,label_x,label_y,label_rotation,
-		  expl_id, publish, inventory, enddate) 
-		  VALUES (NEW.connec_id, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.code, NEW.n_hydrometer, NEW.demand, NEW.state, NEW.annotation, 
-		  NEW.observ, NEW.comment, NEW.rotation,NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, 
-		  NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.streetname, NEW.postnumber, 
-		  NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.workcat_id_end,NEW.label_x,NEW.label_y,NEW.label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory, NEW.enddate );
+INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id, sector_id, customer_code, connec_arccat_id, connec_length, demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
+			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, rotation, link,verified, the_geom, undelete, label_x,label_y,label_rotation,
+		  expl_id, publish, inventory) 
+		  VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code, NEW.connec_arccat_id, NEW.connec_length, NEW.demand, NEW.state, NEW.annotation, 
+		  NEW.observ, NEW.comment,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,
+		  NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.streetname, NEW.postnumber, 
+		  NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, 
+		  expl_id_int, NEW.publish, NEW.inventory );
         --PERFORM audit_function(1,350);     
         RETURN NEW;
 
@@ -119,13 +119,13 @@ INSERT INTO connec (connec_id, elevation, "depth",connecat_id, connec_type, sect
 			
 		
 UPDATE connec 
-			SET connec_id=NEW.connec_id, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, code=NEW.code, n_hydrometer=NEW.n_hydrometer, 
-			demand=NEW.demand, "state"=NEW.state, annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, 
-			soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
-			buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, 
-			address_03=NEW.address_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript, link=NEW.link, verified=NEW.verified, 
-			the_geom=NEW.the_geom, undelete=NEW.undelete,workcat_id_end=NEW.workcat_id_end, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
-			 publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, expl_id=NEW.expl_id
+			SET connec_id=NEW.connec_id, code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.customer_code,
+			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, demand=NEW.demand, "state"=NEW.state, annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, dma_id=NEW.dma_id, 
+			presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
+			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, 
+			address_03=NEW.address_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript,  rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, 
+			the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
+			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id
 			WHERE connec_id=OLD.connec_id;
       
        -- PERFORM audit_function(2,350);     
