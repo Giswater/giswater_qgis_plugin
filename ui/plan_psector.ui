@@ -92,7 +92,7 @@
      </widget>
      <widget class="QLineEdit" name="psector_id">
       <property name="enabled">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
       <property name="geometry">
        <rect>
@@ -771,7 +771,7 @@
        </property>
       </widget>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="Other">
       <attribute name="title">
        <string>Other</string>
       </attribute>
