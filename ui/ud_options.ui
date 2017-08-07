@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>597</width>
-    <height>538</height>
+    <height>459</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1049,7 +1049,7 @@
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>System flow tolerance:</string>
+    <string>Sys. flow tolerance:</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -1086,7 +1086,7 @@
     <enum>QFrame::Plain</enum>
    </property>
    <property name="text">
-    <string>Lateral flow tolerance:</string>
+    <string>Lat. flow tolerance:</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -1227,168 +1227,6 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label_hydrology">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>460</y>
-     <width>91</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>false</italic>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>HYDROLOGY</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
-  <widget class="Line" name="line_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>480</y>
-     <width>571</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="rg_id">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>500</y>
-     <width>150</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
-   <property name="maxVisibleItems">
-    <number>8</number>
-   </property>
-   <property name="frame">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_hydrology_id">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>500</y>
-     <width>101</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>false</italic>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>Hydrology:</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_rg_id">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>500</y>
-     <width>111</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <italic>false</italic>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <property name="text">
-    <string>Raingage:</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="hydrology_id">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>500</y>
-     <width>150</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
-   <property name="maxVisibleItems">
-    <number>8</number>
-   </property>
-   <property name="frame">
-    <bool>false</bool>
-   </property>
-  </widget>
  </widget>
  <tabstops>
   <tabstop>flow_units</tabstop>
@@ -1412,8 +1250,6 @@
   <tabstop>min_surfarea</tabstop>
   <tabstop>head_tolerance</tabstop>
   <tabstop>lat_flow_tol</tabstop>
-  <tabstop>hydrology_id</tabstop>
-  <tabstop>rg_id</tabstop>
  </tabstops>
  <resources/>
  <connections/>
