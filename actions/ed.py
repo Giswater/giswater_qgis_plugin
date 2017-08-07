@@ -18,7 +18,6 @@ import utils_giswater
          
 from ..ui.add_element import Add_element    # @UnresolvedImport
 from ..ui.add_doc import Add_doc          # @UnresolvedImport
-from ..ui.add_file import Add_file          # @UnresolvedImport
 from parent import ParentAction
 
 

@@ -6,14 +6,13 @@ or (at your option) any later version.
 '''
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QMessageBox   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from PyQt4.Qt import QDate
 import inspect
 import os
 import _winreg
-import webbrowser
 
-from PyQt4.QtCore import Qt
+
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
@@ -30,14 +29,15 @@ def fillComboBox(widget, rows, allow_nulls=True):
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
             #why never join here???
-
             widget.addItem(str(elem))
         else:
-            if elem!=None:
+            if elem is not None:
                 widget.addItem(str(elem))
                 
-def fillComboBoxDefault(widget, rows, allow_nulls=True):
-    '''Fill combo box with default value-first from the list '''
+                
+def fillComboBoxDefault(widget, rows,):
+    ''' Fill combo box with default value-first from the list '''
+    
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -46,12 +46,10 @@ def fillComboBoxDefault(widget, rows, allow_nulls=True):
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
             #why never join here???
-
             widget.addItem(str(elem))
         else:
-            if elem!=None:
+            if elem is not None:
                 widget.addItem(str(elem))                
-
         
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
@@ -90,7 +88,6 @@ def getText(widget):
     return elem_text      
 
 
-
 def setText(widget, text):
     
     if type(widget) is str:
@@ -118,7 +115,6 @@ def setCalendarDate(widget, date):
         if date == None:
             date=QDate.currentDate()
         widget.setDate(date)
-
 
 
 def getWidget(widget):
@@ -265,7 +261,7 @@ def get_reg(reg_hkey, reg_path, reg_name):
     if reg_root is not None:
         try:
             registry_key = _winreg.OpenKey(reg_root, reg_path)
-            value, regtype = _winreg.QueryValueEx(registry_key, reg_name)
+            value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
             _winreg.CloseKey(registry_key)
             return value
         except WindowsError:

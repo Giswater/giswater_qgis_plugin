@@ -6,9 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QCursor, QFileDialog
+from PyQt4.QtGui import QFileDialog
 
 import os
 import sys

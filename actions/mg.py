@@ -9,20 +9,18 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
-
-
 from PyQt4.Qt import  QDate, QTime
+from qgis.core import QgsMapLayerRegistry
+
 from datetime import datetime, date
-import time
 import os
 import sys
+import webbrowser
 from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
-from parent_init import ParentDialog
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config import Config                                  # @UnresolvedImport
@@ -32,14 +30,13 @@ from ..ui.topology_tools import TopologyTools                   # @UnresolvedImp
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
-from ..ui.mincut_edit import Mincut_edit          # @UnresolvedImport
-from ..ui.mincut_fin import Mincut_fin
-from ..ui.mincut import Mincut
-from ..ui.multipsector_selector import Multipsector_selector        # @UnresolvedImport
-from ..ui.plan_psector import Plan_psector        # @UnresolvedImport
-from ..ui.psector_management import Psector_management        # @UnresolvedImport
+from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
+from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
+from ..ui.mincut import Mincut                                  # @UnresolvedImport
+from ..ui.multipsector_selector import Multipsector_selector    # @UnresolvedImport
+from ..ui.plan_psector import Plan_psector                      # @UnresolvedImport
+from ..ui.psector_management import Psector_management          # @UnresolvedImport
 
-from functools import partial
 from parent import ParentAction
 
 

@@ -6,11 +6,9 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
+from qgis.core import QgsMapLayerRegistry, QgsProject, QCoreApplication, QgsExpressionContextUtils
+from PyQt4.QtCore import QObject, QSettings, QTranslator
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
-from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
-from qgis.core import * 
-
 
 import os.path
 import sys  
@@ -32,13 +30,8 @@ from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
 #from map_tools.dimensions import Dimensions
 
-
 from search.search_plus import SearchPlus
 
-#from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
-from qgis.gui import *
-
-from init.ud_man_node_init import ManNodeDialog                                  # @UnresolvedImport
 
 
 class Giswater(QObject):  
@@ -699,7 +692,6 @@ class Giswater(QObject):
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_flexunion' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
-					
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
@@ -906,7 +898,6 @@ class Giswater(QObject):
         
         layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")[0]
         layer_connec.setDisplayField('[% "depth" %]')
-
 
     
     def set_map_tool(self, map_tool_name):
@@ -1128,9 +1119,4 @@ class Giswater(QObject):
         filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
         for f in filelist:
             os.remove(f)
-            
-'''
-class Global_type():
-    x = 0
-'''     
             
