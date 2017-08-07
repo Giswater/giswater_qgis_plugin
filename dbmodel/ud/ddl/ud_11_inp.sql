@@ -1366,7 +1366,7 @@ CREATE TABLE "inp_value_yesno" (
 -- Table structure flow regulator
 -- --------------------------
 
-CREATE TABLE "inp_flow_regulator_type"(
+CREATE TABLE "inp_flwreg_type"(
 id character varying(16),
 table_id character varying(50),
 CONSTRAINT inp_flow_regulator_type_pkey PRIMARY KEY (id)
