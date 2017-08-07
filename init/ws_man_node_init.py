@@ -23,7 +23,7 @@ from PyQt4.QtGui import QSizePolicy
 from PyQt4.QtCore import Qt,QObject
 
 
-from qgis.gui import QgsMapToolEmitPoint,QgsMapCanvasSnapper
+from qgis.gui import QgsMapToolEmitPoint,QgsMapCanvasSnapper, QgsDateTimeEdit
 from qgis.core import QgsExpression,QgsFeatureRequest
 
 from qgis.gui import *
@@ -106,10 +106,14 @@ class ManNodeDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
-        self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")  
+        self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
         #self.x=self.dialog.findChild(QDateEdit,"junction_builtdate")
-        
+
+        #self.date_time_edit = self.dialog.findChild(QgsDateTimeEdit, "junction_builtdate")
+
+        #self.date_time_edit.allowNull()
+
         # Manage tab visibility
         self.set_tabs_visibility(16)
               
