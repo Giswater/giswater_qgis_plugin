@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QSettings   
+from PyQt4.QtCore import QCoreApplication, QSettings, Qt 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
 
@@ -14,9 +14,6 @@ import subprocess
 from functools import partial
 
 from pg_dao import PgDao
-
-from PyQt4.QtCore import Qt
-
 
 
 class DaoController():

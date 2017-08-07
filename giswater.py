@@ -893,11 +893,15 @@ class Giswater(QObject):
         layer.editFormConfig().setInitFilePath(file_init)           
         layer.editFormConfig().setInitFunction(name_function)
         
-        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
-        layer_node.setDisplayField('[% "depth" %]')
+        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
+        if layer_node:
+            layer_node = layer_node[0]
+            layer_node.setDisplayField('[% "depth" %]')
         
-        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")[0]
-        layer_connec.setDisplayField('[% "depth" %]')
+        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
+        if layer_connec:
+            layer_connec = layer_connec[0]
+            layer_connec.setDisplayField('[% "depth" %]')
 
     
     def set_map_tool(self, map_tool_name):

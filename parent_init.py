@@ -9,8 +9,8 @@ or (at your option) any later version.
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
-from PyQt4.QtCore import QSettings, Qt, QAbstractItemModel
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QAction, QTextEdit, QPixmap,QMessageBox
+from PyQt4.QtCore import QSettings, Qt
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -21,8 +21,9 @@ import webbrowser
 
 import utils_giswater
 from dao.controller import DaoController
-from init.add_sum import Add_sum          #@UnresolvedImport
-from ui.ws_catalog import WScatalog                  # @UnresolvedImport
+from init.add_sum import Add_sum
+from ui.ws_catalog import WScatalog
+from ui.ud_catalog import UDcatalog
         
 
 class ParentDialog(object):   
@@ -122,7 +123,6 @@ class ParentDialog(object):
         self.load_tab_add_info()
         self.load_tab_analysis()
         self.load_tab_document()
-        
         
     def save_tab_add_info(self):
         ''' Save tab from tab 'Add. info' '''                
@@ -256,7 +256,7 @@ class ParentDialog(object):
             widget.model().select()
             
                    
-    def insert_records (self):
+    def insert_records(self):
         ''' Insert value  Hydrometer | Hydrometer'''
         
         # Create the dialog and signals
@@ -371,11 +371,6 @@ class ParentDialog(object):
                 else:
                     # Open the document
                     os.startfile(self.full_path)          
-                           
-                           
-    
-        
- 
 
                     
     def open_selected_document_from_table(self):
@@ -420,7 +415,6 @@ class ParentDialog(object):
                 if not os.path.exists(self.full_path):
                     message = "File not found:"+self.full_path 
                     self.controller.show_warning(message, context_name='ui_message')
-                       
                 else:
                     # Open the document
                     os.startfile(self.full_path)    
@@ -664,12 +658,9 @@ class ParentDialog(object):
         # Set model of selected widget
         self.set_model_to_table(widget, table_name, filter_)    
         
-        
         # On doble click open_event_gallery
         ''' Button - Open gallery from table event'''
         
-
-          
     
     def set_filter_table_event(self, widget):
         ''' Get values selected by the user and sets a new filter for its table model '''
@@ -829,149 +820,207 @@ class ParentDialog(object):
                 self.tab_main.removeTab(4)  
     
     
-    def actionCentered(self,feature,canvas,layer):
-        
+    def action_centered(self, feature, canvas, layer):
+
         layer.setSelectedFeatures([feature.id()])
         canvas.zoomToSelected(layer)
         
     
-    def actionZoom(self,feature,canvas,layer):
+    def action_zoom_in(self, feature, canvas, layer):
         
         layer.setSelectedFeatures([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomIn()  
 
 
-    def actionZoomOut(self,feature,canvas,layer):
+    def action_zoom_out(self, feature, canvas, layer):
 
         layer.setSelectedFeatures([feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
         
       
-    def actionEnabled(self,action,layer):
+    def action_enabled(self, action, layer):
         
         status = layer.startEditing()
         self.change_status(action, status,layer)
 
 
-    def change_status(self, action, status,layer):
+    def change_status(self, action, status, layer):
 
-        if status == True:
+        if status:
             layer.startEditing()
             action.setActive(True)
-
-        if status == False:
+        else:
             layer.rollBack()
-
+       
             
-    def catalog(self,type):
+    def catalog(self, wsoftware, geom_type):
 
-        self.dlg_cat = WScatalog()
+        # Set dialog depending water software
+        if wsoftware == 'ws':
+            self.dlg_cat = WScatalog()
+        elif wsoftware == 'ud':
+            self.dlg_cat = UDcatalog()
         utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-        
-        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(partial(self.fillTxtnodecat_id,type))
+        self.dlg_cat.open()        
+            
+        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
 
-        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
+        self.matcat_id = self.dlg_cat.findChild(QComboBox, "matcat_id")
         self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")
         self.dnom = self.dlg_cat.findChild(QComboBox, "dnom")
         self.id = self.dlg_cat.findChild(QComboBox, "id")
 
-        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxCatalod_id,type))
-        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxpnom,type))
-        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxdnom,type))
+        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxCatalod_id, geom_type))
+        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxpnom, geom_type))
+        self.matcat_id.currentIndexChanged.connect(partial(self.fillCbxdnom, geom_type))
 
-        self.pnom.currentIndexChanged.connect(partial(self.fillCbxCatalod_id,type))
-        self.pnom.currentIndexChanged.connect(partial(self.fillCbxdnom,type))
+        self.pnom.currentIndexChanged.connect(partial(self.fillCbxCatalod_id, geom_type))
+        self.pnom.currentIndexChanged.connect(partial(self.fillCbxdnom, geom_type))
+        self.dnom.currentIndexChanged.connect(partial(self.fillCbxCatalod_id, geom_type))
 
-        self.dnom.currentIndexChanged.connect(partial(self.fillCbxCatalod_id,type))
-
-        self.matcat_id.clear()
-        self.pnom.clear()
-        self.dnom.clear()
-
-        node_type = self.node_type.currentText()
-        sql= "SELECT DISTINCT(matcat_id) FROM "+self.schema_name+".cat_"+type+ " WHERE "+type+"type_id='"+node_type+ "'"
-  
+        self.node_type_text = None
+        if geom_type == 'node':
+            self.node_type_text = utils_giswater.getWidgetText(self.node_type)           
+            
+        sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        if geom_type == 'node':
+            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql+= " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
-
-        sql= "SELECT DISTINCT(pnom) FROM "+self.schema_name+".cat_"+type+ " WHERE "+type+"type_id='"+node_type+ "'"
-        
+        sql = "SELECT DISTINCT(pnom)"
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        if geom_type == 'node':
+            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"        
+        sql+= " ORDER BY pnom"        
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
 
-        sql = "SELECT dnom FROM  (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM "+self.schema_name+".cat_"+type+ " ORDER BY x)as dnom"
-
+        if geom_type == 'node':
+            sql = "SELECT dnom"
+            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom"
+            sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) as dnom"
+        elif geom_type == 'arc':
+            sql = "SELECT DISTINCT(dnom), (trim('mm' from dnom)::int)as x, dnom"
+            sql+= " FROM "+self.schema_name+".cat_arc ORDER BY x"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
 
         
-    def fillCbxpnom(self,type):
+    def fillCbxpnom(self, geom_type):
 
-     
-        nodetype = self.node_type.currentText()
-        mats=self.matcat_id.currentText()
-
-        sql="SELECT DISTINCT(pnom) FROM "+self.schema_name+".cat_"+type+ ""
-        if(str(nodetype)!= ""):
-            sql += " WHERE "+type+"type_id='"+nodetype+"'"
-        if (str(mats)!=""):
-            sql += " and matcat_id='"+str(mats)+"'"
+        # Get values from filters          
+        mats = utils_giswater.getWidgetText(self.matcat_id) 
+        
+        # Set SQL query             
+        sql_where = None
+        sql = "SELECT DISTINCT(pnom)"
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+          
+        # Build SQL filter
+        if mats != "null":
+            if sql_where is None:
+                sql_where = " WHERE"
+            sql_where+= " matcat_id = '"+mats+"'"
+        if self.node_type_text is not None:
+            if sql_where is None:
+                sql_where = " WHERE"
+            else:
+                sql_where+= " AND"            
+            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql+= sql_where+" ORDER BY pnom"
+                
         rows = self.controller.get_rows(sql)
-        self.pnom.clear()
         utils_giswater.fillComboBox(self.pnom, rows)
         self.fillCbxdnom(type)
 
         
-    def fillCbxdnom(self,type):
-        message = str(type)
-        self.controller.show_info(message, context_name='ui_message' )
-
-        nodetype = self.node_type.currentText()
-        mats=self.matcat_id.currentText()
-        pnom=self.pnom.currentText()
-        sql="SELECT dnom FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom FROM "+self.schema_name+".cat_"+type+ ""
-        if(str(nodetype)!= ""):
-            sql += " WHERE "+type+"type_id='"+nodetype+"'"
-        if (str(mats)!=""):
-            sql += " and matcat_id='"+str(mats)+"'"
-        if(str(pnom)!= ""):
-            sql +=" and pnom='"+str(pnom)+"'"
-        sql +=" ORDER BY x) as dnom"
+    def fillCbxdnom(self, geom_type):
+        
+        # Get values from filters
+        mats = utils_giswater.getWidgetText(self.matcat_id)                                
+        pnom = utils_giswater.getWidgetText(self.pnom)  
+         
+        # Set SQL query
+        sql_where = None        
+        sql = "SELECT dnom" 
+        sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom"
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        
+        # Build SQL filter        
+        if self.node_type_text is not None:
+            if sql_where is None:
+                sql_where = " WHERE"            
+            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
+        if mats != "null":
+            if sql_where is None:
+                sql_where = " WHERE"
+            else:
+                sql_where+= " AND"                 
+            sql_where+= " matcat_id = '"+mats+"'"
+        if pnom != "null":
+            if sql_where is None:
+                sql_where = " WHERE"
+            else:
+                sql_where+= " AND"       
+            sql_where+= " pnom = '"+pnom+"'"
+        sql+= sql_where+" ORDER BY x) as dnom"
+                
         rows = self.controller.get_rows(sql)
-        self.dnom.clear()
         utils_giswater.fillComboBox(self.dnom, rows)
 
         
-    def fillCbxCatalod_id(self,type):    #@UnusedVariable
+    def fillCbxCatalod_id(self, geom_type):
 
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
+        # Get values from filters
+        mats = utils_giswater.getWidgetText(self.matcat_id)                                
+        pnom = utils_giswater.getWidgetText(self.pnom)  
+        dnom = utils_giswater.getWidgetText(self.dnom)  
 
-        if self.id!='null':
-            nodetype = self.node_type.currentText()
-            mats = self.matcat_id.currentText()
-            pnom = self.pnom.currentText()
-            dnom = self.dnom.currentText()
-            sql = "SELECT DISTINCT(id) as id FROM "+self.schema_name+".cat_node"
-            if (str(nodetype)!= ""):
-                sql += " WHERE "+type+"type_id='"+nodetype+"'"
-            if (str(mats)!=""):
-                sql += " and matcat_id='"+str(mats)+"'"
-            if (str(pnom) != ""):
-                sql += " and pnom='"+str(pnom)+"'"
-            if (str(dnom) != ""):
-                sql += " and dnom='" + str(dnom) + "'"
-            sql += " ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            self.id.clear()
-            utils_giswater.fillComboBox(self.id, rows)
+        # Set SQL query
+        sql_where = None  
+        sql = "SELECT DISTINCT(id) as id" 
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        
+        if self.node_type_text is not None:
+            if sql_where is None:
+                sql_where = " WHERE"            
+            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
+                    
+        if mats != "null":
+            if sql_where is None:
+                sql_where = " WHERE"
+            else:
+                sql_where+= " AND"                 
+            sql_where+= " matcat_id = '"+mats+"'"
+        if pnom != "null":
+            if sql_where is None:
+                sql_where = " WHERE"
+            else:
+                sql_where+= " AND"                 
+            sql_where+= " pnom = '"+pnom+"'"
+        if dnom != "null":
+            if sql_where is None:
+                sql_where = " WHERE"
+            else:
+                sql_where+= " AND"                 
+            sql_where+= " dnom = '"+dnom+"'"
+        sql+= sql_where+" ORDER BY id"
+        
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.id, rows)
 
 
-    def fillTxtnodecat_id(self,type):
+    def fill_geomcat_id(self, geom_type):
         self.dlg_cat.close()
-        self.nodecat_id.clear()
-        self.nodecat_id.setText(str(self.id.currentText()))
+        if geom_type == 'node':
+            self.nodecat_id.setText(utils_giswater.getWidgetText(self.id))
+        else:
+            self.arccat_id.setText(utils_giswater.getWidgetText(self.id))                    
+                
+        

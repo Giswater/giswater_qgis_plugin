@@ -6,36 +6,18 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QMessageBox, QComboBox, QLineEdit, QDateEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtCore import Qt, QObject, QPoint
+from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
-from qgis.gui import *
 from functools import partial
-import os
+
 import utils_giswater
 from parent_init import ParentDialog
-from ui.ws_catalog import WScatalog                  # @UnresolvedImport
+from ui.gallery import Gallery              #@UnresolvedImport
+from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
 
-
-from ui.gallery import Gallery          #@UnresolvedImport
-from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
-from PyQt4.QtGui import QSizePolicy
-
-from PyQt4.QtCore import Qt,QObject
-
-
-from qgis.gui import QgsMapToolEmitPoint,QgsMapCanvasSnapper
-from qgis.core import QgsExpression,QgsFeatureRequest
-
-from qgis.gui import *
-from qgis.core import *
-
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-
-
-
-from qgis.core import QgsProject, QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest, QgsMessageLog
-from qgis.core import *
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -65,9 +47,8 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-
-        dialog.parent().setFixedSize(625,720)
-        #dialog.parent().setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Expanding)
+        dialog.parent().setFixedSize(625, 720)
+        
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
@@ -100,7 +81,7 @@ class ManNodeDialog(ParentDialog):
         self.node_type = utils_giswater.getWidgetText("node_type", False)        
         self.nodecat_id = utils_giswater.getWidgetText("nodecat_id", False) 
         
-        # Get widget controls      
+        # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
         self.tbl_info = self.dialog.findChild(QTableView, "tbl_element")   
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
@@ -118,7 +99,6 @@ class ManNodeDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_info, self.schema_name+"."+table_element, self.filter)
-
 
         # Configuration of info table
         self.set_configuration(self.tbl_info, table_element)    
@@ -158,36 +138,28 @@ class ManNodeDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog,'node'))
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node'))
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
         layer = self.iface.activeLayer()
-        
-        action = self.dialog.findChild(QAction, "actionEnable")
 
         # Toolbar actions
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.actionZoom,feature,canvas,layer))
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.actionCentered,feature,canvas,layer))
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.actionEnabled,action,layer))
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.actionZoomOut,feature,canvas,layer))
-        self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.actionRotation)
-        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.actionCopyPaste)
-        
+        action = self.dialog.findChild(QAction, "actionEnable")
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
+        self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
 
-        # QLineEdit
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
-        # ComboBox
         self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
         #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
         #self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
-        
 
-    
-             
         
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
@@ -200,8 +172,6 @@ class ManNodeDialog(ParentDialog):
             self.controller.show_warning(message, context_name='ui_message' ) 
             return
 
-
-        inf_text = ""
         #for i in range(0, len(selected_list)):
         row = selected_list[0].row()
         #id_ = self.tbl_event.model().record(row).value("visit_id")
@@ -255,7 +225,7 @@ class ManNodeDialog(ParentDialog):
         self.num_events = len(self.img_path_list1D) 
         
         limit = self.num_events%9
-        for k in range(0,limit):
+        for k in range(0, limit):
             self.img_path_list1D.append(0)
 
         # Inicialization of two-dimensional array
@@ -265,7 +235,7 @@ class ManNodeDialog(ParentDialog):
         message = str(self.img_path_list)
         self.controller.show_warning(message, context_name='ui_message')
         # Convert one-dimensional array to two-dimensional array
-        idx=0
+        idx = 0
         '''
         for h in range(0,rows):
             for r in range(0,columns):
@@ -296,7 +266,7 @@ class ManNodeDialog(ParentDialog):
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
 
             # Set QLabel like ExtendedQLabel(ClickableLabel)
-            self.widgetExtended=ExtendedQLabel.ExtendedQLabel(widget)
+            self.widgetExtended = ExtendedQLabel.ExtendedQLabel(widget)
  
             self.widgetExtended.setPixmap(pixmap)
             self.start_indx = 0
@@ -348,7 +318,6 @@ class ManNodeDialog(ParentDialog):
         
     def zoom_img(self,i):
 
-            
         handelerIndex=i    
         
         self.dlg_gallery_zoom = GalleryZoom()
@@ -445,26 +414,28 @@ class ManNodeDialog(ParentDialog):
             self.btn_next.setEnabled(True)
             
      
-    def actionRotation(self):
+    def action_rotation(self):
     
-        mapCanvas=self.iface.mapCanvas()
+        mapCanvas = self.iface.mapCanvas()
         self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
         mapCanvas.setMapTool(self.emitPoint)
         QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.get_coordinates)
         
         
-    def get_coordinates(self,point,btn):
+    def get_coordinates(self, point, btn):
 
-        canvas=self.iface.mapCanvas()
+        canvas = self.iface.mapCanvas()
         self.snapper = QgsMapCanvasSnapper(canvas)
        
-        x =point.x()
-        y =point.y()
+        x = point.x()
+        y = point.y()
         
         layer = self.iface.activeLayer().name()
         table = "v_edit_man_"+str(layer.lower())
         
-        sql = "SELECT ST_X(the_geom),ST_Y(the_geom) FROM "+self.schema_name+"."+table+" WHERE node_id = '"+self.id+"'"
+        sql = "SELECT ST_X(the_geom),ST_Y(the_geom)"
+        sql+= " FROM "+self.schema_name+"."+table
+        sql+= " WHERE node_id = '"+self.id+"'"
         rows = self.controller.get_rows(sql)
         
         existing_point_x = rows[0][0]
@@ -480,25 +451,24 @@ class ManNodeDialog(ParentDialog):
         status = self.controller.execute_sql(sql)
         
         if status : 
-        
             message = "Hemisphere is updated for node "+str(self.id)
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message, context_name='ui_message')
         
              
-    def actionCopyPaste(self):
+    def action_copy_paste(self):
         
         # Activate snapping
-        mapCanvas=self.iface.mapCanvas()
+        mapCanvas = self.iface.mapCanvas()
         self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
         mapCanvas.setMapTool(self.emitPoint)
 
-        self.canvas=self.iface.mapCanvas()
+        self.canvas = self.iface.mapCanvas()
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.clickButtonSnapping)
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.manage_snapping)
       
       
-    def clickButtonSnapping(self,point,btn):
+    def manage_snapping(self, point, btn):
      
         #currentTool = self.iface.mapCanvas().mapTool()
         # Get node of snapping
@@ -592,5 +562,4 @@ class ManNodeDialog(ParentDialog):
                 #self.layer.reload()
                 #self.canvas.refresh()
                 #self.iface.refresh()
-                
 
