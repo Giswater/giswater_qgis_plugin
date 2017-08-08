@@ -9,7 +9,8 @@ or (at your option) any later version.
 from PyQt4.QtCore import QObject, SIGNAL
 from PyQt4.QtCore import QPoint
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
+from PyQt4.QtGui import QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis._gui import QgsMapCanvasSnapper
 from qgis._gui import QgsMapToolEmitPoint
@@ -863,7 +864,7 @@ class Mg():
 
         # Show message, insert in DB and close form
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message' )
+        self.controller.show_info(message, context_name='ui_message')
         if utils_giswater.isChecked(self.chk_state_vdefault) == True:
             self.insert_or_update_config_vdefault(self.state_vdefault, "state_vdefault")
         else:
@@ -1574,13 +1575,16 @@ class Mg():
 
 
 
-    def mg_new_psector(self,psector_id=None):
+    def mg_new_psector(self,psector_id=None,enable_tabs=False):
         ''' Button_45 : New psector '''
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
         update = False  # if false: insert; if true: update
-
+        self.tab_arc_node_other=self.dlg_new_psector.findChild(QTabWidget,"tabWidget_2")
+        self.tab_arc_node_other.setTabEnabled(0,enable_tabs)
+        self.tab_arc_node_other.setTabEnabled(1, enable_tabs)
+        self.tab_arc_node_other.setTabEnabled(2, enable_tabs)
         # LineEdit
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
@@ -1650,12 +1654,14 @@ class Mg():
         self.tbl_v_plan_other_x_psector.hideColumn(0)
         '''
         # tab Elements
-        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector"))
-        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_add_other_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_other_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector", self.tbl_arc_plan))
+        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(partial(self.delete_records_with_params, self.tbl_arc_plan, "plan_arc_x_psector", "id"))
+
+        self.dlg_new_psector.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", self.tbl_node_plan ))
+        self.dlg_new_psector.btn_del_node_plan.pressed.connect(partial(self.delete_records_with_params, self.tbl_node_plan, "plan_node_x_psector", "id"))
+
+        self.dlg_new_psector.btn_add_other_plan.pressed.connect(partial(self.snapping, "v_edit_connect", "plan_other_x_psector", self.tbl_other_plan))
+        self.dlg_new_psector.btn_del_other_plan.pressed.connect(partial(self.delete_records_with_params, self.tbl_other_plan, "plan_other_x_psector", "id"))
 
         mapCanvas = self.iface.mapCanvas()
         # Create the appropriate map tool and connect the gotPoint() signal.
@@ -1798,13 +1804,16 @@ class Mg():
         self.controller.execute_sql(sql)
         self.dlg_new_psector.close()
 
-    def snapping(self, btn, tablename):
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),
-                        partial(self.click_button_add, btn,tablename))
+    def snapping(self, layer_view, tablename, table_view):
+        self.p = QObject()
+        #self.p.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_add)
+
+        self.p.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),
+                        partial(self.click_button_add, layer_view, tablename, table_view))
 
 
-    def click_button_add(self,  btn, tablename, point):
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(btn)[0]
+    def click_button_add(self,  layer_view, tablename, table_view, point):
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_view)[0]
         self.iface.setActiveLayer(layer)
         #self.test("333")
         # Find the layer to edit
@@ -1838,22 +1847,35 @@ class Mg():
                     feat_type = 'connec'
                 if element_type in arc_group:
                     feat_type = 'arc'
-
+                #self.test(feat_type)
                 # Get the point
                 point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
                 snappFeat = next(
                     result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                 feature = snappFeat
                 element_id = feature.attribute(feat_type + '_id')
+                psector_id="20"
+                #psector_id = feature.attribute('psector_id')
                 # LEAVE SELECTION
                 result[0].layer.select([result[0].snappedAtGeometry])
-
                 # Get depth of feature
-            sql = "SELECT * FROM " + self.schema_name + "." + tablename + " WHERE " + feat_type + "_id = '" + element_id + "'"
-            #sql= "INSERT INTO " + self.schema_name + "." + tablename
-            self.test(sql)
-                #self.controller.execute_sql(sql)
-            QObject.disconnect()
+                self.test(str(feat_type) + "---" + str(element_id))
+            sql = "SELECT * FROM " + self.schema_name + "." + tablename + " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
+            row = self.dao.get_row(sql)
+            self.test(row)
+            if not row:
+                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
+                sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
+                self.controller.execute_sql(sql)
+                message = "Values has been updated"
+                self.controller.show_info(message, context_name='ui_message')
+            else:
+                self.test("HC Ya existe")
+            table_view.model().select()
+            self.p.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_add)
+            #QObject.disconnect(self.p,0,0,0)
+            #layer.stopEditing()
+
             self.test("111")
 
     def cal_percent(self, widged_total, widged_percent, wided_result):
@@ -1875,12 +1897,11 @@ class Mg():
 
     def mg_psector_mangement(self):
         ''' Button_46 : Psector management '''
-
         'psm es abreviacion de psector_management'
         # Create the dialog and signals
         self.dlg_psector_mangement = Psector_management()
         utils_giswater.setDialog(self.dlg_psector_mangement)
-        table_document = "plan_psector"
+        table_name = "plan_psector"
         column_id = "psector_id"
         # Tables
         self.tbl_psm=self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
@@ -1888,7 +1909,7 @@ class Mg():
         # Buttons
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
-        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.delete_records_with_params, self.tbl_psm, table_document, column_id))
+        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.delete_records_with_params, self.tbl_psm, table_name, column_id))
         # LineEdit
         self.dlg_psector_mangement.txt_short_descript_psm.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_short_descript_psm))
         #self.txt_short_descript_psm.
@@ -1905,7 +1926,7 @@ class Mg():
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
         self.dlg_psector_mangement.close()
-        self.mg_new_psector(psector_id)
+        self.mg_new_psector(psector_id, True)
 
 
     def filter_by_text(self, table, txt):
