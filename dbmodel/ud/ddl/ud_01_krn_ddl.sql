@@ -190,9 +190,9 @@ CREATE TABLE "node" (
 "top_elev" numeric(12,3),
 "ymax" numeric(12,3),
 "elev" numeric(12,3),
-"est_top_elev" numeric(12,3),
-"est_ymax" numeric(12,3),
-"est_elev" numeric(12,3),
+"custom_top_elev" numeric(12,3),
+"custom_ymax" numeric(12,3),
+"custom_elev" numeric(12,3),
 "node_type" varchar(18)  ,
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
@@ -231,6 +231,7 @@ CREATE TABLE "node" (
 "uncertain" boolean,
 "unconnected" boolean,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -245,10 +246,10 @@ CREATE TABLE "arc" (
 "y2" numeric (12,3) ,
 "elev1" numeric(12,3),
 "elev2" numeric(12,3),
-"est_y1" numeric(12,3),
-"est_y2" numeric(12,3),
-"est_elev1" numeric(12,3),
-"est_elev2" numeric(12,3),
+"custom_y1" numeric(12,3),
+"custom_y2" numeric(12,3),
+"custom_elev1" numeric(12,3),
+"custom_elev2" numeric(12,3),
 "arc_type" varchar(18)  ,
 "arccat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
@@ -286,6 +287,7 @@ CREATE TABLE "arc" (
 "inventory" boolean,
 "uncertain" boolean,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -301,6 +303,7 @@ CREATE TABLE "connec" (
 "connecat_id" varchar(30)  ,
 "sector_id" integer NOT NULL  ,
 "customer_code" varchar(30),
+"private_connecat_id" varchar(30),
 "demand" numeric(12,8),
 "state" int2  NOT NULL,
 "connec_arccat_id" varchar(18),
@@ -344,6 +347,7 @@ CREATE TABLE "connec" (
 "inventory" boolean,
 "uncertain" boolean,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 
@@ -402,6 +406,7 @@ CREATE TABLE "gully" (
 "inventory" boolean,
 "uncertain" boolean,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT gully_pkey PRIMARY KEY (gully_id)
 );
 

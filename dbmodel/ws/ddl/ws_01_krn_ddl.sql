@@ -195,6 +195,7 @@ CREATE TABLE "node" (
 "inventory" boolean,
 "hemisphere" float,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT node_pkey PRIMARY KEY (node_id)
 );
 
@@ -239,6 +240,7 @@ CREATE TABLE "arc" (
 "publish" boolean,
 "inventory" boolean,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT arc_pkey PRIMARY KEY (arc_id)
 );
 
@@ -289,6 +291,7 @@ CREATE TABLE "connec" (
 "publish" boolean,
 "inventory" boolean,
 "expl_id" integer,
+"num_value" numeric(12,3),
 CONSTRAINT connec_pkey PRIMARY KEY (connec_id)
 );
 

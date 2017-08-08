@@ -99,11 +99,11 @@ BEGIN
 						RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 					END IF;	
 					
-					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type, arc_id) 
-					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_varchar,NEW.featurecat_id, arc_id_start);			
+					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type) 
+					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_varchar,NEW.featurecat_id);			
 					
-					INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id, featurecat_id, "state")
-					VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
+					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom, expl_id, "state")
+					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom, expl_id_int, NEW."state");
 				END IF;
 
 					IF arc_geom_end IS NOT NULL THEN		
@@ -124,11 +124,11 @@ BEGIN
 						RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 				END IF;
 				
-						INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type, arc_id) 
-						VALUES (NEW.vnode_id, vnode_end, expl_id_int, sector_id_varchar,NEW.featurecat_id, arc_id_end);	
+					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type) 
+					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_varchar,NEW.featurecat_id);			
 					
-						INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, expl_id,featurecat_id, "state")
-						VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
+					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
+					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
 					END IF;
 					
 				IF gully_geom_end IS NOT NULL AND gully_geom_start IS NOT NULL THEN
@@ -137,8 +137,8 @@ BEGIN
 						NEW.featurecat_id='gully';
 					END IF;
 					
-					INSERT INTO link (link_id, feature_id, custom_length, the_geom, expl_id,featurecat_id, "state")
-					VALUES (NEW.link_id, NEW.feature_id,  NEW.custom_length, NEW.the_geom, expl_id_int, NEW.featurecat_id, NEW."state");
+					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
+					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
 				END IF;	
 				
 
@@ -146,7 +146,7 @@ BEGIN
 					
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, expl_id=NEW.expl_id, featurecat_id=NEW.featurecat_id, "state"=NEW."state"
+		SET link_id=NEW.link_id, featurecat_id=NEW.featurecat_id,  feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;

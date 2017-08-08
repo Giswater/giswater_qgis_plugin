@@ -123,14 +123,12 @@ BEGIN
             END IF;
 		
         -- FEATURE INSERT
-				INSERT INTO arc (arc_id, node_1, node_2, y1, y2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type,
-				location_type, workcat_id, buildercat_id, builtdate, ownercat_id, address_01, address_02, address_03, descript, est_y1, est_y2, link, verified, the_geom,workcat_id_end,undelete,label_x,label_y, 
-				label_rotation, code, expl_id, publish, inventory, enddate, uncertain) 
-				VALUES (NEW.arc_id, null, null, NEW.y1, NEW.y2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
-				NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id,
-				NEW.buildercat_id, NEW.builtdate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.est_y1, NEW.est_y2,
-				NEW.link, NEW.verified, NEW.the_geom,NEW.workcat_id_end,NEW.undelete,NEW.label_x,NEW.label_y, NEW.label_rotation, 
-				NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.enddate, NEW.uncertain);
+				INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, 
+				"comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, 
+				descript, link, verified, the_geom, undelete,label_x,label_y, label_rotation, code, expl_id, publish, inventory, uncertain,num_value) 
+				VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.custom_y1,NEW.elev1, NEW.custom_elev1, NEW.y2, NEW.custom_y2, NEW.elev2, NEW.custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, 
+				NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id,
+				NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, NEW.label_rotation, NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
 						
         -- EPA INSERT
@@ -204,13 +202,13 @@ BEGIN
 	END IF;
     
 		UPDATE arc 
-		SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
+		SET arc_id=NEW.arc_id, code=NEW.code, y1=NEW.y1, custom_y1=NEW.custom_y1, elev1=NEW.elev1, custom_elev1=NEW.custom_elev1, y2=NEW.y2, custom_y2=NEW.custom_y2, elev2=NEW.elev2, custom_elev2=NEW.custom_elev2,
+		arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, 
 		annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
-		soilcat_id=NEW.soilcat_id, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
-		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, 
-		address_03=NEW.address_03, descript=NEW.descript, link=NEW.link, est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, 
-		the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end,
-		code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
+		soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
+		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, 
+		address_03=NEW.address_03, descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,label_y=NEW.label_y, label_rotation=NEW.label_rotation,
+		publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value=NEW.num_value
 		WHERE arc_id=OLD.arc_id;	
 
 		--PERFORM audit_function (2,760);

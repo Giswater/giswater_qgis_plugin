@@ -47,8 +47,8 @@ BEGIN
 				NEW.pond_id:= (SELECT nextval('pond_id_seq'));
 			END IF;		
 				
-				INSERT INTO pond (pond_id, connec_id, code_comercial, the_geom, expl_id)
-				VALUES (NEW.pond_id, NEW.connec_id, NEW.code_comercial, NEW.the_geom, expl_id_int);
+				INSERT INTO pond (pond_id, connec_id, the_geom, expl_id)
+				VALUES (NEW.pond_id, NEW.connec_id, NEW.the_geom, expl_id_int);
 		
 		ELSIF man_table='pool' THEN
 			       			-- Pool ID
@@ -58,8 +58,8 @@ BEGIN
 				NEW.pool_id:= (SELECT nextval('pool_id_seq'));
 			END IF; 
 			
-				INSERT INTO pool(pool_id, connec_id, code_comercial, the_geom, expl_id)
-				VALUES (NEW.pool_id, NEW.connec_id, NEW.code_comercial, NEW.the_geom, expl_id_int);
+				INSERT INTO pool(pool_id, connec_id, the_geom, expl_id)
+				VALUES (NEW.pool_id, NEW.connec_id, NEW.the_geom, expl_id_int);
 		
 			
 		END IF;
@@ -73,12 +73,12 @@ BEGIN
 						
 		IF man_table='pond' THEN
 			UPDATE pond
-			SET pond_id=NEW.pond_id, connec_id=NEW.connec_id, code_comercial=NEW.code_comercial, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+			SET pond_id=NEW.pond_id, connec_id=NEW.connec_id, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE pond_id=OLD.pond_id;
 		
 		ELSIF man_table='pool' THEN
 			UPDATE pool
-			SET pool_id=NEW.pool_id, connec_id=NEW.connec_id, code_comercial=NEW.code_comercial, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+			SET pool_id=NEW.pool_id, connec_id=NEW.connec_id, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE pool_id=NEW.pool_id;
 		
 		END IF;

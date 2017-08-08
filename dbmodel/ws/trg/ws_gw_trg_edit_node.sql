@@ -125,12 +125,13 @@ BEGIN
 		END IF;  
         
         -- FEATURE INSERT      
-INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, 
-		buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, enddate, parent_node_id) 
-		VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.node_type, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
-		NEW.dma_id, NEW.soilcat_id, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate,NEW.ownercat_id,
-		NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.workcat_id_end,NEW.undelete,
-		NEW.label_x, NEW.label_y,NEW.label_rotation,NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.enddate, NEW.parent_node_id);
+	INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
+			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete, label_x, 
+			label_y, label_rotation, expl_id, publish, inventory, num_value, hemisphere) 
+			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
+			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
+			NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,
+			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory,  NEW.num_value, NEW.hemisphere);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
@@ -228,12 +229,12 @@ INSERT INTO node (node_id, elevation, depth, node_type, nodecat_id, epa_type, se
 
 	-- UPDATE values
 		UPDATE node 
-	SET node_id=NEW.node_id, elevation=NEW.elevation, "depth"=NEW."depth", node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, 
-		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id,
-		builtdate=NEW.builtdate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
-		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, workcat_id_end=NEW.workcat_id_end,  undelete=NEW.undelete, label_x=NEW.label_x, 
-		label_y=NEW.label_y, label_rotation=NEW.label_rotation, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, parent_node_id=NEW.parent_node_id, expl_id=NEW.expl_id
+	SET node_id=NEW.node_id, code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
+		"state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type
+		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id,
+		builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
+		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 
+		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, hemisphere=NEW.hemisphere
 		WHERE node_id = OLD.node_id;
             
         --PERFORM audit_function(2,380); 

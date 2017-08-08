@@ -119,13 +119,13 @@ BEGIN
 				
 		  INSERT INTO connec (connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code, demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
 		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, rotation, link,verified, the_geom, undelete, label_x,label_y,label_rotation,
-		  expl_id, publish, inventory) 
+		  expl_id, publish, inventory,num_value) 
 		  VALUES (NEW.connec_id, NEW.greentap_code, NEW.greentap_elevation, NEW.greentap_depth, NEW.connecat_id, NEW.sector_id, NEW.greentap_customer_code,  NEW.greentap_demand, NEW."state", NEW.greentap_annotation, 
 		  NEW.greentap_observ, NEW.greentap_comment, NEW.dma_id, NEW.presszonecat_id, NEW.greentap_soilcat_id, NEW.greentap_function_type, NEW.greentap_category_type, NEW.greentap_fluid_type, 
 		  NEW.greentap_location_type, NEW.greentap_workcat_id, NEW.greentap_workcat_id_end,
 		  NEW.greentap_buildercat_id, NEW.greentap_builtdate, NEW.greentap_enddate, NEW.greentap_ownercat_id, NEW.greentap_address_01, NEW.greentap_address_02, NEW.greentap_address_03, NEW.greentap_streetname, NEW.greentap_postnumber, 
 		  NEW.greentap_descript, NEW.greentap_rotation, NEW.greentap_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.greentap_label_x,NEW.greentap_label_y,NEW.greentap_label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory );
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.num_value );
 		  
 		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.greentap_linked_connec); 
 		  
@@ -150,12 +150,12 @@ BEGIN
 			
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code, demand, "state", annotation, observ, "comment",,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
 		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, rotation, link,verified, the_geom, undelete,label_x,label_y,label_rotation, 
-		  expl_id, publish, inventory) 
+		  expl_id, publish, inventory,num_value) 
 		  VALUES (NEW.connec_id, NEW.customer_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW.fountain_demand, NEW."state", NEW.fountain_annotation, 
 		  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
 		  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02, NEW.fountain_address_03, NEW.fountain_streetname, NEW.fountain_postnumber, 
 		  NEW.fountain_descript, NEW.fountain_rotation, NEW.fountain_link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory);
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
 		 
 		 INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, the_geom_pol) 
 		 VALUES (NEW.connec_id, NEW.fountain_vmax, NEW.fountain_linked_connec, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
@@ -183,11 +183,11 @@ BEGIN
 				
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code, demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber,descript, rotation, link,verified, the_geom,undelete,label_x,label_y,label_rotation, 
-		  expl_id, publish, inventory) 
+		  expl_id, publish, inventory,num_value) 
 		  VALUES (NEW.connec_id, NEW.tap_code, NEW.tap_elevation, NEW.tap_depth, NEW.connecat_id, NEW.sector_id, NEW.tap_customer_code, NEW.tap_demand, NEW."state", NEW.tap_annotation, NEW.tap_observ, 
 		  NEW.tap_comment, NEW.dma_id, NEW.presszonecat_id, NEW.tap_soilcat_id, NEW.tap_function_type, NEW.tap_category_type, NEW.tap_fluid_type, NEW.tap_location_type, NEW.tap_workcat_id, NEW.tap_workcat_id_end, NEW.tap_buildercat_id,
 		  NEW.tap_builtdate, NEW.tap_enddate, NEW.tap_ownercat_id, NEW.tap_address_01, NEW.tap_address_02, NEW.tap_address_03, NEW.tap_streetname, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_rotation, NEW.tap_link, 
-		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory);
+		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
 		  
 		  INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
 		  VALUES (NEW.connec_id,  NEW.tap_linked_connec NEW.tap_cat_valve,  NEW.tap_drain_diam, NEW.tap_drain_exit,  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arq_patrimony, NEW.tap_com_state);
@@ -214,11 +214,11 @@ BEGIN
 			
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id, customer_code,  demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript,rotation, link,verified, the_geom,undelete, label_x,label_y,label_rotation,
-		  expl_id, publish, inventory) 
+		  expl_id, publish, inventory, num_value) 
 		  VALUES (NEW.connec_id, NEW.wjoin_code, NEW.wjoin_elevation, NEW.wjoin_depth, NEW.connecat_id, NEW.sector_id, NEW.wjoin_customer_code,  NEW.wjoin_demand, NEW."state", NEW.wjoin_annotation, NEW.wjoin_observ, 
 		  NEW.wjoin_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wjoin_soilcat_id, NEW.wjoin_function_type, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.workcat_id_end, NEW.wjoin_buildercat_id, 
 		  NEW.wjoin_builtdate, NEW.wjoin_enddate, NEW.wjoin_ownercat_id, NEW.wjoin_address_01, NEW.wjoin_address_02, NEW.wjoin_address_03, NEW.wjoin_streetname, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_rotation, NEW.wjoin_link, NEW.verified, 
-		  NEW.the_geom, NEW.undelete, NEW.wjoin_workcat_id_end,NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory); 
+		  NEW.the_geom, NEW.undelete, NEW.wjoin_workcat_id_end,NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.num_value); 
 		 
 		 INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
 		 VALUES (NEW.connec_id, NEW.wjoin_top_floor, NEW.wjoin_cat_valve);
@@ -252,7 +252,7 @@ BEGIN
 			workcat_id_end=NEW.greentap_workcat_id_end, buildercat_id=NEW.greentap_buildercat_id, builtdate=NEW.greentap_builtdate, enddate=NEW.greentap_enddate, ownercat_id=NEW.greentap_ownercat_id, address_01=NEW.greentap_address_01, 
 			address_02=NEW.greentap_address_02, address_03=NEW.greentap_address_03, streetaxis_id=NEW.greentap_streetaxis_id, postnumber=NEW.greentap_postnumber, descript=NEW.greentap_descript, link=NEW.greentap_link, verified=NEW.verified, 
 			the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.greentap_label_x,label_y=NEW.greentap_label_y, label_rotation=NEW.greentap_label_rotation,
-			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id
+			 publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_greentap 
@@ -265,7 +265,7 @@ BEGIN
 			demand=NEW.wjoin_demand, "state"=NEW."state", annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id
 			soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, workcat_id_end=NEW.wjoin_workcat_id_end,
 			buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,enddate=NEW.wjoin_enddate, ownercat_id=NEW.wjoin_ownercat_id, address_01=NEW.wjoin_address_01, address_02=NEW.wjoin_address_02, address_03=NEW.wjoin_address_03, 
-			streetaxis_id=NEW.wjoin_streetaxis_id, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, label_rotation=NEW.wjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id
+			streetaxis_id=NEW.wjoin_streetaxis_id, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, label_rotation=NEW.wjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
 			WHERE connec_id=OLD.connec_id;
 		
             UPDATE man_wjoin 
@@ -279,7 +279,7 @@ BEGIN
 			function_type=NEW.function_type, category_type=NEW.tap_category_type, fluid_type=NEW.tap_fluid_type, location_type=NEW.tap_location_type, workcat_id=NEW.tap_workcat_id, workcat_id_end=NEW.tap_workcat_id_end, 
 			buildercat_id=NEW.tap_buildercat_id, builtdate=NEW.tap_builtdate, enddate=NEW.tap_enddate, ownercat_id=NEW.tap_ownercat_id, address_01=NEW.tap_address_01, address_02=NEW.tap_address_02, address_03=NEW.tap_address_03, 
 			streetaxis_id=NEW.tap_streetaxis_id, postnumber=NEW.tap_postnumber, descript=NEW.tap_descript, link=NEW.tap_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.tap_label_x,
-			label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id
+			label_y=NEW.tap_label_y, label_rotation=NEW.tap_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value
 			WHERE connec_id=OLD.connec_id;
 			
             UPDATE man_tap 
@@ -295,7 +295,7 @@ BEGIN
 			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
 			address_03=NEW.fountain_address_03, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, link=NEW.fountain_link, verified=NEW.verified, 
 			the_geom=NEW.the_geom, undelete=NEW.undelete, workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation, 
-		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fountain_enddate, expl_id=NEW.expl_id
+		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fountain_enddate, expl_id=NEW.expl_id, num_value=NEW.num_value
 			WHERE connec_id=OLD.connec_id;
 			
 			UPDATE man_fountain 

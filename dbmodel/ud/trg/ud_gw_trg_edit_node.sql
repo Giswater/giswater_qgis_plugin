@@ -122,15 +122,14 @@ BEGIN
 		
         -- FEATURE INSERT
 
-INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,
-"comment",dma_id,soilcat_id,category_type,fluid_type,location_type,workcat_id,buildercat_id,
-			builtdate,ownercat_id,address_01,address_02,address_03,descript,est_top_elev,est_ymax,rotation,link,verified,workcat_id_end,undelete,label_x,label_y,label_rotation,the_geom, 
-			code, expl_id, publish, inventory, enddate, uncertain, xyz_date, unconnected)
-			VALUES (NEW.node_id,NEW.top_elev,NEW.ymax,NEW.sander,NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state,NEW.annotation,NEW.observ,
-			NEW.comment,NEW.dma_id,NEW.soilcat_id,NEW.category_type,NEW.fluid_type,NEW.location_type,NEW.workcat_id,NEW.buildercat_id,NEW.builtdate,
-			NEW.ownercat_id,NEW.address_01,NEW.address_02,NEW.address_03,NEW.descript,NEW.est_top_elev,NEW.est_ymax,NEW.rotation,NEW.link,
-			NEW.verified,NEW.workcat_id_end,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
-			NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.enddate, NEW.uncertain, NEW.xyz_date, NEW.unconnected);	
+		INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ, "comment",dma_id,
+				soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id,workcat_id_end, buildercat_id,
+				builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, undelete, label_x, label_y,label_rotation, the_geom, 
+				expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value)
+		VALUES (NEW.node_id, NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax,NEW.custom_ymax,NEW.elev, NEW.custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state, NEW.annotation, NEW.observ,
+				NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW.function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id,NEW.builtdate, NEW.enddate,
+				NEW.ownercat_id,NEW.address_01,NEW.address_02,NEW.address_03,NEW.descript,NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.the_geom,
+				expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected,NEW.num_value);	
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
@@ -202,14 +201,13 @@ INSERT INTO node (node_id,top_elev,ymax,sander,node_type,nodecat_id,epa_type,sec
 		END IF;
 
 		UPDATE node 
-			SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, 
-			sector_id=NEW.sector_id, "state"=NEW.state, annotation=NEW.annotation, "observ"=NEW.observ, "comment"=NEW.comment, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, 
-			category_type=NEW.category_type,fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, 
-			builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, address_01=NEW.address_01,address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
-			est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, workcat_id_end=NEW.workcat_id_end,
-			undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation,the_geom=NEW.the_geom, 
-			code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.enddate, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, 
-			unconnected=NEW.unconnected, expl_id=NEW.expl_id
+			SET node_id=NEW.node_id, code=NEW.code, top_elev=NEW.top_elev,custom_top_elev=NEW.custom_top_elev, ymax=NEW.ymax, custom_ymax=NEW.custom_ymax, elev=NEW.elev, custom_elev=NEW.custom_elev,
+			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, annotation=NEW.annotation, "observ"=NEW.observ, "comment"=NEW.comment, 
+			dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, 
+			workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01,address_02=NEW.address_02, 
+			address_03=NEW.address_03, descript=NEW.descript, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, 
+			label_rotation=NEW.label_rotation,the_geom=NEW.the_geom, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
+			num_value=NEW.num_value
 			WHERE node_id = OLD.node_id;
                 
 	--	PERFORM audit_function (2,810);
