@@ -40,7 +40,17 @@ inp_report.setting,inp_report.reaction,inp_report.f_factor AS "f-factor" FROM in
 
 DROP VIEW IF EXISTS "v_inp_rules" CASCADE;
 CREATE VIEW "v_inp_rules" AS 
-SELECT inp_rules.text FROM inp_rules ORDER BY inp_rules.id;
+SELECT inp_rules_x_arc.id, text 
+FROM inp_rules_x_arc
+	JOIN temp_arc on inp_rules_x_arc.arc_id=temp_arc.arc_id
+	JOIN inp_selector_sector ON temp_arc.sector_id=inp_selector_sector.sector_id
+UNION
+SELECT inp_rules_x_node.id, text 
+FROM inp_rules_x_node 
+	JOIN temp_node on inp_rules_x_node.node_id=temp_node.node_id
+	JOIN inp_selector_sector ON temp_node.sector_id=inp_selector_sector.sector_id
+ORDER BY id;
+
 
 DROP VIEW IF EXISTS "v_inp_times" CASCADE; 
 CREATE VIEW "v_inp_times" AS 
@@ -351,12 +361,20 @@ FROM inp_pattern
 ORDER BY id;
 
 
-DROP VIEW IF EXISTS "v_inp_controls " CASCADE;
-CREATE VIEW "v_inp_controls " AS
-SELECT id,
-text
-FROM inp_controls
+DROP VIEW IF EXISTS "v_inp_controls" CASCADE;
+CREATE VIEW "v_inp_controls" AS 
+SELECT inp_controls_x_arc.id, text 
+FROM inp_controls_x_arc
+	JOIN temp_arc on inp_controls_x_arc.arc_id=temp_arc.arc_id
+	JOIN inp_selector_sector ON temp_arc.sector_id=inp_selector_sector.sector_id
+UNION
+SELECT inp_controls_x_node.id, text 
+FROM inp_controls_x_node 
+	JOIN temp_node on inp_controls_x_node.node_id=temp_node.node_id
+	JOIN inp_selector_sector ON temp_node.sector_id=inp_selector_sector.sector_id
 ORDER BY id;
+
+
 
 DROP VIEW IF EXISTS "v_inp_energy_gl"  CASCADE;
 CREATE VIEW "v_inp_energy_gl"  AS
