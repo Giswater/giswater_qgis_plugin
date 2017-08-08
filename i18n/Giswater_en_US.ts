@@ -3382,7 +3382,14 @@
         <source>Warning</source>
         <translation>Warning</translation>
     </message>
-
+    <message>
+        <source>This id already exists</source>
+        <translation>This id already exists</translation>
+    </message>
+    <message>
+        <source>You are trying to enter different types</source>
+        <translation>You are trying to enter different types</translation>
+    </message>
 </context>
 
 </TS>

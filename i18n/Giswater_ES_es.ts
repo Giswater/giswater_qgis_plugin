@@ -3378,7 +3378,14 @@
         <source>Warning</source>
         <translation>Advertencia</translation>
     </message>
-
+    <message>
+        <source>This id already exists</source>
+        <translation>Este id ya existe</translation>
+    </message>
+    <message>
+        <source>You are trying to enter different types</source>
+        <translation>Estás intentando introducir tipos diferentes</translation>
+    </message>
 </context>
 
 </TS>
