@@ -23,11 +23,11 @@ DROP VIEW IF EXISTS "v_inp_controls" CASCADE;
 CREATE VIEW "v_inp_controls" AS 
 SELECT inp_controls_x_arc.id, text 
 FROM inp_selector_sector, inp_controls_x_arc
-	JOIN temp_arc on inp_controls_x_arc.arc_id=v_arc.arc_id
+	JOIN temp_arc on inp_controls_x_arc.arc_id=temp_arc.arc_id
 	WHERE ((temp_arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
 UNION
 SELECT inp_controls_x_node.id, text FROM inp_selector_sector, inp_controls_x_node 
-	JOIN temp_node on inp_controls_x_node.node_id=v_node.node_id
+	JOIN temp_node on inp_controls_x_node.node_id=temp_node.node_id
 	WHERE ((temp_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
 ORDER BY id;
 
