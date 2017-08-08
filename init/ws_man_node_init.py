@@ -17,6 +17,7 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
+import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):

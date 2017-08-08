@@ -6,23 +6,18 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QAction, QLabel, QPixmap, QLineEdit,QPixmap,QIcon
-from PyQt4.QtCore import QSize
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtCore import Qt
 
 from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-
-from ui.gallery import Gallery          #@UnresolvedImport
-from ui.gallery_zoom import GalleryZoom          #@UnresolvedImport
-from ui.ud_catalog import UDcatalog                  # @UnresolvedImport
-
+from ui.gallery import Gallery              #@UnresolvedImport
+from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
+from ui.ud_catalog import UDcatalog         #@UnresolvedImport
 import ExtendedQLabel
 
-import numpy as np
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -31,9 +26,6 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManNodeDialog(dialog, layer, feature)
-    #dialog.parent().setFixedWidth(650)
-    #dialog.parent().setFixedHeight(700)
-    #dialog.parent().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     init_config()
 
     
@@ -47,8 +39,6 @@ def init_config():
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)      
     
-def test():
-    print "test"
           
      
 class ManNodeDialog(ParentDialog):   
@@ -102,7 +92,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value") 
         self.tbl_price_node = self.dialog.findChild(QTableView, "tbl_masterplan")
                 
-              
         # Load data from related tables
         self.load_data()
 
@@ -152,116 +141,26 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
 
+        feature = self.feature
+        canvas = self.iface.mapCanvas()
+        layer = self.iface.activeLayer()
+        
         # Toolbar actions
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-        # QLineEdit
+        action = self.dialog.findChild(QAction, "actionEnable")
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
         
         # Event
-        self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
+        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
         
-        
-        
-    def catalog(self):
-        self.dlg_cat = UDcatalog()
-        utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-
-        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtnodecat_id)
-        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
-        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
-        self.shape = self.dlg_cat.findChild(QComboBox, "shape")
-        self.geom1 = self.dlg_cat.findChild(QComboBox, "geom1")
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxshape)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxgeom1)
-
-        self.shape.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.shape.currentIndexChanged.connect(self.fillCbxgeom1)
-
-        self.geom1.currentIndexChanged.connect(self.fillCbxCatalod_id)
-
-        self.matcat_id.clear()
-        self.shape.clear()
-        self.geom1.clear()
-
-        sql= "SELECT DISTINCT(matcat_id) as matcat_id FROM ud_sample_dev.cat_node ORDER BY matcat_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
-
-        sql= "SELECT DISTINCT(shape) as shape FROM ud_sample_dev.cat_node ORDER BY shape"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.shape, rows)
-
-        sql= "SELECT DISTINCT(geom1)as geom1 FROM ud_sample_dev.cat_node ORDER BY geom1"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.geom1, rows)
-
-
-    def fillCbxshape(self,index):
-        if index == -1:
-            return
-        mats=self.matcat_id.currentText()
-
-        sql="SELECT DISTINCT(shape) as shape FROM ud_sample_dev.cat_node"
-        if (str(mats)!=""):
-            sql += " WHERE matcat_id='"+str(mats)+"'"
-        sql += " ORDER BY shape"
-        rows = self.controller.get_rows(sql)
-        self.shape.clear()
-        utils_giswater.fillComboBox(self.shape, rows)
-        self.fillCbxgeom1()
-
-
-    def fillCbxgeom1(self,index):
-        if index == -1:
-            return
-        mats=self.matcat_id.currentText()
-        shape=self.shape.currentText()
-        sql="SELECT DISTINCT(geom1) as geom1 FROM ud_sample_dev.cat_node"
-
-        if (str(mats)!=""):
-            sql += " WHERE matcat_id='"+str(mats)+"'"
-        if(str(shape)!= ""):
-            sql +=" and shape='"+str(shape)+"'"
-        sql += " ORDER BY geom1"
-        rows = self.controller.get_rows(sql)
-        self.geom1.clear()
-        utils_giswater.fillComboBox(self.geom1, rows)
-
-
-    def fillCbxCatalod_id(self,index):    #@UnusedVariable
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-        if self.id!='null':
-            mats = self.matcat_id.currentText()
-            shape = self.shape.currentText()
-            geom1 = self.geom1.currentText()
-            sql = "SELECT DISTINCT(id) as id FROM ud_sample_dev.cat_node"
-            if (str(mats)!=""):
-                sql += " WHERE matcat_id='"+str(mats)+"'"
-            if (str(shape) != ""):
-                sql += " and shape='"+str(shape)+"'"
-            if (str(geom1) != ""):
-                sql += " and geom1='" + str(geom1) + "'"
-            sql += " ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            self.id.clear()
-            utils_giswater.fillComboBox(self.id, rows)
-
-
-    def fillTxtnodecat_id(self):
-        self.dlg_cat.close()
-        self.nodecat_id.clear()
-        self.nodecat_id.setText(str(self.id.currentText()))
-
 
     def open_selected_event_from_table(self):
+        
         ''' Button - Open EVENT | gallery from table event '''
         message = "54353"
         self.controller.show_warning(message, context_name='ui_message')
@@ -273,8 +172,6 @@ class ManNodeDialog(ParentDialog):
             self.controller.show_warning(message, context_name='ui_message' ) 
             return
 
-
-        inf_text = ""
         #for i in range(0, len(selected_list)):
         row = selected_list[0].row()
         #id_ = self.tbl_event.model().record(row).value("visit_id")
@@ -457,7 +354,6 @@ class ManNodeDialog(ParentDialog):
         
     def slide_previous(self):
 
-        
         #indx=self.i-1
         indx=(self.start_indx*9)+self.i-1
 
@@ -476,7 +372,6 @@ class ManNodeDialog(ParentDialog):
 
         
     def slide_next(self):
-
   
         #indx=self.i+1 
         indx=(self.start_indx*9)+self.i+1
@@ -496,9 +391,9 @@ class ManNodeDialog(ParentDialog):
 
         
     def previous_gallery(self):
+        
         #self.end_indx = self.end_indx-1
         self.start_indx = self.start_indx-1
-        
         
         # First clear previous
         for i in self.list_widgetExtended:
@@ -507,82 +402,15 @@ class ManNodeDialog(ParentDialog):
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            
+            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
             self.list_widgetExtended[i].setPixmap(pixmap)
 
         # Control sliding buttons
         if self.start_indx == 0 :
             self.btn_previous.setEnabled(False)
 
-            
         control = len(self.img_path_list1D)/9
         if self.start_indx < (control-1):
             self.btn_next.setEnabled(True)
         
-
-  
-        
-    ''' ACTIONS TOOLBAR '''    
-    def actionZoomOut(self):
-    
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomOut()  
-        
-        
-    def actionZoom(self):
-       
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
-    
-    def actionEnabled(self):
-        #btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
-        self.actionEnable = self.dialog.findChild(QAction, "actionEnable")
-        status = self.layer.startEditing()
-        self.set_icon(self.actionEnable, status)
-
-
-    def set_icon(self, widget, status):
-
-        # initialize plugin directory
-        user_folder = os.path.expanduser("~")
-        self.plugin_name = 'giswater'
-        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
-
-        self.layer = self.iface.activeLayer()
-        if status == True:
-            self.layer.startEditing()
-            widget.setActive(True)
-
-        if status == False:
-            self.layer.rollBack()
-
-    def actionCentered(self):
-        feature = self.feature
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-
-        
-
     

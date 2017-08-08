@@ -290,22 +290,26 @@ class ManArcDialog(ParentDialog):
         self.length.setText(str(row['length'])) 
         self.budget.setText(str(row['budget'])) 
     
+        # Set SQL
+        sql_common = "SELECT descript FROM "+self.schema_name+".v_price_x_arc"
+        sql_common+= " WHERE arc_id = '"+self.arc_id+"'" 
+            
         element = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'element'" 
+        sql = sql_common+" AND identif = 'element'"         
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             element = row[0]
 
         m2bottom = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm2bottom'" 
+        sql = sql_common+" AND identif = 'm2bottom'"          
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             m2bottom = row[0]
         
         m3protec = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm3protec'" 
+        sql = sql_common+" AND identif = 'm3protec'"          
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             m3protec = row[0]
         
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
@@ -325,27 +329,27 @@ class ManArcDialog(ParentDialog):
         
         # Fill QLineEdit -> Soilcat
         m3exc = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3exc'" 
+        sql = sql_common+" AND identif = 'm3exc'" 
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             m3exc = row[0]
         
         m3fill = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3fill'" 
+        sql = sql_common+" AND identif = 'm3fill'"         
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             m3fill = row[0]
         
         m3excess = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3excess'" 
+        sql = sql_common+" AND identif = 'm3excess'"         
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             m3excess = row[0]
         
         m2trenchl = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm2trenchl'" 
+        sql = sql_common+" AND identif = 'm2trenchl'"            
         row = self.dao.get_row(sql)
-        if row != None:
+        if row is not None:
             m2trenchl = row[0]
         
         soil_excavation = self.dialog.findChild(QLineEdit, "soil_excavation")
