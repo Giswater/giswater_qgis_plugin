@@ -581,6 +581,7 @@ class ManNodeDialog(ParentDialog):
 
         layer.setSelectedFeatures([feature.id()])
 
+
         canvas.zoomToSelected(layer)
 
         

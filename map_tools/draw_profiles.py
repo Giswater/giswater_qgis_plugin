@@ -152,23 +152,24 @@ class DrawProfiles(ParentMapTool):
                 # Show warning message
                     message = "Node "+node_id+" is alredy selected"
                     self.controller.show_info(message, context_name='ui_message')
-            
-            
-            message = str(len(self.nodes))
-            self.controller.show_info(message, context_name='ui_message')
+
+            #start_point.clear()
+            #start_point.clear()
             
             if len(self.nodes)==1:
                 start_point_id = self.list_of_selected_nodes[0]
-                start_point = self.dlg.findChild(QLineEdit, "start_point")  
-                utils_giswater.setText("start_point", start_point_id)
+                #start_point = self.dlg.findChild(QLineEdit, "start_point")
+                #utils_giswater.setText("start_point", start_point_id)
+                self.widget_start_point.setText(str(start_point_id))
+
             if len(self.nodes)==2:
                 end_point_id = self.list_of_selected_nodes[1]
-                end_point = self.dlg.findChild(QLineEdit, "end_point")  
-                utils_giswater.setText("end_point", end_point_id)
-                
+                #end_point = self.dlg.findChild(QLineEdit, "end_point")
+                #utils_giswater.setText("end_point", end_point_id)
+                self.widget_end_point.setText(str(end_point_id))
                 self.shortest_path(str(self.list_of_selected_nodes[0]),str(self.list_of_selected_nodes[1]))
 
-                
+
             '''
             # WIP
             # To do: On selectionon of 2nd node open form
@@ -196,6 +197,11 @@ class DrawProfiles(ParentMapTool):
 
     def activate(self):
 
+        # Check version of pgr_routing
+        sql = "SELECT pgr_version()"
+        row = self.controller.get_rows(sql)
+        self.version = (str(row[0][0]))[1]
+
         # Control current layer (due to QGIS bug in snapping system)
         #if self.canvas.currentLayer() == None:
         #    self.iface.setActiveLayer(self.layer_node[0])
@@ -222,8 +228,12 @@ class DrawProfiles(ParentMapTool):
         
         self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
-        self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point") 
-        
+        self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
+
+        self.nodes = []
+
+        self.list_of_selected_nodes = []
+
         self.dlg.open()
 
         
@@ -267,7 +277,6 @@ class DrawProfiles(ParentMapTool):
         
         
     def load_profile(self):
-       
 
         self.dlg_load = LoadProfiles()
         utils_giswater.setDialog(self.dlg_load)
@@ -289,35 +298,37 @@ class DrawProfiles(ParentMapTool):
         self.dlg.close()
         
         self.deactivate()
-        
+
+
     def open_profile(self):
     
         # Selected item from list 
         selected_profile = self.tbl_profiles.currentItem().text()
-        
 
-            
         # Get data from DB for selected item| profile_id, start_point, end_point
         sql = "SELECT start_point,end_point FROM"+self.schema_name+".anl_arc_profile_value WHERE profile_id ='"+selected_profile+"'"
         row = self.controller.get_rows(sql)
         start_point=row[0][0]
         end_point=row[0][1]
+
         
         # Fill widgets of form draw_profile | profile_id, start_point, end_point
-        Start_point = self.dlg.findChild(QLineEdit, "start_point")  
-        Start_point.setText(str(start_point))
+        #Start_point = self.dlg.findChild(QLineEdit, "start_point")
+        self.widget_start_point.setText(str(start_point))
         
-        End_point = self.dlg.findChild(QLineEdit, "end_point")  
-        End_point.setText(str(end_point))
+        #End_point = self.dlg.findChild(QLineEdit, "end_point")
+        self.widget_end_point.setText(str(end_point))
         
         Profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
         Profile_id.setText(str(selected_profile))
-        
+
+
         # Get data from DB for selected item| tbl_list_arc
         tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
         sql = "SELECT arc_id FROM "+self.schema_name+".anl_arc_profile_value WHERE profile_id ='"+selected_profile+"'"
         row = self.controller.get_rows(sql)
-      
+
+
         # Fill widget list_of_arcs
         #row = self.controller.get_rows(sql)
         #m=len(row)
@@ -327,15 +338,16 @@ class DrawProfiles(ParentMapTool):
             item_arc = QListWidgetItem(str(row[i][0]))
             tbl_list_arc.addItem(item_arc)
         '''
-        
+
         # Call dijkstra to set new list of arcs and list of nodes
         self.shortest_path(str(start_point), str(end_point))
-        
+
         self.dlg_load.close()
         self.dlg.open()
         
         
     def btn_activate_snapping(self):
+
         # Store user snapping configuration
         self.snapperManager.storeSnappingOptions()
 
@@ -394,7 +406,7 @@ class DrawProfiles(ParentMapTool):
         # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
         for i in range(1, self.n - 1):
             self.draw_nodes(self.memory[i][0], self.memory[i][1], self.memory[i][2], self.memory[i][3],
-                            self.memory[i][4], self.memory[i][5], self.memory[i][6], i)
+                            self.memory[i][4], self.memory[i][5], self.memory[i][6], i,self.memory[i-1][4], self.memory[i-1][5] )
             self.draw_arc()
             self.draw_ground()
 
@@ -422,7 +434,6 @@ class DrawProfiles(ParentMapTool):
 
         # Action on resizeing window
         cid = self.fig1.canvas.mpl_connect('resize_event',self.on_resize)
-
 
 
     def set_properties(self):
@@ -521,7 +532,7 @@ class DrawProfiles(ParentMapTool):
             
             #if None in self.parameters:
             #    message = "Some parameters are missing for node:"+str(node_id)+", table"+str()
-            
+
 
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
@@ -531,7 +542,7 @@ class DrawProfiles(ParentMapTool):
             sql += " FROM "+self.schema_name+".v_edit_arc"
             sql += " WHERE node_1='" + str(node_id) + "' OR node_2='" + str(node_id) + "'"
             row = self.controller.get_rows(sql)
-            
+
 
             self.parameters[3] = row[0][0]
             self.parameters[4] = row[0][1]
@@ -541,7 +552,7 @@ class DrawProfiles(ParentMapTool):
             self.parameters[10] = row[0][5]
             self.parameters[11] = row[0][6]
             self.parameters[7] = row[0][7]
-            
+
 
             # Geom1 from cat_node
             sql = "SELECT geom1"
@@ -550,11 +561,12 @@ class DrawProfiles(ParentMapTool):
             sql += " WHERE id='" + str(nodecat_id) + "'"
             row = self.controller.get_rows(sql)
             self.parameters[6] = row[0][0]
-            
+
 
             # Set node_id in memory
             self.parameters[12] = node_id
-            
+
+            # Check if we have all data for drawing
             if None in self.parameters:
                 message = "Some parameters are missing for node:"
                 self.controller.show_info_box(message, "Info", node_id)
@@ -563,13 +575,6 @@ class DrawProfiles(ParentMapTool):
             self.memory.append(self.parameters)
 
             i = i + 1
-
-        # Check if we have all data for drawing
-        
-            
-        
-        message =str(self.memory)
-        self.controller.show_info(message)
 
             
     def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1,indx):
@@ -588,8 +593,8 @@ class DrawProfiles(ParentMapTool):
 
         x1 = [geom1, geom1, 0]
         y1 = [top_elev - ymax + z1 + cat_geom1, top_elev, top_elev]
-        plt.plot(x, y, 'black')
-        plt.plot(x1, y1, 'black')
+        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x1, y1, 'black',zorder=100)
         plt.show()
 
         self.first_top_x = 0
@@ -610,17 +615,17 @@ class DrawProfiles(ParentMapTool):
         # Vertical line [-1,0]
         x = [start_point - self.fix_x * Decimal(0.2), start_point - self.fix_x * Decimal(0.2)]
         y = [self.min_top_elev - 1 * self.height_row, self.min_top_elev - 6 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         # Vertical line [-2,0]
         x = [start_point - self.fix_x * Decimal(0.75), start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - 2 * self.height_row, self.min_top_elev - 5 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         # Vertical line [-3,0]
         x = [start_point - self.fix_x, start_point - self.fix_x]
         y = [self.min_top_elev - 1 * self.height_row, self.min_top_elev - 6 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         # Fill the fixed part of table with data - draw text
         # Called just with first node
@@ -633,24 +638,24 @@ class DrawProfiles(ParentMapTool):
         x = [start_point, start_point]
         y = [self.min_top_elev - 1 * self.height_row,
              self.min_top_elev - 2 * self.height_row - Decimal(0.1) * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         # Vertical lines [0,0] - marks
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(2.9) * self.height_row, self.min_top_elev - Decimal(3.1) * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(3.9) * self.height_row, self.min_top_elev - Decimal(4.1) * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(4.9) * self.height_row, self.min_top_elev - Decimal(5.1) * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(5.9) * self.height_row, self.min_top_elev - Decimal(6.1) * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
 
     def data_fix_table(self,start_point):
@@ -689,24 +694,29 @@ class DrawProfiles(ParentMapTool):
         self.fill_data(0, 0)
 
 
-    def draw_nodes(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx):
+    def draw_nodes(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx,z22,cat2):
         ''' Draw nodes between first and last node '''
 
         ytop1 = ymax - z1 - cat_geom1
-        ytop2 = ymax - z2 - cat_geom1
+        #ytop2 = ymax - z2 - cat_geom1
+        # cat_geom_1 from node before
+        ytop2 = ymax - z22 - cat2
 
         x = [start_point, start_point - (geom1), start_point - (geom1)]
-        y = [top_elev, top_elev, top_elev - ytop2]
+        #y = [top_elev, top_elev, top_elev - ytop2]
+        #y = [top_elev, top_elev, top_elev  - z22 - cat2]
+        y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
 
         x1 = [start_point - (geom1), start_point - (geom1), start_point + (geom1), start_point + (geom1)]
-        y1 = [top_elev - ytop2 - cat_geom1, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
+        #y1 = [top_elev - ytop2 - cat_geom1, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
+        y1 = [top_elev - ymax + z22, top_elev - ymax, top_elev - ymax, top_elev - ymax + z1]
 
         x2 = [start_point + (geom1),start_point + (geom1), start_point]
         y2 = [top_elev - ytop1, top_elev, top_elev]
 
-        plt.plot(x, y, 'black')
-        plt.plot(x1, y1, 'black')
-        plt.plot(x2, y2, 'black')
+        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x1, y1, 'black',zorder=100)
+        plt.plot(x2, y2, 'black',zorder=100)
         plt.show()
 
         # index -1 for node before
@@ -721,7 +731,8 @@ class DrawProfiles(ParentMapTool):
         self.x2 = (start_point - (geom1))
         self.y2 = top_elev - ytop2
         self.x3 = (start_point - (geom1))
-        self.y3 = top_elev - ytop2 - cat_geom1
+        #self.y3 = top_elev - ytop2 - cat_geom1
+        self.y3 = top_elev - ymax + z22
 
         self.node_top_x = start_point
         self.node_top_y = top_elev
@@ -818,8 +829,8 @@ class DrawProfiles(ParentMapTool):
         x1 = [start_point - geom1, start_point - geom1, start_point + geom1, start_point + geom1, start_point]
         y1 = [top_elev - ymax + z2, top_elev - ymax, top_elev - ymax, top_elev, top_elev]
 
-        plt.plot(x, y, 'black')
-        plt.plot(x1, y1, 'black')
+        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x1, y1, 'black',zorder=100)
         plt.show()
 
         self.x = self.memory[indx - 1][6] + self.memory[indx - 1][0]
@@ -884,31 +895,31 @@ class DrawProfiles(ParentMapTool):
         # x = [self.memory[n - 1][0], self.memory[0][0] - 120]
         y = [self.min_top_elev - self.height_row, self.min_top_elev - self.height_row]
         # y = [self.min_top_elev - 1, self.min_top_elev - 1]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
         # x = [self.memory[n - 1][0], self.memory[0][0] - 120]
         y = [self.min_top_elev - 2 * self.height_row, self.min_top_elev - 2 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         # horizontale krace
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
         # x = [self.memory[n - 1][0], self.memory[0][0] - 90]
         y = [self.min_top_elev - 3 * self.height_row, self.min_top_elev - 3 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x * Decimal(0.75)]
         # x = [self.memory[n - 1][0], self.memory[0][0] - 90]
         y = [self.min_top_elev - 4 * self.height_row, self.min_top_elev - 4 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
         # zadnje dvije linije
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
         # x = [self.memory[n - 1][0], self.memory[0][0] - 120]
         y = [self.min_top_elev - 5 * self.height_row, self.min_top_elev - 5 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
         x = [self.memory[self.n - 1][0], self.memory[0][0] - self.fix_x]
         # x = [self.memory[n - 1][0], self.memory[0][0] - 120]
         y = [self.min_top_elev - 6 * self.height_row, self.min_top_elev - 6 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
 
     def on_resize(self,event):
@@ -951,13 +962,13 @@ class DrawProfiles(ParentMapTool):
         # Draw coocrinates
         x = [0, 0]
         y = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
         x = [start_point,start_point]
         y = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
         x = [0,start_point]
         y = [self.max_top_elev + 1 * self.height_row,self.max_top_elev + 1 * self.height_row]
-        plt.plot(x, y, 'black')
+        plt.plot(x, y, 'black',zorder=100)
 
         # Values left y_ordinate_max
         plt.text(0 - geom1*Decimal(1.5) , self.max_top_elev + self.height_row,str(round(self.max_top_elev + self.height_row,2)),fontsize=7.5,horizontalalignment='right', verticalalignment='center')
@@ -965,6 +976,11 @@ class DrawProfiles(ParentMapTool):
         # Loop till self.max_top_elev + height_row
         y = int(math.ceil(self.min_top_elev - 1 * self.height_row))
         x= int(math.floor(self.max_top_elev))
+        if x%2 == 0 :
+            x = x + 2
+        else :
+            x = x + 1
+
         for i in range(y, x):
             if i%2 == 0:
                 x1 = [0, start_point]
@@ -973,12 +989,13 @@ class DrawProfiles(ParentMapTool):
                 i = i+1
                 x1 = [0, start_point]
                 y1 = [i, i]
-            plt.plot(x1, y1, 'lightgray')
+            plt.plot(x1, y1, 'lightgray',zorder=1)
             # Values left y_ordinate_all
             plt.text(0 - geom1 * Decimal(1.5), i,str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
 
 
     def draw_grid(self):
+
         # Values right y_ordinate_max
         start_point = self.memory[self.n-1][0]
         geom1 = self.memory[self.n-1][6]
@@ -1003,7 +1020,7 @@ class DrawProfiles(ParentMapTool):
         for i in range(50, x,50):
             x1 = [i, i]
             y1 = [self.min_top_elev - 1 * self.height_row, self.max_top_elev + 1 * self.height_row]
-            plt.plot(x1, y1, 'lightgray' )
+            plt.plot(x1, y1, 'lightgray',zorder=1 )
             # values left y_ordinate_all
             plt.text(0 - geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='right', verticalalignment='center')
             plt.text(start_point + geom1 * Decimal(1.5), i, str(i), fontsize=7.5, horizontalalignment='left', verticalalignment='center')
@@ -1018,8 +1035,8 @@ class DrawProfiles(ParentMapTool):
         y = [self.y, self.y2]
         x1 = [self.x1, self.x3]
         y1 = [self.y1, self.y3]
-        plt.plot(x, y, 'black')
-        plt.plot(x1, y1, 'black')
+        plt.plot(x, y, 'black',zorder=100)
+        plt.plot(x1, y1, 'black',zorder=100)
 
 
     def draw_ground(self):
@@ -1054,51 +1071,52 @@ class DrawProfiles(ParentMapTool):
         ''' Calculating shortest path using dijkstra algoritam ''' 
 
         args = []
-
         start_point_id = start_point
         end_point_id = end_point        
     
         args.append(start_point_id)
         args.append(end_point_id)
-     
-        
+
         self.rnode_id = []
         self.rarc_id = []
-        
 
         sql = "SELECT rid"
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + start_point + "'"
         row = self.controller.get_rows(sql)
         rstart_point =int(row[0][0])
-        
-      
-        
+
         sql = "SELECT rid"
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + end_point + "'"
         row = self.controller.get_rows(sql)
         rend_point = int(row[0][0])
-        
-        
+
         # Clear list of arcs and nodes - preparing for new profile
-            
+
         #sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_test_arc'," + start_point + "," +end_point + ",false)"
-        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc'," + str(rstart_point) + "," +str(rend_point) + ",false)"
+        if self.version == '2' :
+            sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc'," + str(rstart_point) + "," +str(rend_point) + ",false,false)"
+
+        elif self.version == '3' :
+            sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM " + self.schema_name + ".v_anl_pgrouting_arc'," + str(rstart_point) + "," + str(rend_point) + ",false)"
+        else :
+            message = "You need to upgrade your version of pg_routing!"
+            return
 
         rows = self.controller.get_rows(sql)
-        
 
-      
-        
         number_nodes=len(rows)
 
         for i in range(0, number_nodes ):
             #self.node_id.append(str(rows[i]['node']))
             #self.arc_id.append(str(rows[i]['edge']))
-            
-            self.rnode_id.append(str(rows[i][2]))
-            self.rarc_id.append(str(rows[i][3]))
+            if self.version == '2':
+                self.rnode_id.append(str(rows[i][1]))
+                self.rarc_id.append(str(rows[i][2]))
+            elif self.version == '3':
+                self.rnode_id.append(str(rows[i][2]))
+                self.rarc_id.append(str(rows[i][3]))
 
         self.rarc_id.pop()
             
@@ -1116,14 +1134,14 @@ class DrawProfiles(ParentMapTool):
         
         
         for m in range(0,len(self.rnode_id)):
-        # convert node_ids   
+        # convert node_ids
 
             sql = "SELECT node_id"
             sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
             sql += " WHERE rid='" + str(self.rnode_id[m]) + "'"
 
             row = self.controller.get_rows(sql)
-            self.node_id.append(str(row[0][0])) 
+            self.node_id.append(str(row[0][0]))
 
         
         # SELECT ARCS OF SHORTEST PATH
@@ -1154,6 +1172,7 @@ class DrawProfiles(ParentMapTool):
 
                 # Select features with these id's
                 layer_arc.setSelectedFeatures(id_list)
+
             
         # SELECT NODES OF SHORTEST PATH
         n=len(self.node_id)
@@ -1175,13 +1194,29 @@ class DrawProfiles(ParentMapTool):
         for layer_node in self.layer_node_man:
 
             it = layer_node.getFeatures(QgsFeatureRequest(expr))
-        
+
             # Build a list of feature id's from the previous result
             self.id_list = [i.id() for i in it]
 
             # Select features with these id's
             layer_node.setSelectedFeatures(self.id_list)
-        
+
+
+            if self.id_list != [] :
+                layer = layer_node
+
+                center_widget = self.id_list[0]
+
+
+        # Center profile (first node)
+        canvas = self.iface.mapCanvas()
+
+        layer.setSelectedFeatures([center_widget])
+
+        canvas.zoomToSelected(layer)
+
+
+
         #layer = iface.activeLayer()
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         m=len(self.arc_id)
@@ -1202,7 +1237,7 @@ class DrawProfiles(ParentMapTool):
         
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paintEvent,self.arc_id,self.node_id))
         self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
-        
+
 
     def clear_profile(self):
 
