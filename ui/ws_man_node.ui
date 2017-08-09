@@ -733,19 +733,6 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="tank_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_tank_pol_id">
         <property name="geometry">
          <rect>
@@ -901,6 +888,28 @@
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="tank_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
+          <width>161</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -2371,19 +2380,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="pump_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_pump_end_date">
         <property name="geometry">
          <rect>
@@ -2477,6 +2473,28 @@
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="pump_builtdate_2">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
+          <width>161</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -3960,27 +3978,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="source_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="source_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="source_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -5286,27 +5313,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="meter_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="meter_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="meter_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -6615,19 +6651,6 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="junction_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="junction_cat_matcat_id">
         <property name="geometry">
          <rect>
@@ -6734,6 +6757,28 @@
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="junction_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
+          <width>161</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -8065,27 +8110,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="waterwell_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="waterwell_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="waterwell_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -9394,27 +9448,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="reduction_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="reduction_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="reduction_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -10846,27 +10909,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="hydrant_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="hydrant_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="hydrant_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -12740,27 +12812,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="valve_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="valve_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="valve_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -14870,27 +14951,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="manhole_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="manhole_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="manhole_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -16199,27 +16289,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="filter_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="filter_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="filter_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -17528,19 +17627,6 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="register_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_register_pol_id">
         <property name="geometry">
          <rect>
@@ -17598,6 +17684,28 @@
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="register_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
+          <width>161</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -18906,27 +19014,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="netwjoin_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="netwjoin_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="netwjoin_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -20235,27 +20352,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="netelement_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="netelement_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="netelement_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -21564,27 +21690,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="netsample_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="netsaplepoint_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="netsample_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -22893,27 +23028,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="exptank_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="expantank_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="exptank_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -24222,27 +24366,36 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QDateEdit" name="flexunion_end_date">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>140</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QgsDateTimeEdit" name="flexunion_builtdate">
         <property name="geometry">
          <rect>
           <x>380</x>
+          <width>160</width>
+          <height>22</height>
           <y>110</y>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="flexunion_end_date">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>140</y>
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>

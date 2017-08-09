@@ -1029,6 +1029,9 @@
           <height>23</height>
          </rect>
         </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
         <property name="calendarPopup">
          <bool>true</bool>
         </property>
@@ -2830,6 +2833,9 @@
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -5064,6 +5070,9 @@
           <height>23</height>
          </rect>
         </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
         <property name="calendarPopup">
          <bool>true</bool>
         </property>
@@ -6589,6 +6598,9 @@
           <width>161</width>
           <height>23</height>
          </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
