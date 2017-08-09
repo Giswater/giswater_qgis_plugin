@@ -468,7 +468,7 @@
        </property>
       </widget>
      </widget>
-     <widget class="QLineEdit" name="short_descript">
+     <widget class="QLineEdit" name="name">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -486,11 +486,14 @@
         <italic>true</italic>
        </font>
       </property>
+      <property name="inputMask">
+       <string/>
+      </property>
       <property name="text">
        <string/>
       </property>
       <property name="maxLength">
-       <number>500</number>
+       <number>32767</number>
       </property>
       <property name="echoMode">
        <enum>QLineEdit::Normal</enum>
@@ -684,7 +687,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="Arc">
       <attribute name="title">

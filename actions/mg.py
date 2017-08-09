@@ -1585,7 +1585,7 @@ class Mg():
         # LineEdit
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
-        self.short_descript = self.dlg_new_psector.findChild(QLineEdit, "short_descript")
+        self.name = self.dlg_new_psector.findChild(QLineEdit, "name")
         self.priority = self.dlg_new_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
@@ -1672,7 +1672,7 @@ class Mg():
             row = self.dao.get_row(sql)
 
             self.psector_id.setText(str(row[0]))
-            self.short_descript.setText(row[15])
+            self.name.setText(row[15])
             index = self.priority.findText(row[2], Qt.MatchFixedString)
             if index >= 0:
                 self.priority.setCurrentIndex(index)
@@ -1899,7 +1899,7 @@ class Mg():
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delet, self.tbl_psm, table_name, column_id))
         # LineEdit
-        self.dlg_psector_mangement.txt_short_descript_psm.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_short_descript_psm))
+        self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name,"plan_psector"))
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
@@ -1916,14 +1916,19 @@ class Mg():
         self.mg_new_psector(psector_id, True)
 
 
-    def filter_by_text(self, table, widget_txt):
+    def filter_by_text(self, table, widget_txt, tablename):
         result_select = utils_giswater.getWidgetText(widget_txt)
-        if result_select == 'null':
-            result_select = ""
-        expr = " psector_id::text LIKE '%"+result_select+"%'"
-        # Refresh model with selected filter
-        table.model().setFilter(expr)
-        table.model().select()
+        if result_select != 'null':
+            expr = " name LIKE '%"+result_select+"%'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table(self.tbl_psm, self.schema_name + "."+tablename)
+
+    def hide_colums(self, widget, comuns_to_hide):
+        for i in range(0, len(comuns_to_hide)):
+            widget.hideColumn(comuns_to_hide[i])
 
     def mg_psector_selector(self):
         ''' Button_47 : Psector selector '''
@@ -1936,23 +1941,31 @@ class Mg():
         self.tbl_all_state = self.dlg_psector_sel.findChild(QTableView, "all_state")
         self.tbl_all_state.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_all_state, self.schema_name + ".value_state")
+        columstohide=[0,2,3,4]
+        self.hide_colums(self.tbl_all_state, columstohide)
 
         self.tbl_selected_state = self.dlg_psector_sel.findChild(QTableView, "selected_state")
         self.tbl_selected_state.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.tbl_selected_state, self.schema_name + ".plan_selector_state")
+        #self.fill_table(self.tbl_selected_state, self.schema_name + ".selector_state")
+        self.filter_by_text2(self.tbl_selected_state)
+        #columstohide = [0, 2, 3, 4]
+        #self.hide_colums(self.tbl_selected_state, columstohide)
 
         self.tbl_all_psector = self.dlg_psector_sel.findChild(QTableView, "all_psector")
         self.tbl_all_psector.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_all_psector, self.schema_name + ".plan_psector")
+        columstohide = [8]
+        self.hide_colums(self.tbl_all_psector, columstohide)
+
 
         self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_psector")
         self.tbl_selected_psector.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.tbl_selected_psector, self.schema_name + ".plan_selector_psector")
+        self.fill_table(self.tbl_selected_psector, self.schema_name + ".selector_psector")
         # Buttons
         self.dlg_psector_sel.btn_accept.pressed.connect(self.pressbtn)
         self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
 
-        self.dlg_psector_sel.btn_select_state.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_state, self.tbl_selected_state, "value_state", "id", "plan_selector_state", "id"))
+        self.dlg_psector_sel.btn_select_state.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_state, self.tbl_selected_state, "value_state", "id", "selector_state", "id"))
         self.dlg_psector_sel.btn_unselect_state.pressed.connect(self.pressbtn)
 
         self.dlg_psector_sel.btn_select_psector.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_psector, self.tbl_selected_psector, "plan_psector", "psector_id", "plan_selector_psector", "id"))
@@ -1971,7 +1984,10 @@ class Mg():
         :param tablename_des: table destini
         :param id_des: Refers to the id of the target table, on which the query will be made
         """
-
+        '''
+        select name from ws_sample_dev.selector_state
+        join ws_sample_dev.value_state on value_state.id = state_id
+        '''
         selected_list = qtable_origin.selectionModel().selectedRows()
 
         if len(selected_list) == 0:
@@ -1994,14 +2010,25 @@ class Mg():
             # if exist - show warning
                 self.controller.show_info_box("Id "+str(expl_id[i])+" is already selected!", "Info")
             else:
-                sql = "INSERT INTO "+self.schema_name+"."+tablename_des+" ("+id_des+") "
-                sql += " VALUES ('"+str(expl_id[i])+"')"
+
+                #sql = "INSERT INTO " + self.schema_name + "." + tablename_des + " (" + id_des + ") "
+                #sql += " VALUES ('" + str(expl_id[i]) + "')"
+
+                sql = 'INSERT INTO '+self.schema_name+'.'+tablename_des+' (state_id, cur_user) '
+                sql += " VALUES ("+str(expl_id[i])+", current_user)"
                 self.controller.execute_sql(sql)
 
         #refresh
+        self.filter_by_text2(qtable_dest)
         self.fill_table(qtable_origin, self.schema_name + "."+tablename_ori)
-        self.fill_table(qtable_dest, self.schema_name + "." + tablename_des)
+        #self.fill_table(qtable_dest, self.schema_name + "." + tablename_ori)
         self.iface.mapCanvas().refresh()
+
+    def filter_by_text2(self, table):
+        expr = " id in (select id from ws_sample_dev.selector_state)"
+        # Refresh model with selected filter
+        table.model().setFilter(expr)
+        table.model().select()
 
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))
