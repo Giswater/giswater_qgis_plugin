@@ -368,7 +368,6 @@ CREATE TABLE "man_hydrant" (
 "communication" character varying(254),
 "valve" character varying(100),
 "valve_diam" numeric(12,3),
-"location" character varying(254),
 CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 );
 
@@ -480,6 +479,10 @@ CREATE TABLE "man_flexunion" (
 "node_id" varchar(16) NOT NULL PRIMARY KEY
 );
 
+CREATE TABLE "man_wtp" (
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
+"name" varchar(50)
+);
 
 CREATE TABLE "man_netsamplepoint"(
 "node_id" varchar(16) NOT NULL PRIMARY KEY,

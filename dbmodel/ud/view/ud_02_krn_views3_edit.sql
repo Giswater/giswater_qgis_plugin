@@ -558,7 +558,8 @@ node.xyz_date AS outfall_xyz_date,
 node.unconnected,
 sector.macrosector_id,
 node.expl_id,
-node.num_value
+node.num_value,
+man_outfall.name AS outfall_name
 FROM selector_expl, node
 	JOIN man_outfall ON man_outfall.node_id = node.node_id
 	JOIN v_node ON v_node.node_id = node.node_id

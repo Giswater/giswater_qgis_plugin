@@ -546,7 +546,6 @@ CREATE TABLE "man_wwtp" (
 "name" varchar(255)
 );
 
-
 CREATE TABLE "man_conduit" (
 "arc_id" varchar(16) NOT NULL PRIMARY KEY
 );

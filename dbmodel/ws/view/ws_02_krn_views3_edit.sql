@@ -583,7 +583,8 @@ man_pump.min_flow AS pump_min_flow,
 man_pump.nom_flow AS pump_nom_flow,
 man_pump."power" AS pump_power,
 man_pump.pressure AS pump_pressure,
-man_pump.elev_height AS pump_elev_height
+man_pump.elev_height AS pump_elev_height,
+man_pump.name AS pump_name
 FROM selector_expl, node
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
@@ -1278,6 +1279,63 @@ FROM selector_expl, node
 	WHERE ((node.expl_id)=(selector_expl.expl_id)
 	AND selector_expl.cur_user="current_user"());
 	
+DROP VIEW IF EXISTS v_edit_man_wtp CASCADE;
+CREATE OR REPLACE VIEW v_edit_man_wtp AS 
+SELECT 
+node.node_id,
+node.code AS wtp_code,
+node.elevation AS wtp_elevation,
+node.depth AS wtp_depth,
+cat_node.nodetype_id,
+node.nodecat_id,
+cat_node.matcat_id AS wtp_cat_matcat_id,
+cat_node.pnom AS wtp_cat_pnom,
+cat_node.dnom AS wtp_cat_dnom,
+node.epa_type,
+node.sector_id,
+node.state,
+node.annotation AS wtp_annotation,
+node.observ AS wtp_observ,
+node.comment AS wtp_comment,
+node.dma_id,
+node.presszonecat_id,
+node.soilcat_id AS wtp_soilcat_id,
+node.function_type AS wtp_function_type,
+node.category_type AS wtp_category_type,
+node.fluid_type AS wtp_fluid_type,
+node.location_type AS wtp_location_type,
+node.workcat_id AS wtp_workcat_id,
+node.workcat_id_end AS wtp_workcat_id_end,
+node.buildercat_id AS wtp_buildercat_id,
+node.builtdate AS wtp_builtdate,
+node.enddate AS wtp_enddate,
+node.ownercat_id AS wtp_ownercat_id,
+node.address_01 AS wtp_address_01,
+node.address_02 AS wtp_address_02,
+node.address_03 AS wtp_address_03,
+node.descript AS wtp_descript,
+cat_node.svg AS wtp_cat_svg,
+node.rotation AS wtp_rotation,
+node.link AS wtp_link,
+node.verified,
+node.the_geom,
+node.undelete,
+node.label_x AS wtp_label_x,
+node.label_y AS wtp_label_y,
+node.label_rotation AS wtp_label_rotation,
+node.publish,
+node.inventory,
+dma.macrodma_id,
+node.expl_id,
+node.hemisphere as wtp_hemisphere,
+node.num_value,
+man_wtp.name AS wtp_name
+FROM selector_expl, node
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
+	JOIN man_wtp ON node.node_id = man_wtp.node_id
+	WHERE ((node.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"());
 	
 DROP VIEW IF EXISTS v_edit_man_expansiontank CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_expansiontank AS 

@@ -127,11 +127,11 @@ BEGIN
         -- FEATURE INSERT      
 	INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete, label_x, 
-			label_y, label_rotation, expl_id, publish, inventory, num_value, hemisphere) 
+			label_y, label_rotation, expl_id, publish, inventory, num_value, hemisphere, num_value) 
 			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,
-			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory,  NEW.num_value, NEW.hemisphere);
+			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory,  NEW.num_value, NEW.hemisphere, NEW.num_value);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
@@ -234,7 +234,7 @@ BEGIN
 		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id,
 		builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 
-		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, hemisphere=NEW.hemisphere
+		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, hemisphere=NEW.hemisphere,num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
             
         --PERFORM audit_function(2,380); 
