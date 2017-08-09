@@ -142,7 +142,7 @@ BEGIN
 			END IF;
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",
-			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate,ownercat_id,address_01,address_02,address_03,descript,est_top_elev,est_ymax,rotation,link,verified,
+			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate,ownercat_id,address_01,address_02,address_03,descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, enddate, uncertain, xyz_date, unconnected, num_value)
 			VALUES (NEW.node_id,NEW.junction_top_elev,NEW.junction_custom_top_elev, NEW.junction_ymax, NEW. junction_custom_ymax, NEW. junction_elev, NEW. junction_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id, 
 			NEW.state,NEW.junction_annotation,NEW.junction_observ, NEW.junction_comment,NEW.dma_id,NEW.junction_soilcat_id, NEW. junction_function_type, NEW.junction_category_type,NEW.junction_fluid_type,NEW.junction_location_type,
@@ -174,7 +174,7 @@ BEGIN
 			END IF;
 			
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id,
-			builtdate,ownercat_id,	address_01,address_02,address_03,descript,est_top_elev,est_ymax,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			builtdate,ownercat_id,	address_01,address_02,address_03,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.outfall_code, NEW.outfall_top_elev,, NEW.outfall_custom_top_elev, NEW.outfall_ymax,NEW.outfall_custom_ymax, NEW.outfall_elev, NEW.outfall_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state,
 			NEW.outfall_annotation,NEW.outfall_observ, NEW.outfall_comment,NEW.dma_id,NEW.outfall_soilcat_id,NEW.outfall_function_type, NEW.outfall_category_type,NEW.outfall_fluid_type,NEW.outfall_location_type,NEW.outfall_workcat_id,NEW.outfall_workcat_id_end,
@@ -239,7 +239,7 @@ BEGIN
 			VALUES (NEW.node_id, NEW.storage_code, NEW.storage_top_elev, NEW.storage_custom_top_elev, NEW.storage_ymax,NEW.storage_custom_ymax, NEW.storage_elev, NEW.storage_custom_elev, NEW.node_type, NEW.nodecat_id,
 			NEW.epa_type,NEW.sector_id, NEW.state,NEW.storage_annotation,NEW.storage_observ,NEW.storage_comment,NEW.dma_id,NEW.storage_soilcat_id, NEW.storage_function_type, NEW.storage_category_type,NEW.storage_fluid_type,
 			NEW.storage_location_type,NEW.storage_workcat_id, NEW.storage_workcat_id_end, NEW.storage_buildercat_id,NEW.storage_builtdate, NEW.storage_enddate, NEW.storage_ownercat_id,NEW.storage_address_01,NEW.storage_address_02,
-			NEW.storage_address_03,NEW.storage_descript,NEW.storage_est_top_elev,NEW.storage_est_ymax,NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,
+			NEW.storage_address_03,NEW.storage_descript, NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,
 			NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.storage_num_value);
 			
 			IF (rec.insert_double_geometry IS TRUE) THEN
@@ -283,7 +283,7 @@ BEGIN
 			VALUES (NEW.node_id, NEW.storage_code, NEW.storage_top_elev, NEW.storage_custom_top_elev, NEW.storage_ymax,NEW.storage_custom_ymax, NEW.storage_elev, NEW.storage_custom_elev, NEW.node_type, NEW.nodecat_id,
 			NEW.epa_type,NEW.sector_id, NEW.state,NEW.storage_annotation,NEW.storage_observ,NEW.storage_comment,NEW.dma_id,NEW.storage_soilcat_id, NEW.storage_function_type, NEW.storage_category_type,NEW.storage_fluid_type,
 			NEW.storage_location_type,NEW.storage_workcat_id, NEW.storage_workcat_id_end, NEW.storage_buildercat_id,NEW.storage_builtdate, NEW.storage_enddate, NEW.storage_ownercat_id,NEW.storage_address_01,NEW.storage_address_02,
-			NEW.storage_address_03,NEW.storage_descript,NEW.storage_est_top_elev,NEW.storage_est_ymax,NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,
+			NEW.storage_address_03,NEW.storage_descript, NEW.storage_rotation,NEW.storage_link,NEW.verified,NEW.undelete,NEW.storage_label_x,NEW.storage_label_y,NEW.storage_label_rotation,
 			NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory,  NEW.uncertain, NEW.storage_xyz_date, NEW.unconnected, NEW.storage_num_value);
 			
 			
@@ -771,7 +771,7 @@ BEGIN
 			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type,	category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
 			ownercat_id=NEW.netgully_ownercat_id, address_01=NEW.netgully_address_01,address_02=NEW.netgully_address_02, address_03=NEW.netgully_address_03, descript=NEW.netgully_descript,
-			est_top_elev=NEW.netgully_est_top_elev, est_ymax=NEW.netgully_est_ymax, rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
+			rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
 			label_rotation=NEW.netgully_label_rotation, the_geom=NEW.the_geom,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netgully_num_value
 			WHERE node_id = OLD.node_id;
 		
@@ -788,7 +788,7 @@ BEGIN
 			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type,	category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
 			ownercat_id=NEW.netgully_ownercat_id, address_01=NEW.netgully_address_01,address_02=NEW.netgully_address_02, address_03=NEW.netgully_address_03, descript=NEW.netgully_descript,
-			est_top_elev=NEW.netgully_est_top_elev, est_ymax=NEW.netgully_est_ymax, rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
+			rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
 			label_rotation=NEW.netgully_label_rotation, the_geom=NEW.the_geom,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netgully_num_value
 			WHERE node_id = OLD.node_id;
 			
@@ -813,7 +813,7 @@ BEGIN
 			custom_elev=NEW.outfall_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, annotation=NEW.outfall_annotation, "observ"=NEW.outfall_observ, 
 			"comment"=NEW.outfall_comment, dma_id=NEW.dma_id, soilcat_id=NEW.outfall_soilcat_id, function_type=NEW.outfall_function_type, category_type=NEW.outfall_category_type,fluid_type=NEW.outfall_fluid_type, location_type=NEW.outfall_location_type, 
 			workcat_id=NEW.outfall_workcat_id, workcat_id_end=NEW.outfall_workcat_id_end,buildercat_id=NEW.outfall_buildercat_id, builtdate=NEW.outfall_builtdate, enddate=NEW.outfall_enddate,  ownercat_id=NEW.outfall_ownercat_id, 
-			address_01=NEW.outfall_address_01,address_02=NEW.outfall_address_02, address_03=NEW.outfall_address_03, descript=NEW.outfall_descript,est_top_elev=NEW.outfall_est_top_elev, est_ymax=NEW.outfall_est_ymax, rotation=NEW.outfall_rotation, 
+			address_01=NEW.outfall_address_01,address_02=NEW.outfall_address_02, address_03=NEW.outfall_address_03, descript=NEW.outfall_descript, rotation=NEW.outfall_rotation, 
 			link=NEW.outfall_link, verified=NEW.verified,  undelete=NEW.undelete, label_x=NEW.outfall_label_x, label_y=NEW.outfall_label_y, label_rotation=NEW.outfall_label_rotation, the_geom=NEW.the_geom,
 			 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.outfall_num_value
 			WHERE node_id = OLD.node_id;
@@ -829,7 +829,7 @@ BEGIN
 			"state"=NEW.storage_state, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
 			category_type=NEW.storage_category_type,fluid_type=NEW.storage_fluid_type, location_type=NEW.storage_location_type, workcat_id=NEW.storage_workcat_id, workcat_id_end=NEW.storage_workcat_id_end, buildercat_id=NEW.storage_buildercat_id, 
 			builtdate=NEW.storage_builtdate, enddate=NEW.storage_enddate, ownercat_id=NEW.storage_ownercat_id, address_01=NEW.storage_address_01,address_02=NEW.storage_address_02, address_03=NEW.storage_address_03, descript=NEW.storage_descript,
-			est_top_elev=NEW.storage_est_top_elev, est_ymax=NEW.storage_est_ymax, rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, 
+			rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, 
 			label_rotation=NEW.storage_label_rotation, the_geom=NEW.the_geom, publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
 			num_value=NEW.storage_num_value
 			WHERE node_id = OLD.node_id;
