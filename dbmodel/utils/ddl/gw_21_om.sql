@@ -21,6 +21,14 @@ CONSTRAINT om_visit_cat_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "om_visit_parameter_type" (
+"id" varchar(50)   NOT NULL,
+"form_type" int2,
+"descript" varchar(100),
+CONSTRAINT om_visit_parameter_type_pkey PRIMARY KEY (id)
+);
+
+
 CREATE TABLE "om_visit_parameter" (
 "id" varchar(50)   NOT NULL,
 "code" varchar (30),
@@ -36,6 +44,7 @@ CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
 CREATE TABLE "om_visit" (
 "id" serial8 NOT NULL,
 "visitcat_id" integer,
+"ext_code" varchar (30),
 "startdate" timestamp(6) WITHOUT TIME ZONE DEFAULT now() ,
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
