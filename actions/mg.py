@@ -9,20 +9,18 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
-
-
 from PyQt4.Qt import  QDate, QTime
+from qgis.core import QgsMapLayerRegistry
+
 from datetime import datetime, date
-import time
 import os
 import sys
 import webbrowser
+from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
-from parent_init import ParentDialog
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config import Config                                  # @UnresolvedImport
@@ -32,36 +30,26 @@ from ..ui.topology_tools import TopologyTools                   # @UnresolvedImp
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
-from ..ui.mincut_edit import Mincut_edit          # @UnresolvedImport
-from ..ui.mincut_fin import Mincut_fin
-from ..ui.mincut import Mincut
-from ..ui.multipsector_selector import Multipsector_selector        # @UnresolvedImport
-from ..ui.plan_psector import Plan_psector        # @UnresolvedImport
-from ..ui.psector_management import Psector_management        # @UnresolvedImport
+from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
+from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
+from ..ui.mincut import Mincut                                  # @UnresolvedImport
+from ..ui.multipsector_selector import Multipsector_selector    # @UnresolvedImport
+from ..ui.plan_psector import Plan_psector                      # @UnresolvedImport
+from ..ui.psector_management import Psector_management          # @UnresolvedImport
 
-from functools import partial
+from parent import ParentAction
 
 
-class Mg():
-
+class Mg(ParentAction):
+   
     def __init__(self, iface, settings, controller, plugin_dir):
-        ''' Class to control Management toolbar actions '''
-
-        # Initialize instance attributes
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.dao = self.controller.dao
-        self.schema_name = self.controller.schema_name
-
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')
-        self.giswater_jar = self.settings.value('files/giswater_jar')
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')
-
-
-    def close_dialog(self, dlg=None):
+        ''' Class to control Management toolbar actions '''  
+                  
+        # Call ParentAction constructor      
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+    
+                  
+    def close_dialog(self, dlg=None): 
         ''' Close dialog '''
 
         dlg.close()
@@ -94,8 +82,6 @@ class Mg():
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-
-        print("asdas")
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'topology_tools')
@@ -193,7 +179,6 @@ class Mg():
         self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
         self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
 
-
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'table_wizard')
         self.dlg.exec_()
@@ -271,22 +256,6 @@ class Mg():
             self.controller.show_info(message, context_name='ui_message')
 
 
-    def get_settings_value(self, settings, parameter):
-        ''' Utility function that fix problem with network units in Windows '''
-
-        file_aux = ""
-        try:
-            file_aux = settings.value(parameter)
-            unit = file_aux[:1]
-            if unit != '\\' and file_aux[1] != ':':
-                path = file_aux[1:]
-                file_aux = unit+":"+path
-        except IndexError:
-            pass
-        return file_aux
-
-
-
     def mg_go2epa(self):
         ''' Button 23. Open form to set INP, RPT and project '''
 
@@ -310,9 +279,9 @@ class Mg():
 
         # Get last GSW file from giswater properties file
         java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())
-        file_gsw = self.get_settings_value(java_settings, 'FILE_GSW')
-
+        java_settings.setIniCodec(sys.getfilesystemencoding())          
+        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
+        
         # Check if that file exists
         if not os.path.exists(file_gsw):
             msg = "Last GSW file not found: "+str(file_gsw)
@@ -320,11 +289,11 @@ class Mg():
             return False
 
         # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat)
-        self.file_inp = self.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = self.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')
-
+        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
+        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')                
+        self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
+                
         # Create dialog
         self.dlg = FileManager()
         utils_giswater.setDialog(self.dlg)
@@ -397,44 +366,9 @@ class Mg():
         ''' Button 24. Open giswater in silent mode
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
-        '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 24)
-
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-
-        # Check if giswater.jar file exists
-        if not os.path.exists(self.giswater_jar):
-            message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-
-        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
-        if not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, context_name='ui_message')
-            self.gsw_file = ""
-
-        # Start program
-        aux = '"'+self.giswater_jar+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
-
-        self.controller.start_program(program)
-
-        # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message' )
-
+        '''       
+        self.execute_giswater("mg_go2epa_express", 24)
+                        
 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
@@ -480,20 +414,17 @@ class Mg():
         user = self.controller.get_project_user()
 
         # Delete previous values
-        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_result"
         self.dao.execute_sql(sql)
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare"
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
 
         # Show message to user
@@ -501,8 +432,9 @@ class Mg():
         self.controller.show_info(message, context_name='ui_message')
         self.close_dialog(self.dlg)
 
-
     '''
+=======
+>>>>>>> 9cf88f7... Add class 'ParentAction' to manage common functions
     def mg_analytics(self):
         # Button 27. Valve analytics 
                 
@@ -690,7 +622,18 @@ class Mg():
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
         self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
 
-
+        #self.arc_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox,self.arc_vdef_enabled, self.arccat_vdefault, "arccat_vdefault"))
+        #self.node_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.node_vdef_enabled, self.nodecat_vdefault))
+        #self.connec_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.connec_vdef_enabled, self.connecat_vdefault))
+        #self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault').stateChanged.connect(partial(self.test, "check"))
+        #self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault').stateChanged.connect(partial(self.test, "check"))
+        #self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault').stateChanged.connect(partial(self.test, "check"))
+       
+        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
+        
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
@@ -752,6 +695,7 @@ class Mg():
         self.dlg.exec_()
 
 
+    # Like def mf_config_get_date(....): but for multi user
     def new_mg_config_get_data(self,tablename):
         # Like def mf_config_get_date(....): but for multi user
         
@@ -813,8 +757,8 @@ class Mg():
         else :
             webbrowser.open(url)
 
-
-    def mg_config_get_data(self, tablename):
+                 
+    def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''
 
         sql = "SELECT *"
@@ -900,13 +844,12 @@ class Mg():
 
 
     def delete_row(self,  parameter):
-
         sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
         self.controller.execute_sql(sql)
-        
+       
         
     def insert_or_update_config_vdefault(self, widget, parameter):
-    
+
         sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
         rows=self.controller.get_rows(sql)
         self.exist = False
@@ -965,20 +908,47 @@ class Mg():
 
     def multi_selector(self,table):
         ''' Execute form multi_selector '''
-
+        
+        if columns is None:
+            return
+               
+        sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
+        for column_name in columns:
+            if column_name != 'id':
+                widget_type = utils_giswater.getWidgetType(column_name)
+                if widget_type is QCheckBox:
+                    value = utils_giswater.isChecked(column_name)                      
+                else:
+                    value = utils_giswater.getWidgetText(column_name)
+                if value is None or value == 'null':
+                    sql+= column_name+" = null, "     
+                else:
+                    if type(value) is not bool:
+                        value = value.replace(",", ".")
+                    sql+= column_name+" = '"+str(value)+"', "           
+        
+        sql = sql[:-2]
+        self.controller.execute_sql(sql)
+                        
+       
+    def multi_selector(self,table):  
+        ''' Execute form multi_selector ''' 
+        
         # Create the dialog and signals
         self.dlg_multi = Multi_selector()
         utils_giswater.setDialog(self.dlg_multi)
 
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
-
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
         self.menu=QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
-
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))
-
+        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
+        
+        self.menu = QMenu()
+        self.dlg_multi.btn_insert.setMenu(self.menu)
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
         self.fill_table(self.tbl, self.schema_name+"."+table)
 
         # Manage i18n of the form and open it
@@ -1019,6 +989,7 @@ class Mg():
         self.tbl_selected_explot.setColumnWidth(0,197)
 
         self.dlg_multiexp.exec_()
+
 
     def filter_all_explot(self,sql, widget):
     
@@ -1542,18 +1513,10 @@ class Mg():
         '''
         self.dlg_mincut.close()
 
-        
+
     def close(self, dlg = None):
         ''' Close dialog '''
         dlg.close()
-        '''
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass
-        '''
         
         
     def mg_dimensions(self):
@@ -1567,9 +1530,6 @@ class Mg():
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
-
-        
-
 
     
     def mg_new_psector(self,psector_id=None):
@@ -1731,7 +1691,9 @@ class Mg():
         self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
         self.dlg_new_psector.exec_()
 
+
     def insert_or_update_new_psector(self, update,table):
+        
         self.test(update)
         if update:
             sql = "UPDATE " + self.schema_name + "."+table+" SET descript='" + self.descript.text()+"'"
@@ -1771,8 +1733,10 @@ class Mg():
             self.test(sql)
         self.controller.execute_sql(sql)
 
+
     def cal_percent(self,widged_total, widged_percent, wided_result):
         wided_result.setText(str((float(widged_total.text())*float(widged_percent.text())/100)))
+
 
     def sum_total(self, widget_total, widged_percent, wided_result):
         wided_result.setText(str((float(widget_total.text()) + float(widged_percent.text()))))
@@ -1811,6 +1775,7 @@ class Mg():
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
 
+
     def charge_psector(self):
         selected_list = self.tbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1832,6 +1797,7 @@ class Mg():
         # Refresh model with selected filter
         table.model().setFilter(expr)
         table.model().select()
+
 
     def mg_psector_selector(self):
         ''' Button_47 : Psector selector '''
@@ -1857,5 +1823,9 @@ class Mg():
         self.pss_txt_short_descript = self.dlg_psector_sel.findChild(QLineEdit, "txt_short_descript")
 
         self.dlg_psector_sel.exec_()
+        
+        
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))
+  
+    

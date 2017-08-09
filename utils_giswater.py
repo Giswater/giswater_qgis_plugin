@@ -1,23 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- *                                                                         *
- *   This file is part of Giswater 2.0                                     *                                 
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QMessageBox   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
 from PyQt4.Qt import QDate
 import inspect
 import os
+import _winreg
 
-from PyQt4.QtCore import Qt
+
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
@@ -34,14 +29,15 @@ def fillComboBox(widget, rows, allow_nulls=True):
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
             #why never join here???
-
             widget.addItem(str(elem))
         else:
-            if elem!=None:
+            if elem is not None:
                 widget.addItem(str(elem))
                 
-def fillComboBoxDefault(widget, rows, allow_nulls=True):
-    '''Fill combo box with default value-first from the list '''
+                
+def fillComboBoxDefault(widget, rows,):
+    ''' Fill combo box with default value-first from the list '''
+    
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -50,12 +46,10 @@ def fillComboBoxDefault(widget, rows, allow_nulls=True):
         elem = row[0]
         if isinstance(elem, int) or isinstance(elem, float):
             #why never join here???
-
             widget.addItem(str(elem))
         else:
-            if elem!=None:
+            if elem is not None:
                 widget.addItem(str(elem))                
-
         
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
@@ -94,7 +88,6 @@ def getText(widget):
     return elem_text      
 
 
-
 def setText(widget, text):
     
     if type(widget) is str:
@@ -122,7 +115,6 @@ def setCalendarDate(widget, date):
         if date == None:
             date=QDate.currentDate()
         widget.setDate(date)
-
 
 
 def getWidget(widget):
@@ -256,5 +248,37 @@ def setImage(widget,cat_shape):
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()  
-                        
-                
+
+
+def get_reg(reg_hkey, reg_path, reg_name):
+    
+    reg_root = None
+    if reg_hkey == "HKEY_LOCAL_MACHINE":
+        reg_root = _winreg.HKEY_LOCAL_MACHINE
+    elif reg_hkey == "HKEY_CURRENT_USER":
+        reg_root = _winreg.HKEY_CURRENT_USER
+    
+    if reg_root is not None:
+        try:
+            registry_key = _winreg.OpenKey(reg_root, reg_path)
+            value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
+            _winreg.CloseKey(registry_key)
+            return value
+        except WindowsError:
+            return None
+        
+        
+def get_settings_value(settings, parameter):
+    ''' Function that fix problem with network units in Windows '''
+    
+    file_aux = ""
+    try:
+        file_aux = settings.value(parameter)
+        unit = file_aux[:1]
+        if unit != '\\' and file_aux[1] != ':':
+            path = file_aux[1:]
+            file_aux = unit+":"+path
+    except IndexError:
+        pass   
+    return file_aux           
+            

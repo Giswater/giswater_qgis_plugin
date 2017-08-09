@@ -6,11 +6,9 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QObject, QSettings, QTranslator
+from qgis.core import QgsMapLayerRegistry, QgsProject, QCoreApplication, QgsExpressionContextUtils
+from PyQt4.QtCore import QObject, QSettings, QTranslator
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
-from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
-from qgis.core import * 
-
 
 import os.path
 import sys  
@@ -32,13 +30,8 @@ from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
 #from map_tools.dimensions import Dimensions
 
-
 from search.search_plus import SearchPlus
 
-#from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
-from qgis.gui import *
-
-from init.ud_man_node_init import ManNodeDialog                                  # @UnresolvedImport
 
 
 class Giswater(QObject):  
@@ -630,6 +623,8 @@ class Giswater(QObject):
         self.layer_man_pgully = None
         
         self.layer_version = None
+        self.layer_dimensions = None
+
         #exists_version = False
         #exists_man_junction = False
 
@@ -697,7 +692,6 @@ class Giswater(QObject):
                     self.layer_node_man_WS.append(cur_layer)
                 if 'v_edit_man_flexunion' == uri_table:
                     self.layer_node_man_WS.append(cur_layer)
-					
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
@@ -729,6 +723,9 @@ class Giswater(QObject):
                     self.layer_arc_man_WS.append(cur_layer)
                 if 'v_edit_man_varc' == uri_table:
                     self.layer_arc_man_WS.append(cur_layer)
+                    
+                if 'v_edit_dimensions' == uri_table:
+                    self.layer_dimensions = cur_layer
 
                 if self.table_gully == uri_table:
                     self.layer_gully = cur_layer
@@ -843,6 +840,9 @@ class Giswater(QObject):
                 self.set_layer_custom_form(self.layer_gully, 'gully')
             if self.layer_man_pgully is not None:       
                 self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
+            
+            # Set cstom for layer dimensions 
+            self.set_layer_custom_form_dimensions(self.layer_dimensions)     
 
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
@@ -880,6 +880,29 @@ class Giswater(QObject):
         layer.editFormConfig().setInitFilePath(file_init)           
         layer.editFormConfig().setInitFunction(name_function) 
         
+        
+    def set_layer_custom_form_dimensions(self, layer):
+ 
+        name_ui = 'dimensions.ui'
+        name_init = 'dimensions.py'
+        name_function = 'formOpen'
+        file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
+        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
+        layer.editFormConfig().setUiForm(file_ui) 
+        layer.editFormConfig().setInitCodeSource(1)
+        layer.editFormConfig().setInitFilePath(file_init)           
+        layer.editFormConfig().setInitFunction(name_function)
+        
+        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
+        if layer_node:
+            layer_node = layer_node[0]
+            layer_node.setDisplayField('[% "depth" %]')
+        
+        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
+        if layer_connec:
+            layer_connec = layer_connec[0]
+            layer_connec.setDisplayField('[% "depth" %]')
+
     
     def set_map_tool(self, map_tool_name):
         ''' Set objects for map tools classes '''  
@@ -1100,9 +1123,4 @@ class Giswater(QObject):
         filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
         for f in filelist:
             os.remove(f)
-            
-'''
-class Global_type():
-    x = 0
-'''     
             
