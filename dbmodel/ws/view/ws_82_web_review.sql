@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
- 
+	
  --REVIEW VIEWS
  
 DROP VIEW IF EXISTS v_edit_review_node CASCADE;
@@ -49,12 +49,10 @@ CREATE OR REPLACE VIEW v_edit_review_arc AS
 	SELECT review_audit_connec.connec_id,
 	 connec.elevation,
 	 connec."depth",
-	 connec.connec_type,
 	 connec.connecat_id,
 	 connec."state",
 	 review_audit_connec.elevation as field_elevation,
 	 review_audit_connec."depth" AS field_depth,
-	 review_audit_connec.connec_type AS field_connec_type,
 	 review_audit_connec.connecat_id AS field_connecat_id,
 	 review_audit_connec.annotation,
 	 review_audit_connec.observ,

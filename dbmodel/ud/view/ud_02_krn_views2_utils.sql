@@ -18,22 +18,23 @@ arc.arc_id,
 arc.node_1, 
 arc.node_2,
 (CASE 
-	WHEN (arc.est_y1 IS NOT NULL) THEN arc.est_y1::numeric (12,3)    
-	ELSE y1::numeric (12,3) END) AS y1,													-- field to customize the different options of y1 (mts or cms, field name or behaviour about the use of y1/est_y1 fields
+	WHEN (arc.custom_y1 IS NOT NULL) THEN arc.custom_y1::numeric (12,3)    
+	ELSE y1::numeric (12,3) END) AS y1,													-- field to customize the different options of y1 (mts or cms, field name or behaviour about the use of y1/custom_y1 fields
 (CASE 
-	WHEN (arc.est_y2 IS NOT NULL) THEN arc.est_y2::numeric (12,3)		
-	ELSE y2::numeric (12,3) END) AS y2,													-- field to customize the different options of y2 (mts or cms, field name or behaviour about the use of y2/est_y2 fields
+	WHEN (arc.custom_y2 IS NOT NULL) THEN arc.custom_y2::numeric (12,3)		
+	ELSE y2::numeric (12,3) END) AS y2,													-- field to customize the different options of y2 (mts or cms, field name or behaviour about the use of y2/custom_y2 fields
 CASE
-	WHEN arc.est_elev1 IS NOT NULL THEN arc.est_elev1
+	WHEN arc.custom_elev1 IS NOT NULL THEN arc.custom_elev1
     ELSE arc.elev1
     END AS elev1,
 CASE
-    WHEN arc.est_elev2 IS NOT NULL THEN arc.est_elev2
+    WHEN arc.custom_elev2 IS NOT NULL THEN arc.custom_elev2
     ELSE arc.elev2
     END AS elev2,												
 arc.arccat_id,
 cat_arc.matcat_id,																	-- field to customize de source of the data matcat_id (from arc catalog or directly from arc table)
 arc.arc_type,
+arc.soilcat_id,
 arc.epa_type,
 arc.sector_id,
 arc.state,
@@ -44,7 +45,7 @@ ELSE st_length2d(arc.the_geom)::numeric (12,3) END) AS length,
 arc.the_geom
 FROM arc
 	JOIN cat_arc ON arc.arccat_id = cat_arc.id
-	JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id
+	JOIN v_state_arc ON arc.arc_id=v_state_arc.arc_id;
 
 
 
@@ -53,26 +54,27 @@ CREATE OR REPLACE VIEW v_node AS
 SELECT
 node.node_id,
 (CASE 
-	WHEN (node.est_top_elev IS NOT NULL) THEN node.est_top_elev::numeric (12,3)    
-	ELSE top_elev::numeric (12,3) END) AS top_elev,										-- field to customize the different options of top_elev (mts or cms, field name or behaviour about the use of top_elev/est_top_elev fields)
+	WHEN (node.custom_top_elev IS NOT NULL) THEN node.custom_top_elev::numeric (12,3)    
+	ELSE top_elev::numeric (12,3) END) AS top_elev,										-- field to customize the different options of top_elev (mts or cms, field name or behaviour about the use of top_elev/custom_top_elev fields)
 (CASE 
-	WHEN (node.est_ymax IS NOT NULL) THEN node.est_ymax::numeric (12,3)		
-	ELSE ymax::numeric (12,3) END) AS ymax,												-- field to customize the different options of ymax (mts or cms, field name or behaviour about the use of y2/est_y2 fields)
+	WHEN (node.custom_ymax IS NOT NULL) THEN node.custom_ymax::numeric (12,3)		
+	ELSE ymax::numeric (12,3) END) AS ymax,												-- field to customize the different options of ymax (mts or cms, field name or behaviour about the use of y2/custom_y2 fields)
 CASE
-    WHEN (node.elev IS NOT NULL AND node.est_elev IS NULL) THEN node.elev
-    WHEN node.est_elev IS NOT NULL THEN node.est_elev
+    WHEN (node.elev IS NOT NULL AND node.custom_elev IS NULL) THEN node.elev
+    WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
     ELSE (node.top_elev - node.ymax)::numeric(12,3)
     END AS elev,
 node.nodecat_id,
 node.node_type,
 node.epa_type,
+node.soilcat_id,
 node.sector_id,
 node.dma_id,
 node.state,
 node.annotation,
 node.the_geom
 FROM node
-JOIN v_state_node ON node.node_id=v_state_node.node_id
+JOIN v_state_node ON node.node_id=v_state_node.node_id;
 
    
    
@@ -119,7 +121,7 @@ SELECT arc.arc_id,
 
 	 
 	 
-
+/*
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
  SELECT 
@@ -160,6 +162,48 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
 	FROM v_arc_x_node1
      JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
      JOIN v_arc ON v_arc_x_node2.arc_id = arc.arc_id;
+*/
 
+DROP VIEW IF EXISTS v_arc_x_node CASCADE;
+CREATE OR REPLACE VIEW v_arc_x_node AS 
+ SELECT 
+    v_arc_x_node1.arc_id,
+    v_arc_x_node1.node_1,
+    v_arc_x_node1.top_elev1,
+    v_arc_x_node1.ymax1,
+    v_arc_x_node1.elev1,
+    v_arc_x_node1.y1,
+    CASE
+            WHEN v_arc_x_node1.z1 IS NOT NULL THEN v_arc_x_node1.z1
+            ELSE 0::numeric
+            END AS z1,
+    v_arc_x_node1.elevmax1,
+    v_arc_x_node2.node_2,
+    v_arc_x_node2.top_elev2,
+    v_arc_x_node2.ymax2,
+    v_arc_x_node2.elev2,
+    v_arc_x_node2.y2,
+    CASE
+            WHEN v_arc_x_node2.z2 IS NOT NULL THEN v_arc_x_node2.z2
+            ELSE 0::numeric
+            END AS z2,
+    v_arc_x_node2.elevmax2,  
+    v_arc_x_node1.geom1,
+    v_arc_x_node1.r1,
+    v_arc_x_node2.r2,
+        CASE
+            WHEN st_length(v_arc.the_geom) = 0::double precision THEN NULL::numeric(6,4)
+            WHEN ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(v_arc.the_geom)) > 1::double precision THEN NULL::numeric(6,4)
+            ELSE ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(v_arc.the_geom))::numeric(6,4)
+        END AS slope,
+    v_arc.state,
+    v_arc.sector_id,
+	v_arc.soilcat_id,
+	v_arc.annotation,
+	v_arc.length,
+    v_arc.the_geom
+	FROM v_arc_x_node1
+     JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
+     JOIN v_arc ON v_arc_x_node2.arc_id = v_arc_x_node1.arc_id;
 
 

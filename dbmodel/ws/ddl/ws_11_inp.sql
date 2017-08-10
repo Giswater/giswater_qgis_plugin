@@ -336,8 +336,10 @@ CREATE TABLE "inp_pump" (
 "power" varchar  ,
 "curve_id" varchar  ,
 "speed" numeric(12,6),
-"pattern" varchar f
-);
+"pattern" varchar,
+"status" character varying(12),
+"to_arc" character varying(16)
+ );
 
 
 CREATE TABLE "inp_quality" (

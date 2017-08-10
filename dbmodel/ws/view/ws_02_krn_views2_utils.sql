@@ -20,6 +20,7 @@ arc.sector_id,
 arc.state, 
 arc.annotation, 
 arc.custom_length, 
+arc.soilcat_id, 
 CASE
 	WHEN arc.builtdate IS NOT NULL THEN arc.builtdate
 	ELSE now()::date
@@ -44,9 +45,10 @@ node.depth,
 cat_node.nodetype_id,
 node.nodecat_id,
 node.epa_type,
+node.annotation,
+node.soilcat_id,
 node.sector_id,
 node.state,
-node.annotation,
 node.the_geom
 FROM node
 	JOIN cat_node on nodecat_id=id
@@ -87,11 +89,12 @@ v_arc_x_node1.depth1,
 v_arc_x_node2.node_2,
 v_arc_x_node2.elevation2,
 v_arc_x_node2.depth2,
-v_arc,arctype_id,
-v_arc,arccat_id,
+v_arc.arctype_id,
+v_arc.arccat_id,
 v_arc.state,
 v_arc.sector_id,
 v_arc.annotation,
+v_arc.soilcat_id,
 v_arc.custom_length,
 v_arc.length,
 v_arc.the_geom

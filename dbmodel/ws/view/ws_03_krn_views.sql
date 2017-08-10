@@ -39,7 +39,7 @@ SELECT
 node.node_id,
 node.elevation,
 node.depth,
-node.node_type,
+cat_node.nodetype_id,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
@@ -47,7 +47,8 @@ node.dma_id,
 node.state,
 node.the_geom,
 node.expl_id
-FROM node;
+FROM node
+LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id));
 
 
 
@@ -96,23 +97,5 @@ JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
 JOIN arc ON v_arc_x_node2.arc_id = arc.arc_id
 WHERE ((arc.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());;
-
-
-
-CREATE OR REPLACE VIEW v_value_cat_node AS 
- SELECT 
- cat_node.id,
- cat_node.nodetype_id,
- node_type.type
-   FROM cat_node
-     JOIN node_type ON node_type.id = nodetype_id;
-
-
-CREATE OR REPLACE VIEW v_value_cat_connec AS 
- SELECT cat_connec.id,
-    cat_connec.type as connec_type,
-    connec_type.type
-   FROM cat_connec
-     JOIN connec_type ON connec_type.id = cat_connec.type;
 
 

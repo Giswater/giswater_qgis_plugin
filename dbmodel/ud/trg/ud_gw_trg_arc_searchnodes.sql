@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION ud_sample.gw_trg_arc_searchnodes()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_searchnodes()
   RETURNS trigger AS
 $BODY$
 DECLARE 

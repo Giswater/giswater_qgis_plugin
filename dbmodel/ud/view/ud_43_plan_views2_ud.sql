@@ -287,7 +287,7 @@ v_plan_ml_arc.cost_unit,
 
 FROM v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
-	JOIN plan_selector_state ON (((v_plan_ml_arc."state") = (plan_selector_state.state_id)));
+	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)));
 
 
 
@@ -324,7 +324,7 @@ v_plan_ml_arc.the_geom
 
 FROM v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
-	JOIN plan_selector_state ON (((v_plan_ml_arc."state") = (plan_selector_state.state_id)));
+	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)));
 
 
 
@@ -347,7 +347,7 @@ node.the_geom
 
 FROM (v_node node
 LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id)))))
-JOIN plan_selector_state ON (((node."state") = (plan_selector_state.state_id)));
+JOIN selector_state ON (((node."state") = (selector_state.state_id)));
 
 
 
@@ -623,7 +623,7 @@ DROP VIEW IF EXISTS "v_plan_psector_filtered" CASCADE;
 			v_plan_psector_arc.atlas_id,
 			v_plan_psector_arc.the_geom
                    FROM v_plan_psector_arc
-		   JOIN plan_selector_psector  ON (plan_selector_psector.id) = (v_plan_psector_arc.psector_id)
+		   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_arc.psector_id)
         UNION
                  SELECT v_plan_psector_node.psector_id,
 			v_plan_psector_node.pem,
@@ -633,7 +633,7 @@ DROP VIEW IF EXISTS "v_plan_psector_filtered" CASCADE;
 			v_plan_psector_node.atlas_id,
 			v_plan_psector_node.the_geom
                    FROM v_plan_psector_node
-		   JOIN plan_selector_psector  ON (plan_selector_psector.id) = (v_plan_psector_node.psector_id)
+		   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_node.psector_id)
 		UNION
                  SELECT v_plan_psector_other.psector_id,
 			v_plan_psector_other.pem,
@@ -643,7 +643,7 @@ DROP VIEW IF EXISTS "v_plan_psector_filtered" CASCADE;
 			v_plan_psector_other.atlas_id,
 			v_plan_psector_other.the_geom
                    FROM v_plan_psector_other
-                   JOIN plan_selector_psector  ON (plan_selector_psector.id) = (v_plan_psector_other.psector_id)) wtotal
+                   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_other.psector_id)) wtotal
 				   
 				   
 				GROUP BY wtotal.psector_id, wtotal.atlas_id, wtotal.the_geom;

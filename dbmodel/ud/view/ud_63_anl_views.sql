@@ -67,7 +67,7 @@ FROM anl_flow_trace_arc
 JOIN v_edit_connec on v_edit_connec.arc_id=anl_flow_trace_arc.arc_id
 JOIN rtc_hydrometer_x_connec on rtc_hydrometer_x_connec.connec_id=v_edit_connec.connec_id;
 
-
+/*
 DROP VIEW IF EXISTS v_anl_dwf_connec;
 CREATE OR REPLACE VIEW v_anl_dwf_connec AS 
  SELECT connec.connec_id,
@@ -78,7 +78,7 @@ CREATE OR REPLACE VIEW v_anl_dwf_connec AS
    FROM connec
      JOIN anl_dwf_connec_x_uses_value ON anl_dwf_connec_x_uses_value.connec_id = connec.connec_id
      JOIN anl_dwf_selector_scenario ON anl_dwf_selector_scenario.scenario_id = anl_dwf_connec_x_uses_value.scenario_id;
- 
+ */
 	 
 DROP VIEW IF EXISTS v_anl_node_sink CASCADE;
 CREATE OR REPLACE VIEW v_anl_node_sink AS
@@ -93,7 +93,7 @@ WHERE ((node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
 
-_exit_node CASCADE;
+DROP VIEW IF EXISTS v_anl_flow_exit_node CASCADE;
 CREATE OR REPLACE VIEW v_anl_flow_exit_node AS
 SELECT
 anl_flow_exit_node.node_id,

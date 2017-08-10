@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_connec CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec AS
@@ -198,4 +198,6 @@ ext_rtc_scada_x_value.status,
 ext_rtc_scada_x_value."timestamp",
 ext_rtc_scada_x_value.interval_seconds
 FROM ext_rtc_scada_x_value JOIN rtc_scada_node ON rtc_scada_node.scada_id=ext_rtc_scada_x_value.scada_id;
+
+*/
 

@@ -20,7 +20,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- parent_node_type
 -- catnode_id
 
-
+/*
 CREATE TABLE limnometer(
 "limno_id" serial NOT NULL,
 "short_descript" character varying(30),
@@ -120,5 +120,5 @@ ALTER TABLE node ADD COLUMN parent_node_id character varying(16);
 ALTER TABLE node DROP CONSTRAINT IF EXISTS "node_parent_node_fkey";
 
 
-
+*/
   

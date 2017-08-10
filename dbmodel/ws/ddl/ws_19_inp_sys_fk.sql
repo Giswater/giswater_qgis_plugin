@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
+/*
 -- ----------------------------
 -- Fk 11
 -- ----------------------------
@@ -164,7 +164,7 @@ ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOR
 ALTER TABLE "inp_rules_x_arc" DROP CONSTRAINT IF EXISTS "inp_rules_x_arc_id_fkey"
 ALTER TABLE "inp_rules_x_arc" ADD CONSTRAINT "inp_rules_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+*/
 
 
 

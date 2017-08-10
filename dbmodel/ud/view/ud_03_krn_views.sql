@@ -16,7 +16,7 @@ SELECT
 gully_id,
 the_geom
 FROM gully
-JOIN man_selector_state ON gully.state=man_selector_state.state_id
+JOIN selector_state ON gully.state=selector_state.state_id
 ;
 
 

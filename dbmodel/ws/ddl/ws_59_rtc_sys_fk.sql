@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
+/*
 -- ----------------------------
 -- Fk 51
 -- ----------------------------
@@ -51,3 +51,4 @@ ALTER TABLE "rtc_options" ADD CONSTRAINT "rtc_options_coefficient_fkey" FOREIGN 
 ALTER TABLE "ext_rtc_hydrometer_x_value" ADD CONSTRAINT "ext_rtc_hydrometer_x_value_hydrometer_id_fkey" FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "ext_rtc_hydrometer_x_data" ADD CONSTRAINT "ext_rtc_hydrometer_x_data_hydrometer_id_fkey" FOREIGN KEY ("hydrometer_id") REFERENCES "rtc_hydrometer" ("hydrometer_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+*/

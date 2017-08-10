@@ -17,10 +17,10 @@ INSERT INTO inp_options VALUES ('LPS', 'H-W', NULL, 1.000000, 1.000000, 40.00000
 -- ----------------------------
 -- Records of inp_flow_regulator_type
 -- ----------------------------
-
-INSERT INTO inp_flow_regulator_type VALUES ('WEIR', 'inp_flwreg_valve');
-INSERT INTO inp_flow_regulator_type VALUES ('PUMP', 'inp_flwreg_pump');
-
+/*
+INSERT INTO inp_flwreg_type VALUES ('WEIR', 'inp_flwreg_valve');
+INSERT INTO inp_flwreg_type VALUES ('PUMP', 'inp_flwreg_pump');
+*/
 
 
 -- ----------------------------

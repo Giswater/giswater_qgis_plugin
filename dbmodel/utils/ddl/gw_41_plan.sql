@@ -10,7 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- COMMON SQL (WS & UD)
 ---------------------------------------------------------------
 
-
 -- ----------------------------
 -- Sequence structure
 -- ----------------------------
@@ -91,7 +90,7 @@ CREATE TABLE "plan_other_x_psector" (
 "id" serial NOT NULL PRIMARY KEY,
 "price_id" varchar(16) COLLATE "default",
 "measurement" numeric (12,2),
-"psector_id" varchar(16) COLLATE "default",
+"psector_id" integer,
 "atlas_id" varchar(16) COLLATE "default",
 "descript" varchar(254) COLLATE "default" 
 );

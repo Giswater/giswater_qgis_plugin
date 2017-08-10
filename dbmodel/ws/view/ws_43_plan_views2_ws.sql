@@ -292,7 +292,7 @@ v_plan_ml_arc.cost_unit,
 
 FROM v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
-	JOIN plan_selector_state ON (((v_plan_ml_arc."state") = (plan_selector_state.state_id)));
+	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)));
 
 	
 
@@ -330,7 +330,7 @@ v_plan_ml_arc.the_geom,
 arc.expl_id
 FROM selector_expl, v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
-	JOIN plan_selector_state ON (((v_plan_ml_arc."state") = (plan_selector_state.state_id)))
+	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)))
 	JOIN arc ON arc.arc_id=v_plan_ml_arc.arc_id
 	WHERE ((arc.expl_id)=(selector_expl.expl_id)
 	AND selector_expl.cur_user="current_user"());
@@ -345,7 +345,7 @@ CREATE VIEW "v_plan_node" AS
 SELECT
 
 node.node_id,
-node.node_type,
+node.nodecat_id,
 node.depth,
 v_price_x_catnode.cost_unit,
 (CASE WHEN (v_price_x_catnode.cost_unit='u') THEN NULL ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)END)) END)::numeric(12,2) AS calculated_depth,
@@ -356,7 +356,7 @@ node.the_geom,
 node.expl_id
 FROM selector_expl, v_node node
 LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
-JOIN plan_selector_state ON (((node."state") = (plan_selector_state.state_id)))
+JOIN selector_state ON (((node."state") = (selector_state.state_id)))
 WHERE ((node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
@@ -400,7 +400,7 @@ CREATE VIEW "v_plan_node_x_psector" AS
 SELECT
 
 node.node_id,
-node.node_type,
+node.nodecat_id,
 plan_node_x_psector.descript,
 (v_price_x_catnode.cost)::numeric(12,2) AS budget,
 plan_node_x_psector.psector_id,
@@ -413,7 +413,7 @@ JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
 JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id) = (node.node_id))))
 WHERE ((node.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"())
-ORDER BY node_type;
+ORDER BY nodecat_id;
 
 
 
@@ -622,7 +622,7 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
                     v_plan_psector_arc.pca,
                     v_plan_psector_arc.the_geom
                    FROM v_plan_psector_arc
-				   JOIN plan_selector_psector  ON (plan_selector_psector.id) = (v_plan_psector_arc.psector_id)
+				   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_arc.psector_id)
         UNION
                  SELECT v_plan_psector_node.psector_id,
 					v_plan_psector_node.pem,
@@ -631,7 +631,7 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
                     v_plan_psector_node.pca,
                     v_plan_psector_node.the_geom
                    FROM v_plan_psector_node
-				   JOIN plan_selector_psector  ON (plan_selector_psector.id) = (v_plan_psector_node.psector_id)
+				   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_node.psector_id)
 		UNION
                  SELECT v_plan_psector_other.psector_id,
 					v_plan_psector_other.pem,
@@ -640,7 +640,7 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
                     v_plan_psector_other.pca,
                     v_plan_psector_other.the_geom
                    FROM v_plan_psector_other
-                   JOIN plan_selector_psector  ON (plan_selector_psector.id) = (v_plan_psector_other.psector_id)) wtotal
+                   JOIN selector_psector  ON (selector_psector.id) = (v_plan_psector_other.psector_id)) wtotal
 				   				   
 				GROUP BY wtotal.psector_id, wtotal.the_geom;
 				

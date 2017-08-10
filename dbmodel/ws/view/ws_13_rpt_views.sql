@@ -16,7 +16,7 @@ CREATE VIEW "v_rpt_arc" AS
 SELECT 
 arc.arc_id, 
 rpt_selector_result.result_id, 
-arc.arctype_id,
+arc.arc_type,
 arc.arccat_id,
 max(rpt_arc.flow) AS max_flow, 
 min(rpt_arc.flow) AS min_flow, 
@@ -36,7 +36,7 @@ FROM rpt_selector_result,rpt_input_arc arc
 JOIN rpt_arc ON ((rpt_arc.arc_id) = (arc.arc_id))
 WHERE ((rpt_arc.result_id) = (rpt_selector_result.result_id))
 AND rpt_selector_result.cur_user="current_user"()
-GROUP BY arc.arc_id, arctype_id, arccat_id, rpt_selector_result.result_id, arc.the_geom 
+GROUP BY arc.arc_id, arc_type, arccat_id, rpt_selector_result.result_id, arc.the_geom 
 ORDER BY arc.arc_id;
 
 
@@ -76,7 +76,7 @@ CREATE VIEW "v_rpt_node" AS
 SELECT 
 node.node_id, 
 rpt_selector_result.result_id,
-node.nodetype_id,
+node.node_type,
 node.nodecat_id,
 max(rpt_node.elevation) AS elevation, 
 max(rpt_node.demand) AS max_demand, 
@@ -92,7 +92,7 @@ FROM rpt_selector_result, rpt_input_node node
 JOIN rpt_node ON ((rpt_node.node_id) = (node.node_id))
 WHERE ((rpt_node.result_id) = (rpt_selector_result.result_id))
 AND rpt_selector_result.cur_user="current_user"()
-GROUP BY node.node_id, nodetype_id, nodecat_id, rpt_selector_result.result_id, node.the_geom ORDER BY node.node_id;
+GROUP BY node.node_id, node_type, nodecat_id, rpt_selector_result.result_id, node.the_geom ORDER BY node.node_id;
 
 
 DROP VIEW IF EXISTS "v_rpt_arc_all" CASCADE;
@@ -101,7 +101,7 @@ SELECT
 rpt_arc.id,
 arc.arc_id,
 rpt_selector_result.result_id,
-arc.arctype_id,
+arc.arc_type,
 arc.arccat_id,
 rpt_arc.flow, 
 rpt_arc.vel, 
@@ -122,7 +122,7 @@ CREATE VIEW "v_rpt_node_all" AS
 SELECT 
 rpt_node.id,
 node.node_id, 
-node.nodetype_id,
+node.node_type,
 node.nodecat_id,
 rpt_selector_result.result_id,
 rpt_node.elevation, 
@@ -168,7 +168,7 @@ FROM rpt_selector_compare, rpt_input_arc arc
 JOIN rpt_arc ON ((rpt_arc.arc_id) = (arc.arc_id))
 WHERE ((rpt_arc.result_id) = (rpt_selector_compare.result_id))
 AND rpt_selector_compare.cur_user="current_user"()
-GROUP BY arc.arc_id,  arctype_id, arccat_id, rpt_selector_compare.result_id, arc.the_geom 
+GROUP BY arc.arc_id,  arc_type, arccat_id, rpt_selector_compare.result_id, arc.the_geom 
 ORDER BY arc.arc_id;
 
 
@@ -206,7 +206,7 @@ CREATE VIEW "v_rpt_comp_node" AS
 SELECT 
 node.node_id, 
 rpt_selector_compare.result_id, 
-node.nodetype_id,
+node.node_type,
 node.nodecat_id,
 max(rpt_node.elevation) AS elevation, 
 max(rpt_node.demand) AS max_demand, 
@@ -221,6 +221,6 @@ FROM rpt_selector_compare, rpt_input_node node
 JOIN rpt_node ON ((rpt_node.node_id) = (node.node_id))
 WHERE ((rpt_node.result_id) = (rpt_selector_compare.result_id))
 AND rpt_selector_compare.cur_user="current_user"()
-GROUP BY node.node_id,  nodetype_id, nodecat_id, rpt_selector_compare.result_id, node.the_geom 
+GROUP BY node.node_id,  node_type, nodecat_id, rpt_selector_compare.result_id, node.the_geom 
 ORDER BY node.node_id;
 

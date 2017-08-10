@@ -1369,7 +1369,7 @@ CREATE TABLE "inp_value_yesno" (
 CREATE TABLE "inp_flwreg_type"(
 id character varying(16),
 table_id character varying(50),
-CONSTRAINT inp_flow_regulator_type_pkey PRIMARY KEY (id)
+CONSTRAINT inp_inp_flwreg_type_pkey PRIMARY KEY (id)
 );
 
 
@@ -1929,6 +1929,7 @@ CREATE TABLE inp_selector_hydrology(
 id serial NOT NULL PRIMARY KEY,
 hydrology_id varchar(20),
 cur_user text
+);
 
 
 
@@ -2013,8 +2014,8 @@ ALTER TABLE "inp_washoff_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
 ALTER TABLE "inp_weir" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_windspeed" ADD PRIMARY KEY ("wind_type");
 ALTER TABLE "raingage" ADD PRIMARY KEY ("rg_id");
-ALTER TABLE "rpt_selector_result" ADD PRIMARY KEY ("id");
-ALTER TABLE "rpt_selector_compare" ADD PRIMARY KEY ("id");
+--ALTER TABLE "rpt_selector_result" ADD PRIMARY KEY ("id");
+--ALTER TABLE "rpt_selector_compare" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_arcflow_sum" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_condsurcharge_sum" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_continuity_errors" ADD PRIMARY KEY ("id");
@@ -2043,7 +2044,7 @@ ALTER TABLE "rpt_storagevol_sum" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_subcatchwashoff_sum" ADD PRIMARY KEY ("result_id", "subc_id", "poll_id");
 ALTER TABLE "rpt_subcathrunoff_sum" ADD PRIMARY KEY ("id");
 ALTER TABLE "rpt_timestep_critelem" ADD PRIMARY KEY ("id");
-ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
+--ALTER TABLE "inp_selector_sector" ADD PRIMARY KEY ("sector_id");
 ALTER TABLE "subcatchment" ADD PRIMARY KEY ("subc_id");
 
 

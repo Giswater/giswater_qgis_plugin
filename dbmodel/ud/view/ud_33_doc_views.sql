@@ -15,7 +15,6 @@ doc_x_gully.doc_id,
 doc.doc_type,
 doc.path,
 doc.observ,
-doc.tagcat_id,
 doc.date,
 doc.user_name
 FROM doc_x_gully

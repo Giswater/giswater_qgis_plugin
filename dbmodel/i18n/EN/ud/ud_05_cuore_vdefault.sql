@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
+/*
 -- ----------------------------
 -- Default values of column views
 -- ----------------------------
@@ -34,3 +34,4 @@ ALTER TABLE element ALTER COLUMN verified SET DEFAULT 'TO REVIEW';
 
 
 -- Custom values (User can customize other fields....)
+*/

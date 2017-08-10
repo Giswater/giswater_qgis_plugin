@@ -25,6 +25,7 @@ CREATE SEQUENCE pool_id_seq
 
 
 
+
 -- ----------------------------
 -- Table: Catalogs
 -- ----------------------------
@@ -491,7 +492,7 @@ CREATE TABLE "man_netsamplepoint"(
 
 
 CREATE TABLE "man_netelement"(
-"node_id" varchar(16) NOT NULL PRIMARY KEY
+"node_id" varchar(16) NOT NULL PRIMARY KEY,
 "serial_number" varchar(30)
 ); 
 

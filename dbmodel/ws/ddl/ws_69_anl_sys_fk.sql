@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 -- ----------------------------
 -- MINCUT
 -- ----------------------------
@@ -75,3 +75,4 @@ ALTER TABLE anl_mincut_result_cat  ADD CONSTRAINT anl_mincut_result_cat_state_mi
 ALTER TABLE anl_mincut_valve_status ADD CONSTRAINT anl_mincut_valve_status_result_cat_id_fkey FOREIGN KEY (result_cat_id) REFERENCES anl_mincut_result_cat (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE anl_mincut_valve_status ADD CONSTRAINT anl_mincut_valve_status_valve_id_fkey FOREIGN KEY (valve_id) REFERENCES node (node_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 
+*/

@@ -320,6 +320,7 @@ undelete boolean
   
 CREATE TABLE "samplepoint"(
 "sample_id" character varying(16) NOT NULL,
+"code" varchar(30) ,
 "lab_code" integer,
 "feature_id" varchar (16),
 "featurecat_id" varchar (30),
@@ -348,7 +349,7 @@ CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
 
 CREATE TABLE "element" (
 "element_id" varchar(16) NOT NULL,
-"code" varchar(30) NOT NULL,
+"code" varchar(30),
 "elementcat_id" varchar(30),
 "serial_number" varchar(30),
 "dma_id" integer,

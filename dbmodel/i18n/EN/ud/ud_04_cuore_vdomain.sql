@@ -11,11 +11,10 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- ----------------------------
 -- Records of value_state
 -- ----------------------------
-INSERT INTO "value_state" VALUES ('OBSOLETE');
-INSERT INTO "value_state" VALUES ('ON_SERVICE');
-INSERT INTO "value_state" VALUES ('RECONSTRUCT');
-INSERT INTO "value_state" VALUES ('REPLACE');
-INSERT INTO "value_state" VALUES ('PLANIFIED');
+INSERT INTO "value_state" VALUES (0,'OBSOLETE');
+INSERT INTO "value_state" VALUES (1,'ON_SERVICE');
+INSERT INTO "value_state" VALUES (2,'PLANIFIED');
+
 
 
 -- ----------------------------

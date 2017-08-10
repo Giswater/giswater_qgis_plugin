@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_man_gully()  RETURNS trigger AS $BODY$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_gully()  RETURNS trigger AS $BODY$
 DECLARE 
     v_sql varchar;
 	gully_geometry varchar;
@@ -110,7 +110,7 @@ BEGIN
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int , NEW.publish, NEW.inventory, NEW.enddate, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
 
 
-        ELSIF gully_geometry = 'pgully' THEN
+        ELSIF gully_geometry = 'gully_pol' THEN
         INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", annotation, "observ", "comment", 
                     dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, 
 					rotation, link, verified, the_geom_pol, undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, enddate, streetaxis_id, postnumber, uncertain, num_value)
@@ -148,7 +148,7 @@ BEGIN
 			streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;
 
-        ELSIF gully_geometry = 'pgully' THEN
+        ELSIF gully_geometry = 'gully_pol' THEN
 			UPDATE gully 
 			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, arccat_id=NEW.arccat_id, 
 			connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", 
@@ -186,7 +186,7 @@ CREATE TRIGGER gw_trg_edit_man_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON "S
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_gully(gully);
 
 
-DROP TRIGGER IF EXISTS gw_trg_edit_man_gully ON "SCHEMA_NAME".v_edit_man_pgully;
-CREATE TRIGGER gw_trg_edit_man_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_pgully
-FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_gully(pgully);
+DROP TRIGGER IF EXISTS gw_trg_edit_man_gully ON "SCHEMA_NAME".v_edit_man_gully_pol;
+CREATE TRIGGER gw_trg_edit_man_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_gully_pol
+FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_gully(gully_pol);
 

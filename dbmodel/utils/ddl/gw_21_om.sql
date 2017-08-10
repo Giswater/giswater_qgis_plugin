@@ -49,6 +49,7 @@ CREATE TABLE "om_visit" (
 "enddate" timestamp(6) WITHOUT TIME ZONE,
 "user_name" varchar(50) DEFAULT user,
 "webclient_id" character varying(50),
+"expl_id" integer,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );

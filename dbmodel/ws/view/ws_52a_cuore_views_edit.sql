@@ -464,7 +464,7 @@ connec.state,
 connec.expl_id
 FROM vnode
 JOIN link on link.vnode_id=vnode.vnode_id
-JOIN connec ON link.connec_id=connec.connec_id;
+JOIN connec ON link.feature_id=connec.connec_id;
 
 
 
@@ -482,4 +482,4 @@ connec.state,
 st_length2d(link.the_geom) AS gis_length,
 connec.expl_id
 FROM link
-JOIN connec ON link.connec_id=connec_connec_id;
+JOIN connec ON link.feature_id=connec.connec_id;

@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-
+/*
 -- ----------------------------
 -- Default values of state selection
 -- ----------------------------
@@ -37,5 +37,6 @@ INSERT INTO "anl_selector_state" VALUES ('ON_SERVICE');
 -- Default values of valve selection
 -- ----------------------------
 INSERT INTO man_selector_valve VALUES ('SHUTOFF');
+*/
 
 

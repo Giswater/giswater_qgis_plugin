@@ -63,11 +63,11 @@ SELECT
 node.node_id, 
 node.code,
 node.top_elev, 
-node.est_top_elev,
+node.custom_top_elev,
 node.ymax,
-node.est_ymax,
+node.custom_ymax,
 node.elev,
-node.est_elev,
+node.custom_elev,
 v_node.elev AS sys_elev,
 node.node_type,
 node.nodecat_id,
@@ -549,7 +549,6 @@ node.undelete,
 node.label_x AS outfall_label_x,
 node.label_y AS outfall_label_y,
 node.label_rotation AS outfall_label_rotation,
-man_outfall.name AS outfall_name,
 node.code AS outfall_code,
 node.publish,
 node.inventory,
@@ -1369,7 +1368,7 @@ FROM selector_expl, node
 
 
 DROP VIEW IF EXISTS v_edit_man_netelement CASCADE;
-CREATE OR REPLACE VIEW v_edit_man_netlement AS 
+CREATE OR REPLACE VIEW v_edit_man_netelement AS 
 SELECT 
 node.node_id,
 node.code AS netel_code,
@@ -1420,7 +1419,7 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value,
-netelement.serial_number
+man_netelement.serial_number
 FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id

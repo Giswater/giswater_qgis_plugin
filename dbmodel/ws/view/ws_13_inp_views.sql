@@ -70,34 +70,32 @@ DROP VIEW IF EXISTS "v_inp_mixing" CASCADE;
 CREATE VIEW "v_inp_mixing" AS 
 SELECT 
 	inp_mixing.node_id, inp_mixing.mix_type, inp_mixing.value, inp_selector_sector.sector_id 
-	FROM (((inp_mixing 
-	JOIN v_inp_node node ON (((inp_mixing.node_id) = (node.node_id)))) 
-	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))))
-	JOIN inp_selector_state ON (((node."state") = (inp_selector_state.state_id))));
+	FROM ((inp_mixing 
+	JOIN v_node node ON (((inp_mixing.node_id) = (node.node_id)))) 
+	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))));
 
 
 DROP VIEW IF EXISTS "v_inp_source" CASCADE;
 CREATE VIEW "v_inp_source" AS 
 SELECT 
 	inp_source.node_id, inp_source.sourc_type, inp_source.quality, inp_source.pattern_id, inp_selector_sector.sector_id 
-	FROM (((inp_source 
-	JOIN v_inp_node node ON (((inp_source.node_id) = (node.node_id)))) 
-	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))))
-	JOIN inp_selector_state ON (((node."state") = (inp_selector_state.state_id))));
+	FROM ((inp_source 
+	JOIN v_node node ON (((inp_source.node_id) = (node.node_id)))) 
+	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))));
 
 
 CREATE OR REPLACE VIEW v_inp_status AS
 SELECT 
 arc.arc_id,
 inp_valve.status
-FROM v_inp_arc arc
+FROM temp_arc arc
 JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
 WHERE inp_valve.status = 'OPEN' OR inp_valve.status = 'CLOSED'
 UNION
 SELECT 
 arc.arc_id,
 inp_pump.status
-FROM v_inp_arc arc
+FROM temp_arc arc
 JOIN inp_pump ON arc.arc_id = concat(inp_pump.node_id, '_n2a')
 WHERE inp_pump.status = 'OPEN' OR inp_pump.status = 'CLOSED';
 
@@ -107,10 +105,9 @@ CREATE VIEW "v_inp_emitter" AS
 SELECT 
 	inp_emitter.node_id, inp_emitter.coef, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, 
 	inp_selector_sector.sector_id 
-	FROM (((inp_emitter 
-	JOIN v_inp_node node ON (((inp_emitter.node_id) = (node.node_id)))) 
-	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))))
-	JOIN inp_selector_state ON (((node."state") = (inp_selector_state.state_id)))); 
+	FROM ((inp_emitter 
+	JOIN v_node node ON (((inp_emitter.node_id) = (node.node_id)))) 
+	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))));
 
 
 DROP VIEW IF EXISTS "v_inp_reservoir" CASCADE;
@@ -121,8 +118,8 @@ inp_reservoir.head,
 inp_reservoir.pattern_id, 
 (st_x(node.the_geom))::numeric(16,3) AS xcoord, 
 (st_y(node.the_geom))::numeric(16,3) AS ycoord, node.sector_id 
-FROM temp_node 
-	JOIN inp_reservoir ON (((inp_reservoir.node_id) = (node.node_id))))));
+FROM temp_node node
+	JOIN inp_reservoir ON (((inp_reservoir.node_id) = (node.node_id)));
 
 
 DROP VIEW IF EXISTS "v_inp_tank" CASCADE;
@@ -131,7 +128,7 @@ SELECT
 	inp_tank.node_id, node.elevation, inp_tank.initlevel, inp_tank.minlevel, inp_tank.maxlevel, inp_tank.diameter, inp_tank.minvol, 
 	inp_tank.curve_id, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, node.sector_id 
 	FROM (((inp_tank 
-	JOIN v_inp_node node ON (((inp_tank.node_id) = (node.node_id))))));
+	JOIN v_node node ON (((inp_tank.node_id) = (node.node_id))))));
 
 
 DROP VIEW IF EXISTS "v_inp_junction" CASCADE;
@@ -144,7 +141,7 @@ inp_junction.pattern_id,
 st_x(node.the_geom)::numeric(16,3) AS xcoord, 
 st_y(node.the_geom)::numeric(16,3) AS ycoord, 
 node.sector_id
-   FROM v_inp_node node
+   FROM v_node node
    LEFT JOIN inp_junction ON inp_junction.node_id = node.node_id
    WHERE epa_type='JUNCTION'
    ORDER BY node.node_id;
@@ -160,7 +157,7 @@ SELECT
 	(('HEAD' || ' ') || (inp_pump.curve_id)) AS head, (('SPEED' || ' ') || inp_pump.speed) AS speed, 
 	(('PATTERN' || ' ') || (inp_pump.pattern)) AS pattern, 
 	arc.sector_id 
-	FROM v_inp_arc arc
+	FROM temp_arc arc
 	JOIN inp_pump ON arc.arc_id = concat(inp_pump.node_id, '_n2a');
 
 
@@ -175,7 +172,7 @@ inp_valve.valv_type,
 inp_valve.curve_id,
 inp_valve.minorloss,
 arc.sector_id
-	FROM v_inp_arc arc
+	FROM temp_arc arc
 	JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
 	JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	WHERE inp_valve.valv_type = 'GPV';
@@ -191,7 +188,7 @@ inp_valve.valv_type,
 inp_valve.flow,
 inp_valve.minorloss,
 arc.sector_id
-FROM v_inp_arc arc
+FROM temp_arc arc
 JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
 JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	WHERE inp_valve.valv_type = 'FCV';
@@ -208,7 +205,7 @@ inp_valve.valv_type,
 inp_valve.coef_loss,
 inp_valve.minorloss,
 arc.sector_id
-	FROM v_inp_arc arc
+	FROM temp_arc arc
 JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
 JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	WHERE inp_valve.valv_type = 'TCV';
@@ -224,7 +221,7 @@ inp_valve.valv_type,
 inp_valve.pressure,
 inp_valve.minorloss,
 arc.sector_id
-FROM v_inp_arc arc
+FROM temp_arc arc
 JOIN inp_valve ON arc.arc_id = concat(inp_valve.node_id, '_n2a')
 JOIN cat_arc ON arc.arccat_id = cat_arc.id
 WHERE inp_valve.valv_type = 'PRV' OR inp_valve.valv_type = 'PSV' OR inp_valve.valv_type = 'PBV';
@@ -236,20 +233,16 @@ SELECT arc.arc_id,
 arc.node_1, 
 arc.node_2, 
 CASE
-WHEN arc.length < 0.10 THEN 0.100::numeric(12,3)
-ELSE arc.length
+	WHEN st_length2d(arc.the_geom)< 0.10 THEN 0.100::numeric(12,3)
+	ELSE st_length2d(arc.the_geom)
 END AS length, 
-arc.arccat_id, 
+--arc.arccat_id, 
 arc.sector_id, 
 arc.state, 
 CASE
-	WHEN temp_arc.builtdate IS NOT NULL THEN temp_arc.builtdate
+	WHEN arc.builtdate IS NOT NULL THEN arc.builtdate
 	ELSE now()::date
 	END AS builtdate, 
-CASE
-	WHEN temp_arc.custom_length IS NOT NULL THEN temp_arc.custom_length::numeric(12,3)
-	ELSE st_length2d(temp_arc.the_geom)::numeric(12,3)
-	END AS length, 
 CASE
 	WHEN custom_dint IS NOT NULL THEN custom_dint
 	ELSE dint
@@ -260,34 +253,36 @@ CASE
 	END AS roughness,  
 inp_pipe.minorloss, 
 inp_pipe.status
-FROM v_inp_arc arc
+FROM temp_arc arc
    JOIN inp_pipe ON arc.arc_id = inp_pipe.arc_id
    JOIN cat_arc ON arc.arccat_id = cat_arc.id
    JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
    JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id 
-   where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age 
+   --where (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age 
 UNION 
 SELECT 
 arc.arc_id, 
 arc.node_1, 
 arc.node_2, 
 CASE
-WHEN arc.length < 0.10 THEN 0.100::numeric(12,3)
-ELSE arc.length
+	WHEN st_length2d(arc.the_geom) < 0.10 THEN 0.100::numeric(12,3)
+	ELSE st_length2d(arc.the_geom)
 END AS length, 
-arc.arccat_id, 
+--arc.arccat_id, 
 arc.sector_id, 
-arc.state, 
+arc.state,
+arc.builtdate, 
 cat_arc.dint AS diameter, 
 inp_cat_mat_roughness.roughness, 
 inp_shortpipe.minorloss, 
 inp_shortpipe.status
-FROM v_inp_arc arc
+FROM temp_arc arc
    JOIN inp_shortpipe ON arc.arc_id = concat(inp_shortpipe.node_id, '_n2a')
    JOIN cat_arc ON arc.arccat_id = cat_arc.id
    JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
-   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id
-   WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age;
+   JOIN inp_cat_mat_roughness ON inp_cat_mat_roughness.matcat_id = cat_mat_arc.id;
+   --WHERE (now()::date - builtdate)/365 >= inp_cat_mat_roughness.init_age and (now()::date - builtdate)/365 < inp_cat_mat_roughness.end_age;
+
 
 
 DROP VIEW IF EXISTS v_inp_vertice CASCADE;
@@ -301,7 +296,7 @@ st_startpoint(arc_1.the_geom) AS startpoint,
 st_endpoint(arc_1.the_geom) AS endpoint, 
 arc_1.sector_id, 
 arc_1.arc_id
-   FROM v_inp_arc arc_1) arc
+   FROM temp_arc arc_1) arc
   WHERE ((arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint))
   ORDER BY 1;
 

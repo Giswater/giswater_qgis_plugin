@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+/*
 ------
 -- FK 01
 ------
@@ -250,5 +250,5 @@ ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_type_fkey" FOREIGN K
 ALTER TABLE "ext_urban_plot" ADD CONSTRAINT "ext_urban_plot_streetaxis_fkey" FOREIGN KEY ("streetaxis") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
-
+*/
 

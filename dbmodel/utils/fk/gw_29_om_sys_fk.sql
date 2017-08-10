@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+/*
 ALTER TABLE "om_visit_event" DROP CONSTRAINT IF EXISTS "om_visit_event_visit_id_fkey";
 ALTER TABLE "om_visit_event" DROP CONSTRAINT IF EXISTS "om_visit_event_parameter_id_fkey";
 ALTER TABLE "om_visit_event" DROP CONSTRAINT IF EXISTS "om_visit_event_position_id_fkey";
@@ -73,4 +74,4 @@ ALTER TABLE "om_visit_parameter_type" ADD CONSTRAINT "om_visit_parameter_type_cr
 
 ALTER TABLE "om_visit_parameter_type" ADD CONSTRAINT "om_visit_parameter_type_context_fkey" FOREIGN KEY ("context") REFERENCES "om_visit_value_context" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+*/
