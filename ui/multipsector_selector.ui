@@ -133,7 +133,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="txt_short_descript">
+   <widget class="QLineEdit" name="txt_name">
     <property name="geometry">
      <rect>
       <x>15</x>
