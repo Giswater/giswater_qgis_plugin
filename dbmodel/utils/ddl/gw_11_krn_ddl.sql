@@ -26,6 +26,33 @@ CREATE TABLE "rpt_selector_compare" (
 );
 
 CREATE TABLE inp_selector_sector(
-id serial NOT NULL PRIMARY KEY,
-sector_id integer,
-cur_user text)
+"id serial" NOT NULL PRIMARY KEY,
+"sector_id" integer,
+"cur_user" text);
+
+
+
+-- ----------------------------
+-- Table structure
+-- ----------------------------
+
+CREATE TABLE "inp_arc_type" (
+"id" varchar(16)   NOT NULL,
+CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "inp_node_type" (
+"id" varchar(16)   NOT NULL,
+CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE "inp_giswater_config" (
+"id" varchar(16) NOT NULL,
+"giswater_file_path" text,
+"inp_file_path" text,
+"rpt_file_path" text,
+"curr_user" text,
+CONSTRAINT inp_giswater_conf PRIMARY KEY (id)
+);

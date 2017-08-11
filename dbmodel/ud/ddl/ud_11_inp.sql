@@ -440,7 +440,7 @@ CREATE TABLE "subcatchment" (
 "conduct_2" numeric(12,4),
 "drytime_2" numeric(12,4),
 "sector_id" integer ,
-"hydrology_id" varchar(20),
+"hydrology_id" integer,
 "the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
@@ -451,7 +451,8 @@ CREATE TABLE "subcatchment" (
 -- ----------------------------
 
 CREATE TABLE "cat_hydrology" (
-"id" varchar(20)   NOT NULL,
+"hydrology_id" serial,
+"name" varchar (30),
 "infiltration" varchar(20)   NOT NULL,
 "descript" varchar(255)  ,
 CONSTRAINT "cat_hydrology_pkey" PRIMARY KEY ("id")
@@ -461,29 +462,14 @@ CONSTRAINT "cat_hydrology_pkey" PRIMARY KEY ("id")
 
 
 -- ----------------------------
--- Table structure
+-- Table structure for Selector
 -- ----------------------------
 
-CREATE TABLE "inp_arc_type" (
-"id" varchar(16)   NOT NULL,
-CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
-);
+CREATE TABLE inp_selector_hydrology(
+id serial NOT NULL PRIMARY KEY,
+hydrology_id integer),
+cur_user text
 
-
-CREATE TABLE "inp_node_type" (
-"id" varchar(16)   NOT NULL,
-CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "inp_giswater_config" (
-"id" varchar(16) NOT NULL,
-"giswater_file_path" text,
-"inp_file_path" text,
-"rpt_file_path" text,
-"curr_user" text,
-CONSTRAINT inp_giswater_conf PRIMARY KEY (id)
-);
 
 
 
@@ -1918,18 +1904,6 @@ CREATE TABLE "rpt_timestep_critelem" (
 );
 
 
-
-
--- ----------------------------
--- Table structure for SELECTORS
--- ----------------------------
-
-
-CREATE TABLE inp_selector_hydrology(
-id serial NOT NULL PRIMARY KEY,
-hydrology_id varchar(20),
-cur_user text
-);
 
 
 

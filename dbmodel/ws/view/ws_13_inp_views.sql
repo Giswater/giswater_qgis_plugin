@@ -12,10 +12,39 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- View structure for v_inp
 -- ----------------------------
 DROP VIEW IF EXISTS "v_inp_curve" CASCADE;
-CREATE VIEW "v_inp_curve" AS 
-SELECT inp_curve.curve_id, inp_curve.x_value, inp_curve.y_value FROM inp_curve ORDER BY inp_curve.id;
+CREATE OR REPLACE VIEW v_inp_curve AS
+SELECT 
+CASE 
+	WHEN x_value is null THEN curve_type::varchar(16)
+	ELSE curve_id END AS curve_id,
+x_value::numeric(12,4),
+y_value::numeric(12,4)
 
+FROM (
 
+SELECT DISTINCT ON (curve_id)
+(SElECT min(sub.id)::integer AS min FROM inp_curve sub WHERE sub.curve_id = inp_curve.curve_id) AS id,
+curve_id,
+concat(';',inp_curve_id.curve_type,':') AS curve_type,
+null as x_value,
+null as y_value
+   FROM inp_curve_id
+   JOIN inp_curve ON inp_curve.curve_id=inp_curve_id.id
+
+UNION
+SELECT
+inp_curve.id,
+inp_curve.curve_id,
+curve_type,
+inp_curve.x_value,
+inp_curve.y_value
+   FROM inp_curve
+   JOIN inp_curve_id ON inp_curve.curve_id=inp_curve_id.id
+ ORDER BY id ASC ,x_value DESC 
+ ) a;
+
+ 
+ 
 DROP VIEW IF EXISTS "v_inp_energy_el" CASCADE;
 CREATE VIEW "v_inp_energy_el" AS 
 SELECT 'PUMP' AS type_pump, inp_energy_el.pump_id, inp_energy_el.parameter, inp_energy_el.value FROM inp_energy_el;
@@ -100,26 +129,32 @@ JOIN inp_pump ON arc.arc_id = concat(inp_pump.node_id, '_n2a')
 WHERE inp_pump.status = 'OPEN' OR inp_pump.status = 'CLOSED';
 
 
+
 DROP VIEW IF EXISTS "v_inp_emitter" CASCADE;
 CREATE VIEW "v_inp_emitter" AS 
 SELECT 
-	inp_emitter.node_id, inp_emitter.coef, (st_x(node.the_geom))::numeric(16,3) AS xcoord, (st_y(node.the_geom))::numeric(16,3) AS ycoord, 
-	inp_selector_sector.sector_id 
-	FROM ((inp_emitter 
-	JOIN v_node node ON (((inp_emitter.node_id) = (node.node_id)))) 
-	JOIN inp_selector_sector ON (((node.sector_id) = (inp_selector_sector.sector_id))));
+inp_emitter.node_id, 
+inp_emitter.coef, 
+(st_x(node.the_geom))::numeric(16,3) AS xcoord, 
+(st_y(node.the_geom))::numeric(16,3) AS ycoord
+FROM ((inp_emitter 
+	JOIN v_node ON (((inp_emitter.node_id) = (v_node.node_id)))) 
+	JOIN inp_selector_sector ON (((v_node.sector_id) = (inp_selector_sector.sector_id))));
 
 
+	
 DROP VIEW IF EXISTS "v_inp_reservoir" CASCADE;
 CREATE VIEW "v_inp_reservoir" AS 
 SELECT 
-inp_reservoir.node_id, 
-inp_reservoir.head, 
-inp_reservoir.pattern_id, 
-(st_x(node.the_geom))::numeric(16,3) AS xcoord, 
-(st_y(node.the_geom))::numeric(16,3) AS ycoord, node.sector_id 
-FROM temp_node node
-	JOIN inp_reservoir ON (((inp_reservoir.node_id) = (node.node_id)));
+CREATE OR REPLACE VIEW fread.v_inp_reservoir AS
+SELECT inp_reservoir.node_id,
+node.elevation as head,
+inp_reservoir.pattern_id,
+st_x(node.the_geom)::numeric(16,3) AS xcoord,
+st_y(node.the_geom)::numeric(16,3) AS ycoord
+FROM fread.v_node
+    JOIN fread.inp_reservoir ON inp_reservoir.node_id::text = v_node.node_id::text;
+	JOIN inp_selector_sector ON (((v_node.sector_id) = (inp_selector_sector.sector_id))));
 
 
 DROP VIEW IF EXISTS "v_inp_tank" CASCADE;

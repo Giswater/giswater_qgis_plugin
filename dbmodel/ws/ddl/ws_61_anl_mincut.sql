@@ -20,20 +20,6 @@ CREATE SEQUENCE "anl_mincut_result_cat_seq"
     NO MAXVALUE
     CACHE 1;
 
-	
-CREATE SEQUENCE "anl_mincut_result_selector_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-	
-CREATE SEQUENCE "anl_mincut_result_selector_compare_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 
@@ -172,14 +158,6 @@ CREATE TABLE "anl_mincut_result_selector" (
 "result_id" varchar (30),
 "cur_user" text,
 CONSTRAINT anl_mincut_result_selector_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "anl_mincut_result_selector_compare" (
-"id" varchar (16) NOT NULL DEFAULT nextval('anl_mincut_result_selector_compare_seq'::regclass),
-"compare_id" varchar (30),
-"cur_user" text,
-CONSTRAINT anl_mincut_result_selector_compare_pkey PRIMARY KEY (id)
 );
 
 

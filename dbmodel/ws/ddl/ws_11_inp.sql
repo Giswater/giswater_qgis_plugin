@@ -122,18 +122,6 @@ CREATE SEQUENCE "temp_arc_seq"
 -- ----------------------------
 
 
-CREATE TABLE "inp_arc_type" (
-"id" varchar(16)   NOT NULL,
-CONSTRAINT inp_arc_type_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "inp_node_type" (
-"id" varchar(16)   NOT NULL,
-CONSTRAINT inp_node_type_pkey PRIMARY KEY (id)
-);
-
-
 CREATE TABLE "inp_cat_mat_roughness" (
   id serial NOT NULL,
   matcat_id character varying(30) NOT NULL,
@@ -145,17 +133,6 @@ CREATE TABLE "inp_cat_mat_roughness" (
   CONSTRAINT inp_cat_mat_roughness_pkey PRIMARY KEY (id)
 );
 
-
-
-CREATE TABLE "inp_giswater_config" (
-"id" varchar(16) NOT NULL,
-"giswater_file_path" text,
-"giswater_software_path" text,
-"inp_file_path" text,
-"rpt_file_path" text,
-"rpt_result_id" text,
-CONSTRAINT inp_giswater_config_pkey PRIMARY KEY (id)
-);
 
 
 
@@ -393,7 +370,6 @@ CREATE TABLE "inp_report" (
 
 CREATE TABLE "inp_reservoir" (
 "node_id" varchar(16)   NOT NULL,
-"head" numeric(12,4),
 "pattern_id" varchar(16)  
 );
 
