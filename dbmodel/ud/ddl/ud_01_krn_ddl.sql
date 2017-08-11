@@ -160,7 +160,7 @@ CREATE TABLE "dma" (
 "expl_id" integer NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (POLYGON, SRID_VALUE)
 );
 
 
@@ -169,7 +169,7 @@ CREATE TABLE "macrosector" (
 "name" character varying(50)NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (POLYGON, SRID_VALUE)
 );
 
 
@@ -179,7 +179,7 @@ CREATE TABLE "sector" (
 "macrosector_id" integer NOT NULL,
 "descript" text,
 "undelete" boolean,
-"the_geom" public.geometry (MULTIPOLYGON, SRID_VALUE)
+"the_geom" public.geometry (POLYGON, SRID_VALUE)
 );
 
 

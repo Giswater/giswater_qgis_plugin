@@ -215,7 +215,7 @@ CREATE TABLE "cat_work" (
 workid_key1 character varying(30),
 workid_key2 character varying(30),
 builtdate date,
-"the_geom" public.geometry(MULTIPOLYGON, SRID_VALUE),
+"the_geom" public.geometry(POLYGON, SRID_VALUE),
 CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 );
 
