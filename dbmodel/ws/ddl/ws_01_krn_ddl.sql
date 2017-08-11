@@ -126,19 +126,19 @@ CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 -- Table: GIS features
 -- ----------------------------
 
-CREATE TABLE macrodma(
-macrodma_id integer NOT NULL PRIMARY KEY,
+CREATE TABLE "macrodma"(
+macrodma_id serial NOT NULL PRIMARY KEY,
 name character varying(50),
-expl_id integer NOT NULL,
+expl_id integer,
 descript character varying(100),
 undelete boolean,
 the_geom geometry(POLYGON,SRID_VALUE)
 );
 
 CREATE TABLE "dma" (
-"dma_id" integer NOT NULL PRIMARY KEY,
+"dma_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(30),
-"expl_id" integer NOT NULL,
+"expl_id" integer,
 "macrodma_id" integer,
 "descript" text,
 "undelete" boolean,
@@ -147,7 +147,7 @@ CREATE TABLE "dma" (
 
 
 CREATE TABLE "sector" (
-"sector_id" integer NOT NULL PRIMARY KEY,
+"sector_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(50),
 "descript" text,
 "undelete" boolean,

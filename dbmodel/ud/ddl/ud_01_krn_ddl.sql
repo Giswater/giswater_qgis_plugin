@@ -155,7 +155,7 @@ CONSTRAINT cat_grate_pkey PRIMARY KEY (id)
 -- ----------------------------
 
 CREATE TABLE "dma" (
-"dma_id" integer NOT NULL PRIMARY KEY,
+"dma_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(30)NOT NULL,
 "expl_id" integer NOT NULL,
 "descript" text,
@@ -165,7 +165,7 @@ CREATE TABLE "dma" (
 
 
 CREATE TABLE "macrosector" (
-"macrosector_id" integer NOT NULL PRIMARY KEY,
+"macrosector_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(50)NOT NULL,
 "descript" text,
 "undelete" boolean,
@@ -174,7 +174,7 @@ CREATE TABLE "macrosector" (
 
 
 CREATE TABLE "sector" (
-"sector_id" integer NOT NULL PRIMARY KEY,
+"sector_id" serial NOT NULL PRIMARY KEY,
 "name" character varying(50)NOT NULL,
 "macrosector_id" integer NOT NULL,
 "descript" text,

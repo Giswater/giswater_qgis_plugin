@@ -1,5 +1,5 @@
 ﻿
-CREATE OR REPLACE FUNCTION ws_sample_dev.gw_fct_node_copy_attributes(    node_ori_aux character varying,    node_desti_aux character varying, table_aux character varying )  RETURNS void AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node_copy_attributes(    node_ori_aux character varying,    node_desti_aux character varying, table_aux character varying )  RETURNS void AS
 $BODY$
 DECLARE 
     rec record;  
@@ -31,7 +31,7 @@ BEGIN
 	
 	-- taking values
 
-	FOR column_aux, udt_name_aux IN select column_name, udt_name FROM information_schema.columns where table_schema='ws_sample_dev' and udt_name <> 'inet' and table_name=table_aux and column_name!='node_id' and column_name!='the_geom'
+	FOR column_aux, udt_name_aux IN select column_name, udt_name FROM information_schema.columns where table_schema='SCHEMA_NAME' and udt_name <> 'inet' and table_name=table_aux and column_name!='node_id' and column_name!='the_geom'
 	LOOP
 		v_sql1= 'SELECT '||column_aux||' FROM v_edit_man_junction where node_id='||quote_literal(node_ori_aux)||';';
 
