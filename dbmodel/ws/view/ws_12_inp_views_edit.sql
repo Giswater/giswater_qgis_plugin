@@ -26,7 +26,7 @@ inp_junction.pattern_id
 FROM inp_selector_sector, node
 	JOIN v_node ON v_node.node_id=node.node_id
 	JOIN inp_junction ON ((inp_junction.node_id) = (node.node_id))
-	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)	AND inp_selector_sector.cur_user="current_user"());
+	WHERE (node.sector_id=inp_selector_sector.sector_id	AND inp_selector_sector.cur_user="current_user"());
 
 
 DROP VIEW IF EXISTS "v_edit_inp_reservoir" CASCADE;
@@ -102,7 +102,7 @@ node."depth",
 node.nodecat_id, 
 node.sector_id, 
 node."state", 
---node.annotation,
+node.annotation,
 node.the_geom,
 inp_valve.valv_type, 
 inp_valve.pressure, 

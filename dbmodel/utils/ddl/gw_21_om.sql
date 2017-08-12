@@ -21,13 +21,6 @@ CONSTRAINT om_visit_cat_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "om_visit_parameter_type" (
-"id" varchar(50)   NOT NULL,
-"form_type" int2,
-"descript" varchar(100),
-CONSTRAINT om_visit_parameter_type_pkey PRIMARY KEY (id)
-);
-
 
 CREATE TABLE "om_visit_parameter" (
 "id" varchar(50)   NOT NULL,
@@ -37,6 +30,7 @@ CREATE TABLE "om_visit_parameter" (
 "data_type" varchar(16) ,
 "criticity" int2,
 "descript" varchar(100),
+"form_type" varchar (30),
 CONSTRAINT om_visit_parameter_pkey PRIMARY KEY (id)
 );
 
@@ -73,6 +67,7 @@ CREATE TABLE "om_visit_event" (
 "compass" float,
 "tstamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
 "status" float,
+"text" text,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
 
@@ -107,15 +102,15 @@ CONSTRAINT om_visit_value_position_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "om_visit_value_parameter_type"(
-id character varying(16),
-obs text,
+id character varying(30),
+descript text,
 CONSTRAINT om_visit_value_context_pkey PRIMARY KEY (id)
 );
 
 
  CREATE TABLE "om_visit_value_criticity"(
 id int2,
-obs text,
+descript text,
 CONSTRAINT om_visit_value_criticity_pkey PRIMARY KEY (id)
 );
 

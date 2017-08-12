@@ -109,9 +109,9 @@ CREATE TABLE "config_vdefault" (
 
 CREATE TABLE "config_searchplus" (
 "id" serial NOT NULL PRIMARY KEY,
-"context"  varchar (50),
 "parameter"  varchar (50),
-"value"  varchar (50)
+"value"  varchar (50),
+"context"  varchar (50)
 );
 
 
