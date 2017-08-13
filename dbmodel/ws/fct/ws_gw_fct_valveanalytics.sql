@@ -21,11 +21,6 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    DELETE FROM "anl_mincut_node";
-    DELETE FROM "anl_mincut_arc";
-    DELETE FROM "anl_mincut_valve";
-    DELETE FROM "anl_mincut_polygon";
-
 
     -- Loop for all the inlet nodes
     FOR rec_table IN SELECT node_id, the_geom FROM  v_anl_node  WHERE epa_type = 'TANK' OR epa_type = 'RESERVOIR'
@@ -84,10 +79,10 @@ BEGIN
     END IF;
 
     -- Insert into polygon table
-    DELETE FROM anl_mincut_polygon WHERE polygon_id = '1';
-    INSERT INTO anl_mincut_polygon VALUES('1',polygon_aux);
+    INSERT INTO anl_mincut_result_polygon VALUES(result_id_var, result_id_var, polygon_aux);
 
     --Insert into result catalog tables
+	
     PERFORM gw_fct_mincut_result_catalog(result_id);
 
     RETURN audit_function(0,320);

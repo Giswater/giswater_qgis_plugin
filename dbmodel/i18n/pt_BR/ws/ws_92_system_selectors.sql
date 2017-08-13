@@ -35,6 +35,6 @@ INSERT INTO "anl_selector_state" VALUES ('ON_SERVICE');
 -- ----------------------------
 -- Default values of valve selection
 -- ----------------------------
-INSERT INTO man_selector_valve VALUES ('SHUTOFF');
+INSERT INTO anl_mincut_selector_valve VALUES ('SHUTOFF');
 
 

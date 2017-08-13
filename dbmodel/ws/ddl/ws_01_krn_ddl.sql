@@ -375,7 +375,7 @@ CONSTRAINT man_hydrant_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_valve" (
 "node_id" varchar(16) NOT NULL,
-"opened" boolean DEFAULT true,
+"closed" boolean DEFAULT true,
 "broken" boolean DEFAULT true,
 "buried" character varying(16),
 "irrigation_indicator" character varying(16),
@@ -549,17 +549,6 @@ CREATE TABLE "man_wjoin"(
 CONSTRAINT man_wjoin_pkey PRIMARY KEY (connec_id)
 );
 
-
- 
- 
--- ----------------------------------
--- Table: selector
--- ----------------------------------
-
-
-CREATE TABLE man_selector_valve (
-"id" varchar(50) NOT NULL PRIMARY KEY
-);
 
 
 

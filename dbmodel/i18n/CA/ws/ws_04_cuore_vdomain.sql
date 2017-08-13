@@ -54,6 +54,6 @@ INSERT INTO man_type_location VALUES ('SENSE DADES DE UBICACIO', null);
 -- ----------------------------
 -- Records of selector_valve
 -- ----------------------------
-INSERT INTO man_selector_valve VALUES ('VALVULA DE TANCAMENT');
+INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA DE TANCAMENT');
 
 

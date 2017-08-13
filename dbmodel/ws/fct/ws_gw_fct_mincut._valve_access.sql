@@ -5,41 +5,10 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_access('valve_id', 'result_id')
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_valve_unaccess('valve_id_var', 'result_id_var')
 
-
-LA FUNCIO PREN AQUEST VALOR:
-if  (select state from anl_mincut_result_valve_access where valve_id=clicked limit 1)=0 then
-		raise exception 'valve permanently closed'
-else if  (select state from anl_mincut_result_valve_access where valve_id=clicked limit 1)=1 then
-		 delete from anl_mincut_result_valve_access where valve_id=clicked 
+if (SELECT valve_id FROM anl_mincut_result_valve_unaccess WHERE valve_id=valve_id_var and result_id=result_id_var) is not null
+		INSERT INTO anl_mincut_result_valve_unaccess (result_id, valve_id) VALUES (result_id_var, valve_id_var)
 else
-		insert into anl_mincut_result_valve_access (result_id, valve_id) VALUES (result_id, valve_id) 	
+		DELETE FROM anl_mincut_result_valve_unaccess WHERE result_id=result_id_var AND valve_id=valve_id_var
 end if;
-
-
-----MINCUT
-CAL REVISAR EL MINCUT PER A QUE TREBALLI AMB EL CURRENT USER: CREC QUE LA SOLUCIO ES FICAR EL CAMP result_id a les taules anl_mincut_arc, anl_mincut_node, anl_mincut_connec, anl_mincut_hydrometer 
-DE MANERA QUE QUAN ES PASSI DE LES ANL A LES RESULT, EN EL HIPOTÈTIC CAS QUE ALTRES USUARIS ESTIGUIN FENT ALTRES RESULTS ID NO PASARIA RES. ES PASARÀ CADASCUN AMB EL SEU
-NOMÉS HI HAURIA CONFLICTE SI DOS USUARIS MANIPULEN EL MATEIX RESULT_ID. 
-DE TOTES MANERES POTSER NO MOLA TREBALLAR AMB LES ANL_MINCUT_NODE I HEM DE TREBALLAR DIRECTAMENT AMB LES RESULT...
-CAL MODIFICAR LA FUNCIÓ PER A QUE EL INSERT EN LA TAULA RESULT_SELECTOR ES FACI TAMBÉ PER USUARI
-CAL QUE INSERTI EN EL CAMP ANL_THE_GEOM EL PUNT CLICAT PER USUARI
-
-
-CAL ELIMINAR LES VISTES COMPARE
-CAL AFEGIR CUR_USER A LES VISTES RESULT
-
-
-
-CAL REVISAR EL MINCUT PER A QUE ANALITZI ELS CONFLICTES DE CONCURRENCIA TEMPORAL
-
-
-CAL REVISAR EL MINCUT INCORPORANT EL TEMA DELS CULS DE SAC AMB VALVULES PERMANENTMENT TANCADE
-
-
-CAL QUE LA VISTA V_ANL_MINCUT_RESULT_VALVE PINTI LES VALVULES PER TRES COLORS: 
-	- PERMANENT TANCADA
-	- PROPOSTA A TANCAR
-	- OBERTA
-	

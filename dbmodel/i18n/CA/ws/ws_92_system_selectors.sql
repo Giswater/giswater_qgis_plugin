@@ -38,6 +38,6 @@ INSERT INTO "anl_selector_state" VALUES ('EN_SERVEI');
 -- ----------------------------
 -- Default values of valve selection
 -- ----------------------------
-INSERT INTO man_selector_valve VALUES ('VALVULA');
+INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA');
 
 

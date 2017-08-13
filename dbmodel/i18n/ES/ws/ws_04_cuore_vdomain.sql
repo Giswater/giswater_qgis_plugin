@@ -55,6 +55,6 @@ INSERT INTO man_type_location VALUES ('SIN DATOS DE UBICACION', null);
 -- ----------------------------
 -- Records of selector_valve
 -- ----------------------------
-INSERT INTO man_selector_valve VALUES ('VALVULA DE CIERRE');
+INSERT INTO anl_mincut_selector_valve VALUES ('VALVULA DE CIERRE');
 
 

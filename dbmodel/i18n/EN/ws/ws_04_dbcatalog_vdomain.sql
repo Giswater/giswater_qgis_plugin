@@ -62,7 +62,7 @@ INSERT INTO db_cat_table VALUES ('element_x_connec', 'GIS feature', 'Contains th
 INSERT INTO db_cat_table VALUES ('value_state', 'value domain (value)', 'Domain data with value describing the state');
 INSERT INTO db_cat_table VALUES ('value_verified', 'value domain (value)', 'Domain data with value describing the verification status.');
 INSERT INTO db_cat_table VALUES ('value_yesno', 'value domain (value)', 'Domain data with values yes/no');
-INSERT INTO db_cat_table VALUES ('man_selector_valve', 'Selector', 'Selector to control the type of valves that will participate to the mincut analysis');
+INSERT INTO db_cat_table VALUES ('anl_mincut_selector_valve', 'Selector', 'Selector to control the type of valves that will participate to the mincut analysis');
 INSERT INTO db_cat_table VALUES ('inp_backdrop', 'Hydraulic input data', 'Identifies a backdrop image and dimensions for the network EPANET map.');
 INSERT INTO db_cat_table VALUES ('inp_controls', 'Hydraulic input data', 'Defines simple controls that modify links based on a single condition.');
 INSERT INTO db_cat_table VALUES ('inp_curve', 'Hydraulic input data', 'Defines data curves and their X,Y points.');
@@ -758,7 +758,7 @@ INSERT INTO db_cat_table_x_column VALUES ('value_verified_id', 'value_verified',
 INSERT INTO db_cat_table_x_column VALUES ('value_verified_observ', 'value_verified', 'observ', 'varchar(254)', 'Observations related to verification status Additional information');
 INSERT INTO db_cat_table_x_column VALUES ('value_yesno_id', 'value_yesno', 'id', 'varchar(16)', 'ID of value yes/no. Primary key.');
 INSERT INTO db_cat_table_x_column VALUES ('value_yesno_observ', 'value_yesno', 'observ', 'varchar(254)', 'Observations related to yes/no value Additional information');
-INSERT INTO db_cat_table_x_column VALUES ('man_selector_valve_id', 'man_selector_valve', 'id', 'varchar(16)', 'ID of value man selector valve. Primary key.');
+INSERT INTO db_cat_table_x_column VALUES ('anl_mincut_selector_valve_id', 'anl_mincut_selector_valve', 'id', 'varchar(16)', 'ID of value man selector valve. Primary key.');
 INSERT INTO db_cat_table_x_column VALUES ('temp_node_elevation', 'temp_node', 'elevation', 'numeric(12,4),', 'Elevation of the temporary node in ft or m.');
 INSERT INTO db_cat_table_x_column VALUES ('temp_node_depth', 'temp_node', 'depth', 'numeric(12,4),', 'Depth of the temporary node in ft or m.');
 INSERT INTO db_cat_table_x_column VALUES ('temp_node_nodecat_id', 'temp_node', 'nodecat_id', 'varchar(30)', 'Node catalog identifier related to the primary key of cat_node table');
@@ -1684,7 +1684,7 @@ INSERT INTO db_cat_clientlayer VALUES ('anl_node_orphan20160815183055277', 'anl_
 INSERT INTO db_cat_clientlayer VALUES ('anl_connec_duplicated20160815183054843', 'anl_connec_duplicated', 'Connec duplicated', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('anl_geometrical_consistency20170111141552826', 'anl_geometrical_consistency', 'Geometrical consistency', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('anl_topological_consistency20170111141552888', 'anl_topological_consistency', 'Topological consistency', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO db_cat_clientlayer VALUES ('man_selector_valve20170129122617904', 'man_selector_valve', 'Valve analytics selector', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO db_cat_clientlayer VALUES ('anl_mincut_selector_valve20170129122617904', 'anl_mincut_selector_valve', 'Valve analytics selector', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('v_edit_anl_valve20170129125030650', 'v_edit_anl_valve', 'Valve analytics', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('anl_selector_state20170129122617819', 'anl_selector_state', 'Analysis selector state', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO db_cat_clientlayer VALUES ('v_anl_node20170129122139526', 'v_anl_node', 'Analysis selected node', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

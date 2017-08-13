@@ -63,7 +63,7 @@ INSERT INTO db_cat_table VALUES (540, 'element_x_connec', 'ws', 'GIS feature', N
 INSERT INTO db_cat_table VALUES (550, 'value_state', 'ws', 'value domain (value)', NULL, 'Domain data with value describing the state');
 INSERT INTO db_cat_table VALUES (560, 'value_verified', 'ws', 'value domain (value)', NULL, 'Domain data with value describing the verification status.');
 INSERT INTO db_cat_table VALUES (570, 'value_yesno', 'ws', 'value domain (value)', NULL, 'Domain data with values yes/no');
-INSERT INTO db_cat_table VALUES (580, 'man_selector_valve', 'ws', 'Selector', NULL, 'Selector to control the type of valves that will participate to the mincut analysis');
+INSERT INTO db_cat_table VALUES (580, 'anl_mincut_selector_valve', 'ws', 'Selector', NULL, 'Selector to control the type of valves that will participate to the mincut analysis');
 INSERT INTO db_cat_table VALUES (590, 'inp_backdrop', 'ws', 'Hydraulic input data', NULL, 'Identifies a backdrop image and dimensions for the network EPANET map.');
 INSERT INTO db_cat_table VALUES (600, 'inp_controls', 'ws', 'Hydraulic input data', NULL, 'Defines simple controls that modify links based on a single condition.');
 INSERT INTO db_cat_table VALUES (610, 'inp_curve', 'ws', 'Hydraulic input data', NULL, 'Defines data curves and their X,Y points.');
