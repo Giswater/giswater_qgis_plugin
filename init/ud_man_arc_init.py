@@ -6,22 +6,15 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction, QLabel, QComboBox,QMessageBox
-from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtGui import QPushButton, QTableView, QTabWidget, QLineEdit, QAction
+from PyQt4.QtCore import Qt
+from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
+
 from functools import partial
+import os
 
 import utils_giswater
 from parent_init import ParentDialog
-from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
-
-from qgis.gui import QgsMapToolIdentify,QgsMapTool,QgsMapToolPan
-import init.ud_man_node_init
-from ui.ud_catalog import UDcatalog
-
-from PyQt4 import QtGui, uic
-import os
-from qgis.core import QgsMessageLog
-from PyQt4.QtGui import QSizePolicy
 
 
 def formOpen(dialog, layer, feature):
@@ -31,9 +24,6 @@ def formOpen(dialog, layer, feature):
     utils_giswater.setDialog(dialog)
     # Create class to manage Feature Form interaction  
     feature_dialog = ManArcDialog(dialog, layer, feature)
-    #dialog.parent().setFixedWidth(625)
-    #dialog.parent().setFixedHeight(720)
-    #dialog.parent().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     init_config()
 
     
@@ -43,16 +33,6 @@ def init_config():
     arc_type = utils_giswater.getWidgetText("arc_type") 
     utils_giswater.setSelectedItem("arc_type", arc_type)
      
-    # Manage 'arccat_id'
-    # arccat_id = utils_giswater.getWidgetText("arccat_id") 
-    # utils_giswater.setSelectedItem("arccat_id", arccat_id)   
-
-    # Manage 'state'
-    # state = utils_giswater.getWidgetText("conduit_state") 
-    # utils_giswater.setSelectedItem("conduit_state", state)   
-    
-    
-
 
 class ManArcDialog(ParentDialog):   
     
@@ -61,6 +41,7 @@ class ManArcDialog(ParentDialog):
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         dialog.parent().setFixedSize(630, 720)
+        
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
@@ -80,6 +61,7 @@ class ManArcDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')           
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -95,7 +77,6 @@ class ManArcDialog(ParentDialog):
         
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
-        #QMessageBox.about(None, 'Ok', str("test"))
         # Configuration of info table
         self.set_configuration(self.tbl_element, table_element)    
         
@@ -109,6 +90,7 @@ class ManArcDialog(ParentDialog):
         # Fill tab event | arc
         self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
+        
         # Configuration of table event | arc
         self.set_configuration(self.tbl_event, table_event_arc)
   
@@ -118,116 +100,23 @@ class ManArcDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
-
-        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(partial(self.go_child,1))
-        self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child,2))
-
-        # QLineEdit
-        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'arc'))
+        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(partial(self.go_child, 1))
+        self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child, 2))
         
         # Manage 'cat_shape'
         self.setImage("label_image_ud_shape")
         
+        feature = self.feature
+        canvas = self.iface.mapCanvas()
+        layer = self.iface.activeLayer()
+        
         # Toolbar actions
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-
-
-    def catalog(self):
-        self.dlg_cat = UDcatalog()
-        utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtarccat_id_id)
-        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
-        self.matcat_id=self.dlg_cat.findChild(QComboBox, "matcat_id")
-        self.shape = self.dlg_cat.findChild(QComboBox, "shape")
-        self.geom1 = self.dlg_cat.findChild(QComboBox, "geom1")
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxshape)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxgeom1)
-
-        self.shape.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.shape.currentIndexChanged.connect(self.fillCbxgeom1)
-
-        self.geom1.currentIndexChanged.connect(self.fillCbxCatalod_id)
-
-        self.matcat_id.clear()
-        self.shape.clear()
-        self.geom1.clear()
-
-        sql= "SELECT DISTINCT(matcat_id)as matcat_id FROM ud_sample_dev.cat_arc ORDER BY matcat_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
-
-        sql= "SELECT DISTINCT(shape)as shape FROM ud_sample_dev.cat_arc ORDER BY shape"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.shape, rows)
-
-        sql= "SELECT DISTINCT(geom1)as geom1 FROM ud_sample_dev.cat_arc ORDER BY geom1"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.geom1, rows)
-
-
-    def fillCbxshape(self,index):
-        if index == -1:
-            return
-        mats=self.matcat_id.currentText()
-
-        sql="SELECT DISTINCT(shape)as shape FROM ud_sample_dev.cat_arc"
-        if (str(mats)!=""):
-            sql += " WHERE matcat_id='"+str(mats)+"'"
-        sql += " ORDER BY shape"
-        rows = self.controller.get_rows(sql)
-        self.shape.clear()
-        utils_giswater.fillComboBox(self.shape, rows)
-        self.fillCbxgeom1()
-
-
-    def fillCbxgeom1(self,index):
-        if index == -1:
-            return
-        mats=self.matcat_id.currentText()
-        shape=self.shape.currentText()
-        sql="SELECT DISTINCT(geom1)as geom1 FROM ud_sample_dev.cat_arc"
-
-        if (str(mats)!=""):
-            sql += " WHERE matcat_id='"+str(mats)+"'"
-        if(str(shape)!= ""):
-            sql +=" and shape='"+str(shape)+"'"
-        sql += " ORDER BY geom1"
-        rows = self.controller.get_rows(sql)
-        self.geom1.clear()
-        utils_giswater.fillComboBox(self.geom1, rows)
-
-
-    def fillCbxCatalod_id(self,index):    #@UnusedVariable
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-        if self.id!='null':
-            mats = self.matcat_id.currentText()
-            shape = self.shape.currentText()
-            geom1 = self.geom1.currentText()
-            sql = "SELECT DISTINCT(id)as id FROM ud_sample_dev.cat_arc"
-            if (str(mats)!=""):
-                sql += " WHERE matcat_id='"+str(mats)+"'"
-            if (str(shape) != ""):
-                sql += " and shape='"+str(shape)+"'"
-            if (str(geom1) != ""):
-                sql += " and geom1='" + str(geom1) + "'"
-            sql += " ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            self.id.clear()
-            utils_giswater.fillComboBox(self.id, rows)
-
-
-    def fillTxtarccat_id_id(self):
-        self.dlg_cat.close()
-        self.arccat_id.clear()
-        self.arccat_id.setText(str(self.id.currentText()))
+        action = self.dialog.findChild(QAction, "actionEnable")        
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))        
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))        
+        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))        
 
         
     def go_child(self,idx):
@@ -235,17 +124,14 @@ class ManArcDialog(ParentDialog):
         # Get name of selected layer 
         selected_layer = self.layer.name()
         widget = str(selected_layer.lower())+"_node_"+str(idx)     
-            
         self.node_widget = self.dialog.findChild(QLineEdit,widget)
         self.node_id= self.node_widget.text()
 
         # get pointer of node by ID
-        n=len(self.node_id)
         aux = "\"node_id\" = "
         # Get a featureIterator from this expression:
         aux += "'" + str(self.node_id) + "', "
         aux = aux[:-2] 
-        
         expr = QgsExpression(aux)
 
         nodes = ["Manhole","Junction","Chamber","Storage","Netgully","Netinit","Wjump","Wwtp","Outfall","Valve"]    
@@ -257,40 +143,6 @@ class ManArcDialog(ParentDialog):
             if id_list != []:
                 self.iface.openFeatureForm(layer,id_list[0])
         
-        
-    def actionZoomOut(self):
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomOut()
-        
-               
-    def actionZoom(self):
-       
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
-        
-    
-    def actionEnabled(self):
-        #btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
-        self.actionEnable = self.dialog.findChild(QAction, "actionEnable")
-        status = self.layer.startEditing()
-        self.set_icon(self.actionEnable, status)
-
 
     def set_icon(self, widget, status):
 
@@ -298,27 +150,13 @@ class ManArcDialog(ParentDialog):
         user_folder = os.path.expanduser("~")
         self.plugin_name = 'giswater'
         self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
-
         self.layer = self.iface.activeLayer()
-        if status == True:
-
+        if status:
             self.layer.startEditing()
-
             widget.setActive(True)
-
-        if status == False:
+        else:
             self.layer.rollBack()
-
-    def actionCentered(self):
-    
-        feature = self.feature
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-        canvas.zoomToSelected(layer)
-    
+   
     
     def fill_costs(self):
         ''' Fill tab costs '''

@@ -883,6 +883,9 @@ class Giswater(QObject):
         
     def set_layer_custom_form_dimensions(self, layer):
  
+        if layer is None:
+            return
+        
         name_ui = 'dimensions.ui'
         name_init = 'dimensions.py'
         name_function = 'formOpen'

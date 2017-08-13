@@ -57,6 +57,7 @@ class ManArcDialog(ParentDialog):
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
         self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
         self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -101,9 +102,6 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
-
-        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
-
         self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(partial(self.go_child, 1))
         self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child, 2))
 
