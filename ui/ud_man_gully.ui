@@ -2724,7 +2724,7 @@
    </attribute>
    <addaction name="actionEnabled"/>
    <addaction name="actionZoom"/>
-   <addaction name="actionZoomout"/>
+   <addaction name="actionZoomOut"/>
    <addaction name="actionCentered"/>
   </widget>
   <action name="actionCentered">
@@ -2758,7 +2758,7 @@
     <string>Enabled</string>
    </property>
   </action>
-  <action name="actionZoomout">
+  <action name="actionZoomOut">
    <property name="icon">
     <iconset>
      <normaloff>../icons/107.png</normaloff>../icons/107.png</iconset>

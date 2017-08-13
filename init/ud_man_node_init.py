@@ -15,7 +15,6 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
-from ui.ud_catalog import UDcatalog         #@UnresolvedImport
 import ExtendedQLabel
 
 
@@ -79,8 +78,6 @@ class ManNodeDialog(ParentDialog):
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
         self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.node_type = utils_giswater.getWidgetText("node_type", False)        
-        self.nodecat_id = utils_giswater.getWidgetText("nodecat_id", False) 
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -139,7 +136,7 @@ class ManNodeDialog(ParentDialog):
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ud', 'node'))
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -153,6 +150,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
 
         self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
@@ -160,10 +158,8 @@ class ManNodeDialog(ParentDialog):
         
 
     def open_selected_event_from_table(self):
-        
         ''' Button - Open EVENT | gallery from table event '''
-        message = "54353"
-        self.controller.show_warning(message, context_name='ui_message')
+
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         # Get selected rows
         selected_list = self.tbl_event.selectionModel().selectedRows()    
@@ -196,7 +192,6 @@ class ManNodeDialog(ParentDialog):
         self.img_path_list = []
         self.img_path_list1D = []
         # Creates a list containing 5 lists, each of 8 items, all set to 0
-
 
         # Fill 1D array with full path
         if row is None:
@@ -374,13 +369,10 @@ class ManNodeDialog(ParentDialog):
     def slide_next(self):
   
         #indx=self.i+1 
-        indx=(self.start_indx*9)+self.i+1
-        
+        indx = (self.start_indx*9)+self.i+1
         pixmap = QPixmap(self.img_path_list1D[indx])
-
         self.lbl_img.setPixmap(pixmap)
-        
-        self.i=self.i+1
+        self.i = self.i+1
     
         # Control sliding buttons
         if indx > 0 :

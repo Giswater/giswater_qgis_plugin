@@ -29,7 +29,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QTableView" name="all_sector">
+  <widget class="QTableView" name="all_row">
    <property name="geometry">
     <rect>
      <x>25</x>
@@ -39,7 +39,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTableView" name="selected_sector">
+  <widget class="QTableView" name="selected_row">
    <property name="geometry">
     <rect>
      <x>315</x>
@@ -75,7 +75,7 @@
     <string>&lt;&lt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="txt_short_descript">
+  <widget class="QLineEdit" name="txt_label">
    <property name="geometry">
     <rect>
      <x>25</x>
@@ -87,7 +87,7 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>all_sector</tabstop>
+  <tabstop>all_row</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>

@@ -29,10 +29,10 @@
   <widget class="QPushButton" name="btn_sector_selection">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>50</y>
-     <width>171</width>
-     <height>31</height>
+     <width>131</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -42,10 +42,10 @@
   <widget class="QPushButton" name="btn_times">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>440</x>
      <y>50</y>
-     <width>171</width>
-     <height>31</height>
+     <width>131</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -55,10 +55,10 @@
   <widget class="QPushButton" name="btn_options">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>300</x>
      <y>50</y>
-     <width>171</width>
-     <height>31</height>
+     <width>131</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -252,6 +252,19 @@
    </property>
    <property name="text">
     <string>Accept</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_sector_selection_2">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>50</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Hydrology selector</string>
    </property>
   </widget>
  </widget>

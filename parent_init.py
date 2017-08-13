@@ -872,21 +872,20 @@ class ParentDialog(object):
         # Set signals
         self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.btn_cancel.clicked.connect(self.dlg_cat.close)
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, geom_type))
-        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, geom_type))
-        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, geom_type))
-        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, geom_type))
+        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
+        self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
+        self.dlg_cat.filter2.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
+        self.dlg_cat.filter3.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
 
         self.node_type_text = None
-        if geom_type == 'node':
+        if wsoftware == 'ws' and geom_type == 'node':
             self.node_type_text = utils_giswater.getWidgetText(self.node_type)           
-            
+                  
         sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
         sql+= " FROM "+self.schema_name+".cat_"+geom_type
-        #if geom_type == 'node' and wsoftware == 'ws':
-        if geom_type == 'node':
+        if wsoftware == 'ws' and geom_type == 'node':
             sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
         sql+= " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
@@ -894,7 +893,7 @@ class ParentDialog(object):
 
         sql = "SELECT DISTINCT("+self.field2+")"
         sql+= " FROM "+self.schema_name+".cat_"+geom_type
-        if geom_type == 'node':
+        if wsoftware == 'ws' and geom_type == 'node':
             sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"        
         sql+= " ORDER BY "+self.field2        
         rows = self.controller.get_rows(sql)
@@ -906,22 +905,25 @@ class ParentDialog(object):
                 sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from dnom)::int) AS x, "+self.field3
+                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
                 sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+            elif geom_type == 'connec':
+                sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
+                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3                
         else:
             if geom_type == 'node':
                 sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
                 sql+= " FROM "+self.schema_name+".cat_"+geom_type
                 sql+= " ORDER BY "+self.field3
             elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from dnom)::int) AS x, "+self.field3
+                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
                 sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"            
-        self.controller.show_info(sql, 100)
+              
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
 
         
-    def fill_filter2(self, geom_type):
+    def fill_filter2(self, wsoftware, geom_type):
 
         # Get values from filters          
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id) 
@@ -936,7 +938,7 @@ class ParentDialog(object):
             if sql_where is None:
                 sql_where = " WHERE"
             sql_where+= " matcat_id = '"+mats+"'"
-        if self.node_type_text is not None:
+        if wsoftware == 'ws' and self.node_type_text is not None:
             if sql_where is None:
                 sql_where = " WHERE"
             else:
@@ -946,7 +948,7 @@ class ParentDialog(object):
                 
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
-        self.fill_filter3(type)
+        self.fill_filter3(wsoftware, geom_type)
 
         
     def fill_filter3(self, wsoftware, geom_type):
@@ -955,21 +957,20 @@ class ParentDialog(object):
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
         filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
          
-        # Set SQL query
+        # Set SQL query       
         sql_where = None   
-        if wsoftware == 'ws':             
-            sql = "SELECT dnom" 
-            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom"
-            sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        if wsoftware == 'ws' and geom_type != 'connec':             
+            sql = "SELECT "+self.field3 
+            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from "+self.field3+"),'-','', 'g')::int) as x, "+self.field3
+        elif wsoftware == 'ws' and geom_type == 'connec':
+            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) as "+self.field3       
         else:
             sql = "SELECT DISTINCT("+self.field3+")"
-            sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
         
-        # Build SQL filter        
-        if self.node_type_text is not None:
-            if sql_where is None:
-                sql_where = " WHERE"            
-            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
+        # Build SQL filter                
+        if wsoftware == 'ws' and self.node_type_text is not None:        
+            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
         if mats != "null":
             if sql_where is None:
                 sql_where = " WHERE"
@@ -982,7 +983,7 @@ class ParentDialog(object):
             else:
                 sql_where+= " AND"       
             sql_where+= " "+self.field2+" = '"+filter2+"'"
-        if wsoftware == 'ws':              
+        if wsoftware == 'ws' and geom_type != 'connec':              
             sql+= sql_where+" ORDER BY x) AS "+self.field3
         else:
             sql+= sql_where+" ORDER BY "+self.field3
@@ -991,8 +992,8 @@ class ParentDialog(object):
         utils_giswater.fillComboBox(self.dlg_cat.filter3, rows)
 
         
-    def fill_catalog_id(self, geom_type):
-
+    def fill_catalog_id(self, wsoftware, geom_type):
+        
         # Get values from filters
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
         filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
@@ -1003,11 +1004,8 @@ class ParentDialog(object):
         sql = "SELECT DISTINCT(id) as id" 
         sql+= " FROM "+self.schema_name+".cat_"+geom_type
         
-        if self.node_type_text is not None:
-            if sql_where is None:
-                sql_where = " WHERE"            
-            sql_where+= " "+geom_type+"type_id = '"+self.node_type_text+"'"
-                    
+        if wsoftware == 'ws' and self.node_type_text is not None:
+            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
         if mats != "null":
             if sql_where is None:
                 sql_where = " WHERE"
@@ -1038,7 +1036,9 @@ class ParentDialog(object):
         self.dlg_cat.close()
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
-        else:
+        elif geom_type == 'arc':
             utils_giswater.setWidgetText(self.arccat_id, catalog_id)                    
+        else:
+            utils_giswater.setWidgetText(self.connecat_id, catalog_id)                    
                 
         

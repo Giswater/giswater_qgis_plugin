@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
 from PyQt4.QtCore import Qt, QObject, QPoint
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint, QgsDateTimeEdit
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
 from functools import partial
 
@@ -77,9 +77,9 @@ class ManNodeDialog(ParentDialog):
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.node_type = utils_giswater.getWidgetText("node_type", False)        
-        self.nodecat_id = utils_giswater.getWidgetText("nodecat_id", False) 
+        self.filter = self.field_id+" = '"+str(self.id)+"'"    
+        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
         
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -89,11 +89,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-        #self.x=self.dialog.findChild(QDateEdit,"junction_builtdate")
-
-        #self.date_time_edit = self.dialog.findChild(QgsDateTimeEdit, "junction_builtdate")
-
-        #self.date_time_edit.allowNull()
 
         # Manage tab visibility
         self.set_tabs_visibility(16)
@@ -156,9 +151,6 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-
-        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
-        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
         #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
