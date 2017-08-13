@@ -18,8 +18,8 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest
-from qgis.gui import QgsRubberBand, QgsVertexMarker
+from qgis.core import QGis, QgsPoint, QgsMapToPixel, QgsFeatureRequest   #@UnresolvedImport
+from qgis.gui import QgsRubberBand, QgsVertexMarker   #@UnresolvedImport
 from PyQt4.QtCore import QPoint, Qt
 from PyQt4.QtGui import QColor, QCursor
 
@@ -30,12 +30,11 @@ class MoveNodeMapTool(ParentMapTool):
     ''' Button 16. Move node
     Execute SQL function: 'gw_fct_node2arc' '''        
 
-    def __init__(self, iface, settings, action, index_action, srid):
+    def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''        
         
         # Call ParentMapTool constructor     
-        super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
-        self.srid = srid  
+        super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)    
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -64,11 +63,13 @@ class MoveNodeMapTool(ParentMapTool):
     def move_node(self, node_id, point):
         ''' Move selected node to the current point '''  
            
+        self.schema_name = self.controller.plugin_settings_value('schema_name')             
+        self.srid = self.controller.plugin_settings_value('srid')            
         if self.srid is None:
-            self.srid = self.settings.value('db/srid')  
-        if self.schema_name is None:
-            self.schema_name = self.settings.value('db/schema_name')               
-                   
+            message = "Error getting SRID from settings"
+            self.controller.show_warning(message, context_name='ui_message')
+            return   
+                               
         # Update node geometry
         the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(self.srid) + ")";
         sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom

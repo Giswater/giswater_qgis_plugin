@@ -11,7 +11,7 @@ from qgis.gui import QgsMapTool
 
 class PointMapTool(QgsMapTool):
 
-    def __init__(self, iface, settings, action, index_action, controller, srid):
+    def __init__(self, iface, settings, action, index_action, controller):
         ''' Class constructor '''   
          
         self.iface = iface
@@ -19,7 +19,6 @@ class PointMapTool(QgsMapTool):
         self.settings = settings
         self.index_action = index_action
         self.controller = controller
-        self.srid = srid
         self.elem_type_type = self.settings.value('insert_values/'+str(index_action)+'_elem_type_type')
         self.schema_name = controller.schema_name  
         self.dao = controller.dao
@@ -31,11 +30,12 @@ class PointMapTool(QgsMapTool):
     def insert_node(self, x, y):
         ''' Insert a new node in the selected coordinates '''
         
+        self.schema_name = self.controller.plugin_settings_value('schema_name')             
+        self.srid = self.controller.plugin_settings_value('srid')            
         if self.srid is None:
-            self.srid = self.settings.value('db/srid')  
-        if self.schema_name is None:
-            self.schema_name = self.settings.value('db/schema_name')  
-            
+            message = "Error getting SRID from settings"
+            self.controller.show_warning(message, context_name='ui_message')
+            return              
         
         if self.elem_type_type is not None: 
             
@@ -75,6 +75,7 @@ class PointMapTool(QgsMapTool):
                 elif wsoftware == 'ud':                
                     message = "Any record found in table 'node_type' related with selected 'node_type.type'"
                     self.controller.show_info(message, context_name='ui_message')
+    
     
     def search_project_type(self):
         ''' Search in table 'version' project type of current QGIS project '''
