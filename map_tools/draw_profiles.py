@@ -12,46 +12,20 @@
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPoint, QgsFeatureRequest, QgsMapLayer, QgsExpression
+from qgis.core import QgsPoint, QgsFeatureRequest, QgsExpression
 from qgis.gui import QgsVertexMarker
 from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QColor, QListWidget, QListWidgetItem
-
-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
-
-from qgis.core import *
-from qgis.gui import *
-
-from decimal import *
-
-import matplotlib.pyplot as plt
-import math
-from dao.controller import DaoController
-import utils_giswater
-#from controller import DaoController
-from ..ui.draw_profile import DrawProfile
-from ..ui.load_profiles import LoadProfiles
-import matplotlib.patches as patches
-
-import utils_giswater
-from parent_init import ParentDialog
-
-from parent import ParentMapTool
-
-
-# Import networkanalysis module
-from qgis.networkanalysis import *
+from PyQt4.QtGui import QColor, QListWidget, QListWidgetItem, QPushButton, QLineEdit
 
 from functools import partial
+from decimal import Decimal
+import matplotlib.pyplot as plt
+import math
 
-from dao.pg_dao import PgDao
-
-import string
-import psycopg2         #@UnusedImport
-import psycopg2.extras
+import utils_giswater
+from parent import ParentMapTool
+from ..ui.draw_profile import DrawProfile       #@UnresolvedImport   
+from ..ui.load_profiles import LoadProfiles     #@UnresolvedImport
 
 
 class DrawProfiles(ParentMapTool):
@@ -71,10 +45,6 @@ class DrawProfiles(ParentMapTool):
         self.vertexMarker.setPenWidth(5)
         self.list_of_selected_nodes = []
         self.nodes = []
-        node_id_dijkstra=[]
-        ''' QgsMapTools inherited event functions '''
-        #self.open()
-        
 
 
     def canvasMoveEvent(self, event):
@@ -85,12 +55,10 @@ class DrawProfiles(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
 
-   
-
         #Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
-        except(TypeError, KeyError) as e:
+        except(TypeError, KeyError):
             self.iface.actionPan().trigger()
             return
 
@@ -120,10 +88,7 @@ class DrawProfiles(ParentMapTool):
             # Get the click
             x = event.pos().x()
             y = event.pos().y()
-
             eventPoint = QPoint(x, y)
-
-            snappFeat = None
 
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
@@ -153,8 +118,6 @@ class DrawProfiles(ParentMapTool):
                     message = "Node "+node_id+" is alredy selected"
                     self.controller.show_info(message, context_name='ui_message')
 
-            #start_point.clear()
-            #start_point.clear()
             
             if len(self.nodes)==1:
                 start_point_id = self.list_of_selected_nodes[0]
@@ -220,50 +183,41 @@ class DrawProfiles(ParentMapTool):
         
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  
         self.btn_save_profile.clicked.connect(self.save_profile)
-
-        
         self.btn_load_profile = self.dlg.findChild(QPushButton, "btn_load_profile")  
         self.btn_load_profile.clicked.connect(self.load_profile)
-
         
         self.profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
         self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
         self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point")
 
         self.nodes = []
-
         self.list_of_selected_nodes = []
-
         self.dlg.open()
 
         
     def save_profile(self):
     
-        id = self.profile_id.text()
+        profile_id = self.profile_id.text()
         start_point = self.widget_start_point.text()
         end_point = self.widget_end_point.text()
         
-        
         # TO DO :Check if all data are entered
-        if id == '' or start_point == '' or end_point == '':
+        if profile_id == '' or start_point == '' or end_point == '':
             self.controller.show_info_box("Some of data is missing", "Info")
             return
         
         # Check if id of profile already exists in DB
-        sql = "SELECT DISTINCT(profile_id) FROM "+self.schema_name+".anl_arc_profile_value WHERE profile_id = '"+id+"'" 
+        sql = "SELECT DISTINCT(profile_id) FROM "+self.schema_name+".anl_arc_profile_value WHERE profile_id = '"+profile_id+"'" 
         row = self.controller.get_row(sql)
         if row:
-        # if exist - show warning
-            self.controller.show_info_box("Profile_id "+id+" exist in data base!", "Info")
+            self.controller.show_info_box("Profile_id "+profile_id+" exist in data base!", "Info")
             return
         
         n = len(self.arc_id)
         for i in range(n):
             sql = "INSERT INTO "+self.schema_name+".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
-            sql+= " VALUES ('"+id+"','"+self.arc_id[i]+"','"+start_point+"','"+end_point+"')"
-            #self.controller.execute_sql(sql) 
+            sql+= " VALUES ('"+profile_id+"','"+self.arc_id[i]+"','"+start_point+"','"+end_point+"')"
             status = self.controller.execute_sql(sql) 
-
             if not status:
                 message = "Error inserting profile table, you need to review data"
                 self.controller.show_warning(message, context_name='ui_message') 
@@ -272,7 +226,6 @@ class DrawProfiles(ParentMapTool):
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message)
-        
         self.deactivate()
         
         
@@ -287,7 +240,6 @@ class DrawProfiles(ParentMapTool):
         self.tbl_profiles = self.dlg_load.findChild(QListWidget, "tbl_profiles") 
         sql = "SELECT DISTINCT(profile_id) FROM "+self.schema_name+".anl_arc_profile_value"
         row = self.controller.get_rows(sql)
-        
         m=len(row)
   
         for i in range(0,m):
@@ -296,7 +248,6 @@ class DrawProfiles(ParentMapTool):
          
         self.dlg_load.open()
         self.dlg.close()
-        
         self.deactivate()
 
 
@@ -306,11 +257,12 @@ class DrawProfiles(ParentMapTool):
         selected_profile = self.tbl_profiles.currentItem().text()
 
         # Get data from DB for selected item| profile_id, start_point, end_point
-        sql = "SELECT start_point,end_point FROM"+self.schema_name+".anl_arc_profile_value WHERE profile_id ='"+selected_profile+"'"
+        sql = "SELECT start_point,end_point"
+        sql+= " FROM"+self.schema_name+".anl_arc_profile_value" 
+        sql+= " WHERE profile_id ='"+selected_profile+"'"
         row = self.controller.get_rows(sql)
-        start_point=row[0][0]
-        end_point=row[0][1]
-
+        start_point = row[0][0]
+        end_point = row[0][1]
         
         # Fill widgets of form draw_profile | profile_id, start_point, end_point
         #Start_point = self.dlg.findChild(QLineEdit, "start_point")
@@ -318,16 +270,14 @@ class DrawProfiles(ParentMapTool):
         
         #End_point = self.dlg.findChild(QLineEdit, "end_point")
         self.widget_end_point.setText(str(end_point))
-        
-        Profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
-        Profile_id.setText(str(selected_profile))
-
+    
+        profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
+        profile_id.setText(str(selected_profile))
 
         # Get data from DB for selected item| tbl_list_arc
-        tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
+        #tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
         sql = "SELECT arc_id FROM "+self.schema_name+".anl_arc_profile_value WHERE profile_id ='"+selected_profile+"'"
         row = self.controller.get_rows(sql)
-
 
         # Fill widget list_of_arcs
         #row = self.controller.get_rows(sql)
@@ -355,7 +305,6 @@ class DrawProfiles(ParentMapTool):
         self.snapperManager.clearSnapping()
 
         # Set snapping to node
-
         self.snapperManager.snapToNode()
 
         # Change cursor
@@ -377,24 +326,18 @@ class DrawProfiles(ParentMapTool):
         self.h = None
 
         
-
     def paintEvent(self,arc_id,node_id):
-        '''
-        Parent function - Draw profiles
-        '''
-        # Clear plot
+        ''' Parent function - Draw profiles '''
         
+        # Clear plot
         plt.gcf().clear()
         #plt.close('all')
         #plt.clear()
    
         # arc_id ,node_id list of nodes and arc form dijkstra algoritam
         self.set_parameters(arc_id,node_id)
-      
         self.fill_memory(arc_id,node_id)
-
         self.set_table_parameters()
-        
 
         # Start drawing
         # Draw first | start node
@@ -406,7 +349,7 @@ class DrawProfiles(ParentMapTool):
         # Function self.draw_nodes(start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, index)
         for i in range(1, self.n - 1):
             self.draw_nodes(self.memory[i][0], self.memory[i][1], self.memory[i][2], self.memory[i][3],
-                            self.memory[i][4], self.memory[i][5], self.memory[i][6], i,self.memory[i-1][4], self.memory[i-1][5] )
+                            self.memory[i][4], self.memory[i][5], self.memory[i][6], i,self.memory[i-1][4], self.memory[i-1][5])
             self.draw_arc()
             self.draw_ground()
 
@@ -430,10 +373,9 @@ class DrawProfiles(ParentMapTool):
         mng = plt.get_current_fig_manager()
         mng.window.showMaximized()
         plt.show()
-        
 
         # Action on resizeing window
-        cid = self.fig1.canvas.mpl_connect('resize_event',self.on_resize)
+        cid = self.fig1.canvas.mpl_connect('resize_event', self.on_resize)
 
 
     def set_properties(self):
@@ -441,7 +383,6 @@ class DrawProfiles(ParentMapTool):
         
         # Set window name
         self.win = plt.gcf()
-
         self.win.canvas.set_window_title('Draw Profile')
 
         self.axes = plt.gca()
@@ -459,16 +400,16 @@ class DrawProfiles(ParentMapTool):
         x_min = round(self.memory[0][0] - self.fix_x - self.fix_x * Decimal(0.15))
         x_max = round(self.memory[self.n - 1][0] + self.fix_x + self.fix_x * Decimal(0.15))
         self.axes.set_xlim([x_min, x_max])
+        
         # Set y-axes
         y_min = round(self.min_top_elev - self.z - self.height_row*Decimal(1.5))
         y_max = round(self.max_top_elev +self.height_row*Decimal(1.5))
         self.axes.set_ylim([y_min, y_max])
 
 
-    def set_parameters(self,arc_id,node_id):
-        '''
-        Get and calculate parameters and values for drawing
-        '''
+    def set_parameters(self, arc_id, node_id):
+        ''' Get and calculate parameters and values for drawing '''
+        
         self.list_of_selected_arcs = arc_id
         self.list_of_selected_nodes = node_id
         
@@ -477,7 +418,7 @@ class DrawProfiles(ParentMapTool):
         self.arc_id = []
 
         # Get arcs between nodes ( on shortest path )
-        self.n= len(self.list_of_selected_nodes)
+        self.n = len(self.list_of_selected_nodes)
       
         # Get length (gis_length) of arcs and save them in separate list ( self.gis_length )
         for arc_id in self.list_of_selected_arcs:
@@ -499,7 +440,7 @@ class DrawProfiles(ParentMapTool):
             i = i + 1
 
 
-    def fill_memory(self,arc_id,cnode_id):
+    def fill_memory(self, arc_id, cnode_id):
         ''' Get parameters from data base
         Fill self.memory with parameterspostgres
         '''
@@ -509,21 +450,17 @@ class DrawProfiles(ParentMapTool):
         # Get parameters and fill the memory
         self.list_of_selected_nodes = cnode_id
       
-
         for node_id in self.list_of_selected_nodes:
-
 
             # start_point = self.start_point[i-1] + gis_length[i]
             # self.parameters : list of parameters for one node
             # self.parameters [start_point, top_elev, y_max,z1, z2, cat_geom1, geom1, slope, elev1, elev2,y1 ,y2, node_id, elev]
-            self.parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None,
-                              None]
+            self.parameters = [self.start_point[i], None, None, None, None, None, None, None, None, None, None, None, None, None]
             # Get data top_elev ,y_max, elev, nodecat_id from v_edit_node
             # change elev to sys_elev
             sql = "SELECT top_elev,ymax,sys_elev,nodecat_id"
-            # sql += " FROM " + self.schema_name + ".     "
-            sql += " FROM "+self.schema_name+".v_edit_node"
-            sql += " WHERE node_id='" + str(node_id) + "'"
+            sql+= " FROM "+self.schema_name+".v_edit_node"
+            sql+= " WHERE node_id='" + str(node_id) + "'"
             row = self.controller.get_rows(sql)
             self.parameters[1] = row[0][0]
             self.parameters[2] = row[0][1]
@@ -533,16 +470,12 @@ class DrawProfiles(ParentMapTool):
             #if None in self.parameters:
             #    message = "Some parameters are missing for node:"+str(node_id)+", table"+str()
 
-
-
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
-            sql = "SELECT z1,z2,cat_geom1,elevmax1,elevmax2, y1,y2,slope"
-            # sql += " FROM " + self.schema_name + ".     "
+            sql = "SELECT z1, z2, cat_geom1, elevmax1, elevmax2, y1, y2, slope"
             sql += " FROM "+self.schema_name+".v_edit_arc"
             sql += " WHERE node_1='" + str(node_id) + "' OR node_2='" + str(node_id) + "'"
             row = self.controller.get_rows(sql)
-
 
             self.parameters[3] = row[0][0]
             self.parameters[4] = row[0][1]
@@ -553,15 +486,12 @@ class DrawProfiles(ParentMapTool):
             self.parameters[11] = row[0][6]
             self.parameters[7] = row[0][7]
 
-
             # Geom1 from cat_node
             sql = "SELECT geom1"
-            # sql += " FROM " + self.schema_name + ".     "
             sql += " FROM "+self.schema_name+".cat_node"
             sql += " WHERE id='" + str(nodecat_id) + "'"
             row = self.controller.get_rows(sql)
             self.parameters[6] = row[0][0]
-
 
             # Set node_id in memory
             self.parameters[12] = node_id
@@ -573,11 +503,10 @@ class DrawProfiles(ParentMapTool):
                 return
 
             self.memory.append(self.parameters)
-
             i = i + 1
 
             
-    def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1,indx):
+    def draw_first_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx):
         ''' Draw first node '''
 
         # Get number of pixels by unit (coordinate [1,1])
@@ -604,13 +533,12 @@ class DrawProfiles(ParentMapTool):
         self.draw_fix_table(start_point)
 
 
-    def draw_fix_table(self,start_point):
+    def draw_fix_table(self, start_point):
         ''' Draw fixed part of table'''
 
         # DRAW TABLE - FIXED PART
         # Draw fixed part of table
         self.draw_marks(0)
-
 
         # Vertical line [-1,0]
         x = [start_point - self.fix_x * Decimal(0.2), start_point - self.fix_x * Decimal(0.2)]
@@ -632,8 +560,9 @@ class DrawProfiles(ParentMapTool):
         self.data_fix_table(start_point)
 
 
-    def draw_marks(self,start_point):
+    def draw_marks(self, start_point):
         ''' Draw marks for each node'''
+        
         # Vertical line [0,0]
         x = [start_point, start_point]
         y = [self.min_top_elev - 1 * self.height_row,
@@ -658,7 +587,7 @@ class DrawProfiles(ParentMapTool):
         plt.plot(x, y, 'black',zorder=100)
 
 
-    def data_fix_table(self,start_point):
+    def data_fix_table(self, start_point):
         ''' FILL THE FIXED PART OF TABLE WITH DATA - DRAW TEXT '''
 
         center = self.gis_length[1] / 2
@@ -667,7 +596,6 @@ class DrawProfiles(ParentMapTool):
         plt.text(-(c + self.fix_x * Decimal(0.2)),
                  self.min_top_elev - 1 * self.height_row - Decimal(0.45) * self.height_row, 'DIAMETER', fontsize=7.5,
                  horizontalalignment='center')
-
 
         plt.text(-(c + self.fix_x * Decimal(0.2)),
                  self.min_top_elev - 1 * self.height_row - Decimal(0.80) * self.height_row, 'SLP. / LEN.', fontsize=7.5,
@@ -819,7 +747,6 @@ class DrawProfiles(ParentMapTool):
                      fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
 
 
-
     def draw_last_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx):
 
         x = [start_point, start_point - (geom1), start_point - (geom1)]
@@ -885,7 +812,7 @@ class DrawProfiles(ParentMapTool):
 
 
     def draw_table_horizontals(self):
-        ''''''
+
         self.set_table_parameters()
 
         #self.n_node = len(self.list_of_selected_nodes)
@@ -934,7 +861,7 @@ class DrawProfiles(ParentMapTool):
         #res.remove()
 
 
-    def check_colision(self,gis_length,pix):
+    def check_colision(self, gis_length, pix):
         '''TO DO'''
         # Checking colision just for text
 
@@ -1094,10 +1021,8 @@ class DrawProfiles(ParentMapTool):
 
         # Clear list of arcs and nodes - preparing for new profile
 
-        #sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_test_arc'," + start_point + "," +end_point + ",false)"
         if self.version == '2' :
             sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc'," + str(rstart_point) + "," +str(rend_point) + ",false,false)"
-
         elif self.version == '3' :
             sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM " + self.schema_name + ".v_anl_pgrouting_arc'," + str(rstart_point) + "," + str(rend_point) + ",false)"
         else :
@@ -1105,7 +1030,6 @@ class DrawProfiles(ParentMapTool):
             return
 
         rows = self.controller.get_rows(sql)
-
         number_nodes=len(rows)
 
         for i in range(0, number_nodes ):
@@ -1119,23 +1043,19 @@ class DrawProfiles(ParentMapTool):
                 self.rarc_id.append(str(rows[i][3]))
 
         self.rarc_id.pop()
-            
         self.arc_id= []
         self.node_id= []
  
-        
         for n in range(0,len(self.rarc_id)):
-        # convert arc_ids   
+            # convert arc_ids   
             sql = "SELECT arc_id"
             sql += " FROM "+self.schema_name+".v_anl_pgrouting_arc"
             sql += " WHERE id='" +str(self.rarc_id[n]) + "'"
             rows = self.controller.get_rows(sql)
             self.arc_id.append(str(rows[0][0]))
         
-        
         for m in range(0,len(self.rnode_id)):
-        # convert node_ids
-
+            # convert node_ids
             sql = "SELECT node_id"
             sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
             sql += " WHERE rid='" + str(self.rnode_id[m]) + "'"
@@ -1143,11 +1063,10 @@ class DrawProfiles(ParentMapTool):
             row = self.controller.get_rows(sql)
             self.node_id.append(str(row[0][0]))
 
-        
         # SELECT ARCS OF SHORTEST PATH
         if rows:
             # Build an expression to select them
-            m=len(self.arc_id)
+            m = len(self.arc_id)
 
             aux = "\"arc_id\" IN ("
             for i in range(m):
@@ -1201,21 +1120,15 @@ class DrawProfiles(ParentMapTool):
             # Select features with these id's
             layer_node.setSelectedFeatures(self.id_list)
 
-
             if self.id_list != [] :
                 layer = layer_node
-
                 center_widget = self.id_list[0]
 
 
         # Center profile (first node)
         canvas = self.iface.mapCanvas()
-
         layer.setSelectedFeatures([center_widget])
-
         canvas.zoomToSelected(layer)
-
-
 
         #layer = iface.activeLayer()
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
@@ -1234,7 +1147,6 @@ class DrawProfiles(ParentMapTool):
         # Remove last element from list because is -1 
         #self.arc_id.pop()
        
-        
         self.dlg.findChild(QPushButton, "btn_draw").clicked.connect(partial(self.paintEvent,self.arc_id,self.node_id))
         self.dlg.findChild(QPushButton, "btn_clear_profile").clicked.connect(self.clear_profile)
 
@@ -1252,22 +1164,20 @@ class DrawProfiles(ParentMapTool):
         #self.widget_start_point = self.dlg.findChild(QLineEdit, "start_point") 
         #self.widget_end_point = self.dlg.findChild(QLineEdit, "end_point") 
         
+        start_point = self.dlg.findChild(QLineEdit, "start_point")  
+        start_point.clear()
+        end_point = self.dlg.findChild(QLineEdit, "end_point")  
+        end_point.clear()
         
-        Start_point = self.dlg.findChild(QLineEdit, "start_point")  
-        Start_point.clear()
-        
-        End_point = self.dlg.findChild(QLineEdit, "end_point")  
-        End_point.clear()
-        
-        Profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
-        Profile_id.clear()
+        profile_id = self.dlg.findChild(QLineEdit, "profile_id")  
+        profile_id.clear()
         
         # Get data from DB for selected item| tbl_list_arc
         tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc") 
         tbl_list_arc.clear()
         
         #Clear selection
-        can=self.iface.mapCanvas()    
+        can = self.iface.mapCanvas()    
         for layer in can.layers():
             layer.removeSelection()
         can.refresh()
