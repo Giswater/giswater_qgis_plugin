@@ -17,7 +17,6 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
-import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):
@@ -88,9 +87,9 @@ class ManNodeDialog(ParentDialog):
         self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
         self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node") 
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
-        self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")  
+        self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-        
+
         # Manage tab visibility
         self.set_tabs_visibility(16)
               
