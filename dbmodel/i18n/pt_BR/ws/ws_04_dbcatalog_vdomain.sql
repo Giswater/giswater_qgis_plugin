@@ -128,8 +128,8 @@ INSERT INTO db_cat_table VALUES (1210, 'inp_value_status_pipe', 'ws', 'Hydraulic
 INSERT INTO db_cat_table VALUES (1220, 'inp_value_status_pump', 'ws', 'Hydraulic input data', NULL, 'Value domain of the pump status');
 INSERT INTO db_cat_table VALUES (1230, 'inp_value_status_valve', 'ws', 'Hydraulic input data', NULL, 'Value domain of the valve status');
 INSERT INTO db_cat_table VALUES (1240, 'inp_value_times', 'ws', 'Hydraulic input data', NULL, 'Value domain of times');
-INSERT INTO db_cat_table VALUES (1270, 'temp_node', 'ws', 'Hydraulic input data', NULL, 'Temporary table of nodes with results from the hydraulic model');
-INSERT INTO db_cat_table VALUES (1280, 'temp_arc', 'ws', 'Hydraulic input data', NULL, 'Temporary table of arcs with results from the hydraulic model');
+INSERT INTO db_cat_table VALUES (1270, 'rpt_inp_node', 'ws', 'Hydraulic input data', NULL, 'Temporary table of nodes with results from the hydraulic model');
+INSERT INTO db_cat_table VALUES (1280, 'rpt_inp_arc', 'ws', 'Hydraulic input data', NULL, 'Temporary table of arcs with results from the hydraulic model');
 INSERT INTO db_cat_table VALUES (1310, 'event_type', 'ws', 'system structure', NULL, 'Contains the information about event types.');
 INSERT INTO db_cat_table VALUES (1320, 'event_parameter', 'ws', 'O&M information', NULL, 'Shows the parameters of the event.');
 INSERT INTO db_cat_table VALUES (1330, 'event_position', 'ws', 'O&M information', NULL, 'Shows the position of the event');

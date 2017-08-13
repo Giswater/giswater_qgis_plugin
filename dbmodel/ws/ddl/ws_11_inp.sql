@@ -100,14 +100,14 @@ CREATE SEQUENCE "rpt_cat_result_id_seq"
     CACHE 1;
 
 
-CREATE SEQUENCE "temp_node_seq"
+CREATE SEQUENCE "rpt_inp_node_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
 
-CREATE SEQUENCE "temp_arc_seq"
+CREATE SEQUENCE "rpt_inp_arc_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -596,45 +596,13 @@ CREATE TABLE "inp_pump_additional" (
 -- ----------------------------
 
 
-CREATE TABLE "temp_node" (
-"node_id" varchar(16) NOT NULL PRIMARY KEY, 
-"elev" numeric(12,3),
-"depth" numeric(12,3),
-"node_type" varchar(18)  ,
-"nodecat_id" varchar(30)  ,
-"epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
-"builtdate" date,
-"annotation" character varying(254),
-"the_geom" public.geometry (POINT, SRID_VALUE)
-);
 
-
-CREATE TABLE "temp_arc" (
-"arc_id" varchar(16) NOT NULL PRIMARY KEY, 
-"node_1" varchar(16) ,
-"node_2" varchar(16) ,
-"arc_type" varchar(18)  ,
-"arccat_id" varchar(30)  ,
-"epa_type" varchar(16)  ,
-"sector_id" integer NOT NULL,
-"state" int2  NOT NULL,
-"annotation" character varying(254),
-"roughness" numeric (12,6),
-"builtdate" date,
-"length" numeric(12,3),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE)
-);
-
-
-
-CREATE TABLE "rpt_input_node" (
+CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
 "result_id" varchar(16) NOT NULL,
 "node_id" varchar(16) NOT NULL,
+"elevation" numeric(12,3),
 "elev" numeric(12,3),
-"depth" numeric(12,3),
 "node_type" varchar(18)  ,
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
@@ -645,7 +613,7 @@ CREATE TABLE "rpt_input_node" (
 );
 
 
-CREATE TABLE "rpt_input_arc" (
+CREATE TABLE "rpt_inp_arc" (
 "id" serial PRIMARY KEY NOT NULL,
 "result_id" varchar(16) NOT NULL,
 "arc_id" varchar(16) ,
@@ -657,8 +625,8 @@ CREATE TABLE "rpt_input_arc" (
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
 "annotation" character varying(254),
+"diameter" numeric (12,3),
 "roughness" numeric (12,6),
-"builtdate" date,
 "length" numeric(12,3),
 "the_geom" public.geometry (LINESTRING, SRID_VALUE)
 );
@@ -798,6 +766,6 @@ ALTER TABLE "rpt_node" ADD PRIMARY KEY ("id");
 
 
 
-CREATE INDEX rpt_input_arc_index ON rpt_input_arc USING GIST (the_geom);
-CREATE INDEX rpt_input_node_index ON rpt_input_node USING GIST (the_geom);
+CREATE INDEX rpt_inp_arc_index ON rpt_inp_arc USING GIST (the_geom);
+CREATE INDEX rpt_inp_node_index ON rpt_inp_node USING GIST (the_geom);
 

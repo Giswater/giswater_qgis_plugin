@@ -103,24 +103,24 @@ DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
  SELECT rtc_hydrometer_x_connec.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
-    temp_arc.arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2
    FROM rtc_hydrometer_x_connec
      JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
-     JOIN temp_arc ON temp_arc.arc_id = v_edit_connec.arc_id;
+     JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = v_edit_connec.arc_id;
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer_x_arc CASCADE;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_arc AS 
  SELECT rtc_hydrometer_x_connec.hydrometer_id,
     rtc_hydrometer_x_connec.connec_id,
-    temp_arc.arc_id,
-    temp_arc.node_1,
-    temp_arc.node_2
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2
    FROM rtc_hydrometer_x_connec
      JOIN v_edit_connec ON v_edit_connec.connec_id = rtc_hydrometer_x_connec.connec_id
-     RIGHT JOIN temp_arc ON temp_arc.arc_id = v_edit_connec.arc_id;
+     RIGHT JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = v_edit_connec.arc_id;
 
 
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node_period AS 
@@ -175,8 +175,8 @@ CREATE OR REPLACE VIEW v_inp_demand AS
             ELSE NULL::character varying
         END AS pattern_id
    FROM inp_junction
-     RIGHT JOIN temp_node ON temp_node.node_id = inp_junction.node_id
-     JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id = temp_node.node_id
+     RIGHT JOIN rpt_inp_node ON rpt_inp_node.node_id = inp_junction.node_id
+     JOIN v_rtc_hydrometer_x_node_period ON v_rtc_hydrometer_x_node_period.node_id = rpt_inp_node.node_id
      JOIN rtc_options ON rtc_options.period_id = v_rtc_hydrometer_x_node_period.period_id
      WHERE rtc_options.rtc_status = 'ON'
 GROUP BY v_rtc_hydrometer_x_node_period.node_id, inp_junction.pattern_id, v_rtc_hydrometer_x_node_period.period_id, rtc_options.coefficient;

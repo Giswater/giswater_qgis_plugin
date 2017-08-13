@@ -32,7 +32,7 @@ max(rpt_arc.reaction) AS max_reaction,
 min(rpt_arc.reaction) AS min_reaction, 
 max(rpt_arc.ffactor) AS max_ffactor, 
 min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom 
-FROM rpt_selector_result,rpt_input_arc arc
+FROM rpt_selector_result,rpt_inp_arc arc
 JOIN rpt_arc ON ((rpt_arc.arc_id) = (arc.arc_id))
 WHERE ((rpt_arc.result_id) = (rpt_selector_result.result_id))
 AND rpt_selector_result.cur_user="current_user"()
@@ -88,7 +88,7 @@ min(rpt_node.press) AS min_pressure,
 max(rpt_node.quality) AS max_quality, 
 min(rpt_node.quality) AS min_quality, 
 node.the_geom 
-FROM rpt_selector_result, rpt_input_node node
+FROM rpt_selector_result, rpt_inp_node node
 JOIN rpt_node ON ((rpt_node.node_id) = (node.node_id))
 WHERE ((rpt_node.result_id) = (rpt_selector_result.result_id))
 AND rpt_selector_result.cur_user="current_user"()
@@ -110,7 +110,7 @@ rpt_arc.setting,
 rpt_arc.ffactor, 
 (now()::date+rpt_arc.time::interval) as time,  
 arc.the_geom
-FROM rpt_selector_result, rpt_input_arc arc
+FROM rpt_selector_result, rpt_inp_arc arc
 JOIN rpt_arc ON rpt_arc.arc_id = arc.arc_id
 WHERE ((rpt_arc.result_id) = (rpt_selector_result.result_id))
 AND rpt_selector_result.cur_user="current_user"()
@@ -132,7 +132,7 @@ rpt_node.press,
 rpt_node.quality, 
 (now()::date+rpt_node.time::interval) as time, 
 node.the_geom 
-FROM rpt_selector_result, rpt_input_node node
+FROM rpt_selector_result, rpt_inp_node node
 JOIN rpt_node ON ((rpt_node.node_id) = (node.node_id))
 WHERE ((rpt_node.result_id) = (rpt_selector_result.result_id))
 AND rpt_selector_result.cur_user="current_user"()
@@ -164,7 +164,7 @@ max(rpt_arc.reaction) AS max_reaction,
  min(rpt_arc.reaction) AS min_reaction, 
 max(rpt_arc.ffactor) AS max_ffactor, 
 min(rpt_arc.ffactor) AS min_ffactor, arc.the_geom 
-FROM rpt_selector_compare, rpt_input_arc arc
+FROM rpt_selector_compare, rpt_inp_arc arc
 JOIN rpt_arc ON ((rpt_arc.arc_id) = (arc.arc_id))
 WHERE ((rpt_arc.result_id) = (rpt_selector_compare.result_id))
 AND rpt_selector_compare.cur_user="current_user"()
@@ -217,7 +217,7 @@ max(rpt_node.press) AS max_pressure,
 min(rpt_node.press) AS min_pressure, 
 max(rpt_node.quality) AS max_quality, 
 min(rpt_node.quality) AS min_quality, node.the_geom 
-FROM rpt_selector_compare, rpt_input_node node
+FROM rpt_selector_compare, rpt_inp_node node
 JOIN rpt_node ON ((rpt_node.node_id) = (node.node_id))
 WHERE ((rpt_node.result_id) = (rpt_selector_compare.result_id))
 AND rpt_selector_compare.cur_user="current_user"()

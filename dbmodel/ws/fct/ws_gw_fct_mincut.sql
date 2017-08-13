@@ -31,7 +31,7 @@ DECLARE
 --BASICS: 
 ---------------------------------------------------------
 --LES VALVULES DISPONIBLES: V_ANL_MINCUT_VALVE
---LA XARXA: V_EDIT_NODE & V_EDIT_ARC_NODE
+--LA XARXA: V_EDIT_NODE & V_EDIT_ARC
 --L'ESTAT: ANL_MINCUT_RESULT_VALVE
 --L'ACCESIBILITAT: ANL_MINCUT_RESULT_VALVE_UNACCESS
 --------------------------------------------------------

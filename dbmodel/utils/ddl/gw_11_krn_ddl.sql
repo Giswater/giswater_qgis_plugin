@@ -25,11 +25,15 @@ CREATE TABLE "rpt_selector_compare" (
 "cur_user" text
 );
 
-CREATE TABLE inp_selector_sector(
-"id serial" NOT NULL PRIMARY KEY,
+CREATE TABLE "inp_selector_sector"(
+"id" serial NOT NULL PRIMARY KEY,
 "sector_id" integer,
 "cur_user" text);
 
+CREATE TABLE "inp_selector_result"(
+"id" serial NOT NULL PRIMARY KEY,
+"result_id" integer,
+"cur_user" text);
 
 
 -- ----------------------------

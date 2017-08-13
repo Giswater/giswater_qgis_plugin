@@ -35,14 +35,14 @@ BEGIN
 --  Empty temp tables
     RAISE NOTICE 'Clear temp tables.';
 
-    DELETE FROM temp_arc;
-    DELETE FROM temp_node;
+    DELETE FROM rpt_inp_arc;
+    DELETE FROM rpt_inp_node;
 		
 --  Copy into temp records
     RAISE NOTICE 'Copy records.';
 
-    INSERT INTO temp_arc SELECT * FROM arc;
-    INSERT INTO temp_node SELECT * FROM node;
+    INSERT INTO rpt_inp_arc SELECT * FROM arc;
+    INSERT INTO rpt_inp_node SELECT * FROM node;
 
 --  Move valves to arc
     RAISE NOTICE 'Start loop.';
@@ -81,7 +81,7 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id; 
             
             ELSIF record_arc1 ISNULL THEN
  
@@ -93,7 +93,7 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id;
 
             END IF;
 
@@ -127,10 +127,10 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,0,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
 
 
             -- Two 'node_1' arcs
@@ -161,10 +161,10 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
                         
 
             -- One 'node_1' and one 'node_2'
@@ -179,10 +179,10 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
 
 		-- Check new arc direction
                 IF loop_record.to_arc = record_arc2.arc_id THEN
@@ -215,20 +215,20 @@ BEGIN
         --Print insert data
         --RAISE NOTICE 'Data: %', record_new_arc;
         
-        INSERT INTO temp_arc VALUES(record_new_arc.*);
+        INSERT INTO rpt_inp_arc VALUES(record_new_arc.*);
 
         -- Add additional nodes
         record_node.epa_type := 'JUNCTION';
         record_node.the_geom := valve_arc_node_1_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_1');
-        INSERT INTO temp_node VALUES(record_node.*);
+        INSERT INTO rpt_inp_node VALUES(record_node.*);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
-        INSERT INTO temp_node VALUES(record_node.*);
+        INSERT INTO rpt_inp_node VALUES(record_node.*);
 
         -- Delete valve node
-        DELETE FROM temp_node WHERE node_id =  node_id_aux;
+        DELETE FROM rpt_inp_node WHERE node_id =  node_id_aux;
 
 
     END LOOP;

@@ -8,8 +8,8 @@ This version of Giswater is provided by Giswater Association
 -- TODO: 
 short_conduits(longitud que en Vicente tabuli en funció de l'alçada)
 result_id
-millorar les taules temp_arc 6 temp_node. Fer-les més petites, només amb la informació que ens fa falta
-Modificar les claus foraneas de les taules de resultats, cap a temp_arc_ temp_node
+millorar les taules rpt_inp_arc 6 rpt_inp_node. Fer-les més petites, només amb la informació que ens fa falta
+Modificar les claus foraneas de les taules de resultats, cap a rpt_inp_arc_ rpt_inp_node
 Permetre que els arc_id i node_id siguin varchar... en la temp...
 */
 
@@ -44,14 +44,14 @@ BEGIN
 --  Empty temp tables
     RAISE NOTICE 'Clear temp tables.';
 
-    DELETE FROM temp_arc;
-    DELETE FROM temp_node;
+    DELETE FROM rpt_inp_arc;
+    DELETE FROM rpt_inp_node;
 		
 --  Copy into temp records
     RAISE NOTICE 'Copy records.';
 
-    INSERT INTO temp_arc SELECT * FROM arc;
-    INSERT INTO temp_node SELECT * FROM node;
+    INSERT INTO rpt_inp_arc SELECT * FROM arc;
+    INSERT INTO rpt_inp_node SELECT * FROM node;
 
 --  Move valves to arc
     RAISE NOTICE 'Start loop.';
@@ -87,7 +87,7 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE arc_id = record_arc1.arc_id; 
             
             ELSIF record_arc1 ISNULL THEN
  
@@ -99,7 +99,7 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE arc_id = record_arc2.arc_id;
 
             END IF;
 
@@ -122,10 +122,10 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,0,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
 
 
             -- Two 'node_1' arcs
@@ -144,10 +144,10 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(node_id_aux, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
                         
 
             -- One 'node_1' and one 'node_2'
@@ -162,10 +162,10 @@ BEGIN
 
                 -- Correct arc geometry
                 arc_reduced_geometry := ST_LineSubstring(record_arc1.the_geom,ST_LineLocatePoint(record_arc1.the_geom,valve_arc_node_2_geom),1);
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_1 = (SELECT concat(a.node_1, '_n2a_2')) WHERE a.arc_id = record_arc1.arc_id; 
 
                 arc_reduced_geometry := ST_LineSubstring(record_arc2.the_geom,0,ST_LineLocatePoint(record_arc2.the_geom,valve_arc_node_1_geom));
-                UPDATE temp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
+                UPDATE rpt_inp_arc AS a SET the_geom = arc_reduced_geometry, node_2 = (SELECT concat(a.node_2, '_n2a_1')) WHERE a.arc_id = record_arc2.arc_id;
                         
             END IF;
 
@@ -205,20 +205,20 @@ BEGIN
         --Print insert data
         --RAISE NOTICE 'Data: %', record_new_arc;
         
-        INSERT INTO temp_arc VALUES(record_new_arc.*);
+        INSERT INTO rpt_inp_arc VALUES(record_new_arc.*);
 
         -- Add additional nodes
         record_node.epa_type := 'JUNCTION';
         record_node.the_geom := valve_arc_node_1_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_1');
-        INSERT INTO temp_node VALUES(record_node.*);
+        INSERT INTO rpt_inp_node VALUES(record_node.*);
 
         record_node.the_geom := valve_arc_node_2_geom;
         record_node.node_id := concat(node_id_aux, '_n2a_2');
-        INSERT INTO temp_node VALUES(record_node.*);
+        INSERT INTO rpt_inp_node VALUES(record_node.*);
 
         -- Delete valve node
-        DELETE FROM temp_node WHERE node_id =  node_id_aux;
+        DELETE FROM rpt_inp_node WHERE node_id =  node_id_aux;
 
 
     END LOOP;
