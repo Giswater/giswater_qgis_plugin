@@ -78,7 +78,9 @@ class ManNodeDialog(ParentDialog):
         # Define class variables
         self.field_id = "node_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                         
+        self.filter = self.field_id+" = '"+str(self.id)+"'"    
+        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
+        self.node_type = self.dialog.findChild(QComboBox, 'node_type')                             
         
         # Get widget controls   
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -150,9 +152,6 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-
-        self.nodecat_id = self.dialog.findChild(QLineEdit, 'nodecat_id')
-        self.node_type = self.dialog.findChild(QComboBox, 'node_type')
         
         # Event
         #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")

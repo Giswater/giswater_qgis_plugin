@@ -905,8 +905,11 @@ class ParentDialog(object):
                 sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm' FROM "+self.field3+"), '-', '', 'g')::int) as x, "+self.field3
                 sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x) AS "+self.field3
             elif geom_type == 'arc':
-                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from dnom)::int) AS x, "+self.field3
+                sql = "SELECT DISTINCT("+self.field3+"), (trim('mm' from "+self.field3+")::int) AS x, "+self.field3
                 sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY x"
+            elif geom_type == 'connec':
+                sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) AS "+self.field3
+                sql+= " FROM "+self.schema_name+".cat_"+geom_type+" ORDER BY "+self.field3                
         else:
             if geom_type == 'node':
                 sql = "SELECT DISTINCT("+self.field3+") AS "+self.field3
@@ -954,19 +957,20 @@ class ParentDialog(object):
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
         filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
          
-        # Set SQL query
+        # Set SQL query       
         sql_where = None   
-        if wsoftware == 'ws':             
-            sql = "SELECT dnom" 
-            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from dnom),'-','', 'g')::int)as x, dnom"
-            sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        if wsoftware == 'ws' and geom_type != 'connec':             
+            sql = "SELECT "+self.field3 
+            sql+= " FROM (SELECT DISTINCT(regexp_replace(trim(' nm'from "+self.field3+"),'-','', 'g')::int) as x, "+self.field3
+        elif wsoftware == 'ws' and geom_type == 'connec':
+            sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from "+self.field3+")) as "+self.field3       
         else:
             sql = "SELECT DISTINCT("+self.field3+")"
-            sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql+= " FROM "+self.schema_name+".cat_"+geom_type
         
-        # Build SQL filter        
+        # Build SQL filter                
         if wsoftware == 'ws' and self.node_type_text is not None:        
-            sql_where+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
         if mats != "null":
             if sql_where is None:
                 sql_where = " WHERE"
@@ -979,7 +983,7 @@ class ParentDialog(object):
             else:
                 sql_where+= " AND"       
             sql_where+= " "+self.field2+" = '"+filter2+"'"
-        if wsoftware == 'ws':              
+        if wsoftware == 'ws' and geom_type != 'connec':              
             sql+= sql_where+" ORDER BY x) AS "+self.field3
         else:
             sql+= sql_where+" ORDER BY "+self.field3
@@ -989,7 +993,7 @@ class ParentDialog(object):
 
         
     def fill_catalog_id(self, wsoftware, geom_type):
-
+        
         # Get values from filters
         mats = utils_giswater.getWidgetText(self.dlg_cat.matcat_id)                                
         filter2 = utils_giswater.getWidgetText(self.dlg_cat.filter2)  
@@ -1001,7 +1005,7 @@ class ParentDialog(object):
         sql+= " FROM "+self.schema_name+".cat_"+geom_type
         
         if wsoftware == 'ws' and self.node_type_text is not None:
-            sql_where+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+            sql_where = " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
         if mats != "null":
             if sql_where is None:
                 sql_where = " WHERE"
@@ -1032,7 +1036,9 @@ class ParentDialog(object):
         self.dlg_cat.close()
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
-        else:
+        elif geom_type == 'arc':
             utils_giswater.setWidgetText(self.arccat_id, catalog_id)                    
+        else:
+            utils_giswater.setWidgetText(self.connecat_id, catalog_id)                    
                 
         
