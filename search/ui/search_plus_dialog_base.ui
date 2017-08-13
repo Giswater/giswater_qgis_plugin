@@ -23,11 +23,11 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
-     <string>URN</string>
+     <string>Network</string>
     </attribute>
     <widget class="SearchableComboBox" name="ppoint_field_zone_4">
      <property name="geometry">
@@ -107,65 +107,6 @@
      </item>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_2">
-    <attribute name="title">
-     <string>Urban</string>
-    </attribute>
-    <widget class="SearchableComboBox" name="urban_properties_number">
-     <property name="geometry">
-      <rect>
-       <x>146</x>
-       <y>40</y>
-       <width>107</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Number</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="SearchableComboBox" name="urban_properties_zone">
-     <property name="geometry">
-      <rect>
-       <x>12</x>
-       <y>10</y>
-       <width>241</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Zone</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="SearchableComboBox" name="urban_properties_block">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>121</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Quadra</string>
-      </property>
-     </item>
-    </widget>
-   </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
      <string>Address</string>
@@ -194,47 +135,6 @@
        <x>10</x>
        <y>40</y>
        <width>245</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Number</string>
-      </property>
-     </item>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab">
-    <attribute name="title">
-     <string>Point</string>
-    </attribute>
-    <widget class="SearchableComboBox" name="ppoint_field_zone">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>243</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <item>
-      <property name="text">
-       <string>Zone</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="SearchableComboBox" name="ppoint_number">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>243</width>
        <height>20</height>
       </rect>
      </property>

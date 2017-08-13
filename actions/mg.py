@@ -9,20 +9,18 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QSettings
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry
-
-
 from PyQt4.Qt import  QDate, QTime
+from qgis.core import QgsMapLayerRegistry
+
 from datetime import datetime, date
-import time
 import os
 import sys
 import webbrowser
+from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
-from parent_init import ParentDialog
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config import Config                                  # @UnresolvedImport
@@ -32,36 +30,26 @@ from ..ui.topology_tools import TopologyTools                   # @UnresolvedImp
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
-from ..ui.mincut_edit import Mincut_edit          # @UnresolvedImport
-from ..ui.mincut_fin import Mincut_fin
-from ..ui.mincut import Mincut
-from ..ui.multipsector_selector import Multipsector_selector        # @UnresolvedImport
-from ..ui.plan_psector import Plan_psector        # @UnresolvedImport
-from ..ui.psector_management import Psector_management        # @UnresolvedImport
+from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
+from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
+from ..ui.mincut import Mincut                                  # @UnresolvedImport
+from ..ui.multipsector_selector import Multipsector_selector    # @UnresolvedImport
+from ..ui.plan_psector import Plan_psector                      # @UnresolvedImport
+from ..ui.psector_management import Psector_management          # @UnresolvedImport
 
-from functools import partial
+from parent import ParentAction
 
 
-class Mg():
-
+class Mg(ParentAction):
+   
     def __init__(self, iface, settings, controller, plugin_dir):
-        ''' Class to control Management toolbar actions '''
-
-        # Initialize instance attributes
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.dao = self.controller.dao
-        self.schema_name = self.controller.schema_name
-
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')
-        self.giswater_jar = self.settings.value('files/giswater_jar')
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')
-
-
-    def close_dialog(self, dlg=None):
+        ''' Class to control Management toolbar actions '''  
+                  
+        # Call ParentAction constructor      
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+    
+                  
+    def close_dialog(self, dlg=None): 
         ''' Close dialog '''
 
         dlg.close()
@@ -94,8 +82,6 @@ class Mg():
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
-
-        print("asdas")
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'topology_tools')
@@ -193,7 +179,6 @@ class Mg():
         self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
         self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
 
-
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'table_wizard')
         self.dlg.exec_()
@@ -271,22 +256,6 @@ class Mg():
             self.controller.show_info(message, context_name='ui_message')
 
 
-    def get_settings_value(self, settings, parameter):
-        ''' Utility function that fix problem with network units in Windows '''
-
-        file_aux = ""
-        try:
-            file_aux = settings.value(parameter)
-            unit = file_aux[:1]
-            if unit != '\\' and file_aux[1] != ':':
-                path = file_aux[1:]
-                file_aux = unit+":"+path
-        except IndexError:
-            pass
-        return file_aux
-
-
-
     def mg_go2epa(self):
         ''' Button 23. Open form to set INP, RPT and project '''
 
@@ -310,9 +279,9 @@ class Mg():
 
         # Get last GSW file from giswater properties file
         java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())
-        file_gsw = self.get_settings_value(java_settings, 'FILE_GSW')
-
+        java_settings.setIniCodec(sys.getfilesystemencoding())          
+        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
+        
         # Check if that file exists
         if not os.path.exists(file_gsw):
             msg = "Last GSW file not found: "+str(file_gsw)
@@ -320,11 +289,11 @@ class Mg():
             return False
 
         # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat)
-        self.file_inp = self.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = self.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')
-
+        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
+        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')                
+        self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
+                
         # Create dialog
         self.dlg = FileManager()
         utils_giswater.setDialog(self.dlg)
@@ -397,44 +366,9 @@ class Mg():
         ''' Button 24. Open giswater in silent mode
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
-        '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 24)
-
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-
-        # Check if giswater.jar file exists
-        if not os.path.exists(self.giswater_jar):
-            message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-
-        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
-        if not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, context_name='ui_message')
-            self.gsw_file = ""
-
-        # Start program
-        aux = '"'+self.giswater_jar+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
-
-        self.controller.start_program(program)
-
-        # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message' )
-
+        '''       
+        self.execute_giswater("mg_go2epa_express", 24)
+                        
 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
@@ -480,20 +414,17 @@ class Mg():
         user = self.controller.get_project_user()
 
         # Delete previous values
-        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_result"
         self.dao.execute_sql(sql)
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare"
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
 
         # Show message to user
@@ -501,8 +432,9 @@ class Mg():
         self.controller.show_info(message, context_name='ui_message')
         self.close_dialog(self.dlg)
 
-
     '''
+=======
+>>>>>>> 9cf88f7... Add class 'ParentAction' to manage common functions
     def mg_analytics(self):
         # Button 27. Valve analytics 
                 
@@ -690,7 +622,18 @@ class Mg():
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
         self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
 
-
+        #self.arc_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox,self.arc_vdef_enabled, self.arccat_vdefault, "arccat_vdefault"))
+        #self.node_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.node_vdef_enabled, self.nodecat_vdefault))
+        #self.connec_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.connec_vdef_enabled, self.connecat_vdefault))
+        #self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault').stateChanged.connect(partial(self.test, "check"))
+        #self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault').stateChanged.connect(partial(self.test, "check"))
+        #self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault').stateChanged.connect(partial(self.test, "check"))
+       
+        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
+        
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
@@ -752,6 +695,7 @@ class Mg():
         self.dlg.exec_()
 
 
+    # Like def mf_config_get_date(....): but for multi user
     def new_mg_config_get_data(self,tablename):
         # Like def mf_config_get_date(....): but for multi user
         
@@ -813,8 +757,8 @@ class Mg():
         else :
             webbrowser.open(url)
 
-
-    def mg_config_get_data(self, tablename):
+                 
+    def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''
 
         sql = "SELECT *"
@@ -877,7 +821,6 @@ class Mg():
             self.insert_or_update_config_vdefault(self.verified_vdefault, "verified_vdefault")
         else:
             self.delete_row("verified_vdefault")
-        #self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
 
         if utils_giswater.isChecked(self.chk_builtdate_vdefault) == True:
             self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
@@ -899,15 +842,14 @@ class Mg():
 
         self.close_dialog(self.dlg)
 
-        
-    def delete_row(self,  parameter):
 
+    def delete_row(self,  parameter):
         sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
         self.controller.execute_sql(sql)
-        
+       
         
     def insert_or_update_config_vdefault(self, widget, parameter):
-    
+
         sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
         rows=self.controller.get_rows(sql)
         self.exist = False
@@ -966,20 +908,47 @@ class Mg():
 
     def multi_selector(self,table):
         ''' Execute form multi_selector '''
-
+        
+        if columns is None:
+            return
+               
+        sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
+        for column_name in columns:
+            if column_name != 'id':
+                widget_type = utils_giswater.getWidgetType(column_name)
+                if widget_type is QCheckBox:
+                    value = utils_giswater.isChecked(column_name)                      
+                else:
+                    value = utils_giswater.getWidgetText(column_name)
+                if value is None or value == 'null':
+                    sql+= column_name+" = null, "     
+                else:
+                    if type(value) is not bool:
+                        value = value.replace(",", ".")
+                    sql+= column_name+" = '"+str(value)+"', "           
+        
+        sql = sql[:-2]
+        self.controller.execute_sql(sql)
+                        
+       
+    def multi_selector(self,table):  
+        ''' Execute form multi_selector ''' 
+        
         # Create the dialog and signals
         self.dlg_multi = Multi_selector()
         utils_giswater.setDialog(self.dlg_multi)
 
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
-
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
         self.menu=QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
-
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))
-
+        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
+        
+        self.menu = QMenu()
+        self.dlg_multi.btn_insert.setMenu(self.menu)
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
         self.fill_table(self.tbl, self.schema_name+"."+table)
 
         # Manage i18n of the form and open it
@@ -1020,6 +989,7 @@ class Mg():
         self.tbl_selected_explot.setColumnWidth(0,197)
 
         self.dlg_multiexp.exec_()
+
 
     def filter_all_explot(self,sql, widget):
     
@@ -1543,18 +1513,10 @@ class Mg():
         '''
         self.dlg_mincut.close()
 
-        
+
     def close(self, dlg = None):
         ''' Close dialog '''
         dlg.close()
-        '''
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass
-        '''
         
         
     def mg_dimensions(self):
@@ -1568,9 +1530,6 @@ class Mg():
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
-
-        
-
 
     
     def mg_new_psector(self,psector_id=None):
@@ -1590,14 +1549,7 @@ class Mg():
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
-        # Buttons
-        self.dlg_new_psector.btn_accept.pressed.connect(self.insert_mg_newp)
-        self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
-        # tab Networks elements
-        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
+        update=False # if false: insert; if true: update
         # LineEdit
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
@@ -1605,7 +1557,7 @@ class Mg():
         self.priority = self.dlg_new_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("priority", rows,False)
+        utils_giswater.fillComboBox("priority", rows, False)
 
         self.descript = self.dlg_new_psector.findChild(QLineEdit, "descript")
         self.text1 = self.dlg_new_psector.findChild(QLineEdit, "text1")
@@ -1647,7 +1599,7 @@ class Mg():
         self.dlg_new_psector.vat_cost.textChanged.connect(partial(self.sum_total, self.sum_gexpenses, self.vat_cost, self.sum_vexpenses))
 
         # Tables
-        # tab Networks elements
+        # tab Elements
         self.tbl_arc_plan = self.dlg_new_psector.findChild(QTableView, "tbl_arc_plan")
         self.tbl_arc_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
@@ -1656,16 +1608,27 @@ class Mg():
         self.tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_node_plan, self.schema_name + ".plan_node_x_psector")
 
+        self.tbl_other_plan = self.dlg_new_psector.findChild(QTableView, "tbl_other_plan")
+        self.tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.fill_table(self.tbl_other_plan, self.schema_name + ".plan_other_x_psector")
+
         # tab Bugdet
         self.tbl_v_plan_other_x_psector = self.dlg_new_psector.findChild(QTableView, "tbl_v_plan_other_x_psector")
         self.fill_table(self.tbl_v_plan_other_x_psector, self.schema_name + ".v_plan_other_x_psector")
         self.tbl_v_plan_other_x_psector.hideColumn(0)
 
+        # tab Elements
+        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_other_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_del_other_plan.pressed.connect(self.pressbtn)
         # if a row is selected from mg_psector_mangement(button 46)
-        if psector_id!=True:
-            sql = "SELECT * FROM " + self.schema_name + ".plan_psector  WHERE psector_id = '" + psector_id + "'"
+        if not isinstance(psector_id, bool):
+            sql = "SELECT * FROM " + self.schema_name + ".plan_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
-            self.psector_id.setText(row[0])
+            self.psector_id.setText(str(row[0]))
             self.short_descript.setText(row[15])
             index = self.priority.findText(row[2], Qt.MatchFixedString)
             if index >= 0:
@@ -1674,32 +1637,37 @@ class Mg():
             self.text1.setText(row[3])
             self.text2.setText(row[4])
             self.observ.setText(row[5])
-            self.scale.setText(str(row[7]))
             self.atlas_id.setText(row[9])
-            self.rotation.setText(str(row[6]))
-            expr = " psector_id LIKE '%" + psector_id + "%'"
+            self.test(row[7])
+            if row[7]!=None:
+                self.scale.setText(str(row[7]))
+            if row[6] != None:
+                self.rotation.setText(str(row[6]))
+
+            expr = " psector_id = "+ str(psector_id)
             # Refresh model with selected filter
             self.tbl_arc_plan.model().setFilter(expr)
             self.tbl_arc_plan.model().select()
-            expr = " psector_id LIKE '%" + psector_id + "%'"
+            expr = " psector_id = " + str(psector_id)
             # Refresh model with selected filter
             self.tbl_node_plan.model().setFilter(expr)
             self.tbl_node_plan.model().select()
 
-            expr = " psector_id LIKE '%" + psector_id + "%'"
+            expr = " psector_id = " + str(psector_id)
             self.tbl_v_plan_other_x_psector.model().setFilter(expr)
             self.tbl_v_plan_other_x_psector.model().select()
 
             # Total other Prices:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector  WHERE psector_id = '" + psector_id + "'"
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
+
             if not row[0]:
                 total_other_price=0
             else:
                 total_other_price=row[0]
             self.sum_v_plan_other_x_psector.setText(str(total_other_price))
             #Total arcs:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector  WHERE psector_id = '" + psector_id + "'"
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
             if not row[0]:
                 total_arcs=0
@@ -1707,7 +1675,7 @@ class Mg():
                 total_arcs=row[0]
             self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
             # Total nnodes:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = '" + psector_id + "'"
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = "+ str(psector_id)
             row = self.dao.get_row(sql)
             if not row[0]:
                 total_nodes=0
@@ -1717,36 +1685,62 @@ class Mg():
 
             sum_expenses=total_other_price+total_arcs+total_nodes
             self.sum_expenses.setText(str(sum_expenses))
-            '''
-
-
-
-            self.sum_oexpenses.setText("30")
-
-            self.vat_cost.setText("40")
-            self.sum_vexpenses.setText("q50")
-
-            sum_expenses=float(self.sum_expenses.text())
-            other=float(self.other.text())
-            other_cost=sum_expenses*other*100
-            '''
-
-        '''
-        expr = " psector_id LIKE '%"+psector_id+"%'"
-        # Refresh model with selected filter
-        self.tbl_node_plan.model().setFilter(expr)
-        self.tbl_node_plan.model().select()
-        '''
-        #self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
-
+            update=True
+        # Buttons
+        self.dlg_new_psector.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector,update,'plan_psector') )
+        self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
         self.dlg_new_psector.exec_()
+
+
+    def insert_or_update_new_psector(self, update,table):
+        
+        self.test(update)
+        if update:
+            sql = "UPDATE " + self.schema_name + "."+table+" SET descript='" + self.descript.text()+"'"
+            sql += ", priority='"+self.priority.currentText()+"'"
+            sql += ", text1='" + self.text1.text() + "'"
+            sql += ", text2='" + self.text2.text() + "'"
+            sql += ", observ='" + self.observ.text() + "'"
+            sql += ", scale='" + self.scale.text() + "'"
+            sql += ", atlas_id='" + self.atlas_id.text() + "'"
+            sql += ", rotation='" + self.rotation.text() + "'"
+            sql += ", short_descript='" + self.short_descript.text() + "'"
+
+            sql += " WHERE psector_id = '"+self.psector_id.text() +"'"
+        else:
+            '''
+            fields=""
+            values=""
+            self.test(self.descript.text())
+            if self.short_descript.text()!="":
+                fields="short_descript"
+                values="'"+self.short_descript.text()+"'" or None
+            if self.descript.text()!="":
+                fields+=", descript"
+                values+=", '"+self.descript.text()+"'" or None
+            if self.priority.currentText()!="":
+                fields += ", priority"
+                values += ", '"+self.priority.currentText()+"'" or None
+
+
+
+            sql = "INSERT INTO " + self.schema_name + "."+table+"("+fields+")"
+            sql += " VALUES (" +values+")"
+            '''
+            #, text1, text2, observ, scale, atlas_id, rotation, short_descript
+            sql = "INSERT INTO " + self.schema_name + "." + table + "(descript, priority, text1)"
+            sql += " VALUES (" + str(self.descript.text()) +","+str(self.priority.currentText())+","+str(self.text1.text())+ ")"
+            self.test(sql)
+        self.controller.execute_sql(sql)
+
 
     def cal_percent(self,widged_total, widged_percent, wided_result):
         wided_result.setText(str((float(widged_total.text())*float(widged_percent.text())/100)))
 
+
     def sum_total(self, widget_total, widged_percent, wided_result):
         wided_result.setText(str((float(widget_total.text()) + float(widged_percent.text()))))
-        
+    '''
     def insert_mg_newp(self):
 
         if self.psector_id.text()=='':
@@ -1756,7 +1750,7 @@ class Mg():
             sql += " VALUES ('" + self.psector_id.text()+ "', '" + self.descript.text()+ "', '" + self.priority.text()+ "', '" + self.text1.text() + "', '" + self.text2.text() +"', '" + self.observ.text()+  "')"
             self.controller.execute_sql(sql)
             self.test("saved")
-
+    '''
 
     def mg_psector_mangement(self):
         ''' Button_46 : Psector management '''
@@ -1781,6 +1775,7 @@ class Mg():
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
 
+
     def charge_psector(self):
         selected_list = self.tbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -1789,16 +1784,10 @@ class Mg():
             return
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
-
-        #1ql = "SELECT * FROM "+self.schema_name+".plan_psector WHERE id = '"+psector_id+"'"
-
-        #rows = self.dao.get_row(sql)
-
         self.dlg_psector_mangement.close()
-        #self.dlg_psector_sel = Multipsector_selector()
-        #utils_giswater.setDialog(self.dlg_psector_sel)
-
         self.mg_new_psector(psector_id)
+
+
     def filter_by_text(self,table,txt):
         result_select = utils_giswater.getWidgetText(txt)
         if result_select=='null':
@@ -1808,6 +1797,7 @@ class Mg():
         # Refresh model with selected filter
         table.model().setFilter(expr)
         table.model().select()
+
 
     def mg_psector_selector(self):
         ''' Button_47 : Psector selector '''
@@ -1833,5 +1823,9 @@ class Mg():
         self.pss_txt_short_descript = self.dlg_psector_sel.findChild(QLineEdit, "txt_short_descript")
 
         self.dlg_psector_sel.exec_()
+        
+        
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))
+  
+    

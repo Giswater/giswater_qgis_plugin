@@ -28,7 +28,7 @@
    <widget class="QLabel" name="label_label_x_7">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>200</x>
       <y>40</y>
       <width>51</width>
       <height>22</height>
@@ -64,7 +64,7 @@
    <widget class="QComboBox" name="state_edit">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>260</x>
       <y>40</y>
       <width>146</width>
       <height>20</height>
@@ -95,6 +95,19 @@
     </property>
     <property name="text">
      <string>Delete</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="txt_mincut_id">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

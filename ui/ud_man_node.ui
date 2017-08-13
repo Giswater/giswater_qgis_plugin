@@ -119,7 +119,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>12</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -143,7 +143,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -243,19 +243,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="chamber_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_chamber_builtdate">
@@ -833,14 +820,33 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="chamber_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_2">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1214,8 +1220,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1748,8 +1754,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2025,7 +2031,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>308</height>
+         <height>320</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2125,31 +2131,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="junction_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::UpDownArrows</enum>
-        </property>
-        <property name="specialValueText">
-         <string/>
-        </property>
-        <property name="displayFormat">
-         <string>M/d/yyyy</string>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_junction_builtdate">
@@ -2727,14 +2708,33 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="junction_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_40">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3267,8 +3267,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3544,7 +3544,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3644,56 +3644,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="manhole_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="specialValueText">
-         <string>-</string>
-        </property>
-        <property name="dateTime">
-         <datetime>
-          <hour>12</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2020</year>
-          <month>1</month>
-          <day>12</day>
-         </datetime>
-        </property>
-        <property name="minimumDateTime">
-         <datetime>
-          <hour>12</hour>
-          <minute>0</minute>
-          <second>0</second>
-          <year>2020</year>
-          <month>1</month>
-          <day>12</day>
-         </datetime>
-        </property>
-        <property name="maximumDate">
-         <date>
-          <year>7999</year>
-          <month>12</month>
-          <day>30</day>
-         </date>
-        </property>
-        <property name="minimumDate">
-         <date>
-          <year>2020</year>
-          <month>1</month>
-          <day>12</day>
-         </date>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_manhole_builtdate">
@@ -4271,14 +4221,33 @@
          </rect>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="manhole_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4484,8 +4453,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5018,8 +4987,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5295,7 +5264,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>308</height>
+         <height>320</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5395,19 +5364,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="netgully_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netgully_builtdate">
@@ -5985,14 +5941,33 @@
          </rect>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="netgully_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_44">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6525,8 +6500,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6802,7 +6777,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6902,19 +6877,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="netinit_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_netinit_builtdate">
@@ -7492,14 +7454,33 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="netinit_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_3">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7818,8 +7799,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8352,8 +8333,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8629,7 +8610,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8729,19 +8710,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="outfall_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_outfall_builtdate">
@@ -9319,14 +9287,33 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="outfall_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9393,8 +9380,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9927,8 +9914,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10204,7 +10191,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10304,19 +10291,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="storage_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_storage_builtdate">
@@ -10894,14 +10868,33 @@
          <string/>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="storage_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_13">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11307,8 +11300,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11841,8 +11834,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12118,7 +12111,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>313</height>
+         <height>325</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12218,19 +12211,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="valve_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_valve_builtdate">
@@ -12808,14 +12788,33 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="valve_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_52">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13348,8 +13347,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13625,7 +13624,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13725,19 +13724,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="wjump_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wjump_builtdate">
@@ -14315,14 +14301,33 @@
          <string/>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="wjump_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_16">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -14841,8 +14846,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15375,8 +15380,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15652,7 +15657,7 @@
          <x>0</x>
          <y>0</y>
          <width>581</width>
-         <height>282</height>
+         <height>298</height>
         </rect>
        </property>
        <attribute name="label">
@@ -15752,19 +15757,6 @@
           <width>160</width>
           <height>20</height>
          </rect>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="wwtp_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>160</y>
-          <width>160</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_wwtp_builtdate">
@@ -16342,14 +16334,33 @@
          <number>3</number>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="wwtp_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>160</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_18">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16416,8 +16427,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -16950,8 +16961,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17365,7 +17376,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>277</height>
+         <height>293</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17416,8 +17427,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>277</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17468,8 +17479,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>277</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17520,8 +17531,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>277</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -17583,8 +17594,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>98</width>
-           <height>28</height>
+           <width>100</width>
+           <height>30</height>
           </rect>
          </property>
          <attribute name="label">
@@ -17649,7 +17660,7 @@
            <x>0</x>
            <y>0</y>
            <width>560</width>
-           <height>329</height>
+           <height>337</height>
           </rect>
          </property>
          <attribute name="label">
@@ -19121,6 +19132,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsDateTimeEdit</class>
+   <extends>QDateTimeEdit</extends>
+   <header>qgsdatetimeedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

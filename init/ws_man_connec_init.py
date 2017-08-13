@@ -12,8 +12,7 @@ from functools import partial
 
 import utils_giswater
 from parent_init import ParentDialog
-from ui.ws_catalog import WScatalog                  # @UnresolvedImport
-from PyQt4.QtGui import QSizePolicy
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -40,13 +39,9 @@ class ManConnecDialog(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
-
         dialog.parent().setFixedSize(620,675)
-        #dialog.parent().setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
 
         
     def init_config_form(self):
@@ -67,9 +62,9 @@ class ManConnecDialog(ParentDialog):
         # Define class variables
         self.field_id = "connec_id"        
         self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.connec_type = utils_giswater.getWidgetText("cat_connectype_id", False)        
-        self.connecat_id = utils_giswater.getWidgetText("connecat_id", False) 
+        self.filter = self.field_id+" = '"+str(self.id)+"'"                       
+        self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
+        self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')        
         
         # Get widget controls      
         self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
@@ -122,165 +117,17 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(self.catalog)
+        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
+        
+        feature = self.feature
+        canvas = self.iface.mapCanvas()
+        layer = self.iface.activeLayer()
+
         # Toolbar actions
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(self.actionZoom)
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(self.actionCentered)
-        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(self.actionEnabled)
-        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(self.actionZoomOut)
-        # QLineEdit
-        self.connecat_id = self.dialog.findChild(QLineEdit, 'connecat_id')
-        # ComboBox
-        self.connec_type = self.dialog.findChild(QComboBox, 'connec_type')
+        action = self.dialog.findChild(QAction, "actionEnable")
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
+        self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+               
         
-    def actionZoomOut(self):
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomOut()
-        
-
-    def actionZoom(self):
-
-        print "zoom"
-        feature = self.feature
-
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-        canvas.zoomIn()
-
-    def actionEnabled(self):
-        # btn_enable_edit = self.dialog.findChild(QPushButton, "btn_enable_edit")
-        self.actionEnable = self.dialog.findChild(QAction, "actionEnable")
-        status = self.layer.startEditing()
-        self.set_icon(self.actionEnable, status)
-
-    def set_icon(self, widget, status):
-
-        # initialize plugin directory
-        user_folder = os.path.expanduser("~")
-        self.plugin_name = 'iw2pg'
-        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
-
-        self.layer = self.iface.activeLayer()
-        if status == True:
-            self.layer.startEditing()
-
-            widget.setActive(True)
-
-        if status == False:
-            self.layer.rollBack()
-
-    def actionCentered(self):
-        feature = self.feature
-        canvas = self.iface.mapCanvas()
-        # Get the active layer (must be a vector layer)
-        layer = self.iface.activeLayer()
-
-        layer.setSelectedFeatures([feature.id()])
-
-        canvas.zoomToSelected(layer)
-
-
-    def catalog(self):
-        self.dlg_cat=WScatalog()
-        utils_giswater.setDialog(self.dlg_cat)
-        self.dlg_cat.open()
-
-        self.dlg_cat.findChild(QPushButton, "btn_ok").clicked.connect(self.fillTxtconnecat_id)
-        self.dlg_cat.findChild(QPushButton, "btn_cancel").clicked.connect(self.dlg_cat.close)
-
-        self.matcat_id = self.dlg_cat.findChild(QComboBox, "matcat_id")
-        self.pnom = self.dlg_cat.findChild(QComboBox, "pnom")
-        self.dnom = self.dlg_cat.findChild(QComboBox, "dnom")
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxpnom)
-        self.matcat_id.currentIndexChanged.connect(self.fillCbxdnom)
-
-        self.pnom.currentIndexChanged.connect(self.fillCbxCatalod_id)
-        self.pnom.currentIndexChanged.connect(self.fillCbxdnom)
-
-        self.dnom.currentIndexChanged.connect(self.fillCbxCatalod_id)
-
-        self.matcat_id.clear()
-        self.pnom.clear()
-        self.dnom.clear()
-        sql = "SELECT DISTINCT(matcat_id) as matcat_id FROM ws_sample_dev.cat_connec ORDER BY matcat_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
-
-        sql = "SELECT DISTINCT(pnom) as pnom FROM ws_sample_dev.cat_connec ORDER BY pnom"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.pnom, rows)
-
-        sql = "SELECT DISTINCT(TRIM(TRAILING ' ' from dnom)) as dnom FROM ws_sample_dev.cat_connec ORDER BY dnom"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg_cat.dnom, rows)
-
-    def fillCbxpnom(self,index):
-        if index == -1:
-            return
-        mats=self.matcat_id.currentText()
-
-        sql="SELECT DISTINCT(pnom) as pnom FROM ws_sample_dev.cat_connec"
-        if (str(mats)!=""):
-            sql += " WHERE matcat_id='"+str(mats)+"'"
-        sql += " ORDER BY pnom"
-        rows = self.controller.get_rows(sql)
-        self.pnom.clear()
-        utils_giswater.fillComboBox(self.pnom, rows)
-        self.fillCbxdnom()
-
-    def fillCbxdnom(self,index):
-        if index == -1:
-            return
-
-        mats=self.matcat_id.currentText()
-        pnom=self.pnom.currentText()
-        sql="SELECT DISTINCT(TRIM(TRAILING ' ' from dnom)) as dnom  FROM ws_sample_dev.cat_connec"
-        if (str(mats)!=""):
-            sql += " WHERE matcat_id='"+str(mats)+"'"
-        if(str(pnom)!= ""):
-            sql +=" and pnom='"+str(pnom)+"'"
-        sql += " ORDER BY dnom"
-        rows = self.controller.get_rows(sql)
-        self.dnom.clear()
-        utils_giswater.fillComboBox(self.dnom, rows)
-
-    def fillCbxCatalod_id(self,index):    #@UnusedVariable
-
-        self.id = self.dlg_cat.findChild(QComboBox, "id")
-
-        if self.id!='null':
-            mats = self.matcat_id.currentText()
-            pnom = self.pnom.currentText()
-            dnom = self.dnom.currentText()
-            sql = "SELECT DISTINCT(id) as id FROM ws_sample_dev.cat_connec"
-            if (str(mats)!=""):
-                sql += " WHERE matcat_id='"+str(mats)+"'"
-            if (str(pnom) != ""):
-                sql += " and pnom='"+str(pnom)+"'"
-            if (str(dnom) != ""):
-                sql += " and dnom='" + str(dnom) + "'"
-            sql += " ORDER BY id"
-            rows = self.controller.get_rows(sql)
-            self.id.clear()
-            utils_giswater.fillComboBox(self.id, rows)
-
-    def fillTxtconnecat_id(self):
-        self.dlg_cat.close()
-        self.connecat_id.clear()
-        self.connecat_id.setText(str(self.id.currentText()))
