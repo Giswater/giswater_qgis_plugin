@@ -1576,61 +1576,49 @@ class Mg():
         utils_giswater.setDialog(self.dlg_new_psector)
         self.list_elemets = {}
         update = False  # if false: insert; if true: update
-        self.tab_arc_node_other=self.dlg_new_psector.findChild(QTabWidget,"tabWidget_2")
+        self.tab_arc_node_other = self.dlg_new_psector.findChild(QTabWidget,"tabWidget_2")
         self.tab_arc_node_other.setTabEnabled(0, enable_tabs)
         self.tab_arc_node_other.setTabEnabled(1, enable_tabs)
         self.tab_arc_node_other.setTabEnabled(2, enable_tabs)
 
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
-        self.name = self.dlg_new_psector.findChild(QLineEdit, "name")
         self.priority = self.dlg_new_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("priority", rows, False)
 
-        self.descript = self.dlg_new_psector.findChild(QLineEdit, "descript")
-        self.text1 = self.dlg_new_psector.findChild(QLineEdit, "text1")
-        self.text2 = self.dlg_new_psector.findChild(QLineEdit, "text2")
-        self.observ = self.dlg_new_psector.findChild(QLineEdit, "observ")
-        self.scale = self.dlg_new_psector.findChild(QLineEdit, "scale")
-        self.scale.setValidator(QDoubleValidator())
-        self.atlas_id = self.dlg_new_psector.findChild(QLineEdit, "atlas_id")
-        self.rotation = self.dlg_new_psector.findChild(QLineEdit, "rotation")
-        self.rotation.setValidator(QDoubleValidator())
+        scale = self.dlg_new_psector.findChild(QLineEdit, "scale")
+        scale.setValidator(QDoubleValidator())
+        rotation = self.dlg_new_psector.findChild(QLineEdit, "rotation")
+        rotation.setValidator(QDoubleValidator())
 
         # tab Bugdet
-        self.sum_v_plan_other_x_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_other_x_psector")
-        self.sum_v_plan_x_arc_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_x_arc_psector")
-        self.sum_v_plan_x_node_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_x_node_psector")
+        sum_expenses = self.dlg_new_psector.findChild(QLineEdit, "sum_expenses")
+        other = self.dlg_new_psector.findChild(QLineEdit, "other")
+        other.setValidator(QDoubleValidator())
+        other_cost = self.dlg_new_psector.findChild(QLineEdit, "other_cost")
 
-        self.sum_expenses = self.dlg_new_psector.findChild(QLineEdit, "sum_expenses")
-        self.other = self.dlg_new_psector.findChild(QLineEdit, "other")
-        self.other.setValidator(QDoubleValidator())
-        self.other_cost = self.dlg_new_psector.findChild(QLineEdit, "other_cost")
+        sum_oexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_oexpenses")
+        gexpenses = self.dlg_new_psector.findChild(QLineEdit, "gexpenses")
+        gexpenses.setValidator(QDoubleValidator())
+        gexpenses_cost = self.dlg_new_psector.findChild(QLineEdit, "gexpenses_cost")
+        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
 
-        self.sum_oexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_oexpenses")
-        self.gexpenses = self.dlg_new_psector.findChild(QLineEdit, "gexpenses")
-        self.gexpenses.setValidator(QDoubleValidator())
-        self.gexpenses_cost = self.dlg_new_psector.findChild(QLineEdit, "gexpenses_cost")
-        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, self.sum_oexpenses, self.gexpenses, self.gexpenses_cost))
+        sum_gexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_gexpenses")
+        vat = self.dlg_new_psector.findChild(QLineEdit, "vat")
+        vat.setValidator(QDoubleValidator())
+        vat_cost = self.dlg_new_psector.findChild(QLineEdit, "vat_cost")
+        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
 
-        self.sum_gexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_gexpenses")
-        self.vat = self.dlg_new_psector.findChild(QLineEdit, "vat")
-        self.vat.setValidator(QDoubleValidator())
-        self.vat_cost = self.dlg_new_psector.findChild(QLineEdit, "vat_cost")
-        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, self.sum_gexpenses, self.vat, self.vat_cost))
+        sum_vexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_vexpenses")
 
-        self.sum_vexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_vexpenses")
-
-        self.dlg_new_psector.other.textChanged.connect(partial(self.cal_percent, self.sum_expenses, self.other, self.other_cost))
-        self.dlg_new_psector.other_cost.textChanged.connect(partial(self.sum_total, self.sum_expenses, self.other_cost, self.sum_oexpenses ))
-
-        self.dlg_new_psector.gexpenses.textChanged.connect(partial(self.cal_percent, self.sum_oexpenses, self.gexpenses, self.gexpenses_cost))
-        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.sum_total, self.sum_oexpenses, self.gexpenses_cost, self.sum_gexpenses))
-
-        self.dlg_new_psector.vat.textChanged.connect(partial(self.cal_percent, self.sum_gexpenses, self.vat, self.vat_cost))
-        self.dlg_new_psector.vat_cost.textChanged.connect(partial(self.sum_total, self.sum_gexpenses, self.vat_cost, self.sum_vexpenses))
+        self.dlg_new_psector.other.textChanged.connect(partial(self.cal_percent, sum_expenses, other, other_cost))
+        self.dlg_new_psector.other_cost.textChanged.connect(partial(self.sum_total, sum_expenses, other_cost, sum_oexpenses))
+        self.dlg_new_psector.gexpenses.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
+        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.sum_total, sum_oexpenses, gexpenses_cost, sum_gexpenses))
+        self.dlg_new_psector.vat.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
+        self.dlg_new_psector.vat_cost.textChanged.connect(partial(self.sum_total, sum_gexpenses, vat_cost, sum_vexpenses))
 
         # Tables
         # tab Elements
@@ -1670,26 +1658,23 @@ class Mg():
             sql = "SELECT psector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
             sql+= " FROM " + self.schema_name + ".plan_psector"
             sql+= " WHERE psector_id = '" + str(psector_id) + "'"
-            self.controller.show_info(sql, 50)
             row = self.dao.get_row(sql)
             if row is None:
                 return
             
             self.psector_id.setText(str(row["psector_id"]))
-            #self.name.setText(row["name"])
+            utils_giswater.setRow(row)
+            utils_giswater.fillWidget("name")            
+            utils_giswater.fillWidget("descript")
             index = self.priority.findText(row["priority"], Qt.MatchFixedString)
             if index >= 0:
                 self.priority.setCurrentIndex(index)
-            self.descript.setText(row["descript"])
-            self.text1.setText(row["text1"])
-            self.text2.setText(row["text2"])
-            self.observ.setText(row["observ"])
-            self.atlas_id.setText(row["atlas_id"])
-
-            if row[7] is not None:
-                self.scale.setText(str(row["scale"]))
-            if row[6] is not None:
-                self.rotation.setText(str(row["rotation"]))
+            utils_giswater.fillWidget("text1")
+            utils_giswater.fillWidget("text2") 
+            utils_giswater.fillWidget("observ") 
+            utils_giswater.fillWidget("atlas_id") 
+            utils_giswater.fillWidget("scale") 
+            utils_giswater.fillWidget("rotation")                         
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan_other_x_psector with selected filter
             expr = " psector_id = "+ str(psector_id)
@@ -1700,40 +1685,38 @@ class Mg():
             self.tbl_node_plan.model().setFilter(expr)
             self.tbl_node_plan.model().select()
 
-            # Total other Prices:
+            # Total other Prices
+            total_other_price = 0            
             sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector"
             sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
             if row is not None:       
-                if not row[0]:
-                    total_other_price = 0
-                else:
+                if row[0]:
                     total_other_price = row[0]
-                self.sum_v_plan_other_x_psector.setText(str(total_other_price))
-
-            # Total arcs:
+            utils_giswater.setText("sum_v_plan_other_x_psector", total_other_price)
+            
+            # Total arcs
+            total_arcs = 0
             sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector"
             sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
             if row is not None:              
-                if not row[0]:
-                    total_arcs = 0
-                else:
+                if row[0]:
                     total_arcs = row[0]
-                self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
+            utils_giswater.setText("sum_v_plan_x_arc_psector", total_arcs)            
 
-            # Total nodes:
+            # Total nodes
+            total_nodes = 0
             sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector"
             sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
             if row is not None:              
-                if not row[0]:
-                    total_nodes = 0
-                else:
+                if row[0]:
                     total_nodes = row[0]
-                self.sum_v_plan_x_node_psector.setText(str(total_nodes))
-                sum_expenses = total_other_price + total_arcs + total_nodes
-                self.sum_expenses.setText(str(sum_expenses))
+            utils_giswater.setText("sum_v_plan_x_node_psector", total_nodes)            
+            
+            sum_expenses = total_other_price + total_arcs + total_nodes
+            utils_giswater.setText("sum_expenses", sum_expenses)
             update = True
 
         # Buttons
@@ -1862,7 +1845,8 @@ class Mg():
                     result[0].layer.select([result[0].snappedAtGeometry])
                     # Get depth of feature
                 if feat_type == elem_type:
-                    sql = "SELECT * FROM " + self.schema_name + "." + tablename + " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
+                    sql = "SELECT * FROM " + self.schema_name + "." + tablename
+                    sql+= " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
                     row = self.dao.get_row(sql)
                     if not row:
                         self.list_elemets[element_id] = feat_type
@@ -1961,7 +1945,7 @@ class Mg():
         # Tables
         self.tbl_all_row = self.dlg_psector_sel.findChild(QTableView, "all_row")
         self.tbl_all_row.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql= "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name not in ("
+        sql = "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name not in ("
         sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector RIGTH JOIN "
         sql += self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
         sql += "WHERE cur_user = current_user)"
@@ -1996,7 +1980,7 @@ class Mg():
         query_right += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
         query_right += "WHERE cur_user = current_user"
 
-        query_delete=  "DELETE FROM "+self.controller.schema_name+".selector_psector "
+        query_delete = "DELETE FROM "+self.controller.schema_name+".selector_psector "
         query_delete += "WHERE current_user = cur_user and selector_psector.psector_id ="
         self.dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, self.tbl_all_row, self.tbl_selected_psector,
                                                                   query_delete, query_left, query_right, field))
@@ -2008,9 +1992,9 @@ class Mg():
     def query_like_widget_text(self, widget):
         
         query = widget.text()
-        sql = "SELECT * FROM "+self.controller.schema_name+".plan_psector where name not in ("
-        sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector right join "
-        sql += ""+self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
+        sql = "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name NOT IN ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector RIGHT JOIN "
+        sql += self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
         sql += "WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
         self.fill_table_by_query(self.tbl_all_row, sql)
 
@@ -2035,7 +2019,7 @@ class Mg():
         self.tbl_selected_state = self.dlg_state_sel.findChild(QTableView, "selected_state")
         self.tbl_selected_state.setSelectionBehavior(QAbstractItemView.SelectRows)
         sql = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state"
-        sql += " JOIN "+self.controller.schema_name+".selector_state on value_state.id=state_id"
+        sql += " JOIN "+self.controller.schema_name+".selector_state on value_state.id = state_id"
         sql += " WHERE cur_user=current_user"
         self.fill_table_by_query(self.tbl_selected_state, sql)
         columstohide = [2]
@@ -2052,10 +2036,10 @@ class Mg():
 
         query_left = "SELECT * FROM "+self.controller.schema_name+".value_state WHERE name NOT IN "
         query_left += "(SELECT name FROM "+self.controller.schema_name+".value_state "
-        query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
+        query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user = current_user)"
 
         query_right = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state JOIN "
-        query_right += self.controller.schema_name+".selector_state ON value_state.id=state_id WHERE cur_user=current_user"
+        query_right += self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user"
         query_delete = "DELETE FROM "+self.controller.schema_name+".selector_state WHERE current_user = cur_user and state_id ="
         field = "state_id"
         self.dlg_state_sel.btn_unselect_state.pressed.connect(
@@ -2070,7 +2054,7 @@ class Mg():
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' )
+            self.controller.show_warning(message, context_name='ui_message')
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -2087,7 +2071,7 @@ class Mg():
         self.iface.mapCanvas().refresh()
 
 
-    def multi_rows_selector(self, qtable_left, qtable_right,  id_ori, tablename_des, id_des, query_left,query_right, field):
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right, field):
         """
         :param qtable_left: QTableView origin
         :param qtable_right: QTableView destini
@@ -2113,7 +2097,9 @@ class Mg():
             curuser_list.append(curuser)
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
-            sql = "SELECT DISTINCT(" + id_des + ", cur_user) FROM " + self.schema_name+"." + tablename_des + " WHERE " + id_des + " = '" + str(expl_id[i])
+            sql = "SELECT DISTINCT(" + id_des + ", cur_user)"
+            sql+= " FROM " + self.schema_name+"." + tablename_des
+            sql+= " WHERE " + id_des + " = '" + str(expl_id[i])
             row = self.dao.get_row(sql)
             if row:
                 # if exist - show warning
@@ -2123,7 +2109,7 @@ class Mg():
                 sql += " VALUES ("+str(expl_id[i])+", current_user)"
                 self.controller.execute_sql(sql)
 
-        #refresh
+        # Refresh
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
         self.iface.mapCanvas().refresh()
@@ -2131,7 +2117,7 @@ class Mg():
 
     def fill_table_by_query(self, qtable, query):
         """
-        :param table: QTableView to show
+        :param qtable: QTableView to show
         :param query: query to set model
         """
         model = QSqlQueryModel()

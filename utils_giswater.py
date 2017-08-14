@@ -12,12 +12,12 @@
 """
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QMessageBox   #@UnresolvedImport
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit   #@UnresolvedImport
 from PyQt4.Qt import QDate
 import inspect
 import os
 
-from PyQt4.QtCore import Qt
+
 def setDialog(p_dialog):
     global _dialog
     _dialog = p_dialog
@@ -40,8 +40,10 @@ def fillComboBox(widget, rows, allow_nulls=True):
             if elem!=None:
                 widget.addItem(str(elem))
                 
+                
 def fillComboBoxDefault(widget, rows, allow_nulls=True):
     '''Fill combo box with default value-first from the list '''
+    
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -56,7 +58,6 @@ def fillComboBoxDefault(widget, rows, allow_nulls=True):
             if elem!=None:
                 widget.addItem(str(elem))                
 
-        
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
@@ -92,7 +93,6 @@ def getText(widget):
     else:
         elem_text = "null"
     return elem_text      
-
 
 
 def setText(widget, text):
@@ -256,5 +256,31 @@ def setImage(widget,cat_shape):
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()  
+        
+        
+def setRow(p_row):
+    global _row
+    _row = p_row
+    
                         
-                
+def fillWidget(widget):
+    
+    key = widget
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
+        return    
+    
+    if key in _row: 
+        if _row[key] is not None:
+            value = unicode(_row[key])
+            if type(widget) is QLineEdit or type(widget) is QTextEdit: 
+                if value == 'None':    
+                    value = ""        
+                widget.setText(value)
+        else:
+            widget.setText("")       
+    else:
+        widget.setText("") 
+        
+        
