@@ -13,6 +13,8 @@ import sys
 import webbrowser
 import ConfigParser
 
+from PyQt4.QtGui import QMessageBox
+
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater    
@@ -30,7 +32,8 @@ class ParentAction():
         self.controller = controller
         self.plugin_dir = plugin_dir       
         self.dao = self.controller.dao         
-        self.schema_name = self.controller.schema_name  
+        self.schema_name = self.controller.schema_name
+        self.project_type = None
           
         # Get files to execute giswater jar
         self.plugin_version = self.get_plugin_version()
@@ -232,4 +235,10 @@ class ParentAction():
 
         # Set text to QLineEdit
         widget.setText(abs_path[0]+'/')
-                        
+
+
+    def test(self, text):
+        QMessageBox.about(None, 'Ok', str(text))
+
+    def pressbtn(self):
+        QMessageBox.about(None, 'Ok', str('btn pressed'))

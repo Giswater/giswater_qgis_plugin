@@ -28,7 +28,6 @@ from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImp
 from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
-from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
 from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
 from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
@@ -43,14 +42,14 @@ from parent import ParentAction
 class Mg(ParentAction):
    
     def __init__(self, iface, settings, controller, plugin_dir):
-        ''' Class to control Management toolbar actions '''  
+        """ Class to control Management toolbar actions """
                   
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
     
                   
     def close_dialog(self, dlg=None): 
-        ''' Close dialog '''
+        """ Close dialog """
 
         dlg.close()
         if dlg is None or type(dlg) is bool:
@@ -62,7 +61,7 @@ class Mg(ParentAction):
 
 
     def mg_arc_topo_repair(self):
-        ''' Button 19. Topology repair '''
+        """ Button 19. Topology repair """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -255,120 +254,6 @@ class Mg(ParentAction):
             message = "Selected CSV has been imported successfully"
             self.controller.show_info(message, context_name='ui_message')
 
-
-    def mg_go2epa(self):
-        ''' Button 23. Open form to set INP, RPT and project '''
-
-        # Initialize variables
-        self.file_inp = None
-        self.file_rpt = None
-        self.project_name = None
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 23)
-
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_2.0.properties"
-        java_properties_path = users_home+os.sep+"giswater"+os.sep+"config"+os.sep+filename
-        if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: "+str(java_properties_path)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get last GSW file from giswater properties file
-        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())          
-        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
-        
-        # Check if that file exists
-        if not os.path.exists(file_gsw):
-            msg = "Last GSW file not found: "+str(file_gsw)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
-        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')                
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
-                
-        # Create dialog
-        self.dlg = FileManager()
-        utils_giswater.setDialog(self.dlg)
-
-        # Set widgets
-        self.dlg.txt_file_inp.setText(self.file_inp)
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
-        self.dlg.txt_result_name.setText(self.project_name)
-
-        # Set signals
-        self.dlg.btn_file_inp.clicked.connect(self.mg_go2epa_select_file_inp)
-        self.dlg.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
-        self.dlg.btn_accept.clicked.connect(self.mg_go2epa_accept)
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'file_manager')
-        self.dlg.exec_()
-
-
-    def mg_go2epa_select_file_inp(self):
-
-        # Set default value if necessary
-        if self.file_inp is None or self.file_inp == '':
-            self.file_inp = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_inp)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        msg = self.controller.tr("Select INP file")
-        self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        self.dlg.txt_file_inp.setText(self.file_inp)
-
-
-    def mg_go2epa_select_file_rpt(self):
-
-        # Set default value if necessary
-        if self.file_rpt is None or self.file_rpt == '':
-            self.file_rpt = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_rpt)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        msg = self.controller.tr("Select RPT file")
-        self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
-
-
-    def mg_go2epa_accept(self):
-        ''' Save INP, RPT and result name into GSW file '''
-
-        # Get widgets values
-        self.file_inp = utils_giswater.getWidgetText('txt_file_inp')
-        self.file_rpt = utils_giswater.getWidgetText('txt_file_rpt')
-        self.project_name = utils_giswater.getWidgetText('txt_result_name')
-
-        # Save INP, RPT and result name into GSW file
-        self.gsw_settings.setValue('FILE_INP', self.file_inp)
-        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
-
-        # Close form
-        self.close_dialog(self.dlg)
-
-
-    def mg_go2epa_express(self):
-        ''' Button 24. Open giswater in silent mode
-        Executes all options of File Manager: 
-        Export INP, Execute EPA software and Import results
-        '''       
-        self.execute_giswater("mg_go2epa_express", 24)
-                        
 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
@@ -714,8 +599,7 @@ class Mg(ParentAction):
         return columns
 
         
-    def test(self, text):
-        QMessageBox.about(None, 'Ok', str(text))
+
 
         
     def open_file_dialog(self, widget):
@@ -1823,7 +1707,11 @@ class Mg(ParentAction):
         self.pss_txt_short_descript = self.dlg_psector_sel.findChild(QLineEdit, "txt_short_descript")
 
         self.dlg_psector_sel.exec_()
-        
+
+
+    def set_project_type(self, project_type):
+        self.project_type = project_type
+
         
     def pressbtn(self):
         QMessageBox.about(None, 'Ok', str('btn pressed'))
