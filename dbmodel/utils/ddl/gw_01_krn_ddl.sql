@@ -427,6 +427,11 @@ CREATE TABLE "value_yesno" (
 );
 
 
+CREATE TABLE value_priority (
+id character varying(16) NOT NULL PRIMARY KEY,
+observ character varying(254)
+);
+
 
 
 -- ----------------------------------
