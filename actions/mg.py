@@ -1664,25 +1664,32 @@ class Mg():
         ##
         if isinstance(psector_id, bool):
             psector_id = 0
+            
         if psector_id != 0:
-            sql = "SELECT * FROM " + self.schema_name + ".plan_psector  WHERE psector_id = " + str(psector_id)
+            
+            sql = "SELECT psector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
+            sql+= " FROM " + self.schema_name + ".plan_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
+            self.controller.show_info(sql, 50)
             row = self.dao.get_row(sql)
-
-            self.psector_id.setText(str(row[0]))
-            self.name.setText(row[15])
-            index = self.priority.findText(row[2], Qt.MatchFixedString)
+            if row is None:
+                return
+            
+            self.psector_id.setText(str(row["psector_id"]))
+            #self.name.setText(row["name"])
+            index = self.priority.findText(row["priority"], Qt.MatchFixedString)
             if index >= 0:
                 self.priority.setCurrentIndex(index)
-            self.descript.setText(row[1])
-            self.text1.setText(row[3])
-            self.text2.setText(row[4])
-            self.observ.setText(row[5])
-            self.atlas_id.setText(row[9])
+            self.descript.setText(row["descript"])
+            self.text1.setText(row["text1"])
+            self.text2.setText(row["text2"])
+            self.observ.setText(row["observ"])
+            self.atlas_id.setText(row["atlas_id"])
 
             if row[7] is not None:
-                self.scale.setText(str(row[7]))
+                self.scale.setText(str(row["scale"]))
             if row[6] is not None:
-                self.rotation.setText(str(row[6]))
+                self.rotation.setText(str(row["rotation"]))
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan_other_x_psector with selected filter
             expr = " psector_id = "+ str(psector_id)
@@ -1694,33 +1701,39 @@ class Mg():
             self.tbl_node_plan.model().select()
 
             # Total other Prices:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector  WHERE psector_id = " + str(psector_id)
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
-            if not row[0]:
-                total_other_price = 0
-            else:
-                total_other_price = row[0]
-            self.sum_v_plan_other_x_psector.setText(str(total_other_price))
+            if row is not None:       
+                if not row[0]:
+                    total_other_price = 0
+                else:
+                    total_other_price = row[0]
+                self.sum_v_plan_other_x_psector.setText(str(total_other_price))
 
             # Total arcs:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector  WHERE psector_id = " + str(psector_id)
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
-            if not row[0]:
-                total_arcs = 0
-            else:
-                total_arcs = row[0]
-            self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
+            if row is not None:              
+                if not row[0]:
+                    total_arcs = 0
+                else:
+                    total_arcs = row[0]
+                self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
 
             # Total nodes:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = " + str(psector_id)
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
-            if not row[0]:
-                total_nodes=0
-            else:
-                total_nodes = row[0]
-            self.sum_v_plan_x_node_psector.setText(str(total_nodes))
-            sum_expenses=total_other_price+total_arcs+total_nodes
-            self.sum_expenses.setText(str(sum_expenses))
+            if row is not None:              
+                if not row[0]:
+                    total_nodes = 0
+                else:
+                    total_nodes = row[0]
+                self.sum_v_plan_x_node_psector.setText(str(total_nodes))
+                sum_expenses = total_other_price + total_arcs + total_nodes
+                self.sum_expenses.setText(str(sum_expenses))
             update = True
 
         # Buttons
@@ -1856,15 +1869,11 @@ class Mg():
                     else:
                         message = "This id already exists"
                         self.controller.show_info(message, context_name='ui_message')
-
                 else:
-                    self.test("Estas intentando introducir un " + feat_type + " en un " + elem_type)
                     message = self.tr("You are trying to introduce")+" "+feat_type+" "+self.tr("in a")+" "+elem_type
-                    self.test(message)
                     self.controller.show_info(message, context_name='ui_message')
 
         if button == 2:
-            self.test(str(len(self.list_elemets)))
             for element_id, feat_type in self.list_elemets.items():
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
                 sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
