@@ -157,9 +157,9 @@ BEGIN
 		  NEW.fountain_descript, NEW.fountain_rotation, NEW.fountain_link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
 		  expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
 		 
-		 INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, the_geom_pol) 
+		 INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, arq_patrimony, the_geom_pol) 
 		 VALUES (NEW.connec_id, NEW.fountain_vmax, NEW.fountain_linked_connec, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
-		 NEW.fountain_connection, NEW.fountain_chlorinator, NEW.the_geom_pol);
+		 NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.the_geom_pol;
 		 
 		ELSIF man_table='man_tap' THEN
 					
@@ -300,7 +300,7 @@ BEGIN
 			
 			UPDATE man_fountain 
 			SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
-			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec,
+			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
 			the_geom_pol=NEW.the_geom_pol
 			WHERE connec_id=OLD.connec_id;
 		END IF;

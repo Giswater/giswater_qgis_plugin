@@ -516,6 +516,7 @@ CREATE TABLE "man_fountain"(
 "regulation_tank" character varying(150),
 "connection" character varying(100),
 "chlorinator" character varying(100),
+"arq_patrimony" boolean,
 "name" character varying(254),
  CONSTRAINT man_fountain_pkey PRIMARY KEY (connec_id)
  );

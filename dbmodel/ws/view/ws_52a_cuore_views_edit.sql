@@ -291,6 +291,7 @@ man_fountain.power AS fountain_power,
 man_fountain.regulation_tank AS fountain_regulation_tank,
 man_fountain.connection AS fountain_connection,
 man_fountain.chlorinator AS fountain_chlorinator,
+man_fountain.arq_patrimony AS fountain_arq_patrimony,
 man_fountain.name AS fountain_name
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
