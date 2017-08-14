@@ -6,21 +6,18 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QObject, SIGNAL
 from PyQt4.QtCore import QPoint
 from PyQt4.QtCore import Qt, QSettings
 
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
-from PyQt4.QtGui import QTableWidget
 from PyQt4.QtGui import QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis._gui import QgsMapCanvasSnapper
 from qgis._gui import QgsMapToolEmitPoint
-from qgis.core import QgsExpressionContextUtils, QgsProject,QgsMapLayerRegistry, QgsPoint, QgsFeatureRequest
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
 from PyQt4.Qt import QDate, QTime
 from datetime import datetime, date
-import time
 import os
 import sys
 import webbrowser
@@ -28,8 +25,6 @@ import webbrowser
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
-from parent_init import ParentDialog
-
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config import Config                                  # @UnresolvedImport
@@ -39,14 +34,13 @@ from ..ui.topology_tools import TopologyTools                   # @UnresolvedImp
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
-from ..ui.mincut_edit import Mincut_edit          # @UnresolvedImport
-from ..ui.mincut_fin import Mincut_fin
-from ..ui.mincut import Mincut
-from ..ui.multipsector_selector import Multipsector_selector        # @UnresolvedImport
-from ..ui.plan_psector import Plan_psector        # @UnresolvedImport
-from ..ui.psector_management import Psector_management        # @UnresolvedImport
-from ..ui.state_selector import State_selector        # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector        # @UnresolvedImport
+from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
+from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
+from ..ui.mincut import Mincut                                  # @UnresolvedImport
+from ..ui.plan_psector import Plan_psector                      # @UnresolvedImport
+from ..ui.psector_management import Psector_management          # @UnresolvedImport
+from ..ui.state_selector import State_selector                  # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector            # @UnresolvedImport
 
 from functools import partial
 
@@ -1576,6 +1570,7 @@ class Mg():
 
     def mg_new_psector(self, psector_id=None, enable_tabs=False):
         ''' Button_45 : New psector '''
+        
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
@@ -1585,7 +1580,7 @@ class Mg():
         self.tab_arc_node_other.setTabEnabled(0, enable_tabs)
         self.tab_arc_node_other.setTabEnabled(1, enable_tabs)
         self.tab_arc_node_other.setTabEnabled(2, enable_tabs)
-        # LineEdit
+
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
         self.name = self.dlg_new_psector.findChild(QLineEdit, "name")
@@ -1660,7 +1655,6 @@ class Mg():
 
         self.dlg_new_psector.btn_add_other_plan.pressed.connect(partial(self.snapping, "v_edit_connect", "plan_other_x_psector", self.tbl_other_plan, "connec"))
         self.dlg_new_psector.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_other_plan, "plan_other_x_psector", "id"))
-
 
         ##
         # if a row is selected from mg_psector_mangement(button 46)
@@ -1737,6 +1731,7 @@ class Mg():
 
 
     def insert_or_update_new_psector(self, update,tablename):
+        
         sql = "SELECT *"
         sql += " FROM " + self.schema_name + "." + tablename
         row = self.dao.get_row(sql)
@@ -1744,6 +1739,7 @@ class Mg():
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             columns.append(column_name)
+            
         if update:
             if columns is not None:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
@@ -1766,6 +1762,7 @@ class Mg():
 
                 sql = sql[:len(sql) - 2]
                 sql += " WHERE psector_id = '" + self.psector_id.text() + "'"
+                
         else:
             values = "VALUES("
             if columns is not None:
@@ -1795,6 +1792,7 @@ class Mg():
 
 
     def snapping(self, layer_view, tablename, table_view, elem_type):
+        
         map_canvas = self.iface.mapCanvas()
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emitPoint = QgsMapToolEmitPoint(map_canvas)
@@ -1812,6 +1810,7 @@ class Mg():
         :param point: param inherited from signal canvasClicked
         :param button: param inherited from signal canvasClicked
         """
+        
         if button == 1:
             layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_view)[0]
             self.iface.setActiveLayer(layer)
@@ -1893,21 +1892,23 @@ class Mg():
         utils_giswater.setDialog(self.dlg_psector_mangement)
         table_name = "plan_psector"
         column_id = "psector_id"
+        
         # Tables
         self.tbl_psm = self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
         self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
 
-        # Buttons
+        # Set signals
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delet, self.tbl_psm, table_name, column_id))
-        # LineEdit
-        self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name,"plan_psector"))
+        self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
 
+
     def charge_psector(self):
+        
         selected_list = self.tbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1920,9 +1921,9 @@ class Mg():
 
 
     def filter_by_text(self, table, widget_txt, tablename):
+        
         result_select = utils_giswater.getWidgetText(widget_txt)
         if result_select != 'null':
-
             expr = " name LIKE '%"+result_select+"%'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
@@ -1930,9 +1931,12 @@ class Mg():
         else:
             self.fill_table(self.tbl_psm, self.schema_name + "."+tablename)
 
+
     def hide_colums(self, widget, comuns_to_hide):
         for i in range(0, len(comuns_to_hide)):
             widget.hideColumn(comuns_to_hide[i])
+            
+            
     def show_colums(self, widget, comuns_to_show):
         for i in range(0, len(comuns_to_show)):
             widget.showColumn(comuns_to_show[i])
@@ -1951,7 +1955,7 @@ class Mg():
         sql= "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name not in ("
         sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector RIGTH JOIN "
         sql += self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
-        sql += "where cur_user=current_user)"
+        sql += "WHERE cur_user = current_user)"
         self.fill_table_by_query(self.tbl_all_row, sql)
         columstohide = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
         self.hide_colums(self.tbl_all_row, columstohide)
@@ -1962,17 +1966,17 @@ class Mg():
         sql += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
         sql += "WHERE cur_user=current_user"
         self.fill_table_by_query(self.tbl_selected_psector, sql)
-        # Buttons
+
         self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
 
         query_left = "SELECT * FROM "+self.controller.schema_name+".plan_psector where name not in "
         query_left += "(SELECT name from "+self.controller.schema_name+".plan_psector "
         query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
-        query_left += "WHERE cur_user=current_user)"
+        query_left += "WHERE cur_user = current_user)"
 
         query_right = "SELECT name, cur_user, plan_psector.psector_id from "+self.controller.schema_name+".plan_psector "
         query_right += "JOIN "+self.controller.schema_name+".selector_psector on plan_psector.psector_id=selector_psector.psector_id "
-        query_right += "WHERE cur_user=current_user"
+        query_right += "WHERE cur_user = current_user"
         field = "psector_id"
         self.dlg_psector_sel.btn_select.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_row, self.tbl_selected_psector, "psector_id", "selector_psector", "id", query_left,query_right, field))
 
@@ -1981,31 +1985,30 @@ class Mg():
         query_left += "ON plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user)"
         query_right = "SELECT name, cur_user, plan_psector.psector_id from "+self.controller.schema_name+".plan_psector "
         query_right += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
-        query_right += "WHERE cur_user=current_user"
-        field="psector_id"
+        query_right += "WHERE cur_user = current_user"
+
         query_delete=  "DELETE FROM "+self.controller.schema_name+".selector_psector "
         query_delete += "WHERE current_user = cur_user and selector_psector.psector_id ="
         self.dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, self.tbl_all_row, self.tbl_selected_psector,
                                                                   query_delete, query_left, query_right, field))
-
-
-        # LineEdit
 
         self.dlg_psector_sel.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_psector_sel.txt_name))
         self.dlg_psector_sel.exec_()
 
 
     def query_like_widget_text(self, widget):
+        
         query = widget.text()
-        sql = "select * from "+self.controller.schema_name+".plan_psector where name not in ("
-        sql += "select name from "+self.controller.schema_name+".plan_psector right join "
+        sql = "SELECT * FROM "+self.controller.schema_name+".plan_psector where name not in ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector right join "
         sql += ""+self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
-        sql += "where cur_user=current_user) AND name LIKE '%" + query + "%'"
+        sql += "WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
         self.fill_table_by_query(self.tbl_all_row, sql)
 
 
     def mg_state_selector(self):
         """ Button_48 : state selector """
+        
         # Create the dialog and signals
         self.dlg_state_sel = State_selector()
         utils_giswater.setDialog(self.dlg_state_sel)
@@ -2029,7 +2032,7 @@ class Mg():
         columstohide = [2]
         self.hide_colums(self.tbl_selected_state, columstohide)
 
-        query_left = "select * from "+self.controller.schema_name+".value_state where name not in (select name from "+self.controller.schema_name+".value_state "
+        query_left = "SELECT * from "+self.controller.schema_name+".value_state WHERE name not in (SELECT name FROM "+self.controller.schema_name+".value_state "
         query_left += " RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
         query_right = "SELECT name, cur_user,state_id FROM "+self.controller.schema_name+".value_state JOIN "+self.controller.schema_name+".selector_state"
         query_right += " ON value_state.id=state_id WHERE cur_user=current_user"
@@ -2042,19 +2045,19 @@ class Mg():
         query_left += "(SELECT name FROM "+self.controller.schema_name+".value_state "
         query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
 
-
         query_right = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state JOIN "
         query_right += self.controller.schema_name+".selector_state ON value_state.id=state_id WHERE cur_user=current_user"
-        query_delete ="DELETE FROM "+self.controller.schema_name+".selector_state WHERE current_user = cur_user and state_id ="
+        query_delete = "DELETE FROM "+self.controller.schema_name+".selector_state WHERE current_user = cur_user and state_id ="
         field = "state_id"
         self.dlg_state_sel.btn_unselect_state.pressed.connect(
             partial(self.unselector, self.tbl_all_state, self.tbl_selected_state, query_delete, query_left, query_right, field))
 
         self.dlg_state_sel.btn_cancel.pressed.connect(self.dlg_state_sel.close)
-
         self.dlg_state_sel.exec_()
 
+
     def unselector(self, qtable_left, qtable_right, sql, query_left, query_right, field):
+        
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -2072,11 +2075,8 @@ class Mg():
         # Refresh
         self.fill_table_by_query(qtable_left, query_left)
         self.fill_table_by_query(qtable_right, query_right)
-
-
-
-
         self.iface.mapCanvas().refresh()
+
 
     def multi_rows_selector(self, qtable_left, qtable_right,  id_ori, tablename_des, id_des, query_left,query_right, field):
         """
@@ -2107,7 +2107,7 @@ class Mg():
             sql = "SELECT DISTINCT(" + id_des + ", cur_user) FROM " + self.schema_name+"." + tablename_des + " WHERE " + id_des + " = '" + str(expl_id[i])
             row = self.dao.get_row(sql)
             if row:
-            # if exist - show warning
+                # if exist - show warning
                 self.controller.show_info_box("Id "+str(expl_id[i])+" is already selected!", "Info")
             else:
                 sql = 'INSERT INTO '+self.schema_name+'.'+tablename_des+' ('+field+', cur_user) '
@@ -2116,10 +2116,9 @@ class Mg():
 
         #refresh
         self.fill_table_by_query(qtable_right, query_right)
-
         self.fill_table_by_query(qtable_left, query_left)
-
         self.iface.mapCanvas().refresh()
+        
 
     def fill_table_by_query(self, qtable, query):
         """
@@ -2131,5 +2130,3 @@ class Mg():
         qtable.setModel(model)
         qtable.show()
 
-    def pressbtn(self):
-        QMessageBox.about(None, 'Ok', str('btn pressed'))
