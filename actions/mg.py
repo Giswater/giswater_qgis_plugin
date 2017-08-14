@@ -45,6 +45,8 @@ from ..ui.mincut import Mincut
 from ..ui.multipsector_selector import Multipsector_selector        # @UnresolvedImport
 from ..ui.plan_psector import Plan_psector        # @UnresolvedImport
 from ..ui.psector_management import Psector_management        # @UnresolvedImport
+from ..ui.state_selector import State_selector        # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector        # @UnresolvedImport
 
 from functools import partial
 
@@ -1934,76 +1936,125 @@ class Mg():
     def show_colums(self, widget, comuns_to_show):
         for i in range(0, len(comuns_to_show)):
             widget.showColumn(comuns_to_show[i])
+
+
     def mg_psector_selector(self):
-        ''' Button_47 : Psector selector '''
+        """ Button_47 : Psector selector """
 
         # Create the dialog and signals
-        self.dlg_psector_sel = Multipsector_selector()
+        self.dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(self.dlg_psector_sel)
 
         # Tables
-        self.tbl_all_state = self.dlg_psector_sel.findChild(QTableView, "all_state")
-        self.tbl_all_state.setSelectionBehavior(QAbstractItemView.SelectRows)
-        #self.set_configuration(self.tbl_all_state, "value_state")
-        self.fill_table_by_query(self.tbl_all_state, "select * from ws_sample_dev.value_state where name not in ("
-                                                     "select name from ws_sample_dev.value_state right join "
-                                                     "ws_sample_dev.selector_state on value_state.id = state_id "
-                                                     "where cur_user=current_user)")
-        columstohide = [0, 2, 3, 4]
-        self.hide_colums(self.tbl_all_state, columstohide)
-
-        self.tbl_selected_state = self.dlg_psector_sel.findChild(QTableView, "selected_state")
-        self.tbl_selected_state.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table_by_query(self.tbl_selected_state,"SELECT name, cur_user, state_id from ws_sample_dev.value_state JOIN ws_sample_dev.selector_state on value_state.id=state_id where cur_user=current_user")
-        columstohide = [2]
-        self.hide_colums(self.tbl_selected_state, columstohide)
-
-
-        self.tbl_all_psector = self.dlg_psector_sel.findChild(QTableView, "all_psector")
-        self.tbl_all_psector.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table_by_query(self.tbl_all_psector, "select * from ws_sample_dev.plan_psector where name not in ("
-                                                     "select name from ws_sample_dev.plan_psector right join "
-                                                     "ws_sample_dev.selector_psector on plan_psector.psector_id = selector_psector.psector_id "
-                                                     "where cur_user=current_user)")
+        self.tbl_all_row = self.dlg_psector_sel.findChild(QTableView, "all_row")
+        self.tbl_all_row.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql= "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name not in ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector RIGTH JOIN "
+        sql += self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
+        sql += "where cur_user=current_user)"
+        self.fill_table_by_query(self.tbl_all_row, sql)
         columstohide = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-        self.hide_colums(self.tbl_all_psector, columstohide)
+        self.hide_colums(self.tbl_all_row, columstohide)
 
-        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_psector")
+        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_row")
         self.tbl_selected_psector.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table_by_query(self.tbl_selected_psector,
-                                 "SELECT name, cur_user, plan_psector.psector_id from ws_sample_dev.plan_psector JOIN ws_sample_dev.selector_psector on plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user")
+        sql = "SELECT name, cur_user, plan_psector.psector_id FROM "+self.controller.schema_name+".plan_psector "
+        sql += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
+        sql += "WHERE cur_user=current_user"
+        self.fill_table_by_query(self.tbl_selected_psector, sql)
         # Buttons
-        self.dlg_psector_sel.btn_accept.pressed.connect(self.pressbtn)
         self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
 
-        query_left = "select * from ws_sample_dev.value_state where name not in (select name from ws_sample_dev.value_state right join ws_sample_dev.selector_state on value_state.id = state_id where cur_user=current_user)"
-        query_right = "SELECT name, cur_user,state_id from ws_sample_dev.value_state JOIN ws_sample_dev.selector_state on value_state.id=state_id where cur_user=current_user"
-        field="state_id"
-        self.dlg_psector_sel.btn_select_state.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_state, self.tbl_selected_state, "id", "selector_state", "state_id",query_left,query_right,field))
+        query_left = "SELECT * FROM "+self.controller.schema_name+".plan_psector where name not in "
+        query_left += "(SELECT name from "+self.controller.schema_name+".plan_psector "
+        query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
+        query_left += "WHERE cur_user=current_user)"
 
-        query_left = "select * from ws_sample_dev.value_state where name not in (select name from ws_sample_dev.value_state right join ws_sample_dev.selector_state on value_state.id = state_id where cur_user=current_user)"
-        query_right = "SELECT name, cur_user, state_id from ws_sample_dev.value_state JOIN ws_sample_dev.selector_state on value_state.id=state_id where cur_user=current_user"
-        field="state_id"
-        self.dlg_psector_sel.btn_unselect_state.pressed.connect(partial(self.unselector, self.tbl_all_state,self.tbl_selected_state,"DELETE FROM ws_sample_dev.selector_state WHERE current_user = cur_user and state_id =",query_left,query_right,field))
-
-
-        query_left = "select * from ws_sample_dev.plan_psector where name not in (select name from ws_sample_dev.plan_psector right join ws_sample_dev.selector_psector on plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user)"
-        query_right = "SELECT name, cur_user,plan_psector.psector_id from ws_sample_dev.plan_psector JOIN ws_sample_dev.selector_psector on plan_psector.psector_id=selector_psector.psector_id where cur_user=current_user"
+        query_right = "SELECT name, cur_user, plan_psector.psector_id from "+self.controller.schema_name+".plan_psector "
+        query_right += "JOIN "+self.controller.schema_name+".selector_psector on plan_psector.psector_id=selector_psector.psector_id "
+        query_right += "WHERE cur_user=current_user"
         field = "psector_id"
-        self.dlg_psector_sel.btn_select_psector.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_psector, self.tbl_selected_psector, "psector_id", "selector_psector", "id", query_left,query_right, field))
+        self.dlg_psector_sel.btn_select.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_row, self.tbl_selected_psector, "psector_id", "selector_psector", "id", query_left,query_right, field))
 
-        query_left = "select * from ws_sample_dev.plan_psector where name not in (select name from ws_sample_dev.plan_psector right join ws_sample_dev.selector_psector on plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user)"
-        query_right = "SELECT name, cur_user, plan_psector.psector_id from ws_sample_dev.plan_psector JOIN ws_sample_dev.selector_psector on plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user"
+        query_left = "SELECT * FROM " + self.controller.schema_name+".plan_psector WHERE name NOT IN "
+        query_left += "(SELECT name FROM "+ self.controller.schema_name+".plan_psector RIGHT JOIN " + self.controller.schema_name+".selector_psector "
+        query_left += "ON plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user)"
+        query_right = "SELECT name, cur_user, plan_psector.psector_id from "+self.controller.schema_name+".plan_psector "
+        query_right += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
+        query_right += "WHERE cur_user=current_user"
         field="psector_id"
-        self.dlg_psector_sel.btn_unselect_psector.pressed.connect(partial(self.unselector, self.tbl_all_psector,self.tbl_selected_psector,"DELETE FROM ws_sample_dev.selector_psector WHERE current_user = cur_user and selector_psector.psector_id =",query_left,query_right,field))
+        query_delete=  "DELETE FROM "+self.controller.schema_name+".selector_psector "
+        query_delete += "WHERE current_user = cur_user and selector_psector.psector_id ="
+        self.dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, self.tbl_all_row, self.tbl_selected_psector,
+                                                                  query_delete, query_left, query_right, field))
+
+
         # LineEdit
-        #self.dlg_psector_sel.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_all_psector, self.dlg_psector_sel.txt_name,"plan_psector"))
-        #self.dlg_psector_sel.txt_name.textChanged.connect(partial(self.test,"qweqe"))
-        self.dlg_psector_sel.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_all_psector, self.dlg_psector_sel.txt_name, "plan_psector"))
+
+        self.dlg_psector_sel.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_psector_sel.txt_name))
         self.dlg_psector_sel.exec_()
 
 
-    def unselector(self, qtable_left, qtable_right,sql,query_left,query_right,field):
+    def query_like_widget_text(self, widget):
+        query = widget.text()
+        sql = "select * from "+self.controller.schema_name+".plan_psector where name not in ("
+        sql += "select name from "+self.controller.schema_name+".plan_psector right join "
+        sql += ""+self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
+        sql += "where cur_user=current_user) AND name LIKE '%" + query + "%'"
+        self.fill_table_by_query(self.tbl_all_row, sql)
+
+
+    def mg_state_selector(self):
+        """ Button_48 : state selector """
+        # Create the dialog and signals
+        self.dlg_state_sel = State_selector()
+        utils_giswater.setDialog(self.dlg_state_sel)
+        # Tables
+        self.tbl_all_state = self.dlg_state_sel.findChild(QTableView, "all_state")
+        self.tbl_all_state.setSelectionBehavior(QAbstractItemView.SelectRows)
+        #self.set_configuration(self.tbl_all_state, "all_state")
+        sql = "SELECT * FROM "+self.controller.schema_name+".value_state WHERE name NOT IN ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".value_state RIGHT JOIN "
+        sql += self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
+        self.fill_table_by_query(self.tbl_all_state, sql)
+        columstohide = [0, 2, 3, 4]
+        self.hide_colums(self.tbl_all_state, columstohide)
+
+        self.tbl_selected_state = self.dlg_state_sel.findChild(QTableView, "selected_state")
+        self.tbl_selected_state.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state"
+        sql += " JOIN "+self.controller.schema_name+".selector_state on value_state.id=state_id"
+        sql += " WHERE cur_user=current_user"
+        self.fill_table_by_query(self.tbl_selected_state, sql)
+        columstohide = [2]
+        self.hide_colums(self.tbl_selected_state, columstohide)
+
+        query_left = "select * from "+self.controller.schema_name+".value_state where name not in (select name from "+self.controller.schema_name+".value_state "
+        query_left += " RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
+        query_right = "SELECT name, cur_user,state_id FROM "+self.controller.schema_name+".value_state JOIN "+self.controller.schema_name+".selector_state"
+        query_right += " ON value_state.id=state_id WHERE cur_user=current_user"
+        field = "state_id"
+        self.dlg_state_sel.btn_select_state.pressed.connect(
+            partial(self.multi_rows_selector, self.tbl_all_state, self.tbl_selected_state, "id", "selector_state",
+                    "state_id", query_left, query_right, field))
+
+        query_left = "SELECT * FROM "+self.controller.schema_name+".value_state WHERE name NOT IN "
+        query_left += "(SELECT name FROM "+self.controller.schema_name+".value_state "
+        query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
+
+
+        query_right = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state JOIN "
+        query_right += self.controller.schema_name+".selector_state ON value_state.id=state_id WHERE cur_user=current_user"
+        query_delete ="DELETE FROM "+self.controller.schema_name+".selector_state WHERE current_user = cur_user and state_id ="
+        field = "state_id"
+        self.dlg_state_sel.btn_unselect_state.pressed.connect(
+            partial(self.unselector, self.tbl_all_state, self.tbl_selected_state, query_delete, query_left, query_right, field))
+
+        self.dlg_state_sel.btn_cancel.pressed.connect(self.dlg_state_sel.close)
+
+        self.dlg_state_sel.exec_()
+
+    def unselector(self, qtable_left, qtable_right, sql, query_left, query_right, field):
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
