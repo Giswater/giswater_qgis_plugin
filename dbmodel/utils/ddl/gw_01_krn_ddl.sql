@@ -253,6 +253,17 @@ id varchar (30),
  CONSTRAINT cat_brand_type_pkey PRIMARY KEY (id)
  );
  
+ 
+ -----------
+-- Temporal tables
+-----------
+ 
+create table temp_node (
+node_id serial PRIMARY KEY,
+the_geom public.geometry(POINT, SRID_VALUE)
+);
+
+
 
 
 -----------
