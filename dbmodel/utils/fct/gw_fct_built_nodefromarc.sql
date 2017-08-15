@@ -5,25 +5,19 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- Function: SCHEMA_NAME.gw_fct_urn();
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_built_nodefromarc();
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_result_calculate(varchar, double, boolean);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_plan_result_calculate(result_id_var text, coefficient_var double, only_planified boolean) RETURNS integer AS
-
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_built_nodefromarc() RETURNS integer AS
 $BODY$
 
 DECLARE 
-urn_id_seq integer;
-project_type_aux varchar;
+
 
 BEGIN 
 
     SET search_path = "SCHEMA_NAME", public;
-	
-	-- TO DO
-	
-	RETURN 1;
 
+	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
