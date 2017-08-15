@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
-    <height>436</height>
+    <width>499</width>
+    <height>502</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>315</x>
-     <y>390</y>
+     <y>460</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>390</y>
+     <y>460</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -45,11 +45,11 @@
      <x>20</x>
      <y>10</y>
      <width>461</width>
-     <height>371</height>
+     <height>431</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -61,11 +61,11 @@
        <x>10</x>
        <y>10</y>
        <width>441</width>
-       <height>321</height>
+       <height>381</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_16">
       <attribute name="title">
@@ -130,167 +130,6 @@
         <string/>
        </property>
       </widget>
-      <widget class="QComboBox" name="node_catalog">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>60</y>
-         <width>201</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_node_catalog">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>60</y>
-         <width>211</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>NodeCatalog (VirtualFromArc):</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="tab_21">
-      <attribute name="title">
-       <string>WS</string>
-      </attribute>
-      <widget class="QComboBox" name="nodeinsert_catalog_vdefault">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>30</y>
-         <width>121</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="nodeinsert_arcendpoint">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>30</y>
-         <width>20</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_nodeinsert_arcendpoint">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>30</y>
-         <width>261</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Nodecat (autom. insert arc endpoint):</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="tab_22">
-      <attribute name="title">
-       <string>UD</string>
-      </attribute>
-      <widget class="QLabel" name="label_node_type_vdefault">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>30</y>
-         <width>211</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="text">
-        <string>Node Type (VirtualFromArc):</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::AutoText</enum>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <property name="margin">
-        <number>3</number>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="node_type_vdefault">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>30</y>
-         <width>191</width>
-         <height>22</height>
-        </rect>
-       </property>
-      </widget>
      </widget>
     </widget>
    </widget>
@@ -304,7 +143,7 @@
        <x>10</x>
        <y>10</y>
        <width>441</width>
-       <height>321</height>
+       <height>381</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -773,17 +612,25 @@
         <number>3</number>
        </property>
       </widget>
-     </widget>
-     <widget class="QWidget" name="tab_23">
-      <attribute name="title">
-       <string>WS</string>
-      </attribute>
+      <widget class="QCheckBox" name="orphannode_delete">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>280</y>
+         <width>20</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
       <widget class="QLabel" name="label_orphannode_delete">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
-         <width>281</width>
+         <y>280</y>
+         <width>261</width>
          <height>22</height>
         </rect>
        </property>
@@ -814,11 +661,47 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="orphannode_delete">
+      <widget class="QLabel" name="label_nodeinsert_arcendpoint_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>310</y>
+         <width>261</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="text">
+        <string>Automatic insert arc endpoint:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+       <property name="margin">
+        <number>3</number>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="nodeinsert_arcendpoint">
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>30</y>
+         <y>310</y>
          <width>20</width>
          <height>21</height>
         </rect>
@@ -894,11 +777,11 @@
        <x>10</x>
        <y>10</y>
        <width>441</width>
-       <height>321</height>
+       <height>381</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_18">
       <attribute name="title">
@@ -956,21 +839,6 @@
         <number>3</number>
        </property>
       </widget>
-      <zorder>node_duplicated_tolerance</zorder>
-      <zorder>label_node_duplicated_tolerance</zorder>
-      <zorder>label_double_geometry_enabled</zorder>
-      <zorder>buffer_value</zorder>
-      <zorder>label_audit_function_control</zorder>
-      <zorder>audit_function_control</zorder>
-      <zorder>label_nodetype_change_enabled</zorder>
-      <zorder>label_vnode_update_tolerance</zorder>
-      <zorder>label_connec_duplicated_tolerance</zorder>
-      <zorder>vnode_update_tolerance</zorder>
-      <zorder>insert_double_geometry</zorder>
-      <zorder>connec_duplicated_tolerance</zorder>
-      <zorder>nodetype_change_enabled</zorder>
-      <zorder>node2arc</zorder>
-      <zorder>label_node2arc</zorder>
      </widget>
      <widget class="QWidget" name="tab_25">
       <attribute name="title">
@@ -1098,11 +966,11 @@
        <x>10</x>
        <y>10</y>
        <width>431</width>
-       <height>321</height>
+       <height>381</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_11">
       <attribute name="title">
@@ -1114,7 +982,7 @@
          <x>5</x>
          <y>10</y>
          <width>411</width>
-         <height>241</height>
+         <height>331</height>
         </rect>
        </property>
        <property name="currentIndex">
@@ -2637,8 +2505,6 @@
   <tabstop>node_proximity</tabstop>
   <tabstop>connec_proximity_control</tabstop>
   <tabstop>connec_proximity</tabstop>
-  <tabstop>nodeinsert_arcendpoint</tabstop>
-  <tabstop>nodeinsert_catalog_vdefault</tabstop>
   <tabstop>orphannode_delete</tabstop>
   <tabstop>node2arc</tabstop>
   <tabstop>node_duplicated_tolerance</tabstop>
