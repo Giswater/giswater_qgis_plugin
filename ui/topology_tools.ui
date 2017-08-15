@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -71,13 +71,13 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>23</y>
+        <y>30</y>
         <width>271</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Node creation from arcs</string>
+       <string>Virtual node from arcs</string>
       </property>
      </widget>
     </widget>
@@ -96,7 +96,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -215,7 +215,7 @@
          <rect>
           <x>16</x>
           <y>28</y>
-          <width>201</width>
+          <width>211</width>
           <height>17</height>
          </rect>
         </property>
@@ -330,9 +330,9 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>23</y>
-        <width>271</width>
-        <height>17</height>
+        <y>30</y>
+        <width>221</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
