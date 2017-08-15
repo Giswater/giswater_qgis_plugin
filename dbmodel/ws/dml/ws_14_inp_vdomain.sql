@@ -11,16 +11,25 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of inp_options
 -- ----------------------------
  
-INSERT INTO inp_options VALUES ('LPS', 'H-W', NULL, 1.000000, 1.000000, 40.000000, 0.001000, 'CONTINUE', 2.000000, 10.000000, 0.000000, '1', 1.000000, 0.500000, 'NONE', 1.000000, 0.010000, '', 40.000000, NULL);
+INSERT INTO inp_options VALUES ('LPS', 'H-W', NULL, 1.000000, 1.000000, 40.000000, 0.001000, 'CONTINUE', 2.000000, 10.000000, 0.000000, '1', 1.000000, 0.500000, 'NONE', 1.000000, 0.010000, '', 40.000000, NULL, 'EPA TABLES', '', 'f', '', '');
 
 
 -- ----------------------------
--- Records of inp_flow_regulator_type
+-- Records of inp_value_opti_valvemodeoptions
 -- ----------------------------
-/*
-INSERT INTO inp_flwreg_type VALUES ('WEIR', 'inp_flwreg_valve');
-INSERT INTO inp_flwreg_type VALUES ('PUMP', 'inp_flwreg_pump');
-*/
+INSERT INTO "inp_value_opti_valvemode" VALUES ('EPA TABLES');
+INSERT INTO "inp_value_opti_valvemode" VALUES ('INVENTORY VALUES');
+INSERT INTO "inp_value_opti_valvemode" VALUES ('MINCUT RESULTS');
+
+
+-- ----------------------------
+-- Records of inp_value_opti_rtc_coef
+-- ----------------------------
+INSERT INTO "inp_value_opti_rtc_coef" VALUES ('MIN');
+INSERT INTO "inp_value_opti_rtc_coef" VALUES ('AVG');
+INSERT INTO "inp_value_opti_rtc_coef" VALUES ('MAX');
+INSERT INTO "inp_value_opti_rtc_coef" VALUES ('REAL');
+
 
 
 -- ----------------------------

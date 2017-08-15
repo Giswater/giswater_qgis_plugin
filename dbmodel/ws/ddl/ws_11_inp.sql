@@ -115,6 +115,32 @@ CREATE SEQUENCE "rpt_inp_arc_seq"
     CACHE 1;
 
 
+	
+
+-- ----------------------------
+-- Table CATALOG
+-- ----------------------------
+
+CREATE TABLE "cat_dscenario" (
+"dscenario_id" serial PRIMARY KEY,
+"name" varchar (30),
+"descript" text
+);
+
+
+
+
+-- ----------------------------
+-- Table structure for Selector
+-- ----------------------------
+
+CREATE TABLE inp_selector_dscenario (
+id serial NOT NULL PRIMARY KEY,
+dscenario_id integer),
+cur_user text
+
+
+	
 
 
 -- ----------------------------
@@ -177,7 +203,8 @@ CREATE TABLE "inp_demand" (
 "node_id" varchar(16)   NOT NULL,
 "demand" numeric(12,6),
 "pattern_id" varchar(16)  ,
-"deman_type" varchar(18)  
+"deman_type" varchar(18)  ,
+"dscenario_id" integer
 );
 
 
@@ -208,7 +235,7 @@ CONSTRAINT inp_energy_gl_pkey PRIMARY KEY (id)
 CREATE TABLE "inp_junction" (
 "node_id" varchar(16)   NOT NULL,
 "demand" numeric(12,6),
-"pattern_id" varchar(16)  
+"pattern_id" varchar(16)
 );
 
 
@@ -248,7 +275,12 @@ CREATE TABLE "inp_options" (
 "tolerance" numeric(12,6),
 "hydraulics_fname" varchar(254)  ,
 "unbalanced_n" numeric(12,6),
-"node_id" varchar(16)  
+"node_id" varchar(16),
+"valve_mode" varchar (18),
+"valve_mode_mincut_result" varchar(30),
+"rtc_enabled" boolean,
+"rtc_period_id" varchar(16),
+"rtc_coefficient" varchar(16)
 );
 
 
@@ -516,6 +548,18 @@ CREATE TABLE "inp_value_opti_unbal" (
 CREATE TABLE "inp_value_opti_units" (
 "id" varchar(18)   NOT NULL
 );
+
+
+CREATE TABLE "inp_value_opti_valvemode" (
+"id" varchar(18)  NOT PRIMARY KEY
+);
+
+
+CREATE TABLE "inp_value_opti_rtc_coef" (
+"id" character varying(16) NOT NULL PRIMARY KEY,
+"observ" text
+);
+
 
 
 CREATE TABLE "inp_value_param_energy" (

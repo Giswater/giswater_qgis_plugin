@@ -451,11 +451,10 @@ CREATE TABLE "subcatchment" (
 -- ----------------------------
 
 CREATE TABLE "cat_hydrology" (
-"hydrology_id" serial,
+"hydrology_id" serial PRIMARY KEY,
 "name" varchar (30),
-"infiltration" varchar(20)   NOT NULL,
-"descript" varchar(255)  ,
-CONSTRAINT "cat_hydrology_pkey" PRIMARY KEY ("id")
+"infiltration" varchar(20) NOT NULL,
+"text" varchar(255)
 );
 
 

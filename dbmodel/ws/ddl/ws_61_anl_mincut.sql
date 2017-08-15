@@ -31,12 +31,13 @@ CREATE SEQUENCE "anl_mincut_result_cat_seq"
 
 CREATE TABLE "anl_mincut_result_cat" (
 id varchar (30) DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL,
-type int2,
-state int2,
+mincut_state int2,
+mincut_class int2,
+mincut_type varchar (30),
 received_date date,
 expl_id integer,
-street character varying (30),
-address_num character varying (30),
+address_1 character varying (250),
+address_2 character varying (250),
 anl_cause character varying (30),
 anl_tstamp timestamp default now(),
 anl_user varchar(30),
@@ -129,25 +130,23 @@ CONSTRAINT anl_mincut_result_valve_pkey PRIMARY KEY (id)
 
 
 CREATE TABLE "anl_mincut_cat_state" (
-id int2 NOT NULL,
+id int2 NOT NULL PRIMARY KEY,
 name text,
-descript text,
-CONSTRAINT mincut_result_cat_type_pkey PRIMARY KEY (id)
+descript text
 );
 
 
 CREATE TABLE "anl_mincut_cat_type" (
-id int2 NOT NULL
+id int2 NOT NULL PRIMARY KEY,
 name text,
-descript text,
-CONSTRAINT mincut_result_cat_type_pkey PRIMARY KEY (id)
+descript text
 );
 
 
+
 CREATE TABLE "anl_mincut_cat_cause" (
-id varchar(30) NOT NULL,
-descript text,
-CONSTRAINT mincut_result_cat_cause_pkey PRIMARY KEY (id)
+id varchar(30) NOT NULL PRIMARY KEY,
+descript text
 );
 
 

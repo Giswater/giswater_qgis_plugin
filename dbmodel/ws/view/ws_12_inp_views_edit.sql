@@ -156,3 +156,20 @@ FROM inp_selector_sector, v_arc_x_node arc
 	JOIN v_arc_x_node ON v_arc_x_node.arc_id=arc.arc_id
 	JOIN inp_pipe ON ((inp_pipe.arc_id) = (arc.arc_id))
 	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id)	AND inp_selector_sector.cur_user="current_user"());
+
+
+	
+DROP VIEW IF EXISTS "v_edit_inp_demand" CASCADE;
+CREATE VIEW "v_edit_inp_demand" AS 
+SELECT 
+id,
+node.node_id,
+inp_demand.demand,
+inp_demand.pattern_id,
+deman_type,
+dscenario_id
+FROM inp_selector_sector, inp_selector_dscenario, node
+	JOIN v_node ON v_node.node_id=node.node_id
+	JOIN inp_demand ON ((inp_demand.node_id) = (node.node_id))
+	WHERE ((node.sector_id)=(inp_selector_sector.sector_id)	AND inp_selector_sector.cur_user="current_user"())
+	WHERE ((inp_demand.dscenario_id)=(inp_selector_dscenario.dscenario_id)	AND inp_selector_dscenario.cur_user="current_user"());

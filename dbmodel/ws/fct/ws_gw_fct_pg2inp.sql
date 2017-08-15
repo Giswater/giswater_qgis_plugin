@@ -17,8 +17,22 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2inp process.';
 		
-	-- AL PRINCIPI DE TOT
-	-- INSERT INTO inp_selector_result (result_id_var, cur_user)
+	-- PROCESSES
+	-- 1) RESULT MANAGEMENT INSERT
+		-- INSERT INTO inp_selector_result (result_id_var, cur_user)
+		-- INSERT INTO rpt_input_node & rpt_input_arc TABLES
+	
+	-- 2) VALVE OPTIONS 
+		-- Copy on inp_valve.status and inp_shorpipe.status se values from inp_options.valve_type & inp_options.valve_type_mincut_result
+		-- table destination: inp_temp_valve (result_id, valve_id, status)
+		
+	-- 3) RTC OPTIONS (IF IS TRUE) 
+		-- Use values from rtc_options 
+		-- Enhance the scenario when hydrometer value is null (when it's used inp_junction.demand value)
+		-- table destination: inp_temp_demand (result_id, node_id, value, pattern)
+	
+		
+	
 	
 END;
 $BODY$
