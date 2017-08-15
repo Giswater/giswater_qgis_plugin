@@ -34,6 +34,65 @@ CONSTRAINT "config_check" CHECK(id = '1')
 );
 
 
+CREATE TABLE "config_param_int" (
+"id" serial NOT NULL PRIMARY KEY,
+"parameter"  varchar (50),
+"value" int4 NOT NULL,
+"user" varchar (30),
+"context" varchar (50),
+"descript" text,
+CONSTRAINT "config_param_int_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "config_param_text" (
+"id" serial NOT NULL PRIMARY KEY,
+"parameter"  varchar (50),
+"value" text NOT NULL,
+"user" varchar (30),
+"context" varchar (50),
+"descript" text,
+CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "config_param_float" (
+"id" serial NOT NULL PRIMARY KEY,
+"parameter"  varchar (50),
+"user" varchar (30),
+"context" varchar (50),
+"descript" text,
+CONSTRAINT "config_param_float_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "config_param_bool" (
+"id" serial NOT NULL PRIMARY KEY,
+"parameter"  varchar (50),
+"value" boolean NOT NULL,
+"user" varchar (30),
+"context" varchar (50),
+"descript" text,
+CONSTRAINT "config_param_bool_pkey" PRIMARY KEY ("id")
+);
+
+
+CREATE TABLE "config_vdefault" (
+"id" serial PRIMARY KEY,
+"parameter" character varying (50),
+"value" text,
+"user" character varying (30),
+"context" varchar (50),
+"descript" text
+);
+
+CREATE TABLE "config_searchplus" (
+"id" serial NOT NULL PRIMARY KEY,
+"parameter"  varchar (50),
+"value"  varchar (50),
+"user" character varying (30),
+"context"  varchar (50),
+"descript" text
+);
+
+
 CREATE TABLE "config_csv_import" (
 "table_name" varchar(50) NOT NULL,
 "gis_client_layer_name" varchar(50),
@@ -64,54 +123,6 @@ CREATE TABLE "config_py_tables" (
 CONSTRAINT "config_py_tables_pkey" PRIMARY KEY ("id")
 );
 
-CREATE TABLE "config_param_int" (
-"id" varchar (50) NOT NULL,
-"value" int4 NOT NULL,
-"context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_int_pkey" PRIMARY KEY ("id")
-);
-
-CREATE TABLE "config_param_text" (
-"id" varchar (50) NOT NULL,
-"value" text NOT NULL,
-"context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
-);
-
-CREATE TABLE "config_param_float" (
-"id" varchar (50) NOT NULL,
-"value" double precision NOT NULL,
-"context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_float_pkey" PRIMARY KEY ("id")
-);
-
-CREATE TABLE "config_param_bool" (
-"id" varchar (50) NOT NULL,
-"value" boolean NOT NULL,
-"context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_bool_pkey" PRIMARY KEY ("id")
-);
-
-
-CREATE TABLE "config_vdefault" (
-"id" serial PRIMARY KEY,
-"parameter" character varying (50),
-"value" text,
-"context" varchar (50),
-"user" character varying (30),
-"descript" text
-);
-
-CREATE TABLE "config_searchplus" (
-"id" serial NOT NULL PRIMARY KEY,
-"parameter"  varchar (50),
-"value"  varchar (50),
-"context"  varchar (50)
-);
 
 
 CREATE TABLE config_client_dvalue(
