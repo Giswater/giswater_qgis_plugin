@@ -231,6 +231,8 @@ CREATE TABLE "plan_result_arc" (
 "thickness" numeric(12,2),
 "width" numeric(12,2),
 "b" numeric(12,2),
+-- to do
+-- gully's cost
 "bulk" numeric(12,2),
 "geom1" numeric(12,2),
 "area" numeric(12,2),
