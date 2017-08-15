@@ -17,7 +17,6 @@ CREATE TABLE "config" (
 "connec_proximity" double precision,
 "arc_toporepair" double precision,
 "nodeinsert_arcendpoint" boolean,
-"nodeinsert_catalog_vdefault" varchar (30),
 "orphannode_delete" boolean,
 "vnode_update_tolerance" double precision,
 "nodetype_change_enabled" boolean,
