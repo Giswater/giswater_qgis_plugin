@@ -9,13 +9,14 @@ This version of Giswater is provided by Giswater Association
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_urn();
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_urn()
-RETURNS integer AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_urn() RETURNS integer AS
 $BODY$
 DECLARE 
 urn_id_seq integer;
 project_type_aux varchar;
 BEGIN 
+
+    SET search_path = "SCHEMA_NAME", public;
 
 	SELECT wsoftware INTO project_type_aux FROM version;
 	IF project_type_aux='WS' THEN

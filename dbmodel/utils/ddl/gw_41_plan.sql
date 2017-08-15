@@ -148,3 +148,121 @@ CREATE TABLE price_value_unit (
   descript character varying(100)
 );
 
+
+
+----------------------------------------------
+-- TABLE SCTRUCTURE FOR BUDGET
+---------------------------------------------
+
+
+-- ----------------------------
+-- Table CATALOG
+-- ----------------------------
+
+CREATE TABLE "plan_result_cat" (
+"result_id" serial PRIMARY KEY,
+"name" varchar (30),
+"network_price_coeff" float,
+timestamp default now(),
+user default cur_user(),
+"descript" text
+);
+
+
+
+
+-- ----------------------------
+-- Table structure for Selector
+-- ----------------------------
+
+CREATE TABLE plan_selector_result (
+id serial NOT NULL PRIMARY KEY,
+result_id integer),
+cur_user text
+
+
+
+-- ----------------------------
+-- Table structure for budget
+-- ----------------------------
+
+
+CREATE TABLE "plan_result_node" (
+"id" serial PRIMARY KEY NOT NULL,
+"result_id" varchar(16) NOT NULL,
+"node_id" varchar(16) NOT NULL,
+"elevation" numeric(12,3),
+"elev" numeric(12,3),
+"node_type" varchar(18)  ,
+"nodecat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,
+"annotation" character varying(254),
+"the_geom" public.geometry (POINT, SRID_VALUE)
+"cost_unit" varchar(3),
+"calculated_depth" numeric(12,2),
+"cost" numeric(12,3),
+"budget" numeric(12,2)
+);
+
+
+
+CREATE TABLE "plan_result_arc" (
+"id" serial PRIMARY KEY NOT NULL,
+"result_id" varchar(16) NOT NULL,
+"arc_id" varchar(16) ,
+"node_1" varchar(16) ,
+"node_2" varchar(16) ,
+"arc_type" varchar(18)  ,
+"arccat_id" varchar(30)  ,
+"epa_type" varchar(16)  ,
+"sector_id" integer NOT NULL,
+"state" int2  NOT NULL,
+"annotation" character varying(254),
+"length" numeric(12,3),
+"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+"soilcat_id" varchar(30),
+"y1" numeric(12,2),
+"y2" numeric(12,2),
+"mean_y" numeric(12,2),
+"z1" numeric(12,2),
+"z2" numeric(12,2),
+"thickness" numeric(12,2),
+"width" numeric(12,2),
+"b" numeric(12,2),
+"bulk" numeric(12,2),
+"geom1" numeric(12,2),
+"area" numeric(12,2),
+"y_param" numeric(12,2),
+"total_y" numeric(12,2),
+"rec_y" numeric(12,2),
+"geom1_ext" numeric(12,2),
+"bulk_bottom" numeric(12,2),
+"calculed_y" numeric(12,2),
+"m3mlexc" numeric(12,2),
+"m2mltrenchl" numeric(12,2),
+"m2mlbottom" numeric(12,2),
+"m2mlpav" numeric(12,2),
+"m3mlprotec" numeric(12,2),
+"m3mlfill" numeric(12,2),
+"m3mlexcess" numeric(12,2),
+"m3exc_cost" numeric(12,2),
+"m2trenchl_cost" numeric(12,2),
+"m2bottom_cost" numeric(12,2),
+"m2pav_cost" numeric(12,2),
+"m3protec_cost" numeric(12,2),
+"m3fill_cost" numeric(12,2),
+"m3excess_cost" numeric(12,2),
+"cost_unit" numeric(12,2),
+"pav_cost" numeric(12,2),
+"exc_cost" numeric(12,2),
+"trenchl_cost" numeric(12,2),
+"base_cost" numeric(12,2),
+"protec_cost" numeric(12,2),
+"fill_cost" numeric(12,2),
+"arc_cost" numeric(12,2),
+"cost " numeric(12,2)
+);
+
+
