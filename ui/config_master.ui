@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -117,7 +117,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_psector_vdefault">
+      <widget class="QCheckBox" name="chk_psector_enabled">
        <property name="geometry">
         <rect>
          <x>200</x>
