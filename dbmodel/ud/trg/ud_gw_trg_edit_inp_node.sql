@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -14,6 +14,8 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;    
 
+	
+	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -29,8 +31,8 @@ BEGIN
 
 
         UPDATE node 
-        SET node_id=NEW.node_id, top_elev=NEW.top_elev, ymax=NEW.ymax, sander=NEW.sander, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", est_top_elev=NEW.est_top_elev, est_ymax=NEW.est_ymax, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom 
+        SET node_id=NEW.node_id, custom_top_elev=NEW.custom_top_elev, custom_ymax=NEW.custom_ymax, custom_elev=NEW.custom_elev, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
+            annotation=NEW.annotation, the_geom=NEW.the_geom 
         WHERE node_id=OLD.node_id;
 
         IF node_table = 'inp_junction' THEN
@@ -54,7 +56,6 @@ BEGIN
 			WHERE node_id=OLD.node_id;
         END IF;
 
-        PERFORM audit_function(2,800); 
         RETURN NEW;
 
 

@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -12,7 +12,8 @@ DECLARE
     epa_type varchar;
     v_sql varchar;
     old_arctype varchar;
-    new_arctype varchar;   
+    new_arctype varchar;  
+
 
 BEGIN
 
@@ -28,9 +29,9 @@ BEGIN
 
 
         UPDATE arc 
-        SET arc_id=NEW.arc_id, y1=NEW.y1, y2=NEW.y2, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
-            "observ"=NEW."observ", "comment"=NEW."comment", custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 
-             est_y1=NEW.est_y1, est_y2=NEW.est_y2, verified=NEW.verified, the_geom=NEW.the_geom 
+        SET arc_id=NEW.arc_id, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
+			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
+            "observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope, the_geom=NEW.the_geom 
         WHERE arc_id = OLD.arc_id;
 
         IF (epa_type = 'CONDUIT') THEN 
@@ -59,7 +60,6 @@ BEGIN
 			WHERE arc_id=OLD.arc_id;
         END IF;
 
-        PERFORM audit_function (2,790);
         RETURN NEW;
 
 

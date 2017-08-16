@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater 2.0
+This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -19,6 +19,8 @@ DECLARE
     old_nodetype varchar;
     new_nodetype varchar;    
 
+
+	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -26,17 +28,16 @@ BEGIN
    
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
-       -- PERFORM audit_function(160,370); 
-        RETURN NEW;
+				INSERT INTO inp_demand (id, demand, pattern_id, deman_type, dscenario_id) 
+				VALUES (NEW.id,NEW.demand, NEW.pattern_id, NEW.deman_type, NEW.dscenario_id)
+				RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-
-        --PERFORM audit_function(2,370); 
-        RETURN NEW;
+				SET id=NEW.id, demand=NEW.demand, pattern_id=NEW.pattern_id, deman_type=NEW.deman_type, dscenario_id=NEW.dscenario_id
+				WHERE id=OLD.id;
         
     ELSIF TG_OP = 'DELETE' THEN
-        --PERFORM audit_function(163,370); 
-        RETURN NEW;
+				RETURN NEW;
     
     END IF;
        
