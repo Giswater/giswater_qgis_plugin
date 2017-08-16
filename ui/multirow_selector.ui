@@ -26,7 +26,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>Cancel</string>
    </property>
   </widget>
   <widget class="QTableView" name="all_row">
@@ -75,7 +75,7 @@
     <string>&lt;&lt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="txt_name">
+  <widget class="QLineEdit" name="txt_label">
    <property name="geometry">
     <rect>
      <x>25</x>

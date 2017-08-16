@@ -629,24 +629,6 @@
          </font>
         </property>
        </widget>
-       <widget class="QDateEdit" name="wjoin_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>110</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="wjoin_streetaxis_id">
         <property name="geometry">
          <rect>
@@ -1038,14 +1020,33 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="QgsDateTimeEdit" name="wjoin_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>110</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_2">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>293</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1329,8 +1330,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>293</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1863,8 +1864,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>293</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2390,19 +2391,6 @@
          </rect>
         </property>
        </widget>
-       <widget class="QDateEdit" name="tap_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>110</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="tap_streetaxis_id">
         <property name="geometry">
          <rect>
@@ -2834,6 +2822,25 @@
          <string/>
         </property>
         <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="tap_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>110</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
          <bool>true</bool>
         </property>
        </widget>
@@ -4804,19 +4811,6 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QDateEdit" name="greentap_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>110</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QComboBox" name="greentap_workcat_id">
         <property name="geometry">
          <rect>
@@ -5065,6 +5059,25 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="greentap_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>110</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -6134,19 +6147,6 @@
          </rect>
         </property>
        </widget>
-       <widget class="QDateEdit" name="fountain_builtdate">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>110</y>
-          <width>160</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="fountain_streetaxis_id">
         <property name="geometry">
          <rect>
@@ -6588,6 +6588,25 @@
         </property>
         <property name="margin">
          <number>3</number>
+        </property>
+       </widget>
+       <widget class="QgsDateTimeEdit" name="fountain_builtdate">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>110</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="displayFormat">
+         <string>dd/MM/yy</string>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+        <property name="allowNull">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -9018,6 +9037,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsDateTimeEdit</class>
+   <extends>QDateTimeEdit</extends>
+   <header>qgsdatetimeedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

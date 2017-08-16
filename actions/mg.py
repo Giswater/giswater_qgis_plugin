@@ -6,21 +6,19 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QPoint
-from PyQt4.QtCore import Qt, QSettings
-
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
-from PyQt4.QtGui import QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
+from PyQt4.QtCore import Qt, QSettings, QPoint
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis._gui import QgsMapCanvasSnapper
-from qgis._gui import QgsMapToolEmitPoint
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.Qt import QDate, QTime
-from datetime import datetime, date
+
+from datetime import datetime
 import os
 import sys
 import webbrowser
+from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -42,29 +40,19 @@ from ..ui.psector_management import Psector_management          # @UnresolvedImp
 from ..ui.state_selector import State_selector                  # @UnresolvedImport
 from ..ui.multirow_selector import Multirow_selector            # @UnresolvedImport
 
-from functools import partial
+from parent import ParentAction                                 # @UnresolvedImport
 
 
-class Mg():
-
+class Mg(ParentAction):
+   
     def __init__(self, iface, settings, controller, plugin_dir):
-        ''' Class to control Management toolbar actions '''
-
-        # Initialize instance attributes
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.dao = self.controller.dao
-        self.schema_name = self.controller.schema_name
-
-        # Get files to execute giswater jar
-        self.java_exe = self.settings.value('files/java_exe')
-        self.giswater_jar = self.settings.value('files/giswater_jar')
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')
-
-
-    def close_dialog(self, dlg=None):
+        ''' Class to control Management toolbar actions '''  
+                  
+        # Call ParentAction constructor      
+        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+    
+                  
+    def close_dialog(self, dlg=None): 
         ''' Close dialog '''
 
         dlg.close()
@@ -98,8 +86,6 @@ class Mg():
         self.dlg.btn_accept.clicked.connect(self.mg_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
 
-        print("asdas")
-
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'topology_tools')
         self.dlg.exec_()
@@ -108,7 +94,7 @@ class Mg():
     def mg_arc_topo_repair_accept(self):
         ''' Button 19. Executes functions that are selected '''
 
-        #Review/Utils
+        # Review/Utils
         if self.dlg.check_node_orphan.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
             self.controller.execute_sql(sql)
@@ -155,7 +141,7 @@ class Mg():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
             self.controller.execute_sql(sql)
 
-        #Builder
+        # Builder
         if self.dlg.create_nodes_from_arcs.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
             self.controller.execute_sql(sql)
@@ -195,7 +181,6 @@ class Mg():
         # Set signals
         self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
         self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
-
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'table_wizard')
@@ -274,22 +259,6 @@ class Mg():
             self.controller.show_info(message, context_name='ui_message')
 
 
-    def get_settings_value(self, settings, parameter):
-        ''' Utility function that fix problem with network units in Windows '''
-
-        file_aux = ""
-        try:
-            file_aux = settings.value(parameter)
-            unit = file_aux[:1]
-            if unit != '\\' and file_aux[1] != ':':
-                path = file_aux[1:]
-                file_aux = unit+":"+path
-        except IndexError:
-            pass
-        return file_aux
-
-
-
     def mg_go2epa(self):
         ''' Button 23. Open form to set INP, RPT and project '''
 
@@ -313,9 +282,9 @@ class Mg():
 
         # Get last GSW file from giswater properties file
         java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())
-        file_gsw = self.get_settings_value(java_settings, 'FILE_GSW')
-
+        java_settings.setIniCodec(sys.getfilesystemencoding())          
+        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
+        
         # Check if that file exists
         if not os.path.exists(file_gsw):
             msg = "Last GSW file not found: "+str(file_gsw)
@@ -323,11 +292,11 @@ class Mg():
             return False
 
         # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat)
-        self.file_inp = self.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = self.get_settings_value(self.gsw_settings, 'FILE_RPT')
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')
-
+        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
+        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
+        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')                
+        self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
+                
         # Create dialog
         self.dlg = FileManager()
         utils_giswater.setDialog(self.dlg)
@@ -400,44 +369,9 @@ class Mg():
         ''' Button 24. Open giswater in silent mode
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
-        '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 24)
-
-        # Check if java.exe file exists
-        if not os.path.exists(self.java_exe):
-            message = "Java Runtime executable file not found at: "+self.java_exe
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-
-        # Check if giswater.jar file exists
-        if not os.path.exists(self.giswater_jar):
-            message = "Giswater executable file not found at: "+self.giswater_jar
-            self.controller.show_warning(message, context_name='ui_message')
-            return
-
-        # Check if gsw file exists. If not giswater will opened anyway with the last .gsw file
-        if not os.path.exists(self.gsw_file):
-            message = "GSW file not found at: "+self.gsw_file
-            self.controller.show_info(message, context_name='ui_message')
-            self.gsw_file = ""
-
-        # Start program
-        aux = '"'+self.giswater_jar+'"'
-        if self.gsw_file != "":
-            aux+= ' "'+self.gsw_file+'"'
-            program = [self.java_exe, "-jar", self.giswater_jar, self.gsw_file, "mg_go2epa_express"]
-        else:
-            program = [self.java_exe, "-jar", self.giswater_jar, "", "mg_go2epa_express"]
-
-        self.controller.start_program(program)
-
-        # Show information message    
-        message = "Executing... "+aux
-        self.controller.show_info(message, context_name='ui_message' )
-
+        '''       
+        self.execute_giswater("mg_go2epa_express", 24)
+                        
 
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
@@ -483,40 +417,23 @@ class Mg():
         user = self.controller.get_project_user()
 
         # Delete previous values
-        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_result"
         self.dao.execute_sql(sql)
         sql = "DELETE FROM "+self.schema_name+".rpt_selector_compare"
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_result VALUES ('"+rpt_selector_result_id+"');"
+        
+        # Set new values to tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_result (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_result_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
-        #sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare VALUES ('"+rpt_selector_compare_id+"');"
         sql = "INSERT INTO "+self.schema_name+".rpt_selector_compare (result_id, cur_user)"
         sql+= " VALUES ('"+rpt_selector_compare_id+"', '"+user+"')"
-
         self.dao.execute_sql(sql)
 
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
         self.close_dialog(self.dlg)
-
-
-    '''
-    def mg_analytics(self):
-        # Button 27. Valve analytics 
-                
-        # Execute SQL function  
-        function_name = "gw_fct_valveanalytics"
-        sql = "SELECT "+self.schema_name+"."+function_name+"();"  
-        result = self.controller.execute_sql(sql)      
-        if result:
-            message = "Valve analytics executed successfully"
-            self.controller.show_info(message, 30, context_name='ui_message')
-    '''
 
 
     def mg_change_elem_type(self):
@@ -653,19 +570,17 @@ class Mg():
         self.dlg.btn_analysis.pressed.connect(partial(self.multi_selector,self.table_anl_selector))
         self.dlg.btn_planning.pressed.connect(partial(self.multi_selector,self.table_plan_selector))
 
-        # QLineEdit
         self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
 
-        # QPushButton
         self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
         self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
         self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
 
-        # QComboBox
+
         self.state_vdefault=self.dlg.findChild(QComboBox,"state_vdefault")
         self.psector_vdefault = self.dlg.findChild(QComboBox, "psector_vdefault")
         self.workcat_vdefault=self.dlg.findChild(QComboBox,"workcat_vdefault")
@@ -676,9 +591,9 @@ class Mg():
 
         # QDateEdit
         self.builtdate_vdefault = self.dlg.findChild(QDateEdit, "builtdate_vdefault")
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'builtdate_vdefault'"
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user" = current_user AND parameter = '+"'builtdate_vdefault'"
         row = self.dao.get_row(sql)
-        if row!= None:
+        if row is not None:
             utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
         else:
             self.builtdate_vdefault.setDate(QDate.currentDate())
@@ -692,20 +607,24 @@ class Mg():
         self.chk_arccat_vdefault = self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault')
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
         self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
-
-
+       
+        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
+        
         # Get om_visit_absolute_path and doc_absolute_path from config_param_text
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
         row = self.dao.get_row(sql)
-        if row :
+        if row:
             path = str(row['value'])
             self.om_visit_absolute_path.setText(path)
 
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        if row :
+        if row:
             path = str(row['value'])
             self.doc_absolute_path.setText(path)
 
@@ -714,35 +633,33 @@ class Mg():
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows)
 
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
-        sql="SELECT DISTINCT(psector_id) FROM" +self.schema_name+".plan_psector ORDER BY psector_id"
+        sql = "SELECT DISTINCT(psector_id) FROM" +self.schema_name+".plan_psector ORDER BY psector_id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("psector_vdefault", rows)
 
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
         rows = self.dao.get_rows(sql)
 
         utils_giswater.fillComboBox("arccat_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodecat_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_connec ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_connec ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("connecat_vdefault", rows)
 
         # Set values from widgets of type QDateEdit
         sql = "SELECT DISTINCT(builtdate_vdefault) FROM" + self.schema_name + ".config"
         rows = self.dao.get_rows(sql)
-        #utils_giswater.setCalendarDate("builtdate_vdefault", rows[0][0])
-
 
         # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value'
         self.generic_columns=self.new_mg_config_get_data('config_vdefault')
@@ -755,6 +672,7 @@ class Mg():
         self.dlg.exec_()
 
 
+    # Like def mf_config_get_date(....): but for multi user
     def new_mg_config_get_data(self,tablename):
         # Like def mf_config_get_date(....): but for multi user
 
@@ -773,10 +691,6 @@ class Mg():
         return columns
 
 
-    def test(self, text):
-        QMessageBox.about(None, 'Ok',"HC test: "+ str(text))
-
-
     def open_file_dialog(self, widget):
         ''' Open File Dialog '''
 
@@ -788,7 +702,6 @@ class Mg():
             message = "File path doesn't exist"
             self.controller.show_warning(message, 10, context_name='ui_message')
             self.file_path = self.plugin_dir
-        #else:
         # Set default value if necessary
         elif self.file_path == 'null':
             self.file_path = self.plugin_dir
@@ -816,8 +729,8 @@ class Mg():
         else :
             webbrowser.open(url)
 
-
-    def mg_config_get_data(self, tablename):
+                 
+    def mg_config_get_data(self, tablename):                
         ''' Get data from selected table '''
 
         sql = "SELECT *"
@@ -903,14 +816,13 @@ class Mg():
 
 
     def delete_row(self,  parameter):
-
         sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
         self.controller.execute_sql(sql)
 
 
     def insert_or_update_config_vdefault(self, widget, parameter):
 
-        sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
+        sql = 'SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user" = current_user'
         rows=self.controller.get_rows(sql)
         self.exist = False
         if type(widget) == QDateEdit:
@@ -942,6 +854,7 @@ class Mg():
 
     def mg_config_accept_table(self, tablename, columns):
         ''' Update values of selected 'tablename' with the content of 'columns' '''
+        
         if columns is not None:
             sql = "UPDATE "+self.schema_name+"."+tablename+" SET "
             for column_name in columns:
@@ -963,24 +876,26 @@ class Mg():
 
             sql = sql[:-2]
             self.controller.execute_sql(sql)
-
-
-    def multi_selector(self,table):
-        ''' Execute form multi_selector '''
-
+                       
+       
+    def multi_selector(self, table):  
+        ''' Execute form multi_selector ''' 
+        
         # Create the dialog and signals
         self.dlg_multi = Multi_selector()
         utils_giswater.setDialog(self.dlg_multi)
 
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
-
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
-        self.menu=QMenu()
+        self.menu = QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
-
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))
-
+        self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
+        
+        self.menu = QMenu()
+        self.dlg_multi.btn_insert.setMenu(self.menu)
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))  
         self.fill_table(self.tbl, self.schema_name+"."+table)
 
         # Manage i18n of the form and open it
@@ -1009,7 +924,6 @@ class Mg():
         self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
 
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
-        #self.tbl_all_explot.hideColumn(0)
         self.tbl_all_explot.hideColumn(2)
         self.tbl_all_explot.hideColumn(3)
         self.tbl_all_explot.hideColumn(4)
@@ -1021,6 +935,7 @@ class Mg():
         self.tbl_selected_explot.setColumnWidth(0,197)
 
         self.dlg_multiexp.exec_()
+
 
     def filter_all_explot(self,sql, widget):
 
@@ -1054,16 +969,11 @@ class Mg():
         row_index = row_index[:-2]
         expl_id = expl_id[:-2]
 
-
-        table_name_select = "exploitation"
-
-        #sql = "DELETE FROM "+self.schema_name+"."+table_name_select
+        #sql = "DELETE FROM "+self.schema_name+".exploitation"
         #sql+= " WHERE expl_id IN ("+expl_id+")"
         #self.controller.execute_sql(sql)
         #self.tbl_all_explot.model().select()
-
         cur_user = self.controller.get_project_user()
-        table_name_unselect = "expl_selector"
 
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
@@ -1079,7 +989,6 @@ class Mg():
                 self.controller.execute_sql(sql)
 
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
-        #refresh
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
         self.iface.mapCanvas().refresh()
 
@@ -1132,8 +1041,8 @@ class Mg():
             # Check if we already have data with selected id
             sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"
             row = self.dao.get_row(sql)
-            if row == None:
-                self.menu.addAction(elem,partial(self.insert, elem,table))
+            if row is None:
+                self.menu.addAction(elem, partial(self.insert, elem,table))
 
 
     def insert(self, id_action, table):
@@ -1283,10 +1192,9 @@ class Mg():
             self.controller.show_warning(message, context_name='ui_message' )
             return
         row = selected_list[0].row()
-        id = self.tbl_mincut_edit.model().record(row).value("id")
-
-        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_result_cat WHERE id = '"+id+"'"
-
+        id_ = self.tbl_mincut_edit.model().record(row).value("id")
+        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_result_cat"
+        sql+= " WHERE id = '"+id_+"'"
         rows = self.dao.get_row(sql)
 
         #self.dlg_min_edit.close()
@@ -1336,7 +1244,7 @@ class Mg():
         # Set values from mincut to comboBox
         #utils_giswater.fillComboBox("type", rows['mincut_result_type'])
         #utils_giswater.fillComboBox("cause", rows['anl_cause'])
-        type = rows['mincut_result_type']
+        mincut_result_type = rows['mincut_result_type']
         cause = rows['anl_cause']
         # Clear comboBoxes
         self.type.clear()
@@ -1354,7 +1262,7 @@ class Mg():
         #utils_giswater.fillComboBox("type", rows)
         for row in rows:
             elem = str(row[0])
-            if elem != type:
+            if elem != mincut_result_type:
                 self.type.addItem(elem)
 
         # Fill ComboBox cause
@@ -1368,9 +1276,8 @@ class Mg():
             if elem != cause:
                 self.cause.addItem(elem)
 
-
-        self.old_id= self.id.text()
-
+        self.old_id = self.id.text()
+        
         self.btn_start = self.dlg_mincut.findChild(QPushButton, "btn_start")
         self.btn_start.clicked.connect(self.real_start)
 
@@ -1473,19 +1380,12 @@ class Mg():
     def accept_update(self):
 
         mincut_result_state = self.state.text()
-        id = self.id.text()
-        #exploitation =
+        id_ = self.id.text()
         street = str(self.street.text())
         number = str(self.number.text())
-        address = str(street + " " + number)
         mincut_result_type = str(utils_giswater.getWidgetText("type"))
         anl_cause = str(utils_giswater.getWidgetText("cause"))
-        #forecast_start =
-        #forecast_end =
         anl_descript = str(utils_giswater.getWidgetText("pred_description"))
-
-        #exec_start =
-        #exec_end =
 
         exec_limit_distance =  self.distance.text()
         exec_depth = self.depth.text()
@@ -1504,7 +1404,6 @@ class Mg():
 
         self.cbx_date_end = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end")
         self.cbx_hours_end = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end")
-
 
         # Get prediction date - start
         dateStart_predict=self.cbx_date_start_predict.date()
@@ -1526,12 +1425,11 @@ class Mg():
         timeEnd_real=self.cbx_hours_end.time()
         forecast_end_real=dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
 
-
         sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "
-        sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+\
-              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', exec_limit_distance ='"+\
-              exec_limit_distance+"', forecast_start='"+forecast_start_predict+"', forecast_end ='"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
-        sql+= " WHERE id = '"+id+"'"
+        sql+= " SET id = '"+id_+"', mincut_result_state = '"+mincut_result_state+"', anl_descript = '"+anl_descript+\
+              "', exec_descript= '"+exec_descript+"', exec_depth = '"+ exec_depth+"', exec_limit_distance = '"+\
+              exec_limit_distance+"', forecast_start= '"+forecast_start_predict+"', forecast_end = '"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
+        sql+= " WHERE id = '"+id_+"'"
         self.controller.execute_sql(sql)
 
         '''
@@ -1545,14 +1443,6 @@ class Mg():
     def close(self, dlg = None):
         ''' Close dialog '''
         dlg.close()
-        '''
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass
-        '''
 
 
     def mg_dimensions(self):
@@ -1726,7 +1616,7 @@ class Mg():
         self.dlg_new_psector.open()
 
 
-    def insert_or_update_new_psector(self, update,tablename):
+    def insert_or_update_new_psector(self, update, tablename):
         
         sql = "SELECT *"
         sql += " FROM " + self.schema_name + "." + tablename
@@ -1735,7 +1625,7 @@ class Mg():
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             columns.append(column_name)
-            
+
         if update:
             if columns is not None:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
@@ -2062,7 +1952,6 @@ class Mg():
             id_ = str(qtable_right.model().record(row).value(field))
             expl_id.append(id_)
         for i in range(0, len(expl_id)):
-            self.test(str(sql)+str(expl_id[i]))
             self.controller.execute_sql(sql+str(expl_id[i]))
 
         # Refresh

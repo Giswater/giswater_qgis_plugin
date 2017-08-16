@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>616</width>
-    <height>697</height>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -448,7 +448,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>365</height>
+         <height>353</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2625,7 +2625,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>365</height>
+         <height>353</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4807,7 +4807,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>338</height>
+         <height>322</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7138,7 +7138,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>338</height>
+         <height>322</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9919,11 +9919,11 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_event_feature_3">
        <attribute name="title">
-        <string>Arc</string>
+        <string>Visit</string>
        </attribute>
        <widget class="QTableView" name="tbl_event_arc">
         <property name="geometry">
@@ -9938,6 +9938,11 @@
          <bool>true</bool>
         </property>
        </widget>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Rehabit</string>
+       </attribute>
       </widget>
      </widget>
      <widget class="QComboBox" name="event_id">
@@ -10051,7 +10056,7 @@
        <rect>
         <x>296</x>
         <y>10</y>
-        <width>91</width>
+        <width>101</width>
         <height>22</height>
        </rect>
       </property>
@@ -10153,7 +10158,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_8">
        <property name="geometry">
@@ -10161,7 +10166,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>397</height>
+         <height>399</height>
         </rect>
        </property>
        <attribute name="label">
@@ -11407,7 +11412,7 @@
          <rect>
           <x>-3</x>
           <y>267</y>
-          <width>65</width>
+          <width>81</width>
           <height>22</height>
          </rect>
         </property>
@@ -11978,7 +11983,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>397</height>
+         <height>389</height>
         </rect>
        </property>
        <attribute name="label">

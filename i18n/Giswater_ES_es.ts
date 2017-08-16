@@ -3280,7 +3280,11 @@
     </message>
     <message>
         <source>Values has been updated</source>
+<<<<<<< HEAD:i18n/Giswater_es.ts:i18n/Giswater_es.ts
+        <translation>Values has been jhugthuf</translation>
+=======
         <translation>Valores actualizados</translation>
+>>>>>>> dev-3.0:i18n/Giswater_ES_es.ts:i18n/Giswater_ES_es.ts
     </message>
     <message>
         <source>You have to select at least one feature!</source>
@@ -3378,6 +3382,34 @@
         <source>Warning</source>
         <translation>Advertencia</translation>
     </message>
+    <message>	
+        <source>Any table has been selected</source>
+        <translation>Any table has been selected</translation>
+    </message>   
+    <message>
+        <source>Cannot get giswater folder from windows registry at: </source>
+        <translation>Cannot get giswater folder from windows registry at: </translation>
+    </message>   
+    <message>
+        <source>Giswater folder not found at: </source>
+        <translation>Giswater folder not found at: </translation>
+    </message>        
+    <message>
+        <source>File path doesn't exist</source>
+        <translation>File path doesn't exist</translation>
+    </message>         
+    <message>
+        <source>Error getting table name from selected layer</source>
+        <translation>Error getting table name from selected layer</translation>
+    </message>         
+    <message>
+        <source>You need to insert doc_id</source>
+        <translation>You need to insert doc_id</translation>
+    </message>          
+    <message>
+        <source>Date interval not valid!</source>
+        <translation>Date interval not valid!</translation>
+    </message>       
     <message>
         <source>This id already exists</source>
         <translation>Este id ya existe</translation>
@@ -3385,7 +3417,9 @@
     <message>
         <source>You are trying to enter different types</source>
         <translation>Estás intentando introducir tipos diferentes</translation>
-    </message>
+    </message>    
+   
+
 </context>
 
 </TS>
