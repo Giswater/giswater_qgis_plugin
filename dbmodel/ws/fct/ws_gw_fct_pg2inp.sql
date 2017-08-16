@@ -5,14 +5,11 @@ This version of Giswater is provided by Giswater Association
 */
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2inp(character varying );
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2inp('result_id_var' character varying)  RETURNS integer AS $BODY$
-DECLARE
-    
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2inp(result_id_var character varying)  RETURNS integer AS $BODY$
       
-
 BEGIN
 
---  Search path
+    --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
 	RAISE NOTICE 'Starting pg2inp process.';
@@ -31,8 +28,7 @@ BEGIN
 		-- Enhance the scenario when hydrometer value is null (when it's used inp_junction.demand value)
 		-- table destination: inp_temp_demand (result_id, node_id, value, pattern)
 	
-		
-	
+	RETURN 0;	
 	
 END;
 $BODY$
