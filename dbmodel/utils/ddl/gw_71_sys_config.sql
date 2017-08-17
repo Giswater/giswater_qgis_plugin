@@ -34,89 +34,37 @@ CONSTRAINT "config_check" CHECK(id = '1')
 );
 
 
-CREATE TABLE "config_param_int" (
-"id" serial NOT NULL PRIMARY KEY,
-"parameter"  varchar (50),
-"value" int4 NOT NULL,
-"user" varchar (30),
-"context" varchar (50),
-"descript" text
-);
-
-CREATE TABLE "config_param_text" (
+CREATE TABLE "config_param_system" (
 "id" serial NOT NULL PRIMARY KEY,
 "parameter"  varchar (50),
 "value" text NOT NULL,
-"user" varchar (30),
+"data_type" varchar(20),
 "context" varchar (50),
-"descript" text
-);
-
-CREATE TABLE "config_param_float" (
-"id" serial NOT NULL PRIMARY KEY,
-"parameter"  varchar (50),
-"user" varchar (30),
-"context" varchar (50),
-"descript" text
-);
-
-CREATE TABLE "config_param_bool" (
-"id" serial NOT NULL PRIMARY KEY,
-"parameter"  varchar (50),
-"value" boolean NOT NULL,
-"user" varchar (30),
-"context" varchar (50),
-"descript" text
+"descript" text,
+CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
 );
 
 
-CREATE TABLE "config_vdefault" (
+CREATE TABLE "config_param_user" (
 "id" serial PRIMARY KEY,
 "parameter" character varying (50),
 "value" text,
-"user" character varying (30),
+"data_type" varchar(20),
+"cur_user" character varying (30),
 "context" varchar (50),
 "descript" text
 );
 
-CREATE TABLE "config_searchplus" (
-"id" serial NOT NULL PRIMARY KEY,
-"parameter"  varchar (50),
-"value"  varchar (50),
-"user" character varying (30),
-"context"  varchar (50),
-"descript" text
-);
 
 
-CREATE TABLE "config_csv_import" (
-"table_name" varchar(50) NOT NULL,
-"gis_client_layer_name" varchar(50),
-CONSTRAINT "config_csv_import_pkey" PRIMARY KEY ("table_name")
-);
-
-
-
-CREATE TABLE "config_ui_forms" (
+CREATE TABLE "config_client_forms" (
 "id" serial NOT NULL,
-"ui_table" varchar (50),
+"table_id" varchar (50),
 "status" boolean,
 "width" int4,
 "column_index" int2,
-"alias" varchar (50),
+"alias" varchar (50)
 CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
-);
-
-CREATE TABLE "config_py_tables" (
-"id" serial NOT NULL,
-"table_name" varchar (50),
-"context" varchar (50),
-"plugin_version" varchar (20), 
-"hidden" boolean,
-"observ" varchar(50),
-"db_schema" boolean,
-"qgis_project" boolean,
-CONSTRAINT "config_py_tables_pkey" PRIMARY KEY ("id")
 );
 
 
