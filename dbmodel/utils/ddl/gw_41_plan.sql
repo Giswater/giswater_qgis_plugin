@@ -177,8 +177,9 @@ user default cur_user(),
 
 CREATE TABLE plan_selector_result (
 id serial NOT NULL PRIMARY KEY,
-result_id integer),
+result_id integer,
 cur_user text
+);
 
 
 
@@ -199,7 +200,7 @@ CREATE TABLE "plan_result_node" (
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
 "annotation" character varying(254),
-"the_geom" public.geometry (POINT, SRID_VALUE)
+"the_geom" public.geometry (POINT, SRID_VALUE),
 "cost_unit" varchar(3),
 "calculated_depth" numeric(12,2),
 "cost" numeric(12,3),
@@ -221,7 +222,7 @@ CREATE TABLE "plan_result_arc" (
 "state" int2  NOT NULL,
 "annotation" character varying(254),
 "length" numeric(12,3),
-"the_geom" public.geometry (LINESTRING, SRID_VALUE)
+"the_geom" public.geometry (LINESTRING, SRID_VALUE),
 "soilcat_id" varchar(30),
 "y1" numeric(12,2),
 "y2" numeric(12,2),

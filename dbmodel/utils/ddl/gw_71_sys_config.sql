@@ -40,8 +40,7 @@ CREATE TABLE "config_param_int" (
 "value" int4 NOT NULL,
 "user" varchar (30),
 "context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_int_pkey" PRIMARY KEY ("id")
+"descript" text
 );
 
 CREATE TABLE "config_param_text" (
@@ -50,8 +49,7 @@ CREATE TABLE "config_param_text" (
 "value" text NOT NULL,
 "user" varchar (30),
 "context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
+"descript" text
 );
 
 CREATE TABLE "config_param_float" (
@@ -59,8 +57,7 @@ CREATE TABLE "config_param_float" (
 "parameter"  varchar (50),
 "user" varchar (30),
 "context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_float_pkey" PRIMARY KEY ("id")
+"descript" text
 );
 
 CREATE TABLE "config_param_bool" (
@@ -69,8 +66,7 @@ CREATE TABLE "config_param_bool" (
 "value" boolean NOT NULL,
 "user" varchar (30),
 "context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_bool_pkey" PRIMARY KEY ("id")
+"descript" text
 );
 
 

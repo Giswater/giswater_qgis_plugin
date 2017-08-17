@@ -466,8 +466,9 @@ CREATE TABLE "cat_hydrology" (
 
 CREATE TABLE inp_selector_hydrology(
 id serial NOT NULL PRIMARY KEY,
-hydrology_id integer),
+hydrology_id integer,
 cur_user text
+);
 
 
 
