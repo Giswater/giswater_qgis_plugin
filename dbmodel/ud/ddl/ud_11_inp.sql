@@ -473,7 +473,6 @@ cur_user text
 
 
 
-
 CREATE TABLE "inp_adjustments" (
 "id" varchar(16) DEFAULT nextval ('"SCHEMA_NAME".inp_adjustments_seq'::regclass) NOT NULL,
 "adj_type" varchar(16)   NOT NULL,
@@ -1457,7 +1456,9 @@ CREATE TABLE "rpt_inp_arc" (
 "elevmax1" numeric(12,3),
 "elevmax2" numeric(12,3),
 "arc_type" varchar(18)  ,
-"arccat_id" varchar(30)  ,
+"arccat_id" varchar(30) ,
+"shape"
+
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
