@@ -1,12 +1,84 @@
-﻿/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
+﻿SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+-- COMMON SQL (WS & UD)
 
 
+-------------------------------------------------------
+-- STATE VIEWS & JOINED WITH MASTERPLAN (ALTERNATIVES)
+-------------------------------------------------------
+
+DROP VIEW IF EXISTS v_state_arc;
+CREATE VIEW v_state_arc AS
+SELECT 
+	arc_id
+	FROM selector_state,arc
+	WHERE arc.state=selector_state.state_id
+	AND selector_state.cur_user=current_user
+
+EXCEPT SELECT
+	arc_id
+	FROM selector_psector,plan_arc_x_psector
+	WHERE plan_arc_x_psector.psector_id=selector_psector.psector_id
+	AND selector_psector.cur_user=current_user AND state=0
+
+UNION SELECT
+	arc_id
+	FROM selector_psector,plan_arc_x_psector
+	WHERE plan_arc_x_psector.psector_id=selector_psector.psector_id
+	AND selector_psector.cur_user=current_user AND state=1;
+	
+
+
+DROP VIEW IF EXISTS v_state_node;
+CREATE VIEW v_state_node AS
+SELECT 
+	node_id
+	FROM selector_state,node
+	WHERE node.state=selector_state.state_id
+	AND selector_state.cur_user=current_user
+
+EXCEPT SELECT
+	node_id
+	FROM selector_psector,plan_node_x_psector
+	WHERE plan_node_x_psector.psector_id=selector_psector.psector_id
+	AND selector_psector.cur_user=current_user AND state=0
+
+UNION SELECT
+	node_id
+	FROM selector_psector,plan_node_x_psector
+	WHERE plan_node_x_psector.psector_id=selector_psector.psector_id
+	AND selector_psector.cur_user=current_user AND state=1;
+
+
+
+	
+DROP VIEW IF EXISTS v_state_connec;
+CREATE VIEW v_state_connec AS
+SELECT 
+	connec_id
+	FROM selector_state,connec
+	WHERE connec.state=selector_state.state_id
+	AND selector_state.cur_user=current_user;
+
+	
+
+DROP VIEW IF EXISTS v_state_gully;
+CREATE VIEW v_state_gully AS
+SELECT 
+	connec_id
+	FROM selector_state,gully
+	WHERE gully.state=selector_state.state_id
+	AND selector_state.cur_user=current_user;
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 -- ----------------------------
 -- View structure for v_arc_x_node
 -- ----------------------------

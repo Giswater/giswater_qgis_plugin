@@ -252,15 +252,15 @@ connec.uncertain,
 sector.macrosector_id,
 connec.expl_id,
 connec.num_value
-FROM selector_expl, selector_state, connec 
+FROM selector_expl, connec 
+	JOIN v_state_connec ON connec.connec_id=v_state_connec.connec_id
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id) = (ext_streetaxis.id)))
 	LEFT JOIN link ON connec.connec_id = link.feature_id
 	LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
-	WHERE 
-	connec.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() AND
-	connec.state=selector_state.state_id AND selector_state.cur_user="current_user"();
+	WHERE connec.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
+
 
 
 
@@ -323,13 +323,13 @@ gully.postnumber,
 gully.expl_id,
 gully.uncertain,
 gully.num_value
-FROM selector_expl, selector_state, gully 
+FROM selector_expl, gully
+	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON gully.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN sector ON gully.sector_id = sector.sector_id
 	WHERE gully.the_geom is not null AND
-	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() AND
-	gully.state=selector_state.state_id AND selector_state.cur_user="current_user"();
+	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
 
 DROP VIEW IF EXISTS v_edit_gully_pol CASCADE;
@@ -391,7 +391,8 @@ gully.postnumber,
 gully.expl_id,
 gully.uncertain,
 gully.num_value
-FROM selector_expl, selector_state, gully 
+FROM selector_expl, gully
+	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON streetaxis_id=ext_streetaxis.id
 	LEFT JOIN sector ON gully.sector_id = sector.sector_id
