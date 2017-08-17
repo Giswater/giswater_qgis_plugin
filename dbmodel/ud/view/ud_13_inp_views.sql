@@ -742,7 +742,7 @@ node_1,
 node_2,
 elevmax1 as z1,
 elevmax2 as z2,
-cat_arc.shape,
+cat_arc_shape.epa as shape,
 cat_arc.curve_id,
 cat_arc.geom1,
 cat_arc.geom2,
@@ -758,7 +758,8 @@ inp_conduit.seepage
 FROM inp_selector_result, rpt_inp_arc
      JOIN inp_conduit ON rpt_inp_arc.arc_id = inp_conduit.arc_id
      JOIN cat_arc ON rpt_inp_arc.arccat_id = cat_arc.id
-     WHERE cat_arc.shape = 'CUSTOM'
+	 JOIN cat_arc_shape ON cat_arc_shape.id=cat_arc.shape
+     WHERE cat_arc_shape.epa = 'CUSTOM'
      AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -771,7 +772,7 @@ node_1,
 node_2,
 elevmax1 as z1,
 elevmax2 as z2,
-cat_arc.shape,
+cat_arc_shape.epa as shape,
 cat_arc.curve_id,
 cat_arc.geom1,
 cat_arc.geom2,
@@ -787,7 +788,8 @@ inp_conduit.seepage
 FROM inp_selector_result, rpt_inp_arc
      JOIN inp_conduit ON rpt_inp_arc.arc_id = inp_conduit.arc_id
      JOIN cat_arc ON rpt_inp_arc.arccat_id = cat_arc.id
-     WHERE cat_arc.shape!='CUSTOM' AND cat_arc.shape!='IRREGULAR'
+	 JOIN cat_arc_shape ON cat_arc_shape.id=cat_arc.shape
+     WHERE cat_arc_shape.epa!='CUSTOM' AND cat_arc_shape.epa!='IRREGULAR'
 	 AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -800,8 +802,8 @@ node_1,
 node_2,
 elevmax1 as z1,
 elevmax2 as z2,
-cat_arc.shape,
-cat_arc.curve_id,
+cat_arc_shape.epa as shape,
+cat_arc.tsect_id,
 cat_arc.geom1,
 cat_arc.geom2,
 cat_arc.geom3,
@@ -816,7 +818,8 @@ inp_conduit.seepage
 FROM inp_selector_result, rpt_inp_arc
      JOIN inp_conduit ON rpt_inp_arc.arc_id = inp_conduit.arc_id
      JOIN cat_arc ON rpt_inp_arc.arccat_id = cat_arc.id
-     WHERE cat_arc.shape = 'IRREGULAR'
+	 JOIN cat_arc_shape ON cat_arc_shape.id=cat_arc.shape
+     WHERE cat_arc_shape.epa = 'IRREGULAR'
 	 AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 

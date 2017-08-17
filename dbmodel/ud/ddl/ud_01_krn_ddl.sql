@@ -83,6 +83,18 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
 
+
+CREATE TABLE "cat_arc_shape" (
+"id" varchar (30) NOT NULL PRIMARY KEY,
+"epa" varchar(30),
+"ui_image" varchar(50),
+"descript" text,
+"active" boolean
+)
+
+
+
+
 CREATE TABLE "cat_node" (
 "id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_node_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,

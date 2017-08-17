@@ -66,7 +66,7 @@ BEGIN
             IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
                 RETURN audit_function(110,830);  
             END IF;      
-			NEW.nodecat_id:= (SELECT "value" FROM config_vdefault WHERE "parameter"='nodecat_vdefault' AND "user"="current_user"());
+			NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
         END IF;
 
         -- Sector ID
@@ -94,7 +94,7 @@ BEGIN
 		
 		-- Verified
         IF (NEW.verified IS NULL) THEN
-            NEW.verified := (SELECT "value" FROM config_vdefault WHERE "parameter"='verified_vdefault' AND "user"="current_user"());
+            NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
             IF (NEW.verified IS NULL) THEN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
@@ -102,7 +102,7 @@ BEGIN
 
 		-- State
         IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_vdefault WHERE "parameter"='state_vdefault' AND "user"="current_user"());
+            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
@@ -125,7 +125,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.junction_workcat_id IS NULL) THEN
-				NEW.junction_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.junction_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.junction_workcat_id IS NULL) THEN
 					NEW.junction_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -133,7 +133,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.junction_builtdate IS NULL) THEN
-				NEW.junction_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.junction_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -157,7 +157,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.outfall_workcat_id IS NULL) THEN
-				NEW.outfall_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.outfall_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.outfall_workcat_id IS NULL) THEN
 					NEW.outfall_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -165,7 +165,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.outfall_builtdate IS NULL) THEN
-				NEW.outfall_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.outfall_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 			
 		--Copy id to code field
@@ -187,7 +187,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.valve_workcat_id IS NULL) THEN
-				NEW.valve_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.valve_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.valve_workcat_id IS NULL) THEN
 					NEW.valve_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -195,7 +195,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.valve_builtdate IS NULL) THEN
-				NEW.valve_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.valve_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -217,7 +217,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.storage_workcat_id IS NULL) THEN
-				NEW.storage_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.storage_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.storage_workcat_id IS NULL) THEN
 					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -225,7 +225,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.storage_builtdate IS NULL) THEN
-				NEW.storage_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.storage_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -261,7 +261,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.storage_workcat_id IS NULL) THEN
-				NEW.storage_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.storage_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.storage_workcat_id IS NULL) THEN
 					NEW.storage_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -269,7 +269,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.storage_builtdate IS NULL) THEN
-				NEW.storage_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.storage_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -302,7 +302,7 @@ BEGIN
 					
 			-- Workcat_id
 			IF (NEW.netgully_workcat_id IS NULL) THEN
-				NEW.netgully_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.netgully_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.netgully_workcat_id IS NULL) THEN
 					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -310,7 +310,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netgully_builtdate IS NULL) THEN
-				NEW.netgully_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.netgully_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -346,7 +346,7 @@ BEGIN
 
 		-- Workcat_id
 			IF (NEW.netgully_workcat_id IS NULL) THEN
-				NEW.netgully_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.netgully_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.netgully_workcat_id IS NULL) THEN
 					NEW.netgully_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -354,7 +354,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netgully_builtdate IS NULL) THEN
-				NEW.netgully_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.netgully_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 				--Copy id to code field
@@ -387,7 +387,7 @@ BEGIN
 
 			-- Workcat_id
 			IF (NEW.chamber_workcat_id IS NULL) THEN
-				NEW.chamber_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.chamber_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.chamber_workcat_id IS NULL) THEN
 					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -395,7 +395,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.chamber_builtdate IS NULL) THEN
-				NEW.chamber_builtdate:=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.chamber_builtdate:=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -431,7 +431,7 @@ BEGIN
 		ELSIF man_table='man_chamber_pol' THEN
 			-- Workcat_id
 			IF (NEW.chamber_workcat_id IS NULL) THEN
-				NEW.chamber_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.chamber_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.chamber_workcat_id IS NULL) THEN
 					NEW.chamber_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -439,7 +439,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.chamber_builtdate IS NULL) THEN
-				NEW.chamber_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.chamber_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -472,7 +472,7 @@ BEGIN
 		
 			-- Workcat_id
 			IF (NEW.manhole_workcat_id IS NULL) THEN
-				NEW.manhole_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.manhole_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.manhole_workcat_id IS NULL) THEN
 					NEW.manhole_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -480,7 +480,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.manhole_builtdate IS NULL) THEN
-				NEW.manhole_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.manhole_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 					--Copy id to code field
@@ -504,7 +504,7 @@ BEGIN
 			
 			-- Workcat_id
 			IF (NEW.netinit_workcat_id IS NULL) THEN
-				NEW.netinit_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.netinit_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.netinit_workcat_id IS NULL) THEN
 					NEW.netinit_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -512,7 +512,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netinit_builtdate IS NULL) THEN
-				NEW.netinit_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.netinit_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 				--Copy id to code field
@@ -536,13 +536,13 @@ BEGIN
 	
 			-- Workcat_id
 			IF (NEW.wjump_workcat_id IS NULL) THEN
-				NEW.wjump_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.wjump_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 					NEW.wjump_workcat_id := (SELECT id FROM cat_work limit 1);
 			END IF;
 		
 			--Builtdate
 			IF (NEW.wjump_builtdate IS NULL) THEN
-				NEW.wjump_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.wjump_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -565,7 +565,7 @@ BEGIN
 		
 			-- Workcat_id
 			IF (NEW.wwtp_workcat_id IS NULL) THEN
-				NEW.wwtp_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.wwtp_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.wwtp_workcat_id IS NULL) THEN
 					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -573,7 +573,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.wwtp_builtdate IS NULL) THEN
-				NEW.wwtp_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.wwtp_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 		--Copy id to code field
@@ -606,7 +606,7 @@ BEGIN
 			
 			-- Workcat_id
 			IF (NEW.wwtp_workcat_id IS NULL) THEN
-				NEW.wwtp_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.wwtp_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.wwtp_workcat_id IS NULL) THEN
 					NEW.wwtp_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -614,7 +614,7 @@ BEGIN
 
 				--Builtdate
 			IF (NEW.wwtp_builtdate IS NULL) THEN
-				NEW.wwtp_builtdate :=(SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.wwtp_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 			
 					--Copy id to code field
@@ -645,7 +645,7 @@ BEGIN
 				
 			-- Workcat_id
 			IF (NEW.netelement_workcat_id IS NULL) THEN
-				NEW.netelement_workcat_id := (SELECT "value" FROM config_vdefault WHERE "parameter"='workcat_vdefault' AND "user"="current_user"());
+				NEW.netelement_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
 				IF (NEW.netelement_workcat_id IS NULL) THEN
 					NEW.netelement_workcat_id := (SELECT id FROM cat_work limit 1);
 				END IF;
@@ -653,7 +653,7 @@ BEGIN
 
 			--Builtdate
 			IF (NEW.netelement_builtdate IS NULL) THEN
-				NEW.netelement_builtdate := (SELECT "value" FROM config_vdefault WHERE "parameter"='builtdate_vdefault' AND "user"="current_user"());
+				NEW.netelement_builtdate := (SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 			END IF;
 
 			--Copy id to code field

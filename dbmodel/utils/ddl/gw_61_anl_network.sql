@@ -5,58 +5,55 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- ----------------------------
--- TOPOLOGY TOOLS
--- ----------------------------
-
 SET search_path = "SCHEMA_NAME", public;
 
 
-CREATE TABLE "anl_node_orphan" (
-node_id varchar(16),
-node_type varchar (30),
-the_geom public.geometry(POINT, SRID_VALUE),
-CONSTRAINT anl_node_orphan_pkey PRIMARY KEY (node_id)
-);
+-- ----------------------------
+-- REVIEW TOPOLOGY TOOLS
+-- ----------------------------
 
-
-CREATE TABLE "anl_node_duplicated" (
-node_id varchar (16) NOT NULL,
-node_conserv varchar (16) NOT NULL,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_node_duplicated_pkey PRIMARY KEY (node_id)
-);
-
-
-CREATE TABLE "anl_connec_duplicated"(
-id serial NOT NULL,
-connec_id character varying(16),
-connec_conserv character varying(16),
-the_geom geometry(POINT, SRID_VALUE),
-CONSTRAINT anl_connec_duplicated_pkey PRIMARY KEY (id)
-);
-
-
-CREATE TABLE "anl_arc_same_startend"(
-arc_id character varying(16),
-length float,
-the_geom geometry(LINESTRING,SRID_VALUE),
-CONSTRAINT anl_arc_same_startend_pkey PRIMARY KEY (arc_id)
-);
-
-
-CREATE TABLE "anl_arc_no_startend_node"(
+ 
+CREATE TABLE "anl_review_node" (
 id serial NOT NULL PRIMARY KEY,
-arc_id character varying(16),
-the_geom geometry(LINESTRING,SRID_VALUE),
-the_geom_p geometry(POINT,SRID_VALUE)
+node_id varchar (16),
+node_type varchar (30),
+num_arcs integer,
+expl_id integer,
+context varchar (30),
+cur_user varchar (30),
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
 
-CREATE INDEX anl_node_orphan_index ON anl_node_orphan USING GIST (the_geom);
-CREATE INDEX anl_node_duplicated_index ON anl_node_duplicated USING GIST (the_geom);
-CREATE INDEX anl_connec_duplicated_index ON anl_connec_duplicated USING gist (the_geom);
-CREATE INDEX anl_arc_same_startend_index ON anl_arc_same_startend USING gist (the_geom);
-CREATE INDEX anl_arc_no_startend_node_index ON anl_arc_no_startend_node USING GIST (the_geom);
+
+CREATE TABLE "anl_review_arc" (
+id serial NOT NULL PRIMARY KEY,
+arc_id varchar (16),
+arc_type varchar (30),
+expl_id integer,
+context varchar (30),
+cur_user varchar (30),
+the_geom public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+
+CREATE TABLE "anl_review_arc_x_node" (
+id serial NOT NULL PRIMARY KEY,
+arc_id varchar (16),
+node_id varchar (16),
+arc_type varchar (30),
+expl_id integer,
+context varchar (30),
+cur_user varchar (30),
+the_geom public.geometry (LINESTRING, SRID_VALUE)
+the_geom_p public.geometry (LINESTRING, SRID_VALUE)
+);
+
+
+CREATE INDEX anl_review_node_index   ON anl_review_node   USING gist(the_geom);
+CREATE INDEX anl_review_arc_index   ON anl_review_arc USING gist(the_geom);
+CREATE INDEX anl_review_arc_x_node_index   ON anl_review_arc_x_node USING gist(the_geom);
+
 

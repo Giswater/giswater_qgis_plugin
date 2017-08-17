@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_dump_subcatchments() RETURNS SETOF character varying LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_dump_subcatch() RETURNS SETOF character varying LANGUAGE plpgsql AS $$
 DECLARE
     subcatchment_polygon public.geometry;
     row_id varchar(16);

@@ -17,6 +17,10 @@ ALTER TABLE "node" DROP CONSTRAINT IF EXISTS "node_epa_type_fkey";
 ALTER TABLE "arc" ADD CONSTRAINT "arc_epa_type_fkey" FOREIGN KEY ("epa_type") REFERENCES "inp_arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "node" ADD CONSTRAINT "node_epa_type_fkey" FOREIGN KEY ("epa_type") REFERENCES "inp_node_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE "cat_arc_shape" DROP CONSTRAINT IF EXISTS "cat_arc_shape_epa_type_fkey";
+ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_epa_type_fkey" FOREIGN KEY ("epa") REFERENCES "inp_value_catarc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
 
 -- ----------------------------
 -- Foreign Key structure 

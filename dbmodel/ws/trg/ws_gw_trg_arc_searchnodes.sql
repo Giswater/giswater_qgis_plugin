@@ -73,7 +73,7 @@ BEGIN
             VALUES (
                 (SELECT nextval('urn_id_seq')),
                 (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
-                (SELECT nodecat_vdefault FROM config_vdefault WHERE user=cur_user()), 
+                (SELECT nodecat_vdefault FROM config_param_user WHERE user=cur_user()), 
                 (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
                 ST_endpoint(NEW.the_geom)
             );

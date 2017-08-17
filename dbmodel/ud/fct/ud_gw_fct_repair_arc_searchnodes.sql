@@ -4,8 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_topo_arc_searchnodes();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_topo_arc_searchnodes() RETURNS void AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_repair_arc_searchnodes();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_repair_arc_searchnodes() RETURNS void AS
 
 $BODY$
 DECLARE 
