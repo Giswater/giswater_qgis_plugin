@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QSettings, QPoint
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint
 
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.Qt import QDate, QTime
@@ -244,7 +244,7 @@ class Mg(ParentAction):
         # Open CSV file for read and copy into database
         rf = open(self.file_csv)
         sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
-        if (header_status == Qt.Checked):
+        if header_status == Qt.Checked:
             sql+= " HEADER"
         sql+= " DELIMITER AS '"+delimiter+"'"
         status = self.dao.copy_expert(sql, rf)
@@ -452,11 +452,11 @@ class Mg(ParentAction):
         count = layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message, context_name='ui_message')
             return
         elif count > 1:
             message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message, context_name='ui_message')
 
 
         # Get selected features (nodes)
@@ -777,37 +777,37 @@ class Mg(ParentAction):
         # Show message, insert in DB and close form
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
-        if utils_giswater.isChecked(self.chk_state_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_state_vdefault):
             self.insert_or_update_config_vdefault(self.state_vdefault, "state_vdefault")
         else:
             self.delete_row("state_vdefault")
-        if utils_giswater.isChecked(self.chk_psector_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_psector_vdefault):
             self.insert_or_update_config_vdefault(self.psector_vdefault, "psector_vdefault")
         else:
             self.delete_row("psector_vdefault")
-        if utils_giswater.isChecked(self.chk_workcat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_workcat_vdefault):
             self.insert_or_update_config_vdefault(self.workcat_vdefault, "workcat_vdefault")
         else:
             self.delete_row("workcat_vdefault")
-        if utils_giswater.isChecked(self.chk_cverified_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_cverified_vdefault):
             self.insert_or_update_config_vdefault(self.verified_vdefault, "verified_vdefault")
         else:
             self.delete_row("verified_vdefault")
 
-        if utils_giswater.isChecked(self.chk_builtdate_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_builtdate_vdefault):
             self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
         else:
             self.delete_row("builtdate_vdefault")
 
-        if utils_giswater.isChecked(self.chk_arccat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_arccat_vdefault):
             self.insert_or_update_config_vdefault(self.arccat_vdefault, "arccat_vdefault")
         else:
             self.delete_row("arccat_vdefault")
-        if utils_giswater.isChecked(self.chk_nodecat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_nodecat_vdefault):
             self.insert_or_update_config_vdefault(self.nodecat_vdefault, "nodecat_vdefault")
         else:
             self.delete_row("nodecat_vdefault")
-        if utils_giswater.isChecked(self.chk_connecat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_connecat_vdefault):
             self.insert_or_update_config_vdefault(self.connecat_vdefault, "connecat_vdefault")
         else:
             self.delete_row("connecat_vdefault")
@@ -1197,8 +1197,6 @@ class Mg(ParentAction):
         sql+= " WHERE id = '"+id_+"'"
         rows = self.dao.get_row(sql)
 
-        #self.dlg_min_edit.close()
-
         # Create the dialog and signals
         self.dlg_mincut = Mincut()
         utils_giswater.setDialog(self.dlg_mincut)
@@ -1344,9 +1342,6 @@ class Mg(ParentAction):
         self.mincut_fin.setText(id_fin)
         self.address_fin.setText(address_fin)
 
-        # set status
-        #self.state.setText(str(self.state_values[2][0]) )
-
         # Open the dialog
         self.dlg_fin.show()
 
@@ -1354,8 +1349,8 @@ class Mg(ParentAction):
     def accept(self):
 
         # reach end_date and end_hour from mincut_fin dialog
-        datestart=self.cbx_date_start_fin.date()
-        timestart=self.cbx_hours_start_fin.time()
+        datestart = self.cbx_date_start_fin.date()
+        timestart = self.cbx_hours_start_fin.time()
         dateend = self.cbx_date_end_fin.date()
         timeend = self.cbx_hours_end_fin.time()
 
@@ -1450,9 +1445,6 @@ class Mg(ParentAction):
 
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
-
-        # Find the layer to edit
-        #layer = self.iface.activeLayer()
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
@@ -1531,7 +1523,6 @@ class Mg(ParentAction):
         self.dlg_new_psector.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", self.tbl_node_plan, "node" ))
         self.dlg_new_psector.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_node_plan, "plan_node_x_psector", "id"))
 
-        self.dlg_new_psector.btn_add_other_plan.pressed.connect(partial(self.snapping, "v_edit_connect", "plan_other_x_psector", self.tbl_other_plan, "connec"))
         self.dlg_new_psector.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_other_plan, "plan_other_x_psector", "id"))
 
         ##
@@ -1544,10 +1535,10 @@ class Mg(ParentAction):
             psector_id = 0
             
         if psector_id != 0:
-            
-            sql = "SELECT psector_id, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
-            sql+= " FROM " + self.schema_name + ".plan_psector"
-            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
+
+            sql = "SELECT psector_id, name, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
+            sql += " FROM " + self.schema_name + ".plan_psector"
+            sql += " WHERE psector_id = " + str(psector_id)
             row = self.dao.get_row(sql)
             if row is None:
                 return
@@ -1697,57 +1688,53 @@ class Mg(ParentAction):
         :param button: param inherited from signal canvasClicked
         """
         
-        if button == 1:
-            layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_view)[0]
-            self.iface.setActiveLayer(layer)
+        if button == Qt.LeftButton:
 
-            node_group = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source"]
-            connec_group = ["Wjoin", "Fountain"]
+            node_group = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant"]
             arc_group = ["Pipe"]
-            self.canvas = self.iface.mapCanvas()
-            self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-            map_point = self.canvas.getCoordinateTransform().transform(point)
+            canvas = self.iface.mapCanvas()
+            snapper = QgsMapCanvasSnapper(canvas)
+            map_point = canvas.getCoordinateTransform().transform(point)
             x = map_point.x()
             y = map_point.y()
             event_point = QPoint(x, y)
 
             # Snapping
-            (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+            (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
             # That's the snapped point
-            if result <> []:
+            if result:
                 # Check feature
                 for snapPoint in result:
                     element_type = snapPoint.layer.name()
+                    feat_type = None
                     if element_type in node_group:
                         feat_type = 'node'
-                    if element_type in connec_group:
-                        feat_type = 'connec'
-                    if element_type in arc_group:
+                    elif element_type in arc_group:
                         feat_type = 'arc'
 
-                    # Get the point
-                    feature = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
-                    element_id = feature.attribute(feat_type + '_id')
+                    if feat_type is not None:
+                        # Get the point
+                        feature = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                        element_id = feature.attribute(feat_type + '_id')
 
-                    # LEAVE SELECTION
-                    result[0].layer.select([result[0].snappedAtGeometry])
-                    # Get depth of feature
-                if feat_type == elem_type:
-                    sql = "SELECT * FROM " + self.schema_name + "." + tablename
-                    sql+= " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
-                    row = self.dao.get_row(sql)
-                    if not row:
-                        self.list_elemets[element_id] = feat_type
-                    else:
-                        message = "This id already exists"
-                        self.controller.show_info(message, context_name='ui_message')
-                else:
-                    message = self.tr("You are trying to introduce")+" "+feat_type+" "+self.tr("in a")+" "+elem_type
-                    self.controller.show_info(message, context_name='ui_message')
+                        # LEAVE SELECTION
+                        snapPoint.layer.select([snapPoint.snappedAtGeometry])
+                        # Get depth of feature
+                        if feat_type == elem_type:
+                            sql = "SELECT * FROM " + self.schema_name + "." + tablename
+                            sql+= " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
+                            row = self.dao.get_row(sql)
+                            if not row:
+                                self.list_elemets[element_id] = feat_type
+                            else:
+                                message = "This id already exists"
+                                self.controller.show_info(message, context_name='ui_message')
+                        else:
+                            message = self.tr("You are trying to introduce")+" "+feat_type+" "+self.tr("in a")+" "+elem_type
+                            self.controller.show_info(message, context_name='ui_message')
 
-        if button == 2:
+        elif button == Qt.RightButton:
             for element_id, feat_type in self.list_elemets.items():
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
                 sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
