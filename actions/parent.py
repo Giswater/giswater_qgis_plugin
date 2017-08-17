@@ -186,7 +186,7 @@ class ParentAction():
         
         # Compare Java and Plugin versions
         if self.plugin_version <> self.giswater_build_version:
-            msg = "Giswater and plugin versions are different. "
+            msg = "Giswater and plugin versions are different. \n"
             msg+= "Giswater version: "+self.giswater_build_version
             msg+= " - Plugin version: "+self.plugin_version
             self.controller.show_info(msg, 10, context_name='ui_message')
@@ -202,9 +202,7 @@ class ParentAction():
         url = utils_giswater.getWidgetText(widget) 
         if url == 'null':
             url = 'www.giswater.org'
-            webbrowser.open(url)
-        else:
-            webbrowser.open(url)        
+        webbrowser.open(url)        
                 
                 
     def open_file_dialog(self, widget):

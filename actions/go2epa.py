@@ -6,38 +6,33 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QDoubleValidator
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
-from PyQt4.QtGui import QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from PyQt4.Qt import QDate, QTime
-from qgis.core import QgsMapLayerRegistry
+from PyQt4.QtCore import QSettings
+from PyQt4.QtGui import QDoubleValidator, QFileDialog, QCheckBox, QDateEdit
+from PyQt4.QtSql import QSqlQueryModel
 
-from datetime import datetime, date
+from datetime import date
 import os
 import sys
-import webbrowser
 from functools import partial
-
-from ..ui.ud_options import UDoptions
-from ..ui.file_manager import FileManager  # @UnresolvedImport
-from ..ui.ws_options import WSoptions
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
+import utils_giswater
 
+from ..ui.ud_options import UDoptions       #@UnresolvedImport
+from ..ui.file_manager import FileManager   #@UnresolvedImport
+from ..ui.ws_options import WSoptions       #@UnresolvedImport
 
 from parent import ParentAction
-import utils_giswater
 
 
 class Go2Epa(ParentAction):
+    
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """
-
-        # Call ParentAction constructor      
+        """ Class to control Management toolbar actions """    
+        self.minor_version = "3.0"        
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+
 
     def close_dialog(self, dlg=None):
         """ Close dialog """
@@ -50,8 +45,10 @@ class Go2Epa(ParentAction):
         except AttributeError:
             pass
 
+
     def set_project_type(self, project_type):
         self.project_type = project_type
+
 
     def mg_go2epa(self):
         """ Button 23. Open form to set INP, RPT and project """
@@ -67,7 +64,7 @@ class Go2Epa(ParentAction):
 
         # Get giswater properties file
         users_home = os.path.expanduser("~")
-        filename = "giswater_2.0.properties"
+        filename = "giswater_" + self.minor_version + ".properties"
         java_properties_path = users_home + os.sep + "giswater" + os.sep + "config" + os.sep + filename
         if not os.path.exists(java_properties_path):
             msg = "Giswater properties file not found: " + str(java_properties_path)
@@ -110,32 +107,28 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.btn_opt_hyd.setText("Options")
             self.dlg_go2epa.btn_time_opt.setText("Times")
             self.dlg_go2epa.btn_rep_time.setText("Report")
-
             self.dlg_go2epa.btn_opt_hyd.clicked.connect(self.ws_options)
-            # self.test("ws")
+
         if self.project_type == 'ud':
             self.dlg_go2epa.btn_opt_hyd.setText("Hydrology selector")
             self.dlg_go2epa.btn_time_opt.setText("Options")
             self.dlg_go2epa.btn_rep_time.setText("Times")
-
             self.dlg_go2epa.btn_opt_hyd.clicked.connect(self.ud_options)
-
-            # self.test("ud")
 
         # self.dlg.btn_sector_selection.clicked.connect()
         # self.dlg.btn_option.clicked.connect()
-
-
-
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_go2epa, 'file_manager')
         self.dlg_go2epa.exec_()
 
+
     def ws_options(self):
+        
         # Create dialog
         self.dlg_wsoptions = WSoptions()
         utils_giswater.setDialog(self.dlg_wsoptions)
+        
         # Allow QTextView only Double text
         self.dlg_wsoptions.viscosity.setValidator(QDoubleValidator())
         self.dlg_wsoptions.trials.setValidator(QDoubleValidator())
@@ -170,6 +163,7 @@ class Go2Epa(ParentAction):
         sql = "SELECT DISTINCT(pattern_id) FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("pattern", rows, False)
+        
         update = True
         self.dlg_wsoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.pressed.connect(self.dlg_wsoptions.close)
@@ -177,6 +171,7 @@ class Go2Epa(ParentAction):
 
 
     def ud_options(self):
+        
         # Create dialog
         self.dlg_udoptions = UDoptions()
         utils_giswater.setDialog(self.dlg_udoptions)
@@ -195,7 +190,6 @@ class Go2Epa(ParentAction):
         self.dlg_udoptions.tolerance.setValidator(QDoubleValidator())
         self.dlg_udoptions.demand_multiplier.setValidator(QDoubleValidator())
         '''
-
 
 
         #Set values from widgets of type QComboBox
@@ -217,13 +211,14 @@ class Go2Epa(ParentAction):
         sql = "SELECT DISTINCT(pattern_id) FROM "+self.schema_name+".inp_pattern ORDER BY pattern_id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("pattern", rows, False)
+        
         update = True
-        self.dlg_wsoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', self.dlg_wsoptions))
-
+        self.dlg_udoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', self.dlg_wsoptions))
         self.dlg_udoptions.btn_cancel.pressed.connect(self.dlg_udoptions.close)
         self.dlg_udoptions.exec_()
+        
+        
     def insert_or_update(self, update, tablename, dialog):
-        self.test(("qwe"))
 
         sql = "SELECT *"
         sql += " FROM " + self.schema_name + "." + tablename
@@ -284,6 +279,8 @@ class Go2Epa(ParentAction):
 
         self.controller.execute_sql(sql)
         dialog.close()
+        
+        
     def mg_go2epa_select_file_inp(self):
 
         # Set default value if necessary
@@ -299,6 +296,7 @@ class Go2Epa(ParentAction):
         self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
         self.dlg.txt_file_inp.setText(self.file_inp)
 
+
     def mg_go2epa_select_file_rpt(self):
 
         # Set default value if necessary
@@ -313,6 +311,7 @@ class Go2Epa(ParentAction):
         msg = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
         self.dlg.txt_file_rpt.setText(self.file_rpt)
+
 
     def mg_go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
@@ -330,12 +329,14 @@ class Go2Epa(ParentAction):
         # Close form
         self.close_dialog(self.dlg)
 
+
     def mg_go2epa_express(self):
         """ Button 24. Open giswater in silent mode
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
         """
         self.execute_giswater("mg_go2epa_express", 24)
+
 
     def fill_table_by_query(self, qtable, query):
         """
@@ -346,6 +347,4 @@ class Go2Epa(ParentAction):
         model.setQuery(query)
         qtable.setModel(model)
         qtable.show()
-
-
 
