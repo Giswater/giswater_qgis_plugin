@@ -3379,6 +3379,13 @@
         <translation>Advertència</translation>
     </message>
     <message>
+        <source>This id already exists</source>
+        <translation>Aquest id ja existeix</translation>
+    </message>
+    <message>
+        <source>You are trying to enter different types</source>
+        <translation>Estàs intentant introduir tipus diferents</translation>
+    </message>
         <source>Any table has been selected</source>
         <translation>Any table has been selected</translation>
     </message>   

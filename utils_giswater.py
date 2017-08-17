@@ -34,8 +34,8 @@ def fillComboBox(widget, rows, allow_nulls=True):
             if elem is not None:
                 widget.addItem(str(elem))
                 
-                
-def fillComboBoxDefault(widget, rows,):
+
+def fillComboBoxDefault(widget, rows):
     ''' Fill combo box with default value-first from the list '''
     
     if type(widget) is str:
@@ -50,7 +50,6 @@ def fillComboBoxDefault(widget, rows,):
         else:
             if elem is not None:
                 widget.addItem(str(elem))                
-        
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
@@ -248,7 +247,33 @@ def setImage(widget,cat_shape):
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()  
-
+        
+        
+def setRow(p_row):
+    global _row
+    _row = p_row
+    
+                        
+def fillWidget(widget):
+    
+    key = widget
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
+        return    
+    
+    if key in _row: 
+        if _row[key] is not None:
+            value = unicode(_row[key])
+            if type(widget) is QLineEdit or type(widget) is QTextEdit: 
+                if value == 'None':    
+                    value = ""        
+                widget.setText(value)
+        else:
+            widget.setText("")       
+    else:
+        widget.setText("") 
+        
 
 def get_reg(reg_hkey, reg_path, reg_name):
     
