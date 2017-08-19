@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -17,15 +17,16 @@ BEGIN
     -- Get data from config table
     SELECT * INTO rec FROM config; 
 
-    -- Create table for duplicated connecs
-    DELETE FROM anl_connec_duplicated;
-    INSERT INTO anl_connec_duplicated (connec_id, connec_conserv, the_geom)
-    SELECT DISTINCT t1.connec_id, t2.connec_id, t1.the_geom
+    -- Reset values
+	DELETE FROM anl_review_connec WHERE cur_user="current_user"() AND context='Connec duplicated';;
+		
+    -- Computing process
+    INSERT INTO anl_review_connec (connec_id, state, descript, expl_id, context, the_geom)
+    SELECT DISTINCT t1.connec_id, t1.state, t2.connec_id, t1.expl_id, 'Connec duplicated', t1.the_geom
     FROM connec AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.connec_duplicated_tolerance)) 
     WHERE t1.connec_id != t2.connec_id  
     ORDER BY t1.connec_id;
     
-    PERFORM audit_function(0,20);
     RETURN;  
     
 END;

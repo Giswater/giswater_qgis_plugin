@@ -20,9 +20,10 @@ BEGIN
     -- Clear tables
     DELETE FROM anl_ud_topological_consistency;
 
-    -- Check number of connected pipes to node depending on node type
+    -- Check number of connected conduits to node depending on node type
     INSERT INTO anl_topological_consistency (node_id, node_type, num_arcs, the_geom)
-    SELECT node_id, node_type, COUNT(*), node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id WHERE node.node_type != 'OUTFALL' GROUP BY node.node_id HAVING COUNT(*) = 1;
+    SELECT node_id, node_type, COUNT(*), node.the_geom FROM node INNER JOIN arc ON arc.node_1 = node.node_id OR arc.node_2 = node.node_id 
+	WHERE node.node_type != 'OUTFALL' GROUP BY node.node_id HAVING COUNT(*) = 1;
 
     --PERFORM audit_function(0,30);
     RETURN;

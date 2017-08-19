@@ -5,10 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 
 
--- Function: SCHEMA_NAME.gw_fct_urn();
-/*
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(varchar, double, boolean);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_plan_estimate_result(result_id_var text, coefficient_var double, only_planified boolean) RETURNS integer AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_estimate_result(varchar, float, boolean);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_plan_estimate_result(result_id_var text, coefficient_var float ) RETURNS integer AS
 
 $BODY$
 
@@ -19,7 +17,7 @@ project_type_aux varchar;
 BEGIN 
 
     SET search_path = "SCHEMA_NAME", public;
-	
+	/*
 	INSERT INTO plan_result_table
 	SELECT
 	null,
@@ -30,11 +28,10 @@ BEGIN
 	
 	
 	-- TO DO
-
+*/
 	RETURN 1;
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-	*/

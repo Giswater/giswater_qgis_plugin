@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -51,13 +51,15 @@ BEGIN
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
 
+	/*
+
     DELETE FROM "anl_mincut_result_node" where result_id=result_id_arg;
-    DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;;
-    DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;;
-    DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;;
-    DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;;
-    DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; ;
-	
+    DELETE FROM "anl_mincut_result_arc" where result_id=result_id_arg;
+    DELETE FROM "anl_mincut_result_valve" where result_id=result_id_arg;
+    DELETE FROM "anl_mincut_result_polygon" where result_id=result_id_arg;
+    DELETE FROM "anl_mincut_result_connec" where result_id=result_id_arg;
+    DELETE FROM "anl_mincut_result_hydrometer" where result_id=result_id_arg; 
+
 	-- 
 	INSERT INTO anl_mincut_result_valve (result_id, node_id, closed, broken)
 	SELECT * FROM v_anl_mincut_valve;
@@ -146,7 +148,10 @@ BEGIN
 	
     PERFORM gw_fct_valveanalytics(result_id_arg);
 
-    RETURN audit_function(0,310);
+*/
+
+
+    RETURN 1;
 
 
 END;

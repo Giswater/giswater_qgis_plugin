@@ -15,7 +15,6 @@ CREATE TABLE "config" (
 "arc_searchnodes" double precision,
 "node2arc" double precision,
 "connec_proximity" double precision,
-"arc_toporepair" double precision,
 "nodeinsert_arcendpoint" boolean,
 "orphannode_delete" boolean,
 "vnode_update_tolerance" double precision,

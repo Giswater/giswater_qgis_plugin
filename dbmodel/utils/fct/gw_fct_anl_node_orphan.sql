@@ -15,18 +15,19 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Reset values
-    DELETE FROM anl_node_orphan;
-
-    -- Loop for all the arcs
+    DELETE FROM anl_review_node WHERE cur_user="current_user"() AND context='Node orphan';
+		
+    -- Computing process
     FOR rec_node IN SELECT DISTINCT * FROM node AS a WHERE (SELECT COUNT(*) FROM arc WHERE node_1 = a.node_id OR node_2 = a.node_id) = 0
     LOOP
-        INSERT INTO anl_node_orphan VALUES (rec_node.node_id, rec_node.node_type, rec_node.the_geom);
+        INSERT INTO anl_review_node (node_id, state, expl_id, context, the_geom) 
+		VALUES (rec_node.node_id, rec_node.state, rec_node.expl_id, 'Node orphan', rec_node.the_geom);
     END LOOP;
 
-    PERFORM audit_function(0,40);
     RETURN;
         
 END;
 $$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+ 

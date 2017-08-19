@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW v_anl_review_arc AS
 SELECT
 arc_id,
 arc_type,
+state,
 context,
 exploitation.name AS expl_name,
 the_geom
@@ -31,6 +32,7 @@ CREATE OR REPLACE VIEW v_anl_review_node AS
 SELECT
 node_id,
 node_type,
+state,
 num_arcs,
 context,
 exploitation.name AS expl_name,
@@ -52,6 +54,7 @@ arc_id,
 arc_type,
 node_id,
 node_type,
+state,
 context,
 exploitation.name AS expl_name,
 the_geom
@@ -71,6 +74,7 @@ arc_id,
 arc_type,
 node_id,
 node_type,
+state,
 context,
 exploitation.name AS expl_name,
 the_geom_p

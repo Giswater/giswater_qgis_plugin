@@ -17,13 +17,27 @@ CREATE TABLE "anl_review_node" (
 id serial NOT NULL PRIMARY KEY,
 node_id varchar (16),
 node_type varchar (30),
+state integer,
 num_arcs integer,
+descript text,
 expl_id integer,
 context varchar (30),
-cur_user varchar (30),
+cur_user varchar (30) DEFAULT "current_user"(),
 the_geom public.geometry (POINT, SRID_VALUE)
 );
 
+
+CREATE TABLE "anl_review_connec" (
+id serial NOT NULL PRIMARY KEY,
+connec_id varchar (16),
+connec_type varchar (30),
+state integer,
+descript text,
+expl_id integer,
+context varchar (30),
+cur_user varchar (30) DEFAULT "current_user"(),
+the_geom public.geometry (POINT, SRID_VALUE)
+);
 
 
 
@@ -31,9 +45,10 @@ CREATE TABLE "anl_review_arc" (
 id serial NOT NULL PRIMARY KEY,
 arc_id varchar (16),
 arc_type varchar (30),
+state integer,
 expl_id integer,
 context varchar (30),
-cur_user varchar (30),
+cur_user varchar (30) DEFAULT "current_user"(),
 the_geom public.geometry (LINESTRING, SRID_VALUE)
 );
 
@@ -44,11 +59,12 @@ id serial NOT NULL PRIMARY KEY,
 arc_id varchar (16),
 node_id varchar (16),
 arc_type varchar (30),
+state integer,
 expl_id integer,
 context varchar (30),
-cur_user varchar (30),
+cur_user varchar (30) DEFAULT "current_user"(),
 the_geom public.geometry (LINESTRING, SRID_VALUE),
-the_geom_p public.geometry (LINESTRING, SRID_VALUE)
+the_geom_p public.geometry (POINT, SRID_VALUE)
 );
 
 

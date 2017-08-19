@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -19,9 +19,13 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
+    
     -- Select options
     SELECT * INTO optionsRecord FROM inp_options LIMIT 1;
 
+    -- Looking for state control
+    PERFORM gw_fct_state_control('node', NEW.node_id, NEW.state, TG_OP);
+    
     -- Select arcs with start-end on the updated node
     querystring := 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
 

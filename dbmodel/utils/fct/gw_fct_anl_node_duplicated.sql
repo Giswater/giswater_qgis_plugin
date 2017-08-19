@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -18,16 +18,16 @@ BEGIN
     -- Get data from config table
     SELECT * INTO rec FROM config; 
 
-    -- Create table for duplicated nodes
-    DELETE FROM anl_node_duplicated;
-    INSERT INTO anl_node_duplicated (node_id, node_conserv, the_geom)
-    SELECT DISTINCT t1.node_id, t2.node_id, t1.the_geom
+    -- Reset values
+    DELETE FROM anl_review_node WHERE cur_user="current_user"() AND context='Node duplicated';
+		
+		
+    -- Computing process
+    INSERT INTO anl_review_node (node_id, state, descript, expl_id, context, the_geom)
+    SELECT DISTINCT t1.node_id, t1.state, t2.node_id, t1.expl_id, 'Node duplicated', t1.the_geom
     FROM node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.node_duplicated_tolerance)) 
     WHERE t1.node_id != t2.node_id  
     ORDER BY t1.node_id;
-
-    PERFORM audit_function(0,30);
-    RETURN;
 
 END;
 $BODY$
