@@ -52,7 +52,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_result_name_to_show">
+  <widget class="QLabel" name="label_result_name">
    <property name="geometry">
     <rect>
      <x>20</x>

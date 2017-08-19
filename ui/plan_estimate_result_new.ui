@@ -7,39 +7,21 @@
     <x>0</x>
     <y>0</y>
     <width>352</width>
-    <height>177</height>
+    <height>134</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QCheckBox" name="checkBox">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>80</y>
-     <width>221</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>7</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="other">
+  <widget class="QLineEdit" name="text_prices_coeficient">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>160</x>
      <y>50</y>
-     <width>181</width>
+     <width>161</width>
      <height>21</height>
     </rect>
    </property>
@@ -56,7 +38,7 @@
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
    </property>
   </widget>
-  <widget class="QLabel" name="other_label_2">
+  <widget class="QLabel" name="label_prices_coefficient">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -77,11 +59,11 @@
     <string>Prices coefficient:</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept_2">
+  <widget class="QPushButton" name="btn_calculate">
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>130</y>
+     <y>90</y>
      <width>91</width>
      <height>26</height>
     </rect>
@@ -90,11 +72,11 @@
     <string>Calculate</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_accept_3">
+  <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>130</y>
+     <y>90</y>
      <width>81</width>
      <height>26</height>
     </rect>
@@ -103,12 +85,12 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QLabel" name="other_label_3">
+  <widget class="QLabel" name="label_result_id">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>121</width>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -124,15 +106,15 @@
     <string>Result_id:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="other_2">
+  <widget class="QLineEdit" name="text_result_id">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>160</x>
      <y>20</y>
-     <width>181</width>
+     <width>161</width>
      <height>21</height>
     </rect>
    </property>
@@ -147,27 +129,6 @@
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="other_label_4">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>80</y>
-     <width>101</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>MS Shell Dlg 2</family>
-     <pointsize>8</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Only planified:</string>
    </property>
   </widget>
  </widget>
