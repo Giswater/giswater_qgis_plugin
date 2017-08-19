@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -47,16 +47,16 @@ CREATE SEQUENCE "price_simple_value_seq"
 CREATE TABLE "plan_psector" (
 "psector_id" serial NOT NULL PRIMARY KEY,
 "name" varchar (50) NOT NULL,
-"descript" text COLLATE "default",
+"descript" text ,
 "expl_id" integer,
-"priority" varchar(16) COLLATE "default",
-"text1" text COLLATE "default",
-"text2" text COLLATE "default",
-"observ" text COLLATE "default",
+"priority" varchar(16) ,
+"text1" text ,
+"text2" text ,
+"observ" text ,
 "rotation" numeric (8,4),
 "scale" numeric (8,2),
-"sector_id" varchar(30) COLLATE "default",
-"atlas_id" varchar(16) COLLATE "default",
+"sector_id" integer,
+"atlas_id" varchar(16) ,
 "gexpenses" numeric (4,2),
 "vat" numeric (4,2),
 "other" numeric (4,2),
@@ -66,33 +66,33 @@ CREATE TABLE "plan_psector" (
 
 CREATE TABLE "plan_arc_x_psector" (
 "id" serial NOT NULL PRIMARY KEY,
-"arc_id" varchar(16) COLLATE "default",
+"arc_id" varchar(16) ,
 "psector_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "doable" boolean NOT NULL,
-"atlas_id" varchar(16) COLLATE "default",
-"descript" varchar(254) COLLATE "default" 
+"atlas_id" varchar(16) ,
+"descript" varchar(254)  
 );
 
 
 CREATE TABLE "plan_node_x_psector" (
 "id" serial NOT NULL PRIMARY KEY,
-"node_id" varchar(16) COLLATE "default",
+"node_id" varchar(16) ,
 "psector_id" integer NOT NULL,
 "state" int2 NOT NULL,
 "doable" boolean NOT NULL,
-"atlas_id" varchar(16) COLLATE "default",
-"descript" varchar(254) COLLATE "default" 
+"atlas_id" varchar(16) ,
+"descript" varchar(254)  
 );
 
 
 CREATE TABLE "plan_other_x_psector" (
 "id" serial NOT NULL PRIMARY KEY,
-"price_id" varchar(16) COLLATE "default",
+"price_id" varchar(16) ,
 "measurement" numeric (12,2),
 "psector_id" integer,
-"atlas_id" varchar(16) COLLATE "default",
-"descript" varchar(254) COLLATE "default" 
+"atlas_id" varchar(16) ,
+"descript" varchar(254)  
 );
 
 
@@ -105,8 +105,8 @@ CREATE TABLE plan_arc_x_pavement (
 
 
 CREATE TABLE "plan_value_ps_priority" (
-"id" varchar(16) COLLATE "default" NOT NULL,
-"observ" varchar(254) COLLATE "default"
+"id" varchar(16)  NOT NULL,
+"observ" varchar(254) 
 );
 
 
@@ -163,8 +163,8 @@ CREATE TABLE "plan_result_cat" (
 "result_id" serial PRIMARY KEY,
 "name" varchar (30),
 "network_price_coeff" float,
-timestamp default now(),
-user default cur_user(),
+tstamp timestamp default now(),
+cur_user text,
 "descript" text
 );
 
@@ -190,7 +190,7 @@ cur_user text
 
 CREATE TABLE "plan_result_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(16) NOT NULL,
+"result_id" varchar(30) NOT NULL,
 "node_id" varchar(16) NOT NULL,
 "elevation" numeric(12,3),
 "elev" numeric(12,3),
@@ -211,7 +211,7 @@ CREATE TABLE "plan_result_node" (
 
 CREATE TABLE "plan_result_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(16) NOT NULL,
+"result_id" varchar(30) NOT NULL,
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,

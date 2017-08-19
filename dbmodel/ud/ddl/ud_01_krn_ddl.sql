@@ -90,7 +90,7 @@ CREATE TABLE "cat_arc_shape" (
 "ui_image" varchar(50),
 "descript" text,
 "active" boolean
-)
+);
 
 
 

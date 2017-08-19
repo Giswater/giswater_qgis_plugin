@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -430,5 +430,5 @@ INSERT INTO "inp_value_yesno" VALUES ('YES');
 -- ----------------------------
 -- Records of inp_hydrology
 -- ----------------------------
-INSERT INTO "cat_hydrology" VALUES ('HC_DEFAULT', 'CURVE_NUMBER', 'Default value of infiltration');
+INSERT INTO "cat_hydrology" VALUES (1, 'Infiltration default value', 'CURVE_NUMBER', 'Default value of infiltration');
  

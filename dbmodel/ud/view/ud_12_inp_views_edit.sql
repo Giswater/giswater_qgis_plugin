@@ -387,4 +387,4 @@ JOIN v_node ON v_node.node_id=subcatchment.node_id
 	   WHERE 
 	   ((subcatchment.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"()) AND
 	   ((subcatchment.hydrology_id)=(inp_selector_hydrology.hydrology_id) AND inp_selector_hydrology.cur_user="current_user"());
-   
+	  

@@ -164,9 +164,9 @@ v_arc.soilcat_id,
 v_arc.custom_length,
 v_arc.length,
 v_arc.the_geom
-FROM v_arc_x_node1
-	JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
-	JOIN v_arc ON v_arc_x_node2.arc_id = v_arc.arc_id;
+   FROM v_arc
+     JOIN v_arc_x_node1 ON v_arc_x_node1.arc_id::text = v_arc.arc_id::text
+     JOIN v_arc_x_node2 ON v_arc_x_node2.arc_id::text = v_arc.arc_id::text;
 
 
 

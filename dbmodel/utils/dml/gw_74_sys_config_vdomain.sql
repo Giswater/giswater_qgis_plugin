@@ -13,14 +13,12 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proximity, arc_toporepair, nodeinsert_arcendpoint, nodeinsert_catalog_vdefault, orphannode_delete, vnode_update_tolerance, nodetype_change_enabled, 
+INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proximity, arc_toporepair, nodeinsert_arcendpoint, orphannode_delete, vnode_update_tolerance, nodetype_change_enabled, 
 	samenode_init_end_control, node_proximity_control, connec_proximity_control, node_duplicated_tolerance, connec_duplicated_tolerance, audit_function_control, arc_searchnodes_control, insert_double_geometry, buffer_value)
-  VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, NULL, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
+  VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, NULL, false, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
 
+/*
 INSERT INTO config_param_bool VALUES ('slope_arc_direction', true, NULL, NULL);
-
-INSERT INTO config_csv_import VALUES ('inp_pattern', 'Patterns');
-INSERT INTO config_csv_import VALUES ('inp_curve', 'Curve');
 
 
 INSERT INTO config_param_text VALUES ('custom_giswater_folder', 'c:/', NULL, NULL );
@@ -200,58 +198,4 @@ INSERT INTO config_ui_forms VALUES (3890, 'v_ui_element_x_connec', NULL, 150, 1,
 INSERT INTO config_ui_forms VALUES (3892, 'v_ui_element_x_connec', NULL, 100, 2, NULL);
 INSERT INTO config_ui_forms VALUES (3906, 'v_ui_element_x_connec', NULL, 100, 9, NULL);
 INSERT INTO config_ui_forms VALUES (4100, 'v_ui_om_visit_x_arc', NULL, NULL, 1, NULL);
-
-
-
-INSERT INTO config_py_tables VALUES (17, 'v_edit_man_varc', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (18, 'v_edit_man_siphon', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (19, 'v_edit_man_conduit', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (20, 'v_edit_man_waccel', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (21, 'v_edit_man_chamber', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (22, 'v_edit_man_chamber_pol', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (23, 'v_edit_man_netgully', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (24, 'v_edit_man_netgully_pol', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (25, 'v_edit_man_netinit', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (26, 'v_edit_man_wjump', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (27, 'v_edit_man_wwtp', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (28, 'v_edit_man_wwtp_pol', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (29, 'v_edit_man_storage', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (30, 'v_edit_man_storage_pol', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (31, 'v_edit_man_outfall', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (32, 'v_edit_man_junction', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (33, 'v_edit_man_manhole', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (34, 'v_edit_man_valve', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (35, 'v_ui_element_x_gully', 'ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (36, 'v_ui_doc_x_gully', 'ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (37, 'v_ui_event_x_gully', 'ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (38, 'v_edit_gully', 'ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (39, 'v_edit_man_wjoin', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (40, 'v_edit_man_tap', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (41, 'v_edit_man_greentap', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (42, 'v_edit_man_fountain', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (43, 'v_edit_man_tank', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (44, 'v_edit_man_pump', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (45, 'v_edit_man_source', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (46, 'v_edit_man_meter', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (47, 'v_edit_man_junction', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (48, 'v_edit_man_manhole', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (49, 'v_edit_man_reduction', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (50, 'v_edit_man_hydrant', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (51, 'v_edit_man_valve', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (52, 'v_edit_man_waterwell', 'ws', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (1, 'v_ui_element_x_arc', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (2, 'v_ui_doc_x_arc', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (3, 'v_ui_event_x_arc', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (4, 'v_ui_element_x_node', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (5, 'v_ui_doc_x_node', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (6, 'v_ui_event_x_node', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (7, 'v_rtc_scada', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (8, 'v_rtc_scada_value', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (9, 'v_ui_element_x_connec', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (10, 'v_ui_doc_x_connec', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (11, 'v_ui_event_x_connec', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (12, 'v_rtc_hydrometer', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (13, 'v_edit_rtc_hydro_data_x_connec', 'ws&ud', NULL, NULL, true, false);
-INSERT INTO config_py_tables VALUES (14, 'v_edit_arc', 'ws&ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (15, 'v_edit_node', 'ws&ud', NULL, NULL, true, true);
-INSERT INTO config_py_tables VALUES (16, 'v_edit_connec', 'ws&ud', NULL, NULL, true, true);
+*/

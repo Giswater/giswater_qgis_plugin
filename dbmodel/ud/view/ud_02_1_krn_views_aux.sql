@@ -65,7 +65,7 @@ SELECT
 DROP VIEW IF EXISTS v_state_gully;
 CREATE VIEW v_state_gully AS
 SELECT 
-	connec_id
+	gully_id
 	FROM selector_state,gully
 	WHERE gully.state=selector_state.state_id
 	AND selector_state.cur_user=current_user;
@@ -196,44 +196,43 @@ SELECT arc.arc_id,
 
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
- SELECT 
-    v_arc_x_node1.arc_id,
+ SELECT v_arc.arc_id,
     v_arc_x_node1.node_1,
     v_arc_x_node1.top_elev1,
     v_arc_x_node1.ymax1,
     v_arc_x_node1.elev1,
-    v_arc_x_node1.y1,
-    CASE
+    v_arc.y1,
+        CASE
             WHEN v_arc_x_node1.z1 IS NOT NULL THEN v_arc_x_node1.z1
             ELSE 0::numeric
-            END AS z1,
+        END AS z1,
     v_arc_x_node1.elevmax1,
     v_arc_x_node2.node_2,
     v_arc_x_node2.top_elev2,
     v_arc_x_node2.ymax2,
     v_arc_x_node2.elev2,
-    v_arc_x_node2.y2,
-    CASE
+    v_arc.y2,
+        CASE
             WHEN v_arc_x_node2.z2 IS NOT NULL THEN v_arc_x_node2.z2
             ELSE 0::numeric
-            END AS z2,
-    v_arc_x_node2.elevmax2,  
+        END AS z2,
+    v_arc_x_node2.elevmax2,
     v_arc_x_node1.geom1,
     v_arc_x_node1.r1,
     v_arc_x_node2.r2,
-    CASE
+        CASE
             WHEN st_length(v_arc.the_geom) = 0::double precision THEN NULL::numeric(6,4)
             WHEN ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(v_arc.the_geom)) > 1::double precision THEN NULL::numeric(6,4)
             ELSE ((1::numeric * (v_arc_x_node1.elevmax1 - v_arc_x_node2.elevmax2))::double precision / st_length(v_arc.the_geom))::numeric(6,4)
-    END AS slope,
+        END AS slope,
     v_arc.state,
     v_arc.sector_id,
-	v_arc.soilcat_id,
-	v_arc.annotation,
-	v_arc.length,
+    v_arc.soilcat_id,
+    v_arc.annotation,
+    v_arc.length,
     v_arc.the_geom
-	FROM v_arc_x_node1
-     JOIN v_arc_x_node2 ON v_arc_x_node1.arc_id = v_arc_x_node2.arc_id
-     JOIN v_arc ON v_arc_x_node2.arc_id = v_arc_x_node1.arc_id;
+   FROM v_arc
+     LEFT JOIN v_arc_x_node1 ON v_arc_x_node1.arc_id::text = v_arc.arc_id::text
+     LEFT JOIN v_arc_x_node2 ON v_arc_x_node2.arc_id::text = v_arc.arc_id::text;
 
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -14,21 +14,58 @@ DECLARE
     newPoint public.geometry;    
     connecPoint public.geometry;
 	check_aux boolean;
+        psector_vdefault_var integer;
 
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     
-    -- Get data from config table
+ -- Get data from config table
     SELECT * INTO rec FROM config;  
-	SELECT arc_topocoh INTO check_aux FROM value_state where NEW.state=id;
+
+
+ -- Looking for state=2 coherence (permisions and psector_vdefault)
+    IF TG_OP = 'INSERT' THEN
+	IF NEW.state=2 THEN
+		SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+		IF psector_vdefault_var IS NULL THEN	
+			RAISE EXCEPTION 'You are not allowed to manage with values of arc state=2. Please review your profile parameters';
+		ELSE
+			INSERT INTO plan_arc_x_psector (arc_id, psector_id, state, doable) VALUES (NEW.arc_id, psector_vdefault, 1, TRUE);
+		END IF;
+	END IF;
+
+    ELSIF TG_OP = 'UPDATE' THEN
+	IF NEW.state=2 AND NEW.state!=OLD.state THEN
+		SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+		IF psector_vdefault_var IS NULL THEN	
+			RAISE EXCEPTION 'You are not allowed to manage with values of arc state=2. Please review your profile parameters';
+		ELSE
+			INSERT INTO plan_arc_x_psector (arc_id, psector_id, state, doable) VALUES (NEW.arc_id, psector_vdefault, 1, TRUE);
+		END IF;
+	END IF;
 	
-   SELECT * INTO nodeRecord1 FROM node WHERE (ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes) AND ((check_aux IS true AND NEW.state=node.state) OR check_aux IS false))
-    ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+	IF NEW.state=1 AND OLD.state=2 THEN
+		SELECT value INTO psector_vdefault_var FROM config_param_user WHERE parameter='psector_vdefault' AND cur_user="current_user"();
+		IF psector_vdefault_var IS NULL THEN	
+			RAISE EXCEPTION 'You are not allowed to manage witrh values of arc state=2. Please review your profile parameters';
+		ELSE
+			INSERT INTO plan_arc_x_psector (arc_id, psector_id, state, doable) VALUES (NEW.arc_id, psector_vdefault, 1, TRUE);
+		END IF;
+	END IF;
+    END IF;
 	
-	SELECT * INTO nodeRecord2 FROM node WHERE (ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, rec.arc_searchnodes) AND ((check_aux IS true AND NEW.state=node.state) OR check_aux IS false))
-    ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
-   
+	
+-- Lookig for state=0
+    IF NEW.state=0 THEN
+	RAISE WARNING 'Topology is not enabled with state=0. The feature will be disconected of the network';
+	RETURN NEW;
+	
+-- Lookig for extremal nodes
+    ELSE 
+	SELECT * INTO nodeRecord1 FROM v_edit_node WHERE node_id=gw_fct_state_searchnodes(NEW.arc_id, NEW.state, 'StartPoint'::varchar, NEW.the_geom);
+	SELECT * INTO nodeRecord2 FROM v_edit_node WHERE node_id=gw_fct_state_searchnodes(NEW.arc_id, NEW.state, 'EndPoint'::varchar, NEW.the_geom);
+	
 
     -- Control of length line
     IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
@@ -99,7 +136,9 @@ BEGIN
     ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS FALSE) THEN
         RETURN NEW;
 		
-	END IF;
+   END IF;
+
+END IF;
 
 END; 
 $BODY$

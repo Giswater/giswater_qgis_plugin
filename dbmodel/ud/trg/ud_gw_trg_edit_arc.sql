@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -30,6 +30,11 @@ BEGIN
 			IF (NEW.arc_id IS NULL) THEN
 				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				NEW.arc_id:= (SELECT nextval('urn_id_seq'));
+			END IF;
+
+			-- code
+			IF (NEW.code IS NULL) THEN
+				NEW.code = NEW.arc_id;
 			END IF;
 
          -- Arc type
@@ -123,12 +128,16 @@ BEGIN
             END IF;
 		
         -- FEATURE INSERT
-				INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", annotation, observ, 
-				"comment", inverted_slope, custom_length, dma_id, soilcat_id, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, 
-				descript, link, verified, the_geom, undelete,label_x,label_y, label_rotation, code, expl_id, publish, inventory, uncertain,num_value) 
-				VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.custom_y1,NEW.elev1, NEW.custom_elev1, NEW.y2, NEW.custom_y2, NEW.elev2, NEW.custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, 
-				NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id,
-				NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, NEW.label_rotation, NEW.code, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
+				INSERT INTO arc (arc_id, code, node_1, node_2, y1, custom_y1, elev1, custom_elev1, y2, custom_y2, elev2, custom_elev2, arc_type, arccat_id, epa_type,
+				sector_id, "state", annotation, observ, "comment", inverted_slope, custom_length, dma_id, soilcat_id, function_type,
+				category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, 
+				address_01, address_02, address_03, descript, link, verified, the_geom, undelete,label_x,label_y, 
+				label_rotation, expl_id, publish, inventory, uncertain, num_value) 
+				VALUES (NEW.arc_id, NEW.code, null, null, NEW.y1, NEW.custom_y1, NEW.elev1, NEW.custom_elev1, NEW.y2, NEW.custom_y2, NEW.elev2, NEW.custom_elev2, NEW.arc_type, NEW.arccat_id, NEW.epa_type, 
+				NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW.comment, NEW.inverted_slope, NEW.custom_length, NEW.dma_id, NEW.soilcat_id, NEW.function_type, 
+				NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, 
+				NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y, 
+				NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value);
 				
 						
         -- EPA INSERT

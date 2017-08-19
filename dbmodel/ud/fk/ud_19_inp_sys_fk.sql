@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -20,7 +20,7 @@ ALTER TABLE "node" ADD CONSTRAINT "node_epa_type_fkey" FOREIGN KEY ("epa_type") 
 ALTER TABLE "cat_arc_shape" DROP CONSTRAINT IF EXISTS "cat_arc_shape_epa_type_fkey";
 ALTER TABLE "cat_arc_shape" ADD CONSTRAINT "cat_arc_shape_epa_type_fkey" FOREIGN KEY ("epa") REFERENCES "inp_value_catarc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+*/
 
 -- ----------------------------
 -- Foreign Key structure 
@@ -262,11 +262,8 @@ ALTER TABLE "rpt_timestep_critelem" ADD CONSTRAINT "rpt_timestep_critelem_result
 
 ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_sector_id_fkey" FOREIGN KEY ("sector_id") REFERENCES "sector" ("sector_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_hydrology_id_fkey" FOREIGN KEY ("hydrology_id") REFERENCES "cat_hydrology" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "subcatchment" ADD CONSTRAINT "subcatchment_hydrology_id_fkey" FOREIGN KEY ("hydrology_id") REFERENCES "cat_hydrology" ("hydrology_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-ALTER TABLE subcatchment  ADD CONSTRAINT subcatchment_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-*/

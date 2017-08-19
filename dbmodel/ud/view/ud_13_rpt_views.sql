@@ -284,7 +284,7 @@ rpt_inp_node.sector_id,
 rpt_inp_node.the_geom 
 FROM rpt_selector_result, rpt_inp_node
 	JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id=rpt_inp_node.node_id
-	WHERE rpt_nodeflooding_sum.result_id=rpt_selector_result.result_id))
+	WHERE rpt_nodeflooding_sum.result_id=rpt_selector_result.result_id
 	AND rpt_selector_result.cur_user="current_user"()
 	AND rpt_inp_node.result_id=rpt_selector_result.result_id;
 
@@ -813,7 +813,7 @@ subcatchment.sector_id,
 subcatchment.the_geom 
 FROM rpt_selector_compare, subcatchment
 	JOIN rpt_lidperformance_sum ON rpt_lidperformance_sum.subc_id=subcatchment.subc_id
-	WHERE rpt_lidperformance_sum.result_id=rpt_selector_compare.result_id))
+	WHERE rpt_lidperformance_sum.result_id=rpt_selector_compare.result_id
 	AND rpt_selector_compare.cur_user="current_user"();
 
 
@@ -1036,7 +1036,7 @@ rpt_routing_timestep.id,
 rpt_routing_timestep.result_id, 
 rpt_routing_timestep.text 
 FROM rpt_selector_compare, rpt_routing_timestep
-	WHERE rpt_routing_timestep.result_id=rpt_selector_compare.result_id))
+	WHERE rpt_routing_timestep.result_id=rpt_selector_compare.result_id
 	AND rpt_selector_compare.cur_user="current_user"();
 
 
@@ -1159,5 +1159,5 @@ rpt_timestep_critelem.id,
 rpt_timestep_critelem.result_id, 
 rpt_timestep_critelem.text 
 	FROM rpt_selector_compare, rpt_timestep_critelem
-	WHERE rpt_timestep_critelem.result_id=rpt_selector_compare.result_id))
+	WHERE rpt_timestep_critelem.result_id=rpt_selector_compare.result_id
 	AND rpt_selector_compare.cur_user="current_user"();

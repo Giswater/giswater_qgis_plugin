@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -114,7 +114,7 @@ BEGIN
         INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", annotation, "observ", "comment", 
                     dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom_pol, undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, enddate, streetaxis_id, postnumber, uncertain,num_value)
 					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
-					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,, NEW.buildercat_id, 
+					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
 					NEW.builtdate, NEW.enddate,NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
 					NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int, NEW.publish, NEW.inventory, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
         END IF;     

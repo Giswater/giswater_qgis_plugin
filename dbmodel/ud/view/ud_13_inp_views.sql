@@ -31,14 +31,14 @@ inp_controls_x_arc.id,
 text 
 FROM inp_selector_sector, inp_controls_x_arc
 	JOIN rpt_inp_arc on inp_controls_x_arc.arc_id=rpt_inp_arc.arc_id
-	WHERE rpt_inp_arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
+	WHERE rpt_inp_arc.sector_id=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"()
 UNION
 SELECT 
 inp_controls_x_node.id, 
 text
 FROM inp_selector_sector, inp_controls_x_node 
 	JOIN rpt_inp_node on inp_controls_x_node.node_id=rpt_inp_node.node_id
-	WHERE rpt_inp_node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"())
+	WHERE rpt_inp_node.sector_id=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"()
 ORDER BY id;
 
 
@@ -53,7 +53,7 @@ inp_curve.y_value,
 (CASE 
 	WHEN x_value = (SELECT MIN(x_value) FROM inp_curve AS sub WHERE sub.curve_id = inp_curve.curve_id) THEN inp_curve_id.curve_type 
 	ELSE null END) AS curve_type
-FROM inp_curve JOIN inp_curve_id ON inp_curve_id.id=inp_curve.curve_id)
+FROM inp_curve JOIN inp_curve_id ON inp_curve_id.id=inp_curve.curve_id
 ORDER BY inp_curve.id;
 
 
@@ -129,7 +129,7 @@ SELECT
 'RECOVERY'::text AS type_evpa, 
 inp_evaporation.recovery 
 FROM inp_evaporation 
-	WHERE inp_evaporation.recovery) > '0';
+	WHERE inp_evaporation.recovery > '0';
 
 	
 
@@ -235,7 +235,7 @@ inp_options.head_tolerance,
 inp_options.sys_flow_tol,
 inp_options.lat_flow_tol
 FROM inp_options, inp_selector_hydrology
-   JOIN cat_hydrology ON inp_selector_hydrology.hydrology_id = cat_hydrology.id;
+   JOIN cat_hydrology ON inp_selector_hydrology.hydrology_id = cat_hydrology.hydrology_id;
 
    
 
@@ -608,7 +608,7 @@ curveno,
 conduct_2,
 drytime_2
 FROM v_edit_subcatchment
-	JOIN cat_hydrology ON hydrology_id=id
+	JOIN cat_hydrology ON cat_hydrology.hydrology_id=v_edit_subcatchment.hydrology_id
 	WHERE cat_hydrology.infiltration='CURVE_NUMBER';
 
 
@@ -621,7 +621,7 @@ suction,
 conduct, 
 initdef 
 FROM v_edit_subcatchment
-	JOIN cat_hydrology ON hydrology_id=id
+	JOIN cat_hydrology ON cat_hydrology.hydrology_id=v_edit_subcatchment.hydrology_id
 	WHERE cat_hydrology.infiltration='GREEN_AMPT';
 
 
@@ -636,7 +636,7 @@ decay,
 drytime, 
 maxinfil
 FROM v_edit_subcatchment
-	JOIN cat_hydrology ON hydrology_id=id
+	JOIN cat_hydrology ON cat_hydrology.hydrology_id=v_edit_subcatchment.hydrology_id
 	WHERE cat_hydrology.infiltration='MODIFIED_HORTON' 
 	OR cat_hydrology.infiltration ='HORTON';
 
@@ -678,7 +678,7 @@ inp_lidusage_subc_x_lidco.fromimp,
 inp_lidusage_subc_x_lidco.toperv::integer, 
 inp_lidusage_subc_x_lidco.rptfile 
 FROM v_edit_subcatchment
-	JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id=v_editsubcatchment.subc_id;
+	JOIN inp_lidusage_subc_x_lidco ON inp_lidusage_subc_x_lidco.subc_id=v_edit_subcatchment.subc_id;
 
 
 
@@ -697,8 +697,8 @@ inp_groundwater.b2,
 inp_groundwater.a3, 
 inp_groundwater.tw, 
 inp_groundwater.h, 
-'LATERAL' || ' ') || (inp_groundwater.fl_eq_lat)) AS fl_eq_lat, 
-'DEEP' || ' ') || (inp_groundwater.fl_eq_lat)) AS fl_eq_deep
+'LATERAL' || ' ' || (inp_groundwater.fl_eq_lat) AS fl_eq_lat, 
+'DEEP' || ' ' || (inp_groundwater.fl_eq_lat) AS fl_eq_deep
 FROM v_edit_subcatchment
 	JOIN inp_groundwater ON inp_groundwater.subc_id=v_edit_subcatchment.subc_id;
 
@@ -708,7 +708,7 @@ FROM v_edit_subcatchment
 DROP VIEW IF EXISTS "v_inp_coverages" CASCADE;
 CREATE VIEW "v_inp_coverages" AS 
 SELECT 
-subcatchment.subc_id, 
+v_edit_subcatchment.subc_id, 
 inp_coverage_land_x_subc.landus_id, 
 inp_coverage_land_x_subc.percent
 FROM inp_coverage_land_x_subc 
@@ -934,7 +934,7 @@ inp_pump.startup,
 inp_pump.shutoff
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_pump ON rpt_inp_arc.arc_id = inp_pump.arc_id
-	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -960,7 +960,7 @@ inp_weir.surcharge
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_weir ON inp_weir.arc_id = rpt_inp_arc.arc_id
 	JOIN inp_value_weirs ON inp_weir.weir_type = inp_value_weirs.id
-	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -976,7 +976,7 @@ inp_conduit.flap,
 inp_conduit.seepage
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_conduit ON rpt_inp_arc.arc_id = inp_conduit.arc_id
-	WHERE inp_conduit.kentry > (0)::numeric) OR (inp_conduit.kexit > (0)::numeric)) OR (inp_conduit.kavg > (0)::numeric)) OR inp_conduit.flap='YES')
+	WHERE inp_conduit.kentry > (0)::numeric OR (inp_conduit.kexit > (0)::numeric) OR (inp_conduit.kavg > (0)::numeric) OR inp_conduit.flap='YES'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -1001,7 +1001,7 @@ inp_junction.apond,
 (st_y(rpt_inp_node.the_geom))::numeric(16,3) AS ycoord
 FROM inp_selector_result, rpt_inp_node
 	JOIN inp_junction ON inp_junction.node_id=rpt_inp_node.node_id
-    AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
 
@@ -1124,7 +1124,8 @@ SELECT
 rpt_inp_node.node_id, 
 top_elev,
 elev,
-ymaxinp_outfall.outfall_type AS type_otlfr, 
+ymax,
+inp_outfall.outfall_type AS type_otlfr, 
 inp_outfall.gate, 
 (st_x(rpt_inp_node.the_geom))::numeric(16,3) AS xcoord, 
 (st_y(rpt_inp_node.the_geom))::numeric(16,3) AS ycoord
@@ -1142,7 +1143,8 @@ SELECT
 rpt_inp_node.node_id, 
 top_elev,
 elev,
-ymaxinp_outfall.outfall_type AS type_otlnm, 
+ymax,
+inp_outfall.outfall_type AS type_otlnm, 
 inp_outfall.gate, 
 (st_x(rpt_inp_node.the_geom))::numeric(16,3) AS xcoord, 
 (st_y(rpt_inp_node.the_geom))::numeric(16,3) AS ycoord
@@ -1160,7 +1162,8 @@ SELECT
 rpt_inp_node.node_id, 
 top_elev,
 elev,
-ymaxinp_outfall.outfall_type AS type_otlti, 
+ymax,
+inp_outfall.outfall_type AS type_otlti, 
 inp_outfall.curve_id, 
 inp_outfall.gate, 
 (st_x(rpt_inp_node.the_geom))::numeric(16,3) AS xcoord, 
@@ -1179,7 +1182,8 @@ SELECT
 rpt_inp_node.node_id, 
 top_elev,
 elev,
-ymaxinp_outfall.outfall_type AS type_otlts, 
+ymax,
+inp_outfall.outfall_type AS type_otlts, 
 inp_outfall.timser_id, 
 inp_outfall.gate, 
 (st_x(rpt_inp_node.the_geom))::numeric(16,3) AS xcoord, 
@@ -1198,7 +1202,8 @@ SELECT
 rpt_inp_node.node_id, 
 top_elev,
 elev,
-ymaxinp_storage.y0, 
+ymax,
+inp_storage.y0, 
 inp_storage.storage_type AS type_stfc,
 inp_storage.a1, 
 inp_storage.a2, 
@@ -1223,7 +1228,8 @@ SELECT
 rpt_inp_node.node_id, 
 top_elev,
 elev,
-ymaxinp_storage.y0, 
+ymax,
+inp_storage.y0, 
 inp_storage.storage_type AS type_sttb, 
 inp_storage.curve_id, 
 inp_storage.apond, 
@@ -1358,7 +1364,7 @@ CREATE OR REPLACE VIEW v_inp_vertice AS
 	FROM inp_selector_result, rpt_inp_arc
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()) arc
 	WHERE (arc.point < arc.startpoint OR arc.point > arc.startpoint) AND (arc.point < arc.endpoint OR arc.point > arc.endpoint)
-	ORDER BY nextval('"SCHEMA_NAME".inp_vertice_seq'::regclass;
+	ORDER BY id;
 
 
 

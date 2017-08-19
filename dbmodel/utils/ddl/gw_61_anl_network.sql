@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -47,7 +47,7 @@ arc_type varchar (30),
 expl_id integer,
 context varchar (30),
 cur_user varchar (30),
-the_geom public.geometry (LINESTRING, SRID_VALUE)
+the_geom public.geometry (LINESTRING, SRID_VALUE),
 the_geom_p public.geometry (LINESTRING, SRID_VALUE)
 );
 

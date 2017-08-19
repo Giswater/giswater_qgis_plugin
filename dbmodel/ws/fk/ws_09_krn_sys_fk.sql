@@ -79,8 +79,27 @@ ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_dma_id_fkey";
 -- 
 --CREATE FK
 ---
+ALTER TABLE "link" ADD CONSTRAINT "link_connec_id_fkey" FOREIGN KEY ("connec_id") REFERENCES "connec" ("connec_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "link" ADD CONSTRAINT "link_vnode_id_fkey" FOREIGN KEY ("vnode_id") REFERENCES "vnode" ("vnode_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "dma" ADD CONSTRAINT "dma_macrodma_id_fkey" FOREIGN KEY ("macrodma_id") REFERENCES "macrodma" ("macrodma_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "macrodma" ADD CONSTRAINT "macrodma_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
---ALTER TABLE "dma" ADD CONSTRAINT "dma_presszonecat_id_fkey" FOREIGN KEY ("presszonecat_id") REFERENCES "cat_presszone" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALTER TABLE "cat_connec" ADD CONSTRAINT "cat_connec_type_fkey" FOREIGN KEY ("connec_type") REFERENCES "connec_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "dma" ADD CONSTRAINT "dma_presszonecat_id_fkey" FOREIGN KEY ("presszonecat_id") REFERENCES "cat_presszone" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "cat_arc" ADD CONSTRAINT "cat_arc_arctype_id_fkey" FOREIGN KEY ("arctype_id") REFERENCES "arc_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

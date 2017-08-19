@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -26,6 +26,11 @@ BEGIN
             PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
+
+	-- code
+	IF (NEW.code IS NULL) THEN
+		NEW.code = NEW.arc_id;
+	END IF;
 
         -- Arc type
         IF (NEW.cat_arctype_id IS NULL) THEN

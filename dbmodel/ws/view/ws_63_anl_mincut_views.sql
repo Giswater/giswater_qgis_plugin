@@ -6,23 +6,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
--- ----------------------------
--- Consistency
--- ----------------------------
-
-DROP VIEW IF EXISTS v_anl_topological_consistency CASCADE;
-CREATE OR REPLACE VIEW v_anl_topological_consistency AS
-SELECT
-anl_node_topological_consistency.node_id,
-node_type,
-num_arcs,
-anl_node_topological_consistency.the_geom,
-node.expl_id
-FROM selector_expl, anl_node_topological_consistency
-JOIN node ON node.node_id=anl_node_topological_consistency.node_id
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
-
 
 
 -- ----------------------------

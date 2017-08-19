@@ -10,7 +10,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 CREATE TABLE "config" (
-"id" varchar(18) NOT NULL,
+"id" varchar(18) NOT NULL PRIMARY KEY,
 "node_proximity" double precision,
 "arc_searchnodes" double precision,
 "node2arc" double precision,
@@ -29,7 +29,6 @@ CREATE TABLE "config" (
 "arc_searchnodes_control" boolean,
 "insert_double_geometry" boolean,
 "buffer_value" double precision,
-CONSTRAINT "config_pkey" PRIMARY KEY ("id"),
 CONSTRAINT "config_check" CHECK(id = '1')
 );
 
@@ -40,8 +39,7 @@ CREATE TABLE "config_param_system" (
 "value" text NOT NULL,
 "data_type" varchar(20),
 "context" varchar (50),
-"descript" text,
-CONSTRAINT "config_param_text_pkey" PRIMARY KEY ("id")
+"descript" text
 );
 
 
@@ -58,13 +56,12 @@ CREATE TABLE "config_param_user" (
 
 
 CREATE TABLE "config_client_forms" (
-"id" serial NOT NULL,
+"id" serial NOT NULL PRIMARY KEY,
 "table_id" varchar (50),
 "status" boolean,
 "width" int4,
 "column_index" int2,
 "alias" varchar (50)
-CONSTRAINT "config_ui_forms_pkey" PRIMARY KEY ("id")
 );
 
 

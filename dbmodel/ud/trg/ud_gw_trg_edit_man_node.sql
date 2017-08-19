@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -176,7 +176,7 @@ BEGIN
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev,node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id,
 			builtdate,ownercat_id,	address_01,address_02,address_03,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
-			VALUES (NEW.node_id, NEW.outfall_code, NEW.outfall_top_elev,, NEW.outfall_custom_top_elev, NEW.outfall_ymax,NEW.outfall_custom_ymax, NEW.outfall_elev, NEW.outfall_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state,
+			VALUES (NEW.node_id, NEW.outfall_code, NEW.outfall_top_elev, NEW.outfall_custom_top_elev, NEW.outfall_ymax,NEW.outfall_custom_ymax, NEW.outfall_elev, NEW.outfall_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,NEW.state,
 			NEW.outfall_annotation,NEW.outfall_observ, NEW.outfall_comment,NEW.dma_id,NEW.outfall_soilcat_id,NEW.outfall_function_type, NEW.outfall_category_type,NEW.outfall_fluid_type,NEW.outfall_location_type,NEW.outfall_workcat_id,NEW.outfall_workcat_id_end,
 			NEW.outfall_buildercat_id,NEW.outfall_builtdate, NEW.outfall_enddate, NEW.outfall_ownercat_id,NEW.outfall_address_01,NEW.outfall_address_02,NEW.outfall_address_03,NEW.outfall_descript,NEW.outfall_rotation,NEW.outfall_link,
 			NEW.verified,NEW.undelete,NEW.outfall_label_x,NEW.outfall_label_y,NEW.outfall_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.outfall_xyz_date, NEW.unconnected, NEW.outfall_num_value);
@@ -247,13 +247,13 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name
+				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.storage_length, NEW.storage_width,NEW.storage_custom_area, NEW.storage_max_volume, NEW.storage_util_volume, NEW.storage_min_height,NEW.storage_accessibility, NEW.storage_name);
 				
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
-				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name
+				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.storage_length, NEW.storage_width,NEW.storage_custom_area, NEW.storage_max_volume, NEW.storage_util_volume, NEW.storage_min_height,NEW.storage_accessibility, NEW.storage_name);
 			END IF;
 			
@@ -292,7 +292,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name
+				INSERT INTO man_storage (node_id,pol_id, length, width, custom_area, max_volume, util_volume, min_height, accessibility, name)
 				VALUES(NEW.node_id, NEW.pol_id, NEW.storage_length, NEW.storage_width,NEW.storage_custom_area, NEW.storage_max_volume, NEW.storage_util_volume, NEW.storage_min_height,NEW.storage_accessibility, NEW.storage_name);
 								INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
 				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.pol_id) WHERE node_id=NEW.node_id;
@@ -363,7 +363,7 @@ BEGIN
 			END IF;
 					
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state",annotation,observ,"comment",dma_id,soilcat_id,function_type, 
-			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate,ownercat_id,	address_01,address_02,address_03,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
+			category_type,fluid_type,location_type,workcat_id, workcat_id_end, buildercat_id, builtdate,ownercat_id, address_01,address_02,address_03,descript,rotation,link,verified,undelete,label_x,label_y,label_rotation,the_geom,
 			expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value) 
 			VALUES (NEW.node_id, NEW.netgully_code, NEW.netgully_top_elev, NEW.netgully_custom_top_elev, NEW.netgully_ymax, NEW.netgully_custom_ymax, NEW.netgully_elev, NEW.netgully_custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state,NEW.netgully_annotation,NEW.netgully_observ, NEW.netgully_comment,NEW.dma_id,NEW.netgully_soilcat_id,NEW.netgully_function_type, NEW.netgully_category_type,NEW.netgully_fluid_type,NEW.netgully_location_type,NEW.netgully_workcat_id, 
@@ -417,13 +417,13 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name
+				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
 				VALUES (NEW.node_id,NEW.pol_id, NEW.chamber_length,NEW.chamber_width, NEW.chamber_sander_depth, NEW.chamber_max_volume, NEW.chamber_util_volume, 
 				NEW.chamber_inlet, NEW.chamber_bottom_channel, NEW.chamber_accessibility,NEW.chamber_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,(SELECT ST_Envelope(ST_Buffer(node.the_geom,rec.buffer_value)) from "SCHEMA_NAME".node where node_id=NEW.node_id));
 			
 			ELSE
-				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name
+				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
 				VALUES (NEW.node_id,NEW.pol_id, NEW.chamber_length,NEW.chamber_width, NEW.chamber_sander_depth, NEW.chamber_max_volume, NEW.chamber_util_volume, 
 				NEW.chamber_inlet, NEW.chamber_bottom_channel, NEW.chamber_accessibility,NEW.chamber_name);
 			END IF;	
@@ -461,7 +461,7 @@ BEGIN
 					NEW.pol_id:= (SELECT nextval('pol_id_seq'));
 				END IF;
 				
-				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name
+				INSERT INTO man_chamber (node_id,pol_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name)
 				VALUES (NEW.node_id,NEW.pol_id, NEW.chamber_length,NEW.chamber_width, NEW.chamber_sander_depth, NEW.chamber_max_volume, NEW.chamber_util_volume, 
 				NEW.chamber_inlet, NEW.chamber_bottom_channel, NEW.chamber_accessibility,NEW.chamber_name);
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
@@ -559,7 +559,7 @@ BEGIN
 			NEW.undelete,NEW.wjump_label_x,NEW.wjump_label_y,NEW.wjump_label_rotation,NEW.the_geom, expl_id_int, NEW.publish, NEW.inventory, NEW.uncertain, NEW.wjump_xyz_date, NEW.unconnected, NEW.wjump_num_value);
 
 			INSERT INTO man_wjump (node_id, length, width,sander_depth,prot_surface, accessibility, name) 
-			VALUES (NEW.node_id, NEW.wjump_length,NEW.wjump_width,,NEW.wjump_sander_depth,NEW.wjump_prot_surface,NEW.wjump_accessibility, NEW.wjump_name);	
+			VALUES (NEW.node_id, NEW.wjump_length,NEW.wjump_width, NEW.wjump_sander_depth,NEW.wjump_prot_surface,NEW.wjump_accessibility, NEW.wjump_name);	
 
 		ELSIF man_table='man_wwtp' THEN
 		
@@ -754,7 +754,7 @@ BEGIN
 			SET node_id=NEW.node_id, code=NEW.junction_code, top_elev=NEW.junction_top_elev, custom_top_elev=NEW.junction_custom_top_elev, ymax=NEW.junction_ymax, custom_ymax=NEW.junction_custom_ymax, elev=NEW.junction_elev, 
 			custom_elev=NEW.junction_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, annotation=NEW.junction_annotation, "observ"=NEW.junction_observ, 
 			"comment"=NEW.junction_comment, dma_id=NEW.dma_id, soilcat_id=NEW.junction_soilcat_id, function_type=NEW.junction_function_type,	category_type=NEW.junction_category_type,fluid_type=NEW.junction_fluid_type, 
-			location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, workcat_id_end=NEW.junction_workcat_id_end, buildercat_id=NEW.junction_buildercat_id, builtdate=NEW.junction_builtdate, enddate=NEW.junction_enddate, , 
+			location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, workcat_id_end=NEW.junction_workcat_id_end, buildercat_id=NEW.junction_buildercat_id, builtdate=NEW.junction_builtdate, enddate=NEW.junction_enddate,
 			ownercat_id=NEW.junction_ownercat_id, address_01=NEW.junction_address_01,address_02=NEW.junction_address_02, address_03=NEW.junction_address_03, descript=NEW.junction_descript, rotation=NEW.junction_rotation, 
 			link=NEW.junction_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.junction_label_x, label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation,the_geom=NEW.the_geom, 
 			 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.junction_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.junction_num_value
@@ -976,8 +976,8 @@ BEGIN
 		ELSIF man_table='man_wwtp' THEN
 		
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev, n
-			ode_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	"state"=NEW.state, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, dma_id=NEW.dma_id, 
+			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev,
+			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	"state"=NEW.state, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.wwtp_soilcat_id, function_type=NEW.wwtp_function_type, category_type=NEW.wwtp_category_type, fluid_type=NEW.wwtp_fluid_type, location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, 
 			workcat_id_end=NEW.wwtp_workcat_id_end, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate, enddate=NEW.wwtp_enddate,  ownercat_id=NEW.wwtp_ownercat_id,address_01=NEW.wwtp_address_01,address_02=NEW.wwtp_address_02, 
 			address_03=NEW.wwtp_address_03, descript=NEW.wwtp_descript,rotation=NEW.wwtp_rotation, link=NEW.wwtp_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,
@@ -991,8 +991,8 @@ BEGIN
 		ELSIF man_table='man_wwtp_pol' THEN
 		
 			UPDATE node 
-			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev, n
-			ode_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	"state"=NEW.state, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, dma_id=NEW.dma_id, 
+			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev, 
+			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	"state"=NEW.state, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.wwtp_soilcat_id, function_type=NEW.wwtp_function_type, category_type=NEW.wwtp_category_type, fluid_type=NEW.wwtp_fluid_type, location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, 
 			workcat_id_end=NEW.wwtp_workcat_id_end, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate, enddate=NEW.wwtp_enddate,  ownercat_id=NEW.wwtp_ownercat_id,address_01=NEW.wwtp_address_01,address_02=NEW.wwtp_address_02, 
 			address_03=NEW.wwtp_address_03, descript=NEW.wwtp_descript,rotation=NEW.wwtp_rotation, link=NEW.wwtp_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,

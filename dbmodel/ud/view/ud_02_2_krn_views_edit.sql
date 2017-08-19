@@ -397,9 +397,7 @@ FROM selector_expl, gully
 	LEFT JOIN ext_streetaxis ON streetaxis_id=ext_streetaxis.id
 	LEFT JOIN sector ON gully.sector_id = sector.sector_id
 	WHERE gully.the_geom_pol is not null AND
-	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"() AND
-	gully.state=selector_state.state_id AND selector_state.cur_user="current_user"();
-
+	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
 
 	
@@ -1454,7 +1452,7 @@ v_arc_x_node.slope AS conduit_slope,
 arc.arc_type,
 arc.arccat_id,
 cat_arc.matcat_id AS conduit_matcat_id,
-cat_arc.custom_shape AS conduit_cat_shape,
+cat_arc.shape AS conduit_cat_shape,
 cat_arc.geom1 AS conduit_cat_geom1,
 cat_arc.width AS conduit_cat_width,
 st_length2d(arc.the_geom)::numeric(12,2) AS conduit_gis_length,
@@ -1529,7 +1527,7 @@ v_arc_x_node.slope AS siphon_slope,
 arc.arc_type,
 arc.arccat_id,
 cat_arc.matcat_id AS siphon_matcat_id,
-cat_arc.custom_shape AS siphon_cat_shape,
+cat_arc.shape AS siphon_cat_shape,
 cat_arc.geom1 AS siphon_cat_geom1,
 cat_arc.width AS siphon_cat_width,
 st_length2d(arc.the_geom)::numeric(12,2) AS siphon_gis_length,
@@ -1606,7 +1604,7 @@ v_arc_x_node.slope AS waccel_slope,
 arc.arc_type,
 arc.arccat_id,
 cat_arc.matcat_id AS waccel_matcat_id,
-cat_arc.custom_shape AS waccel_cat_shape,
+cat_arc.shape AS waccel_cat_shape,
 cat_arc.geom1 AS waccel_cat_geom1,
 cat_arc.width AS waccel_cat_width,
 st_length2d(arc.the_geom)::numeric(12,2) AS waccel_gis_length,
@@ -1686,7 +1684,7 @@ v_arc_x_node.slope AS varc_slope,
 arc.arc_type,
 arc.arccat_id,
 cat_arc.matcat_id AS varc_matcat_id,
-cat_arc.custom_shape AS varc_cat_shape,
+cat_arc.shape AS varc_cat_shape,
 cat_arc.geom1 AS varc_cat_geom1,
 st_length2d(arc.the_geom)::numeric(12,2) AS varc_gis_length,
 arc.epa_type,

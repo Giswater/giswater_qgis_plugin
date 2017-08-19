@@ -1432,7 +1432,7 @@ CREATE TABLE "inp_flwreg_weir" (
 
 CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(16) NOT NULL,
+"result_id" varchar(30) NOT NULL,
 "node_id" varchar(16) NOT NULL,
 "top_elev" numeric(12,3),
 "ymax" numeric (12,3),
@@ -1449,7 +1449,7 @@ CREATE TABLE "rpt_inp_node" (
 
 CREATE TABLE "rpt_inp_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(16) NOT NULL,
+"result_id" varchar(30) NOT NULL,
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
@@ -1457,8 +1457,6 @@ CREATE TABLE "rpt_inp_arc" (
 "elevmax2" numeric(12,3),
 "arc_type" varchar(18)  ,
 "arccat_id" varchar(30) ,
-"shape"
-
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
@@ -1472,7 +1470,7 @@ CREATE TABLE "rpt_inp_arc" (
 
 CREATE TABLE "rpt_arcflow_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_arcflow_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "arc_id" varchar(50)  ,
 "arc_type" varchar(18)  ,
 "max_flow" numeric(12,4),
@@ -1498,7 +1496,7 @@ CREATE TABLE "rpt_arcflow_sum" (
 
 CREATE TABLE "rpt_arcpolload_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_arcpolload_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "arc_id" varchar(16)  ,
 "poll_id" varchar(16)  ,
 CONSTRAINT "rpt_arcpolload_pkey" PRIMARY KEY ("id")
@@ -1508,7 +1506,7 @@ CONSTRAINT "rpt_arcpolload_pkey" PRIMARY KEY ("id")
 
 CREATE TABLE "rpt_condsurcharge_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_condsurcharge_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "arc_id" varchar(50)  ,
 "both_ends" numeric(12,4),
 "upstream" numeric(12,4),
@@ -1521,7 +1519,7 @@ CREATE TABLE "rpt_condsurcharge_sum" (
 
 CREATE TABLE "rpt_continuity_errors" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_continuity_errors_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "text" varchar(255)  
 );
 
@@ -1529,7 +1527,7 @@ CREATE TABLE "rpt_continuity_errors" (
 
 CREATE TABLE "rpt_critical_elements" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_critical_elements_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "text" varchar(255)  
 );
 
@@ -1537,7 +1535,7 @@ CREATE TABLE "rpt_critical_elements" (
 
 CREATE TABLE "rpt_flowclass_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_flowclass_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "arc_id" varchar(50)  ,
 "length" numeric(12,4),
 "dry" numeric(12,4),
@@ -1556,7 +1554,7 @@ CREATE TABLE "rpt_flowclass_sum" (
 
 CREATE TABLE "rpt_flowrouting_cont" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_flowrouting_cont_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "dryw_inf" numeric(12,4),
 "wetw_inf" numeric(12,4),
 "ground_inf" numeric(12,4),
@@ -1576,7 +1574,7 @@ CREATE TABLE "rpt_flowrouting_cont" (
 
 CREATE TABLE "rpt_groundwater_cont" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_groundwater_cont_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "init_stor" numeric(12,4),
 "infilt" numeric(12,4),
 "upzone_et" numeric(12,4),
@@ -1591,7 +1589,7 @@ CREATE TABLE "rpt_groundwater_cont" (
 
 CREATE TABLE "rpt_high_conterrors" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_high_conterrors_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "text" varchar(255)  
 );
 
@@ -1599,7 +1597,7 @@ CREATE TABLE "rpt_high_conterrors" (
 
 CREATE TABLE "rpt_high_flowinest_ind" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_high_flowinest_ind_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "text" varchar(255)  
 );
 
@@ -1607,7 +1605,7 @@ CREATE TABLE "rpt_high_flowinest_ind" (
 
 CREATE TABLE "rpt_instability_index" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_instability_index_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "text" varchar(255)  
 );
 
@@ -1615,7 +1613,7 @@ CREATE TABLE "rpt_instability_index" (
 
 CREATE TABLE "rpt_lidperformance_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_lidperformance_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "subc_id" varchar(16)  ,
 "lidco_id" varchar(16)  ,
 "tot_inflow" numeric(12,4),
@@ -1632,7 +1630,7 @@ CREATE TABLE "rpt_lidperformance_sum" (
 
 CREATE TABLE "rpt_nodedepth_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodedepth_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
 "aver_depth" numeric(12,4),
@@ -1646,7 +1644,7 @@ CREATE TABLE "rpt_nodedepth_sum" (
 
 CREATE TABLE "rpt_nodeflooding_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodeflooding_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "node_id" varchar(50)  ,
 "hour_flood" numeric(12,4),
 "max_rate" numeric(12,4),
@@ -1660,7 +1658,7 @@ CREATE TABLE "rpt_nodeflooding_sum" (
 
 CREATE TABLE "rpt_nodeinflow_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodeinflow_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
 "max_latinf" numeric(12,4),
@@ -1677,7 +1675,7 @@ CREATE TABLE "rpt_nodeinflow_sum" (
 
 CREATE TABLE "rpt_nodesurcharge_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_nodesurcharge_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "node_id" varchar(50)  ,
 "swnod_type" varchar(18)  ,
 "hour_surch" numeric(12,4),
@@ -1689,7 +1687,7 @@ CREATE TABLE "rpt_nodesurcharge_sum" (
 
 CREATE TABLE "rpt_outfallflow_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_outfallflow_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "node_id" varchar(50)  ,
 "flow_freq" numeric(12,4),
 "avg_flow" numeric(12,4),
@@ -1701,7 +1699,7 @@ CREATE TABLE "rpt_outfallflow_sum" (
 
 CREATE TABLE "rpt_outfallload_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_outfallload_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "poll_id" varchar(16)  ,
 "node_id" varchar(50)  ,
 "value" numeric(12,4)
@@ -1711,7 +1709,7 @@ CREATE TABLE "rpt_outfallload_sum" (
 
 CREATE TABLE "rpt_pumping_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_pumping_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "arc_id" varchar(50)  ,
 "percent" numeric(12,4),
 "num_startup" int4,
@@ -1728,7 +1726,7 @@ CREATE TABLE "rpt_pumping_sum" (
 
 CREATE TABLE "rpt_qualrouting_cont" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_qualrouting_cont_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "poll_id" varchar(16)  ,
 "dryw_inf" numeric(12,4),
 "wetw_inf" numeric(12,4),
@@ -1747,7 +1745,7 @@ CREATE TABLE "rpt_qualrouting_cont" (
 
 CREATE TABLE "rpt_rainfall_dep" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_rainfall_dep_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "sewer_rain" numeric(12,4),
 "rdiip_prod" numeric(12,4),
 "rdiir_rat" numeric(12,4)
@@ -1757,7 +1755,7 @@ CREATE TABLE "rpt_rainfall_dep" (
 
 CREATE TABLE "rpt_cat_result" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_cat_result_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "flow_units" varchar(3)  ,
 "rain_runof" varchar(3)  ,
 "snowmelt" varchar(3)  ,
@@ -1792,7 +1790,7 @@ CREATE TABLE "rpt_routing_timestep" (
 
 CREATE TABLE "rpt_runoff_qual" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_runoff_qual_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "poll_id" varchar(16)  ,
 "init_buil" numeric(12,4),
 "surf_buil" numeric(12,4),
@@ -1809,7 +1807,7 @@ CREATE TABLE "rpt_runoff_qual" (
 
 CREATE TABLE "rpt_runoff_quant" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_runoff_quant_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "initsw_co" numeric(12,4),
 "total_prec" numeric(12,4),
 "evap_loss" numeric(12,4),
@@ -1826,7 +1824,7 @@ CREATE TABLE "rpt_runoff_quant" (
 
 CREATE TABLE "rpt_storagevol_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_storagevol_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "node_id" varchar(50)  ,
 "aver_vol" numeric(12,4),
 "avg_full" numeric(12,4),
@@ -1842,7 +1840,7 @@ CREATE TABLE "rpt_storagevol_sum" (
 
 CREATE TABLE "rpt_subcatchwashoff_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_subcatchwashoff_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "subc_id" varchar(16)   NOT NULL,
 "poll_id" varchar(16)   NOT NULL,
 "value" numeric
@@ -1852,7 +1850,7 @@ CREATE TABLE "rpt_subcatchwashoff_sum" (
 
 CREATE TABLE "rpt_subcathrunoff_sum" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_subcathrunoff_sum_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "subc_id" varchar(16)  ,
 "tot_precip" numeric(12,4),
 "tot_runon" numeric(12,4),
@@ -1873,7 +1871,7 @@ CREATE TABLE "rpt_subcathrunoff_sum" (
 
 CREATE TABLE "rpt_timestep_critelem" (
 "id" int4 DEFAULT nextval ('"SCHEMA_NAME".rpt_timestep_critelem_seq'::regclass) NOT NULL,
-"result_id" varchar(16)  ,
+"result_id" varchar(30)  ,
 "text" varchar(255)  
 );
 

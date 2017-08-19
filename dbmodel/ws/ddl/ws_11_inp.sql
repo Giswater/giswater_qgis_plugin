@@ -643,7 +643,7 @@ CREATE TABLE "inp_pump_additional" (
 
 CREATE TABLE "rpt_inp_node" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(16) NOT NULL,
+"result_id" varchar(30) NOT NULL,
 "node_id" varchar(16) NOT NULL,
 "elevation" numeric(12,3),
 "elev" numeric(12,3),
@@ -659,7 +659,7 @@ CREATE TABLE "rpt_inp_node" (
 
 CREATE TABLE "rpt_inp_arc" (
 "id" serial PRIMARY KEY NOT NULL,
-"result_id" varchar(16) NOT NULL,
+"result_id" varchar(30) NOT NULL,
 "arc_id" varchar(16) ,
 "node_1" varchar(16) ,
 "node_2" varchar(16) ,
@@ -679,7 +679,7 @@ CREATE TABLE "rpt_inp_arc" (
 
 CREATE TABLE "rpt_arc" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_arc_id_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "arc_id" varchar(16)  ,
 "length" numeric,
 "diameter" numeric,
@@ -698,7 +698,7 @@ CREATE TABLE "rpt_arc" (
 
 CREATE TABLE "rpt_energy_usage" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_energy_usage_id_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "nodarc_id" varchar(16),
 "usage_fact" numeric,
 "avg_effic" numeric,
@@ -711,7 +711,7 @@ CREATE TABLE "rpt_energy_usage" (
 
 CREATE TABLE "rpt_hydraulic_status" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_hydraulic_status_id_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "time" varchar(10)  ,
 "text" varchar(100)  
 );
@@ -719,7 +719,7 @@ CREATE TABLE "rpt_hydraulic_status" (
 
 CREATE TABLE "rpt_node" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_node_id_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "node_id" varchar(16)   NOT NULL,
 "elevation" numeric,
 "demand" numeric,
@@ -733,7 +733,7 @@ CREATE TABLE "rpt_node" (
 
 CREATE TABLE "rpt_cat_result" (
 "id" int4 DEFAULT nextval('"SCHEMA_NAME".rpt_cat_result_id_seq'::regclass) NOT NULL,
-"result_id" varchar(16)   NOT NULL,
+"result_id" varchar(30)   NOT NULL,
 "n_junction" numeric,
 "n_reservoir" numeric,
 "n_tank" numeric,

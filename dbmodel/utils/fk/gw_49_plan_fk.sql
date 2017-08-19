@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -48,7 +48,7 @@ ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
 
 
 
-
+*/
 
 ALTER TABLE "cat_arc" ADD CONSTRAINT "cat_arc_cost_unit_fkey" FOREIGN KEY ("cost_unit") REFERENCES "price_value_unit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "cat_arc" ADD CONSTRAINT "cat_arc_cost_fkey" FOREIGN KEY ("cost") REFERENCES "price_compost" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -85,10 +85,5 @@ ALTER TABLE "price_compost_value" ADD CONSTRAINT "price_compost_value_simple_id_
 ALTER TABLE "price_compost" ADD CONSTRAINT "price_compost_unit_fkey" FOREIGN KEY ("unit") REFERENCES "price_value_unit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "price_simple" ADD CONSTRAINT "price_simple_unit_fkey" FOREIGN KEY ("unit") REFERENCES "price_value_unit" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "plan_selector_psector" ADD CONSTRAINT "plan_selector_psector_id_fkey" FOREIGN KEY ("id") REFERENCES "plan_psector" ("psector_id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "plan_selector_state" ADD CONSTRAINT "plan_selector_state_id_fkey" FOREIGN KEY ("id") REFERENCES "value_state" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "plan_psector"  ADD CONSTRAINT "plan_psector_expl_id_fkey" FOREIGN KEY (expl_id) REFERENCES "exploitation" (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE plan_psector  ADD CONSTRAINT plan_psector_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation (expl_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
-*/

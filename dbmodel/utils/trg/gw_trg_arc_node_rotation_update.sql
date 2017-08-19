@@ -186,6 +186,7 @@ ALTER FUNCTION SCHEMA_NAME.gw_trg_arc_node_rotation_update()
   OWNER TO postgres;
   
 
-  
+/*  
 DROP TRIGGER IF EXISTS gw_trg_arc_node_rotation_update ON "SCHEMA_NAME".arc;
 CREATE TRIGGER gw_trg_arc_node_rotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc  FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_node_rotation_update();
+*/
