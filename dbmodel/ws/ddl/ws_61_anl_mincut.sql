@@ -30,7 +30,7 @@ CREATE SEQUENCE "anl_mincut_result_cat_seq"
 
 
 CREATE TABLE "anl_mincut_result_cat" (
-id varchar (30) DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL,
+id varchar (30) DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL PRIMARY KEY,
 mincut_state int2,
 mincut_class int2,
 mincut_type varchar (30),
@@ -52,53 +52,47 @@ exec_descript text,
 exec_the_geom public.geometry(POINT, SRID_VALUE),
 exec_from_plot float,
 exec_depth float,
-exec_appropiate boolean,	
-CONSTRAINT mincut_result_cat_pkey PRIMARY KEY (id)
+exec_appropiate boolean
 );
 
 
 CREATE TABLE "anl_mincut_result_polygon" (
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 result_id varchar (30),
 polygon_id varchar (16),
-the_geom public.geometry (MULTIPOLYGON, SRID_VALUE),
-CONSTRAINT anl_mincut_result_polygon_pkey PRIMARY KEY (id)
+the_geom public.geometry (MULTIPOLYGON, SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_mincut_result_node" (
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 result_id varchar (30),
 node_id varchar (16),
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_mincut_result_node_pkey PRIMARY KEY (id)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
 CREATE TABLE "anl_mincut_result_arc" (
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 result_id varchar (30),
 arc_id varchar (16),
 the_geom public.geometry (LINESTRING, SRID_VALUE)
-CONSTRAINT anl_mincut_result_arc_pkey PRIMARY KEY (id)
 );
 
 
 
 CREATE TABLE IF NOT EXISTS "anl_mincut_result_connec" (
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 result_id varchar (30),
 connec_id character varying(16) NOT NULL,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_mincut_result_connec_pkey PRIMARY KEY (id)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
 
 
 CREATE TABLE IF NOT EXISTS "anl_mincut_result_hydrometer" (
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 result_id varchar (30),
-hydrometer_id character varying(16) NOT NULL,
-CONSTRAINT anl_mincut_result_hydrometer_pkey PRIMARY KEY (id)
+hydrometer_id character varying(16) NOT NULL
 );
 
 
@@ -110,24 +104,22 @@ node_id character varying(16) NOT NULL
 
 
 CREATE TABLE IF NOT EXISTS "anl_mincut_result_valve" (
-id serial NOT NULL,
+id serial NOT NULL PRIMARY KEY,
 result_id varchar (30),
 node_id character varying(16),
 closed boolean,
 broken boolean,
 unaccess boolean,
 proposed boolean,
-the_geom public.geometry (POINT, SRID_VALUE),
-CONSTRAINT anl_mincut_result_valve_pkey PRIMARY KEY (id)
+the_geom public.geometry (POINT, SRID_VALUE)
 );
+
 
 
 
 -- ----------------------------
 -- DVALUES
 -- ----------------------------
-
-
 
 CREATE TABLE "anl_mincut_cat_state" (
 id int2 NOT NULL PRIMARY KEY,
@@ -136,12 +128,17 @@ descript text
 );
 
 
-CREATE TABLE "anl_mincut_cat_type" (
+CREATE TABLE "anl_mincut_cat_class" (
 id int2 NOT NULL PRIMARY KEY,
 name text,
 descript text
 );
 
+
+CREATE TABLE "anl_mincut_cat_type" (
+id varchar(30) NOT NULL PRIMARY KEY,
+descript text
+);
 
 
 CREATE TABLE "anl_mincut_cat_cause" (
@@ -150,18 +147,18 @@ descript text
 );
 
 
+
+
+
 -- ----------------------------
 -- SELECTOR
 -- ----------------------------
 
 
-
-
 CREATE TABLE "anl_mincut_result_selector" (
-"id" varchar (16) NOT NULL DEFAULT nextval('anl_mincut_result_selector_seq'::regclass),
+"id" SERIAL PRIMARY KEY,
 "result_id" varchar (30),
-"cur_user" text,
-CONSTRAINT anl_mincut_result_selector_pkey PRIMARY KEY (id)
+"cur_user" text
 );
 
 

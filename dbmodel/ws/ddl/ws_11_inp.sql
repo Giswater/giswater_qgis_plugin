@@ -136,8 +136,9 @@ CREATE TABLE "cat_dscenario" (
 
 CREATE TABLE inp_selector_dscenario (
 id serial NOT NULL PRIMARY KEY,
-dscenario_id integer),
+dscenario_id integer,
 cur_user text
+);
 
 
 	
@@ -551,7 +552,7 @@ CREATE TABLE "inp_value_opti_units" (
 
 
 CREATE TABLE "inp_value_opti_valvemode" (
-"id" varchar(18)  NOT PRIMARY KEY
+"id" varchar(18)  PRIMARY KEY
 );
 
 

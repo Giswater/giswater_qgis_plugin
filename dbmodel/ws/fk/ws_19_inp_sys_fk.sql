@@ -1,11 +1,12 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
-/*
+
+
 -- ----------------------------
 -- Fk 11
 -- ----------------------------
@@ -34,6 +35,7 @@ ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_unbalanced_fkey
 ALTER TABLE "inp_pipe" DROP CONSTRAINT IF EXISTS "inp_pipe_arc_id_fkey";
 
 ALTER TABLE "inp_pump" DROP CONSTRAINT IF EXISTS "inp_pump_node_id_fkey";
+
 ALTER TABLE "inp_shortpipe" DROP CONSTRAINT IF EXISTS "inp_shortpipe_node_id_fkey";
 
 ALTER TABLE "inp_report" DROP CONSTRAINT IF EXISTS "inp_report_pressure_fkey";
@@ -74,7 +76,7 @@ ALTER TABLE "rpt_hydraulic_status" DROP CONSTRAINT IF EXISTS "rpt_hydraulic_stat
 ALTER TABLE "rpt_node" DROP CONSTRAINT IF EXISTS "rpt_node_result_id_fkey";
 --ALTER TABLE "rpt_node" DROP CONSTRAINT IF EXISTS "rpt_node_node_id_fkey";
 
-ALTER TABLE "inp_selector_state" DROP CONSTRAINT IF EXISTS "inp_selector_state_id_fkey";
+ALTER TABLE "selector_state" DROP CONSTRAINT IF EXISTS "inp_selector_state_id_fkey";
 
 
 ALTER TABLE "arc_type" DROP CONSTRAINT IF EXISTS "arc_type_epa_default_fkey";
@@ -150,21 +152,30 @@ ALTER TABLE "rpt_hydraulic_status" ADD CONSTRAINT "rpt_hydraulic_status_result_i
 ALTER TABLE "rpt_node" ADD CONSTRAINT "rpt_node_result_id_fkey" FOREIGN KEY ("result_id") REFERENCES "rpt_cat_result" ("result_id") ON DELETE CASCADE ON UPDATE CASCADE;
 -- ALTER TABLE "rpt_node" ADD CONSTRAINT "rpt_node_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE "inp_selector_state" ADD CONSTRAINT "inp_selector_state_id_fkey" FOREIGN KEY ("id") REFERENCES "value_state" ("id");
 
-ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey"
+ALTER TABLE "inp_controls_x_node" DROP CONSTRAINT IF EXISTS "inp_controls_x_node_id_fkey";
 ALTER TABLE "inp_controls_x_node" ADD CONSTRAINT "inp_controls_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_rules_x_node" DROP CONSTRAINT IF EXISTS "inp_rules_x_node_id_fkey"
+ALTER TABLE "inp_rules_x_node" DROP CONSTRAINT IF EXISTS "inp_rules_x_node_id_fkey";
 ALTER TABLE "inp_rules_x_node" ADD CONSTRAINT "inp_rules_x_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "node" ("node_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey"
+ALTER TABLE "inp_controls_x_arc" DROP CONSTRAINT IF EXISTS "inp_controls_x_arc_id_fkey";
 ALTER TABLE "inp_controls_x_arc" ADD CONSTRAINT "inp_controls_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "inp_rules_x_arc" DROP CONSTRAINT IF EXISTS "inp_rules_x_arc_id_fkey"
+ALTER TABLE "inp_rules_x_arc" DROP CONSTRAINT IF EXISTS "inp_rules_x_arc_id_fkey";
 ALTER TABLE "inp_rules_x_arc" ADD CONSTRAINT "inp_rules_x_arc_id_fkey" FOREIGN KEY ("arc_id") REFERENCES "arc" ("arc_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-*/
+
+ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_period_id_fkey";
+ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_coefficient_fkey";
+ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_valve_mode_mincut_result_fkey";
+ALTER TABLE "inp_options" DROP CONSTRAINT IF EXISTS "inp_options_valve_mode_fkey";
+
+
+ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_period_id_fkey" FOREIGN KEY ("rtc_period_id") REFERENCES "ext_cat_period" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_coefficient_fkey" FOREIGN KEY ("rtc_coefficient") REFERENCES "inp_value_opti_rtc_coef" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_valve_mode_mincut_result_fkey" FOREIGN KEY ("valve_mode_mincut_result") REFERENCES "anl_mincut_result_cat" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "inp_options" ADD CONSTRAINT "inp_options_valve_mode_fkey" FOREIGN KEY ("valve_mode") REFERENCES "inp_value_opti_valvemode" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 

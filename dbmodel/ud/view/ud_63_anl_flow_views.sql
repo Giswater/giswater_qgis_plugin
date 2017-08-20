@@ -14,7 +14,7 @@ SELECT
 arc_id,
 arc_type,
 context,
-expl_id,
+anl_flow_arc.expl_id,
 the_geom
 FROM selector_expl, anl_flow_arc
 	WHERE anl_flow_arc.expl_id=selector_expl.expl_id
@@ -29,7 +29,7 @@ SELECT
 node_id,
 node_type,
 context,
-expl_id,
+anl_flow_node.expl_id,
 the_geom
 FROM selector_expl, anl_flow_node
 	WHERE anl_flow_node.expl_id=selector_expl.expl_id
@@ -44,7 +44,7 @@ CREATE OR REPLACE VIEW v_anl_flowtrace_connec AS
 SELECT
 connec_id,
 context,
-expl_id,
+anl_flow_arc.expl_id,
 v_edit_connec.the_geom
 FROM selector_expl, anl_flow_arc
 	JOIN v_edit_connec on v_edit_connec.arc_id=anl_flow_arc.arc_id
@@ -62,7 +62,7 @@ hydrometer_id,
 v_edit_connec.connec_id,
 code,
 context,
-expl_id,
+anl_flow_arc.expl_id,
 anl_flow_arc.arc_id
 FROM selector_expl, anl_flow_arc
 	JOIN v_edit_connec on v_edit_connec.arc_id=anl_flow_arc.arc_id

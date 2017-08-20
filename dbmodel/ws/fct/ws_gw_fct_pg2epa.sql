@@ -25,6 +25,7 @@ BEGIN
 	-- 2) VALVE OPTIONS 
 		-- Copy on inp_valve.status and inp_shorpipe.status se values from inp_options.valve_type & inp_options.valve_type_mincut_result
 		-- table destination: inp_temp_valve (result_id, valve_id, status)
+		-- If mincut valve options is choosed, demand of all internal nodes of the mincut polygon must be CERO!!!!
 		
 	-- 3) RTC OPTIONS (IF IS TRUE) 
 		-- Use values from rtc_options 

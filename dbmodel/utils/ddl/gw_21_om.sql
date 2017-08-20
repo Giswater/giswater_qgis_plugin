@@ -101,7 +101,7 @@ CONSTRAINT om_visit_value_position_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "om_visit_value_parameter_type"(
+CREATE TABLE "om_visit_parameter_type"(
 id character varying(30),
 descript text,
 CONSTRAINT om_visit_value_context_pkey PRIMARY KEY (id)

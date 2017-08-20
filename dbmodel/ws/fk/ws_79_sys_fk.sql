@@ -1,10 +1,12 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+
 /*
 ------
 -- FK 00
@@ -13,8 +15,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_type_fkey";
 ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_type_fkey" FOREIGN KEY ("type") REFERENCES "ext_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-ALTER TABLE "ext_urban_propierties" DROP CONSTRAINT IF EXISTS "ext_urban_propierties_streetaxis_fkey";
-ALTER TABLE "ext_urban_propierties" ADD CONSTRAINT "ext_urban_propierties_streetaxis_fkey" FOREIGN KEY ("streetaxis") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ext_urban_plot" DROP CONSTRAINT IF EXISTS "urban_plot_streetaxis_fkey";
+ALTER TABLE "ext_urban_plot" ADD CONSTRAINT "urban_plot_streetaxis_fkey" FOREIGN KEY ("streetaxis") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 ALTER TABLE "ext_rtc_scada" DROP CONSTRAINT IF EXISTS "ext_rtc_scada_cat_scada_id_fkey";

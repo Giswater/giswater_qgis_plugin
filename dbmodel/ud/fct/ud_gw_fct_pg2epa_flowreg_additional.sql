@@ -1,13 +1,14 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_pump_additional();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_pump_additional()  RETURNS integer AS
+DROP FUNCTION IF EXISTS gw_fct_pg2epa_flowreg_additional();
+CREATE OR REPLACE FUNCTION gw_fct_pg2epa_flowreg_additional()  RETURNS integer AS
 
 $BODY$
 DECLARE
@@ -16,7 +17,7 @@ arc_rec record;
 pump_rec record;
 node_id_aux text;
 rec record;
-record_new_arc SCHEMA_NAME.arc%ROWTYPE;
+record_new_arc arc%ROWTYPE;
 n1_geom public.geometry;
 n2_geom public.geometry;
 p1_geom public.geometry;
@@ -38,6 +39,7 @@ BEGIN
 
     SELECT * INTO rec FROM version;
 
+	/*
     
 --  Start process	
     RAISE NOTICE 'Starting additional pumps process.';
@@ -107,12 +109,17 @@ BEGIN
 	END LOOP;
     
     END LOOP;
-     	
+
+*/
+	
     RETURN 1;
+	
+
 		
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
 
   

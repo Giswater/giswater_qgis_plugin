@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_delete() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_orphannode_delete() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
     rec record;
     numArcs integer;
@@ -38,6 +38,6 @@ END;
 $$;
 
 
-DROP TRIGGER IF EXISTS gw_trg_arc_delete on "SCHEMA_NAME"."arc";
-CREATE TRIGGER gw_trg_arc_delete AFTER DELETE ON "SCHEMA_NAME"."arc" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_delete"();
+DROP TRIGGER IF EXISTS gw_trg_arc_prphannode_delete on "SCHEMA_NAME"."arc";
+CREATE TRIGGER gw_trg_arc_orphannode_delete AFTER DELETE ON "SCHEMA_NAME"."arc" FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_arc_orphannode_delete"();
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,24 +6,50 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_anl_node_exit_upper_intro() RETURNS integer AS $BODY$
+
 DECLARE
+sys_elev1_var numeric(12,3);
+sys_elev2_var numeric(12,3);
+rec_node record;
+rec_arc record;
 
 
 BEGIN
 
-    -- Search path
+
     SET search_path = "SCHEMA_NAME", public;
-	
-	-- Reset values
-    DELETE FROM anl_node_exit_upper_intro;
+
+    -- Reset values
+    DELETE FROM anl_review_arc WHERE cur_user="current_user"() AND context='Node exit upper intro';
 
 
+-- Init variables
+	sys_elev1_var=0;
+	sys_elev2_var=0;
+
+
+    -- Comptuing process
+	FOR rec_node IN SELECT * FROM v_edit_node
+	LOOP
 	
+		FOR rec_arc IN SELECT * FROM v_edit_arc where node_1=rec_node.node_id
+		LOOP
+			sys_elev1_var=greatest(sys_elev1_var,rec_arc.sys_elev1);
+		END LOOP;
+
+		FOR rec_arc IN SELECT * FROM v_edit_arc where node_2=rec_node.node_id
+		LOOP
+			sys_elev2_var=greatest(sys_elev2_var,rec_arc.sys_elev2);
+		END LOOP;
+		
+		IF sys_elev1_var > sys_elev2_var THEN
+			INSERT INTO anl_review_node (node_id, expl_id, context, the_geom) VALUES
+			(rec_node.node_id, rec_node.expl_id, 'Node exit upper intro'::text, rec_node.the_geom);
+		END IF;
+		
+	END LOOP;
 	
-	
-	
-	
-    RETURN NULL;
+RETURN 1;
         
 END;
 $BODY$

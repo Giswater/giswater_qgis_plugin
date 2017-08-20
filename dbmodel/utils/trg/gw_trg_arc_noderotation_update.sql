@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_node_rotation_update()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_noderotation_update()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -182,11 +182,9 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_trg_arc_node_rotation_update()
-  OWNER TO postgres;
   
 
 /*  
-DROP TRIGGER IF EXISTS gw_trg_arc_node_rotation_update ON "SCHEMA_NAME".arc;
-CREATE TRIGGER gw_trg_arc_node_rotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc  FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_node_rotation_update();
+DROP TRIGGER IF EXISTS gw_trg_arc_noderotation_update ON "SCHEMA_NAME".arc;
+CREATE TRIGGER gw_trg_arc_noderotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc  FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_noderotation_update();
 */

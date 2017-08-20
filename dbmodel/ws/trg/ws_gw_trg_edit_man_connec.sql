@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -148,7 +148,7 @@ BEGIN
 				NEW.fountain_code=NEW.connec_id;
 			END IF;
 			
-		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code, demand, "state", annotation, observ, "comment",,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
+		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code, demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
 		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, rotation, link,verified, the_geom, undelete,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory,num_value) 
 		  VALUES (NEW.connec_id, NEW.customer_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW.fountain_demand, NEW."state", NEW.fountain_annotation, 
@@ -159,7 +159,7 @@ BEGIN
 		 
 		 INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, arq_patrimony, the_geom_pol) 
 		 VALUES (NEW.connec_id, NEW.fountain_vmax, NEW.fountain_linked_connec, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
-		 NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.the_geom_pol;
+		 NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.the_geom_pol);
 		 
 		ELSIF man_table='man_tap' THEN
 					
@@ -190,7 +190,7 @@ BEGIN
 		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
 		  
 		  INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
-		  VALUES (NEW.connec_id,  NEW.tap_linked_connec NEW.tap_cat_valve,  NEW.tap_drain_diam, NEW.tap_drain_exit,  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arq_patrimony, NEW.tap_com_state);
+		  VALUES (NEW.connec_id,  NEW.tap_linked_connec, NEW.tap_cat_valve,  NEW.tap_drain_diam, NEW.tap_drain_exit,  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arq_patrimony, NEW.tap_com_state);
 		  
 		ELSIF man_table='man_wjoin' THEN  
 
@@ -262,7 +262,7 @@ BEGIN
         ELSIF man_table ='man_wjoin' THEN
 			UPDATE connec 
 			SET connec_id=NEW.connec_id,code=NEW.wjoin_code, elevation=NEW.wjoin_elevation, "depth"=NEW.wjoin_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.wjoin_cutomer_code,
-			demand=NEW.wjoin_demand, "state"=NEW."state", annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id
+			demand=NEW.wjoin_demand, "state"=NEW."state", annotation=NEW.wjoin_annotation, observ=NEW.wjoin_observ, "comment"=NEW.wjoin_comment, rotation=NEW.wjoin_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
 			soilcat_id=NEW.wjoin_soilcat_id, category_type=NEW.wjoin_category_type, fluid_type=NEW.wjoin_fluid_type, location_type=NEW.wjoin_location_type, workcat_id=NEW.wjoin_workcat_id, workcat_id_end=NEW.wjoin_workcat_id_end,
 			buildercat_id=NEW.wjoin_buildercat_id, builtdate=NEW.wjoin_builtdate,enddate=NEW.wjoin_enddate, ownercat_id=NEW.wjoin_ownercat_id, address_01=NEW.wjoin_address_01, address_02=NEW.wjoin_address_02, address_03=NEW.wjoin_address_03, 
 			streetaxis_id=NEW.wjoin_streetaxis_id, postnumber=NEW.wjoin_postnumber, descript=NEW.wjoin_descript, link=NEW.wjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.wjoin_label_x,label_y=NEW.wjoin_label_y, label_rotation=NEW.wjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value

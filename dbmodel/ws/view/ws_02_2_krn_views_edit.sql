@@ -1,4 +1,4 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -50,7 +50,6 @@ CREATE VIEW v_edit_sector AS SELECT
 FROM inp_selector_sector,sector 
 WHERE ((sector.sector_id)=(inp_selector_sector.sector_id) 
 AND inp_selector_sector.cur_user="current_user"());
-
 
 
 
@@ -773,7 +772,7 @@ dma.macrodma_id,
 node.expl_id,
 node.hemisphere as valve_hemisphere,
 node.num_value,
-man_valve.opened AS valve_opened,
+man_valve.closed AS valve_closed,
 man_valve.broken AS valve_broken,
 man_valve.buried AS valve_buried,
 man_valve.irrigation_indicator AS valve_irrigation_indicator,

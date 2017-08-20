@@ -41,10 +41,6 @@ ALTER TABLE "price_compost_value" DROP CONSTRAINT IF EXISTS "price_compost_value
 ALTER TABLE "price_compost" DROP CONSTRAINT IF EXISTS "price_compost_unit_fkey";
 ALTER TABLE "price_simple" DROP CONSTRAINT IF EXISTS "price_simple_unit_fkey";
 
-ALTER TABLE "plan_selector_psector" DROP CONSTRAINT IF EXISTS "plan_selector_psector_id_fkey";
-ALTER TABLE "plan_selector_state" DROP CONSTRAINT IF EXISTS "plan_selector_state_id_fkey";
-
-ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS "plan_psector_expl_id_fkey";
 
 
 

@@ -18,10 +18,10 @@ BEGIN
     SELECT * INTO rec FROM config; 
 
     -- Reset values
-	DELETE FROM anl_review_connec WHERE cur_user="current_user"() AND context='Connec duplicated';;
+	DELETE FROM anl_review_connec WHERE cur_user="current_user"() AND context='Connec duplicated';
 		
     -- Computing process
-    INSERT INTO anl_review_connec (connec_id, state, descript, expl_id, context, the_geom)
+    INSERT INTO anl_review_connec (connec_id, state, connec_id_aux, expl_id, context, the_geom)
     SELECT DISTINCT t1.connec_id, t1.state, t2.connec_id, t1.expl_id, 'Connec duplicated', t1.the_geom
     FROM connec AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,(rec.connec_duplicated_tolerance)) 
     WHERE t1.connec_id != t2.connec_id  

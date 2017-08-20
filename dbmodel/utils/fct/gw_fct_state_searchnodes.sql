@@ -11,6 +11,16 @@ DECLARE
 
 BEGIN 
 
+/* 
+Comments:
+The goal of this function is control the snapping from arcs to nodes. 
+The big diference between insert and update (we manage tp_op) is that on in case of state=2 for arcs on update the arc exists and already belongs on one aleternative
+
+
+
+*/
+
+
  -- Set search_path
     SET search_path = 'SCHEMA_NAME', public;
     

@@ -4,8 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa(character varying, boolean);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa (result_id_var character varying, export_subcatch boolean)  RETURNS integer AS $BODY$
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying, boolean);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg (result_id_var character varying)  RETURNS integer AS $BODY$
 DECLARE
     
       
@@ -15,14 +15,10 @@ BEGIN
 --  Search path
     SET search_path = "SCHEMA_NAME", public;
 
-	RAISE NOTICE 'Starting pg2epa process.';
+	RAISE NOTICE 'Starting epa2pg process.';
 		
-	-- PROCESSES
-	-- 1) RESULT MANAGEMENT INSERT
-		-- INSERT INTO inp_selector_result (result_id_var, cur_user)
-		-- INSERT INTO rpt_input_node & rpt_input_arc TABLES
-	
-	-- 2) EXPORT SUBCATCHMENT
+
+	-- 1) INSERT INTO rpt_selector_result (result_id_var, cur_user)
 	
 
 RETURN 1;

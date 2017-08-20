@@ -9,25 +9,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
 -- ----------------------------
--- MINCUT
--- ----------------------------
-
-DROP VIEW IF EXISTS v_anl_mincut_valve CASCADE;
-CREATE OR REPLACE VIEW v_anl_mincut_valve AS 
-SELECT 
-v_edit_node.node_id,
-cat_node.nodetype_id,
-closed,
-broken,
-the_geom
-FROM v_edit_node
-JOIN cat_node ON v_edit_node.node.nodecat_id=cat_node.id
-JOIN man_valve ON v_edit_node.node_id=man_valve.node_id
-JOIN anl_mincut_selector_valve ON cat_node.nodetype_id=anl_mincut_selector_valve.id;
-
-
-
--- ----------------------------
 -- MINCUT CATALOG
 -- ----------------------------
 
@@ -63,7 +44,7 @@ GROUP BY anl_mincut_result_node.id, anl_mincut_result_selector.result_id, node.t
 ORDER BY anl_mincut_result_node.node_id;
 
 
-DROP VIEW IF EXISTS "v_anl_mincut_result_valve" CASCADE; -- to do!
+DROP VIEW IF EXISTS "v_anl_mincut_result_valve" CASCADE;
 CREATE VIEW "v_anl_mincut_result_valve" AS
 SELECT 
 anl_mincut_result_valve.result_id,
@@ -74,7 +55,7 @@ unaccess,
 proposed,
 the_geom
 FROM anl_mincut_result_selector, anl_mincut_result_valve 
-WHERE ((anl_mincut_result_selector.id) = (anl_mincut_result_valve.result_id))
+WHERE anl_mincut_result_selector.result_id = anl_mincut_result_valve.result_id
 AND anl_mincut_result_selector.cur_user="current_user"();
 
 

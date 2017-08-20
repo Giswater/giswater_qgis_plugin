@@ -47,7 +47,7 @@ UNION SELECT
 	node_id
 	FROM selector_psector,plan_node_x_psector
 	WHERE plan_node_x_psector.psector_id=selector_psector.psector_id
-	AND selector_psector.cur_user=current_user AND state=1
+	AND selector_psector.cur_user=current_user AND state=1;
 	
 	
 	
@@ -58,7 +58,7 @@ SELECT
 	connec_id
 	FROM selector_state,connec
 	WHERE connec.state=selector_state.state_id
-	AND selector_state.cur_user=current_user
+	AND selector_state.cur_user=current_user;
 
 
 

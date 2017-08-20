@@ -118,21 +118,22 @@ inp_energy_el.pump_id,
 inp_energy_el.parameter, 
 inp_energy_el.value 
 FROM inp_selector_result, inp_energy_el
-	JOIN rpt_inp_node ON inp_mixing.node_id=rpt_inp_node.node_id
-	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	JOIN rpt_inp_node ON inp_energy_el.pump_id=rpt_inp_node.node_id
+	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
 	ORDER BY id;
 
 	
 
 DROP VIEW IF EXISTS "v_inp_reactions_el" CASCADE;
 CREATE VIEW "v_inp_reactions_el"  AS
-SELECT id,
+SELECT 
+inp_reactions_el.id,
 parameter,
 inp_reactions_el.arc_id,
 value
 FROM inp_selector_result, inp_reactions_el
-	JOIN rpt_inp_arc ON inp_mixing.node_id=rpt_inp_node.node_id
-	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	JOIN rpt_inp_arc ON inp_reactions_el.arc_id=rpt_inp_arc.arc_id
+	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
 	ORDER BY id;
 
 
@@ -157,9 +158,8 @@ inp_source.sourc_type,
 inp_source.quality, 
 inp_source.pattern_id
 FROM inp_selector_result, inp_source 
-	JOIN rpt_inp_node ON inp_mixing.node_id=rpt_inp_node.node_id
+	JOIN rpt_inp_node ON inp_source.node_id=rpt_inp_node.node_id
 	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
-	ORDER BY id;
 
 	
 
@@ -170,14 +170,14 @@ inp_valve.status
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
 	WHERE inp_valve.status = 'OPEN' OR inp_valve.status = 'CLOSED'
-	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
 UNION
 SELECT 
 rpt_inp_arc.arc_id,
 inp_pump.status
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_pump ON rpt_inp_arc.arc_id = concat(inp_pump.node_id, '_n2a')
-	WHERE inp_pump.status = 'OPEN' OR inp_pump.status = 'CLOSED';
+	WHERE inp_pump.status = 'OPEN' OR inp_pump.status = 'CLOSED'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -188,10 +188,10 @@ CREATE VIEW "v_inp_emitter" AS
 SELECT 
 inp_emitter.node_id, 
 inp_emitter.coef, 
-(st_x(node.the_geom))::numeric(16,3) AS xcoord, 
-(st_y(node.the_geom))::numeric(16,3) AS ycoord
+(st_x(the_geom))::numeric(16,3) AS xcoord, 
+(st_y(the_geom))::numeric(16,3) AS ycoord
 FROM inp_selector_result, inp_emitter 
-	JOIN rpt_inp_node ON inp_emitter.node_id = rpt_inp_node.node_id;
+	JOIN rpt_inp_node ON inp_emitter.node_id = rpt_inp_node.node_id
 	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -200,10 +200,10 @@ DROP VIEW IF EXISTS "v_inp_reservoir" CASCADE;
 CREATE OR REPLACE VIEW "v_inp_reservoir" AS
 SELECT 
 inp_reservoir.node_id,
-node.elevation as head,
+elevation as head,
 inp_reservoir.pattern_id,
-st_x(node.the_geom)::numeric(16,3) AS xcoord,
-st_y(node.the_geom)::numeric(16,3) AS ycoord
+st_x(the_geom)::numeric(16,3) AS xcoord,
+st_y(the_geom)::numeric(16,3) AS ycoord
 FROM inp_selector_result, inp_reservoir
     JOIN rpt_inp_node ON inp_reservoir.node_id = rpt_inp_node.node_id
 	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
@@ -214,17 +214,17 @@ DROP VIEW IF EXISTS "v_inp_tank" CASCADE;
 CREATE VIEW "v_inp_tank" AS 
 SELECT 
 inp_tank.node_id, 
-node.elevation, 
+elevation, 
 inp_tank.initlevel, 
 inp_tank.minlevel, 
 inp_tank.maxlevel, 
 inp_tank.diameter, 
 inp_tank.minvol, 
 inp_tank.curve_id, 
-(st_x(node.the_geom))::numeric(16,3) AS xcoord, 
-(st_y(node.the_geom))::numeric(16,3) AS ycoord
+(st_x(the_geom))::numeric(16,3) AS xcoord, 
+(st_y(the_geom))::numeric(16,3) AS ycoord
 FROM inp_selector_result, inp_tank 
-	JOIN rpt_inp_node ON inp_tank.node_id=rpt_inp_node.node_id;
+	JOIN rpt_inp_node ON inp_tank.node_id=rpt_inp_node.node_id
 	WHERE rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -241,8 +241,8 @@ st_y(the_geom)::numeric(16,3) AS ycoord
 FROM inp_selector_result, inp_junction
    JOIN rpt_inp_node ON inp_junction.node_id = rpt_inp_node.node_id
    WHERE epa_type='JUNCTION'
-   AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
-   ORDER BY node.node_id;
+   AND rpt_inp_node.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
+   ORDER BY rpt_inp_node.node_id;
 
 
 DROP VIEW IF EXISTS "v_inp_pump" CASCADE;
@@ -255,7 +255,7 @@ rpt_inp_arc.node_2,
 (('HEAD' || ' ') || (inp_pump.curve_id)) AS head, (('SPEED' || ' ') || inp_pump.speed) AS speed, 
 (('PATTERN' || ' ') || (inp_pump.pattern)) AS pattern
 FROM inp_selector_result, inp_pump
-	JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = concat(inp_pump.node_id, '_n2a');
+	JOIN rpt_inp_arc ON rpt_inp_arc.arc_id = concat(inp_pump.node_id, '_n2a')
 	WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -272,7 +272,7 @@ inp_valve.minorloss
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
 	JOIN cat_arc ON rpt_inp_arc.arccat_id = cat_arc.id
-	WHERE inp_valve.valv_type = 'GPV';
+	WHERE inp_valve.valv_type = 'GPV'
   	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -286,7 +286,7 @@ inp_valve.valv_type,
 inp_valve.flow
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-	WHERE inp_valve.valv_type = 'FCV';
+	WHERE inp_valve.valv_type = 'FCV'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -302,7 +302,7 @@ inp_valve.coef_loss,
 inp_valve.minorloss
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-	WHERE inp_valve.valv_type = 'TCV';
+	WHERE inp_valve.valv_type = 'TCV'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -315,7 +315,7 @@ rpt_inp_arc.diameter,
 inp_valve.valv_type
 FROM inp_selector_result, rpt_inp_arc
 	JOIN inp_valve ON rpt_inp_arc.arc_id = concat(inp_valve.node_id, '_n2a')
-	WHERE inp_valve.valv_type = 'PRV' OR inp_valve.valv_type = 'PSV' OR inp_valve.valv_type = 'PBV';
+	WHERE inp_valve.valv_type = 'PRV' OR inp_valve.valv_type = 'PSV' OR inp_valve.valv_type = 'PBV'
 	AND rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
 
 
@@ -335,7 +335,7 @@ inp_pipe.minorloss,
 inp_pipe.status
 FROM inp_selector_result,rpt_inp_arc
    JOIN inp_pipe ON rpt_inp_arc.arc_id = inp_pipe.arc_id
-   WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();
+   WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"()
 
 UNION 
 SELECT 
@@ -348,8 +348,8 @@ rpt_inp_arc.state,
 rpt_inp_arc.diameter, 
 rpt_inp_arc.roughness,  
 rpt_inp_arc.length, 
-inp_pipe.minorloss, 
-inp_pipe.status
+inp_shortpipe.minorloss, 
+inp_shortpipe.status
 FROM inp_selector_result, rpt_inp_arc
    JOIN inp_shortpipe ON rpt_inp_arc.arc_id = concat(inp_shortpipe.node_id, '_n2a')
    WHERE rpt_inp_arc.result_id=inp_selector_result.result_id AND inp_selector_result.cur_user="current_user"();

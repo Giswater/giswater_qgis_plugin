@@ -18,18 +18,18 @@ DECLARE
 BEGIN 
 
     SET search_path=SCHEMA_NAME, public;
-
+	
 
      -- control for downgrade features to state(0)
-     IF tg_op_aux = 'UPDATE' THEN
-	IF feature_type_aux='node' and state_aux=0 THEN
-		SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
-		IF state_aux!=old_state_aux THEN
-			SELECT count(arc_id) INTO num_arcs FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state!=0;
-			IF num_arcs > 0 THEN 
-				RAISE EXCEPTION 'Before downgrade the node to state 0, please disconnect the associated arcs, node_id= %',feature_id_aux;
+    IF tg_op_aux = 'UPDATE' THEN
+		IF feature_type_aux='node' and state_aux=0 THEN
+			SELECT state INTO old_state_aux FROM node WHERE node_id=feature_id_aux;
+			IF state_aux!=old_state_aux THEN
+				SELECT count(arc_id) INTO num_arcs FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state!=0;
+				IF num_arcs > 0 THEN 
+					RAISE EXCEPTION 'Before downgrade the node to state 0, please disconnect the associated arcs, node_id= %',feature_id_aux;
+				END IF;
 			END IF;
-		END IF;
 
 	ELSIF feature_type_aux='arc' and state_aux=0 THEN
 		SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
