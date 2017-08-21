@@ -449,7 +449,7 @@ CREATE TABLE "inp_tank" (
 
 
 CREATE TABLE "inp_times" (
-"duration" varchar(10)   NOT NULL,
+"duration" integer NOT NULL,
 "hydraulic_timestep" varchar(10)  ,
 "quality_timestep" varchar(10)  ,
 "rule_timestep" varchar(10)  ,
