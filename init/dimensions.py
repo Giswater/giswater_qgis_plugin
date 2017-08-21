@@ -115,16 +115,16 @@ class Dimensions(ParentDialog):
             for snapPoint in result:
                 
                 element_type = snapPoint.layer.name()
-                message = str(element_type)
-                self.controller.show_info(message, context_name='ui_message' )
-                
+                #self.controller.show_info(str(element_type), context_name='ui_message')
                 if element_type in node_group:
                     feat_type = 'node'
-                if element_type in connec_group:
+                elif element_type in connec_group:
                     feat_type = 'connec'
+                else:
+                    continue
                         
                 # Get the point
-                point = QgsPoint(snapPoint.snappedVertex)   #@UnusedVariable
+                point = QgsPoint(snapPoint.snappedVertex)   
                 snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
                 feature = snappFeat
                 element_id = feature.attribute(feat_type+'_id')
@@ -133,21 +133,22 @@ class Dimensions(ParentDialog):
                 snapPoint.layer.select([snapPoint.snappedAtGeometry])
            
                 # Get depth of feature
-                sql = "SELECT depth FROM "+self.schema_name+"."+feat_type+" WHERE "+feat_type+"_id = '"+element_id+"'"  
-                
-                rows = self.controller.get_rows(sql) 
-                
-                self.depth=self.dialog.findChild(QLineEdit, "depth")
-                self.depth.setText(str(rows[0][0]))
-                self.feature_id =self.dialog.findChild(QLineEdit, "feature_id")
-                self.feature_id.setText(str(element_id))
-                self.feature_type =self.dialog.findChild(QLineEdit, "feature_type")
-                self.feature_type.setText(str(element_type))
-                
+                sql = "SELECT depth"
+                sql+= " FROM "+self.schema_name+"."+feat_type 
+                sql+= " WHERE "+feat_type+"_id = '"+element_id+"'"  
+                row = self.dao.get_row(sql)
+                if not row:
+                    return
+                depth = self.dialog.findChild(QLineEdit, "depth")
+                depth.setText(str(row[0]))
+                feature_id = self.dialog.findChild(QLineEdit, "feature_id")
+                feature_id.setText(str(element_id))
+                feature_type = self.dialog.findChild(QLineEdit, "feature_type")
+                feature_type.setText(str(element_type))
+            
                 # Reset snapping
                 point = []
-                #break
-                        
+               
     
     def create_map_tips(self):
         ''' Create MapTips on the map '''
