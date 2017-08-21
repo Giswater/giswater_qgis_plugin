@@ -86,7 +86,7 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 CREATE TABLE "cat_arc_shape" (
 "id" varchar (30) NOT NULL PRIMARY KEY,
 "epa" varchar(30),
-"ui_image" varchar(50),
+"image" varchar(50),
 "descript" text,
 "active" boolean
 );
