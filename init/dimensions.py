@@ -46,12 +46,26 @@ class Dimensions(ParentDialog):
         btn_snapping = self.dialog.findChild(QPushButton, "btn_snapping")
         btn_snapping.clicked.connect(self.snapping)
         
-        mapCanvas = self.iface.mapCanvas()
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
-        mapCanvas.setMapTool(self.emitPoint)
+        # Set layers dimensions, node and connec
+        self.layer_dimensions = None
+        self.layer_dimensions = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")
+        if self.layer_dimensions:
+            self.layer_dimensions = self.layer_dimensions[0]   
+         
+        self.layer_node = None   
+        self.layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
+        if self.layer_node:
+            self.layer_node = self.layer_node[0]      
+            
+        self.layer_connec = None   
+        self.layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
+        if self.layer_connec:
+            self.layer_connec = self.layer_connec[0]               
         
+        # Set snapping and map tips
         self.canvas = self.iface.mapCanvas()
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         self.create_map_tips()
         
@@ -59,28 +73,26 @@ class Dimensions(ParentDialog):
     def orientation(self):
         
         # Disconnect previous snapping
-        QObject.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
+        QObject.disconnect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)
+        QObject.connect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
         
         
     def snapping(self):
                
         # Disconnect previous snapping
-        QObject.disconnect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
+        QObject.disconnect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_orientation)
         
         # Track mouse movement
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)
-        
-        #self.canvas.xyCoordinates.disconnect( self.canvasMoveEvent )
+        QObject.connect(self.emit_point, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.click_button_snapping)    
         
         
     def click_button_orientation(self, point, btn): #@UnusedVariable
     
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
+        if not self.layer_dimensions:
+            return   
+             
+        layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
-
-        self.canvas = self.iface.mapCanvas()
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.x_symbol = self.dialog.findChild(QLineEdit, "x_symbol")
         self.x_symbol.setText(str(point.x()))
@@ -89,33 +101,33 @@ class Dimensions(ParentDialog):
         
 
     def click_button_snapping(self, point, btn):    #@UnusedVariable
-                 
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
+                                 
+        if not self.layer_dimensions:
+            return   
+             
+        layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
         layer.startEditing()
         
         node_group = ["Junction","Valve","Reduction","Tank","Meter","Manhole","Source","Hydrant"]
         connec_group = ["Wjoin","Fountain"]
         
-        self.canvas = self.iface.mapCanvas()
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-
+        snapper = QgsMapCanvasSnapper(self.canvas)
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
                      
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+        (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
             
         # That's the snapped point
         if result <> []:
 
             # Check feature
-            for snapPoint in result:
+            for snap_point in result:
                 
-                element_type = snapPoint.layer.name()
-                #self.controller.show_info(str(element_type), context_name='ui_message')
+                element_type = snap_point.layer.name()
                 if element_type in node_group:
                     feat_type = 'node'
                 elif element_type in connec_group:
@@ -124,13 +136,13 @@ class Dimensions(ParentDialog):
                     continue
                         
                 # Get the point
-                point = QgsPoint(snapPoint.snappedVertex)   
-                snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
-                feature = snappFeat
+                point = QgsPoint(snap_point.snappedVertex)   
+                snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                feature = snapp_feature
                 element_id = feature.attribute(feat_type+'_id')
  
                 # LEAVE SELECTION
-                snapPoint.layer.select([snapPoint.snappedAtGeometry])
+                snap_point.layer.select([snap_point.snappedAtGeometry])
            
                 # Get depth of feature
                 sql = "SELECT depth"
@@ -153,35 +165,43 @@ class Dimensions(ParentDialog):
     def create_map_tips(self):
         ''' Create MapTips on the map '''
         
-        self.timerMapTips = QTimer(self.canvas)
-        self.mapTip_connec = QgsMapTip()
-        self.mapTip_node = QgsMapTip()
-        self.canvas.connect(self.canvas, SIGNAL( "xyCoordinates(const QgsPoint&)" ), self.map_tip_changed)
-        self.canvas.connect(self.timerMapTips, SIGNAL( "timeout()" ),self.show_map_tip)
+        self.timer_map_tips = QTimer(self.canvas)
+        self.map_tip_node = QgsMapTip()
+        self.map_tip_connec = QgsMapTip()
+        self.canvas.connect(self.canvas, SIGNAL("xyCoordinates(const QgsPoint&)"), self.map_tip_changed)
+        self.canvas.connect(self.timer_map_tips, SIGNAL("timeout()"), self.show_map_tip)
+        
+        self.timer_map_tips_clear = QTimer(self.canvas)        
+        self.canvas.connect(self.timer_map_tips_clear, SIGNAL("timeout()"), self.clear_map_tip)
 
             
     def map_tip_changed(self, p):
         ''' SLOT. Initialize the Timer to show MapTips on the map '''
         
-        if self.canvas.underMouse(): # Only if mouse is over the map
-            # Here you could check if your custom MapTips button is active or sth
-            self.lastMapPosition = QgsPoint(p.x(), p.y())
-            self.mapTip_connec.clear(self.canvas)
-            self.mapTip_node.clear(self.canvas)
-            self.timerMapTips.start(100) # time in milliseconds
+        if self.canvas.underMouse(): 
+            self.last_map_position = QgsPoint(p.x(), p.y())
+            self.map_tip_node.clear(self.canvas)
+            self.map_tip_connec.clear(self.canvas)
+            self.timer_map_tips.start(100)
 
             
     def show_map_tip(self):
         ''' SLOT. Show MapTips on the map '''
         
-        self.timerMapTips.stop()
-        layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")[0]
-        layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")[0]
-
+        self.timer_map_tips.stop()
         if self.canvas.underMouse(): 
-            # Here you could check if your custom MapTips button is active or sth
-            pointQgs = self.lastMapPosition
-            pointQt = self.canvas.mouseLastXY()
-            self.mapTip_node.showMapTip(layer_node, pointQgs, pointQt, self.canvas)
-            self.mapTip_connec.showMapTip(layer_connec, pointQgs, pointQt, self.canvas)
-
+            point_qgs = self.last_map_position
+            point_qt = self.canvas.mouseLastXY()
+            if self.layer_node:
+                self.map_tip_node.showMapTip(self.layer_node, point_qgs, point_qt, self.canvas)
+            if self.layer_connec:
+                self.map_tip_connec.showMapTip(self.layer_connec, point_qgs, point_qt, self.canvas)
+            self.timer_map_tips_clear.start(2000)               
+                                            
+            
+    def clear_map_tip(self):
+        ''' SLOT. Show MapTips on the map '''
+        self.timer_map_tips_clear.stop()
+        self.map_tip_node.clear(self.canvas)         
+        self.map_tip_connec.clear(self.canvas)    
+            
