@@ -154,7 +154,8 @@ class Dimensions(ParentDialog):
         ''' Create MapTips on the map '''
         
         self.timerMapTips = QTimer(self.canvas)
-        self.mapTip = QgsMapTip()
+        self.mapTip_connec = QgsMapTip()
+        self.mapTip_node = QgsMapTip()
         self.canvas.connect(self.canvas, SIGNAL( "xyCoordinates(const QgsPoint&)" ), self.map_tip_changed)
         self.canvas.connect(self.timerMapTips, SIGNAL( "timeout()" ),self.show_map_tip)
 
@@ -165,7 +166,8 @@ class Dimensions(ParentDialog):
         if self.canvas.underMouse(): # Only if mouse is over the map
             # Here you could check if your custom MapTips button is active or sth
             self.lastMapPosition = QgsPoint(p.x(), p.y())
-            self.mapTip.clear(self.canvas)
+            self.mapTip_connec.clear(self.canvas)
+            self.mapTip_node.clear(self.canvas)
             self.timerMapTips.start(100) # time in milliseconds
 
             
@@ -180,6 +182,6 @@ class Dimensions(ParentDialog):
             # Here you could check if your custom MapTips button is active or sth
             pointQgs = self.lastMapPosition
             pointQt = self.canvas.mouseLastXY()
-            self.mapTip.showMapTip(layer_node, pointQgs, pointQt, self.canvas)
-            self.mapTip.showMapTip(layer_connec, pointQgs, pointQt, self.canvas)
+            self.mapTip_node.showMapTip(layer_node, pointQgs, pointQt, self.canvas)
+            self.mapTip_connec.showMapTip(layer_connec, pointQgs, pointQt, self.canvas)
 
