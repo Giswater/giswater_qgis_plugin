@@ -20,7 +20,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Reset values
-    DELETE FROM anl_review_arc WHERE cur_user="current_user"() AND context='Node exit upper intro';
+    DELETE FROM anl_arc WHERE cur_user="current_user"() AND context='Node exit upper intro';
 
 
 -- Init variables
@@ -43,7 +43,7 @@ BEGIN
 		END LOOP;
 		
 		IF sys_elev1_var > sys_elev2_var THEN
-			INSERT INTO anl_review_node (node_id, expl_id, context, the_geom) VALUES
+			INSERT INTO anl_node (node_id, expl_id, context, the_geom) VALUES
 			(rec_node.node_id, rec_node.expl_id, 'Node exit upper intro'::text, rec_node.the_geom);
 		END IF;
 		

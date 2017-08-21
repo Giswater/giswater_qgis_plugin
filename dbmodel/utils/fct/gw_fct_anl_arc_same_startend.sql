@@ -13,10 +13,10 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Reset values
-    DELETE FROM anl_review_arc WHERE cur_user="current_user"() AND context='Arc with same start-end nodes';
+    DELETE FROM anl_arc WHERE cur_user="current_user"() AND context='Arc with same start-end nodes';
     
 	-- Computing process
-    INSERT INTO anl_review_arc (arc_id, state, expl_id, context, the_geom)
+    INSERT INTO anl_arc (arc_id, state, expl_id, context, the_geom)
     SELECT arc_id, state, expl_id, 'Arc with same start-end nodes', the_geom
     FROM arc WHERE node_1::text=node_2::text;
 
