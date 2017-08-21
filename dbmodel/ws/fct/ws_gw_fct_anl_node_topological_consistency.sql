@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE OR REPLACE FUNCTION gw_fct_anl_node_topo_consistency() RETURNS void AS $BODY$
+CREATE OR REPLACE FUNCTION gw_fct_anl_node_topological_consistency() RETURNS void AS $BODY$
 DECLARE
     rec_node record;
     rec record;
