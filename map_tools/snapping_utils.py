@@ -37,7 +37,6 @@ class SnappingConfigManager():
         proj = QgsProject.instance()
         proj.writeEntry('Digitizing', 'SnappingMode', 'advanced')
 
-
         
     def set_layers(self, layer_arc_man, layer_connec_man, layer_node_man):
         self.layer_arc_man = layer_arc_man
@@ -93,10 +92,8 @@ class SnappingConfigManager():
 
     def unsnapToArc(self):
         ''' Unset snapping to Arc '''
-        #QgsProject.instance().blockSignals(True)
         for layer in self.layer_arc_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), False, 2, 2, 1.0, False)
-        #QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
         
         
@@ -113,8 +110,6 @@ class SnappingConfigManager():
     def snapToConnec(self):
         ''' Set snapping to Connec '''
         QgsProject.instance().blockSignals(True)
-        #QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
-
         for layer in self.layer_connec_man:
             QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
         QgsProject.instance().blockSignals(False)
@@ -124,15 +119,12 @@ class SnappingConfigManager():
     def snapToValve(self):
         ''' Set snapping to Connec '''
         QgsProject.instance().blockSignals(True)
-        #QgsProject.instance().setSnapSettingsForLayer(self.layer_connec.id(), True, 2, 2, 1.0, False)
-        
         for layer in self.layer_node_man:
             if layer.name() == 'Valve':
                 QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snapSettingsChanged.emit()  # update the gui
         
-
 
     def snapToLayer(self, Layer):
         ''' Set snapping to Layer '''
