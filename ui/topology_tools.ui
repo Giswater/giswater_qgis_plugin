@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>350</height>
+    <height>349</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -96,7 +96,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -117,7 +117,7 @@
        <widget class="QCheckBox" name="check_node_duplicated">
         <property name="geometry">
          <rect>
-          <x>18</x>
+          <x>20</x>
           <y>56</y>
           <width>183</width>
           <height>17</height>
@@ -130,7 +130,7 @@
        <widget class="QCheckBox" name="check_arc_same_start_end">
         <property name="geometry">
          <rect>
-          <x>18</x>
+          <x>20</x>
           <y>118</y>
           <width>211</width>
           <height>17</height>
@@ -143,7 +143,7 @@
        <widget class="QCheckBox" name="check_node_orphan">
         <property name="geometry">
          <rect>
-          <x>18</x>
+          <x>20</x>
           <y>30</y>
           <width>165</width>
           <height>17</height>
@@ -156,7 +156,7 @@
        <widget class="QCheckBox" name="check_arcs_without_nodes_start_end">
         <property name="geometry">
          <rect>
-          <x>18</x>
+          <x>20</x>
           <y>144</y>
           <width>171</width>
           <height>17</height>
@@ -166,23 +166,10 @@
          <string>Arc no start-end node</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="check_node_state_coherence">
-        <property name="geometry">
-         <rect>
-          <x>18</x>
-          <y>84</y>
-          <width>171</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Node state coherence</string>
-        </property>
-       </widget>
        <widget class="QCheckBox" name="check_connec_duplicated">
         <property name="geometry">
          <rect>
-          <x>18</x>
+          <x>20</x>
           <y>178</y>
           <width>177</width>
           <height>17</height>
@@ -192,29 +179,11 @@
          <string>Connec duplicated</string>
         </property>
        </widget>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>WS</string>
-      </attribute>
-      <widget class="QGroupBox" name="groupBox_8">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>231</width>
-         <height>209</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Topology review</string>
-       </property>
        <widget class="QCheckBox" name="check_topology_coherence">
         <property name="geometry">
          <rect>
-          <x>16</x>
-          <y>28</y>
+          <x>20</x>
+          <y>80</y>
           <width>211</width>
           <height>17</height>
          </rect>
