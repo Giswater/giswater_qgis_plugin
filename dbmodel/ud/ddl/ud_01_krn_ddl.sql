@@ -51,7 +51,6 @@ CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" varchar(16),
-"custom_shape" varchar(30),
 "tsect_id" varchar(16)  ,
 "curve_id" varchar(16)  ,
 "geom1" numeric(12,4),
