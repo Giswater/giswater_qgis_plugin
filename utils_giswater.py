@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox
 from PyQt4.Qt import QDate
 import inspect
 import os
@@ -75,7 +75,7 @@ def getText(widget):
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)          
     if widget:
-        if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
+        if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.text()
         elif type(widget) is QTextEdit:
             text = widget.toPlainText()
@@ -274,11 +274,12 @@ def get_settings_value(settings, parameter):
     file_aux = ""
     try:
         file_aux = settings.value(parameter)
-        unit = file_aux[:1]
-        if unit != '\\' and file_aux[1] != ':':
-            path = file_aux[1:]
-            file_aux = unit+":"+path
+        if file_aux is not None:
+            unit = file_aux[:1]
+            if unit != '\\' and file_aux[1] != ':':
+                path = file_aux[1:]
+                file_aux = unit+":"+path
     except IndexError:
         pass   
     return file_aux           
-            
+

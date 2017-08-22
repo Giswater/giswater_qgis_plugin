@@ -1147,11 +1147,6 @@
      </rect>
     </property>
    </widget>
-   <zorder>label_quality</zorder>
-   <zorder>label_node_id</zorder>
-   <zorder>node_id</zorder>
-   <zorder>quality</zorder>
-   <zorder>checkBox_3</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_4">
    <property name="geometry">
@@ -1202,7 +1197,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="quality_2">
+   <widget class="QComboBox" name="valve_mode_mincut_result">
     <property name="geometry">
      <rect>
       <x>420</x>
@@ -1212,7 +1207,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="quality_3">
+   <widget class="QComboBox" name="valve_mode">
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -1259,11 +1254,6 @@
      <number>3</number>
     </property>
    </widget>
-   <zorder>label_quality_2</zorder>
-   <zorder>quality_2</zorder>
-   <zorder>quality_3</zorder>
-   <zorder>label_quality_3</zorder>
-   <zorder>checkBox_2</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_5">
    <property name="geometry">
@@ -1314,7 +1304,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="quality_6">
+   <widget class="QComboBox" name="rtc_coefficient">
     <property name="geometry">
      <rect>
       <x>420</x>
@@ -1324,7 +1314,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="quality_7">
+   <widget class="QComboBox" name="rtc_period_id">
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -1334,7 +1324,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="chk_enabled">
     <property name="geometry">
      <rect>
       <x>10</x>

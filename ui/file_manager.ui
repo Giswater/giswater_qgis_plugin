@@ -26,7 +26,7 @@
     <string>Sector Selection</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_rep_time">
+  <widget class="QPushButton" name="btn_scensel_time">
    <property name="geometry">
     <rect>
      <x>435</x>
@@ -78,7 +78,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_opt_hyd">
+  <widget class="QPushButton" name="btn_opt_hs">
    <property name="geometry">
     <rect>
      <x>150</x>
@@ -265,19 +265,6 @@
    </property>
    <property name="text">
     <string>Cancel</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_opt_hyd_2">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>20</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Dscenario Selector</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="chk_export_subcatch">
