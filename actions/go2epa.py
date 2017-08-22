@@ -7,8 +7,10 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QSettings
+from PyQt4.QtGui import QAbstractItemView
+from PyQt4.QtGui import QComboBox
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit
-from PyQt4.QtGui import QPushButton, QTableView, QLineEdit, QTimeEdit
+from PyQt4.QtGui import QLabel, QPushButton, QTableView, QLineEdit, QTimeEdit, QSpinBox
 from PyQt4.QtSql import QSqlQueryModel
 from datetime import date, datetime, timedelta, time
 from dateutil.relativedelta import relativedelta
@@ -108,7 +110,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.mg_go2epa_accept)
         self.dlg_go2epa.btn_cancel.pressed.connect(self.dlg_go2epa.close)
-        self.dlg_go2epa.btn_sector_selection.pressed.connect(self.sector_selection)
+
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_opt_hs.setText("Options")
             self.dlg_go2epa.btn_time_opt.setText("Times")
@@ -116,6 +118,7 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
             self.dlg_go2epa.btn_opt_hs.clicked.connect(self.ws_options)
             self.dlg_go2epa.btn_time_opt.clicked.connect(self.ws_times)
+            self.dlg_go2epa.btn_sector_selection.pressed.connect(self.sector_selection)
             #self.dlg_go2epa.btn_scensel_time.clicked.connect()
 
         if self.project_type == 'ud':
@@ -125,6 +128,7 @@ class Go2Epa(ParentAction):
             self.dlg_go2epa.btn_opt_hs.clicked.connect(self.ud_hydrology_selector)
             self.dlg_go2epa.btn_time_opt.clicked.connect(self.ud_options)
             self.dlg_go2epa.btn_scensel_time.clicked.connect(self.ud_times)
+            self.dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection,  "sector", "inp_selector_sector", "name", "sector_id", "sector_id"))
         # self.dlg.btn_sector_selection.clicked.connect()
         # self.dlg.btn_option.clicked.connect()
 
@@ -132,24 +136,120 @@ class Go2Epa(ParentAction):
         self.controller.translate_form(self.dlg_go2epa, 'file_manager')
         self.dlg_go2epa.exec_()
 
-    def sector_selection(self):
-        self.dlg_sector_selection = Multirow_selector()
-        utils_giswater.setDialog(self.dlg_sector_selection)
-        self.tbl_all_psector=self.dlg_sector_selection.findChild(QTableView, "all_row")
-        self.tbl_selected_psector = self.dlg_sector_selection.findChild(QTableView, "selected_row")
+    def sector_selection(self,  tblnameL, tbelnameR, fieldwhere, fieldONL, fieldONR):
+        self.dlg_psector_sel = Multirow_selector()
+        utils_giswater.setDialog(self.dlg_psector_sel)
 
-        self.btn_select=self.dlg_sector_selection.findChild(QPushButton, "btn_select")
-        self.btn_unselect = self.dlg_sector_selection.findChild(QPushButton, "btn_unselect")
-        self.txt_short_descript = self.dlg_sector_selection.findChild(QLineEdit, 'txt_short_descript')
+        # Tables
+        self.tbl_all_row = self.dlg_psector_sel.findChild(QTableView, "all_row")
+        self.tbl_all_row.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT name FROM "+self.controller.schema_name + "." + tblnameL + " WHERE " + fieldwhere + " NOT IN ("
+        sql += "SELECT " + fieldwhere + " FROM "+self.controller.schema_name + "." + tblnameL + " RIGTH JOIN "
+        sql += self.controller.schema_name + "." + tbelnameR + " ON " + tblnameL + "." + fieldONL + " = " + tbelnameR + "." + fieldONR
+        sql += " WHERE cur_user = current_user)"
+        self.fill_table_by_query(self.tbl_all_row, sql)
 
-        sql = "SELECT * FROM " + self.schema_name + ".sector WHERE descript LIKE '%"
-        self.txt_short_descript.textChanged.connect(partial(self.filter_all_explot, sql, self.txt_short_descript))
-
+        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_row")
+        self.tbl_selected_psector.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT name, sector.sector_id FROM "+self.controller.schema_name+"." + tblnameL
+        sql += " JOIN "+self.controller.schema_name + "." + tbelnameR + " ON " + tblnameL + "." + fieldONL + " = " + tbelnameR + "." + fieldONR
+        sql += " WHERE cur_user=current_user"
+        self.fill_table_by_query(self.tbl_selected_psector, sql)
+        TOCA PARAMETRIZAR TODO ESTO!!!!
         #self.btn_select.pressed.connect(self.selection)
-        #self.btn_unselect.pressed.connect(self.unselection)
+        query_left = "SELECT * FROM "+self.controller.schema_name+".sector WHERE name NOT IN "
+        query_left += "(SELECT name FROM "+self.controller.schema_name+".sector "
+        query_left += "RIGHT JOIN "+self.controller.schema_name+".inp_selector_sector ON sector.sector_id = inp_selector_sector.sector_id "
+        query_left += "WHERE cur_user = current_user)"
 
-        self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
-        self.dlg_multiexp.exec_()
+        query_right = "SELECT name, cur_user, sector.sector_id from "+self.controller.schema_name+".sector "
+        query_right += "JOIN "+self.controller.schema_name+".inp_selector_sector ON sector.sector_id=inp_selector_sector.sector_id "
+        query_right += "WHERE cur_user = current_user"
+        field = "sector_id"
+        self.dlg_psector_sel.btn_select.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_row, self.tbl_selected_psector, "sector_id", "inp_selector_sector", "sector_id", query_left,query_right, field))
+
+
+        #self.btn_unselect.pressed.connect(self.unselection)
+        query_left = "SELECT * FROM " + self.controller.schema_name+".sector WHERE name NOT IN "
+        query_left += "(SELECT name FROM "+ self.controller.schema_name+".sector RIGHT JOIN " + self.controller.schema_name+".inp_selector_sector "
+        query_left += "ON sector.sector_id = inp_selector_sector.sector_id where cur_user=current_user)"
+        query_right = "SELECT name, cur_user, sector.sector_id from "+self.controller.schema_name+".sector "
+        query_right += "JOIN "+self.controller.schema_name+".inp_selector_sector ON sector.sector_id = inp_selector_sector.sector_id "
+        query_right += "WHERE cur_user = current_user"
+
+        query_delete = "DELETE FROM "+self.controller.schema_name+".inp_selector_sector "
+        query_delete += "WHERE current_user = cur_user and inp_selector_sector.sector_id ="
+        self.dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, self.tbl_all_row, self.tbl_selected_psector,
+                                                                  query_delete, query_left, query_right, field))
+
+        self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
+        self.dlg_psector_sel.exec_()
+
+
+    def unselector(self, qtable_left, qtable_right, sql, query_left, query_right, field):
+        """
+        :param qtable_left: QTableView origin
+        :param qtable_right: QTableView destini
+        """
+        selected_list = qtable_right.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = str(qtable_right.model().record(row).value(field))
+            expl_id.append(id_)
+        for i in range(0, len(expl_id)):
+            self.controller.execute_sql(sql + str(expl_id[i]))
+
+        # Refresh
+        self.fill_table_by_query(qtable_left, query_left)
+        self.fill_table_by_query(qtable_right, query_right)
+        self.iface.mapCanvas().refresh()
+
+
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right, field):
+        """
+        :param qtable_left: QTableView origin
+        :param qtable_right: QTableView destini
+        :param tablename_ori: table origin
+        :param id_ori: Refers to the id of the source table
+        :param tablename_des: table destini
+        :param id_des: Refers to the id of the target table, on which the query will be made
+        """
+        selected_list = qtable_left.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        expl_id = []
+        curuser_list = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable_left.model().record(row).value(id_ori)
+            expl_id.append(id_)
+            curuser = qtable_left.model().record(row).value("cur_user")
+            curuser_list.append(curuser)
+        for i in range(0, len(expl_id)):
+            # Check if expl_id already exists in expl_selector
+            sql = "SELECT DISTINCT(" + id_des + ", cur_user)"
+            sql += " FROM " + self.schema_name + "." + tablename_des
+            sql += " WHERE " + id_des + " = '" + str(expl_id[i])
+            row = self.dao.get_row(sql)
+            if row:
+                # if exist - show warning
+                self.controller.show_info_box("Id " + str(expl_id[i]) + " is already selected!", "Info")
+            else:
+                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename_des + ' (' + field + ', cur_user) '
+                sql += " VALUES (" + str(expl_id[i]) + ", current_user)"
+                self.controller.execute_sql(sql)
+
+        # Refresh
+        self.fill_table_by_query(qtable_right, query_right)
+        self.fill_table_by_query(qtable_left, query_left)
+        self.iface.mapCanvas().refresh()
 
     def filter_all_explot(self, sql, widget):
 
@@ -353,11 +453,28 @@ class Go2Epa(ParentAction):
     def ud_hydrology_selector(self):
         self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
+
+        self.dlg_hydrology_selector.btn_accept.pressed.connect(self.dlg_hydrology_selector.close)
+
+        self.lbl_infiltration = self.dlg_hydrology_selector.findChild(QLabel, "infiltration")
+        self.lbl_descript = self.dlg_hydrology_selector.findChild(QLabel, "descript")
+        self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
+
         self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
+
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("hydrology", rows, False)
+        self.update_labels()
         self.dlg_hydrology_selector.exec_()
+
+
+    def update_labels(self):
+        sql = "SELECT infiltration, descript FROM "+self.schema_name + ".cat_hydrology WHERE name='"+str(self.dlg_hydrology_selector.hydrology.currentText())+"'"
+        row = self.dao.get_row(sql)
+        self.lbl_infiltration.setText(str(row[0]))
+        self.lbl_descript.setText(str(row[1]))
+
 
     def filter_cbx_by_text(self,tablename, widgettxt, widgetcbx):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + "." +str(tablename)
@@ -365,6 +482,7 @@ class Go2Epa(ParentAction):
         sql += "ORDER BY name "
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widgetcbx, rows, False)
+        self.update_labels()
 
 
 
@@ -400,6 +518,10 @@ class Go2Epa(ParentAction):
                             h = int(timeparts[0]) + int(aux)
                             aux = str(h) + ":" + str(timeparts[1]) + ":00"
                             value = aux
+                        elif widget_type is QSpinBox:
+                            x=dialog.findChild(QSpinBox, str(column_name))
+                            value = x.value()
+                            self.controller.show_warning(str(column_name) + "..."+str(value))
                         else:
                             value = utils_giswater.getWidgetText(column_name)
                         if value == 'null':
@@ -407,11 +529,11 @@ class Go2Epa(ParentAction):
                         elif value is None:
                             pass
                         else:
-                            if type(value) is not bool:
+                            if type(value) is not bool and widget_type is not QSpinBox:
                                 value = value.replace(",", ".")
                             sql += column_name + " = '" + str(value) + "', "
 
-                    #self.controller.show_warning(str(sql))
+
                 sql = sql[:len(sql) - 2]
                 #sql += " WHERE psector_id = '" + self.psector_id.text() + "'"
 
