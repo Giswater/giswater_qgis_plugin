@@ -57,6 +57,7 @@ DECLARE
     num_arcs integer;
     shortpipe_record record;
     to_arc_aux text;
+	arc_id_aux text;
     
 
 BEGIN

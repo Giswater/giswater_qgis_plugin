@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of inp_options
 -- ----------------------------
  
-INSERT INTO inp_options VALUES ('LPS', 'H-W', NULL, 1.000000, 1.000000, 40.000000, 0.001000, 'CONTINUE', 2.000000, 10.000000, 0.000000, '1', 1.000000, 0.500000, 'NONE', 1.000000, 0.010000, '', 40.000000, NULL, 'EPA TABLES', NULL, 'f', NULL, NULL);
+INSERT INTO inp_options VALUES (1,'LPS', 'H-W', NULL, 1.000000, 1.000000, 40.000000, 0.001000, 'CONTINUE', 2.000000, 10.000000, 0.000000, '1', 1.000000, 0.500000, 'NONE', 1.000000, 0.010000, '', 40.000000, NULL, 'EPA TABLES', NULL, 'f', NULL, NULL);
 
 
 -- ----------------------------
@@ -43,7 +43,7 @@ INSERT INTO "inp_report" VALUES ('0', '', 'YES', 'YES', 'YES', 'ALL', 'ALL', 'YE
 -- Records of inp_times
 -- ----------------------------
  
-INSERT INTO "inp_times" VALUES ('24', '0:30', '0:06', '0:05', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
+INSERT INTO "inp_times" VALUES (1,'24', '0:30', '0:06', '0:05', '1:00', '0:00', '1:00', '0:00', '12 am', 'NONE');
 
 
 -- ----------------------------

@@ -7,7 +7,7 @@
 -------------------------------------------------------
 ----------------------------------------------------
 
-DROP VIEW IF EXISTS v_state_arc;
+DROP VIEW IF EXISTS v_state_arc CASCADE;;
 CREATE VIEW v_state_arc AS
 SELECT 
 	arc_id
@@ -29,7 +29,7 @@ UNION SELECT
 	
 
 
-DROP VIEW IF EXISTS v_state_node;
+DROP VIEW IF EXISTS v_state_node CASCADE;;
 CREATE VIEW v_state_node AS
 SELECT 
 	node_id
@@ -52,7 +52,7 @@ UNION SELECT
 	
 	
 
-DROP VIEW IF EXISTS v_state_connec;
+DROP VIEW IF EXISTS v_state_connec CASCADE;;
 CREATE VIEW v_state_connec AS
 SELECT 
 	connec_id
@@ -121,7 +121,7 @@ FROM node
    	JOIN v_state_node ON node.node_id=v_state_node.node_id;
 
    
-DROP VIEW IF EXISTS  v_arc_x_node1;
+DROP VIEW IF EXISTS  v_arc_x_node1 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node1 AS 
 SELECT 
 v_arc.arc_id,
@@ -132,7 +132,7 @@ FROM v_arc
 	JOIN v_node ON v_arc.node_1 = v_node.node_id;
 
 	
-DROP VIEW IF EXISTS  v_arc_x_node2;
+DROP VIEW IF EXISTS  v_arc_x_node2 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node2 AS 
 SELECT 
 v_arc.arc_id,
@@ -165,9 +165,8 @@ v_arc.custom_length,
 v_arc.length,
 v_arc.the_geom
    FROM v_arc
-     JOIN v_arc_x_node1 ON v_arc_x_node1.arc_id::text = v_arc.arc_id::text
-     JOIN v_arc_x_node2 ON v_arc_x_node2.arc_id::text = v_arc.arc_id::text;
-
+     LEFT JOIN v_arc_x_node1 ON v_arc_x_node1.arc_id::text = v_arc.arc_id::text
+     LEFT JOIN v_arc_x_node2 ON v_arc_x_node2.arc_id::text = v_arc.arc_id::text;
 
 
 

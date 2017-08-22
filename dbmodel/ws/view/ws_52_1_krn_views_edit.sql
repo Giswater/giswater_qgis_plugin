@@ -458,6 +458,7 @@ FROM selector_expl, connec
  	AND selector_expl.cur_user="current_user"());
 
 
+DROP VIEW IF EXISTS v_edit_vnode CASCADE;
 CREATE VIEW v_edit_vnode AS SELECT
 vnode.vnode_id,
 vnode.arc_id,

@@ -1,11 +1,11 @@
-/*
+﻿/*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
-
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+/*
+SET search_path = "test_ws11", public, pg_catalog;
 
 -- SPECIFIC SQL (WS)
 
@@ -155,17 +155,16 @@ v_price_x_catsoil.trenchlining,
 sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
-arc.the_geom,
-arc.expl_id
-FROM selector_expl, v_arc arc
+arc.the_geom
+FROM v_arc arc
 	JOIN v_arc_x_node ON ((((arc.arc_id) = (v_arc_x_node.arc_id))))
 	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id) = (v_price_x_catarc.id))))
 	LEFT JOIN v_price_x_catsoil ON ((((arc.soilcat_id) = (v_price_x_catsoil.id))))
 	LEFT JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id) = (arc.arc_id))))
 	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id) = (plan_arc_x_pavement.pavcat_id))))
-	WHERE ((arc.expl_id)=(selector_expl.expl_id)
-	AND selector_expl.cur_user="current_user"())
-	GROUP BY arc.arc_id, v_arc_x_node.depth1, v_arc_x_node.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, m2bottom_cost,m3protec_cost,v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, arc.expl_id;
+	GROUP BY arc.arc_id, v_arc_x_node.depth1, v_arc_x_node.depth2, mean_depth,arc.arccat_id, dint,z1,z2,area,width,bulk, cost_unit, arc_cost, 
+	m2bottom_cost,m3protec_cost,v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost,
+	m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom;
 	
 	
 
@@ -326,15 +325,12 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
 v_plan_ml_arc."state",
-v_plan_ml_arc.the_geom,
-arc.expl_id
-FROM selector_expl, v_plan_ml_arc
+v_plan_ml_arc.the_geom
+FROM v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
 	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)))
-	JOIN arc ON arc.arc_id=v_plan_ml_arc.arc_id
-	WHERE ((arc.expl_id)=(selector_expl.expl_id)
-	AND selector_expl.cur_user="current_user"());
-
+	JOIN arc ON arc.arc_id=v_plan_ml_arc.arc_id;
+	
 
 -- ----------------------------
 -- View structure for v_plan_node
@@ -352,13 +348,10 @@ v_price_x_catnode.cost_unit,
 v_price_x_catnode.cost,
 (CASE WHEN (v_price_x_catnode.cost_unit='u') THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
 node."state",
-node.the_geom,
-node.expl_id
-FROM selector_expl, v_node node
+node.the_geom
+FROM v_node node
 LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
-JOIN selector_state ON (((node."state") = (selector_state.state_id)))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"());
+JOIN selector_state ON (((node."state") = (selector_state.state_id)));
 
 
 
@@ -379,15 +372,12 @@ v_plan_arc.budget,
 plan_arc_x_psector.psector_id,
 arc."state",
 plan_arc_x_psector.atlas_id,
-arc.the_geom,
-arc.expl_id
-FROM selector_expl,arc 
+arc.the_geom
+FROM arc 
 JOIN cat_arc ON ((((arc.arccat_id) = (cat_arc.id))))
 JOIN plan_arc_x_psector ON ((((plan_arc_x_psector.arc_id) = (arc.arc_id))))
-JOIN v_plan_arc ON ((((arc.arc_id) = (v_plan_arc.arc_id))))
-WHERE ((arc.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"())
-ORDER BY arccat_id;
+JOIN v_plan_arc ON ((((arc.arc_id) = (v_plan_arc.arc_id))));
+
 
 
 
@@ -406,14 +396,11 @@ plan_node_x_psector.descript,
 plan_node_x_psector.psector_id,
 node."state",
 node.the_geom,
-plan_node_x_psector.atlas_id,
-node.expl_id
-FROM selector_expl,node 
+plan_node_x_psector.atlas_id
+FROM node 
 JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
-JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id) = (node.node_id))))
-WHERE ((node.expl_id)=(selector_expl.expl_id)
-AND selector_expl.cur_user="current_user"())
-ORDER BY nodecat_id;
+JOIN plan_node_x_psector ON ((((plan_node_x_psector.node_id) = (node.node_id))));
+
 
 
 
@@ -644,4 +631,4 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
 				   				   
 				GROUP BY wtotal.psector_id, wtotal.the_geom;
 				
-				
+	*/			

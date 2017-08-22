@@ -11,14 +11,11 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Records of config system table
 -- ----------------------------
 
-INSERT INTO config VALUES (1, 0.1, 0.5, 0.5, 0.1, 0.5,false,null,false,null,false);
-
 -- ----------------------------
 -- Records of node type system table
 -- ----------------------------
 INSERT INTO node_type VALUES ('CURVA','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('REDUCCION','REDUCTION','JUNCTION', 'man_reduction', 'inp_junction', 'om_visit_x_node');
-INSERT INTO node_type VALUES ('LUVE','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('ADAPTACION','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('UNION','JUNCTION','JUNCTION', 'man_junction',  'inp_junction', 'om_visit_x_node');
 INSERT INTO node_type VALUES ('LINEA_DE_FONDO','JUNCTION','JUNCTION', 'man_junction', 'inp_junction', 'om_visit_x_node');

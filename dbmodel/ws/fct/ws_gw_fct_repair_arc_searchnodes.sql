@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path="SCHEMA_NAME",public;
 
+/*
 DROP FUNCTION IF EXISTS gw_fct_topo_arc_searchnodes();
 CREATE OR REPLACE FUNCTION gw_fct_topo_arc_searchnodes() RETURNS void AS
 $BODY$
@@ -68,3 +69,5 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+  
+    */
