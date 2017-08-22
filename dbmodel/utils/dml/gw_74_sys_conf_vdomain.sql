@@ -1,25 +1,22 @@
-﻿/*
+/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
 
-
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
--- ----------------------------
--- Records of config system table
--- ----------------------------
-/*
-INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proximity, nodeinsert_arcendpoint, orphannode_delete, vnode_update_tolerance, nodetype_change_enabled, 
-	samenode_init_end_control, node_proximity_control, connec_proximity_control, node_duplicated_tolerance, connec_duplicated_tolerance, audit_function_control, arc_searchnodes_control, insert_double_geometry, buffer_value)
-  VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, false, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
-*/
+
+INSERT INTO config (id, node_proximity, arc_searchnodes, node2arc, connec_proximity, nodeinsert_arcendpoint, 
+		orphannode_delete, vnode_update_tolerance, nodetype_change_enabled, 		
+		samenode_init_end_control, node_proximity_control, connec_proximity_control, 
+		node_duplicated_tolerance, connec_duplicated_tolerance, audit_function_control, arc_searchnodes_control, insert_double_geometry, buffer_value)
+		VALUES ('1', 0.10000000000000001, 0.5, 0.5, 0.10000000000000001, false, false, 0.5, false, true, true, true, 0.001, 0.001, true, true, true, 1);
 
 
-INSERT INTO config_client_forms VALUES (3868, 'v_ui_element_x_gully', true, 100, 5, NULL);
+		INSERT INTO config_client_forms VALUES (3867, 'v_ui_element_x_gully', true, 100, 5, NULL);
 INSERT INTO config_client_forms VALUES (3870, 'v_ui_element_x_gully', NULL, NULL, 6, NULL);
 INSERT INTO config_client_forms VALUES (3872, 'v_ui_element_x_gully', NULL, NULL, 7, NULL);
 INSERT INTO config_client_forms VALUES (3874, 'v_ui_element_x_gully', true, 100, 8, NULL);
