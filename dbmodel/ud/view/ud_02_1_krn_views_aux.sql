@@ -7,7 +7,7 @@
 -- STATE VIEWS & JOINED WITH MASTERPLAN (ALTERNATIVES)
 -------------------------------------------------------
 
-DROP VIEW IF EXISTS v_state_arc;
+DROP VIEW IF EXISTS v_state_arc CASCADE;
 CREATE VIEW v_state_arc AS
 SELECT 
 	arc_id
@@ -29,7 +29,7 @@ UNION SELECT
 	
 
 
-DROP VIEW IF EXISTS v_state_node;
+DROP VIEW IF EXISTS v_state_node CASCADE;
 CREATE VIEW v_state_node AS
 SELECT 
 	node_id
@@ -50,9 +50,8 @@ UNION SELECT
 	AND selector_psector.cur_user=current_user AND state=1;
 
 
-
 	
-DROP VIEW IF EXISTS v_state_connec;
+DROP VIEW IF EXISTS v_state_connec CASCADE;
 CREATE VIEW v_state_connec AS
 SELECT 
 	connec_id
@@ -62,7 +61,7 @@ SELECT
 
 	
 
-DROP VIEW IF EXISTS v_state_gully;
+DROP VIEW IF EXISTS v_state_gully CASCADE;
 CREATE VIEW v_state_gully AS
 SELECT 
 	gully_id
@@ -70,14 +69,7 @@ SELECT
 	WHERE gully.state=selector_state.state_id
 	AND selector_state.cur_user=current_user;
 
-	
-	
-	
-	
-	
-	
-	
-	
+		
 	
 -- ----------------------------
 -- View structure for v_arc_x_node
@@ -169,8 +161,7 @@ SELECT arc.arc_id,
      JOIN v_node node ON arc.node_1 = node.node_id
      JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
 
-	 
-	 
+	 	 
 	 
 DROP VIEW IF EXISTS v_arc_x_node2 CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node2 AS 
@@ -192,7 +183,6 @@ SELECT arc.arc_id,
      JOIN cat_arc ON arc.arccat_id = cat_arc.id AND arc.arccat_id = cat_arc.id;
 
 	 
-	
 
 DROP VIEW IF EXISTS v_arc_x_node CASCADE;
 CREATE OR REPLACE VIEW v_arc_x_node AS 
@@ -234,5 +224,4 @@ CREATE OR REPLACE VIEW v_arc_x_node AS
    FROM v_arc
      LEFT JOIN v_arc_x_node1 ON v_arc_x_node1.arc_id::text = v_arc.arc_id::text
      LEFT JOIN v_arc_x_node2 ON v_arc_x_node2.arc_id::text = v_arc.arc_id::text;
-
 
