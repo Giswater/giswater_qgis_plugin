@@ -75,7 +75,7 @@
     <string>&lt;&lt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="txt_label">
+  <widget class="QLineEdit" name="txt_name">
    <property name="geometry">
     <rect>
      <x>25</x>

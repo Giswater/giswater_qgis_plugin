@@ -7,7 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QSettings
-from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit, QTimeEdit, QLineEdit
+from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit
+from PyQt4.QtGui import QPushButton, QTableView, QLineEdit, QTimeEdit
 from PyQt4.QtSql import QSqlQueryModel
 from datetime import date, datetime, timedelta, time
 from dateutil.relativedelta import relativedelta
@@ -21,7 +22,7 @@ import utils_giswater
 
 
 from ..ui.file_manager import FileManager   #@UnresolvedImport
-from ..ui.multiexpl_selector import Multiexpl_selector       #@UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector       #@UnresolvedImport
 from ..ui.ws_options import WSoptions       #@UnresolvedImport
 from ..ui.ws_times import WStimes       #@UnresolvedImport
 from ..ui.ud_options import UDoptions       #@UnresolvedImport
@@ -130,6 +131,34 @@ class Go2Epa(ParentAction):
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg_go2epa, 'file_manager')
         self.dlg_go2epa.exec_()
+
+    def sector_selection(self):
+        self.dlg_sector_selection = Multirow_selector()
+        utils_giswater.setDialog(self.dlg_sector_selection)
+        self.tbl_all_psector=self.dlg_sector_selection.findChild(QTableView, "all_row")
+        self.tbl_selected_psector = self.dlg_sector_selection.findChild(QTableView, "selected_row")
+
+        self.btn_select=self.dlg_sector_selection.findChild(QPushButton, "btn_select")
+        self.btn_unselect = self.dlg_sector_selection.findChild(QPushButton, "btn_unselect")
+        self.txt_short_descript = self.dlg_sector_selection.findChild(QLineEdit, 'txt_short_descript')
+
+        sql = "SELECT * FROM " + self.schema_name + ".sector WHERE descript LIKE '%"
+        self.txt_short_descript.textChanged.connect(partial(self.filter_all_explot, sql, self.txt_short_descript))
+
+        #self.btn_select.pressed.connect(self.selection)
+        #self.btn_unselect.pressed.connect(self.unselection)
+
+        self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
+        self.dlg_multiexp.exec_()
+
+    def filter_all_explot(self, sql, widget):
+
+        sql += widget.text()+"%'"
+        self.controller.show_warning(str(sql))
+        model = QSqlQueryModel()
+        model.setQuery(sql)
+        self.tbl_all_psector.setModel(model)
+        self.tbl_all_psector.show()
 
 
     def ws_options(self):
@@ -322,10 +351,23 @@ class Go2Epa(ParentAction):
         self.dlg_udtimes.exec_()
 
     def ud_hydrology_selector(self):
-        self.dlg_hydrology_selector =HydrologySelector()
+        self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
-
+        self.dlg_hydrology_selector.txt_name.textChanged.connect(partial(self.filter_cbx_by_text, "cat_hydrology", self.dlg_hydrology_selector.txt_name, self.dlg_hydrology_selector.hydrology))
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".cat_hydrology ORDER BY name"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("hydrology", rows, False)
         self.dlg_hydrology_selector.exec_()
+
+    def filter_cbx_by_text(self,tablename, widgettxt, widgetcbx):
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name + "." +str(tablename)
+        sql += " WHERE name LIKE '%" + str(widgettxt.text()) + "%' "
+        sql += "ORDER BY name "
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox(widgetcbx, rows, False)
+
+
+
     def insert_or_update(self, update, tablename, dialog):
         sql = "SELECT *"
         sql += " FROM " + self.schema_name + "." + tablename
