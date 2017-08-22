@@ -218,7 +218,7 @@ arc.publish,
 arc.inventory,
 dma.macrodma_id,
 arc.expl_id,
-arc.num_value
+arc.num_value AS pipe_num_value
 FROM selector_expl,arc
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
@@ -277,7 +277,7 @@ arc.publish,
 arc.inventory,
 dma.macrodma_id,
 arc.expl_id,
-arc.num_value
+arc.num_value AS varc_num_value
 FROM selector_expl,arc 
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
@@ -336,7 +336,7 @@ node.publish,
 node.inventory,
 dma.macrodma_id,
 node.expl_id,
-node.num_value,
+node.num_value AS hydrant_num_value,
 node.hemisphere AS hydrant_hemisphere,
 man_hydrant.fire_code AS hydrant_fire_code,
 man_hydrant.communication AS hydrant_communication,
@@ -402,7 +402,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as junction_hemisphere,
-node.num_value
+node.num_value as junction_num_value
 FROM selector_expl, node
 	JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -462,7 +462,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as manhole_hemisphere,
-node.num_value,
+node.num_value as manhole_num_value,
 man_manhole.name as manhole_name
 FROM selector_expl, node
 	JOIN v_node ON node.node_id=v_node.node_id
@@ -524,7 +524,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as meter_hemisphere,
-node.num_value
+node.num_value as meter_num_value
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
@@ -583,7 +583,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as pump_hemisphere,
-node.num_value,
+node.num_value as pump_num_value,
 man_pump.max_flow AS pump_max_flow,
 man_pump.min_flow AS pump_min_flow,
 man_pump.nom_flow AS pump_nom_flow,
@@ -650,7 +650,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as reduction_hemisphere,
-node.num_value,
+node.num_value as reduction_num_value,
 man_reduction.diam1 AS reduction_diam1,
 man_reduction.diam2 AS reduction_diam2
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
@@ -711,7 +711,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere AS source_hemisphere,
-node.num_value,
+node.num_value as source_num_value,
 man_source.name AS source_name
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -771,7 +771,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as valve_hemisphere,
-node.num_value,
+node.num_value as valve_num_value,
 man_valve.closed AS valve_closed,
 man_valve.broken AS valve_broken,
 man_valve.buried AS valve_buried,
@@ -846,8 +846,8 @@ node.publish,
 node.inventory,
 dma.macrodma_id,
 node.expl_id,
-node.hemisphere  waterwell_hemisphere,
-node.num_value,
+node.hemisphere as waterwell_hemisphere,
+node.num_value as waterwell_num_value,
 man_waterwell.name AS waterwell_name
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -906,7 +906,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as tank_hemisphere,
-node.num_value,
+node.num_value as tank_num_value,
 man_tank.pol_id AS tank_pol_id,
 man_tank.vmax AS tank_vmax,
 man_tank.vutil AS tank_vutil,
@@ -970,7 +970,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as tank_hemisphere,
-node.num_value,
+node.num_value as tank_num_value,
 man_tank.pol_id AS tank_pol_id,
 man_tank.vmax AS tank_vmax,
 man_tank.vutil AS tank_vutil,
@@ -1035,7 +1035,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as filter_hemisphere,
-node.num_value
+node.num_value as filter_num_value
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
@@ -1093,7 +1093,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as register_hemisphere,
-node.num_value,
+node.num_value as register_num_value,
 man_register.pol_id AS register_pol_id
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -1153,7 +1153,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as register_hemisphere,
-node.num_value,
+node.num_value as register_num_value,
 man_register.pol_id AS register_pol_id
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -1213,7 +1213,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as netwjoin_hemisphere,
-node.num_value,
+node.num_value as netwjoin_num_value,
 man_netwjoin.demand as netwjoin_demand,
 man_netwjoin.streetaxis_id as netwjoin_streetaxis_id,
 ext_streetaxis.name as netwjoin_streetname,
@@ -1224,7 +1224,7 @@ FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
 	JOIN man_netwjoin ON node.node_id = man_netwjoin.node_id
-	JOIN ext_streetaxis ON man_netwjoin.streetaxis_id=ext_streetaxis.id
+	LEFT JOIN ext_streetaxis ON man_netwjoin.streetaxis_id=ext_streetaxis.id
 	WHERE ((node.expl_id)=(selector_expl.expl_id)
 	AND selector_expl.cur_user="current_user"());
 	
@@ -1278,7 +1278,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as flexunion_hemisphere,
-node.num_value
+node.num_value as flexunion_num_value
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
@@ -1335,7 +1335,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as wtp_hemisphere,
-node.num_value,
+node.num_value as wtp_num_value,
 man_wtp.name AS wtp_name
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -1393,7 +1393,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as exptank_hemisphere,
-node.num_value
+node.num_value as exptank_num_value
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))
@@ -1451,7 +1451,7 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as netsample_hemisphere,
-node.num_value,
+node.num_value as netsample_num_value,
 man_netsamplepoint.lab_code AS netsample_lab_code
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
@@ -1510,8 +1510,8 @@ node.inventory,
 dma.macrodma_id,
 node.expl_id,
 node.hemisphere as netelement_hemisphere,
-node.num_value,
-man_netelement.serial_number
+node.num_value as netelement_num_value,
+man_netelement.serial_number as netelement_serial_number
 FROM selector_expl, node JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN dma ON (((node.dma_id) = (dma.dma_id)))

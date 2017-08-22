@@ -778,7 +778,8 @@ CREATE TABLE "inp_mapunits" (
 
 
 CREATE TABLE "inp_options" (
-"flow_units" varchar(20)   NOT NULL,
+"id" integer NOT NULL,
+"flow_units" varchar(20) ,
 "flow_routing" varchar(12)  ,
 "link_offsets" varchar(12)  ,
 "force_main_equation" varchar(3)  ,
@@ -1904,7 +1905,7 @@ ALTER TABLE "inp_landuses" ADD PRIMARY KEY ("landus_id");
 ALTER TABLE "inp_lid_control" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_lidusage_subc_x_lidco" ADD PRIMARY KEY ("subc_id", "lidco_id");
 ALTER TABLE "inp_loadings_pol_x_subc" ADD PRIMARY KEY ("poll_id", "subc_id");
-ALTER TABLE "inp_options" ADD PRIMARY KEY ("flow_units");
+ALTER TABLE "inp_options" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_orifice" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_outfall" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_outlet" ADD PRIMARY KEY ("arc_id");

@@ -257,7 +257,8 @@ CREATE TABLE "inp_mixing" (
 
 
 CREATE TABLE "inp_options" (
-"units" varchar(20)   NOT NULL,
+"id" integer NOT NULL,
+"units" varchar(20),
 "headloss" varchar(20)  ,
 "hydraulics" varchar(12)  ,
 "specific_gravity" numeric(12,6),
@@ -449,7 +450,8 @@ CREATE TABLE "inp_tank" (
 
 
 CREATE TABLE "inp_times" (
-"duration" integer NOT NULL,
+"id" integer NOT NULL,
+"duration" integer,
 "hydraulic_timestep" varchar(10)  ,
 "quality_timestep" varchar(10)  ,
 "rule_timestep" varchar(10)  ,
@@ -772,7 +774,7 @@ ALTER TABLE "inp_emitter" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_junction" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_label" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_mixing" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "inp_options" ADD PRIMARY KEY ("units");
+ALTER TABLE "inp_options" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_pattern" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_pipe" ADD PRIMARY KEY ("arc_id");
 ALTER TABLE "inp_project_id" ADD PRIMARY KEY ("title");
@@ -782,7 +784,7 @@ ALTER TABLE "inp_reservoir" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_source" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_tags" ADD PRIMARY KEY ("node_id");
 ALTER TABLE "inp_tank" ADD PRIMARY KEY ("node_id");
-ALTER TABLE "inp_times" ADD PRIMARY KEY ("duration");
+ALTER TABLE "inp_times" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_typevalue_energy" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_typevalue_pump" ADD PRIMARY KEY ("id");
 ALTER TABLE "inp_typevalue_reactions_gl" ADD PRIMARY KEY ("id");

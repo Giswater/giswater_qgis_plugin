@@ -71,7 +71,8 @@ connec.label_rotation,
 connec.publish,
 connec.inventory,
 dma.macrodma_id,
-connec.expl_id
+connec.expl_id,
+connec.num_value
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
@@ -137,6 +138,7 @@ connec.publish,
 connec.inventory,
 dma.macrodma_id,
 connec.expl_id,
+connec.num_value as wjoin_num_value,
 man_wjoin.top_floor AS wjoin_top_floor,
 man_wjoin.cat_valve AS wjoin_cat_valve
 FROM selector_expl, connec
@@ -206,6 +208,7 @@ connec.publish,
 connec.inventory,
 dma.macrodma_id,
 connec.expl_id,
+connec.num_value as tap_num_value,
 man_tap.linked_connec AS tap_linked_connec,
 man_tap.cat_valve AS tap_cat_valve,
 man_tap.drain_diam AS tap_drain_diam,
@@ -281,6 +284,7 @@ connec.publish,
 connec.inventory,
 dma.macrodma_id,
 connec.expl_id,
+connec.num_value as fountain_num_value,
 man_fountain.pol_id,
 man_fountain.linked_connec AS fountain_linked_connec,
 man_fountain.vmax AS fountain_vmax,
@@ -360,6 +364,7 @@ connec.publish,
 connec.inventory,
 dma.macrodma_id,
 connec.expl_id,
+connec.num_value as fountain_num_value,
 polygon.the_geom,
 man_fountain.pol_id,
 man_fountain.linked_connec AS fountain_linked_connec,
@@ -439,6 +444,7 @@ connec.publish,
 connec.inventory,
 dma.macrodma_id,
 connec.expl_id,
+connec.num_value as greentap_num_value,
 man_greentap.linked_connec AS greentap_linked_connec
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id

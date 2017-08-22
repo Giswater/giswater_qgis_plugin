@@ -42,37 +42,30 @@ BEGIN
 	
     -- Node ID	
 		IF (NEW.node_id IS NULL) THEN
-			PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+			--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 	
-	-- Node type
-		IF (NEW.node_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM node_type WHERE node_type.man_table=man_table_2) = 0) THEN
-                RETURN audit_function(105,430);  
-            END IF;
-            NEW.node_type:= (SELECT id FROM node_type WHERE node_type.man_table=man_table_2 LIMIT 1);
-        END IF;
-
-		
-	-- Epa type
-		IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type LIMIT 1)::text;   
-		END IF;
-
-
 	-- Node Catalog ID
 
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RETURN audit_function(110,430);  
+               RETURN audit_function(110,430);  
 			END IF;
-			NEW.nodecat_id:= (SELECT "value" FROM config_param_user JOIN cat_node ON config_vdefault.value=cat_node.id WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() AND cat_node.nodetype_id=NEW.node_type);
-				IF (NEW.nodecat_id IS NULL) THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
+			/*IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
+				RAISE EXCEPTION 'Your catalog is different than node type';
+			END IF;*/
+			IF (NEW.nodecat_id IS NULL) THEN
 					NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
-				END IF;
+			END IF;
 		END IF;
-
+		
+	-- Epa type
+		IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
+		END IF;
+		
      -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
@@ -121,9 +114,9 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-        
-		SELECT code_autofill INTO code_autofill_bool FROM node_type WHERE id=NEW.node_type;
-		
+
+		SELECT code_autofill INTO code_autofill_bool FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id ;   
+
 -- FEATURE INSERT      
 	IF man_table='man_tank' THEN
 			
@@ -148,9 +141,9 @@ BEGIN
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 		buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02, address_03, descript, rotation, link, verified,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.tank_code, NEW.tank_elevation, NEW.tank_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, NEW.presszonecat_id,
-		NEW.tank_soilcat_id, NEW.tankl_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
+		NEW.tank_soilcat_id, NEW.tank_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
 		NEW.tank_address_02, NEW.tank_address_03, NEW.tank_descript, NEW.tank_rotation, NEW.tank_link, NEW.verified, NEW.undelete,NEW.tank_label_x,NEW.tank_label_y,NEW.tank_label_rotation, 
-		expl_id_int, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.tank_hemisphere,NEW.num_value);
+		expl_id_int, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.tank_hemisphere,NEW.tank_num_value);
 		
 		IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.tank_pol_id IS NULL) THEN
@@ -186,9 +179,9 @@ BEGIN
 		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 		buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02, address_03, descript, rotation, link, verified,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.tank_code, NEW.tank_elevation, NEW.tank_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, NEW.presszonecat_id,
-		NEW.tank_soilcat_id, NEW.tankl_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
+		NEW.tank_soilcat_id, NEW.tank_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
 		NEW.tank_address_02, NEW.tank_address_03, NEW.tank_descript, NEW.tank_rotation, NEW.tank_link, NEW.verified, NEW.undelete,NEW.tank_label_x,NEW.tank_label_y,NEW.tank_label_rotation, 
-		expl_id_int, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.tank_hemisphere,NEW.num_value);
+		expl_id_int, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.tank_hemisphere,NEW.tank_num_value);
 
 		IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.tank_pol_id IS NULL) THEN
@@ -221,7 +214,7 @@ BEGIN
 			END IF;
 			
 		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
-		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete,label_x,label_y,label_rotation,  code, expl_id, publish, inventory, hemisphere, num_value) 
+		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.hydrant_code, NEW.hydrant_elevation, NEW.hydrant_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.hydrant_annotation, NEW.hydrant_observ, NEW.hydrant_comment, 
 		NEW.dma_id, NEW.presszonecat_id, NEW.hydrant_soilcat_id, NEW.hydrant_function_type, NEW.hydrant_category_type, NEW.hydrant_fluid_type, NEW.hydrant_location_type, NEW.hydrant_workcat_id, NEW.hydrant_workcat_id_end, 
 		NEW.hydrant_buildercat_id, NEW.hydrant_builtdate,NEW.hydrant_enddate, NEW.hydrant_ownercat_id, NEW.hydrant_address_01, NEW.hydrant_address_02, NEW.hydrant_address_03, NEW.hydrant_descript, NEW.hydrant_rotation, NEW.hydrant_link, 
@@ -278,13 +271,13 @@ BEGIN
 			END IF;
 			
 		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
-		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, num_value) 
+		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, hemisphere,num_value) 
 		VALUES (NEW.node_id, NEW.pump_code, NEW.pump_elevation, NEW.pump_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,NEW."state", NEW.pump_annotation, NEW.pump_observ, NEW.pump_comment, NEW.dma_id, NEW.presszonecat_id, NEW.pump_soilcat_id, NEW.pump_function_type,
 		NEW.pump_category_type, NEW.pump_fluid_type, NEW.pump_location_type, NEW.pump_workcat_id, NEW.pump_workcat_id_end, NEW.pump_buildercat_id, NEW.pump_builtdate, NEW.pump_enddate, NEW.pump_ownercat_id, NEW.pump_address_01,
 		NEW.pump_address_02, NEW.pump_address_03, NEW.pump_descript, NEW.pump_rotation, NEW.pump_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.pump_label_x,NEW.pump_label_y,NEW.pump_label_rotation, expl_id_int, NEW.publish, 
 		NEW.inventory, NEW.pump_hemisphere, NEW.pump_num_value);
 		
-		INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height,name) VALUES(NEW.node_id, NEW.pump_max_flow, NEW,pump_min_flow, NEW.pump_nom_flow, NEW.pump_power, NEW.pump_pressure, NEW.pump_elev_height, NEW.pump_name);
+		INSERT INTO man_pump (node_id, max_flow, min_flow, nom_flow, power, pressure, elev_height,name) VALUES(NEW.node_id, NEW.pump_max_flow, NEW.pump_min_flow, NEW.pump_nom_flow, NEW.pump_power, NEW.pump_pressure, NEW.pump_elev_height, NEW.pump_name);
 		
 	ELSIF man_table='man_reduction' THEN
 				
@@ -396,8 +389,8 @@ BEGIN
 				NEW.meter_code=NEW.node_id;
 			END IF;
 			
-		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, 
-		buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, enddate, hemisphere, num_value) 
+		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, 
+		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.meter_code, NEW.meter_elevation, NEW.meter_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.meter_annotation, NEW.meter_observ, NEW.meter_comment, NEW.dma_id, NEW.presszonecat_id,
 		NEW.meter_soilcat_id, NEW.meter_function_type, NEW.meter_category_type, NEW.meter_fluid_type, NEW.meter_location_type, NEW.meter_workcat_id, NEW.meter_workcat_id_end, NEW.meter_buildercat_id, NEW.meter_builtdate, NEW.meter_enddate, 
 		NEW.meter_ownercat_id, NEW.meter_address_01, NEW.meter_address_02, NEW.meter_address_03, NEW.meter_descript, NEW.meter_rotation, NEW.meter_link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.meter_label_x,NEW.meter_label_y,
@@ -483,8 +476,8 @@ BEGIN
 				NEW.filter_code=NEW.node_id;
 			END IF;
 			
-		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, 
-		buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, enddate, hemisphere, num_value)
+		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, 
+		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, hemisphere, num_value)
 		VALUES (NEW.node_id, NEW.filter_code, NEW.filter_elevation, NEW.filter_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.filter_annotation, NEW.filter_observ, 
 		NEW.filter_comment, NEW.dma_id, NEW.presszonecat_id, NEW.filter_soilcat_id, NEW.filter_function_type, NEW.filter_category_type, NEW.filter_fluid_type, NEW.filter_location_type, NEW.filter_workcat_id, NEW.filter_workcat_id_end, NEW.filter_buildercat_id, 
 		NEW.filter_builtdate, NEW.filter_enddate, NEW.filter_ownercat_id, NEW.filter_address_01, NEW.filter_address_02, NEW.filter_address_03, NEW.filter_descript, NEW.filter_rotation, NEW.filter_link, NEW.verified, 
@@ -594,8 +587,8 @@ BEGIN
 		NEW.netwjoin_buildercat_id, NEW.netwjoin_builtdate, NEW.netwjoin_enddate, NEW.netwjoin_ownercat_id, NEW.netwjoin_address_01, NEW.netwjoin_address_02, NEW.netwjoin_address_03, NEW.netwjoin_descript, NEW.netwjoin_rotation, NEW.netwjoin_link, NEW.verified, 
 		NEW.the_geom, NEW.undelete,NEW.netwjoin_label_x,NEW.netwjoin_label_y,NEW.netwjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.netwjoin_hemisphere, NEW.netwjoin_num_value);
 		
-		INSERT INTO man_netwjoin (node_id, demand, streetaxis_id, postnumber, top_floor, lead_verified, cat_valve) 
-		VALUES(NEW.node_id, NEW.netwjoin_demand, NEW.netwjoin_streetaxis_id, NEW.netwjoin_postnumber, NEW.netwjoin_top_floor, NEW.netwjoin_lead_verified, NEW.netwjoin_cat_valve);
+		INSERT INTO man_netwjoin (node_id, demand, streetaxis_id, postnumber, top_floor,  cat_valve) 
+		VALUES(NEW.node_id, NEW.netwjoin_demand, NEW.netwjoin_streetaxis_id, NEW.netwjoin_postnumber, NEW.netwjoin_top_floor, NEW.netwjoin_cat_valve);
 		
 	ELSIF man_table='man_expansiontank' THEN
 
@@ -617,8 +610,8 @@ BEGIN
 				NEW.exptank_code=NEW.node_id;
 			END IF;
 			
-		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, 
-		buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,workcat_id_end, undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, enddate, hemisphere, num_value) 
+		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
+		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete,label_x,label_y,label_rotation,  expl_id, publish, inventory, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.exptank_code, NEW.exptank_elevation, NEW.exptank_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.exptank_annotation, NEW.exptank_observ,
 		NEW.exptank_comment, NEW.dma_id, NEW.presszonecat_id, NEW.exptank_soilcat_id, NEW.exptank_function_type, NEW.exptank_category_type, NEW.exptank_fluid_type, NEW.exptank_location_type, NEW.exptank_workcat_id, NEW.exptank_workcat_id_end, 
 		NEW.exptank_buildercat_id, NEW.exptank_builtdate, NEW.exptank_enddate,  NEW.exptank_ownercat_id, NEW.exptank_address_01, NEW.exptank_address_02, NEW.exptank_address_03, NEW.exptank_descript, NEW.exptank_rotation, NEW.exptank_link, NEW.verified, 
@@ -647,7 +640,7 @@ BEGIN
 			END IF;
 			
 		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
-		buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, enddate, hemisphere, num_value) 
+		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.flexunion_code, NEW.flexunion_elevation, NEW.flexunion_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.flexunion_annotation, NEW.flexunion_observ,
 		NEW.flexunion_comment, NEW.dma_id, NEW.presszonecat_id, NEW.flexunion_soilcat_id, NEW.flexunion_function_type, NEW.flexunion_category_type, NEW.flexunion_fluid_type, NEW.flexunion_location_type, NEW.flexunion_workcat_id, NEW.flexunion_workcat_id_end, 
 		NEW.flexunion_buildercat_id, NEW.flexunion_builtdate, NEW.flexunion_enddate,  NEW.flexunion_ownercat_id, NEW.flexunion_address_01, NEW.flexunion_address_02, NEW.flexunion_address_03, NEW.flexunion_descript, NEW.flexunion_rotation, NEW.flexunion_link, 
@@ -735,7 +728,7 @@ BEGIN
 			END IF;
 			
 		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
-		buildercat_id, builtdate,ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, enddate, hemisphere, num_value) 
+		buildercat_id, builtdate,enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.wtp_code, NEW.wtp_elevation, NEW.wtp_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.wtp_annotation, NEW.wtp_observ,
 		NEW.wtp_comment, NEW.dma_id, NEW.presszonecat_id, NEW.wtp_soilcat_id, NEW.wtp_function_type, NEW.wtp_category_type, NEW.wtp_fluid_type, NEW.wtp_location_type, NEW.wtp_workcat_id, NEW.wtp_workcat_id_end, 
 		NEW.wtp_buildercat_id, NEW.wtp_builtdate, NEW.wtp_enddate,  NEW.wtp_ownercat_id, NEW.wtp_address_01, NEW.wtp_address_02, NEW.wtp_address_03, NEW.wtp_descript, NEW.wtp_rotation, NEW.wtp_link, 
@@ -824,7 +817,7 @@ BEGIN
         END IF;
 
 	-- Node catalog restriction
-        IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) AND (NEW.node_type=OLD.node_type) THEN  
+      /*  IF (OLD.nodecat_id IS NOT NULL) AND (NEW.nodecat_id <> OLD.nodecat_id) AND (NEW.node_type=OLD.node_type) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=OLD.nodecat_id);
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id) = (cat_node.nodetype_id))) WHERE cat_node.id=NEW.nodecat_id);
             IF (quote_literal(old_nodetype) <> quote_literal(new_nodetype)) THEN
@@ -844,7 +837,7 @@ BEGIN
 				EXECUTE v_sql2;
 			END IF;
 		END IF;
-
+*/
 
 -- MANAGEMENT UPDATE
     IF man_table ='man_junction' THEN
@@ -906,7 +899,7 @@ BEGIN
 	ELSIF man_table ='man_pump' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.pump_code, elevation=NEW.pump_elevation, "depth"=NEW."pump_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state",
-		annotation=NEW.pump_annotation, "observ"=NEW."pump_observ", "comment"=NEW."pump_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pump_soilcat_id, function_type=NEW.function_type, 
+		annotation=NEW.pump_annotation, "observ"=NEW."pump_observ", "comment"=NEW."pump_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pump_soilcat_id, function_type=NEW.pump_function_type, 
 		category_type=NEW.pump_category_type, fluid_type=NEW.pump_fluid_type, location_type=NEW.pump_location_type, workcat_id=NEW.pump_workcat_id, workcat_id_end=NEW.pump_workcat_id_end, buildercat_id=NEW.pump_buildercat_id, 
 		builtdate=NEW.pump_builtdate,  enddate=NEW.pump_enddate, ownercat_id=NEW.pump_ownercat_id, address_01=NEW.pump_address_01, address_02=NEW.pump_address_02, address_03=NEW.pump_address_03, 
 		descript=NEW.pump_descript,rotation=NEW.pump_rotation, link=NEW.pump_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.pump_label_x, label_y=NEW.pump_label_y,
@@ -942,7 +935,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 		
 		UPDATE man_hydrant 
-		SET node_id=NEW.node_id, fire_code=hydrant_fire_code, communication=NEW.hydrant_communication, valve=NEW.hydrant_valve, valve_diam=NEW.hydrant_valve_diam
+		SET node_id=NEW.node_id, fire_code=NEW.hydrant_fire_code, communication=NEW.hydrant_communication, valve=NEW.hydrant_valve, valve_diam=NEW.hydrant_valve_diam
 		WHERE node_id=OLD.node_id;			
 
 	ELSIF man_table ='man_source' THEN
@@ -981,7 +974,7 @@ BEGIN
 		workcat_id_end=NEW.waterwell_workcat_id_end, buildercat_id=NEW.waterwell_buildercat_id, builtdate=NEW.waterwell_builtdate, enddate=NEW.waterwell_enddate, ownercat_id=NEW.waterwell_ownercat_id, 
 		address_01=NEW.waterwell_address_01, address_02=NEW.waterwell_address_02, address_03=NEW.waterwell_address_03, descript=NEW.waterwell_descript,rotation=NEW.waterwell_rotation, link=NEW.waterwell_link, 
 		verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.waterwell_label_x, label_y=NEW.waterwell_label_y, label_rotation=NEW.waterwell_label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
-		expl_id=NEW.expl_id, hemisphere=NEW.waterwell_hemisphere, num_value=waterwell_num_value
+		expl_id=NEW.expl_id, hemisphere=NEW.waterwell_hemisphere, num_value=NEW.waterwell_num_value
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_waterwell 
@@ -1068,12 +1061,12 @@ BEGIN
 		"state"=NEW."state", annotation=NEW.netwjoin_annotation, "observ"=NEW."netwjoin_observ", "comment"=NEW."netwjoin_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netwjoin_soilcat_id, 
 		function_type=NEW.netwjoin_function_type, category_type=NEW.netwjoin_category_type, fluid_type=NEW.netwjoin_fluid_type, location_type=NEW.netwjoin_location_type, workcat_id=NEW.netwjoin_workcat_id, 
 		workcat_id_end=NEW.netwjoin_workcat_id_end, buildercat_id=NEW.netwjoin_buildercat_id, builtdate=NEW.netwjoin_builtdate, enddate=NEW.netwjoin_enddate, ownercat_id=NEW.netwjoin_ownercat_id, address_01=NEW.netwjoin_address_01, 
-		address_02=NEW.netwjoin_address_02, address_03=NEW.netwjoin_address_03, descript=NEW.netwjoin_descript,rotation=NEW.netwjoin_rotation, link=NEW.netwjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, ndelete=NEW.undelete, 
+		address_02=NEW.netwjoin_address_02, address_03=NEW.netwjoin_address_03, descript=NEW.netwjoin_descript,rotation=NEW.netwjoin_rotation, link=NEW.netwjoin_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, 
 		label_x=NEW.netwjoin_label_x, label_y=NEW.netwjoin_label_y, label_rotation=NEW.netwjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.netwjoin_hemisphere, num_value=NEW.netwjoin_num_value
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netwjoin
-		SET node_id=NEW.node_id, demand=NEW.netwjoin_demand, streetaxis_id=NEW.netwjoin_streetaxis_id, postnumber=NEW.netwjoin_postnumber,top_floor= NEW.netwjoin_top_floor, lead_verified=NEW.netwjoin_lead_verified, cat_valve=NEW.netwjoin_cat_valve
+		SET node_id=NEW.node_id, demand=NEW.netwjoin_demand, streetaxis_id=NEW.netwjoin_streetaxis_id, postnumber=NEW.netwjoin_postnumber,top_floor= NEW.netwjoin_top_floor, cat_valve=NEW.netwjoin_cat_valve
 		WHERE node_id=OLD.node_id;		
 		
 	ELSIF man_table ='man_expansiontank' THEN
@@ -1083,7 +1076,7 @@ BEGIN
 		function_type=NEW.exptank_function_type, category_type=NEW.exptank_category_type, fluid_type=NEW.exptank_fluid_type, location_type=NEW.exptank_location_type, workcat_id=NEW.exptank_workcat_id, workcat_id_end=NEW.exptank_workcat_id_end, 
 		buildercat_id=NEW.exptank_buildercat_id, builtdate=NEW.exptank_builtdate, enddate=NEW.exptank_enddate,  ownercat_id=NEW.exptank_ownercat_id, address_01=NEW.exptank_address_01, address_02=NEW.exptank_address_02, 
 		address_03=NEW.exptank_address_03, descript=NEW.exptank_descript,rotation=NEW.exptank_rotation, link=NEW.exptank_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.exptank_label_x, 
-		label_y=NEW.exptank_label_y, label_rotation=NEW.exptank_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.exptank_hemisphere, num_value=exptank_num_value
+		label_y=NEW.exptank_label_y, label_rotation=NEW.exptank_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.exptank_hemisphere, num_value=NEW.exptank_num_value
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_expansiontank
@@ -1097,8 +1090,8 @@ BEGIN
 		function_type=NEW.flexunion_function_type, category_type=NEW.flexunion_category_type, fluid_type=NEW.flexunion_fluid_type, location_type=NEW.flexunion_location_type, workcat_id=NEW.flexunion_workcat_id, 
 		workcat_id_end=NEW.flexunion_workcat_id_end, buildercat_id=NEW.flexunion_buildercat_id, builtdate=NEW.flexunion_builtdate, enddate=NEW.flexunion_enddate,  ownercat_id=NEW.flexunion_ownercat_id, address_01=NEW.flexunion_address_01, 
 		address_02=NEW.flexunion_address_02, address_03=NEW.flexunion_address_03, descript=NEW.flexunion_descript,rotation=NEW.flexunion_rotation, link=NEW.flexunion_link, verified=NEW.verified, the_geom=NEW.the_geom, 
-		undelete=NEW.undelete, label_x=NEW.flexunion_label_x, label_y=NEW.flexunion_label_y, label_rotation=NEW.flexunion_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=flexunion_hemisphere,
-		num_value=flexunion_num_value
+		undelete=NEW.undelete, label_x=NEW.flexunion_label_x, label_y=NEW.flexunion_label_y, label_rotation=NEW.flexunion_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.flexunion_hemisphere,
+		num_value=NEW.flexunion_num_value
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_flexunion
@@ -1109,10 +1102,10 @@ BEGIN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.netelement_code, elevation=NEW.netelement_elevation, "depth"=NEW."netelement_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
 		"state"=NEW."state", annotation=NEW.netelement_annotation, "observ"=NEW."netelement_observ", "comment"=NEW."netelement_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netelement_soilcat_id, 
-		function_type=netelement_function_type, category_type=NEW.netelement_category_type, fluid_type=NEW.netelement_fluid_type, location_type=NEW.netelement_location_type, workcat_id=NEW.netelement_workcat_id, 
+		function_type=NEW.netelement_function_type, category_type=NEW.netelement_category_type, fluid_type=NEW.netelement_fluid_type, location_type=NEW.netelement_location_type, workcat_id=NEW.netelement_workcat_id, 
 		workcat_id_end=NEW.netelement_workcat_id_end, buildercat_id=NEW.netelement_buildercat_id, builtdate=NEW.netelement_builtdate, enddate=NEW.netelement_enddate,  ownercat_id=NEW.netelement_ownercat_id, address_01=NEW.netelement_address_01, 
 		address_02=NEW.netelement_address_02, address_03=NEW.netelement_address_03, descript=NEW.netelement_descript,rotation=NEW.netelement_rotation, link=NEW.netelement_link, verified=NEW.verified, the_geom=NEW.the_geom, 
-		undelete=NEW.undelete, label_x=NEW.netelement_label_x, label_y=NEW.netelement_label_y, label_rotation=NEW.netelement_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=netelement_hemisphere,
+		undelete=NEW.undelete, label_x=NEW.netelement_label_x, label_y=NEW.netelement_label_y, label_rotation=NEW.netelement_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.netelement_hemisphere,
 		num_value=NEW.netelement_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -1128,7 +1121,7 @@ BEGIN
 		workcat_id_end=NEW.netsample_workcat_id_end, buildercat_id=NEW.netsample_buildercat_id, builtdate=NEW.netsample_builtdate, enddate=NEW.netsample_enddate,  ownercat_id=NEW.netsample_ownercat_id, 
 		address_01=NEW.netsample_address_01, address_02=NEW.netsample_address_02, address_03=NEW.netsample_address_03, descript=NEW.netsample_descript,rotation=NEW.netsample_rotation, link=NEW.netsample_link, 
 		verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.netsample_label_x, label_y=NEW.netsample_label_y, label_rotation=NEW.netsample_label_rotation, publish=NEW.publish, inventory=NEW.inventory,
-		expl_id=NEW.expl_id, hemisphere=netsample_hemisphere, num_value=NEW.netsample_num_value
+		expl_id=NEW.expl_id, hemisphere=NEW.netsample_hemisphere, num_value=NEW.netsample_num_value
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netsamplepoint
@@ -1142,8 +1135,8 @@ BEGIN
 			function_type=NEW.wtp_function_type, category_type=NEW.wtp_category_type, fluid_type=NEW.wtp_fluid_type, location_type=NEW.wtp_location_type, workcat_id=NEW.wtp_workcat_id, 
 			workcat_id_end=NEW.wtp_workcat_id_end, buildercat_id=NEW.wtp_buildercat_id, builtdate=NEW.wtp_builtdate, enddate=NEW.wtp_enddate,  ownercat_id=NEW.wtp_ownercat_id, address_01=NEW.wtp_address_01, 
 			address_02=NEW.wtp_address_02, address_03=NEW.wtp_address_03, descript=NEW.wtp_descript,rotation=NEW.wtp_rotation, link=NEW.wtp_link, verified=NEW.verified, the_geom=NEW.the_geom, 
-			undelete=NEW.undelete, label_x=NEW.wtp_label_x, label_y=NEW.wtp_label_y, label_rotation=NEW.wtp_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=wtp_hemisphere,
-			num_value=wtp_num_value
+			undelete=NEW.undelete, label_x=NEW.wtp_label_x, label_y=NEW.wtp_label_y, label_rotation=NEW.wtp_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.wtp_hemisphere,
+			num_value=NEW.wtp_num_value
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_wtp
