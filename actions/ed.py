@@ -140,7 +140,10 @@ class Ed(ParentAction):
     def ed_giswater_jar(self):   
         ''' Button 36. Open giswater.jar with selected .gsw file '''
         
-        self.execute_giswater("ed_giswater_jar", 36)
+        if 'nt' in sys.builtin_module_names: 
+            self.execute_giswater("ed_giswater_jar", 36)
+        else:
+            self.controller.show_info("Function not supported in this Operating System")
                                               
                           
     def ed_add_element(self):

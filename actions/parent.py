@@ -33,11 +33,12 @@ class ParentAction():
         self.dao = self.controller.dao         
         self.schema_name = self.controller.schema_name  
           
-        # Get files to execute giswater jar
-        self.plugin_version = self.get_plugin_version()
-        self.java_exe = self.get_java_exe()              
-        (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
+        # Get files to execute giswater jar (only in Windows)
+        if 'nt' in sys.builtin_module_names: 
+            self.plugin_version = self.get_plugin_version()
+            self.java_exe = self.get_java_exe()              
+            (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
+            self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
     
     
     def get_plugin_version(self):

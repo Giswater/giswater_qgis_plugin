@@ -1004,6 +1004,12 @@ class Giswater(QObject):
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 100)
+        
+        # Linux: Disable actions related with go2epa and giswater.jar
+        if 'nt' not in sys.builtin_module_names:
+            self.enable_action(False, 23)
+            self.enable_action(False, 24) 
+            self.enable_action(False, 36)                          
                 
                     
     def ws_generic(self, function_name):   

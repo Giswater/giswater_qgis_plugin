@@ -262,6 +262,10 @@ class Mg(ParentAction):
     def mg_go2epa(self):
         ''' Button 23. Open form to set INP, RPT and project '''
 
+        if 'nt' not in sys.builtin_module_names: 
+            self.controller.show_info("Function not supported in this Operating System")
+            return 
+        
         # Initialize variables
         self.file_inp = None
         self.file_rpt = None
@@ -370,7 +374,10 @@ class Mg(ParentAction):
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
         '''       
-        self.execute_giswater("mg_go2epa_express", 24)
+        if 'nt' in sys.builtin_module_names: 
+            self.execute_giswater("mg_go2epa_express", 24)
+        else:
+            self.controller.show_info("Function not supported in this Operating System")        
                         
 
     def mg_result_selector(self):
