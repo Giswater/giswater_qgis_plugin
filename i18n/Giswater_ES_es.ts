@@ -3406,6 +3406,13 @@
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>
     </message>       
+        <source>This id already exists</source>
+        <translation>Este id ya existe</translation>
+    </message>
+    <message>
+        <source>You are trying to enter different types</source>
+        <translation>Estás intentando introducir tipos diferentes</translation>
+    </message>    
     <message>
         <source>Error inserting profile table, you need to review data</source>
         <translation>Error inserting profile table, you need to review data</translation>
@@ -3418,6 +3425,7 @@
         <source>You need to upgrade your version of pg_routing!</source>
         <translation>You need to upgrade your version of pg_routing!</translation>
     </message>
+   
 
 </context>
 
