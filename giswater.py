@@ -94,7 +94,7 @@ class Giswater(QObject):
         connection_status = self.controller.set_database_connection()
         if not connection_status:
             msg = self.controller.last_error  
-            self.controller.show_message(msg, 1, 100) 
+            self.controller.show_warning(msg, 30) 
             return 
         
         self.dao = self.controller.dao 

@@ -82,12 +82,14 @@ class DaoController():
         connection_settings.beginGroup(root_conn);           
         groups = connection_settings.childGroups();                                 
         if self.connection_name in groups:      
+        
             root = self.connection_name+"/"  
             host = connection_settings.value(root+"host", '')
             port = connection_settings.value(root+"port", '')            
             db = connection_settings.value(root+"database", '')
             self.user = connection_settings.value(root+"username", '')
             pwd = connection_settings.value(root+"password", '') 
+                        
             # We need to create this connections for Table Views
             self.db = QSqlDatabase.addDatabase("QPSQL")
             self.db.setHostName(host)
@@ -95,22 +97,20 @@ class DaoController():
             self.db.setDatabaseName(db)
             self.db.setUserName(self.user)
             self.db.setPassword(pwd)
-            self.status = self.db.open()    
-            if not self.status:
+            status = self.db.open() 
+            
+            # Connect to Database 
+            self.dao = PgDao()     
+            self.dao.set_params(host, port, db, self.user, pwd)
+            status = self.dao.init_db()                 
+            if not status:
                 msg = "Database connection error. Please check connection parameters"
-                self.show_warning(msg)
                 self.last_error = self.tr(msg)
                 return False           
         else:
             msg = "Database connection name not found. Please check configuration file 'giswater.config'"
-            self.show_warning(msg)
             self.last_error = self.tr(msg)
-            return False
-    
-        # Connect to Database 
-        self.dao = PgDao()     
-        self.dao.set_params(host, port, db, self.user, pwd)
-        status = self.dao.init_db()
+            return False   
        
         return status    
     
