@@ -147,7 +147,7 @@ BEGIN
 		
 		IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.tank_pol_id IS NULL) THEN
-					NEW.tank_pol_id:= (SELECT nextval('pol_id_seq'));
+					NEW.tank_pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 				
 					INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_pol_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
@@ -176,21 +176,24 @@ BEGIN
 				NEW.tank_code=NEW.node_id;
 			END IF;
 			
-		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
-		buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02, address_03, descript, rotation, link, verified,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value) 
-		VALUES (NEW.node_id, NEW.tank_code, NEW.tank_elevation, NEW.tank_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, NEW.presszonecat_id,
-		NEW.tank_soilcat_id, NEW.tank_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
-		NEW.tank_address_02, NEW.tank_address_03, NEW.tank_descript, NEW.tank_rotation, NEW.tank_link, NEW.verified, NEW.undelete,NEW.tank_label_x,NEW.tank_label_y,NEW.tank_label_rotation, 
-		expl_id_int, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.tank_hemisphere,NEW.tank_num_value);
-
 		IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.tank_pol_id IS NULL) THEN
-					NEW.tank_pol_id:= (SELECT nextval('pol_id_seq'));
+					NEW.tank_pol_id:= (SELECT nextval('urn_id_seq'));
 				END IF;
 				
-				INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name) VALUES (NEW.node_id, NEW.tank_pol_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);
+				INSERT INTO man_tank (node_id,pol_id, vmax, vutil, area, chlorination,name)
+				VALUES (NEW.node_id, NEW.tank_pol_id, NEW.tank_vmax, NEW.tank_vutil, NEW.tank_area,NEW.tank_chlorination, NEW.tank_name);				
+				
 				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.tank_pol_id,NEW.the_geom);
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.tank_pol_id) WHERE node_id=NEW.node_id;
+								
+				INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
+				buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02, address_03, descript, rotation, link, verified,undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, the_geom, hemisphere, num_value) 
+				VALUES (NEW.node_id, NEW.tank_code, NEW.tank_elevation, NEW.tank_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.tank_annotation, NEW.tank_observ, NEW.tank_comment,NEW.dma_id, NEW.presszonecat_id,
+				NEW.tank_soilcat_id, NEW.tank_function_type, NEW.tank_category_type, NEW.tank_fluid_type, NEW.tank_location_type,NEW.tank_workcat_id, NEW.tank_workcat_id_end, NEW.tank_buildercat_id, NEW.tank_builtdate, NEW.tank_enddate, NEW.tank_ownercat_id, NEW.tank_address_01, 
+				NEW.tank_address_02, NEW.tank_address_03, NEW.tank_descript, NEW.tank_rotation, NEW.tank_link, NEW.verified, NEW.undelete,NEW.tank_label_x,NEW.tank_label_y,NEW.tank_label_rotation, 
+				expl_id_int, NEW.publish, NEW.inventory, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.tank_pol_id),  NEW.tank_hemisphere,NEW.tank_num_value);
+		
+				
 			END IF;
 			
 	ELSIF man_table='man_hydrant' THEN
@@ -514,7 +517,7 @@ BEGIN
 		
 		IF (rec.insert_double_geometry IS TRUE) THEN
 				IF (NEW.register_pol_id IS NULL) THEN
-					NEW.register_pol_id:= (SELECT nextval('pol_id_seq'));
+					NEW.register_pol_id:= (SELECT nextval('urn_id_seq'));
 					END IF;
 				
 					INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
@@ -543,21 +546,23 @@ BEGIN
 				NEW.register_code=NEW.node_id;
 			END IF;
 			
-		INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
+			
+		IF (rec.insert_double_geometry IS TRUE) THEN
+				IF (NEW.register_pol_id IS NULL) THEN
+					NEW.register_pol_id:= (SELECT nextval('urn_id_seq'));
+				END IF;
+				
+
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.register_pol_id,NEW.the_geom);
+				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
+				
+				INSERT INTO node (node_id, code, elevation, depth,  nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 		buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete,label_x,label_y,label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 		VALUES (NEW.node_id, NEW.register_code, NEW.register_elevation, NEW.register_depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.register_annotation, NEW.register_observ,
 		NEW.register_comment, NEW.dma_id, NEW.presszonecat_id, NEW.register_soilcat_id, NEW.register_function_type, NEW.register_category_type, NEW.register_fluid_type, NEW.register_location_type, NEW.register_workcat_id, NEW.register_workcat_id_end, NEW.register_buildercat_id, 
 		NEW.register_builtdate, NEW.register_enddate, NEW.register_ownercat_id, NEW.register_address_01, NEW.register_address_02, NEW.register_address_03, NEW.register_descript, NEW.register_rotation, NEW.register_link, NEW.verified, 
-		NEW.the_geom, NEW.undelete,NEW.register_label_x,NEW.register_label_y,NEW.register_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.register_hemisphere, NEW.register_num_value);
-		
-		IF (rec.insert_double_geometry IS TRUE) THEN
-				IF (NEW.register_pol_id IS NULL) THEN
-					NEW.register_pol_id:= (SELECT nextval('pol_id_seq'));
-				END IF;
+		(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.register_pol_id), NEW.undelete,NEW.register_label_x,NEW.register_label_y,NEW.register_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.register_hemisphere, NEW.register_num_value);
 				
-				INSERT INTO man_register (node_id,pol_id) VALUES (NEW.node_id, NEW.register_pol_id);
-				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.pol_id,NEW.the_geom);
-				UPDATE node SET the_geom =(SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.register_pol_id) WHERE node_id=NEW.node_id;
 			END IF;			
 			
 	ELSIF man_table='man_netwjoin' THEN

@@ -15,6 +15,7 @@ DECLARE
     v_sql varchar;
     arc_id_seq int8;
 	expl_id_int integer;
+	code_autofill_bool boolean;
 
 BEGIN
 
@@ -25,10 +26,10 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
     
         -- Arc ID
-        /*IF (NEW.arc_id IS NULL) THEN
+        IF (NEW.arc_id IS NULL) THEN
            -- PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
-        END IF;*/
+        END IF;
 
         -- Arc type
         IF (NEW.cat_arctype_id IS NULL) THEN
@@ -99,7 +100,8 @@ BEGIN
 				RETURN NULL; 
             END IF;
 
-       
+       SELECT code_autofill INTO code_autofill_bool FROM arc JOIN cat_arc ON cat_arc.id =arc.arccat_id JOIN arc_type ON arc_type.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+	   
         
         -- Set EPA type
         NEW.epa_type = 'PIPE';        

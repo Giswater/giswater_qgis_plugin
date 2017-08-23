@@ -19,11 +19,17 @@ DECLARE
     connec_id_seq int8;
 	expl_id_int integer;
 	code_autofill_bool boolean;
-
+	man_table_2 varchar;
+	rec Record;
+	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     man_table:= TG_ARGV[0];
+	man_table_2:=man_table;
+	
+		--Get data from config table
+	SELECT * INTO rec FROM config;	
 	
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -37,7 +43,8 @@ BEGIN
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
             --PERFORM audit_function(150,350); 
-            RETURN NULL;                   
+				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"());
+            --RETURN NULL;                   
         END IF;
 
         -- Sector ID
@@ -67,15 +74,15 @@ BEGIN
         END IF;
 
 	    -- State
-		/*
+		
 		        IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
-		
-	*/
+
+	
 		-- Verified
         IF (NEW.verified IS NULL) THEN
             NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='verified_vdefault' AND "cur_user"="current_user"());
@@ -96,6 +103,7 @@ BEGIN
             END IF;
 		
 		--SELECT code_autofill INTO code_autofill_bool FROM connec_type WHERE id=NEW.connec_type;
+		 
 		
         -- FEATURE INSERT
 		IF man_table='man_greentap' THEN
@@ -126,7 +134,7 @@ BEGIN
 		  NEW.greentap_location_type, NEW.greentap_workcat_id, NEW.greentap_workcat_id_end,
 		  NEW.greentap_buildercat_id, NEW.greentap_builtdate, NEW.greentap_enddate, NEW.greentap_ownercat_id, NEW.greentap_address_01, NEW.greentap_address_02, NEW.greentap_address_03, NEW.greentap_streetname, NEW.greentap_postnumber, 
 		  NEW.greentap_descript, NEW.greentap_rotation, NEW.greentap_link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.greentap_label_x,NEW.greentap_label_y,NEW.greentap_label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.greentap_num_value);
 		  
 		  INSERT INTO man_greentap (connec_id, linked_connec) VALUES(NEW.connec_id, NEW.greentap_linked_connec); 
 		  
@@ -152,16 +160,71 @@ BEGIN
 		  INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code, demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
 		  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, rotation, link,verified, the_geom, undelete,label_x,label_y,label_rotation, 
 		  expl_id, publish, inventory,num_value) 
-		  VALUES (NEW.connec_id, NEW.customer_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW.fountain_demand, NEW."state", NEW.fountain_annotation, 
+		  VALUES (NEW.connec_id, NEW.fountain_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW.fountain_demand, NEW."state", NEW.fountain_annotation, 
 		  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
 		  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02, NEW.fountain_address_03, NEW.fountain_streetname, NEW.fountain_postnumber, 
 		  NEW.fountain_descript, NEW.fountain_rotation, NEW.fountain_link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
-		  expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
+		  expl_id_int, NEW.publish, NEW.inventory, NEW.fountain_num_value);
+		  
 		 
-		 INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, arq_patrimony, the_geom_pol) 
-		 VALUES (NEW.connec_id, NEW.fountain_vmax, NEW.fountain_linked_connec, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
-		 NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.the_geom_pol);
+		 IF (rec.insert_double_geometry IS TRUE) THEN
+			IF (NEW.fountain_pol_id IS NULL) THEN
+					NEW.fountain_pol_id:= (SELECT nextval('urn_id_seq'));
+					END IF;
+				
+				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, arq_patrimony, pol_id) 
+				VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
+				NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
+				
+				INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fountain_pol_id,(SELECT ST_Envelope(ST_Buffer(connec.the_geom,rec.buffer_value)) from "SCHEMA_NAME".connec where connec_id=NEW.connec_id));
+			ELSE
+				INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, arq_patrimony, pol_id) 
+				VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
+				NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
+			END IF;
 		 
+		ELSIF man_table='man_fountain_pol' THEN
+							
+					-- Workcat_id
+					IF (NEW.fountain_workcat_id IS NULL) THEN
+						NEW.fountain_workcat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='workcat_vdefault' AND "cur_user"="current_user"());
+						IF (NEW.fountain_workcat_id IS NULL) THEN
+							NEW.fountain_workcat_id := (SELECT id FROM cat_work limit 1);
+						END IF;
+					END IF;
+					
+					--Builtdate
+						IF (NEW.fountain_builtdate IS NULL) THEN
+							NEW.fountain_builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
+						END IF;
+				--Copy id to code field
+					IF (NEW.fountain_code IS NULL AND code_autofill_bool IS TRUE) THEN 
+						NEW.fountain_code=NEW.connec_id;
+					END IF;
+					 		 
+				 IF (rec.insert_double_geometry IS TRUE) THEN
+					IF (NEW.fountain_pol_id IS NULL) THEN
+						NEW.fountain_pol_id:= (SELECT nextval('urn_id_seq'));
+					END IF;
+					
+					INSERT INTO man_fountain(connec_id, linked_connec, vmax, vtotal, container_number, pump_number, power, regulation_tank,name, connection, chlorinator, arq_patrimony, pol_id) 
+					VALUES (NEW.connec_id, NEW.fountain_linked_connec, NEW.fountain_vmax, NEW.fountain_vtotal,NEW.fountain_container_number, NEW.fountain_pump_number, NEW.fountain_power, NEW.fountain_regulation_tank, NEW.fountain_name, 
+					NEW.fountain_connection, NEW.fountain_chlorinator, NEW.fountain_arq_patrimony, NEW.fountain_pol_id);
+				 
+					INSERT INTO polygon(pol_id,the_geom) VALUES (NEW.fountain_pol_id,NEW.the_geom);
+					
+				
+				INSERT INTO connec(connec_id, code, elevation, "depth",connecat_id,  sector_id,customer_code, demand, "state", annotation, observ, "comment",dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
+				  workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript, rotation, link,verified, the_geom, undelete,label_x,label_y,label_rotation, 
+				  expl_id, publish, inventory,num_value) 
+				  VALUES (NEW.connec_id, NEW.fountain_code, NEW.fountain_elevation, NEW.fountain_depth, NEW.connecat_id, NEW.sector_id, NEW.fountain_customer_code, NEW.fountain_demand, NEW."state", NEW.fountain_annotation, 
+				  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
+				  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02, NEW.fountain_address_03, NEW.fountain_streetname, NEW.fountain_postnumber, 
+				  NEW.fountain_descript, NEW.fountain_rotation, NEW.fountain_link, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.fountain_pol_id), NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
+				  expl_id_int, NEW.publish, NEW.inventory, NEW.fountain_num_value);
+				  
+				END IF;
+			
 		ELSIF man_table='man_tap' THEN
 					
 			-- Workcat_id
@@ -188,7 +251,7 @@ BEGIN
 		  VALUES (NEW.connec_id, NEW.tap_code, NEW.tap_elevation, NEW.tap_depth, NEW.connecat_id, NEW.sector_id, NEW.tap_customer_code, NEW.tap_demand, NEW."state", NEW.tap_annotation, NEW.tap_observ, 
 		  NEW.tap_comment, NEW.dma_id, NEW.presszonecat_id, NEW.tap_soilcat_id, NEW.tap_function_type, NEW.tap_category_type, NEW.tap_fluid_type, NEW.tap_location_type, NEW.tap_workcat_id, NEW.tap_workcat_id_end, NEW.tap_buildercat_id,
 		  NEW.tap_builtdate, NEW.tap_enddate, NEW.tap_ownercat_id, NEW.tap_address_01, NEW.tap_address_02, NEW.tap_address_03, NEW.tap_streetname, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_rotation, NEW.tap_link, 
-		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.num_value);
+		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.tap_num_value);
 		  
 		  INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
 		  VALUES (NEW.connec_id,  NEW.tap_linked_connec, NEW.tap_cat_valve,  NEW.tap_drain_diam, NEW.tap_drain_exit,  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arq_patrimony, NEW.tap_com_state);
@@ -217,9 +280,9 @@ BEGIN
 		  location_type, workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01, address_02, address_03, streetaxis_id, postnumber, descript,rotation, link,verified, the_geom,undelete, label_x,label_y,label_rotation,
 		  expl_id, publish, inventory, num_value) 
 		  VALUES (NEW.connec_id, NEW.wjoin_code, NEW.wjoin_elevation, NEW.wjoin_depth, NEW.connecat_id, NEW.sector_id, NEW.wjoin_customer_code,  NEW.wjoin_demand, NEW."state", NEW.wjoin_annotation, NEW.wjoin_observ, 
-		  NEW.wjoin_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wjoin_soilcat_id, NEW.wjoin_function_type, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.workcat_id_end, NEW.wjoin_buildercat_id, 
-		  NEW.wjoin_builtdate, NEW.wjoin_enddate, NEW.wjoin_ownercat_id, NEW.wjoin_address_01, NEW.wjoin_address_02, NEW.wjoin_address_03, NEW.wjoin_streetname, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_rotation, NEW.wjoin_link, NEW.verified, 
-		  NEW.the_geom, NEW.undelete, NEW.wjoin_workcat_id_end,NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.num_value); 
+		  NEW.wjoin_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wjoin_soilcat_id, NEW.wjoin_function_type, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.wjoin_workcat_id_end, NEW.wjoin_buildercat_id, 
+		  NEW.wjoin_builtdate, NEW.wjoin_enddate, NEW.wjoin_ownercat_id, NEW.wjoin_address_01, NEW.wjoin_address_02, NEW.wjoin_address_03, NEW.wjoin_streetaxis_id, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_rotation, NEW.wjoin_link, NEW.verified, 
+		  NEW.the_geom, NEW.undelete, NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.wjoin_num_value); 
 		 
 		 INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
 		 VALUES (NEW.connec_id, NEW.wjoin_top_floor, NEW.wjoin_cat_valve);
@@ -302,8 +365,45 @@ BEGIN
 			UPDATE man_fountain 
 			SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
 			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
-			pol_id=NEW.pol_id
+			pol_id=NEW.fountain_pol_id
 			WHERE connec_id=OLD.connec_id;
+
+        ELSIF man_table ='man_fountain_pol' THEN
+            UPDATE connec 
+			SET connec_id=NEW.connec_id, code=NEW.fountain_code, elevation=NEW.fountain_elevation, "depth"=NEW.fountain_depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id, customer_code=NEW.fountain_customer_code, 
+			demand=NEW.fountain_demand, "state"=NEW."state", annotation=NEW.fountain_annotation, observ=NEW.fountain_observ, "comment"=NEW.fountain_comment, rotation=NEW.fountain_rotation,dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id,
+			soilcat_id=NEW.fountain_soilcat_id, function_type=NEW.fountain_function_type, category_type=NEW.fountain_category_type, fluid_type=NEW.fountain_fluid_type, location_type=NEW.fountain_location_type, workcat_id=NEW.fountain_workcat_id,
+			buildercat_id=NEW.fountain_buildercat_id, builtdate=NEW.fountain_builtdate,ownercat_id=NEW.fountain_ownercat_id, address_01=NEW.fountain_address_01, address_02=NEW.fountain_address_02,
+			address_03=NEW.fountain_address_03, streetaxis_id=NEW.fountain_streetaxis_id, postnumber=NEW.fountain_postnumber, descript=NEW.fountain_descript, link=NEW.fountain_link, verified=NEW.verified, 
+			undelete=NEW.undelete, workcat_id_end=NEW.fountain_workcat_id_end, label_x=NEW.fountain_label_x,label_y=NEW.fountain_label_y, label_rotation=NEW.fountain_label_rotation, 
+		    publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.fountain_enddate, expl_id=NEW.expl_id, num_value=NEW.fountain_num_value
+			WHERE connec_id=OLD.connec_id;
+			
+			UPDATE man_fountain 
+			SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+			regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
+			pol_id=NEW.fountain_pol_id
+			WHERE connec_id=OLD.connec_id;			
+			
+		IF (NEW.fountain_pol_id IS NULL) THEN
+				UPDATE man_fountain 
+				SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+				regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
+				pol_id=NEW.fountain_pol_id
+				WHERE connec_id=OLD.connec_id;	
+				UPDATE polygon SET the_geom=NEW.the_geom
+				WHERE pol_id=OLD.fountain_pol_id;
+		ELSE
+				UPDATE man_fountain 
+				SET connec_id=NEW.connec_id, vmax=NEW.fountain_vmax,vtotal=NEW.fountain_vtotal,container_number=NEW.fountain_container_number,pump_number=NEW.fountain_pump_number,power=NEW.fountain_power,
+				regulation_tank=NEW.fountain_regulation_tank,name=NEW.fountain_name,connection=NEW.fountain_connection,chlorinator=NEW.fountain_chlorinator, linked_connec=NEW.fountain_linked_connec, arq_patrimony=NEW.fountain_arq_patrimony,
+				pol_id=NEW.fountain_pol_id
+				WHERE connec_id=OLD.connec_id;	
+				UPDATE polygon SET the_geom=NEW.the_geom,pol_id=NEW.fountain_pol_id
+				WHERE pol_id=OLD.fountain_pol_id;
+		END IF;
+			
+			
 		END IF;
 
         --PERFORM audit_function(2,350);     
@@ -311,14 +411,19 @@ BEGIN
     
 
     ELSIF TG_OP = 'DELETE' THEN
-
-        DELETE FROM connec WHERE connec_id = OLD.connec_id;
-
+		IF man_table ='man_fountain'  THEN
+					IF OLD.fountain_pol_id IS NOT NULL THEN
+						DELETE FROM polygon WHERE pol_id = OLD.fountain_pol_id;
+						DELETE FROM connec WHERE connec_id = OLD.connec_id;
+					ELSE
+					    DELETE FROM connec WHERE connec_id = OLD.connec_id;
+					END IF;		
         --PERFORM audit_function(3,350);     
         RETURN NULL;
    
     
 
+END IF;
 END IF;
 END;
 $BODY$
@@ -337,3 +442,6 @@ CREATE TRIGGER gw_trg_edit_man_tap INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCH
 
 DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain ON "SCHEMA_NAME".v_edit_man_fountain;
 CREATE TRIGGER gw_trg_edit_man_fountain INSTEAD OF INSERT OR DELETE OR UPDATE ON "SCHEMA_NAME".v_edit_man_fountain FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_edit_man_connec('man_fountain');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_man_fountain_pol ON "ws30".v_edit_man_fountain_pol;
+CREATE TRIGGER gw_trg_edit_man_fountain_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON "ws30".v_edit_man_fountain_pol FOR EACH ROW EXECUTE PROCEDURE "ws30".gw_trg_edit_man_connec('man_fountain_pol');
