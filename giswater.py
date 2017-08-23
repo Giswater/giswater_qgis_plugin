@@ -25,11 +25,10 @@ from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
-#from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
-#from map_tools.dimensions import Dimensions
+from actions.mincut import MincutParent
 
 from search.search_plus import SearchPlus
 
@@ -102,6 +101,7 @@ class Giswater(QObject):
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
@@ -137,6 +137,11 @@ class Giswater(QObject):
                 elif int(index_action) in (23, 24):
                     callback_function = getattr(self.go2epa, function_name)
                     action.triggered.connect(callback_function)
+                elif int(index_action) == 26:
+                    callback_function = getattr(self.mincut, 'mg_mincut')
+                    action.triggered.connect(callback_function)
+                    # Generic function
+
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -241,14 +246,8 @@ class Giswater(QObject):
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 18:
                 map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 26:
-                map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            #elif int(index_action) == 39:
-            #    map_tool = Dimensions(self.iface, self.settings, action, index_action)
-            #elif int(index_action) == 27:
-            #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
                 map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
             elif int(index_action) == 52:
