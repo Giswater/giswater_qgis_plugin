@@ -20,6 +20,8 @@ def setDialog(p_dialog):
 
 def fillComboBox(widget, rows, allow_nulls=True):
 
+    if rows is None:
+        return
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -35,7 +37,7 @@ def fillComboBox(widget, rows, allow_nulls=True):
                 widget.addItem(str(elem))
                 
                 
-def fillComboBoxDefault(widget, rows,):
+def fillComboBoxDefault(widget, rows):
     ''' Fill combo box with default value-first from the list '''
     
     if type(widget) is str:
@@ -96,7 +98,7 @@ def setText(widget, text):
         return    
     
     value = unicode(text)
-    if type(widget) is QLineEdit or type(widget) is QTextEdit: 
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel:
         if value == 'None':    
             value = ""        
         widget.setText(value)       

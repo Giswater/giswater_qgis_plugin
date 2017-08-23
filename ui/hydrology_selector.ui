@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>351</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,21 +72,11 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="infiltration">
-   <property name="geometry">
-    <rect>
-     <x>105</x>
-     <y>115</y>
-     <width>216</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_chamber_est_top_elev_2">
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>205</y>
+     <y>155</y>
      <width>66</width>
      <height>41</height>
     </rect>
@@ -190,14 +180,89 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="descript">
+  <widget class="QLabel" name="infiltration">
    <property name="geometry">
     <rect>
-     <x>105</x>
-     <y>220</y>
-     <width>216</width>
+     <x>100</x>
+     <y>110</y>
+     <width>66</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>Infiltration:</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="descript">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>140</y>
+     <width>281</width>
      <height>71</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="text">
+    <string>descript</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_accept">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>250</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Accept</string>
    </property>
   </widget>
  </widget>

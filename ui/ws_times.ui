@@ -674,16 +674,6 @@
     <number>23</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="start_clocktime_">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>220</y>
-     <width>171</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
  <tabstops>
   <tabstop>duration</tabstop>
