@@ -140,14 +140,14 @@ class DaoController():
     def show_info(self, text, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        #self.show_message(text, 0, duration, context_name)
-        QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
+        self.show_message(text, 0, duration, context_name)
+        #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
     def show_warning(self, text, duration=5, context_name=None):
         ''' Show message to the user.
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        #self.show_message(text, 1, duration, context_name)
-        QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
+        self.show_message(text, 1, duration, context_name)
+        #QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
 
     def show_warning_detail(self, text, detail_text, context_name=None):
         ''' Show warning message with a button to show more details '''  
@@ -352,28 +352,28 @@ class DaoController():
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
         if pos_ini <> -1 and pos_fi <> -1:
-            uri_table = uri[pos_end_schema+2:pos_fi ]
+            uri_table = uri[pos_end_schema+2:pos_fi]
 
         return uri_table    
         
         
-    def get_layer_source_key(self):
-        ''' Get table or view name of selected layer '''
-
-        uri_schema = None
+    def get_layer_primary_key(self):
+        ''' Get primary key of selected layer '''
+        
+        uri_pk = None
         layer = self.iface.activeLayer()  
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
-        pos_end_schema = uri.rfind('srid=')
+        pos_end = uri.rfind('srid=')
         if pos_ini <> -1:
-            uri_schema = uri[pos_ini + 5:pos_end_schema-2]
+            uri_pk = uri[pos_ini + 5:pos_end-2]
 
-        return uri_schema
+        return uri_pk
         
    
     def get_project_user(self):
         ''' Set user '''
-		
+
         user = None
         #self.canvas = self.iface.mapCanvas() 
         # Check if we have any layer loaded

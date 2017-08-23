@@ -628,7 +628,7 @@ class ParentDialog(object):
         self.date_event_to.dateChanged.connect(partial(self.set_filter_table_event, widget))
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
     
-        feature_key = self.controller.get_layer_source_key()
+        feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature = 'NODE'
         if feature_key == 'connec_id':
@@ -677,7 +677,7 @@ class ParentDialog(object):
         table_name_event_id = self.schema_name+'."om_visit_parameter"'
         event_type_value = utils_giswater.getWidgetText("event_type")
         # Get type of feature
-        feature_key = self.controller.get_layer_source_key()
+        feature_key = self.controller.get_layer_primary_key()
         if feature_key == 'node_id':
             feature = 'NODE'
         if feature_key == 'connec_id':

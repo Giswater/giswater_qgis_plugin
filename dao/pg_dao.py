@@ -117,17 +117,18 @@ class PgDao():
     def check_schema(self, schemaname):
         ''' Check if selected schema exists ''' 
         exists = True
+        schemaname = schemaname.replace('"', '')        
         sql = "SELECT nspname FROM pg_namespace WHERE nspname = '"+schemaname+"'";
         self.cursor.execute(sql)         
         if self.cursor.rowcount == 0:      
             exists = False
         return exists    
-
     
     
     def check_table(self, schemaname, tablename):
         ''' Check if selected table exists in selected schema '''        
         exists = True
+        schemaname = schemaname.replace('"', '')         
         sql = "SELECT * FROM pg_tables"
         sql+= " WHERE schemaname = '"+schemaname+"' AND tablename = '"+tablename+"'"    
         self.cursor.execute(sql)         
@@ -139,6 +140,7 @@ class PgDao():
     def check_view(self, schemaname, viewname):
         ''' Check if selected view exists in selected schema '''
         exists = True
+        schemaname = schemaname.replace('"', '') 
         sql = "SELECT * FROM pg_views"
         sql+= " WHERE schemaname = '"+schemaname+"' AND viewname = '"+viewname+"'"    
         self.cursor.execute(sql)         
@@ -153,9 +155,5 @@ class PgDao():
             self.cursor.copy_expert(sql, csv_file)
             return None
         except Exception as e:
-            return e 
-            
-
-
-    
+            return e   
         
