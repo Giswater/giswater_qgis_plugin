@@ -6,7 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QSettings
+from datetime import datetime
+from PyQt4.QtCore import QSettings, QTime
 from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTableView, QTimeEdit, QSpinBox, QAbstractItemView
 from PyQt4.QtSql import QSqlQueryModel
 
@@ -364,6 +365,7 @@ class Go2Epa(ParentAction):
         update = True
         self.dlg_wsoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.pressed.connect(self.dlg_wsoptions.close)
+        self.go2epa_options_get_data('inp_options')
         self.dlg_wsoptions.exec_()
 
 
@@ -378,6 +380,7 @@ class Go2Epa(ParentAction):
         update = True
         dlg_wstimes.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_times', dlg_wstimes))
         dlg_wstimes.btn_cancel.pressed.connect(dlg_wstimes.close)
+        self.go2epa_options_get_data('inp_times')
         dlg_wstimes.exec_()
 
 
@@ -445,6 +448,7 @@ class Go2Epa(ParentAction):
         update = True
         dlg_udoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', dlg_udoptions))
         dlg_udoptions.btn_cancel.pressed.connect(dlg_udoptions.close)
+        self.go2epa_options_get_data('inp_options')
         dlg_udoptions.exec_()
 
 
@@ -456,6 +460,7 @@ class Go2Epa(ParentAction):
         update = True
         dlg_udtimes.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', dlg_udtimes))
         dlg_udtimes.btn_cancel.pressed.connect(dlg_udtimes.close)
+        self.go2epa_options_get_data('inp_options')
         dlg_udtimes.exec_()
 
 
@@ -635,3 +640,37 @@ class Go2Epa(ParentAction):
         qtable.setModel(model)
         qtable.show()
 
+
+    def go2epa_options_get_data(self, tablename):
+        ''' Get data from selected table '''
+        sql = 'SELECT * FROM ' + self.schema_name + "." + tablename
+        row = self.dao.get_row(sql)
+        if not row:
+            self.controller.show_warning("Any data found in table "+tablename)
+            return None
+        # Iterate over all columns and populate its corresponding widget
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            widget_type = utils_giswater.getWidgetType(column_name)
+
+            if widget_type is QCheckBox:
+                utils_giswater.setChecked(column_name, row[column_name])
+            elif widget_type is QDateEdit:
+                utils_giswater.setCalendarDate(column_name,datetime.strptime(row[column_name], '%Y-%m-%d'))
+            elif widget_type is QTimeEdit:
+                timeparts = str(row[column_name]).split(':')
+                if len(timeparts) < 3:
+                    timeparts.append("0")
+                days = int(timeparts[0]) / 24
+                hours = int(timeparts[0]) % 24
+                minuts= int(timeparts[1])
+                seconds= int(timeparts[2])
+                time = QTime(hours,minuts, seconds)
+                utils_giswater.setTimeEdit(column_name, time)
+                utils_giswater.setText(column_name + "_day", days)
+
+            else:
+                utils_giswater.setWidgetText(column_name, row[column_name])
+            columns.append(column_name)
+        return columns
