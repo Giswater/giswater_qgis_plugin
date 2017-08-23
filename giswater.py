@@ -24,11 +24,10 @@ from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
-#from map_tools.valve_analytics import ValveAnalytics
 from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
-#from map_tools.dimensions import Dimensions
+from actions.mincut import MincutParent
 
 from search.search_plus import SearchPlus
 
@@ -104,6 +103,7 @@ class Giswater(QObject):
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
@@ -130,13 +130,17 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01,02,19, 21, 23, 24, 25,27,39,41,45,46,47,48,28,99):
+                if int(index_action) in (01, 02 ,19, 21, 23, 24, 25, 27, 39, 41, 45, 46, 47, 48, 28, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
                 elif int(index_action) in (32, 33, 34, 36):                       
                     callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)                    
+                    action.triggered.connect(callback_function)
+                elif int(index_action) == 26:
+                    callback_function = getattr(self.mincut, 'mg_mincut')
+                    action.triggered.connect(callback_function)
+                    # Generic function
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -214,70 +218,7 @@ class Giswater(QObject):
                     obj_action.triggered.connect( partial(self.menu_activate,str(row_id[i][0])))
                 
                 action.setMenu(self.menu_arc)
-                '''
-                self.sub_menu=QMenu()
-                
-                list = [] 
-                
-                for i in range(0, len(row)):
-                    sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE i18n='"+str(row[i][0])+"'"    
-                    row_id = self.dao.get_rows(sql) 
-   
-                    list.append(QMenu(self.sub_menu))
-                    #self.sub_menu=QMenu()
-                    list[i].setTitle(row[i][0])
-                    self.menu.addMenu(list[i])
 
-                    for j in range(0, len(row_id)):                 
-                        # Get shortcut
-                        sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type WHERE id='"+str(row_id[j][0])+"'"    
-                        row_shortcut = self.dao.get_rows(sql) 
-
-                        obj_action = QAction(str(row_id[j][0]),self)
-                        obj_action.setShortcut(str(row_shortcut[0][0]))
-                        list[i].addAction( obj_action )
-                        # Provide node_type and node_type_id
-                        obj_action.triggered.connect( partial(self.menu_activate,str(row[i][0])))
-
-                action.setMenu(self.menu)
-                '''
-            
-            '''    
-            if index_action == '02':
-            # Button add_arc
-                # Add drop down menu to button in toolbar
-                self.menu_arc=QMenu()
-                #self.sub_menu=QMenu()
-                self.menu_arc.clear()
-                # Get translated type
-                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".arc_type "    
-                row = self.dao.get_rows(sql) 
-                
-                self.sub_menu_arc=QMenu()
-                
-                list = [] 
-                
-                for i in range(0, len(row)):
-                    sql = "SELECT DISTINCT(id) FROM "+schema_name+".arc_type WHERE i18n='"+str(row[i][0])+"'"    
-                    row_id = self.dao.get_rows(sql) 
-   
-                    list.append(QMenu(self.sub_menu_arc))
-                    #self.sub_menu=QMenu()
-                    list[i].setTitle(row[i][0])
-                    self.menu_arc.addMenu(list[i])
-
-                    for j in range(0, len(row_id)):                 
-                        # Get shortcut
-                        sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".arc_type WHERE id='"+str(row_id[j][0])+"'"    
-                        row_shortcut = self.dao.get_rows(sql) 
-
-                        obj_action = QAction(str(row_id[j][0]),self)
-                        obj_action.setShortcut(str(row_shortcut[0][0]))
-                        list[i].addAction( obj_action )
-                        obj_action.triggered.connect( partial(self.menu_activate,str(row[i][0]) ))
-                           
-                action.setMenu(self.menu_arc)
-            '''          
                   
         if toolbar is not None:
             toolbar.addAction(action)  
@@ -336,14 +277,8 @@ class Giswater(QObject):
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 18:
                 map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 26:
-                map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            #elif int(index_action) == 39:
-            #    map_tool = Dimensions(self.iface, self.settings, action, index_action)
-            #elif int(index_action) == 27:
-            #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
                 map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
             elif int(index_action) == 52:
@@ -850,15 +785,12 @@ class Giswater(QObject):
         # Set objects for map tools classes
         self.set_map_tool('mg_move_node')
         self.set_map_tool('mg_delete_node')
-        self.set_map_tool('mg_mincut')
         self.set_map_tool('mg_flow_trace')
         self.set_map_tool('mg_flow_exit')
         self.set_map_tool('mg_connec_tool')
         self.set_map_tool('mg_extract_raster_value')
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
-        self.set_map_tool('mg_mincut')
-        #self.set_map_tool('mg_dimensions')
 
         # Set SearchPlus object
         self.set_search_plus()
