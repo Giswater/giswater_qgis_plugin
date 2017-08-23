@@ -55,6 +55,33 @@ class MincutParent(ParentAction):
         # Call ParentAction constructor
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
+        self.canvas = self.iface.mapCanvas()
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emitPoint)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+
+        # Get layers of node,arc,connec groupe
+        self.node_group = []
+        self.connec_group = []
+        self.arc_group = []
+
+        sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".node_type_cat_type "
+        nodes = self.controller.get_rows(sql)
+        for node in nodes:
+            self.node_group.append(str(node[0]))
+
+        sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".connec_type_cat_type "
+        connecs = self.controller.get_rows(sql)
+        for connec in connecs:
+            self.connec_group.append(str(connec[0]))
+
+        sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".arc_type_cat_type "
+        arcs = self.controller.get_rows(sql)
+        for arc in arcs:
+            self.arc_group.append(str(arc[0]))
+
+
 
     def close_dialog(self, dlg=None):
         ''' Close dialog '''
@@ -158,7 +185,7 @@ class MincutParent(ParentAction):
 
         # Toolbar actions
         self.dlg.findChild(QAction, "actionConfig").triggered.connect(self.config)
-        #self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincut)
+        self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincutInit)
         #self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
         #self.actionCustomMincut.triggered.connect(self.customMincut)
         self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.addConnecInit)
@@ -312,14 +339,6 @@ class MincutParent(ParentAction):
 
     def addConnecInit(self):
 
-        self.canvas = self.iface.mapCanvas()
-
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emitPoint)
-
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-
         # Check if user entered ID
         check = self.check_id()
         if check == 0:
@@ -330,12 +349,7 @@ class MincutParent(ParentAction):
         QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),self.snappingConnec)
 
 
-    def snappingConnec(self, point, btn):  # @UnusedVariable
-
-        connec_group = ["Wjoin", "Fountain"]
-
-        self.canvas = self.iface.mapCanvas()
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
+    def snappingConnec(self, point, btn):
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -353,15 +367,14 @@ class MincutParent(ParentAction):
 
                 element_type = snapPoint.layer.name()
 
-                if element_type in connec_group:
+                if element_type in self.connec_group:
                     feat_type = 'connec'
                 else:
                     continue
 
                 # Get the point
                 point = QgsPoint(snapPoint.snappedVertex)
-                snappFeat = next(
-                    snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
                 feature = snappFeat
                 element_id = feature.attribute(feat_type + '_id')
 
@@ -430,7 +443,7 @@ class MincutParent(ParentAction):
         # -self.btn_cancel.pressed.connect(self.close_dialog_multi)
 
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
-        #self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table))
+        self.btn_delete_hydro.pressed.connect(partial(self.delete_records_hydro, self.tbl, table))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
 
@@ -438,7 +451,7 @@ class MincutParent(ParentAction):
         self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table))
 
         self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
-        #self.btn_accept.pressed.connect(self.exec_hydro)
+        self.btn_accept.pressed.connect(self.exec_hydro)
 
         self.hydrometer = self.dlg_hydro.findChild(QLineEdit, "hydrometer_id")
         # Adding auto-completion to a QLineEdit
@@ -528,7 +541,7 @@ class MincutParent(ParentAction):
         # self.menu=QMenu()
         self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
-        #self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))
+        self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))
 
         self.fill_table_config(self.tbl_config, self.schema_name + "." + table)
 
@@ -589,3 +602,262 @@ class MincutParent(ParentAction):
 
         # Attach model to table view
         widget.setModel(model)
+
+
+    def delete_records_hydro(self, widget, table_name):
+        ''' Delete selected elements of the table '''
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+
+        del_id = []
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("hydrometer_id")
+            inf_text += str(id_) + ", "
+            list_id = list_id + "'" + str(id_) + "', "
+            #del_id.append(str(list_id))
+            del_id.append(id_)
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",inf_text)
+
+        if answer:
+            for id in del_id:
+                self.hydro_ids.remove(id)
+
+        expr = ""
+        # Reload table
+        expr = "hydrometer_id = '" + self.hydro_ids[0] + "'"
+        if len(self.hydro_ids) > 1:
+            for id in range(1, len(self.hydro_ids)):
+                expr += " OR hydrometer_id = '" + self.hydro_ids[id] + "'"
+
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+
+    def exec_hydro(self):
+        # delete * from anl_mincut_hydrometer
+        sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
+        self.controller.execute_sql(sql)
+
+        for id in self.hydro_ids:
+            # Insert into anl_mincut_hydrometer all selected connecs
+            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer (hydrometer_id)"
+            sql += " VALUES ('" + id + "')"
+            status_insert = self.controller.execute_sql(sql)
+
+            if status_insert:
+                # Show message to user
+                # message = "Values has been updated"
+                # self.controller.show_info(message, context_name='ui_message')
+
+                # Execute SQL function
+                self.id = self.dlg.findChild(QLineEdit, "id")
+                self.id_text = self.id.text()
+                function_name = "gw_fct_mincut_result_catalog"
+                sql = "SELECT " + self.schema_name + "." + function_name + "('" + self.id_text + "');"
+
+                status = self.controller.execute_sql(sql)
+
+        if status:
+            # Show message to user
+            message = "Values has been updated"
+            self.controller.show_info(message, context_name='ui_message')
+
+            message = "Execute gw_fct_mincut_result_catalog done successfully"
+            self.controller.show_info(message, context_name='ui_message')
+
+
+    def delete_records_config(self, widget, table_name):
+        ''' Delete selected elements of the table '''
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value("id")
+            inf_text += str(id_) + ", "
+            list_id = list_id + "'" + str(id_) + "', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",
+                                              inf_text)
+        if answer:
+            sql = "DELETE FROM " + self.schema_name + "." + table_name
+            sql += " WHERE id IN (" + list_id + ")"
+            self.controller.execute_sql(sql)
+            widget.model().select()
+
+
+
+    def mincutInit(self):
+
+        # Check if user entered ID
+        check = self.check_id()
+        if check == 0:
+            return
+        else:
+            pass
+
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingNodeArc)
+
+
+    def snappingNodeArc(self, point, btn):
+
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+        # That's the snapped point
+        if result <> []:
+
+            # Check feature
+            for snapPoint in result:
+
+                element_type = snapPoint.layer.name()
+                message = str(element_type)
+                self.controller.show_info(message, context_name='ui_message')
+
+                if element_type in self.arc_group :
+                    feat_type = 'arc'
+                if element_type in self.node_group:
+                    feat_type = 'node'
+                #else:
+                #    continue
+
+
+                # Get the point
+                point = QgsPoint(snapPoint.snappedVertex)
+                snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                feature = snappFeat
+                element_id = feature.attribute(feat_type + '_id')
+
+                # LEAVE SELECTION
+                snapPoint.layer.select([snapPoint.snappedAtGeometry])
+
+                self.mincut(element_id,feat_type)
+
+
+    def mincut(self,elem_id,elem_type):
+
+        # Execute SQL function
+        function_name = "gw_fct_mincut"
+        sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(elem_id) + "', '" + str(elem_type) + "', '" + self.id_text + "');"
+        message = str(sql)
+        self.controller.show_info(message, context_name='ui_message')
+        self.hold_elem_id = elem_id
+        self.hold_elem_type = self.elem_type
+        self.hold_id_text = self.id_text
+        status = self.controller.execute_sql(sql)
+
+        # Refresh map canvas
+        self.iface.mapCanvas().refreshAllLayers()
+
+        if status:
+            message = "Mincut done successfully"
+            self.controller.show_info(message, context_name='ui_message')
+
+            # If mincut is done enable CustomMincut
+            self.actionCustomMincut.setDisabled(False)
+
+        # TRRIGER REPAINT
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
+
+
+    def customMincatInit(self):
+
+        # Check if user entered ID
+        check = self.check_id()
+        if check == 0:
+            return
+        else:
+            pass
+
+        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingValveAnalytics)
+
+
+    def snappingValveAnalytics(self):
+        # Set active layer
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("Valve analytics")[0]
+        self.iface.setActiveLayer(layer)
+
+        map_point = self.canvas.getCoordinateTransform().transform(point)
+        x = map_point.x()
+        y = map_point.y()
+        eventPoint = QPoint(x, y)
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+        # That's the snapped point
+        if result <> []:
+
+            # Check feature
+            for snapPoint in result:
+
+                if snapPoint.layer.name() == 'Valve analytics':
+                    # Get the point
+                    point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
+                    snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                    # LEAVE SELECTION
+                    result[0].layer.select([result[0].snappedAtGeometry])
+
+                    element_id = feature.attribute(feat_type + '_id')
+
+                    self.customMincut(element_id)
+
+
+    def customMincut(self,elem_id):
+        ''' Valve analytics '''
+
+        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_valve_unaccess (mincut_result_cat_id, valve_id)"
+        sql += " VALUES ('" + self.id_text + "', '" + elem_id + "')"
+
+        status = self.controller.execute_sql(sql)
+        if status:
+            # Show message to user
+            message = "Values has been updated"
+            self.controller.show_info(message, context_name='ui_message')
+
+        # After executing SQL call mincut action again
+        # Execute SQL function
+        function_name = "gw_fct_mincut"
+        # Use elem id of previous element - repeatin automatic mincut
+        sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(self.hold_elem_id) + "', '" + str(self.hold_elem_type) + "', '" + str(self.hold_id_text) + "');"
+        message = str(sql)
+        self.controller.show_info(message, context_name='ui_message')
+        status = self.controller.execute_sql(sql)
+
+        # Refresh map canvas
+        self.iface.mapCanvas().refreshAllLayers()
+
+        if status:
+            message = "Mincut done successfully"
+            self.controller.show_info(message, context_name='ui_message')
+
+            # If mincut is done enable CustomMincut
+            self.actionCustomMincut.setDisabled(False)
+
+        # TRRIGER REPAINT
+        for layerRefresh in self.iface.mapCanvas().layers():
+            layerRefresh.triggerRepaint()
