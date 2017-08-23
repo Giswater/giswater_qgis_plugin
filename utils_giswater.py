@@ -20,6 +20,8 @@ def setDialog(p_dialog):
 
 def fillComboBox(widget, rows, allow_nulls=True):
 
+    if rows is None:
+        return
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
     widget.clear()
@@ -69,6 +71,7 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
             if elem[0] == dict_field:
                 widget.addItem(elem[1])          
 
+
 def getText(widget):
     
     if type(widget) is str:
@@ -106,6 +109,7 @@ def setText(widget, text):
 
 
 def setCalendarDate(widget, date):
+    
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:

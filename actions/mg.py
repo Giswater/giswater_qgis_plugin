@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import Qt, QSettings, QPoint
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
 from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.Qt import QDate, QTime
@@ -273,7 +273,7 @@ class Mg(ParentAction):
 
         # Get giswater properties file
         users_home = os.path.expanduser("~")
-        filename = "giswater_2.0.properties"
+        filename = "giswater_"+self.giswater_version+".properties"
         java_properties_path = users_home+os.sep+"giswater"+os.sep+"config"+os.sep+filename
         if not os.path.exists(java_properties_path):
             msg = "Giswater properties file not found: "+str(java_properties_path)

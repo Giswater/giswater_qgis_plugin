@@ -25,6 +25,7 @@ class ParentAction():
         ''' Class constructor '''
 
         # Initialize instance attributes
+        self.giswater_version = "3.0"
         self.iface = iface
         self.settings = settings
         self.controller = controller
@@ -63,7 +64,7 @@ class ParentAction():
         ''' Get executable Giswater file and build version from windows registry '''
              
         reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\Giswater\\2.1"
+        reg_path = "SOFTWARE\\Giswater\\"+self.giswater_version
         reg_name = "InstallFolder"
         giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if giswater_folder is None:
