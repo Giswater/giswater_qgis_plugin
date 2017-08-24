@@ -251,6 +251,14 @@ def setWidgetVisible(widget, visible=True):
     if widget:
         widget.setVisible(visible)
         
+        
+def setWidgetEnabled(widget, enabled=True):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)    
+    if widget:
+        widget.setEnabled(enabled)
+                
 
 def setImage(widget,cat_shape):
     ''' Set pictures for UD'''

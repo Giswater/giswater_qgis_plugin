@@ -393,9 +393,9 @@ class Go2Epa(ParentAction):
     def enable_linetext(self, widget1, widget2, text):
         """ Enable or disable txt """
         if utils_giswater.getWidgetText(widget1) == text:
-            widget2.setEnabled(False)
+            utils_giswater.setWidgetEnabled(widget2, False)
         else:
-            widget2.setEnabled(True)
+            utils_giswater.setWidgetEnabled(widget2, True)
 
 
     def ud_options(self):

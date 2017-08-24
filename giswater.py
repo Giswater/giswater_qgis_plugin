@@ -132,7 +132,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01, 02, 19, 21, 23, 24, 25, 27, 28, 39, 41, 45, 46, 47, 48, 99):
+                if int(index_action) in (01, 02, 19, 21, 25, 27, 28, 39, 41, 45, 46, 47, 48, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
