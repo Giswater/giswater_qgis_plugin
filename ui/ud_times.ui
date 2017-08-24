@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Timeseries</string>
   </property>
   <widget class="QLabel" name="label_start_time">
    <property name="geometry">
