@@ -11,7 +11,6 @@ from PyQt4.QtCore import Qt
 from qgis.core import QgsMapLayerRegistry, QgsExpression, QgsFeatureRequest
 
 from functools import partial
-import os
 
 import utils_giswater
 from parent_init import ParentDialog
@@ -125,38 +124,26 @@ class ManArcDialog(ParentDialog):
         selected_layer = self.layer.name()
         widget = str(selected_layer.lower())+"_node_"+str(idx)     
         self.node_widget = self.dialog.findChild(QLineEdit,widget)
-        self.node_id= self.node_widget.text()
+        self.node_id = self.node_widget.text()
 
         # get pointer of node by ID
         aux = "\"node_id\" = "
-        # Get a featureIterator from this expression:
-        aux += "'" + str(self.node_id) + "', "
-        aux = aux[:-2] 
+        aux += "'" + str(self.node_id) + "'"
         expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)            
+            return            
 
         nodes = ["Manhole","Junction","Chamber","Storage","Netgully","Netinit","Wjump","Wwtp","Outfall","Valve"]    
-        for i in range(0,len(nodes)):
+        for i in range(0, len(nodes)):
             layer = QgsMapLayerRegistry.instance().mapLayersByName( nodes[i] )[0]
             # Get a featureIterator from this expression:
             it = layer.getFeatures(QgsFeatureRequest(expr))
             id_list = [i for i in it]
             if id_list != []:
                 self.iface.openFeatureForm(layer,id_list[0])
-        
-
-    def set_icon(self, widget, status):
-
-        # initialize plugin directory
-        user_folder = os.path.expanduser("~")
-        self.plugin_name = 'giswater'
-        self.plugin_dir = os.path.join(user_folder, '.qgis2/python/plugins/' + self.plugin_name)
-        self.layer = self.iface.activeLayer()
-        if status:
-            self.layer.startEditing()
-            widget.setActive(True)
-        else:
-            self.layer.rollBack()
-   
+         
     
     def fill_costs(self):
         ''' Fill tab costs '''
@@ -323,30 +310,35 @@ class ManArcDialog(ParentDialog):
         width.setText(str(row['width']))
 
         # Get values from database        
-        sql = "SELECT length,budget"
+        sql = "SELECT length, budget"
         sql+= " FROM "+self.schema_name+".v_plan_arc" 
         sql+= " WHERE arc_id = '"+self.arc_id+"'"    
         row = self.dao.get_row(sql)
+        if row:
+            self.length.setText(str(row['length'])) 
+            self.budget.setText(str(row['budget'])) 
         
-        self.length.setText(str(row['length'])) 
-        self.budget.setText(str(row['budget'])) 
-        
+        # Set SQL
+        sql_common = "SELECT descript FROM "+self.schema_name+".v_price_x_arc"
+        sql_common+= " WHERE arc_id = '"+self.arc_id+"'" 
+                
         element = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'element'" 
+        m2bottom = None
+        m3protec = None
+        
+        sql = sql_common + " AND identif = 'element'"          
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             element = row[0]
 
-        m2bottom = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm2bottom'" 
+        sql = sql_common + " AND identif = 'm2bottom'"  
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             m2bottom = row[0]
         
-        m3protec = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif = 'm3protec'" 
+        sql = sql_common + " AND identif = 'm3protec'"  
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             m3protec = row[0]
         
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
@@ -368,7 +360,6 @@ class ManArcDialog(ParentDialog):
         m3fill = None
         m3excess = None
         m2trenchl = None
-        sql_common = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"'"
         
         sql = sql_common + " AND identif = 'm3exc'"         
         row = self.dao.get_row(sql)
