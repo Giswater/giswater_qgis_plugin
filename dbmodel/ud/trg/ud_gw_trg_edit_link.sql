@@ -21,7 +21,7 @@ DECLARE
 	connec_geom_end public.geometry;
 	arc_id_start varchar;
 	arc_id_end varchar;
-	sector_id_varchar varchar;
+	sector_id_int integer;
 	connec_counter varchar;
 	
 BEGIN
@@ -42,7 +42,7 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-		/*
+		
 		-- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
@@ -50,16 +50,16 @@ BEGIN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
-		*/
+	
    			--vnode id
 			IF (NEW.vnode_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+				--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
 			END IF;      
 			
         -- link ID
 			IF (NEW.link_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn()+1,true);
+				--PERFORM setval('urn_id_seq', gw_fct_urn()+1,true);
 				NEW.link_id:= (SELECT nextval('urn_id_seq'));
 			END IF;			
 		
@@ -79,19 +79,23 @@ BEGIN
 				SELECT the_geom INTO connec_geom_end FROM connec WHERE ST_DWithin(vnode_end, connec.the_geom,0.001) LIMIT 1;
 				SELECT arc_id INTO arc_id_start FROM arc WHERE ST_DWithin(vnode_start, arc.the_geom,0.001) LIMIT 1;
 				SELECT arc_id INTO arc_id_end FROM arc WHERE ST_DWithin(vnode_end, arc.the_geom,0.001) LIMIT 1;
-				
+					
+				IF arc_geom_start IS  NULL  OR arc_geom_end IS  NULL  THEN			
+					RAISE NOTICE 'ARC START AND END NULL' ;
+				END IF;
+
 				IF arc_geom_start IS NOT NULL THEN
 				
 					IF NEW.feature_id IS NULL AND gully_geom_end IS NOT NULL  THEN
 						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_end, gully.the_geom,0.001));
 						NEW.featurecat_id='gully';
-						sector_id_varchar=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
+						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 
 					IF NEW.feature_id IS NULL AND connec_geom_end IS NOT NULL THEN
 						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_end, connec.the_geom,0.001));
 						NEW.featurecat_id='connec';
-						sector_id_varchar=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
+						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 					
 					SELECT connec_id INTO connec_counter FROM v_edit_man_connec WHERE connec_id=NEW.feature_id AND arc_id IS NOT NULL;
@@ -99,11 +103,11 @@ BEGIN
 						RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 					END IF;	
 					
-					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type) 
-					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_varchar,NEW.featurecat_id);			
+					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type,state) 
+					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_int,NEW.featurecat_id,NEW.state);			
 					
-					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom, expl_id, "state")
-					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom, expl_id_int, NEW."state");
+					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
+					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);
 				END IF;
 
 					IF arc_geom_end IS NOT NULL THEN		
@@ -111,12 +115,12 @@ BEGIN
 					IF NEW.feature_id IS NULL AND gully_geom_start IS NOT NULL THEN
 						NEW.feature_id=(SELECT gully_id FROM gully WHERE  ST_DWithin(vnode_start, gully.the_geom,0.001));
 						NEW.featurecat_id='gully';
-						sector_id_varchar=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
+						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 					IF NEW.feature_id IS NULL AND connec_geom_start IS NOT NULL THEN
 						NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001));
 						NEW.featurecat_id='connec';
-						sector_id_varchar=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
+						sector_id_int=(SELECT sector_id FROM connec WHERE connec_id=NEW.feature_id);
 					END IF;
 					
 				SELECT connec_id INTO connec_counter FROM v_edit_man_connec WHERE connec_id=NEW.feature_id AND arc_id IS NOT NULL;
@@ -124,8 +128,8 @@ BEGIN
 						RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 				END IF;
 				
-					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type) 
-					VALUES (NEW.vnode_id, vnode_start, expl_id_int, sector_id_varchar,NEW.featurecat_id);			
+					INSERT INTO vnode (vnode_id, the_geom, expl_id,  sector_id, vnode_type,state) 
+					VALUES (NEW.vnode_id, vnode_end, expl_id_int, sector_id_int,NEW.featurecat_id,NEW.state);			
 					
 					INSERT INTO link (link_id,featurecat_id, feature_id, vnode_id,  the_geom)
 					VALUES (NEW.link_id,  NEW.featurecat_id, NEW.feature_id, NEW.vnode_id, NEW.the_geom);

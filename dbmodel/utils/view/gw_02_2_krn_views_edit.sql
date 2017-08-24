@@ -16,7 +16,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	code,
 	lab_code,
 	feature_id,
-	featurecat_id
+	featurecat_id,
 	dma_id,
 	state,
 	workcat_id,

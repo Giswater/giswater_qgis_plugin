@@ -35,7 +35,18 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-
+			
+        -- Dma ID
+        IF (NEW.dma_id IS NULL) THEN
+            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+                RETURN audit_function(125,830);  
+            END IF;
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+            IF (NEW.dma_id IS NULL) THEN
+                RETURN audit_function(130,830);  
+            END IF;            
+        END IF;
+		
 --Samplepoint ID
 		IF (NEW.sample_id IS NULL) THEN
 			SELECT max(sample_id::integer) INTO sample_id_seq FROM samplepoint WHERE sample_id ~ '^\d+$';
@@ -45,9 +56,8 @@ BEGIN
 		
 -- FEATURE INSERT      
 		
-				INSERT INTO samplepoint (sample_id, state, rotation, code_lab, element_type, workcat_id, workcat_id_end, street1, street2, place, element_code, cabinet, dma_id2, observations, the_geom, expl_id)
-				VALUES (NEW.sample_id, NEW.state, NEW.rotation, NEW.code_lab, NEW.element_type, NEW.workcat_id, NEW.workcat_id_end, NEW.street1, NEW.street2, NEW.place, NEW.element_code,
-				NEW.cabinet, NEW.dma_id2, NEW.observations, NEW.the_geom, expl_id_int);
+				INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, "state", workcat_id, workcat_id_end, rotation, street1, street2, place_name, cabinet, observations, the_geom, expl_id)
+				VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW."state", NEW.workcat_id, NEW.workcat_id_end,  NEW.rotation, NEW.street1, NEW.street2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, expl_id_int);
 	
 		RETURN NEW;
 						
@@ -58,8 +68,8 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 			UPDATE samplepoint 
-			SET sample_id=NEW.sample_id, state=NEW.state, rotation=NEW.rotation, code_lab=NEW.code_lab, element_type=NEW.element_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, street1=NEW.street1, 
-			street2=NEW.street2, place=NEW.place, element_code=NEW.element_code, cabinet=NEW.cabinet, dma_id2=NEW.dma_id2, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+			SET sample_id=NEW.sample_id,  code=NEW.code,lab_code=NEW.lab_code,  feature_id=NEW.feature_id, featurecat_id=NEW.featurecat_id, dma_id=NEW.dma_id,"state"=NEW."state", rotation=NEW.rotation, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
+			street1=NEW.street1, street2=NEW.street2, place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id
 			WHERE sample_id=NEW.sample_id;
 
         PERFORM audit_function(2,430); 

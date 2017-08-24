@@ -29,13 +29,13 @@ BEGIN
 		
 			--vnode id
 		IF (NEW.vnode_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+				--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				NEW.vnode_id:= (SELECT nextval('urn_id_seq'));
 			END IF;               
 			
         -- link ID
 		IF (NEW.link_id IS NULL) THEN
-				PERFORM setval('urn_id_seq', gw_fct_urn()+1,true);
+				--PERFORM setval('urn_id_seq', gw_fct_urn()+1,true);
 				NEW.link_id:= (SELECT nextval('urn_id_seq'));
 			END IF;			
 		
@@ -51,7 +51,7 @@ BEGIN
 		
 		IF NEW.feature_id IS NULL THEN
 			NEW.feature_id=(SELECT connec_id FROM connec WHERE  ST_DWithin(vnode_start, connec.the_geom,0.001) OR ST_DWithin(vnode_end, connec.the_geom,0.001));
-			NEW.featurecat_id=(SELECT connec_type FROM connec WHERE connec_id=NEW.feature_id);
+			NEW.featurecat_id=(SELECT connec_type FROM connec JOIN cat_connec ON connec.connecat_id = cat_connec.id JOIN connec_type ON cat_connec.connectype_id = connec_type.id WHERE connec_id=NEW.feature_id);
 		END IF;
 		
 		IF arc_geom_start IS NOT NULL THEN
@@ -67,14 +67,14 @@ BEGIN
 			RAISE EXCEPTION 'Connec already has a link %', NEW.feature_id;
 		END IF;
 		
-		INSERT INTO link (link_id, feature_id, vnode_id, custom_length, the_geom, featurecat_id)
-		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id, NEW.custom_length, NEW.the_geom, NEW.featurecat_id);
+		INSERT INTO link (link_id, feature_id, vnode_id, the_geom, featurecat_id)
+		VALUES (NEW.link_id, NEW.feature_id, NEW.vnode_id,  NEW.the_geom, NEW.featurecat_id);
 		
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE link 
-		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, custom_length=NEW.custom_length, the_geom=NEW.the_geom, featurecat_id=NEW.featurecat_id
+		SET link_id=NEW.link_id, feature_id=NEW.feature_id, vnode_id=NEW.vnode_id, the_geom=NEW.the_geom, featurecat_id=NEW.featurecat_id
 		WHERE link_id=OLD.link_id;			
                 
         RETURN NEW;
