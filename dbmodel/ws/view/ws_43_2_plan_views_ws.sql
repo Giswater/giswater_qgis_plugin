@@ -4,8 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-/*
-SET search_path = "test_ws11", public, pg_catalog;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 -- SPECIFIC SQL (WS)
 
@@ -631,4 +631,3 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
 				   				   
 				GROUP BY wtotal.psector_id, wtotal.the_geom;
 				
-	*/			
