@@ -21,34 +21,38 @@ BEGIN
 
         -- connec ID
         IF (NEW.connec_id IS NULL) THEN
-            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+            --PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.connec_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
         -- connec Catalog ID
         IF (NEW.connecat_id IS NULL) THEN
-                RETURN audit_function(150,860); 
+               -- RETURN audit_function(150,860); 
+			   NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='connecat_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.connecat_id IS NULL) THEN
+				NEW.connecat_id:=(SELECT id FROM cat_connec LIMIT 1);
+			END IF;
         END IF;
 
         -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                RETURN audit_function(115,860); 
+               -- RETURN audit_function(115,860); 
             END IF;
             NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
             IF (NEW.sector_id IS NULL) THEN
-                RETURN audit_function(120,860); 
+               -- RETURN audit_function(120,860); 
             END IF;
         END IF;
         
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                RETURN audit_function(125,860); 
+               -- RETURN audit_function(125,860); 
             END IF;
             NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
             IF (NEW.dma_id IS NULL) THEN
-                RETURN audit_function(130,860); 
+               -- RETURN audit_function(130,860); 
             END IF;
         END IF;
 		

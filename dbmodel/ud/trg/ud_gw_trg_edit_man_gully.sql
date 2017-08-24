@@ -24,7 +24,7 @@ BEGIN
 
         -- gully ID
         IF (NEW.gully_id IS NULL) THEN
-            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+            --PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.gully_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -40,7 +40,11 @@ BEGIN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
                 RETURN audit_function(115,850); 
             END IF;
-            NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+            IF gully_geometry = 'gully' THEN
+				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
+			ELSIF gully_geometry = 'gully_pol' THEN
+				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom_pol, sector.the_geom,0.001) LIMIT 1);
+			END IF;
             IF (NEW.sector_id IS NULL) THEN
                 RETURN audit_function(120,850); 
             END IF;
@@ -51,7 +55,11 @@ BEGIN
             IF ((SELECT COUNT(*) FROM dma) = 0) THEN
                 RETURN audit_function(125,850); 
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+		  IF gully_geometry = 'gully' THEN
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			ELSIF gully_geometry = 'gully_pol' THEN
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom_pol, dma.the_geom,0.001) LIMIT 1);
+			END IF;
             IF (NEW.dma_id IS NULL) THEN
                 RETURN audit_function(130,850); 
             END IF;
@@ -92,7 +100,12 @@ BEGIN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				
             END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+		  IF gully_geometry = 'gully' THEN
+				expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+			ELSIF gully_geometry = 'gully_pol' THEN
+				expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom_pol, exploitation.the_geom,0.001) LIMIT 1);
+			END IF;			
+            
             IF (expl_id_int IS NULL) THEN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
@@ -101,24 +114,23 @@ BEGIN
 		
         -- FEATURE INSERT
  IF gully_geometry = 'gully' THEN
-        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", dma_id, 
+        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", dma_id, 
 					soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript,rotation, link, 
-					verified, the_geom,	undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, enddate, streetaxis_id, postnumber,  uncertain, num_value)
-					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, 
+					verified, the_geom,	undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, streetaxis_id, postnumber,  uncertain, num_value)
+					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, 
 					NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, 
 					NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,
-					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int , NEW.publish, NEW.inventory, NEW.enddate, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
+					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int , NEW.publish, NEW.inventory,  NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
 
 
         ELSIF gully_geometry = 'gully_pol' THEN
-        INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", annotation, "observ", "comment", 
-                    dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, 
-					rotation, link, verified, the_geom_pol, undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, enddate, streetaxis_id, postnumber, uncertain, num_value)
-					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, 
-					NEW.arc_id, NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,
-					NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate,NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, 
-					NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.featurecat_id, NEW.feature_id, NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int, NEW.publish, NEW.inventory, 
-					NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
+        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", dma_id, 
+					soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript,rotation, link, 
+					verified, the_geom_pol,	undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, streetaxis_id, postnumber,  uncertain, num_value)
+					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, 
+					NEW.sector_id, NEW."state", NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, 
+					NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom_pol, NEW.undelete,NEW.featurecat_id,
+					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int , NEW.publish, NEW.inventory,  NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
         END IF;  
 
 
@@ -129,16 +141,23 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
         -- UPDATE dma/sector
-        IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)THEN   
-            NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);         
+        IF gully_geometry = 'gully'  THEN
+			IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN   
+				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);          
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1); 
+			END IF;
+        ELSIF gully_geometry = 'gully_pol' THEN 
+			IF (NEW.the_geom_pol IS DISTINCT FROM OLD.the_geom_pol) THEN   
+				NEW.sector_id:= (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom_pol, sector.the_geom,0.001) LIMIT 1);          
+				NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom_pol, dma.the_geom,0.001) LIMIT 1);         
+			END IF;
         END IF;
 
 
         -- UPDATE values
 		IF gully_geometry = 'gully' THEN
 			UPDATE gully 
-			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, arccat_id=NEW.arccat_id, 
+			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, 
 			connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", 
 			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
@@ -150,12 +169,12 @@ BEGIN
 
         ELSIF gully_geometry = 'gully_pol' THEN
 			UPDATE gully 
-			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, arccat_id=NEW.arccat_id, 
+			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, 
 			connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", 
 			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
             ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
-            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
+            rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom_pol=NEW.the_geom_pol,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
 			label_x=NEW.label_x, label_y=NEW.label_y,label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 			 streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber,   expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value
 			WHERE gully_id = OLD.gully_id;

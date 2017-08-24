@@ -885,7 +885,7 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value as manhole_num_value,
-man_manhole.length AS manhole_lepth,
+man_manhole.length AS manhole_length,
 man_manhole.width AS manhole_width,
 man_manhole.sander_depth AS manhole_sander_depth,
 man_manhole.prot_surface AS manhole_prot_surface,
@@ -1153,7 +1153,7 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value as chamber_num_value,
-man_chamber.pol_id,
+man_chamber.pol_id AS chamber_pol_id,
 man_chamber.length AS chamber_length,
 man_chamber.width AS chamber_width,
 man_chamber.sander_depth AS chamber_sander_depth,
@@ -1223,7 +1223,7 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value as chamber_num_value,
-man_chamber.pol_id,
+man_chamber.pol_id  AS chamber_pol_id,
 man_chamber.length AS chamber_length,
 man_chamber.width AS chamber_width,
 man_chamber.sander_depth AS chamber_sander_depth,
@@ -1294,7 +1294,7 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value as wwtp_num_value,
-man_wwtp.pol_id,
+man_wwtp.pol_id AS wwtp_pol_id,
 man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
@@ -1343,7 +1343,7 @@ node.descript AS wwtp_descript,
 node.rotation AS wwtp_rotation,
 node.link AS wwtp_link,
 node.verified,
-node.the_geom,
+polygon.the_geom,
 node.undelete,
 node.label_x AS wwtp_label_x,
 node.label_y AS wwtp_label_y,
@@ -1356,7 +1356,7 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value as wwtp_num_value,
-man_wwtp.pol_id,
+man_wwtp.pol_id AS wwtp_pol_id, 
 man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
@@ -1370,12 +1370,12 @@ DROP VIEW IF EXISTS v_edit_man_netelement CASCADE;
 CREATE OR REPLACE VIEW v_edit_man_netelement AS 
 SELECT 
 node.node_id,
-node.code AS netel_code,
-node.top_elev AS netel_top_elev,
-node.custom_top_elev AS netel_custom_top_elev,
-node.ymax AS netele_ymax,
-node.custom_ymax AS netel_custom_ymax,
-node.elev AS netel_elev,
+node.code AS netelement_code,
+node.top_elev AS netelement_top_elev,
+node.custom_top_elev AS netelement_custom_top_elev,
+node.ymax AS netelement_ymax,
+node.custom_ymax AS netelement_custom_ymax,
+node.elev AS netelement_elev,
 node.custom_elev AS netelement_custom_elev,
 v_node.elev AS netelement_sys_elev,
 node.node_type,
@@ -1418,12 +1418,12 @@ node.unconnected,
 sector.macrosector_id,
 node.expl_id,
 node.num_value as netelement_num_value,
-man_netelement.serial_number
+man_netelement.serial_number as netelement_serial_number
 FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
-	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); ;
+	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); 
 
 
 
