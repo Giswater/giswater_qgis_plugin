@@ -20,6 +20,7 @@ from ..ui.mincut import Mincut
 from ..ui.mincut_fin import Mincut_fin
 from ..ui.multi_selector import Multi_selector
 from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer
+from ..ui.mincut_add_connec import Mincut_add_connec
 
 from datetime import datetime, date
 import os
@@ -80,19 +81,6 @@ class MincutParent(ParentAction):
         arcs = self.controller.get_rows(sql)
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
-
-
-
-    def close_dialog(self, dlg=None):
-        ''' Close dialog '''
-
-        dlg.close()
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass
 
 
     def mg_mincut(self):
@@ -188,7 +176,7 @@ class MincutParent(ParentAction):
         self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincutInit)
         #self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
         #self.actionCustomMincut.triggered.connect(self.customMincut)
-        self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.addConnecInit)
+        self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.addConnec)
         self.dlg.findChild(QAction, "actionAddHydrometer").triggered.connect(self.addHydrometer)
 
         self.dlg.show()
@@ -208,7 +196,7 @@ class MincutParent(ParentAction):
         self.depth.setEnabled(True)
         self.real_description.setEnabled(True)
 
-        # set status
+        # Set status
         self.state.setText(str(self.state_values[1][0]))
 
 
@@ -250,7 +238,6 @@ class MincutParent(ParentAction):
         street_fin = str(self.street.text())
         number_fin = str(self.number.text())
 
-        #address_fin = street_fin + " " + number_fin
         self.mincut_fin.setText(id_fin)
         self.street_fin.setText(street_fin)
         self.number_fin.setText(number_fin)
@@ -272,9 +259,6 @@ class MincutParent(ParentAction):
         # exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
-        # address = str(street +" "+ number)
-        # mincut_result_type = str(utils_giswater.getWidgetText("type"))
-        # anl_cause = str(utils_giswater.getWidgetText("cause"))
         mincut_result_type = self.type.currentText()
         anl_cause = self.cause.currentText()
 
@@ -337,7 +321,9 @@ class MincutParent(ParentAction):
         self.dlg_fin.close()
 
 
-    def addConnecInit(self):
+    def addConnec(self):
+        ''' Init function od add connec '''
+        self.ids = []
 
         # Check if user entered ID
         check = self.check_id()
@@ -346,6 +332,52 @@ class MincutParent(ParentAction):
         else:
             pass
 
+        self.dlg_connec = Mincut_add_connec()
+        utils_giswater.setDialog(self.dlg_connec)
+
+        table = "connec"
+
+        self.tbl_connec = self.dlg_connec.findChild(QTableView, "tbl_mincut_connec")
+
+        #- self.btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
+        # -self.btn_cancel.pressed.connect(self.close_dialog_multi)
+
+        self.btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
+        self.btn_delete_connec.pressed.connect(partial(self.delete_records, self.tbl_connec, table, "connec_id"))
+
+        self.btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
+        self.btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table,"connec_id",self.dlg_connec))
+
+        self.btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
+        self.btn_insert_connec_snap.pressed.connect(self.snapping_init)
+
+        btn_accept = self.dlg_connec.findChild(QPushButton, "btn_accept")
+        btn_accept.pressed.connect(partial(self.exec_sql,"connec_id", "connec"))
+
+        self.connec = self.dlg_connec.findChild(QLineEdit, "connec_id")
+        # Adding auto-completion to a QLineEdit
+        self.completer = QCompleter()
+        self.connec.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(connec_id) FROM " + self.schema_name + ".connec "
+        row = self.controller.get_rows(sql)
+
+        values = []
+        for value in row:
+            values.append(str(value[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+
+        # Set signal to reach selected value from QCompleter
+        # self.completer.activated.connect(self.autocomplete)
+
+        # self.fill_table(self.tbl, self.schema_name+"."+table)
+        self.dlg_connec.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_connec.show()
+
+    def snapping_init(self):
         QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),self.snappingConnec)
 
 
@@ -381,32 +413,41 @@ class MincutParent(ParentAction):
                 # LEAVE SELECTION
                 snapPoint.layer.select([snapPoint.snappedAtGeometry])
 
-                self.addConnec(element_id)
 
+                # Add element
+                #self.addConnec(element_id)
+                table_name = self.schema_name + ".connec"
+                if element_id in self.ids:
+                    message = " Connec_id :" + element_id + " id already in the list!"
+                    self.controller.show_info_box(message, context_name='ui_message')
+                    return
+                else:
+                    self.ids.append(element_id)
 
-    def addConnec(self,element_id):
+                # Reload table
+                expr = "connec_id = '" + self.ids[0] + "'"
+                if len(self.ids) > 1:
+                    for el in range(1, len(self.ids)):
+                        expr += " OR connec_id= '" + self.ids[el] + "'"
 
-        sql = "DELETE FROM " + self.schema_name + ".anl_mincut_connec"
-        self.controller.execute_sql(sql)
+                # expr = "hydrometer_id = '368' OR hydrometer_id = '334' OR hydrometer_id = '675'"
+                # Set model
+                model = QSqlTableModel();
+                model.setTable(table_name)
+                model.setEditStrategy(QSqlTableModel.OnManualSubmit)
 
-        # Insert into anl_mincut_connec all selected connecs
-        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_connec (connec_id)"
-        sql += " VALUES ('" + element_id + "')"
-        status = self.controller.execute_sql(sql)
-        if status:
-            # Show message to user
-            message = "Values has been updated"
-            self.controller.show_info(message, context_name='ui_message')
+                model.select()
 
-        # Execute SQL function
-        function_name = "gw_fct_mincut_result_catalog"
-        sql = "SELECT " + self.schema_name + "." + function_name + "('" + self.id_text + "');"
+                # Check for errors
+                if model.lastError().isValid():
+                    self.controller.show_warning(model.lastError().text())
 
-        status = self.controller.execute_sql(sql)
+                # Attach model to table view
+                #widget.setModel(model)
+                self.tbl_connec.setModel(model)
 
-        if status:
-            message = "Execute gw_fct_mincut_result_catalog done successfully"
-            self.controller.show_info(message, context_name='ui_message')
+                self.tbl_connec.model().setFilter(expr)
+                self.tbl_connec.model().select()
 
 
     def check_id(self):
@@ -425,6 +466,8 @@ class MincutParent(ParentAction):
     def addHydrometer(self):
         ''' Action add hydtometer '''
 
+        self.ids = []
+
         # Check if user entered ID
         check = self.check_id()
         if check == 0 :
@@ -442,18 +485,17 @@ class MincutParent(ParentAction):
         #- self.btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
         # -self.btn_cancel.pressed.connect(self.close_dialog_multi)
 
+        self.hydrometer = self.dlg_hydro.findChild(QLineEdit, "hydrometer_id")
+
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
-        self.btn_delete_hydro.pressed.connect(partial(self.delete_records_hydro, self.tbl, table))
+        self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table,"hydrometer_id"))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-
-        self.hydro_ids = []
-        self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table))
+        self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
 
         self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
-        self.btn_accept.pressed.connect(self.exec_hydro)
+        self.btn_accept.pressed.connect(partial(self.exec_sql,"hydrometer_id", "hydrometer"))
 
-        self.hydrometer = self.dlg_hydro.findChild(QLineEdit, "hydrometer_id")
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
         self.hydrometer.setCompleter(self.completer)
@@ -477,28 +519,33 @@ class MincutParent(ParentAction):
         self.dlg_hydro.show()
 
 
-    def fill_table(self, widget, table_name):
+    def fill_table(self, widget, table_name ,id, dialog) :
         ''' Set a model with selected filter.
         Attach that model to selected table '''
 
         expr = ""
-        hydro_id = self.hydrometer.text()
-        if hydro_id in self.hydro_ids:
-            message = "Hydrometer_id "+hydro_id+" id already in the list!"
-            self.controller.show_info_box(message, context_name='ui_message')
-            return
-        else :
-            self.hydro_ids.append(hydro_id)
+        # el_id->hydro_id = self.hydrometer.text()
+        widget_id = dialog.findChild(QLineEdit, id )
+        el_id = widget_id.text()
 
         # Check if user entered hydrometer_id
-        if hydro_id == "":
+        if el_id == "":
             message = "You need to enter id"
             self.controller.show_info_box(message, context_name='ui_message')
             return
-        expr = "hydrometer_id = '" + self.hydro_ids[0] + "'"
-        if len(self.hydro_ids) > 1:
-            for id in range(1, len(self.hydro_ids)):
-                expr += " OR hydrometer_id = '" + self.hydro_ids[id] + "'"
+
+        if el_id in self.ids:
+            message = str(id)+ ":"+el_id+" id already in the list!"
+            self.controller.show_info_box(message, context_name='ui_message')
+            return
+        else :
+            self.ids.append(el_id)
+
+        # Reload table
+        expr = str(id) + " = '" + self.ids[0] + "'"
+        if len(self.ids) > 1:
+            for el in range(1, len(self.ids)):
+                expr += " OR " + str(id) + "= '" + self.ids[el] + "'"
 
         # expr = "hydrometer_id = '368' OR hydrometer_id = '334' OR hydrometer_id = '675'"
         # Set model
@@ -578,6 +625,7 @@ class MincutParent(ParentAction):
 
     def insert(self, id_action, table):
         ''' On action(select value from menu) execute SQL '''
+
         # Insert value into database
         sql = "INSERT INTO "+self.schema_name+"."+table+" (id) "
         sql+= " VALUES ('"+id_action+"')"
@@ -604,7 +652,7 @@ class MincutParent(ParentAction):
         widget.setModel(model)
 
 
-    def delete_records_hydro(self, widget, table_name):
+    def delete_records(self, widget, table_name, id) :
         ''' Delete selected elements of the table '''
 
         # Get selected rows
@@ -619,7 +667,8 @@ class MincutParent(ParentAction):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = widget.model().record(row).value("hydrometer_id")
+            #id_ = widget.model().record(row).value("hydrometer_id")
+            id_ = widget.model().record(row).value(id)
             inf_text += str(id_) + ", "
             list_id = list_id + "'" + str(id_) + "', "
             #del_id.append(str(list_id))
@@ -629,32 +678,33 @@ class MincutParent(ParentAction):
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",inf_text)
 
         if answer:
-            for id in del_id:
-                self.hydro_ids.remove(id)
+            for el in del_id:
+                self.ids.remove(el)
 
         expr = ""
         # Reload table
-        expr = "hydrometer_id = '" + self.hydro_ids[0] + "'"
-        if len(self.hydro_ids) > 1:
-            for id in range(1, len(self.hydro_ids)):
-                expr += " OR hydrometer_id = '" + self.hydro_ids[id] + "'"
+        expr = str(id)+" = '" + self.ids[0] + "'"
+        if len(self.ids) > 1:
+            for el in range(1, len(self.ids)):
+                expr += " OR "+str(id)+ "= '" + self.ids[el] + "'"
 
         widget.model().setFilter(expr)
         widget.model().select()
 
 
-    def exec_hydro(self):
+    def exec_sql(self, id_el, element):
+
         # delete * from anl_mincut_hydrometer
-        sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_hydrometer"
+        sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_"+str(element)
         self.controller.execute_sql(sql)
 
-        for id in self.hydro_ids:
+        for id in self.ids:
             # Insert into anl_mincut_hydrometer all selected connecs
-            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_hydrometer (hydrometer_id)"
+            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_"+str(element)+" ("+str(id_el)+")"
             sql += " VALUES ('" + id + "')"
-            status_insert = self.controller.execute_sql(sql)
+            status = self.controller.execute_sql(sql)
 
-            if status_insert:
+            if status:
                 # Show message to user
                 # message = "Values has been updated"
                 # self.controller.show_info(message, context_name='ui_message')
@@ -704,7 +754,6 @@ class MincutParent(ParentAction):
             widget.model().select()
 
 
-
     def mincutInit(self):
 
         # Check if user entered ID
@@ -727,6 +776,9 @@ class MincutParent(ParentAction):
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
+        message = str(result)
+        self.controller.show_info(message, context_name='ui_message')
+
         # That's the snapped point
         if result <> []:
 
@@ -737,24 +789,31 @@ class MincutParent(ParentAction):
                 message = str(element_type)
                 self.controller.show_info(message, context_name='ui_message')
 
+                message = str(len(result))
+                self.controller.show_info(message, context_name='ui_message')
+
                 if element_type in self.arc_group :
                     feat_type = 'arc'
+                    message = "arccc"
+                    self.controller.show_info(message, context_name='ui_message')
                 if element_type in self.node_group:
                     feat_type = 'node'
+                    message = "noooede"
+                    self.controller.show_info(message, context_name='ui_message')
+
                 #else:
                 #    continue
 
+                    # Get the point
+                    point = QgsPoint(snapPoint.snappedVertex)
+                    snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                    feature = snappFeat
+                    element_id = feature.attribute(feat_type + '_id')
 
-                # Get the point
-                point = QgsPoint(snapPoint.snappedVertex)
-                snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
-                feature = snappFeat
-                element_id = feature.attribute(feat_type + '_id')
+                    # LEAVE SELECTION
+                    snapPoint.layer.select([snapPoint.snappedAtGeometry])
 
-                # LEAVE SELECTION
-                snapPoint.layer.select([snapPoint.snappedAtGeometry])
-
-                self.mincut(element_id,feat_type)
+                    self.mincut(element_id,feat_type)
 
 
     def mincut(self,elem_id,elem_type):
