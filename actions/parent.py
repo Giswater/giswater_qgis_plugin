@@ -13,6 +13,8 @@ import sys
 import webbrowser
 import ConfigParser
 
+from PyQt4.QtGui import QMessageBox
+
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater    
@@ -31,7 +33,8 @@ class ParentAction():
         self.controller = controller
         self.plugin_dir = plugin_dir       
         self.dao = self.controller.dao         
-        self.schema_name = self.controller.schema_name  
+        self.schema_name = self.controller.schema_name
+        self.project_type = None
           
         # Get files to execute giswater jar (only in Windows)
         if 'nt' in sys.builtin_module_names: 
@@ -185,7 +188,7 @@ class ParentAction():
         
         # Compare Java and Plugin versions
         if self.plugin_version <> self.giswater_build_version:
-            msg = "Giswater and plugin versions are different. "
+            msg = "Giswater and plugin versions are different. \n"
             msg+= "Giswater version: "+self.giswater_build_version
             msg+= " - Plugin version: "+self.plugin_version
             self.controller.show_info(msg, 10, context_name='ui_message')
@@ -201,9 +204,7 @@ class ParentAction():
         url = utils_giswater.getWidgetText(widget) 
         if url == 'null':
             url = 'www.giswater.org'
-            webbrowser.open(url)
-        else:
-            webbrowser.open(url)        
+        webbrowser.open(url)        
                 
                 
     def open_file_dialog(self, widget):
@@ -234,4 +235,10 @@ class ParentAction():
 
         # Set text to QLineEdit
         widget.setText(abs_path[0]+'/')
-                        
+
+
+    def test(self, text):
+        QMessageBox.about(None, 'Ok', str(text))
+
+    def pressbtn(self):
+        QMessageBox.about(None, 'Ok', str('btn pressed'))

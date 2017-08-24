@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>383</height>
+    <width>528</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>File</string>
+   <string>Multirow selector</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -19,7 +19,7 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>440</x>
      <y>345</y>
      <width>75</width>
      <height>23</height>
@@ -32,7 +32,7 @@
   <widget class="QTableView" name="all_row">
    <property name="geometry">
     <rect>
-     <x>25</x>
+     <x>20</x>
      <y>45</y>
      <width>216</width>
      <height>286</height>
@@ -42,7 +42,7 @@
   <widget class="QTableView" name="selected_row">
    <property name="geometry">
     <rect>
-     <x>315</x>
+     <x>300</x>
      <y>45</y>
      <width>216</width>
      <height>286</height>
@@ -52,7 +52,7 @@
   <widget class="QPushButton" name="btn_select">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>250</x>
      <y>45</y>
      <width>36</width>
      <height>31</height>
@@ -65,7 +65,7 @@
   <widget class="QPushButton" name="btn_unselect">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>250</x>
      <y>90</y>
      <width>36</width>
      <height>31</height>
@@ -78,7 +78,7 @@
   <widget class="QLineEdit" name="txt_name">
    <property name="geometry">
     <rect>
-     <x>25</x>
+     <x>20</x>
      <y>15</y>
      <width>216</width>
      <height>20</height>

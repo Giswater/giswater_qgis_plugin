@@ -16,6 +16,7 @@ from functools import partial
 
 from actions.ed import Ed
 from actions.mg import Mg
+from actions.go2epa import Go2Epa
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -104,6 +105,7 @@ class Giswater(QObject):
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
@@ -130,13 +132,16 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01,02,19, 21, 23, 24, 25,27,39,41,45,46,47,48,28,99):
+                if int(index_action) in (01, 02, 19, 21, 25, 27, 28, 39, 41, 45, 46, 47, 48, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
                 elif int(index_action) in (32, 33, 34, 36):                       
                     callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)                    
+                    action.triggered.connect(callback_function)
+                elif int(index_action) in (23, 24):
+                    callback_function = getattr(self.go2epa, function_name)
+                    action.triggered.connect(callback_function)
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -144,9 +149,7 @@ class Giswater(QObject):
                     action.triggered.connect(partial(callback_function, function_name))
             except AttributeError:
                 action.setEnabled(False)                
-        else:
-            action.setEnabled(False)
-            
+
      
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
@@ -481,11 +484,13 @@ class Giswater(QObject):
         ''' Search in table 'version' project type of current QGIS project '''
         
         try:
-            self.mg.project_type = None
+            self.mg.set_project_type(None)
+            self.go2epa.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
-                self.mg.project_type = wsoftware.lower()
+                self.mg.set_project_type(wsoftware.lower())
+                self.go2epa.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
                     self.actions['26'].setVisible(True)
                     self.actions['27'].setVisible(True)
