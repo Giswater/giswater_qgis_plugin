@@ -151,10 +151,12 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-        
-        # Event
-        #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
-        #self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+             
+        # Set snapping
+        self.canvas = self.iface.mapCanvas()
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         
     def open_selected_event_from_table(self):
@@ -377,22 +379,13 @@ class ManNodeDialog(ParentDialog):
      
     def action_rotation(self):
     
-        mapCanvas = self.iface.mapCanvas()
-        self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
-        mapCanvas.setMapTool(self.emitPoint)
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.get_coordinates)
+        self.emit_point.canvasClicked.connect(self.get_coordinates)      
         
         
-    def get_coordinates(self, point, btn):
-
-        canvas = self.iface.mapCanvas()
-        self.snapper = QgsMapCanvasSnapper(canvas)
-       
-        x = point.x()
-        y = point.y()
+    def get_coordinates(self, point, btn):   #@UnusedVariable
         
-        layer = self.iface.activeLayer().name()
-        table = "v_edit_man_"+str(layer.lower())
+        layer_name = self.iface.activeLayer().name()
+        table = "v_edit_man_"+str(layer_name.lower())
         
         sql = "SELECT ST_X(the_geom),ST_Y(the_geom)"
         sql+= " FROM "+self.schema_name+"."+table
@@ -413,21 +406,12 @@ class ManNodeDialog(ParentDialog):
         
              
     def action_copy_paste(self):
+                          
+        self.emit_point.canvasClicked.connect(self.manage_snapping)      
         
-        # Activate snapping
-        mapCanvas = self.iface.mapCanvas()
-        self.emitPoint = QgsMapToolEmitPoint(mapCanvas)
-        mapCanvas.setMapTool(self.emitPoint)
-
-        self.canvas = self.iface.mapCanvas()
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
         
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.manage_snapping)
-      
-      
-    def manage_snapping(self, point, btn):
-     
-        #currentTool = self.iface.mapCanvas().mapTool()
+    def manage_snapping(self, point):    
+                         
         # Get node of snapping
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -439,84 +423,49 @@ class ManNodeDialog(ParentDialog):
 
         # That's the snapped point
         if result <> []:
-
-            # Check feature
-            for snapPoint in result:
-                
-                if snapPoint.layer.name() == self.iface.activeLayer().name():
-                
-                    # Get the point
-                    point = QgsPoint(snapPoint.snappedVertex)   #@UnusedVariable
-                    snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
-                    feature = snappFeat
-                    
-                    #element_id = feature.attribute('state')
-                    element_id = feature.attribute('node_id')
-                    feature_attributes = feature.attributes()
-                    
-                    
-                    #Delete firts element : node_id because we dont want to copy id 
-                    
-                    #feature_attributes.pop(0)
-
-                    # LEAVE SELECTION
-                    snapPoint.layer.select([snapPoint.snappedAtGeometry])
-
+            for snapped_point in result:
+                if snapped_point.layer.name() == self.iface.activeLayer().name():
+                    # Get only one feature
+                    point = QgsPoint(snapped_point.snappedVertex)   #@UnusedVariable
+                    snapped_feature = next(snapped_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapped_point.snappedAtGeometry)))
+                    snapped_feature_attr = snapped_feature.attributes()
+                    # Leave selection
+                    snapped_point.layer.select([snapped_point.snappedAtGeometry])
                     break
-
-        # Copy
-        layer = self.iface.activeLayer()
-
-        provider = layer.dataProvider()
-        # Fields of attribute table
-        fields = provider.fields()
-        #for field in fields:
         
-        # Get feature for the form 
-        # Get pointer of node by ID
-
         aux = "\"node_id\" = "
-        aux += "'" + str(self.id) + "', "
-        aux = aux[:-2] 
-         
+        aux += "'" + str(self.id) + "'"         
         expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)            
+            return    
+            
         layer = self.iface.activeLayer()
+        fields = layer.dataProvider().fields()
         layer.startEditing()
-        
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i for i in it]
         
-        n = len(fields)
-        message = ""
         if id_list != []:
             
-            
             # id_list[0]: pointer on current feature
-            id_current=id_list[0].attribute('node_id')
-            # Replace id 
-            feature_attributes[0]=id_current
+            id_current = id_list[0].attribute('node_id')
             
-            '''
-            message = "Do you want to update these values for node" + str(self.id) + str(feature_attributes)
-            self.controller.show_info(message, context_name='ui_message' )
-            '''
-            
+            message = "Selected snapped node to copy values from: " + str(snapped_feature_attr[0]) + "\n"
+            message+= "Do you want to copy its values to the current node?\n\n"
+            # Replace id because we don't have to copy it!
+            snapped_feature_attr[0] = id_current
+            for i in range(1, len(fields)):
+                message += str(fields[i].name())+": " +str(snapped_feature_attr[i]) + "\n" 
+
             # Show message before executing
-            for i in range(0,n):
-                message += str(fields[i].name())+":" +str(feature_attributes[i]) + "\n" 
-            #self.controller.ask_question(message, context_name='ui_message' )
             answer = self.controller.ask_question(message, "Update records", None)
 
             # If ok execute and refresh form 
-            # If cancel return
             if answer:
-                id_list[0].setAttributes(feature_attributes)
+                id_list[0].setAttributes(snapped_feature_attr)
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
-                # Restart forms 
-                self.close()
-                self.iface.openFeatureForm(layer,id_list[0])
-                #self.layer.reload()
-                #self.canvas.refresh()
-                #self.iface.refresh()
+                self.dialog.refreshFeature()
 
