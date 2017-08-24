@@ -25,7 +25,7 @@
    <property name="title">
     <string>Connec</string>
    </property>
-   <widget class="QListWidget" name="tbl_mincut_connec">
+   <widget class="QTableView" name="tbl_mincut_connec">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -62,7 +62,7 @@
     <string>OK</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="hydrometer_id">
+  <widget class="QLineEdit" name="connec_id">
    <property name="geometry">
     <rect>
      <x>25</x>
@@ -106,7 +106,7 @@
      <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_delete_2">
+  <widget class="QPushButton" name="btn_snapping">
    <property name="geometry">
     <rect>
      <x>205</x>
