@@ -84,6 +84,7 @@ class MincutParent(ParentAction):
 
 
     def mg_mincut(self):
+        ''' Btn 26 - New Mincut '''
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
@@ -175,7 +176,7 @@ class MincutParent(ParentAction):
         self.dlg.findChild(QAction, "actionConfig").triggered.connect(self.config)
         self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincutInit)
         #self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
-        #self.actionCustomMincut.triggered.connect(self.customMincut)
+        #self.actionCustomMincut.triggered.connect(self.customMincatInit)
         self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.addConnec)
         self.dlg.findChild(QAction, "actionAddHydrometer").triggered.connect(self.addHydrometer)
 
@@ -225,6 +226,8 @@ class MincutParent(ParentAction):
 
         self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
+
+        self.btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
 
         self.btn_accept.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
@@ -322,7 +325,7 @@ class MincutParent(ParentAction):
 
 
     def addConnec(self):
-        ''' Init function od add connec '''
+        ''' B3-121: Connec selector  '''
         self.ids = []
 
         # Check if user entered ID
@@ -464,7 +467,7 @@ class MincutParent(ParentAction):
 
 
     def addHydrometer(self):
-        ''' Action add hydtometer '''
+        ''' B4-122: Hydrometer selector '''
 
         self.ids = []
 
@@ -567,6 +570,7 @@ class MincutParent(ParentAction):
 
 
     def config(self):
+        ''' B5-99: Config '''
 
         # Dialog multi_selector
         self.dlg_multi = Multi_selector()
@@ -755,6 +759,7 @@ class MincutParent(ParentAction):
 
 
     def mincutInit(self):
+        ''' B1-126: Automatic mincut analysis '''
 
         # Check if user entered ID
         check = self.check_id()
@@ -776,9 +781,6 @@ class MincutParent(ParentAction):
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
-        message = str(result)
-        self.controller.show_info(message, context_name='ui_message')
-
         # That's the snapped point
         if result <> []:
 
@@ -786,21 +788,27 @@ class MincutParent(ParentAction):
             for snapPoint in result:
 
                 element_type = snapPoint.layer.name()
-                message = str(element_type)
-                self.controller.show_info(message, context_name='ui_message')
-
-                message = str(len(result))
-                self.controller.show_info(message, context_name='ui_message')
-
-                if element_type in self.arc_group :
-                    feat_type = 'arc'
-                    message = "arccc"
-                    self.controller.show_info(message, context_name='ui_message')
                 if element_type in self.node_group:
                     feat_type = 'node'
-                    message = "noooede"
-                    self.controller.show_info(message, context_name='ui_message')
+                #else:
+                #    continue
 
+                    # Get the point
+                    point = QgsPoint(snapPoint.snappedVertex)
+                    snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                    feature = snappFeat
+                    element_id = feature.attribute(feat_type + '_id')
+
+                    # LEAVE SELECTION
+                    snapPoint.layer.select([snapPoint.snappedAtGeometry])
+
+                    self.mincut(element_id,feat_type)
+
+            for snapPoint in result:
+
+                element_type = snapPoint.layer.name()
+                if element_type in self.arc_group :
+                    feat_type = 'arc'
                 #else:
                 #    continue
 
@@ -821,8 +829,7 @@ class MincutParent(ParentAction):
         # Execute SQL function
         function_name = "gw_fct_mincut"
         sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(elem_id) + "', '" + str(elem_type) + "', '" + self.id_text + "');"
-        message = str(sql)
-        self.controller.show_info(message, context_name='ui_message')
+
         self.hold_elem_id = elem_id
         self.hold_elem_type = self.elem_type
         self.hold_id_text = self.id_text
@@ -844,7 +851,7 @@ class MincutParent(ParentAction):
 
 
     def customMincatInit(self):
-
+        ''' B2-123: Custom mincut analysis '''
         # Check if user entered ID
         check = self.check_id()
         if check == 0:
@@ -887,7 +894,8 @@ class MincutParent(ParentAction):
 
 
     def customMincut(self,elem_id):
-        ''' Valve analytics '''
+        ''' Init function of custom mincut - Valve analytics
+        Working just with layer Valve analytics '''
 
         sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_valve_unaccess (mincut_result_cat_id, valve_id)"
         sql += " VALUES ('" + self.id_text + "', '" + elem_id + "')"
