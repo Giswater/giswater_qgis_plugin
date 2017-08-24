@@ -19,7 +19,6 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-
 from ..ui.file_manager import FileManager   # @UnresolvedImport
 from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
 from ..ui.ws_options import WSoptions       # @UnresolvedImport
@@ -94,55 +93,56 @@ class Go2Epa(ParentAction):
         self.project_name = self.gsw_settings.value('PROJECT_NAME')
 
         # Create dialog
-        dlg_go2epa = FileManager()
-        utils_giswater.setDialog(dlg_go2epa)
+        self.dlg_go2epa = FileManager()
+        utils_giswater.setDialog(self.dlg_go2epa)
+        #self.dlg_go2epa.setWindowTitle("Options Table")
 
         # Set widgets
-        dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
-        dlg_go2epa.txt_result_name.setText(self.project_name)
+        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
+        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
+        self.dlg_go2epa.txt_result_name.setText(self.project_name)
 
         # Set signals
-        dlg_go2epa.btn_file_inp.clicked.connect(self.mg_go2epa_select_file_inp)
-        dlg_go2epa.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
-        dlg_go2epa.btn_accept.clicked.connect(self.mg_go2epa_accept)
-        dlg_go2epa.btn_cancel.pressed.connect(dlg_go2epa.close)
+        self.dlg_go2epa.btn_file_inp.clicked.connect(self.mg_go2epa_select_file_inp)
+        self.dlg_go2epa.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
+        self.dlg_go2epa.btn_accept.clicked.connect(self.mg_go2epa_accept)
+        self.dlg_go2epa.btn_cancel.pressed.connect(self.dlg_go2epa.close)
 
         if self.project_type == 'ws':
-            dlg_go2epa.btn_opt_hs.setText("Options")
-            dlg_go2epa.btn_time_opt.setText("Times")
-            dlg_go2epa.btn_scensel_time.setText("Dscenario Selector")
-            dlg_go2epa.chk_export_subcatch.setVisible(False)
-            dlg_go2epa.btn_opt_hs.clicked.connect(self.ws_options)
-            dlg_go2epa.btn_time_opt.clicked.connect(self.ws_times)
+            self.dlg_go2epa.btn_opt_hs.setText("Options")
+            self.dlg_go2epa.btn_time_opt.setText("Times")
+            self.dlg_go2epa.btn_scensel_time.setText("Dscenario Selector")
+            self.dlg_go2epa.chk_export_subcatch.setVisible(False)
+            self.dlg_go2epa.btn_opt_hs.clicked.connect(self.ws_options)
+            self.dlg_go2epa.btn_time_opt.clicked.connect(self.ws_times)
             insertfield = "sector_id"
             hide_cols_left = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
             hide_cols_right = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-            dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection,  "sector", hide_cols_left, "inp_selector_sector", hide_cols_right, "name", "sector_id", "sector_id", insertfield))
+            self.dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection,  "sector", hide_cols_left, "inp_selector_sector", hide_cols_right, "name", "sector_id", "sector_id", insertfield))
             insertfield = "dscenario_id"
             hide_cols_left = [0, 2]
             hide_cols_right = [0, 2, 3, 4, 5]
-            dlg_go2epa.btn_scensel_time.clicked.connect(partial(self.sector_selection, "cat_dscenario", hide_cols_left, "inp_selector_dscenario", hide_cols_right, "name", "dscenario_id", "dscenario_id", insertfield))
+            self.dlg_go2epa.btn_scensel_time.clicked.connect(partial(self.sector_selection, "cat_dscenario", hide_cols_left, "inp_selector_dscenario", hide_cols_right, "name", "dscenario_id", "dscenario_id", insertfield))
 
         if self.project_type == 'ud':
-            dlg_go2epa.btn_opt_hs.setText("Hydrology selector")
-            dlg_go2epa.btn_time_opt.setText("Options")
-            dlg_go2epa.btn_scensel_time.setText("Times")
-            dlg_go2epa.btn_opt_hs.clicked.connect(self.ud_hydrology_selector)
-            dlg_go2epa.btn_time_opt.clicked.connect(self.ud_options)
-            dlg_go2epa.btn_scensel_time.clicked.connect(self.ud_times)
+            self.dlg_go2epa.btn_opt_hs.setText("Hydrology selector")
+            self.dlg_go2epa.btn_time_opt.setText("Options")
+            self.dlg_go2epa.btn_scensel_time.setText("Times")
+            self.dlg_go2epa.btn_opt_hs.clicked.connect(self.ud_hydrology_selector)
+            self.dlg_go2epa.btn_time_opt.clicked.connect(self.ud_options)
+            self.dlg_go2epa.btn_scensel_time.clicked.connect(self.ud_times)
             insertfield = "sector_id"
             hide_cols_left = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
             hide_cols_right = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-            dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection, "sector", hide_cols_left, "inp_selector_sector", hide_cols_right, "name", "sector_id", "sector_id", insertfield))
+            self.dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection, "sector", hide_cols_left, "inp_selector_sector", hide_cols_right, "name", "sector_id", "sector_id", insertfield))
 
         # Manage i18n of the form and open it
-        self.controller.translate_form(dlg_go2epa, 'file_manager')
-        dlg_go2epa.exec_()
+        self.controller.translate_form(self.dlg_go2epa, 'file_manager')
+        self.dlg_go2epa.exec_()
 
 
     def sector_selection(self,  tblnameL, hide_cols_left, tbelnameR, hide_cols_right, fieldwhere, fieldONL, fieldONR, insertfield):
-        """ Load the tables in the selection form '""'
+        """ Load the tables in the selection form 
         :param tblnameL: Name of the table to load in the QTableView from SELECT *
         :param fieldwhere: To complete the SELECT with a WHERE
         :param tbelnameR: Name of the table to load in the QTableView from tblnameL
@@ -152,6 +152,7 @@ class Go2Epa(ParentAction):
         :param hide_cols_left: Columns that want to hide from the right QTableView
         :param hide_cols_right: Columns that want to hide from the left QTableView
         """
+        
         dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(dlg_psector_sel)
 
@@ -197,9 +198,10 @@ class Go2Epa(ParentAction):
         """ Hide columns in QTableView """
         for i in range(0, len(comuns_to_hide)):
             widget.hideColumn(comuns_to_hide[i])
+            
 
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field):
-        """ Unselec the selected rows and places them on the other QTableView '""'
+        """ Unselect the selected rows and places them on the other QTableView 
         :param field: Name of the column on which you want to do the search for the unselection
         :param query_right: Update QTableView right
         :param query_left: Update QTableView left
@@ -228,7 +230,7 @@ class Go2Epa(ParentAction):
 
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right, insertfield):
-        """ Places the selected rows into other QTableView '""'
+        """ Places the selected rows into other QTableView 
         :param qtable_left: QTableView origin
         :param qtable_right: QTableView destini
         :param id_ori: Refers to the id of the source table
@@ -249,7 +251,6 @@ class Go2Epa(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = qtable_left.model().record(row).value(id_ori)
-
             expl_id.append(id_)
             curuser = qtable_left.model().record(row).value("cur_user")
             curuser_list.append(curuser)
@@ -270,12 +271,12 @@ class Go2Epa(ParentAction):
         # Refresh
         self.fill_table_by_query(qtable_right, query_right)
         self.fill_table_by_query(qtable_left, query_left)
-
         self.iface.mapCanvas().refresh()
 
 
     def ws_options(self):
-        """ Dialog wx_options.ui """
+        """ Open dialog ws_options.ui """
+        
         # Create dialog
         self.dlg_wsoptions = WSoptions()
         utils_giswater.setDialog(self.dlg_wsoptions)
@@ -356,29 +357,28 @@ class Go2Epa(ParentAction):
             self.dlg_wsoptions.rtc_period_id.setEnabled(True)
             self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
         # TODO
-        self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(partial(self.enabled_linetext, self.dlg_wsoptions.unbalanced, self.dlg_wsoptions.unbalanced_n, "STOP", False))
-        self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(partial(self.enabled_linetext, self.dlg_wsoptions.hydraulics, self.dlg_wsoptions.hydraulics_fname, "", False))
-        self.dlg_wsoptions.quality.currentIndexChanged.connect(partial(self.enabled_linetext, self.dlg_wsoptions.quality, self.dlg_wsoptions.node_id, "TRACE", False))
-        self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(partial(self.enabled_linetext, self.dlg_wsoptions.valve_mode, self.dlg_wsoptions.valve_mode_mincut_result, "MINCUT RESULTS", False))
+        self.dlg_wsoptions.unbalanced.currentIndexChanged.connect(partial(self.enable_linetext, "unbalanced", "unbalanced_n", "STOP"))
+        self.dlg_wsoptions.hydraulics.currentIndexChanged.connect(partial(self.enable_linetext, "hydraulics", "hydraulics_fname", ""))
+        self.dlg_wsoptions.quality.currentIndexChanged.connect(partial(self.enable_linetext, "quality", "node_id", "TRACE"))
+        self.dlg_wsoptions.valve_mode.currentIndexChanged.connect(partial(self.enable_linetext, "valve_mode", "valve_mode_mincut_result", "MINCUT RESULTS"))
         self.dlg_wsoptions.chk_enabled.stateChanged.connect(self.enable_per_coef)
 
-        update = True
-        self.dlg_wsoptions.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_options', self.dlg_wsoptions))
+        self.dlg_wsoptions.btn_accept.pressed.connect(partial(self.insert_or_update, True, 'inp_options', self.dlg_wsoptions))
         self.dlg_wsoptions.btn_cancel.pressed.connect(self.dlg_wsoptions.close)
         self.go2epa_options_get_data('inp_options')
         self.dlg_wsoptions.exec_()
 
 
     def ws_times(self):
-        """ Dialog ws_times.ui"""
+        """ Open dialog ws_times.ui"""
+        
         dlg_wstimes = WStimes()
         utils_giswater.setDialog(dlg_wstimes)
         dlg_wstimes.duration.setValidator(QIntValidator())
         sql = "SELECT id FROM "+self.schema_name+".inp_value_times ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox("statistic", rows, False)
-        update = True
-        dlg_wstimes.btn_accept.pressed.connect(partial(self.insert_or_update, update, 'inp_times', dlg_wstimes))
+        dlg_wstimes.btn_accept.pressed.connect(partial(self.insert_or_update, True, 'inp_times', dlg_wstimes))
         dlg_wstimes.btn_cancel.pressed.connect(dlg_wstimes.close)
         self.go2epa_options_get_data('inp_times')
         dlg_wstimes.exec_()
@@ -386,24 +386,21 @@ class Go2Epa(ParentAction):
 
     def enable_per_coef(self):
         """ Enable or dissable cbx """
-        if utils_giswater.isChecked(self.dlg_wsoptions.chk_enabled):
-            self.dlg_wsoptions.rtc_period_id.setEnabled(True)
-            self.dlg_wsoptions.rtc_coefficient.setEnabled(True)
-        else:
-            self.dlg_wsoptions.rtc_period_id.setEnabled(False)
-            self.dlg_wsoptions.rtc_coefficient.setEnabled(False)
+        self.dlg_wsoptions.rtc_period_id.setEnabled(utils_giswater.isChecked("chk_enabled"))
+        self.dlg_wsoptions.rtc_coefficient.setEnabled(utils_giswater.isChecked("chk_enabled"))
 
 
-    def enabled_linetext(self, widget1, widget2, text, enabled):
-        """ Enable or dissable txt """
-        if widget1.currentText() == text:
-            widget2.setEnabled(enabled)
+    def enable_linetext(self, widget1, widget2, text):
+        """ Enable or disable txt """
+        if utils_giswater.getWidgetText(widget1) == text:
+            widget2.setEnabled(False)
         else:
             widget2.setEnabled(True)
 
 
     def ud_options(self):
         """ Dialog ud_options.ui """
+        
         # Create dialog
         dlg_udoptions = UDoptions()
         utils_giswater.setDialog(dlg_udoptions)
@@ -454,6 +451,7 @@ class Go2Epa(ParentAction):
 
     def ud_times(self):
         """ Dialog ud_times.ui """
+        
         dlg_udtimes = UDtimes()
         utils_giswater.setDialog(dlg_udtimes)
         dlg_udtimes.dry_days.setValidator(QIntValidator())
@@ -466,6 +464,7 @@ class Go2Epa(ParentAction):
 
     def ud_hydrology_selector(self):
         """ Dialog hydrology_selector.ui """
+        
         self.dlg_hydrology_selector = HydrologySelector()
         utils_giswater.setDialog(self.dlg_hydrology_selector)
 
@@ -481,8 +480,9 @@ class Go2Epa(ParentAction):
 
 
     def update_labels(self):
-        """ Show text in labes from SELECT"""
-        sql = "SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology WHERE name='"+str(self.dlg_hydrology_selector.hydrology.currentText())+"'"
+        """ Show text in labels from SELECT """
+        sql = "SELECT infiltration, text FROM "+self.schema_name + ".cat_hydrology"
+        sql+= " WHERE name = '"+str(self.dlg_hydrology_selector.hydrology.currentText())+"'"
         row = self.dao.get_row(sql)
         if row is not None:
             utils_giswater.setText("infiltration", row[0])
@@ -491,8 +491,8 @@ class Go2Epa(ParentAction):
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + "." + str(tablename)
-        sql += " WHERE name LIKE '%" + str(widgettxt.text()) + "%' "
-        sql += "ORDER BY name "
+        sql += " WHERE name LIKE '%" + str(widgettxt.text()) + "%'"
+        sql += " ORDER BY name "
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widgetcbx, rows, False)
         self.update_labels()
@@ -500,6 +500,7 @@ class Go2Epa(ParentAction):
 
     def insert_or_update(self, update, tablename, dialog):
         """ INSERT or UPDATE tables according :param update"""
+        
         sql = "SELECT *"
         sql += " FROM " + self.schema_name + "." + tablename
         row = self.dao.get_row(sql)
@@ -574,7 +575,8 @@ class Go2Epa(ParentAction):
 
 
     def mg_go2epa_select_file_inp(self):
-
+        """ Select INP file """
+        
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
             self.file_inp = self.plugin_dir
@@ -586,11 +588,12 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select INP file")
         self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        self.dlg.txt_file_inp.setText(self.file_inp)
+        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
 
 
     def mg_go2epa_select_file_rpt(self):
-
+        """ Select RPT file """
+        
         # Set default value if necessary
         if self.file_rpt is None or self.file_rpt == '':
             self.file_rpt = self.plugin_dir
@@ -602,7 +605,7 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
+        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
 
     def mg_go2epa_accept(self):
@@ -619,7 +622,7 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
 
         # Close form
-        self.close_dialog(self.dlg)
+        self.close_dialog(self.dlg_go2epa)
 
 
     def mg_go2epa_express(self):
@@ -643,11 +646,13 @@ class Go2Epa(ParentAction):
 
     def go2epa_options_get_data(self, tablename):
         ''' Get data from selected table '''
-        sql = 'SELECT * FROM ' + self.schema_name + "." + tablename
+        
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.dao.get_row(sql)
         if not row:
-            self.controller.show_warning("Any data found in table "+tablename)
+            self.controller.show_warning("Any data found in table " + tablename)
             return None
+        
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
@@ -657,7 +662,7 @@ class Go2Epa(ParentAction):
             if widget_type is QCheckBox:
                 utils_giswater.setChecked(column_name, row[column_name])
             elif widget_type is QDateEdit:
-                utils_giswater.setCalendarDate(column_name,datetime.strptime(row[column_name], '%Y-%m-%d'))
+                utils_giswater.setCalendarDate(column_name, datetime.strptime(row[column_name], '%Y-%m-%d'))
             elif widget_type is QTimeEdit:
                 timeparts = str(row[column_name]).split(':')
                 if len(timeparts) < 3:
@@ -669,8 +674,11 @@ class Go2Epa(ParentAction):
                 time = QTime(hours,minuts, seconds)
                 utils_giswater.setTimeEdit(column_name, time)
                 utils_giswater.setText(column_name + "_day", days)
-
             else:
                 utils_giswater.setWidgetText(column_name, row[column_name])
+                
             columns.append(column_name)
+            
         return columns
+    
+    
