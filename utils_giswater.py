@@ -11,7 +11,9 @@ from PyQt4.Qt import QDate
 from PyQt4.QtCore import QTime
 import inspect
 import os
-import _winreg
+import sys 
+if 'nt' in sys.builtin_module_names: 
+    import _winreg 
 
 
 def setDialog(p_dialog):
@@ -37,7 +39,7 @@ def fillComboBox(widget, rows, allow_nulls=True):
             if elem is not None:
                 widget.addItem(str(elem))
                 
-                
+
 def fillComboBoxDefault(widget, rows):
     ''' Fill combo box with default value-first from the list '''
     
@@ -52,8 +54,8 @@ def fillComboBoxDefault(widget, rows):
             widget.addItem(str(elem))
         else:
             if elem is not None:
-                widget.addItem(str(elem))                
-        
+                widget.addItem(str(elem))          
+                      
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
@@ -72,6 +74,7 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
         for elem in aux:
             if elem[0] == dict_field:
                 widget.addItem(elem[1])          
+
 
 def getText(widget):
     
@@ -109,8 +112,8 @@ def setText(widget, text):
         widget.setValue(float(value))
 
 
-
 def setCalendarDate(widget, date):
+    
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)
     if not widget:
@@ -263,24 +266,53 @@ def setImage(widget,cat_shape):
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()  
-
+        
+        
+def setRow(p_row):
+    global _row
+    _row = p_row
+    
+                        
+def fillWidget(widget):
+    
+    key = widget
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)      
+    if not widget:
+        return    
+    
+    if key in _row: 
+        if _row[key] is not None:
+            value = unicode(_row[key])
+            if type(widget) is QLineEdit or type(widget) is QTextEdit: 
+                if value == 'None':    
+                    value = ""        
+                widget.setText(value)
+        else:
+            widget.setText("")       
+    else:
+        widget.setText("") 
+        
 
 def get_reg(reg_hkey, reg_path, reg_name):
     
-    reg_root = None
-    if reg_hkey == "HKEY_LOCAL_MACHINE":
-        reg_root = _winreg.HKEY_LOCAL_MACHINE
-    elif reg_hkey == "HKEY_CURRENT_USER":
-        reg_root = _winreg.HKEY_CURRENT_USER
-    
-    if reg_root is not None:
-        try:
-            registry_key = _winreg.OpenKey(reg_root, reg_path)
-            value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
-            _winreg.CloseKey(registry_key)
-            return value
-        except WindowsError:
-            return None
+    if 'nt' in sys.builtin_module_names:     
+        reg_root = None
+        if reg_hkey == "HKEY_LOCAL_MACHINE":
+            reg_root = _winreg.HKEY_LOCAL_MACHINE
+        elif reg_hkey == "HKEY_CURRENT_USER":
+            reg_root = _winreg.HKEY_CURRENT_USER
+        
+        if reg_root is not None:
+            try:
+                registry_key = _winreg.OpenKey(reg_root, reg_path)
+                value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
+                _winreg.CloseKey(registry_key)
+                return value
+            except WindowsError:
+                return None
+    else:
+        return None
         
         
 def get_settings_value(settings, parameter):

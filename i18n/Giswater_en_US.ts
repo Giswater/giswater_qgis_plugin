@@ -3383,6 +3383,13 @@
         <translation>Warning</translation>
     </message>
     <message>
+        <source>This id already exists</source>
+        <translation>This id already exists</translation>
+    </message>
+    <message>
+        <source>You are trying to enter different types</source>
+        <translation>You are trying to enter different types</translation>
+    </message>
         <source>Cannot get giswater folder from windows registry at: </source>
         <translation>Cannot get giswater folder from windows registry at: </translation>
     </message>   
@@ -3405,7 +3412,21 @@
     <message>
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>
-    </message>    
+    </message>
+    <message>
+        <source>Error inserting profile table, you need to review data</source>
+        <translation>Error inserting profile table, you need to review data</translation>
+    </message>
+    <message>
+        <source>Some parameters are missing for node</source>
+        <translation>Some parameters are missing for node</translation>
+    </message>
+    <message>
+        <source>You need to upgrade your version of pg_routing!</source>
+        <translation>You need to upgrade your version of pg_routing!</translation>
+    </message>
+
+
 
 
 </context>

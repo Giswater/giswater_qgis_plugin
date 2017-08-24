@@ -137,7 +137,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QLabel" name="label_end_time">
+  <widget class="QLabel" name="label_endtime">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -174,7 +174,7 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QLabel" name="label_end_date">
+  <widget class="QLabel" name="label_enddate">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -577,7 +577,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QDateEdit" name="end_date">
+  <widget class="QDateEdit" name="enddate">
    <property name="geometry">
     <rect>
      <x>119</x>
@@ -590,7 +590,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QTimeEdit" name="end_time">
+  <widget class="QTimeEdit" name="endtime">
    <property name="geometry">
     <rect>
      <x>190</x>
@@ -797,8 +797,8 @@
  <tabstops>
   <tabstop>start_date</tabstop>
   <tabstop>start_time</tabstop>
-  <tabstop>end_date</tabstop>
-  <tabstop>end_time</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>endtime</tabstop>
   <tabstop>report_start_date</tabstop>
   <tabstop>report_step</tabstop>
   <tabstop>wet_step</tabstop>

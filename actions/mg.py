@@ -6,13 +6,15 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView
+from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
-from PyQt4.Qt import  QDate, QTime
-from qgis.core import QgsMapLayerRegistry
+from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
-from datetime import datetime, date
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
+from PyQt4.Qt import QDate, QTime
+
+from datetime import datetime
 import os
 import sys
 import webbrowser
@@ -32,11 +34,12 @@ from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImp
 from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
 from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
 from ..ui.mincut import Mincut                                  # @UnresolvedImport
-from ..ui.multipsector_selector import Multipsector_selector    # @UnresolvedImport
 from ..ui.plan_psector import Plan_psector                      # @UnresolvedImport
 from ..ui.psector_management import Psector_management          # @UnresolvedImport
+from ..ui.state_selector import State_selector                  # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector            # @UnresolvedImport
 
-from parent import ParentAction
+from parent import ParentAction                                 # @UnresolvedImport
 
 
 class Mg(ParentAction):
@@ -90,7 +93,7 @@ class Mg(ParentAction):
     def mg_arc_topo_repair_accept(self):
         ''' Button 19. Executes functions that are selected '''
 
-        #Review/Utils
+        # Review/Utils
         if self.dlg.check_node_orphan.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
             self.controller.execute_sql(sql)
@@ -137,7 +140,7 @@ class Mg(ParentAction):
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
             self.controller.execute_sql(sql)
 
-        #Builder
+        # Builder
         if self.dlg.create_nodes_from_arcs.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
             self.controller.execute_sql(sql)
@@ -240,7 +243,7 @@ class Mg(ParentAction):
         # Open CSV file for read and copy into database
         rf = open(self.file_csv)
         sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
-        if (header_status == Qt.Checked):
+        if header_status == Qt.Checked:
             sql+= " HEADER"
         sql+= " DELIMITER AS '"+delimiter+"'"
         status = self.dao.copy_expert(sql, rf)
@@ -317,21 +320,6 @@ class Mg(ParentAction):
         self.controller.show_info(message, context_name='ui_message')
         self.close_dialog(self.dlg)
 
-    '''
-=======
->>>>>>> 9cf88f7... Add class 'ParentAction' to manage common functions
-    def mg_analytics(self):
-        # Button 27. Valve analytics 
-                
-        # Execute SQL function  
-        function_name = "gw_fct_valveanalytics"
-        sql = "SELECT "+self.schema_name+"."+function_name+"();"  
-        result = self.controller.execute_sql(sql)      
-        if result:
-            message = "Valve analytics executed successfully"
-            self.controller.show_info(message, 30, context_name='ui_message')
-    '''
-
 
     def mg_change_elem_type(self):
         ''' Button 28: User select one node. A form is opened showing current node_type.type 
@@ -349,11 +337,11 @@ class Mg(ParentAction):
         count = layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message, context_name='ui_message')
             return
         elif count > 1:
             message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message' )
+            self.controller.show_info(message, context_name='ui_message')
 
 
         # Get selected features (nodes)
@@ -467,19 +455,16 @@ class Mg(ParentAction):
         self.dlg.btn_analysis.pressed.connect(partial(self.multi_selector,self.table_anl_selector))
         self.dlg.btn_planning.pressed.connect(partial(self.multi_selector,self.table_plan_selector))
 
-        # QLineEdit
         self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
 
-        # QPushButton
         self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
         self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
         self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
         self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
 
-        # QComboBox
         self.state_vdefault=self.dlg.findChild(QComboBox,"state_vdefault")
         self.psector_vdefault = self.dlg.findChild(QComboBox, "psector_vdefault")
         self.workcat_vdefault=self.dlg.findChild(QComboBox,"workcat_vdefault")
@@ -490,9 +475,9 @@ class Mg(ParentAction):
 
         # QDateEdit
         self.builtdate_vdefault = self.dlg.findChild(QDateEdit, "builtdate_vdefault")
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'builtdate_vdefault'"
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_vdefault WHERE "user" = current_user AND parameter = '+"'builtdate_vdefault'"
         row = self.dao.get_row(sql)
-        if row!= None:
+        if row is not None:
             utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
         else:
             self.builtdate_vdefault.setDate(QDate.currentDate())
@@ -506,13 +491,6 @@ class Mg(ParentAction):
         self.chk_arccat_vdefault = self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault')
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
         self.chk_connecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault')
-
-        #self.arc_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox,self.arc_vdef_enabled, self.arccat_vdefault, "arccat_vdefault"))
-        #self.node_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.node_vdef_enabled, self.nodecat_vdefault))
-        #self.connec_vdef_enabled.stateChanged.connect(partial(self.chec_checkbox, self.connec_vdef_enabled, self.connecat_vdefault))
-        #self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault').stateChanged.connect(partial(self.test, "check"))
-        #self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault').stateChanged.connect(partial(self.test, "check"))
-        #self.dlg.findChild(QCheckBox, 'chk_connecat_vdefault').stateChanged.connect(partial(self.test, "check"))
        
         self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
         self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
@@ -523,14 +501,14 @@ class Mg(ParentAction):
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'om_visit_absolute_path'"
         row = self.dao.get_row(sql)
-        if row :
+        if row:
             path = str(row['value'])
             self.om_visit_absolute_path.setText(path)
 
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        if row :
+        if row:
             path = str(row['value'])
             self.doc_absolute_path.setText(path)
 
@@ -539,35 +517,33 @@ class Mg(ParentAction):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows)
 
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("state_vdefault", rows)
-        sql="SELECT DISTINCT(psector_id) FROM" +self.schema_name+".plan_psector ORDER BY psector_id"
+        sql = "SELECT DISTINCT(psector_id) FROM" +self.schema_name+".plan_psector ORDER BY psector_id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("psector_vdefault", rows)
 
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("workcat_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
         rows = self.dao.get_rows(sql)
 
         utils_giswater.fillComboBox("arccat_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("nodecat_vdefault", rows)
-        sql="SELECT DISTINCT(id) FROM" +self.schema_name+".cat_connec ORDER BY id"
+        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_connec ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("connecat_vdefault", rows)
 
         # Set values from widgets of type QDateEdit
         sql = "SELECT DISTINCT(builtdate_vdefault) FROM" + self.schema_name + ".config"
         rows = self.dao.get_rows(sql)
-        #utils_giswater.setCalendarDate("builtdate_vdefault", rows[0][0])
-
 
         # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value'
         self.generic_columns=self.new_mg_config_get_data('config_vdefault')
@@ -580,10 +556,9 @@ class Mg(ParentAction):
         self.dlg.exec_()
 
 
-    # Like def mf_config_get_date(....): but for multi user
     def new_mg_config_get_data(self,tablename):
         # Like def mf_config_get_date(....): but for multi user
-        
+
         sql = 'SELECT * FROM ' + self.schema_name + "." + tablename +' WHERE "user"=current_user'
         rows = self.dao.get_rows(sql)
         if not rows:
@@ -598,10 +573,7 @@ class Mg(ParentAction):
             columns.append(str(i[1]))
         return columns
 
-        
 
-
-        
     def open_file_dialog(self, widget):
         ''' Open File Dialog '''
 
@@ -613,7 +585,6 @@ class Mg(ParentAction):
             message = "File path doesn't exist"
             self.controller.show_warning(message, 10, context_name='ui_message')
             self.file_path = self.plugin_dir
-        #else:
         # Set default value if necessary
         elif self.file_path == 'null':
             self.file_path = self.plugin_dir
@@ -688,38 +659,38 @@ class Mg(ParentAction):
 
         # Show message, insert in DB and close form
         message = "Values has been updated"
-        self.controller.show_info(message, context_name='ui_message' )
-        if utils_giswater.isChecked(self.chk_state_vdefault) == True:
+        self.controller.show_info(message, context_name='ui_message')
+        if utils_giswater.isChecked(self.chk_state_vdefault):
             self.insert_or_update_config_vdefault(self.state_vdefault, "state_vdefault")
         else:
             self.delete_row("state_vdefault")
-        if utils_giswater.isChecked(self.chk_psector_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_psector_vdefault):
             self.insert_or_update_config_vdefault(self.psector_vdefault, "psector_vdefault")
         else:
             self.delete_row("psector_vdefault")
-        if utils_giswater.isChecked(self.chk_workcat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_workcat_vdefault):
             self.insert_or_update_config_vdefault(self.workcat_vdefault, "workcat_vdefault")
         else:
             self.delete_row("workcat_vdefault")
-        if utils_giswater.isChecked(self.chk_cverified_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_cverified_vdefault):
             self.insert_or_update_config_vdefault(self.verified_vdefault, "verified_vdefault")
         else:
             self.delete_row("verified_vdefault")
 
-        if utils_giswater.isChecked(self.chk_builtdate_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_builtdate_vdefault):
             self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
         else:
             self.delete_row("builtdate_vdefault")
 
-        if utils_giswater.isChecked(self.chk_arccat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_arccat_vdefault):
             self.insert_or_update_config_vdefault(self.arccat_vdefault, "arccat_vdefault")
         else:
             self.delete_row("arccat_vdefault")
-        if utils_giswater.isChecked(self.chk_nodecat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_nodecat_vdefault):
             self.insert_or_update_config_vdefault(self.nodecat_vdefault, "nodecat_vdefault")
         else:
             self.delete_row("nodecat_vdefault")
-        if utils_giswater.isChecked(self.chk_connecat_vdefault) == True:
+        if utils_giswater.isChecked(self.chk_connecat_vdefault):
             self.insert_or_update_config_vdefault(self.connecat_vdefault, "connecat_vdefault")
         else:
             self.delete_row("connecat_vdefault")
@@ -730,11 +701,11 @@ class Mg(ParentAction):
     def delete_row(self,  parameter):
         sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
         self.controller.execute_sql(sql)
-       
-        
+
+
     def insert_or_update_config_vdefault(self, widget, parameter):
 
-        sql='SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user'
+        sql = 'SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user" = current_user'
         rows=self.controller.get_rows(sql)
         self.exist = False
         if type(widget) == QDateEdit:
@@ -766,7 +737,7 @@ class Mg(ParentAction):
 
     def mg_config_accept_table(self, tablename, columns):
         ''' Update values of selected 'tablename' with the content of 'columns' '''
-
+        
         if columns is not None:
             sql = "UPDATE "+self.schema_name+"."+tablename+" SET "
             for column_name in columns:
@@ -788,34 +759,9 @@ class Mg(ParentAction):
 
             sql = sql[:-2]
             self.controller.execute_sql(sql)
-
-
-    def multi_selector(self,table):
-        ''' Execute form multi_selector '''
-        
-        if columns is None:
-            return
-               
-        sql = "UPDATE "+self.schema_name+"."+tablename+" SET "         
-        for column_name in columns:
-            if column_name != 'id':
-                widget_type = utils_giswater.getWidgetType(column_name)
-                if widget_type is QCheckBox:
-                    value = utils_giswater.isChecked(column_name)                      
-                else:
-                    value = utils_giswater.getWidgetText(column_name)
-                if value is None or value == 'null':
-                    sql+= column_name+" = null, "     
-                else:
-                    if type(value) is not bool:
-                        value = value.replace(",", ".")
-                    sql+= column_name+" = '"+str(value)+"', "           
-        
-        sql = sql[:-2]
-        self.controller.execute_sql(sql)
-                        
+                       
        
-    def multi_selector(self,table):  
+    def multi_selector(self, table):  
         ''' Execute form multi_selector ''' 
         
         # Create the dialog and signals
@@ -825,7 +771,7 @@ class Mg(ParentAction):
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
-        self.menu=QMenu()
+        self.menu = QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table)) 
@@ -859,9 +805,8 @@ class Mg(ParentAction):
         self.btn_unselect.pressed.connect(self.unselection)
 
         self.dlg_multiexp.btn_cancel.pressed.connect(self.dlg_multiexp.close)
-        
+
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
-        #self.tbl_all_explot.hideColumn(0)
         self.tbl_all_explot.hideColumn(2)
         self.tbl_all_explot.hideColumn(3)
         self.tbl_all_explot.hideColumn(4)
@@ -876,7 +821,7 @@ class Mg(ParentAction):
 
 
     def filter_all_explot(self,sql, widget):
-    
+
         sql += widget.text()+"%'"
         model = QSqlQueryModel()
         model.setQuery(sql)
@@ -889,7 +834,7 @@ class Mg(ParentAction):
         self.tbl_all_explot = self.dlg_multiexp.findChild(QTableView, "all_explot")
         self.tbl_selected_explot = self.dlg_multiexp.findChild(QTableView, "selected_explot")
 
-        selected_list =self.tbl_all_explot.selectionModel().selectedRows()
+        selected_list = self.tbl_all_explot.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message, context_name='ui_message' )
@@ -907,16 +852,11 @@ class Mg(ParentAction):
         row_index = row_index[:-2]
         expl_id = expl_id[:-2]
 
-
-        table_name_select = "exploitation"
-
-        #sql = "DELETE FROM "+self.schema_name+"."+table_name_select
+        #sql = "DELETE FROM "+self.schema_name+".exploitation"
         #sql+= " WHERE expl_id IN ("+expl_id+")"
         #self.controller.execute_sql(sql)
         #self.tbl_all_explot.model().select()
-
         cur_user = self.controller.get_project_user()
-        table_name_unselect = "expl_selector"
 
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
@@ -932,7 +872,6 @@ class Mg(ParentAction):
                 self.controller.execute_sql(sql)
 
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
-        #refresh
         self.fill_table(self.tbl_all_explot, self.schema_name + ".exploitation")
         self.iface.mapCanvas().refresh()
 
@@ -970,7 +909,7 @@ class Mg(ParentAction):
         self.fill_table(self.tbl_selected_explot, self.schema_name + ".expl_selector")
         self.iface.mapCanvas().refresh()
 
-        
+
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu'''
 
@@ -985,8 +924,8 @@ class Mg(ParentAction):
             # Check if we already have data with selected id
             sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"
             row = self.dao.get_row(sql)
-            if row == None:
-                self.menu.addAction(elem,partial(self.insert, elem,table))
+            if row is None:
+                self.menu.addAction(elem, partial(self.insert, elem,table))
 
 
     def insert(self, id_action, table):
@@ -1025,9 +964,13 @@ class Mg(ParentAction):
             self.controller.execute_sql(sql)
             widget.model().select()
 
-            
-    def delete_records_with_params(self, widget, table_name, column_id):
-        ''' Delete selected elements of the table '''
+
+    def multi_rows_delet(self, widget, table_name, column_id):
+        """ Delete selected elements of the table
+        :param QTableView widget: origin
+        :param table_name: table origin
+        :param column_id: Refers to the id of the source table
+        """
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
@@ -1052,11 +995,11 @@ class Mg(ParentAction):
             sql+= " WHERE "+column_id+" IN ("+list_id+")"
             self.controller.execute_sql(sql)
             widget.model().select()
-            
-            
+
+
     def close_dialog_multi(self, dlg=None):
         ''' Close dialog '''
-        
+
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg_multi
         try:
@@ -1123,7 +1066,7 @@ class Mg(ParentAction):
         widget.model().setFilter(expr)
         widget.model().select()
 
-        
+
     def accept_min(self):
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
@@ -1132,13 +1075,10 @@ class Mg(ParentAction):
             self.controller.show_warning(message, context_name='ui_message' )
             return
         row = selected_list[0].row()
-        id = self.tbl_mincut_edit.model().record(row).value("id")
-
-        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_result_cat WHERE id = '"+id+"'"
-
+        id_ = self.tbl_mincut_edit.model().record(row).value("id")
+        sql = "SELECT * FROM "+self.schema_name+".anl_mincut_result_cat"
+        sql+= " WHERE id = '"+id_+"'"
         rows = self.dao.get_row(sql)
-
-        #self.dlg_min_edit.close()
 
         # Create the dialog and signals
         self.dlg_mincut = Mincut()
@@ -1185,7 +1125,7 @@ class Mg(ParentAction):
         # Set values from mincut to comboBox
         #utils_giswater.fillComboBox("type", rows['mincut_result_type'])
         #utils_giswater.fillComboBox("cause", rows['anl_cause'])
-        type = rows['mincut_result_type']
+        mincut_result_type = rows['mincut_result_type']
         cause = rows['anl_cause']
         # Clear comboBoxes
         self.type.clear()
@@ -1203,7 +1143,7 @@ class Mg(ParentAction):
         #utils_giswater.fillComboBox("type", rows)
         for row in rows:
             elem = str(row[0])
-            if elem != type:
+            if elem != mincut_result_type:
                 self.type.addItem(elem)
 
         # Fill ComboBox cause
@@ -1217,9 +1157,8 @@ class Mg(ParentAction):
             if elem != cause:
                 self.cause.addItem(elem)
 
-
-        self.old_id= self.id.text()
-
+        self.old_id = self.id.text()
+        
         self.btn_start = self.dlg_mincut.findChild(QPushButton, "btn_start")
         self.btn_start.clicked.connect(self.real_start)
 
@@ -1260,20 +1199,15 @@ class Mg(ParentAction):
         self.time_end = QTime.currentTime()
         self.cbx_hours_end.setTime(self.time_end)
 
-
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
 
         self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
         self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
-        #self.cbx_date_start_fin.setDate(self.date_start)
-        #self.cbx_hours_start_fin.setTime(self.time_start)
 
         self.cbx_date_end_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_end_fin")
         self.cbx_hours_end_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_end_fin")
-        #self.cbx_date_end_fin.setDate(self.date_end)
-        #self.cbx_hours_end_fin.setTime(self.time_end)
 
         self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
@@ -1281,30 +1215,25 @@ class Mg(ParentAction):
         self.btn_accept.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
 
-        #self.btn_cancel.clicked.connect()
-
         # Set values mincut and address
         self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
         self.address_fin = self.dlg_fin.findChild(QLineEdit, "address")
         id_fin = self.id.text()
         street_fin = self.street.text()
         number_fin = str(self.number.text())
-        address_fin = street_fin +" "+ number_fin
+        address_fin = street_fin + " " + number_fin
         self.mincut_fin.setText(id_fin)
         self.address_fin.setText(address_fin)
-
-        # set status
-        #self.state.setText(str(self.state_values[2][0]) )
 
         # Open the dialog
         self.dlg_fin.show()
 
-        
+
     def accept(self):
-    
+
         # reach end_date and end_hour from mincut_fin dialog
-        datestart=self.cbx_date_start_fin.date()
-        timestart=self.cbx_hours_start_fin.time()
+        datestart = self.cbx_date_start_fin.date()
+        timestart = self.cbx_hours_start_fin.time()
         dateend = self.cbx_date_end_fin.date()
         timeend = self.cbx_hours_end_fin.time()
 
@@ -1316,7 +1245,7 @@ class Mg(ParentAction):
 
         #self.dlg_fin.close()
 
-        
+
     def real_start(self):
 
         self.date_start = QDate.currentDate()
@@ -1327,21 +1256,14 @@ class Mg(ParentAction):
 
 
     def accept_update(self):
-    
+
         mincut_result_state = self.state.text()
-        id = self.id.text()
-        #exploitation =
+        id_ = self.id.text()
         street = str(self.street.text())
         number = str(self.number.text())
-        address = str(street + " " + number)
         mincut_result_type = str(utils_giswater.getWidgetText("type"))
         anl_cause = str(utils_giswater.getWidgetText("cause"))
-        #forecast_start =
-        #forecast_end =
         anl_descript = str(utils_giswater.getWidgetText("pred_description"))
-
-        #exec_start =
-        #exec_end =
 
         exec_limit_distance =  self.distance.text()
         exec_depth = self.depth.text()
@@ -1360,7 +1282,6 @@ class Mg(ParentAction):
 
         self.cbx_date_end = self.dlg_mincut.findChild(QDateEdit, "cbx_date_end")
         self.cbx_hours_end = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_end")
-
 
         # Get prediction date - start
         dateStart_predict=self.cbx_date_start_predict.date()
@@ -1382,12 +1303,11 @@ class Mg(ParentAction):
         timeEnd_real=self.cbx_hours_end.time()
         forecast_end_real=dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
 
-
         sql = "UPDATE "+self.schema_name+".anl_mincut_result_cat "
-        sql+= " SET id = '"+id+"',mincut_result_state = '"+mincut_result_state+"',anl_descript = '"+anl_descript+\
-              "',exec_descript= '"+exec_descript+"', exec_depth ='"+ exec_depth+"', exec_limit_distance ='"+\
-              exec_limit_distance+"', forecast_start='"+forecast_start_predict+"', forecast_end ='"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
-        sql+= " WHERE id = '"+id+"'"
+        sql+= " SET id = '"+id_+"', mincut_result_state = '"+mincut_result_state+"', anl_descript = '"+anl_descript+\
+              "', exec_descript= '"+exec_descript+"', exec_depth = '"+ exec_depth+"', exec_limit_distance = '"+\
+              exec_limit_distance+"', forecast_start= '"+forecast_start_predict+"', forecast_end = '"+ forecast_end_predict+"', exec_start ='"+ forecast_start_real+"', exec_end ='"+ forecast_end_real+"' , address ='"+ street +"', address_num ='"+ number +"', mincut_result_type ='"+ mincut_result_type +"', anl_cause ='"+ anl_cause +"' "
+        sql+= " WHERE id = '"+id_+"'"
         self.controller.execute_sql(sql)
 
         '''
@@ -1401,86 +1321,69 @@ class Mg(ParentAction):
     def close(self, dlg = None):
         ''' Close dialog '''
         dlg.close()
-        
-        
+
+
     def mg_dimensions(self):
-        ''' Button_39: Dimensioning ''' 
+        ''' Button_39: Dimensioning '''
 
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
-        
-        # Find the layer to edit
-        #layer = self.iface.activeLayer()
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
 
-    
-    def mg_new_psector(self,psector_id=None):
+
+    def mg_new_psector(self, psector_id=None, enable_tabs=False):
         ''' Button_45 : New psector '''
-        '''
-        layer = self.iface.activeLayer()
-        QMessageBox.about(None, 'Ok', str(layer.name()))
-        # Get selected features (nodes)
-        features = layer.selectedFeatures()
-        QMessageBox.about(None, 'Ok', str(features))
-        feature = features[0]
-        QMessageBox.about(None, 'Ok', str(feature))
-        # Get node_id form current node
-        self.node_id = feature.attribute('node_id')
-        QMessageBox.about(None, 'Ok', str(self.node_id))
-        '''
+        
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
         utils_giswater.setDialog(self.dlg_new_psector)
-        update=False # if false: insert; if true: update
-        # LineEdit
+        self.list_elemets = {}
+        update = False  # if false: insert; if true: update
+        self.tab_arc_node_other = self.dlg_new_psector.findChild(QTabWidget,"tabWidget_2")
+        self.tab_arc_node_other.setTabEnabled(0, enable_tabs)
+        self.tab_arc_node_other.setTabEnabled(1, enable_tabs)
+        self.tab_arc_node_other.setTabEnabled(2, enable_tabs)
+
         # tab General elements
         self.psector_id = self.dlg_new_psector.findChild(QLineEdit, "psector_id")
-        self.short_descript = self.dlg_new_psector.findChild(QLineEdit, "short_descript")
         self.priority = self.dlg_new_psector.findChild(QComboBox, "priority")
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".value_priority ORDER BY id"
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("priority", rows, False)
 
-        self.descript = self.dlg_new_psector.findChild(QLineEdit, "descript")
-        self.text1 = self.dlg_new_psector.findChild(QLineEdit, "text1")
-        self.text2 = self.dlg_new_psector.findChild(QLineEdit, "text2")
-        self.observ = self.dlg_new_psector.findChild(QLineEdit, "observ")
-        self.scale = self.dlg_new_psector.findChild(QLineEdit, "scale")
-        self.atlas_id = self.dlg_new_psector.findChild(QLineEdit, "atlas_id")
-        self.rotation = self.dlg_new_psector.findChild(QLineEdit, "rotation")
+        scale = self.dlg_new_psector.findChild(QLineEdit, "scale")
+        scale.setValidator(QDoubleValidator())
+        rotation = self.dlg_new_psector.findChild(QLineEdit, "rotation")
+        rotation.setValidator(QDoubleValidator())
 
         # tab Bugdet
-        self.sum_v_plan_other_x_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_other_x_psector")
-        self.sum_v_plan_x_arc_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_x_arc_psector")
-        self.sum_v_plan_x_node_psector = self.dlg_new_psector.findChild(QLineEdit, "sum_v_plan_x_node_psector")
+        sum_expenses = self.dlg_new_psector.findChild(QLineEdit, "sum_expenses")
+        other = self.dlg_new_psector.findChild(QLineEdit, "other")
+        other.setValidator(QDoubleValidator())
+        other_cost = self.dlg_new_psector.findChild(QLineEdit, "other_cost")
 
-        self.sum_expenses = self.dlg_new_psector.findChild(QLineEdit, "sum_expenses")
-        self.other = self.dlg_new_psector.findChild(QLineEdit, "other")
-        self.other_cost = self.dlg_new_psector.findChild(QLineEdit, "other_cost")
+        sum_oexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_oexpenses")
+        gexpenses = self.dlg_new_psector.findChild(QLineEdit, "gexpenses")
+        gexpenses.setValidator(QDoubleValidator())
+        gexpenses_cost = self.dlg_new_psector.findChild(QLineEdit, "gexpenses_cost")
+        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
 
-        self.sum_oexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_oexpenses")
-        self.gexpenses = self.dlg_new_psector.findChild(QLineEdit, "gexpenses")
-        self.gexpenses_cost = self.dlg_new_psector.findChild(QLineEdit, "gexpenses_cost")
-        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, self.sum_oexpenses, self.gexpenses, self.gexpenses_cost))
+        sum_gexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_gexpenses")
+        vat = self.dlg_new_psector.findChild(QLineEdit, "vat")
+        vat.setValidator(QDoubleValidator())
+        vat_cost = self.dlg_new_psector.findChild(QLineEdit, "vat_cost")
+        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
 
-        self.sum_gexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_gexpenses")
-        self.vat = self.dlg_new_psector.findChild(QLineEdit, "vat")
-        self.vat_cost = self.dlg_new_psector.findChild(QLineEdit, "vat_cost")
-        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.cal_percent, self.sum_gexpenses, self.vat, self.vat_cost))
+        sum_vexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_vexpenses")
 
-        self.sum_vexpenses = self.dlg_new_psector.findChild(QLineEdit, "sum_vexpenses")
-
-
-        self.dlg_new_psector.other.textChanged.connect(partial(self.cal_percent, self.sum_expenses, self.other, self.other_cost))
-        self.dlg_new_psector.other_cost.textChanged.connect(partial(self.sum_total, self.sum_expenses, self.other_cost,self.sum_oexpenses ))
-
-        self.dlg_new_psector.gexpenses.textChanged.connect(partial(self.cal_percent, self.sum_oexpenses, self.gexpenses, self.gexpenses_cost))
-        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.sum_total, self.sum_oexpenses, self.gexpenses_cost, self.sum_gexpenses))
-
-        self.dlg_new_psector.vat.textChanged.connect(partial(self.cal_percent, self.sum_gexpenses, self.vat, self.vat_cost))
-        self.dlg_new_psector.vat_cost.textChanged.connect(partial(self.sum_total, self.sum_gexpenses, self.vat_cost, self.sum_vexpenses))
+        self.dlg_new_psector.other.textChanged.connect(partial(self.cal_percent, sum_expenses, other, other_cost))
+        self.dlg_new_psector.other_cost.textChanged.connect(partial(self.sum_total, sum_expenses, other_cost, sum_oexpenses))
+        self.dlg_new_psector.gexpenses.textChanged.connect(partial(self.cal_percent, sum_oexpenses, gexpenses, gexpenses_cost))
+        self.dlg_new_psector.gexpenses_cost.textChanged.connect(partial(self.sum_total, sum_oexpenses, gexpenses_cost, sum_gexpenses))
+        self.dlg_new_psector.vat.textChanged.connect(partial(self.cal_percent, sum_gexpenses, vat, vat_cost))
+        self.dlg_new_psector.vat_cost.textChanged.connect(partial(self.sum_total, sum_gexpenses, vat_cost, sum_vexpenses))
 
         # Tables
         # tab Elements
@@ -1496,224 +1399,492 @@ class Mg(ParentAction):
         self.tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(self.tbl_other_plan, self.schema_name + ".plan_other_x_psector")
 
-        # tab Bugdet
-        self.tbl_v_plan_other_x_psector = self.dlg_new_psector.findChild(QTableView, "tbl_v_plan_other_x_psector")
-        self.fill_table(self.tbl_v_plan_other_x_psector, self.schema_name + ".v_plan_other_x_psector")
-        self.tbl_v_plan_other_x_psector.hideColumn(0)
-
         # tab Elements
-        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_add_node_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_node_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_add_other_plan.pressed.connect(self.pressbtn)
-        self.dlg_new_psector.btn_del_other_plan.pressed.connect(self.pressbtn)
+        self.dlg_new_psector.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector", self.tbl_arc_plan, "arc"))
+        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_arc_plan, "plan_arc_x_psector", "id"))
+
+        self.dlg_new_psector.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", self.tbl_node_plan, "node" ))
+        self.dlg_new_psector.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_node_plan, "plan_node_x_psector", "id"))
+
+        self.dlg_new_psector.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_other_plan, "plan_other_x_psector", "id"))
+
+        ##
         # if a row is selected from mg_psector_mangement(button 46)
-        if not isinstance(psector_id, bool):
-            sql = "SELECT * FROM " + self.schema_name + ".plan_psector  WHERE psector_id = "+ str(psector_id)
+        # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
+        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0. de esta manera si psector_id
+        # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
+        ##
+        if isinstance(psector_id, bool):
+            psector_id = 0
+            
+        if psector_id != 0:
+
+            sql = "SELECT psector_id, name, priority, descript, text1, text2, observ, atlas_id, scale, rotation "
+            sql += " FROM " + self.schema_name + ".plan_psector"
+            sql += " WHERE psector_id = " + str(psector_id)
             row = self.dao.get_row(sql)
-            self.psector_id.setText(str(row[0]))
-            self.short_descript.setText(row[15])
-            index = self.priority.findText(row[2], Qt.MatchFixedString)
+            if row is None:
+                return
+            
+            self.psector_id.setText(str(row["psector_id"]))
+            utils_giswater.setRow(row)
+            utils_giswater.fillWidget("name")            
+            utils_giswater.fillWidget("descript")
+            index = self.priority.findText(row["priority"], Qt.MatchFixedString)
             if index >= 0:
                 self.priority.setCurrentIndex(index)
-            self.descript.setText(row[1])
-            self.text1.setText(row[3])
-            self.text2.setText(row[4])
-            self.observ.setText(row[5])
-            self.atlas_id.setText(row[9])
-            self.test(row[7])
-            if row[7]!=None:
-                self.scale.setText(str(row[7]))
-            if row[6] != None:
-                self.rotation.setText(str(row[6]))
+            utils_giswater.fillWidget("text1")
+            utils_giswater.fillWidget("text2") 
+            utils_giswater.fillWidget("observ") 
+            utils_giswater.fillWidget("atlas_id") 
+            utils_giswater.fillWidget("scale") 
+            utils_giswater.fillWidget("rotation")                         
 
+            # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan_other_x_psector with selected filter
             expr = " psector_id = "+ str(psector_id)
-            # Refresh model with selected filter
             self.tbl_arc_plan.model().setFilter(expr)
             self.tbl_arc_plan.model().select()
+
             expr = " psector_id = " + str(psector_id)
-            # Refresh model with selected filter
             self.tbl_node_plan.model().setFilter(expr)
             self.tbl_node_plan.model().select()
 
-            expr = " psector_id = " + str(psector_id)
-            self.tbl_v_plan_other_x_psector.model().setFilter(expr)
-            self.tbl_v_plan_other_x_psector.model().select()
-
-            # Total other Prices:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector  WHERE psector_id = "+ str(psector_id)
+            # Total other Prices
+            total_other_price = 0            
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_other_x_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
-
-            if not row[0]:
-                total_other_price=0
-            else:
-                total_other_price=row[0]
-            self.sum_v_plan_other_x_psector.setText(str(total_other_price))
-            #Total arcs:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector  WHERE psector_id = "+ str(psector_id)
+            if row is not None:       
+                if row[0]:
+                    total_other_price = row[0]
+            utils_giswater.setText("sum_v_plan_other_x_psector", total_other_price)
+            
+            # Total arcs
+            total_arcs = 0
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_arc_x_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
             row = self.dao.get_row(sql)
-            if not row[0]:
-                total_arcs=0
-            else:
-                total_arcs=row[0]
-            self.sum_v_plan_x_arc_psector.setText(str(total_arcs))
-            # Total nnodes:
-            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector  WHERE psector_id = "+ str(psector_id)
-            row = self.dao.get_row(sql)
-            if not row[0]:
-                total_nodes=0
-            else:
-                total_nodes = row[0]
-            self.sum_v_plan_x_node_psector.setText(str(total_nodes))
+            if row is not None:              
+                if row[0]:
+                    total_arcs = row[0]
+            utils_giswater.setText("sum_v_plan_x_arc_psector", total_arcs)            
 
-            sum_expenses=total_other_price+total_arcs+total_nodes
-            self.sum_expenses.setText(str(sum_expenses))
-            update=True
+            # Total nodes
+            total_nodes = 0
+            sql = "SELECT SUM(budget) FROM " + self.schema_name + ".v_plan_node_x_psector"
+            sql+= " WHERE psector_id = '" + str(psector_id) + "'"
+            row = self.dao.get_row(sql)
+            if row is not None:              
+                if row[0]:
+                    total_nodes = row[0]
+            utils_giswater.setText("sum_v_plan_x_node_psector", total_nodes)            
+            
+            sum_expenses = total_other_price + total_arcs + total_nodes
+            utils_giswater.setText("sum_expenses", sum_expenses)
+            update = True
+
         # Buttons
-        self.dlg_new_psector.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector,update,'plan_psector') )
+        self.dlg_new_psector.btn_accept.pressed.connect(partial(self.insert_or_update_new_psector, update, 'plan_psector'))
         self.dlg_new_psector.btn_cancel.pressed.connect(self.dlg_new_psector.close)
-        self.dlg_new_psector.exec_()
+        self.dlg_new_psector.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_new_psector.open()
 
 
-    def insert_or_update_new_psector(self, update,table):
+    def insert_or_update_new_psector(self, update, tablename):
         
-        self.test(update)
+        sql = "SELECT *"
+        sql += " FROM " + self.schema_name + "." + tablename
+        row = self.dao.get_row(sql)
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            columns.append(column_name)
+
         if update:
-            sql = "UPDATE " + self.schema_name + "."+table+" SET descript='" + self.descript.text()+"'"
-            sql += ", priority='"+self.priority.currentText()+"'"
-            sql += ", text1='" + self.text1.text() + "'"
-            sql += ", text2='" + self.text2.text() + "'"
-            sql += ", observ='" + self.observ.text() + "'"
-            sql += ", scale='" + self.scale.text() + "'"
-            sql += ", atlas_id='" + self.atlas_id.text() + "'"
-            sql += ", rotation='" + self.rotation.text() + "'"
-            sql += ", short_descript='" + self.short_descript.text() + "'"
+            if columns is not None:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+                for column_name in columns:
+                    if column_name != 'psector_id':
+                        widget_type = utils_giswater.getWidgetType(column_name)
+                        if widget_type is QCheckBox:
+                            value = utils_giswater.isChecked(column_name)
+                        elif widget_type is QDateEdit:
+                            date = self.dlg.findChild(QDateEdit, str(column_name))
+                            value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
+                        else:
+                            value = utils_giswater.getWidgetText(column_name)
+                        if value is None or value == 'null':
+                            sql += column_name + " = null, "
+                        else:
+                            if type(value) is not bool:
+                                value = value.replace(",", ".")
+                            sql += column_name + " = '" + str(value) + "', "
 
-            sql += " WHERE psector_id = '"+self.psector_id.text() +"'"
+                sql = sql[:len(sql) - 2]
+                sql += " WHERE psector_id = '" + self.psector_id.text() + "'"
+                
         else:
-            '''
-            fields=""
-            values=""
-            self.test(self.descript.text())
-            if self.short_descript.text()!="":
-                fields="short_descript"
-                values="'"+self.short_descript.text()+"'" or None
-            if self.descript.text()!="":
-                fields+=", descript"
-                values+=", '"+self.descript.text()+"'" or None
-            if self.priority.currentText()!="":
-                fields += ", priority"
-                values += ", '"+self.priority.currentText()+"'" or None
-
-
-
-            sql = "INSERT INTO " + self.schema_name + "."+table+"("+fields+")"
-            sql += " VALUES (" +values+")"
-            '''
-            #, text1, text2, observ, scale, atlas_id, rotation, short_descript
-            sql = "INSERT INTO " + self.schema_name + "." + table + "(descript, priority, text1)"
-            sql += " VALUES (" + str(self.descript.text()) +","+str(self.priority.currentText())+","+str(self.text1.text())+ ")"
-            self.test(sql)
+            values = "VALUES("
+            if columns is not None:
+                sql = "INSERT INTO " + self.schema_name + "." + tablename+" ("
+                for column_name in columns:
+                    if column_name != 'psector_id':
+                        widget_type = utils_giswater.getWidgetType(column_name)
+                        if widget_type is not None:
+                            if widget_type is QCheckBox:
+                                values += utils_giswater.isChecked(column_name)+", "
+                            elif widget_type is QDateEdit:
+                                date = self.dlg.findChild(QDateEdit, str(column_name))
+                                values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss')+", "
+                            else:
+                                value =utils_giswater.getWidgetText(column_name)
+                            if value is None or value == 'null':
+                                sql += column_name + ", "
+                                values += "null, "
+                            else:
+                                values += "'" + value + "',"
+                                sql += column_name + ", "
+                sql = sql[:len(sql) - 2]+") "
+                values = values[:len(values)-2] + ")"
+                sql += values
         self.controller.execute_sql(sql)
+        self.dlg_new_psector.close()
 
 
-    def cal_percent(self,widged_total, widged_percent, wided_result):
+    def snapping(self, layer_view, tablename, table_view, elem_type):
+        
+        map_canvas = self.iface.mapCanvas()
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emitPoint = QgsMapToolEmitPoint(map_canvas)
+        map_canvas.setMapTool(self.emitPoint)
+        self.dlg_new_psector.btn_add_arc_plan.setText('Editing')
+        self.emitPoint.canvasClicked.connect(partial(self.click_button_add, layer_view, tablename, table_view, elem_type))
+
+
+    def click_button_add(self, layer_view, tablename, table_view, elem_type, point, button):
+        """
+        :param layer_view: it is the view we are using
+        :param tablename:  Is the name of the table that we will use to make the SELECT and INSERT
+        :param table_view: it's QTableView we are using, need ir for upgrade his own view
+        :param elem_type: Used to buy the object that we "click" with the type of object we want to add or delete
+        :param point: param inherited from signal canvasClicked
+        :param button: param inherited from signal canvasClicked
+        """
+        
+        if button == Qt.LeftButton:
+
+            node_group = ["Junction", "Valve", "Reduction", "Tank", "Meter", "Manhole", "Source", "Hydrant"]
+            arc_group = ["Pipe"]
+            canvas = self.iface.mapCanvas()
+            snapper = QgsMapCanvasSnapper(canvas)
+            map_point = canvas.getCoordinateTransform().transform(point)
+            x = map_point.x()
+            y = map_point.y()
+            event_point = QPoint(x, y)
+
+            # Snapping
+            (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
+
+            # That's the snapped point
+            if result:
+                # Check feature
+                for snapPoint in result:
+                    element_type = snapPoint.layer.name()
+                    feat_type = None
+                    if element_type in node_group:
+                        feat_type = 'node'
+                    elif element_type in arc_group:
+                        feat_type = 'arc'
+
+                    if feat_type is not None:
+                        # Get the point
+                        feature = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
+                        element_id = feature.attribute(feat_type + '_id')
+
+                        # LEAVE SELECTION
+                        snapPoint.layer.select([snapPoint.snappedAtGeometry])
+                        # Get depth of feature
+                        if feat_type == elem_type:
+                            sql = "SELECT * FROM " + self.schema_name + "." + tablename
+                            sql+= " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
+                            row = self.dao.get_row(sql)
+                            if not row:
+                                self.list_elemets[element_id] = feat_type
+                            else:
+                                message = "This id already exists"
+                                self.controller.show_info(message, context_name='ui_message')
+                        else:
+                            message = self.tr("You are trying to introduce")+" "+feat_type+" "+self.tr("in a")+" "+elem_type
+                            self.controller.show_info(message, context_name='ui_message')
+
+        elif button == Qt.RightButton:
+            for element_id, feat_type in self.list_elemets.items():
+                sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
+                sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
+                self.controller.execute_sql(sql)
+            table_view.model().select()
+            self.emitPoint.canvasClicked.disconnect()
+            self.list_elemets.clear()
+            self.dlg_new_psector.btn_add_arc_plan.setText('Add')
+
+
+    def cal_percent(self, widged_total, widged_percent, wided_result):
         wided_result.setText(str((float(widged_total.text())*float(widged_percent.text())/100)))
 
 
     def sum_total(self, widget_total, widged_percent, wided_result):
         wided_result.setText(str((float(widget_total.text()) + float(widged_percent.text()))))
-    '''
-    def insert_mg_newp(self):
 
-        if self.psector_id.text()=='':
-            self.test("Field psector_id needed")
-        else:
-            sql = "INSERT INTO " + self.schema_name + ".plan_psector (psector_id, descript, priority, text1, text2, observ)"
-            sql += " VALUES ('" + self.psector_id.text()+ "', '" + self.descript.text()+ "', '" + self.priority.text()+ "', '" + self.text1.text() + "', '" + self.text2.text() +"', '" + self.observ.text()+  "')"
-            self.controller.execute_sql(sql)
-            self.test("saved")
-    '''
 
     def mg_psector_mangement(self):
         ''' Button_46 : Psector management '''
-        
-        'psm es abreviacion de psector_management'
+
+        # psm es abreviacion de psector_management
         # Create the dialog and signals
         self.dlg_psector_mangement = Psector_management()
         utils_giswater.setDialog(self.dlg_psector_mangement)
-        table_document="plan_psector"
-        column_id="psector_id"
+        table_name = "plan_psector"
+        column_id = "psector_id"
+        
         # Tables
-        self.tbl_psm=self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
-        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows) #Select by rows instead of individual cells
-        # Buttons
+        self.tbl_psm = self.dlg_psector_mangement.findChild(QTableView, "tbl_psm")
+        self.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)  # Select by rows instead of individual cells
+
+        # Set signals
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
-        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.delete_records_with_params, self.tbl_psm, table_document,column_id))
-        # LineEdit
-        self.dlg_psector_mangement.txt_short_descript_psm.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_short_descript_psm))
-        #self.txt_short_descript_psm.
+        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delet, self.tbl_psm, table_name, column_id))
+        self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
         self.dlg_psector_mangement.exec_()
 
 
     def charge_psector(self):
+        
         selected_list = self.tbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' )
+            self.controller.show_warning(message, context_name='ui_message')
             return
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
         self.dlg_psector_mangement.close()
-        self.mg_new_psector(psector_id)
+        self.mg_new_psector(psector_id, True)
 
 
-    def filter_by_text(self,table,txt):
-        result_select = utils_giswater.getWidgetText(txt)
-        if result_select=='null':
-            result_select=""
+    def filter_by_text(self, table, widget_txt, tablename):
+        
+        result_select = utils_giswater.getWidgetText(widget_txt)
+        if result_select != 'null':
+            expr = " name LIKE '%"+result_select+"%'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table(self.tbl_psm, self.schema_name + "."+tablename)
 
-        expr = " psector_id LIKE '%"+result_select+"%'"
-        # Refresh model with selected filter
-        table.model().setFilter(expr)
-        table.model().select()
+
+    def hide_colums(self, widget, comuns_to_hide):
+        for i in range(0, len(comuns_to_hide)):
+            widget.hideColumn(comuns_to_hide[i])
+            
+            
+    def show_colums(self, widget, comuns_to_show):
+        for i in range(0, len(comuns_to_show)):
+            widget.showColumn(comuns_to_show[i])
 
 
     def mg_psector_selector(self):
-        ''' Button_47 : Psector selector '''
+        """ Button_47 : Psector selector """
 
         # Create the dialog and signals
-        self.dlg_psector_sel = Multipsector_selector()
+        self.dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(self.dlg_psector_sel)
-        # Buttons
-        self.dlg_psector_sel.btn_accept.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
-        self.dlg_psector_sel.btn_select_state.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_unselect_state.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_select_psector.pressed.connect(self.pressbtn)
-        self.dlg_psector_sel.btn_unselect_psector.pressed.connect(self.pressbtn)
 
         # Tables
-        self.tbl_all_state = self.dlg_psector_sel.findChild(QTableView, "all_state")
-        self.tbl_selected_state = self.dlg_psector_sel.findChild(QTableView, "selected_state")
-        self.tbl_all_psector = self.dlg_psector_sel.findChild(QTableView, "all_psector")
-        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_psector")
+        self.tbl_all_row = self.dlg_psector_sel.findChild(QTableView, "all_row")
+        self.tbl_all_row.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name not in ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector RIGTH JOIN "
+        sql += self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
+        sql += "WHERE cur_user = current_user)"
+        self.fill_table_by_query(self.tbl_all_row, sql)
+        columstohide = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+        self.hide_colums(self.tbl_all_row, columstohide)
 
-        # LineEdit
-        self.pss_txt_short_descript = self.dlg_psector_sel.findChild(QLineEdit, "txt_short_descript")
+        self.tbl_selected_psector = self.dlg_psector_sel.findChild(QTableView, "selected_row")
+        self.tbl_selected_psector.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT name, cur_user, plan_psector.psector_id FROM "+self.controller.schema_name+".plan_psector "
+        sql += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
+        sql += "WHERE cur_user=current_user"
+        self.fill_table_by_query(self.tbl_selected_psector, sql)
 
+        self.dlg_psector_sel.btn_cancel.pressed.connect(self.dlg_psector_sel.close)
+
+        query_left = "SELECT * FROM "+self.controller.schema_name+".plan_psector where name not in "
+        query_left += "(SELECT name from "+self.controller.schema_name+".plan_psector "
+        query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
+        query_left += "WHERE cur_user = current_user)"
+
+        query_right = "SELECT name, cur_user, plan_psector.psector_id from "+self.controller.schema_name+".plan_psector "
+        query_right += "JOIN "+self.controller.schema_name+".selector_psector on plan_psector.psector_id=selector_psector.psector_id "
+        query_right += "WHERE cur_user = current_user"
+        field = "psector_id"
+        self.dlg_psector_sel.btn_select.pressed.connect(partial(self.multi_rows_selector, self.tbl_all_row, self.tbl_selected_psector, "psector_id", "selector_psector", "id", query_left,query_right, field))
+
+        query_left = "SELECT * FROM " + self.controller.schema_name+".plan_psector WHERE name NOT IN "
+        query_left += "(SELECT name FROM "+ self.controller.schema_name+".plan_psector RIGHT JOIN " + self.controller.schema_name+".selector_psector "
+        query_left += "ON plan_psector.psector_id = selector_psector.psector_id where cur_user=current_user)"
+        query_right = "SELECT name, cur_user, plan_psector.psector_id from "+self.controller.schema_name+".plan_psector "
+        query_right += "JOIN "+self.controller.schema_name+".selector_psector ON plan_psector.psector_id = selector_psector.psector_id "
+        query_right += "WHERE cur_user = current_user"
+
+        query_delete = "DELETE FROM "+self.controller.schema_name+".selector_psector "
+        query_delete += "WHERE current_user = cur_user and selector_psector.psector_id ="
+        self.dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, self.tbl_all_row, self.tbl_selected_psector,
+                                                                  query_delete, query_left, query_right, field))
+
+        self.dlg_psector_sel.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_psector_sel.txt_name))
         self.dlg_psector_sel.exec_()
 
 
     def set_project_type(self, project_type):
         self.project_type = project_type
 
+
+    def query_like_widget_text(self, widget):
         
-    def pressbtn(self):
-        QMessageBox.about(None, 'Ok', str('btn pressed'))
-  
-    
+        query = widget.text()
+        sql = "SELECT * FROM "+self.controller.schema_name+".plan_psector WHERE name NOT IN ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".plan_psector RIGHT JOIN "
+        sql += self.controller.schema_name+".selector_psector on plan_psector.psector_id = selector_psector.psector_id "
+        sql += "WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
+        self.fill_table_by_query(self.tbl_all_row, sql)
+
+
+    def mg_state_selector(self):
+        """ Button_48 : state selector """
+        
+        # Create the dialog and signals
+        self.dlg_state_sel = State_selector()
+        utils_giswater.setDialog(self.dlg_state_sel)
+        # Tables
+        self.tbl_all_state = self.dlg_state_sel.findChild(QTableView, "all_state")
+        self.tbl_all_state.setSelectionBehavior(QAbstractItemView.SelectRows)
+        #self.set_configuration(self.tbl_all_state, "all_state")
+        sql = "SELECT * FROM "+self.controller.schema_name+".value_state WHERE name NOT IN ("
+        sql += "SELECT name FROM "+self.controller.schema_name+".value_state RIGHT JOIN "
+        sql += self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
+        self.fill_table_by_query(self.tbl_all_state, sql)
+        columstohide = [0, 2, 3, 4]
+        self.hide_colums(self.tbl_all_state, columstohide)
+
+        self.tbl_selected_state = self.dlg_state_sel.findChild(QTableView, "selected_state")
+        self.tbl_selected_state.setSelectionBehavior(QAbstractItemView.SelectRows)
+        sql = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state"
+        sql += " JOIN "+self.controller.schema_name+".selector_state on value_state.id = state_id"
+        sql += " WHERE cur_user=current_user"
+        self.fill_table_by_query(self.tbl_selected_state, sql)
+        columstohide = [2]
+        self.hide_colums(self.tbl_selected_state, columstohide)
+
+        query_left = "SELECT * from "+self.controller.schema_name+".value_state WHERE name not in (SELECT name FROM "+self.controller.schema_name+".value_state "
+        query_left += " RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user)"
+        query_right = "SELECT name, cur_user,state_id FROM "+self.controller.schema_name+".value_state JOIN "+self.controller.schema_name+".selector_state"
+        query_right += " ON value_state.id=state_id WHERE cur_user=current_user"
+        field = "state_id"
+        self.dlg_state_sel.btn_select_state.pressed.connect(
+            partial(self.multi_rows_selector, self.tbl_all_state, self.tbl_selected_state, "id", "selector_state",
+                    "state_id", query_left, query_right, field))
+
+        query_left = "SELECT * FROM "+self.controller.schema_name+".value_state WHERE name NOT IN "
+        query_left += "(SELECT name FROM "+self.controller.schema_name+".value_state "
+        query_left += "RIGHT JOIN "+self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user = current_user)"
+
+        query_right = "SELECT name, cur_user, state_id from "+self.controller.schema_name+".value_state JOIN "
+        query_right += self.controller.schema_name+".selector_state ON value_state.id = state_id WHERE cur_user=current_user"
+        query_delete = "DELETE FROM "+self.controller.schema_name+".selector_state WHERE current_user = cur_user and state_id ="
+        field = "state_id"
+        self.dlg_state_sel.btn_unselect_state.pressed.connect(
+            partial(self.unselector, self.tbl_all_state, self.tbl_selected_state, query_delete, query_left, query_right, field))
+
+        self.dlg_state_sel.btn_cancel.pressed.connect(self.dlg_state_sel.close)
+        self.dlg_state_sel.exec_()
+
+
+    def unselector(self, qtable_left, qtable_right, sql, query_left, query_right, field):
+        
+        selected_list = qtable_right.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = str(qtable_right.model().record(row).value(field))
+            expl_id.append(id_)
+        for i in range(0, len(expl_id)):
+            self.controller.execute_sql(sql+str(expl_id[i]))
+
+        # Refresh
+        self.fill_table_by_query(qtable_left, query_left)
+        self.fill_table_by_query(qtable_right, query_right)
+        self.iface.mapCanvas().refresh()
+
+
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right, field):
+        """
+        :param qtable_left: QTableView origin
+        :param qtable_right: QTableView destini
+        :param tablename_ori: table origin
+        :param id_ori: Refers to the id of the source table
+        :param tablename_des: table destini
+        :param id_des: Refers to the id of the target table, on which the query will be made
+        """
+
+        selected_list = qtable_left.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        expl_id = []
+        curuser_list = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable_left.model().record(row).value(id_ori)
+            expl_id.append(id_)
+            curuser = qtable_left.model().record(row).value("cur_user")
+            curuser_list.append(curuser)
+        for i in range(0, len(expl_id)):
+            # Check if expl_id already exists in expl_selector
+            sql = "SELECT DISTINCT(" + id_des + ", cur_user)"
+            sql+= " FROM " + self.schema_name+"." + tablename_des
+            sql+= " WHERE " + id_des + " = '" + str(expl_id[i])
+            row = self.dao.get_row(sql)
+            if row:
+                # if exist - show warning
+                self.controller.show_info_box("Id "+str(expl_id[i])+" is already selected!", "Info")
+            else:
+                sql = 'INSERT INTO '+self.schema_name+'.'+tablename_des+' ('+field+', cur_user) '
+                sql += " VALUES ("+str(expl_id[i])+", current_user)"
+                self.controller.execute_sql(sql)
+
+        # Refresh
+        self.fill_table_by_query(qtable_right, query_right)
+        self.fill_table_by_query(qtable_left, query_left)
+        self.iface.mapCanvas().refresh()
+        
+
+    def fill_table_by_query(self, qtable, query):
+        """
+        :param qtable: QTableView to show
+        :param query: query to set model
+        """
+        model = QSqlQueryModel()
+        model.setQuery(query)
+        qtable.setModel(model)
+        qtable.show()
+

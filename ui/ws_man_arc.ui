@@ -76,7 +76,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>41</y>
+      <y>50</y>
       <width>579</width>
       <height>431</height>
      </rect>
@@ -87,7 +87,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -812,7 +812,7 @@
         <property name="calendarPopup">
          <bool>true</bool>
         </property>
-        <property name="allowNull">
+        <property name="allowNull" stdset="0">
          <bool>true</bool>
         </property>
        </widget>
@@ -822,8 +822,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>327</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1107,7 +1107,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pipe_adress_02">
+       <widget class="QLabel" name="label_pipe_address_02">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1245,7 +1245,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_pipe_adress_01">
+       <widget class="QLabel" name="label_pipe_address_01">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1281,7 +1281,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pipe_adress_01">
+       <widget class="QLineEdit" name="pipe_address_01">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1340,7 +1340,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="pipe_adress_02">
+       <widget class="QLineEdit" name="pipe_address_02">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -1348,6 +1348,58 @@
           <width>431</width>
           <height>25</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_pipe_num_value">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>315</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Numeric value:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="pipe_num_value">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>315</y>
+          <width>431</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
         </property>
        </widget>
       </widget>
@@ -1367,15 +1419,15 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>327</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2063,7 +2115,7 @@
         <property name="calendarPopup">
          <bool>true</bool>
         </property>
-        <property name="allowNull">
+        <property name="allowNull" stdset="0">
          <bool>true</bool>
         </property>
        </widget>
@@ -2358,7 +2410,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_adress_02">
+       <widget class="QLabel" name="label_varc_address_02">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2496,7 +2548,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_varc_adress_01">
+       <widget class="QLabel" name="label_varc_address_01">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2532,7 +2584,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_adress_01">
+       <widget class="QLineEdit" name="varc_address_01">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2591,7 +2643,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="varc_adress_02">
+       <widget class="QLineEdit" name="varc_address_02">
         <property name="geometry">
          <rect>
           <x>110</x>
@@ -2599,6 +2651,55 @@
           <width>431</width>
           <height>25</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="varc_num_value">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>315</y>
+          <width>431</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_varc_num_value">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>315</y>
+          <width>90</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Numeric value:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
         </property>
        </widget>
       </widget>

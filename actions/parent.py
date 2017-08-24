@@ -27,6 +27,7 @@ class ParentAction():
         ''' Class constructor '''
 
         # Initialize instance attributes
+        self.giswater_version = "3.0"
         self.iface = iface
         self.settings = settings
         self.controller = controller
@@ -35,11 +36,12 @@ class ParentAction():
         self.schema_name = self.controller.schema_name
         self.project_type = None
           
-        # Get files to execute giswater jar
-        self.plugin_version = self.get_plugin_version()
-        self.java_exe = self.get_java_exe()              
-        (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
-        self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
+        # Get files to execute giswater jar (only in Windows)
+        if 'nt' in sys.builtin_module_names: 
+            self.plugin_version = self.get_plugin_version()
+            self.java_exe = self.get_java_exe()              
+            (self.giswater_file_path, self.giswater_build_version) = self.get_giswater_jar() 
+            self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
     
     
     def get_plugin_version(self):
@@ -66,7 +68,7 @@ class ParentAction():
         ''' Get executable Giswater file and build version from windows registry '''
              
         reg_hkey = "HKEY_LOCAL_MACHINE"
-        reg_path = "SOFTWARE\\Giswater\\2.1"
+        reg_path = "SOFTWARE\\Giswater\\"+self.giswater_version
         reg_name = "InstallFolder"
         giswater_folder = utils_giswater.get_reg(reg_hkey, reg_path, reg_name)
         if giswater_folder is None:

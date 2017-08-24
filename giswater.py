@@ -48,13 +48,11 @@ class Giswater(QObject):
 
         # Initialize instance attributes
         self.iface = iface
-        self.legend = iface.legendInterface()    
         self.dao = None
         self.actions = {}
         self.search_plus = None
         self.map_tools = {}
         self.srid = None  
-        self.menu_values = None
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
@@ -62,8 +60,8 @@ class Giswater(QObject):
         self.icon_folder = self.plugin_dir+'/icons/'    
 
         # Initialize svg giswater directory
-        self.svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
-        QgsExpressionContextUtils.setProjectVariable('svg_path',self.svg_plugin_dir)   
+        svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
+        QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
 
         # Initialize locale
         locale = QSettings().value('locale/userLocale')
@@ -72,9 +70,9 @@ class Giswater(QObject):
         if not os.path.exists(locale_path):
             locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_en_US.qm')
 
-        self.translator = QTranslator()
-        self.translator.load(locale_path)
-        QCoreApplication.installTranslator(self.translator)
+        translator = QTranslator()
+        translator.load(locale_path)
+        QCoreApplication.installTranslator(translator)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
@@ -97,10 +95,12 @@ class Giswater(QObject):
         connection_status = self.controller.set_database_connection()
         if not connection_status:
             msg = self.controller.last_error  
-            self.controller.show_message(msg, 1, 100) 
+            self.controller.show_warning(msg, 30) 
             return 
         
         self.dao = self.controller.dao 
+        self.schema_name = self.controller.get_schema_name()
+        self.schema_exists = self.dao.check_schema(self.schema_name)
         
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -118,7 +118,7 @@ class Giswater(QObject):
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
-        self.legend.currentLayerChanged.connect(self.current_layer_changed) 
+        self.iface.legendInterface().currentLayerChanged.connect(self.current_layer_changed) 
 
   
     def tr(self, message):
@@ -132,7 +132,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01,02,19, 21, 25,27,39,41,45,46,47,28,99):
+                if int(index_action) in (01, 02, 19, 21, 23, 24, 25, 27, 28, 39, 41, 45, 46, 47, 48, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -153,8 +153,6 @@ class Giswater(QObject):
      
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
-        schema_name=self.controller.get_schema_name()
-
         if parent is None:
             parent = self.iface.mainWindow()
 
@@ -166,127 +164,49 @@ class Giswater(QObject):
                 
         if icon is None:
             action = QAction(text, parent) 
+            
         else:
+        
             action = QAction(icon, text, parent)  
-            if index_action == '01':
-                # Button add_node   
-                # Add drop down menu to button in toolbar
-                self.menu=QMenu()
-                self.menu.clear()
-             
-   
+            
+            # Button add_node: add drop down menu to button in toolbar
+            if self.schema_exists and index_action == '01':
+                menu = QMenu()
                 # Get translated type
-                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".node_type_cat_type "    
+                sql = "SELECT DISTINCT(i18n) FROM "+self.schema_name+".node_type_cat_type "    
                 row_id = self.dao.get_rows(sql) 
-                
-                # Get shortcut
-                #sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type WHERE id='"+str(row_id[j][0])+"'"    
-                #sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type_cat_type "    
-                #row_shortcut = self.dao.get_rows(sql) 
-                
                 for i in range(0, len(row_id)):
                     # Get shortcut 
-                    sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type_cat_type WHERE i18n='"+str(row_id[i][0])+"'" 
+                    sql = "SELECT DISTINCT(shortcut_key) FROM "+self.schema_name+".node_type_cat_type" 
+                    sql+= " WHERE i18n = '"+str(row_id[i][0])+"'" 
                     row_shortcut = self.dao.get_rows(sql)
-                    obj_action = QAction(str(row_id[i][0]),self)
+                    obj_action = QAction(str(row_id[i][0]), self)
                     obj_action.setShortcut(str(row_shortcut[0][0]))
-                    self.menu.addAction(obj_action)
-                    obj_action.triggered.connect( partial(self.menu_activate,str(row_id[i][0])))
+                    menu.addAction(obj_action)
+                    obj_action.triggered.connect(partial(self.menu_activate, str(row_id[i][0])))
                 
-                action.setMenu(self.menu)
+                action.setMenu(menu)
                 
-            if index_action == '02':
-            
-                # Button add_arc 
-                # Add drop down menu to button in toolbar
-                self.menu_arc=QMenu()
-                self.menu_arc.clear()
-
+            # Button add_arc: add drop down menu to button in toolbar
+            elif self.schema_exists and index_action == '02':
+                menu_arc = QMenu()
                 # Get translated type
-                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".arc_type_cat_type "    
+                sql = "SELECT DISTINCT(i18n) FROM "+self.schema_name+".arc_type_cat_type "    
                 row_id = self.dao.get_rows(sql) 
-               
-
                 for i in range(0, len(row_id)):
                     # Get shortcut 
-                    sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".arc_type_cat_type WHERE i18n='"+str(row_id[i][0])+"'" 
+                    sql = "SELECT DISTINCT(shortcut_key) FROM "+self.schema_name+".arc_type_cat_type"
+                    sql+= " WHERE i18n = '"+str(row_id[i][0])+"'" 
                     row_shortcut = self.dao.get_rows(sql)
-                    obj_action = QAction(str(row_id[i][0]),self)
+                    obj_action = QAction(str(row_id[i][0]), self)
                     obj_action.setShortcut(str(row_shortcut[0][0]))
-                    self.menu_arc.addAction(obj_action)
-                    obj_action.triggered.connect( partial(self.menu_activate,str(row_id[i][0])))
+                    menu_arc.addAction(obj_action)
+                    obj_action.triggered.connect(partial(self.menu_activate, str(row_id[i][0])))
                 
-                action.setMenu(self.menu_arc)
-                '''
-                self.sub_menu=QMenu()
-                
-                list = [] 
-                
-                for i in range(0, len(row)):
-                    sql = "SELECT DISTINCT(id) FROM "+schema_name+".node_type WHERE i18n='"+str(row[i][0])+"'"    
-                    row_id = self.dao.get_rows(sql) 
-   
-                    list.append(QMenu(self.sub_menu))
-                    #self.sub_menu=QMenu()
-                    list[i].setTitle(row[i][0])
-                    self.menu.addMenu(list[i])
-
-                    for j in range(0, len(row_id)):                 
-                        # Get shortcut
-                        sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".node_type WHERE id='"+str(row_id[j][0])+"'"    
-                        row_shortcut = self.dao.get_rows(sql) 
-
-                        obj_action = QAction(str(row_id[j][0]),self)
-                        obj_action.setShortcut(str(row_shortcut[0][0]))
-                        list[i].addAction( obj_action )
-                        # Provide node_type and node_type_id
-                        obj_action.triggered.connect( partial(self.menu_activate,str(row[i][0])))
-
-                action.setMenu(self.menu)
-                '''
-            
-            '''    
-            if index_action == '02':
-            # Button add_arc
-                # Add drop down menu to button in toolbar
-                self.menu_arc=QMenu()
-                #self.sub_menu=QMenu()
-                self.menu_arc.clear()
-                # Get translated type
-                sql = "SELECT DISTINCT(i18n) FROM "+schema_name+".arc_type "    
-                row = self.dao.get_rows(sql) 
-                
-                self.sub_menu_arc=QMenu()
-                
-                list = [] 
-                
-                for i in range(0, len(row)):
-                    sql = "SELECT DISTINCT(id) FROM "+schema_name+".arc_type WHERE i18n='"+str(row[i][0])+"'"    
-                    row_id = self.dao.get_rows(sql) 
-   
-                    list.append(QMenu(self.sub_menu_arc))
-                    #self.sub_menu=QMenu()
-                    list[i].setTitle(row[i][0])
-                    self.menu_arc.addMenu(list[i])
-
-                    for j in range(0, len(row_id)):                 
-                        # Get shortcut
-                        sql = "SELECT DISTINCT(shortcut_key) FROM "+schema_name+".arc_type WHERE id='"+str(row_id[j][0])+"'"    
-                        row_shortcut = self.dao.get_rows(sql) 
-
-                        obj_action = QAction(str(row_id[j][0]),self)
-                        obj_action.setShortcut(str(row_shortcut[0][0]))
-                        list[i].addAction( obj_action )
-                        obj_action.triggered.connect( partial(self.menu_activate,str(row[i][0]) ))
-                           
-                action.setMenu(self.menu_arc)
-            '''          
+                action.setMenu(menu_arc)  
                   
         if toolbar is not None:
             toolbar.addAction(action)  
-             
-        if menu is not None:
-            self.iface.addPluginToMenu(menu, action)
             
         if index_action is not None:         
             self.actions[index_action] = action
@@ -299,17 +219,18 @@ class Giswater(QObject):
         return action
           
         
-    def menu_activate(self,node_type):
+    def menu_activate(self, node_type):
         
         # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)[0]
-        self.iface.setActiveLayer(layer)
-        
-        # Find the layer to edit
-        #layer = self.iface.activeLayer()
-        layer.startEditing()
-        # Implement the Add Feature button
-        self.iface.actionAddFeature().trigger()
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)
+        if layer:
+            layer = layer[0]
+            self.iface.setActiveLayer(layer)
+            layer.startEditing()
+            # Implement the Add Feature button
+            self.iface.actionAddFeature().trigger()
+        else:
+            self.controller.show_warning("Selected layer name not found: "+str(node_type))
 
     
     def add_action(self, index_action, toolbar, parent):
@@ -362,7 +283,63 @@ class Giswater(QObject):
         
         return action         
 
+     
+    def manage_toolbars(self):
+        ''' Manage actions of the different toolbars '''
         
+        parent = self.iface.mainWindow()        
+        if self.toolbar_ud_enabled:
+            self.toolbar_ud_name = self.tr('toolbar_ud_name')
+            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
+            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
+        if self.toolbar_ws_enabled:
+            self.toolbar_ws_name = self.tr('toolbar_ws_name')
+            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
+            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
+        if self.toolbar_mg_enabled:
+            self.toolbar_mg_name = self.tr('toolbar_mg_name')
+            self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
+            self.toolbar_mg.setObjectName(self.toolbar_mg_name)      
+        if self.toolbar_ed_enabled:
+            self.toolbar_ed_name = self.tr('toolbar_ed_name')
+            self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
+            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
+                
+        # Set an action list for every toolbar    
+        list_actions_ud = ['02','04','05']
+        list_actions_ws = ['10','11','12','14','15','08','29','13']
+        list_actions_mg = ['01','02','16','17','18','19','20','21','22','23','24','25','26','27','28','39','41','43','45','46','47','48','99','56','57']
+        list_actions_ed = ['30','31','32','33','34','35','36','52']
+                
+        # UD toolbar   
+        if self.toolbar_ud_enabled:        
+            self.ag_ud = QActionGroup(parent)
+            for elem in list_actions_ud:
+                self.add_action(elem, self.toolbar_ud, self.ag_ud)            
+                
+        # WS toolbar 
+        if self.toolbar_ws_enabled:  
+            self.ag_ws = QActionGroup(parent)
+            for elem in list_actions_ws:
+                self.add_action(elem, self.toolbar_ws, self.ag_ws)
+                
+        # MANAGEMENT toolbar 
+        if self.toolbar_mg_enabled:      
+            self.ag_mg = QActionGroup(parent)
+            for elem in list_actions_mg:
+                self.add_action(elem, self.toolbar_mg, self.ag_mg)
+                    
+        # EDIT toolbar 
+        if self.toolbar_ed_enabled:      
+            self.ag_ed = QActionGroup(parent);
+            for elem in list_actions_ed:
+                self.add_action(elem, self.toolbar_ed, self.ag_ed)                                      
+         
+        # Disable and hide all toolbars
+        self.enable_actions(False)
+        self.hide_toolbars() 
+                
+           
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
         
@@ -431,64 +408,15 @@ class Giswater(QObject):
         self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
         
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
-        parent = self.iface.mainWindow()
         self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
         self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
         self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
         
-        if self.toolbar_ud_enabled:
-            self.toolbar_ud_name = self.tr('toolbar_ud_name')
-            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
-            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
-        if self.toolbar_ws_enabled:
-            self.toolbar_ws_name = self.tr('toolbar_ws_name')
-            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
-            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
-        if self.toolbar_mg_enabled:
-            self.toolbar_mg_name = self.tr('toolbar_mg_name')
-            self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
-            self.toolbar_mg.setObjectName(self.toolbar_mg_name)      
-        if self.toolbar_ed_enabled:
-            self.toolbar_ed_name = self.tr('toolbar_ed_name')
-            self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
-            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
-                
-        # Set an action list for every toolbar    
-        self.list_actions_ud = ['02','04','05']
-        self.list_actions_ws = ['10','11','12','14','15','08','29','13']
-        self.list_actions_mg = ['01','02','16','17','18','19','20','21','22','23','24','25','26','27','28','39','41','43','45','46','47','99','56','57']
-        self.list_actions_ed = ['30','31','32','33','34','35','36','52']
-
-        # UD toolbar   
-        if self.toolbar_ud_enabled:        
-            self.ag_ud = QActionGroup(parent)
-            for elem in self.list_actions_ud:
-                self.add_action(elem, self.toolbar_ud, self.ag_ud)            
-                
-        # WS toolbar 
-        if self.toolbar_ws_enabled:  
-            self.ag_ws = QActionGroup(parent)
-            for elem in self.list_actions_ws:
-                self.add_action(elem, self.toolbar_ws, self.ag_ws)
-                
-        # MANAGEMENT toolbar 
-        if self.toolbar_mg_enabled:      
-            self.ag_mg = QActionGroup(parent)
-            for elem in self.list_actions_mg:
-                self.add_action(elem, self.toolbar_mg, self.ag_mg)
-                    
-        # EDIT toolbar 
-        if self.toolbar_ed_enabled:      
-            self.ag_ed = QActionGroup(parent);
-            for elem in self.list_actions_ed:
-                self.add_action(elem, self.toolbar_ed, self.ag_ed)                                      
-         
-        # Disable and hide all toolbars
-        self.enable_actions(False)
-        self.hide_toolbars() 
+        # Manage actions of the different toolbars
+        self.manage_toolbars()
                          
-        # Load automatically custom forms for layers 'arc', 'node', and 'connec'   
+        # Load automatically custom forms for layers 'arc', 'node', and 'connec'? 
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
                                  
         # Project initialization
@@ -608,18 +536,15 @@ class Giswater(QObject):
             return    
         
         # Initialize variables
-        self.layer_arc = None
-        self.layer_arc_man_UD = []
-        self.layer_arc_man_WS = []
+        self.layer_arc_man_ud = []
+        self.layer_arc_man_ws = []
 
-        self.layer_node = None
-        self.layer_node_man_UD = []
-        self.layer_node_man_WS = []
-        self.layer_valve = None
+        self.layer_node_man_ud = []
+        self.layer_node_man_ws = []
 
         self.layer_connec = None
-        self.layer_connec_man_UD = []
-        self.layer_connec_man_WS = []
+        self.layer_connec_man_ud = []
+        self.layer_connec_man_ws = []
 
         self.layer_gully = None
         self.layer_pgully = None
@@ -637,97 +562,87 @@ class Giswater(QObject):
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)   #@UnusedVariable
             if uri_table is not None:
-                
-                if self.table_arc in uri_table:
-                    self.layer_arc = cur_layer
-
-                if self.table_node == uri_table:
-                    self.layer_node = cur_layer
-  
+ 
                 if 'v_edit_man_chamber' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_netgully' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_netinit' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_wjump' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_wwtp' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_outfall' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_storage' == uri_table:
-                    self.layer_node_man_UD.append(cur_layer)
+                    self.layer_node_man_ud.append(cur_layer)
 
                 # Node group from WS project
                 if 'v_edit_man_source' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_pump' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_meter' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_tank' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_hydrant' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_waterwell' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_manhole' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_reduction' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_filter' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
-                    
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_register' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_netwjoin' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_expansiontank' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
                 if 'v_edit_man_flexunion' == uri_table:
-                    self.layer_node_man_WS.append(cur_layer)
+                    self.layer_node_man_ws.append(cur_layer)
 
                 if self.table_connec == uri_table:
                     self.layer_connec = cur_layer
                 
                 if self.table_man_connec == uri_table or self.table_connec == uri_table:
-                    self.layer_connec_man_UD.append(cur_layer)
-                if 'v_edit_man_greentap' == uri_table :
-                    self.layer_connec_man_WS.append(cur_layer)
-                if 'v_edit_man_wjoin' == uri_table :
-                    self.layer_connec_man_WS.append(cur_layer)
-                if 'v_edit_man_fountain' == uri_table :
-                    self.layer_connec_man_WS.append(cur_layer)
-                if 'v_edit_man_tap' == uri_table :
-                    self.layer_connec_man_WS.append(cur_layer)
-                    
-                if self.table_arc == uri_table:
-                    self.layer_arc = cur_layer
+                    self.layer_connec_man_ud.append(cur_layer)
+                if 'v_edit_man_greentap' == uri_table:
+                    self.layer_connec_man_ws.append(cur_layer)
+                if 'v_edit_man_wjoin' == uri_table:
+                    self.layer_connec_man_ws.append(cur_layer)
+                if 'v_edit_man_fountain' == uri_table:
+                    self.layer_connec_man_ws.append(cur_layer)
+                if 'v_edit_man_tap' == uri_table:
+                    self.layer_connec_man_ws.append(cur_layer)
                     
                 if 'v_edit_man_conduit' == uri_table:
-                    self.layer_arc_man_UD.append(cur_layer)
+                    self.layer_arc_man_ud.append(cur_layer)
                 if 'v_edit_man_siphon' == uri_table:
-                    self.layer_arc_man_UD.append(cur_layer)
+                    self.layer_arc_man_ud.append(cur_layer)
                 if 'v_edit_man_varc' == uri_table:
-                    self.layer_arc_man_UD.append(cur_layer)
+                    self.layer_arc_man_ud.append(cur_layer)
                 if 'v_edit_man_waccel' == uri_table:
-                    self.layer_arc_man_UD.append(cur_layer)
+                    self.layer_arc_man_ud.append(cur_layer)
                     
                 if 'v_edit_man_pipe' == uri_table:
-                    self.layer_arc_man_WS.append(cur_layer)
+                    self.layer_arc_man_ws.append(cur_layer)
                 if 'v_edit_man_varc' == uri_table:
-                    self.layer_arc_man_WS.append(cur_layer)
+                    self.layer_arc_man_ws.append(cur_layer)
                     
                 if 'v_edit_dimensions' == uri_table:
                     self.layer_dimensions = cur_layer
@@ -762,7 +677,7 @@ class Giswater(QObject):
         elif self.layer_version is not None and exists == True:
             pass
         else:
-            message = "To use this project with Giswater layers man_junction and version must exist. Please check your project !"
+            message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
             self.controller.show_warning(message)
             return
 
@@ -770,8 +685,7 @@ class Giswater(QObject):
         # Check if really exists
         layer_source = self.controller.get_layer_source(self.layer_version)  
         self.schema_name = layer_source['schema']
-        schema_name = self.schema_name.replace('"', '')
-        if self.schema_name is None or not self.dao.check_schema(schema_name):
+        if self.schema_name is None or not self.dao.check_schema(self.schema_name):
             self.controller.show_warning("Schema not found: "+self.schema_name)            
             return
 
@@ -783,11 +697,7 @@ class Giswater(QObject):
         self.controller.get_error_message(-1)        
         
         # Set SRID from table node
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
-        row = self.dao.get_row(sql)
-        if row:
-            self.srid = row[0]   
-            self.controller.plugin_settings_set_value("srid", self.srid)  
+        self.manage_srid(self.schema_name)
 
         # Search project type in table 'version'
         self.search_project_type()
@@ -796,74 +706,13 @@ class Giswater(QObject):
 
         # Set layer custom UI form and init function   
         if self.load_custom_forms:
-            
-            #if self.layer_arc is not None:    
-            #    self.set_layer_custom_form(self.layer_arc, 'arc') 
-                
-            if self.layer_arc_man_UD is not None:
-                for i in range(len(self.layer_arc_man_UD)):
-                    if self.layer_arc_man_UD[i] is not None:    
-                        self.set_layer_custom_form(self.layer_arc_man_UD[i], 'man_arc')
-                        
-            if self.layer_arc_man_WS is not None: 
-                for i in range(len(self.layer_arc_man_WS)):
-                    if self.layer_arc_man_WS[i] is not None:      
-                        self.set_layer_custom_form(self.layer_arc_man_WS[i], 'man_arc')
-                  
-            #if self.layer_node is not None:       
-            #    self.set_layer_custom_form(self.layer_node, 'node') 
-                
-            if self.layer_node_man_UD is not None: 
-                for i in range(len(self.layer_node_man_UD)):
-                    if self.layer_node_man_UD[i] is not None:       
-                        self.set_layer_custom_form(self.layer_node_man_UD[i], 'man_node')
-            
-            if self.layer_node_man_WS is not None:  
-                for i in range(len(self.layer_node_man_WS)):
-                    if self.layer_node_man_WS[i] is not None:   
-                        self.set_layer_custom_form(self.layer_node_man_WS[i], 'man_node')
-                                                                               
-            if self.layer_connec is not None:       
-                self.set_layer_custom_form(self.layer_connec, 'connec')
-                
-            if self.layer_connec_man_UD is not None:
-                for i in range(len(self.layer_connec_man_UD)):
-                    if self.layer_connec_man_UD[i] is not None:      
-                        self.set_layer_custom_form(self.layer_connec_man_UD[i], 'man_connec')
-                
-            if self.layer_connec_man_WS is not None:   
-                for i in range(len(self.layer_connec_man_WS)):
-                    if self.layer_connec_man_WS[i] is not None:  
-                        self.set_layer_custom_form(self.layer_connec_man_WS[i], 'man_connec')     
-                 
-            if self.layer_gully is not None:       
-                self.set_layer_custom_form(self.layer_gully, 'gully') 
-            if self.layer_man_gully is not None:       
-                self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
-             
-            if self.layer_pgully is not None:       
-                self.set_layer_custom_form(self.layer_gully, 'gully')
-            if self.layer_man_pgully is not None:       
-                self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
-            
-            # Set cstom for layer dimensions 
-            self.set_layer_custom_form_dimensions(self.layer_dimensions)     
+            self.manage_custom_forms()
 
         # Manage current layer selected     
         self.current_layer_changed(self.iface.activeLayer())   
         
         # Set objects for map tools classes
-        self.set_map_tool('mg_move_node')
-        self.set_map_tool('mg_delete_node')
-        self.set_map_tool('mg_mincut')
-        self.set_map_tool('mg_flow_trace')
-        self.set_map_tool('mg_flow_exit')
-        self.set_map_tool('mg_connec_tool')
-        self.set_map_tool('mg_extract_raster_value')
-        self.set_map_tool('mg_draw_profiles')
-        self.set_map_tool('ed_flow_regulator')
-        self.set_map_tool('mg_mincut')
-        #self.set_map_tool('mg_dimensions')
+        self.manage_map_tools()
 
         # Set SearchPlus object
         self.set_search_plus()
@@ -871,7 +720,68 @@ class Giswater(QObject):
         # Delete python compiled files
         self.delete_pyc_files()
                   
-                            
+              
+    def manage_srid(self, schema_name):
+        ''' Find SRID of selected schema '''
+        
+        schema_name = schema_name.replace('"', '')        
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
+        row = self.dao.get_row(sql)
+        if row:
+            self.srid = row[0]   
+            self.controller.plugin_settings_set_value("srid", self.srid)      
+                
+                      
+    def manage_custom_forms(self):
+        ''' Set layer custom UI form and init function '''
+        
+        if self.layer_arc_man_ud is not None:
+            for i in range(len(self.layer_arc_man_ud)):
+                if self.layer_arc_man_ud[i] is not None:    
+                    self.set_layer_custom_form(self.layer_arc_man_ud[i], 'man_arc')
+                    
+        if self.layer_arc_man_ws is not None: 
+            for i in range(len(self.layer_arc_man_ws)):
+                if self.layer_arc_man_ws[i] is not None:      
+                    self.set_layer_custom_form(self.layer_arc_man_ws[i], 'man_arc')
+            
+        if self.layer_node_man_ud is not None: 
+            for i in range(len(self.layer_node_man_ud)):
+                if self.layer_node_man_ud[i] is not None:       
+                    self.set_layer_custom_form(self.layer_node_man_ud[i], 'man_node')
+        
+        if self.layer_node_man_ws is not None:  
+            for i in range(len(self.layer_node_man_ws)):
+                if self.layer_node_man_ws[i] is not None:   
+                    self.set_layer_custom_form(self.layer_node_man_ws[i], 'man_node')
+                                                                           
+        if self.layer_connec is not None:       
+            self.set_layer_custom_form(self.layer_connec, 'connec')
+            
+        if self.layer_connec_man_ud is not None:
+            for i in range(len(self.layer_connec_man_ud)):
+                if self.layer_connec_man_ud[i] is not None:      
+                    self.set_layer_custom_form(self.layer_connec_man_ud[i], 'man_connec')
+            
+        if self.layer_connec_man_ws is not None:   
+            for i in range(len(self.layer_connec_man_ws)):
+                if self.layer_connec_man_ws[i] is not None:  
+                    self.set_layer_custom_form(self.layer_connec_man_ws[i], 'man_connec')     
+             
+        if self.layer_gully is not None:       
+            self.set_layer_custom_form(self.layer_gully, 'gully') 
+        if self.layer_man_gully is not None:       
+            self.set_layer_custom_form(self.layer_man_gully, 'man_gully')   
+         
+        if self.layer_pgully is not None:       
+            self.set_layer_custom_form(self.layer_pgully, 'gully')
+        if self.layer_man_pgully is not None:       
+            self.set_layer_custom_form(self.layer_man_pgully, 'man_gully')   
+        
+        # Set cstom for layer dimensions 
+        self.set_layer_custom_form_dimensions(self.layer_dimensions)                     
+                
+                                    
     def set_layer_custom_form(self, layer, name):
         ''' Set custom UI form and init python code of selected layer '''
         
@@ -904,24 +814,40 @@ class Giswater(QObject):
         layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
         if layer_node:
             layer_node = layer_node[0]
-            layer_node.setDisplayField('[% "depth" %]')
+            layer_node.setDisplayField('depth : [% "depth" %]')
         
         layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
         if layer_connec:
             layer_connec = layer_connec[0]
-            layer_connec.setDisplayField('[% "depth" %]')
+            layer_connec.setDisplayField('depth : [% "depth" %]')
 
     
+    def manage_map_tools(self):
+        ''' Manage map tools '''
+        
+        self.set_map_tool('mg_move_node')
+        self.set_map_tool('mg_delete_node')
+        self.set_map_tool('mg_mincut')
+        self.set_map_tool('mg_flow_trace')
+        self.set_map_tool('mg_flow_exit')
+        self.set_map_tool('mg_connec_tool')
+        self.set_map_tool('mg_extract_raster_value')
+        self.set_map_tool('mg_draw_profiles')
+        self.set_map_tool('ed_flow_regulator')
+        self.set_map_tool('mg_mincut')
+        #self.set_map_tool('mg_dimensions')
+                
+        
     def set_map_tool(self, map_tool_name):
         ''' Set objects for map tools classes '''  
 
         if map_tool_name in self.map_tools:
             map_tool = self.map_tools[map_tool_name]
             if self.mg.project_type == 'ws':
-                map_tool.set_layers(self.layer_arc_man_WS, self.layer_connec_man_WS, self.layer_node_man_WS)
+                map_tool.set_layers(self.layer_arc_man_ws, self.layer_connec_man_ws, self.layer_node_man_ws)
                 map_tool.set_controller(self.controller)
             else:
-                map_tool.set_layers(self.layer_arc_man_UD, self.layer_connec_man_UD, self.layer_node_man_UD)
+                map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud)
                 map_tool.set_controller(self.controller)
             if map_tool_name == 'mg_extract_raster_value':
                 map_tool.set_config_action(self.actions['99'])                
@@ -959,33 +885,29 @@ class Giswater(QObject):
             if layer is None:
                 return            
 
-        # Check is selected layer is 'arc', 'node' or 'connec'
+        # Check is selected layer is 'arc', 'node', 'connec' or 'gully'
         setting_name = None
         layer_source = self.controller.get_layer_source(layer)  
         uri_table = layer_source['table']
         if uri_table is not None:
+            
+            # buttons_arc            
             if self.table_arc in uri_table:  
                 setting_name = 'buttons_arc'
+            elif self.table_varc in uri_table:  
+                setting_name = 'buttons_arc'  
+            elif self.table_siphon in uri_table:  
+                setting_name = 'buttons_arc' 
+            elif self.table_conduit in uri_table:  
+                setting_name = 'buttons_arc'   
+            elif self.table_waccel in uri_table:  
+                setting_name = 'buttons_arc'     
+            elif self.table_pipe in uri_table:  
+                setting_name = 'buttons_arc'    
+                                
+            # buttons_node
             elif self.table_node in uri_table:  
                 setting_name = 'buttons_node'
-            elif self.table_connec in uri_table:  
-                setting_name = 'buttons_connec' 
-            elif self.table_gully in uri_table:  
-                setting_name = 'buttons_gully' 
-            elif self.table_pgully in uri_table:  
-                setting_name = 'buttons_gully' 
-                
-            elif self.table_wjoin in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_page in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_greentap in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_fountain in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_tap in uri_table:  
-                setting_name = 'buttons_connec'
-                
             elif self.table_tank in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_pump in uri_table:  
@@ -1008,7 +930,6 @@ class Giswater(QObject):
                 setting_name = 'buttons_node'   
             elif self.table_filter in uri_table:  
                 setting_name = 'buttons_node'
-            
             elif self.table_chamber in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_chamber_pol in uri_table:  
@@ -1031,8 +952,6 @@ class Giswater(QObject):
                 setting_name = 'buttons_node'  
             elif self.table_outfall in uri_table:  
                 setting_name = 'buttons_node' 
-                
-                
             elif self.table_register in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_netwjoin in uri_table:  
@@ -1040,17 +959,27 @@ class Giswater(QObject):
             elif self.table_expansiontank in uri_table:  
                 setting_name = 'buttons_node' 
             elif self.table_flexunion in uri_table:  
-                setting_name = 'buttons_node'
-            elif self.table_varc in uri_table:  
-                setting_name = 'buttons_arc'  
-            elif self.table_siphon in uri_table:  
-                setting_name = 'buttons_arc' 
-            elif self.table_conduit in uri_table:  
-                setting_name = 'buttons_arc'   
-            elif self.table_waccel in uri_table:  
-                setting_name = 'buttons_arc'     
-            elif self.table_pipe in uri_table:  
-                setting_name = 'buttons_arc'    
+                setting_name = 'buttons_node'                
+            
+            # buttons_connec
+            elif self.table_connec in uri_table:  
+                setting_name = 'buttons_connec' 
+            elif self.table_wjoin in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_page in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_greentap in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_fountain in uri_table:  
+                setting_name = 'buttons_connec'
+            elif self.table_tap in uri_table:  
+                setting_name = 'buttons_connec'
+                
+            # buttons_gully
+            elif self.table_gully in uri_table:  
+                setting_name = 'buttons_gully' 
+            elif self.table_pgully in uri_table:  
+                setting_name = 'buttons_gully' 
         
         if setting_name is not None:
             try:
@@ -1080,6 +1009,12 @@ class Giswater(QObject):
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 100)
+        
+        # Linux: Disable actions related with go2epa and giswater.jar
+        if 'nt' not in sys.builtin_module_names:
+            self.enable_action(False, 23)
+            self.enable_action(False, 24) 
+            self.enable_action(False, 36)                          
                 
                     
     def ws_generic(self, function_name):   
