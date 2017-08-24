@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from PyQt4.QtCore import Qt, QObject, QPoint
+from PyQt4.QtCore import Qt, QPoint
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
@@ -17,10 +17,11 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
+import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a connec is identified in the map '''
+    ''' Function called when a feature is identified in the map '''
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -39,7 +40,6 @@ def init_config():
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
     utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
       
-    
      
 class ManNodeDialog(ParentDialog):   
     
@@ -160,39 +160,31 @@ class ManNodeDialog(ParentDialog):
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
 
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         # Get selected rows
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         selected_list = self.tbl_event.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message, context_name='ui_message' ) 
             return
 
-        #for i in range(0, len(selected_list)):
         row = selected_list[0].row()
-        #id_ = self.tbl_event.model().record(row).value("visit_id")
         self.visit_id = self.tbl_event.model().record(row).value("visit_id")
         self.event_id = self.tbl_event.model().record(row).value("event_id")
-        picture = self.tbl_event.model().record(row).value("value")
-        #inf_text+= str(id_)+", "
-        #inf_text = inf_text[:-2]
-        #self.visit_id = inf_text 
         
         # Get all events | pictures for visit_id
         sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        # Get absolute path
+        # TODO: Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        n = int((len(rows)/9)+1)
 
         self.img_path_list = []
         self.img_path_list1D = []
         # Creates a list containing 5 lists, each of 8 items, all set to 0
-
 
         # Fill 1D array with full path
         if row is None:
@@ -201,8 +193,7 @@ class ManNodeDialog(ParentDialog):
             return
         else:
             for value in rows:
-                full_path = str(row[0])+str(value[0])
-                #self.img_path_list.append(full_path)
+                full_path = str(row[0]) + str(value[0])
                 self.img_path_list1D.append(full_path)
          
         # Create the dialog and signals
@@ -220,28 +211,22 @@ class ManNodeDialog(ParentDialog):
         # Fill one-dimensional array till the end with "0"
         self.num_events = len(self.img_path_list1D) 
         
-        limit = self.num_events%9
-        for k in range(0, limit):
+        limit = self.num_events % 9
+        for k in range(0, limit):   # @UnusedVariable
             self.img_path_list1D.append(0)
 
         # Inicialization of two-dimensional array
-        rows = self.num_events/9+1
+        rows = self.num_events / 9+1
         columns = 9 
-        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]
+        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)] # @UnusedVariable
         message = str(self.img_path_list)
         self.controller.show_warning(message, context_name='ui_message')
         # Convert one-dimensional array to two-dimensional array
-        idx = 0
-        '''
-        for h in range(0,rows):
-            for r in range(0,columns):
-                self.img_path_list[h][r]=self.img_path_list1D[idx]    
-                idx=idx+1
-        '''     
+        idx = 0 
         if rows == 1:
             for br in range(0,len(self.img_path_list1D)):
                 self.img_path_list[0][br]=self.img_path_list1D[br]
-        else :
+        else:
             for h in range(0,rows):
                 for r in range(0,columns):
                     self.img_path_list[h][r]=self.img_path_list1D[idx]    
@@ -251,10 +236,8 @@ class ManNodeDialog(ParentDialog):
         self.list_widgetExtended=[]
         self.list_labels=[]
         
-        
         for i in range(0, 9):
             # Set image to QLabel
-
             pixmap = QPixmap(str(self.img_path_list[0][i]))
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
@@ -262,22 +245,20 @@ class ManNodeDialog(ParentDialog):
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
 
             # Set QLabel like ExtendedQLabel(ClickableLabel)
-            self.widgetExtended = ExtendedQLabel.ExtendedQLabel(widget)
- 
-            self.widgetExtended.setPixmap(pixmap)
+            self.widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
+            self.widget_extended.setPixmap(pixmap)
             self.start_indx = 0
+            
             # Set signal of ClickableLabel   
-
-            self.dlg_gallery.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
-  
-            self.list_widgetExtended.append(self.widgetExtended)
+            #self.dlg_gallery.connect(self.widget_extended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
+            self.widget_extended.clicked.connect(partial(self.zoom_img, i))
+            
+            self.list_widgetExtended.append(self.widget_extended)
             self.list_labels.append(widget)
       
         self.start_indx = 0
-        #self.end_indx = len(self.img_path_list)-1
         self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
         self.btn_next.clicked.connect(self.next_gallery)
-        
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
         
@@ -297,7 +278,6 @@ class ManNodeDialog(ParentDialog):
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            
             self.list_widgetExtended[i].setPixmap(pixmap)
 
         # Control sliding buttons
@@ -307,19 +287,17 @@ class ManNodeDialog(ParentDialog):
         if self.start_indx == 0 :
             self.btn_previous.setEnabled(False)
      
-        control = len(self.img_path_list1D)/9
+        control = len(self.img_path_list1D) / 9
         if self.start_indx == (control-1):
             self.btn_next.setEnabled(False)
             
         
-    def zoom_img(self,i):
+    def zoom_img(self, i):
 
-        handelerIndex=i    
+        handelerIndex = i    
         
         self.dlg_gallery_zoom = GalleryZoom()
-        #pixmap = QPixmap(img)
         pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-        #pixmap = pixmap.scaled(711,501,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
   
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
         self.lbl_img.setPixmap(pixmap)
@@ -334,10 +312,9 @@ class ManNodeDialog(ParentDialog):
         self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
         self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
         
-        self.i=i
+        self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
-        
         self.dlg_gallery_zoom.exec_() 
         
         # Controling start index
@@ -347,47 +324,37 @@ class ManNodeDialog(ParentDialog):
         
     def slide_previous(self):
     
-        #indx=self.i-1
-        indx=(self.start_indx*9)+self.i-1
-
+        indx = (self.start_indx*9) + self.i -1
         pixmap = QPixmap(self.img_path_list1D[indx])
-
         self.lbl_img.setPixmap(pixmap)
-        
         self.i=self.i-1
         
         # Control sliding buttons
         if indx == 0 :
             self.btn_slidePrevious.setEnabled(False) 
             
-        if indx < (self.num_events-1):
+        if indx < (self.num_events - 1):
             self.btn_slideNext.setEnabled(True) 
 
         
     def slide_next(self):
 
-        #indx=self.i+1 
-        indx=(self.start_indx*9)+self.i+1
-        
+        indx = (self.start_indx*9) + self.i + 1
         pixmap = QPixmap(self.img_path_list1D[indx])
-
         self.lbl_img.setPixmap(pixmap)
-        
-        self.i=self.i+1
+        self.i = self.i + 1
     
         # Control sliding buttons
         if indx > 0 :
             self.btn_slidePrevious.setEnabled(True) 
             
-        if indx == (self.num_events-1):
+        if indx == (self.num_events - 1):
             self.btn_slideNext.setEnabled(False) 
 
         
     def previous_gallery(self):
     
-        #self.end_indx = self.end_indx-1
         self.start_indx = self.start_indx-1
-        
         
         # First clear previous
         for i in self.list_widgetExtended:
@@ -397,15 +364,13 @@ class ManNodeDialog(ParentDialog):
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            
             self.list_widgetExtended[i].setPixmap(pixmap)
 
         # Control sliding buttons
         if self.start_indx == 0 :
             self.btn_previous.setEnabled(False)
-
             
-        control = len(self.img_path_list1D)/9
+        control = len(self.img_path_list1D) / 9
         if self.start_indx < (control-1):
             self.btn_next.setEnabled(True)
             
@@ -433,20 +398,16 @@ class ManNodeDialog(ParentDialog):
         sql+= " FROM "+self.schema_name+"."+table
         sql+= " WHERE node_id = '"+self.id+"'"
         rows = self.controller.get_rows(sql)
-        
         existing_point_x = rows[0][0]
         existing_point_y = rows[0][1]
-        existing_point = str(QPoint(existing_point_x,existing_point_y))
-   
-        # coordinates of existing node , coordinates of new selection
-        #sql = "SELECT degrees(ST_Azimuth(ST_Point(25, 45), ST_Point(75, 100)))" 
-        #hemisphere = "SELECT degrees(ST_Azimuth(ST_Point("+str(x)+","+str(y)+"), ST_Point("+str(existing_point_x)+","+str(existing_point_y)+")))" 
              
-        #sql = "UPDATE '"+self.schema_name+"'.node SET hemisphere='"+str(hemisphere)+"' WHERE node_id ='"+str(self.id)+"'" 
-        sql = "UPDATE "+self.schema_name+".node SET hemisphere =(SELECT degrees(ST_Azimuth(ST_Point("+str(x)+","+str(y)+"), ST_Point("+str(existing_point_x)+","+str(existing_point_y)+")))) WHERE node_id ='"+str(self.id)+"'"
+        sql = "UPDATE "+self.schema_name+".node "
+        sql+= " SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point("+str(point.x())+","+str(point.y())+"), "
+        sql+= " ST_Point("+str(existing_point_x)+","+str(existing_point_y)+"))))"
+        sql+= " WHERE node_id ='"+str(self.id)+"'"      
         status = self.controller.execute_sql(sql)
         
-        if status : 
+        if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
         

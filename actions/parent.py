@@ -236,9 +236,3 @@ class ParentAction():
         # Set text to QLineEdit
         widget.setText(abs_path[0]+'/')
 
-
-    def test(self, text):
-        QMessageBox.about(None, 'Ok', str(text))
-
-    def pressbtn(self):
-        QMessageBox.about(None, 'Ok', str('btn pressed'))

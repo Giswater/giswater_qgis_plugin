@@ -105,7 +105,7 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child, 2))
         
         # Manage 'cat_shape'
-        self.setImage("label_image_ud_shape")
+        self.set_image("label_image_ud_shape")
         
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -364,29 +364,30 @@ class ManArcDialog(ParentDialog):
         arc_protection.setText(m3protec)
         arc_protection.setAlignment(Qt.AlignJustify)
         
-        # Fill QLineEdit -> Soilcat
         m3exc = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3exc'" 
+        m3fill = None
+        m3excess = None
+        m2trenchl = None
+        sql_common = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"'"
+        
+        sql = sql_common + " AND identif = 'm3exc'"         
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             m3exc = row[0]
         
-        m3fill = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3fill'" 
+        sql = sql_common + " AND identif = 'm3fill'" 
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             m3fill = row[0]
         
-        m3excess = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm3excess'" 
+        sql = sql_common + " AND identif = 'm3excess'" 
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             m3excess = row[0]
         
-        m2trenchl = None
-        sql = "SELECT descript FROM "+self.schema_name+".v_price_x_arc WHERE arc_id = '"+self.arc_id+"' AND identif= 'm2trenchl'" 
+        sql = sql_common + " AND identif = 'm2trenchl'" 
         row = self.dao.get_row(sql)
-        if row != None:
+        if row:
             m2trenchl = row[0]
         
         soil_excavation = self.dialog.findChild(QLineEdit, "soil_excavation")
