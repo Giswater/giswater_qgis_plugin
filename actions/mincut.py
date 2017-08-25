@@ -21,6 +21,7 @@ from ..ui.mincut_fin import Mincut_fin
 from ..ui.multi_selector import Multi_selector
 from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer
 from ..ui.mincut_add_connec import Mincut_add_connec
+from ..ui.mincut_edit import Mincut_edit
 
 from datetime import datetime, date
 import os
@@ -347,9 +348,11 @@ class MincutParent(ParentAction):
 
         self.btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
         self.btn_delete_connec.pressed.connect(partial(self.delete_records, self.tbl_connec, table, "connec_id"))
+        self.set_icon(self.btn_delete_connec,"112.png")
 
         self.btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
         self.btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table,"connec_id",self.dlg_connec))
+        self.set_icon(self.btn_insert_connec, "111.png")
 
         self.btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
         self.btn_insert_connec_snap.pressed.connect(self.snapping_init)
@@ -492,9 +495,11 @@ class MincutParent(ParentAction):
 
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table,"hydrometer_id"))
+        self.set_icon(self.btn_delete_hydro, "112.png")
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
         self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
+        self.set_icon(self.btn_insert_hydro, "111.png")
 
         self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
         self.btn_accept.pressed.connect(partial(self.exec_sql,"hydrometer_id", "hydrometer"))
@@ -928,3 +933,240 @@ class MincutParent(ParentAction):
         # TRRIGER REPAINT
         for layerRefresh in self.iface.mapCanvas().layers():
             layerRefresh.triggerRepaint()
+
+
+    def mg_mincut_management(self):
+        ''' Btn 27 - Mincut management'''
+
+        # Create the dialog and signals
+        self.dlg_min_edit = Mincut_edit()
+        utils_giswater.setDialog(self.dlg_min_edit)
+
+        self.combo_state_edit = self.dlg_min_edit.findChild(QComboBox, "state_edit")
+        self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
+
+
+
+        self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
+        # Adding auto-completion to a QLineEdit
+        self.completer = QCompleter()
+        self.txt_mincut_id.setCompleter(self.completer)
+        model = QStringListModel()
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        row = self.controller.get_rows(sql)
+
+        values = []
+        for value in row:
+            values.append(str(value[0]))
+
+        model.setStringList(values)
+        self.completer.setModel(model)
+        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
+
+        self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
+        self.dlg_min_edit.btn_cancel.pressed.connect( self.dlg_min_edit.close)
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
+
+
+        #self.btn_accept_min = self.dlg_min_edit.findChild(QPushButton, "btn_accept")
+        #self.btn_accept_min.clicked.connect(self.accept_min)
+
+        #self.dlg_min_edit.btn_cancel.pressed.connect(partial(self.close, self.dlg_min_edit))
+
+        # Fill ComboBox state
+        sql = "SELECT id"
+        sql += " FROM " + self.schema_name + ".anl_mincut_cat_state"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox("state_edit", rows)
+
+        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".anl_mincut_result_cat")
+
+        for i in range(1, 18):
+            self.tbl_mincut_edit.hideColumn(i)
+
+        self.combo_state_edit.activated.connect(partial(self.filter_by_state, self.tbl_mincut_edit))
+
+        self.dlg_min_edit.show()
+
+
+    def open_mincut(self):
+        ''' Open form of mincut
+        Fill form with selested mincut'''
+
+        selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        row = selected_list[0].row()
+        # Get mincut_id from selected row
+        id = self.tbl_mincut_edit.model().record(row).value("id")
+        self.dlg_min_edit.close()
+
+        self.mg_mincut()
+
+
+        #TO DO-force fill form
+        sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
+        sql += " WHERE id = '" + id + "'"
+        rows = self.controller.get_rows(sql)
+
+        self.id.setText(rows[0]['id'])
+        self.state.setText(rows[0]['mincut_result_state_unused'])
+        utils_giswater.setWidgetText("pred_description", rows[0]['anl_descript'])
+        utils_giswater.setWidgetText("real_description", rows[0]['exec_descript'])
+        self.distance.setText(str(rows[0]['exec_limit_distance']))
+        self.depth.setText(str(rows[0]['exec_depth']))
+
+        # from address separate street and number
+        address_db = rows[0]['address_1']
+
+        self.street.setText(address_db)
+        number_db = rows[0]['address_2']
+        self.number.setText(number_db)
+
+        # Set values from mincut to comboBox
+        # utils_giswater.fillComboBox("type", rows['mincut_result_type'])
+        # utils_giswater.fillComboBox("cause", rows['anl_cause'])
+        mincut_result_type = rows[0]['mincut_type']
+        cause = rows[0]['anl_cause']
+        # Clear comboBoxes
+        self.type.clear()
+        self.cause.clear()
+
+        # Fill comboBoxes
+        self.type.addItem(rows[0]['mincut_result_type'])
+        self.cause.addItem(rows[0]['anl_cause'])
+
+
+        '''
+        # Fill ComboBox type
+        sql = "SELECT id"
+        sql += " FROM " + self.schema_name + ".anl_mincut_result_cat_type"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        # utils_giswater.fillComboBox("type", rows)
+        for row in rows:
+            elem = str(row[0])
+            if elem != mincut_result_type:
+                self.type.addItem(elem)
+
+        # Fill ComboBox cause
+        sql = "SELECT id"
+        sql += " FROM " + self.schema_name + ".anl_mincut_result_cat_cause"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        # utils_giswater.fillComboBox("cause", rows)
+        for row in rows:
+            elem = str(row[0])
+            if elem != cause:
+                self.cause.addItem(elem)
+
+        self.old_id = self.id.text()
+
+        self.btn_start = self.dlg_mincut.findChild(QPushButton, "btn_start")
+        self.btn_start.clicked.connect(self.real_start)
+
+        self.btn_end = self.dlg_mincut.findChild(QPushButton, "btn_end")
+        self.btn_end.clicked.connect(self.real_end)
+
+        self.cbx_date_start = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start")
+        self.cbx_hours_start = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_start")
+
+        self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
+        self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
+        self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+
+        self.btn_end.setEnabled(True)
+
+        self.distance.setEnabled(True)
+        self.depth.setEnabled(True)
+        self.real_description.setEnabled(True)
+
+        self.cbx_date_end.setEnabled(True)
+        self.cbx_hours_end.setEnabled(True)
+        self.cbx_date_start.setEnabled(True)
+        self.cbx_hours_start.setEnabled(True)
+
+        # Disable to edit ID
+        self.id.setEnabled(False)
+        '''
+
+
+    def filter_by_id(self, table, widget_txt, tablename):
+
+        #result_select = utils_giswater.getWidgetText(widget_txt)
+        id = utils_giswater.getWidgetText(widget_txt)
+        if id != 'null':
+            expr = " id LIKE '" + id + "'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
+
+
+    def filter_by_state(self,widget):
+
+        result_select = utils_giswater.getWidgetText("state_edit")
+        expr = " mincut_result_state = '"+result_select+"'"
+
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+
+
+    def fill_table_mincut_management(self, widget, table_name):
+        ''' Set a model with selected filter.
+        Attach that model to selected table '''
+
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+
+
+    def delete_mincut_management(self, widget, table_name, column_id):
+        ''' Delete selected elements of the table
+         Delete by id '''
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message' )
+            return
+
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(column_id))
+            inf_text+= str(id_)+", "
+            list_id = list_id+"'"+str(id_)+"', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+
+        if answer:
+            sql = "DELETE FROM "+self.schema_name+"."+table_name
+            sql+= " WHERE "+column_id+" IN ("+list_id+")"
+            self.controller.execute_sql(sql)
+            widget.model().select()
+
+
+    def set_icon(self,widget,indx):
+        self.plugin_dir = os.path.dirname(__file__)[:-7]
+        self.icon_folder = self.plugin_dir + '\icons'
+        widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
