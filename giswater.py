@@ -32,7 +32,12 @@ from actions.mincut import MincutParent
 
 from search.search_plus import SearchPlus
 
+from qgis.core import *
+from qgis.gui import *
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
+from PyQt4.Qt import *
 
 class Giswater(QObject):  
     
@@ -102,6 +107,7 @@ class Giswater(QObject):
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
@@ -127,7 +133,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01, 02, 19, 25, 27, 28, 39, 41, 45, 46, 47, 48, 98, 99):
+                if int(index_action) in (01, 02, 19, 25, 28, 39, 41, 45, 46, 47, 48, 98, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -140,8 +146,9 @@ class Giswater(QObject):
                 elif int(index_action) == 26:
                     callback_function = getattr(self.mincut, 'mg_mincut')
                     action.triggered.connect(callback_function)
-                    # Generic function
-
+                elif int(index_action) == 27:
+                    callback_function = getattr(self.mincutManagement, 'mg_mincut_management')
+                    action.triggered.connect(callback_function)
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -204,7 +211,7 @@ class Giswater(QObject):
             
         return action
           
-        
+
     def menu_activate(self, node_type):
         
         # Set active layer
