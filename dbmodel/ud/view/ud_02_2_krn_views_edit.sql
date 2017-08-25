@@ -230,7 +230,7 @@ connec.address_01,
 connec.address_02,
 connec.address_03,
 connec.streetaxis_id,
-ext_streetaxis.name,
+ext_streetaxis.name AS streetname,
 connec.postnumber,
 connec.descript,
 cat_connec.svg AS "cat_svg",
@@ -1024,10 +1024,12 @@ man_netgully.units AS netgully_units,
 man_netgully.groove AS netgully_groove,
 man_netgully.siphon AS netgully_siphon,
 man_netgully.streetaxis_id AS netgully_streetaxis_id,
-man_netgully.postnumber AS netgully_postnumber
+man_netgully.postnumber AS netgully_postnumber,
+ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 	 
@@ -1091,10 +1093,12 @@ man_netgully.units AS netgully_units,
 man_netgully.groove AS netgully_groove,
 man_netgully.siphon AS netgully_siphon,
 man_netgully.streetaxis_id AS netgully_streetaxis_id,
-man_netgully.postnumber AS netgully_postnumber
+man_netgully.postnumber AS netgully_postnumber,
+ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_netgully.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();	 
@@ -1649,7 +1653,8 @@ arc.num_value as waccel_num_value,
 man_waccel.sander_length AS waccel_sander_length,
 man_waccel.sander_depth AS waccel_sander_depth,
 man_waccel.prot_surface AS waccel_prot_surface,
-man_waccel.name AS waccel_name
+man_waccel.name AS waccel_name,
+man_waccel.accessibility AS waccel_accessibility
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id

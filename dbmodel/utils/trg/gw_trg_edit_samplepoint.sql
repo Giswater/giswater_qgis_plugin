@@ -56,8 +56,8 @@ BEGIN
 		
 -- FEATURE INSERT      
 		
-				INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, "state", workcat_id, workcat_id_end, rotation, street1, street2, place_name, cabinet, observations, the_geom, expl_id)
-				VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW."state", NEW.workcat_id, NEW.workcat_id_end,  NEW.rotation, NEW.street1, NEW.street2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, expl_id_int);
+				INSERT INTO samplepoint (sample_id, code, lab_code, feature_id, featurecat_id, dma_id, "state", workcat_id, workcat_id_end, rotation, street1, street2, place_name, cabinet, observations, the_geom, expl_id, verified)
+				VALUES (NEW.sample_id, NEW.code, NEW.lab_code, NEW.feature_id, NEW.featurecat_id,  NEW.dma_id, NEW."state", NEW.workcat_id, NEW.workcat_id_end,  NEW.rotation, NEW.street1, NEW.street2, NEW.place_name, NEW.cabinet, NEW.observations, NEW.the_geom, expl_id_int, NEW.verified);
 	
 		RETURN NEW;
 						
@@ -69,7 +69,7 @@ BEGIN
 
 			UPDATE samplepoint 
 			SET sample_id=NEW.sample_id,  code=NEW.code,lab_code=NEW.lab_code,  feature_id=NEW.feature_id, featurecat_id=NEW.featurecat_id, dma_id=NEW.dma_id,"state"=NEW."state", rotation=NEW.rotation, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
-			street1=NEW.street1, street2=NEW.street2, place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+			street1=NEW.street1, street2=NEW.street2, place_name=NEW.place_name, cabinet=NEW.cabinet, observations=NEW.observations, the_geom=NEW.the_geom, expl_id=NEW.expl_id, verified=NEW.verified
 			WHERE sample_id=NEW.sample_id;
 
         PERFORM audit_function(2,430); 

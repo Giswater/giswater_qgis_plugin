@@ -345,6 +345,7 @@ CREATE TABLE "samplepoint"(
 "place_name" character varying(254),
 "cabinet" character varying(150),
 "observations" character varying(254),
+"verified" character varying(30),
 "the_geom" geometry(Point,SRID_VALUE),
 "expl_id" integer,
 CONSTRAINT man_samplepoint_pkey PRIMARY KEY (sample_id)
@@ -385,6 +386,7 @@ CREATE TABLE "element" (
 "label_x" character varying(30),
 "label_y" character varying(30),
 "label_rotation" numeric(6,3),
+"undelete" boolean,
 "publish" boolean,
 "inventory" boolean,
 "expl_id" integer,
