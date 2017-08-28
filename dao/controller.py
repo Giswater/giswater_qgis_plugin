@@ -137,8 +137,8 @@ class DaoController():
             self.log_codes[log_code_id] = result[0]    
         else:
             self.log_codes[log_code_id] = "Error message not found in the database: "+str(log_code_id)
-        
-    
+
+
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
         ''' Show message to the user with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
@@ -150,15 +150,17 @@ class DaoController():
         self.iface.messageBar().pushMessage("", msg, message_level, duration)
         #QMessageBox.about(None, 'Ok', str(text))
             
+
     def show_info(self, text, duration=5, context_name=None, parameter=None):
         ''' Show information message to the user '''
         self.show_message(text, 0, duration, context_name, parameter)
         #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
+
     def show_warning(self, text, duration=5, context_name=None, parameter=None):
         ''' Show warning message to the user '''
         self.show_message(text, 1, duration, context_name, parameter)
-        #QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
+        
 
     def show_warning_detail(self, text, detail_text, context_name=None):
         ''' Show warning message with a button to show more details '''  
@@ -460,6 +462,6 @@ class DaoController():
         
         # If dialog is set, then translate form
         if dialog:
-            self.translate_form(dialog, locale_name)                                 
+            self.translate_form(dialog, locale_name)                              
         
             
