@@ -2,22 +2,19 @@
 from PyQt4 import QtGui, uic
 import os
 
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'hydrology_selector.ui'))
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'table_wizard.ui'))
 
-
-class TableWizard(QtGui.QDialog, FORM_CLASS):
-
+class HydrologySelector(QtGui.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """ Constructor """
-        super(TableWizard, self).__init__(parent)
+        super(HydrologySelector, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        
-        
+
     def initGui(self):
         pass

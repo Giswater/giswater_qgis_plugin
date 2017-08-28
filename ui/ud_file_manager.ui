@@ -42,7 +42,7 @@
   <widget class="QPushButton" name="btn_times">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>300</x>
      <y>50</y>
      <width>131</width>
      <height>21</height>
@@ -55,7 +55,7 @@
   <widget class="QPushButton" name="btn_options">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>155</x>
      <y>50</y>
      <width>131</width>
      <height>21</height>
@@ -257,7 +257,7 @@
   <widget class="QPushButton" name="btn_sector_selection_2">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>445</x>
      <y>50</y>
      <width>131</width>
      <height>21</height>

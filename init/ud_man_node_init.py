@@ -160,34 +160,27 @@ class ManNodeDialog(ParentDialog):
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
 
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         # Get selected rows
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_node")
         selected_list = self.tbl_event.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message, context_name='ui_message' ) 
             return
 
-        #for i in range(0, len(selected_list)):
         row = selected_list[0].row()
-        #id_ = self.tbl_event.model().record(row).value("visit_id")
         self.visit_id = self.tbl_event.model().record(row).value("visit_id")
         self.event_id = self.tbl_event.model().record(row).value("event_id")
-        picture = self.tbl_event.model().record(row).value("value")
-        #inf_text+= str(id_)+", "
-        #inf_text = inf_text[:-2]
-        #self.visit_id = inf_text 
         
         # Get all events | pictures for visit_id
         sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        # Get absolute path
+        # TODO: Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_text"
         sql +=" WHERE id = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
-        n = int((len(rows)/9)+1)
 
         self.img_path_list = []
         self.img_path_list1D = []
@@ -220,27 +213,21 @@ class ManNodeDialog(ParentDialog):
         self.num_events = len(self.img_path_list1D) 
         
         limit = self.num_events%9
-        for k in range(0,limit):
+        for k in range(0, limit):   # @UnusedVariable
             self.img_path_list1D.append(0)
 
         # Inicialization of two-dimensional array
-        rows = self.num_events/9+1
+        rows = self.num_events / 9+1
         columns = 9 
-        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)]
+        self.img_path_list = [[0 for x in range(columns)] for x in range(rows)] # @UnusedVariable
         message = str(self.img_path_list)
         self.controller.show_warning(message, context_name='ui_message')
         # Convert one-dimensional array to two-dimensional array
-        idx=0
-        '''
-        for h in range(0,rows):
-            for r in range(0,columns):
-                self.img_path_list[h][r]=self.img_path_list1D[idx]    
-                idx=idx+1
-        '''     
+        idx = 0 
         if rows == 1:
             for br in range(0,len(self.img_path_list1D)):
                 self.img_path_list[0][br]=self.img_path_list1D[br]
-        else :
+        else:
             for h in range(0,rows):
                 for r in range(0,columns):
                     self.img_path_list[h][r]=self.img_path_list1D[idx]    
@@ -250,10 +237,8 @@ class ManNodeDialog(ParentDialog):
         self.list_widgetExtended=[]
         self.list_labels=[]
         
-        
         for i in range(0, 9):
             # Set image to QLabel
-
             pixmap = QPixmap(str(self.img_path_list[0][i]))
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
@@ -261,23 +246,21 @@ class ManNodeDialog(ParentDialog):
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
 
             # Set QLabel like ExtendedQLabel(ClickableLabel)
-            self.widgetExtended=ExtendedQLabel.ExtendedQLabel(widget)
- 
-            self.widgetExtended.setPixmap(pixmap)
+            self.widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
+            self.widget_extended.setPixmap(pixmap)
             self.start_indx = 0
+            
             # Set signal of ClickableLabel   
-
-            self.dlg_gallery.connect( self.widgetExtended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
-  
-            self.list_widgetExtended.append(self.widgetExtended)
+            #self.dlg_gallery.connect(self.widget_extended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
+            self.widget_extended.clicked.connect(partial(self.zoom_img, i))            
+            self.list_widgetExtended.append(self.widget_extended)
             self.list_labels.append(widget)
       
         self.start_indx = 0
-        #self.end_indx = len(self.img_path_list)-1
-        self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
+        self.btn_next = self.dlg_gallery.findChild(QPushButton, "btn_next")
         self.btn_next.clicked.connect(self.next_gallery)
         
-        self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
+        self.btn_previous = self.dlg_gallery.findChild(QPushButton, "btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
         
         self.dlg_gallery.exec_()
@@ -285,17 +268,16 @@ class ManNodeDialog(ParentDialog):
         
     def next_gallery(self):
 
-        self.start_indx = self.start_indx+1
+        self.start_indx = self.start_indx + 1
         
         # Clear previous
         for i in self.list_widgetExtended:
             i.clear()
-            #i.clicked.disconnect(self.zoom_img) #this disconnect all!
   
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
             
             self.list_widgetExtended[i].setPixmap(pixmap)
 
@@ -312,20 +294,14 @@ class ManNodeDialog(ParentDialog):
             
         
     def zoom_img(self,i):
-
-        #myButton.clicked.disconnect(function_B) #this disconnect function_B
-        #self.list_labels[i].disconnect( partial(self.zoom_img,self.img_path_list[self.start_indx][i]))
-        
-        handelerIndex=i    
+       
+        handelerIndex = i    
         
         self.dlg_gallery_zoom = GalleryZoom()
-        #pixmap = QPixmap(img)
         pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-        #pixmap = pixmap.scaled(711,501,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
   
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
         self.lbl_img.setPixmap(pixmap)
-        #lbl_img.show()
             
         zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
         zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id") 
@@ -336,7 +312,7 @@ class ManNodeDialog(ParentDialog):
         self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
         self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
         
-        self.i=i
+        self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
         
@@ -349,14 +325,11 @@ class ManNodeDialog(ParentDialog):
         
     def slide_previous(self):
 
-        #indx=self.i-1
-        indx=(self.start_indx*9)+self.i-1
-
+        indx = (self.start_indx*9) + self.i - 1
         pixmap = QPixmap(self.img_path_list1D[indx])
-
         self.lbl_img.setPixmap(pixmap)
         
-        self.i=self.i-1
+        self.i = self.i-1
         
         # Control sliding buttons
         if indx == 0 :
@@ -368,7 +341,6 @@ class ManNodeDialog(ParentDialog):
         
     def slide_next(self):
   
-        #indx=self.i+1 
         indx = (self.start_indx*9)+self.i+1
         pixmap = QPixmap(self.img_path_list1D[indx])
         self.lbl_img.setPixmap(pixmap)
@@ -378,13 +350,12 @@ class ManNodeDialog(ParentDialog):
         if indx > 0 :
             self.btn_slidePrevious.setEnabled(True) 
             
-        if indx == (self.num_events-1):
+        if indx == (self.num_events - 1):
             self.btn_slideNext.setEnabled(False) 
 
         
     def previous_gallery(self):
         
-        #self.end_indx = self.end_indx-1
         self.start_indx = self.start_indx-1
         
         # First clear previous

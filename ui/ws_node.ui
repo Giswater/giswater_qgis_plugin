@@ -41,7 +41,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>6</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page_feature">
     <attribute name="title">
@@ -240,7 +240,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="adress_02">
+    <widget class="QLineEdit" name="address_02">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -250,7 +250,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_adress_03">
+    <widget class="QLabel" name="label_address_03">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -271,7 +271,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>adress_03</string>
+      <string>address_03</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -286,7 +286,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_adress_02">
+    <widget class="QLabel" name="label_address_02">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -307,7 +307,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>adress_02</string>
+      <string>address_02</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -322,7 +322,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="adress_01">
+    <widget class="QLineEdit" name="address_01">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -384,7 +384,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_adress_01">
+    <widget class="QLabel" name="label_address_01">
      <property name="geometry">
       <rect>
        <x>415</x>
@@ -405,7 +405,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <property name="text">
-      <string>adress_01</string>
+      <string>address_01</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -731,7 +731,7 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="adress_03">
+    <widget class="QLineEdit" name="address_03">
      <property name="geometry">
       <rect>
        <x>520</x>
@@ -1071,13 +1071,13 @@
     <zorder>label_state</zorder>
     <zorder>label_fluid_type</zorder>
     <zorder>label_soilcat_id</zorder>
-    <zorder>adress_02</zorder>
-    <zorder>label_adress_03</zorder>
-    <zorder>label_adress_02</zorder>
-    <zorder>adress_01</zorder>
+    <zorder>address_02</zorder>
+    <zorder>label_address_03</zorder>
+    <zorder>label_address_02</zorder>
+    <zorder>address_01</zorder>
     <zorder>label_workcat_id</zorder>
     <zorder>depth</zorder>
-    <zorder>label_adress_01</zorder>
+    <zorder>label_address_01</zorder>
     <zorder>category_type</zorder>
     <zorder>label_depth</zorder>
     <zorder>label_elevation</zorder>
@@ -1092,7 +1092,7 @@
     <zorder>label_builtdate</zorder>
     <zorder>label_category_type</zorder>
     <zorder>sector_id</zorder>
-    <zorder>adress_03</zorder>
+    <zorder>address_03</zorder>
     <zorder>label_annotation</zorder>
     <zorder>observ</zorder>
     <zorder>link</zorder>
@@ -8889,9 +8889,9 @@
   <tabstop>fluid_type</tabstop>
   <tabstop>location_type</tabstop>
   <tabstop>ownercat_id</tabstop>
-  <tabstop>adress_01</tabstop>
-  <tabstop>adress_02</tabstop>
-  <tabstop>adress_03</tabstop>
+  <tabstop>address_01</tabstop>
+  <tabstop>address_02</tabstop>
+  <tabstop>address_03</tabstop>
   <tabstop>annotation</tabstop>
   <tabstop>observ</tabstop>
   <tabstop>comment</tabstop>

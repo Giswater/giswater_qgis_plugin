@@ -16,6 +16,7 @@ from functools import partial
 
 from actions.ed import Ed
 from actions.mg import Mg
+from actions.go2epa import Go2Epa
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -94,7 +95,7 @@ class Giswater(QObject):
         connection_status = self.controller.set_database_connection()
         if not connection_status:
             msg = self.controller.last_error  
-            self.controller.show_message(msg, 1, 100) 
+            self.controller.show_warning(msg, 30) 
             return 
         
         self.dao = self.controller.dao 
@@ -104,6 +105,7 @@ class Giswater(QObject):
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
@@ -116,7 +118,6 @@ class Giswater(QObject):
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
-        self.iface.legendInterface().currentLayerChanged.connect(self.current_layer_changed) 
 
   
     def tr(self, message):
@@ -130,13 +131,16 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01,02,19, 21, 23, 24, 25,27,39,41,45,46,47,48,28,98,99):
+                if int(index_action) in (01, 02, 19, 25, 27, 28, 39, 41, 45, 46, 47, 48, 98, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
                 elif int(index_action) in (32, 33, 34, 36):                       
                     callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)                    
+                    action.triggered.connect(callback_function)
+                elif int(index_action) in (23, 24):
+                    callback_function = getattr(self.go2epa, function_name)
+                    action.triggered.connect(callback_function)
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -144,9 +148,7 @@ class Giswater(QObject):
                     action.triggered.connect(partial(callback_function, function_name))
             except AttributeError:
                 action.setEnabled(False)                
-        else:
-            action.setEnabled(False)
-            
+
      
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
         
@@ -284,15 +286,7 @@ class Giswater(QObject):
     def manage_toolbars(self):
         ''' Manage actions of the different toolbars '''
         
-        parent = self.iface.mainWindow()        
-        if self.toolbar_ud_enabled:
-            self.toolbar_ud_name = self.tr('toolbar_ud_name')
-            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
-            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
-        if self.toolbar_ws_enabled:
-            self.toolbar_ws_name = self.tr('toolbar_ws_name')
-            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
-            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
+        parent = self.iface.mainWindow()         
         if self.toolbar_mg_enabled:
             self.toolbar_mg_name = self.tr('toolbar_mg_name')
             self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
@@ -303,22 +297,8 @@ class Giswater(QObject):
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
         # Set an action list for every toolbar    
-        list_actions_ud = ['02','04','05']
-        list_actions_ws = ['10','11','12','14','15','08','29','13']
-        list_actions_mg = ['01','02','16','17','18','19','20','21','22','23','24','25','26','27','28','39','41','43','45','46','47','48','56','57', '98', '99']
+        list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','39','41','43','45','46','47','48','56','57','98','99']
         list_actions_ed = ['30','31','32','33','34','35','36','52']
-                
-        # UD toolbar   
-        if self.toolbar_ud_enabled:        
-            self.ag_ud = QActionGroup(parent)
-            for elem in list_actions_ud:
-                self.add_action(elem, self.toolbar_ud, self.ag_ud)            
-                
-        # WS toolbar 
-        if self.toolbar_ws_enabled:  
-            self.ag_ws = QActionGroup(parent)
-            for elem in list_actions_ws:
-                self.add_action(elem, self.toolbar_ws, self.ag_ws)
                 
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
@@ -405,8 +385,6 @@ class Giswater(QObject):
         self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
         
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
-        self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
-        self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
         self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
         
@@ -427,10 +405,6 @@ class Giswater(QObject):
             for action_index, action in self.actions.iteritems():   #@UnusedVariable
                 self.iface.removePluginMenu(self.menu_name, action)
                 self.iface.removeToolBarIcon(action)
-            if self.toolbar_ud_enabled:    
-                del self.toolbar_ud
-            if self.toolbar_ws_enabled:    
-                del self.toolbar_ws
             if self.toolbar_mg_enabled:    
                 del self.toolbar_mg
             if self.toolbar_ed_enabled:    
@@ -463,10 +437,6 @@ class Giswater(QObject):
         ''' Hide all toolbars from QGIS GUI '''
         
         try:
-            if self.toolbar_ud_enabled:            
-                self.toolbar_ud.setVisible(False)
-            if self.toolbar_ws_enabled:                
-                self.toolbar_ws.setVisible(False)
             if self.toolbar_mg_enabled:                
                 self.toolbar_mg.setVisible(False)
             if self.toolbar_ed_enabled:                
@@ -481,29 +451,27 @@ class Giswater(QObject):
         ''' Search in table 'version' project type of current QGIS project '''
         
         try:
-            self.mg.project_type = None
+            self.mg.set_project_type(None)
+            self.go2epa.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
-                self.mg.project_type = wsoftware.lower()
+                self.mg.set_project_type(wsoftware.lower())
+                self.go2epa.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
                     self.actions['26'].setVisible(True)
                     self.actions['27'].setVisible(True)
                     self.actions['56'].setVisible(False)
                     self.actions['57'].setVisible(False)
                     self.actions['43'].setVisible(False)
-                    self.actions['52'].setVisible(False)
-                    if self.toolbar_ws_enabled:
-                        self.toolbar_ws.setVisible(True)                            
+                    self.actions['52'].setVisible(False)                         
                 elif wsoftware.lower() == 'ud':
                     self.actions['26'].setVisible(False)
                     self.actions['27'].setVisible(False)
                     self.actions['56'].setVisible(True)
                     self.actions['57'].setVisible(True)
                     self.actions['43'].setVisible(True)
-                    self.actions['52'].setVisible(True)
-                    if self.toolbar_ud_enabled:
-                        self.toolbar_ud.setVisible(True)                
+                    self.actions['52'].setVisible(True)               
 
             # Set visible MANAGEMENT and EDIT toolbar
             if self.toolbar_mg_enabled:         
@@ -691,8 +659,9 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
-        # Set SRID from table node
-        self.manage_srid(self.schema_name)
+        # Get SRID from table node
+        self.srid = self.dao.get_srid(self.schema_name, self.table_node)
+        self.controller.plugin_settings_set_value("srid", self.srid)           
 
         # Search project type in table 'version'
         self.search_project_type()
@@ -702,9 +671,8 @@ class Giswater(QObject):
         # Set layer custom UI form and init function   
         if self.load_custom_forms:
             self.manage_custom_forms()
-
-        # Manage current layer selected     
-        self.current_layer_changed(self.iface.activeLayer())   
+            
+        self.custom_enable_actions()           
         
         # Set objects for map tools classes
         self.manage_map_tools()
@@ -713,18 +681,7 @@ class Giswater(QObject):
         self.set_search_plus()
         
         # Delete python compiled files
-        self.delete_pyc_files()
-                  
-              
-    def manage_srid(self, schema_name):
-        ''' Find SRID of selected schema '''
-        
-        schema_name = schema_name.replace('"', '')        
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
-        row = self.dao.get_row(sql)
-        if row:
-            self.srid = row[0]   
-            self.controller.plugin_settings_set_value("srid", self.srid)      
+        self.delete_pyc_files()  
                 
                       
     def manage_custom_forms(self):
@@ -866,133 +823,7 @@ class Giswater(QObject):
         except RuntimeError as e:
             self.controller.show_warning("Error setting searchplus button: "+str(e))
             self.actions['32'].setVisible(False)         
-            
-                   
-    def current_layer_changed(self, layer):
-        ''' Manage new layer selected '''
-
-        # Disable all actions (buttons)
-        self.enable_actions(False)
-        self.custom_enable_actions()     
-        
-        if layer is None:
-            layer = self.iface.activeLayer() 
-            if layer is None:
-                return            
-
-        # Check is selected layer is 'arc', 'node', 'connec' or 'gully'
-        setting_name = None
-        layer_source = self.controller.get_layer_source(layer)  
-        uri_table = layer_source['table']
-        if uri_table is not None:
-            
-            # buttons_arc            
-            if self.table_arc in uri_table:  
-                setting_name = 'buttons_arc'
-            elif self.table_varc in uri_table:  
-                setting_name = 'buttons_arc'  
-            elif self.table_siphon in uri_table:  
-                setting_name = 'buttons_arc' 
-            elif self.table_conduit in uri_table:  
-                setting_name = 'buttons_arc'   
-            elif self.table_waccel in uri_table:  
-                setting_name = 'buttons_arc'     
-            elif self.table_pipe in uri_table:  
-                setting_name = 'buttons_arc'    
-                                
-            # buttons_node
-            elif self.table_node in uri_table:  
-                setting_name = 'buttons_node'
-            elif self.table_tank in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_pump in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_source in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_meter in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_junction in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_waterwell in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_reduction in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_hydrant in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_valve in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_manhole in uri_table:  
-                setting_name = 'buttons_node'   
-            elif self.table_filter in uri_table:  
-                setting_name = 'buttons_node'
-            elif self.table_chamber in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_chamber_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_netgully in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_netgully_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_netinit in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_wjump in uri_table:  
-                setting_name = 'buttons_node'   
-            elif self.table_wwtp in uri_table:  
-                setting_name = 'buttons_node'     
-            elif self.table_wwtp_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_storage in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_storage_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_outfall in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_register in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_netwjoin in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_expansiontank in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_flexunion in uri_table:  
-                setting_name = 'buttons_node'                
-            
-            # buttons_connec
-            elif self.table_connec in uri_table:  
-                setting_name = 'buttons_connec' 
-            elif self.table_wjoin in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_page in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_greentap in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_fountain in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_tap in uri_table:  
-                setting_name = 'buttons_connec'
-                
-            # buttons_gully
-            elif self.table_gully in uri_table:  
-                setting_name = 'buttons_gully' 
-            elif self.table_pgully in uri_table:  
-                setting_name = 'buttons_gully' 
-        
-        if setting_name is not None:
-            try:
-                list_index_action = self.settings.value('layers/'+setting_name, None)
-                if list_index_action:
-                    if type(list_index_action) is list:
-                        for index_action in list_index_action:
-                            if index_action != '-1' and str(index_action) in self.actions:
-                                self.actions[index_action].setEnabled(True)
-                    elif type(list_index_action) is unicode:
-                        index_action = str(list_index_action)
-                        if index_action != '-1' and str(index_action) in self.actions:
-                            self.actions[index_action].setEnabled(True)                
-            except AttributeError:
-                pass
-            except KeyError:
-                pass
-    
+               
         
     def custom_enable_actions(self):
         ''' Enable selected actions '''
@@ -1004,6 +835,12 @@ class Giswater(QObject):
         
         # Enable ED toolbar
         self.enable_actions(True, 30, 100)
+        
+        # Linux: Disable actions related with go2epa and giswater.jar
+        if 'nt' not in sys.builtin_module_names:
+            self.enable_action(False, 23)
+            self.enable_action(False, 24) 
+            self.enable_action(False, 36)                          
                 
                     
     def ws_generic(self, function_name):   

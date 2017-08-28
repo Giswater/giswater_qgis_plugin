@@ -6,12 +6,12 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import Qt, QSettings, QPoint
+from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
+from PyQt4.QtGui import QFileDialog, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
 from PyQt4.QtGui import QSpinBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.Qt import QDate, QTime
 
@@ -29,10 +29,8 @@ from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImp
 from ..ui.config_master import ConfigMaster                     # @UnresolvedImport
 from ..ui.config_edit import ConfigEdit                         # @UnresolvedImport
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
-from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
-from ..ui.file_manager import FileManager                       # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
 from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
 from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImport
@@ -160,221 +158,6 @@ class Mg(ParentAction):
         self.iface.mapCanvas().refresh()
 
 
-    def mg_table_wizard(self):
-        """ Button 21. WS/UD table wizard
-        Create dialog to select CSV file and table to import contents to """
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 21)
-
-        # Get CSV file path from settings file 
-        self.file_csv = self.controller.plugin_settings_value('file_csv')
-        if self.file_csv is None:
-            self.file_csv = self.plugin_dir+"/test.csv"
-
-        # Create dialog
-        self.dlg = TableWizard()
-        self.dlg.txt_file_path.setText(self.file_csv)
-
-        # Fill combo 'table' 
-        self.mg_table_wizard_get_tables()
-
-        # Set signals
-        self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
-        self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'table_wizard')
-        self.dlg.exec_()
-
-
-    def mg_table_wizard_get_tables(self):
-        """ Get available tables from configuration table 'config_csv_import' """
-
-        self.table_dict = {}
-        self.dlg.cbo_table.addItem('', '')
-        sql = "SELECT gis_client_layer_name, table_name"
-        sql += " FROM "+self.schema_name+".config_csv_import"
-        sql += " ORDER BY gis_client_layer_name"
-        rows = self.dao.get_rows(sql)
-        if rows:
-            for row in rows:
-                elem = [row[0], row[1]]
-                self.table_dict[row[0]] = row[1]
-                self.dlg.cbo_table.addItem(row[0], elem)
-        else:
-            self.controller.show_warning("Table 'config_csv_import' is empty")
-
-
-    def mg_table_wizard_select_file(self):
-
-        # Set default value if necessary
-        if self.file_csv == '':
-            self.file_csv = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_csv)
-        os.chdir(folder_path)
-        msg = "Select CSV file"
-        self.file_csv = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.csv')
-        self.dlg.txt_file_path.setText(self.file_csv)
-
-        # Save CSV file path into settings
-        self.controller.plugin_settings_set_value('file_csv', self.file_csv)
-
-
-    def mg_table_wizard_import_csv(self):
-
-        # Get selected table, delimiter, and header
-        alias = utils_giswater.getWidgetText(self.dlg.cbo_table)
-        if not alias:
-            self.controller.show_warning("Any table has been selected", context_name='ui_message')
-            return False
-
-        table_name = self.table_dict[alias]
-        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)
-        header_status = self.dlg.chk_header.checkState()
-
-        # Get CSV file. Check if file exists
-        self.file_csv = self.dlg.txt_file_path.toPlainText()
-        if not os.path.exists(self.file_csv):
-            message = "Selected file not found: "+self.file_csv
-            self.controller.show_warning(message, context_name='ui_message')
-            return False
-
-        # Open CSV file for read and copy into database
-        rf = open(self.file_csv)
-        sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
-        if header_status == Qt.Checked:
-            sql += " HEADER"
-        sql += " DELIMITER AS '"+delimiter+"'"
-        status = self.dao.copy_expert(sql, rf)
-        if status:
-            self.dao.rollback()
-            msg = "Cannot import CSV into table "+table_name+". Reason:\n"+str(status).decode('utf-8')
-            QMessageBox.warning(None, "Import CSV", self.controller.tr(msg))
-            return False
-        else:
-            self.dao.commit()
-            message = "Selected CSV has been imported successfully"
-            self.controller.show_info(message, context_name='ui_message')
-
-
-    def mg_go2epa(self):
-        """ Button 23. Open form to set INP, RPT and project """
-
-        # Initialize variables
-        self.file_inp = None
-        self.file_rpt = None
-        self.project_name = None
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 23)
-
-        # Get giswater properties file
-        users_home = os.path.expanduser("~")
-        filename = "giswater_"+self.giswater_version+".properties"
-        java_properties_path = users_home+os.sep+"giswater"+os.sep+"config"+os.sep+filename
-        if not os.path.exists(java_properties_path):
-            msg = "Giswater properties file not found: "+str(java_properties_path)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get last GSW file from giswater properties file
-        java_settings = QSettings(java_properties_path, QSettings.IniFormat)
-        java_settings.setIniCodec(sys.getfilesystemencoding())          
-        file_gsw = utils_giswater.get_settings_value(java_settings, 'FILE_GSW')
-        
-        # Check if that file exists
-        if not os.path.exists(file_gsw):
-            msg = "Last GSW file not found: "+str(file_gsw)
-            self.controller.show_warning(msg)
-            return False
-
-        # Get INP, RPT file path and project name from GSW file
-        self.gsw_settings = QSettings(file_gsw, QSettings.IniFormat) 
-        self.file_inp = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_INP')
-        self.file_rpt = utils_giswater.get_settings_value(self.gsw_settings, 'FILE_RPT')                
-        self.project_name = self.gsw_settings.value('PROJECT_NAME')                                                         
-                
-        # Create dialog
-        self.dlg = FileManager()
-        utils_giswater.setDialog(self.dlg)
-
-        # Set widgets
-        self.dlg.txt_file_inp.setText(self.file_inp)
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
-        self.dlg.txt_result_name.setText(self.project_name)
-
-        # Set signals
-        self.dlg.btn_file_inp.clicked.connect(self.mg_go2epa_select_file_inp)
-        self.dlg.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
-        self.dlg.btn_accept.clicked.connect(self.mg_go2epa_accept)
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'file_manager')
-        self.dlg.exec_()
-
-
-    def mg_go2epa_select_file_inp(self):
-
-        # Set default value if necessary
-        if self.file_inp is None or self.file_inp == '':
-            self.file_inp = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_inp)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        msg = self.controller.tr("Select INP file")
-        self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        self.dlg.txt_file_inp.setText(self.file_inp)
-
-
-    def mg_go2epa_select_file_rpt(self):
-
-        # Set default value if necessary
-        if self.file_rpt is None or self.file_rpt == '':
-            self.file_rpt = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_rpt)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        msg = self.controller.tr("Select RPT file")
-        self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        self.dlg.txt_file_rpt.setText(self.file_rpt)
-
-
-    def mg_go2epa_accept(self):
-        """ Save INP, RPT and result name into GSW file """
-
-        # Get widgets values
-        self.file_inp = utils_giswater.getWidgetText('txt_file_inp')
-        self.file_rpt = utils_giswater.getWidgetText('txt_file_rpt')
-        self.project_name = utils_giswater.getWidgetText('txt_result_name')
-
-        # Save INP, RPT and result name into GSW file
-        self.gsw_settings.setValue('FILE_INP', self.file_inp)
-        self.gsw_settings.setValue('FILE_RPT', self.file_rpt)
-        self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
-
-        # Close form
-        self.close_dialog(self.dlg)
-
-
-    def mg_go2epa_express(self):
-        """ Button 24. Open giswater in silent mode
-        Executes all options of File Manager: 
-        Export INP, Execute EPA software and Import results
-        """
-        self.execute_giswater("mg_go2epa_express", 24)
-                        
-
     def mg_result_selector(self):
         ''' Button 25. Result selector '''
 
@@ -459,7 +242,6 @@ class Mg(ParentAction):
         elif count > 1:
             message = "More than one feature selected. Only the first one will be processed!"
             self.controller.show_info(message, context_name='ui_message')
-
 
         # Get selected features (nodes)
         features = layer.selectedFeatures()
@@ -799,7 +581,7 @@ class Mg(ParentAction):
 
 
     def mg_config_edit(self):
-        """ Button 98 - Open a dialog showing data from table 'config_param_user' """     
+        """ Button 98: Open a dialog showing data from table 'config_param_user' """     
 
         # Create the dialog and signals
         self.dlg_config_edit = ConfigEdit()
@@ -1041,7 +823,7 @@ class Mg(ParentAction):
         selected_list = self.tbl_all_explot.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' )
+            self.controller.show_warning(message, context_name='ui_message')
             return
 
         row_index = ""
@@ -1049,29 +831,23 @@ class Mg(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = self.tbl_all_explot.model().record(row).value("expl_id")
-
             expl_id += str(id_)+", "
             row_index += str(row+1)+", "
 
         row_index = row_index[:-2]
         expl_id = expl_id[:-2]
-
-        #sql = "DELETE FROM "+self.schema_name+".exploitation"
-        #sql+= " WHERE expl_id IN ("+expl_id+")"
-        #self.controller.execute_sql(sql)
-        #self.tbl_all_explot.model().select()
         cur_user = self.controller.get_project_user()
 
         for i in range(0, len(expl_id)):
             # Check if expl_id already exists in expl_selector
-            sql = "SELECT DISTINCT(expl_id) FROM "+self.schema_name+".expl_selector WHERE expl_id = '"+expl_id[i]+"'"
+            sql = "SELECT DISTINCT(expl_id) FROM "+self.schema_name+".expl_selector"
+            sql += " WHERE expl_id = '"+expl_id[i]+"'"
             row = self.dao.get_row(sql)
             if row:
             # if exist - show warning
                 self.controller.show_info_box("Expl_id "+expl_id[i]+" is already selected!", "Info")
-                #self.controller.show_warning("Any data found in table "+tablename)
             else:
-                sql = "INSERT INTO "+self.schema_name+".expl_selector (expl_id,cur_user) "
+                sql = "INSERT INTO "+self.schema_name+".expl_selector (expl_id, cur_user) "
                 sql+= " VALUES ('"+expl_id[i]+"', '"+cur_user+"')"
                 self.controller.execute_sql(sql)
 
@@ -1096,7 +872,6 @@ class Mg(ParentAction):
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = self.tbl_selected_explot.model().record(row).value("expl_id")
-
             expl_id += str(id_)+", "
             row_index += str(row+1)+", "
 
@@ -1115,7 +890,7 @@ class Mg(ParentAction):
 
 
     def fill_insert_menu(self,table):
-        """ Insert menu on QPushButton->QMenu"""
+        """ Insert menu on QPushButton->QMenu """
 
         self.menu.clear()
         sql = "SELECT id FROM "+self.schema_name+".value_state"
@@ -1528,7 +1303,7 @@ class Mg(ParentAction):
 
 
     def mg_dimensions(self):
-        """ Button_39: Dimensioning """
+        """ Button 39: Dimensioning """
 
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
@@ -1538,7 +1313,7 @@ class Mg(ParentAction):
 
 
     def mg_new_psector(self, psector_id=None, enable_tabs=False):
-        """ Button_45 : New psector """
+        """ Button 45: New psector """
         
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
@@ -1762,10 +1537,11 @@ class Mg(ParentAction):
         self.emitPoint = QgsMapToolEmitPoint(map_canvas)
         map_canvas.setMapTool(self.emitPoint)
         self.dlg_new_psector.btn_add_arc_plan.setText('Editing')
+        self.dlg_new_psector.btn_add_node_plan.setText('Editing')
         self.emitPoint.canvasClicked.connect(partial(self.click_button_add, layer_view, tablename, table_view, elem_type))
 
 
-    def click_button_add(self,  layer_view, tablename, table_view, elem_type, point, button):
+    def click_button_add(self, layer_view, tablename, table_view, elem_type, point, button):
         """
         :param layer_view: it is the view we are using
         :param tablename:  Is the name of the table that we will use to make the SELECT and INSERT
@@ -1810,7 +1586,7 @@ class Mg(ParentAction):
                         # Get depth of feature
                         if feat_type == elem_type:
                             sql = "SELECT * FROM " + self.schema_name + "." + tablename
-                            sql+= " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
+                            sql += " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
                             row = self.dao.get_row(sql)
                             if not row:
                                 self.list_elemets[element_id] = feat_type
@@ -1825,11 +1601,13 @@ class Mg(ParentAction):
             for element_id, feat_type in self.list_elemets.items():
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
                 sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
+                self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
             table_view.model().select()
             self.emitPoint.canvasClicked.disconnect()
             self.list_elemets.clear()
             self.dlg_new_psector.btn_add_arc_plan.setText('Add')
+            self.dlg_new_psector.btn_add_node_plan.setText('Add')
 
 
     def cal_percent(self, widged_total, widged_percent, wided_result):
@@ -1841,7 +1619,7 @@ class Mg(ParentAction):
 
 
     def mg_psector_mangement(self):
-        """ Button_46 : Psector management """
+        """ Button 46: Psector management """
 
         # psm es abreviacion de psector_management
         # Create the dialog and signals
@@ -1900,7 +1678,7 @@ class Mg(ParentAction):
 
 
     def mg_psector_selector(self):
-        """ Button_47 : Psector selector """
+        """ Button 47: Psector selector """
 
         # Create the dialog and signals
         self.dlg_psector_sel = Multirow_selector()
@@ -1953,6 +1731,10 @@ class Mg(ParentAction):
         self.dlg_psector_sel.exec_()
 
 
+    def set_project_type(self, project_type):
+        self.project_type = project_type
+
+
     def query_like_widget_text(self, widget):
         
         query = widget.text()
@@ -1964,7 +1746,7 @@ class Mg(ParentAction):
 
 
     def mg_state_selector(self):
-        """ Button_48 : state selector """
+        """ Button 48: state selector """
         
         # Create the dialog and signals
         self.dlg_state_sel = State_selector()

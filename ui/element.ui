@@ -153,7 +153,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_end_date">
+  <widget class="QLabel" name="label_enddate">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -737,6 +737,23 @@
    </property>
    <property name="text">
     <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="add_geom">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>380</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/129.png</normaloff>../icons/129.png</iconset>
    </property>
   </widget>
  </widget>

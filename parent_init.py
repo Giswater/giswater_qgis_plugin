@@ -55,7 +55,7 @@ class ParentDialog(object):
         if not os.path.isfile(setting_file):
             message = "Config file not found at: "+setting_file
             self.iface.messageBar().pushMessage(message, QgsMessageBar.WARNING, 20)  
-            self.close()
+            self.close_dialog()
             return
             
         # Set plugin settings
@@ -84,7 +84,7 @@ class ParentDialog(object):
         
         try:
             self.dialog.parent().accepted.connect(self.save)
-            self.dialog.parent().rejected.connect(self.close)
+            self.dialog.parent().rejected.connect(self.close_dialog)
         except:
             pass
         
@@ -105,56 +105,21 @@ class ParentDialog(object):
             if text != widget_name:
                 widget.setText(text)         
          
-       
-    def load_tab_add_info(self):
-        ''' Load data from tab 'Add. info' '''                
-        pass
-
-    def load_tab_analysis(self):
-        ''' Load data from tab 'Analysis' '''          
-        pass
-                
-    def load_tab_document(self):
-        ''' Load data from tab 'Document' '''   
-        pass
     
     def load_data(self):
         ''' Load data from related tables '''
-        self.load_tab_add_info()
-        self.load_tab_analysis()
-        self.load_tab_document()
-        
-    def save_tab_add_info(self):
-        ''' Save tab from tab 'Add. info' '''                
         pass
-
-    def save_tab_analysis(self):
-        ''' Save tab from tab 'Analysis' '''          
-        pass
+    
                 
-    def save_tab_document(self):
-        ''' Save tab from tab 'Document' '''   
-        pass       
-                        
-    def save_data(self):
-        ''' Save data from related tables '''        
-        self.save_tab_add_info()
-        self.save_tab_analysis()
-        self.save_tab_document()  
-                
-               
     def save(self):
         ''' Save feature '''
-        self.save_data()   
-        self.dialog.accept()
-        self.close()     
-        
-        #Save new element_id
+        self.dialog.save()
+        self.close_dialog()     
         layer = self.iface.activeLayer()
         layer.commitChanges()
         
         
-    def close(self):
+    def close_dialog(self):
         ''' Close form without saving ''' 
         self.dialog.parent().setVisible(False)         
         
@@ -168,7 +133,6 @@ class ParentDialog(object):
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)        
         model.setFilter(filter_)
-
         model.select()
 
         # Check for errors
@@ -305,12 +269,12 @@ class ParentDialog(object):
             table_hydrometer = "v_rtc_hydrometer"
             self.fill_tbl_hydrometer(self.tbl_hydrometer, self.schema_name+"."+table_hydrometer, self.filter)
           
-            self.dlg_sum.close()
+            self.dlg_sum.close_dialog()
                 
               
     def btn_close(self):
         ''' Close form without saving '''
-        self.dlg_sum.close()
+        self.dlg_sum.close_dialog()
           
         
     def open_selected_document(self):
@@ -617,10 +581,6 @@ class ParentDialog(object):
         self.date_event_from = self.dialog.findChild(QDateEdit, "date_event_from")
         date = QDate.currentDate();
         self.date_event_to.setDate(date);
-        
-        #self.btn_open_event = self.dialog.findChild(QPushButton,"btn_open_event")
-        #self.btn_open_event.clicked.connect(self.open_selected_event_from_table) 
-
 
         # Set signals
         event_type.activated.connect(partial(self.set_filter_table_event, widget))
@@ -646,7 +606,6 @@ class ParentDialog(object):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("event_id", rows)
            
-
         # Fill ComboBox event_type
         sql = "SELECT DISTINCT(parameter_type)"
         sql+= " FROM "+table_name_event_id
@@ -798,7 +757,7 @@ class ParentDialog(object):
             self.tab_main.removeTab(4)          
                 
                 
-    def setImage(self, widget):
+    def set_image(self, widget):
         
         # Manage 'cat_shape'
         arc_id = utils_giswater.getWidgetText("arc_id") 
@@ -871,7 +830,7 @@ class ParentDialog(object):
             
         # Set signals
         self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.clicked.connect(self.dlg_cat.close)
+        self.dlg_cat.btn_cancel.clicked.connect(self.dlg_cat.close_dialog)
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -1033,7 +992,7 @@ class ParentDialog(object):
     def fill_geomcat_id(self, geom_type):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.dlg_cat.close()
+        self.dlg_cat.close_dialog()
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
         elif geom_type == 'arc':

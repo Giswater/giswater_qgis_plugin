@@ -6,11 +6,14 @@ or (at your option) any later version.
 '''
 
 ''' Module with utility functions to interact with dialog and its widgets '''
-from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
+from PyQt4.QtGui import QLineEdit, QComboBox, QWidget, QPixmap, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, QSpinBox, QTimeEdit
 from PyQt4.Qt import QDate
+from PyQt4.QtCore import QTime
 import inspect
 import os
-import _winreg
+import sys 
+if 'nt' in sys.builtin_module_names: 
+    import _winreg 
 
 
 def setDialog(p_dialog):
@@ -51,7 +54,8 @@ def fillComboBoxDefault(widget, rows):
             widget.addItem(str(elem))
         else:
             if elem is not None:
-                widget.addItem(str(elem))                
+                widget.addItem(str(elem))          
+                      
         
 def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
 
@@ -77,7 +81,7 @@ def getText(widget):
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)          
     if widget:
-        if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox:
+        if type(widget) is QLineEdit or type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
             text = widget.text()
         elif type(widget) is QTextEdit:
             text = widget.toPlainText()
@@ -98,11 +102,11 @@ def setText(widget, text):
         return    
     
     value = unicode(text)
-    if type(widget) is QLineEdit or type(widget) is QTextEdit: 
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel:
         if value == 'None':    
             value = ""        
         widget.setText(value)       
-    elif type(widget) is QDoubleSpinBox: 
+    elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
         if value == 'None':    
             value = 0        
         widget.setValue(float(value))
@@ -115,9 +119,20 @@ def setCalendarDate(widget, date):
     if not widget:
         return
     if type(widget) is QDateEdit:
-        if date == None:
-            date=QDate.currentDate()
+        if date is None:
+            date = QDate.currentDate()
         widget.setDate(date)
+
+
+def setTimeEdit(widget, time):
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)
+    if not widget:
+        return
+    if type(widget) is QTimeEdit:
+        if time is None:
+            time = QTime(00, 00, 00)
+        widget.setTime(time)
 
 
 def getWidget(widget):
@@ -158,7 +173,7 @@ def setWidgetText(widget, text):
         widget = _dialog.findChild(QWidget, widget)       
     if not widget:
         return
-    if type(widget) is QLineEdit or type(widget) is QTextEdit:
+    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit:
         setText(widget, text)
     elif type(widget) is QDoubleSpinBox:
         setText(widget, text)           
@@ -236,6 +251,14 @@ def setWidgetVisible(widget, visible=True):
     if widget:
         widget.setVisible(visible)
         
+        
+def setWidgetEnabled(widget, enabled=True):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QWidget, widget)    
+    if widget:
+        widget.setEnabled(enabled)
+                
 
 def setImage(widget,cat_shape):
     ''' Set pictures for UD'''
@@ -281,20 +304,23 @@ def fillWidget(widget):
 
 def get_reg(reg_hkey, reg_path, reg_name):
     
-    reg_root = None
-    if reg_hkey == "HKEY_LOCAL_MACHINE":
-        reg_root = _winreg.HKEY_LOCAL_MACHINE
-    elif reg_hkey == "HKEY_CURRENT_USER":
-        reg_root = _winreg.HKEY_CURRENT_USER
-    
-    if reg_root is not None:
-        try:
-            registry_key = _winreg.OpenKey(reg_root, reg_path)
-            value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
-            _winreg.CloseKey(registry_key)
-            return value
-        except WindowsError:
-            return None
+    if 'nt' in sys.builtin_module_names:     
+        reg_root = None
+        if reg_hkey == "HKEY_LOCAL_MACHINE":
+            reg_root = _winreg.HKEY_LOCAL_MACHINE
+        elif reg_hkey == "HKEY_CURRENT_USER":
+            reg_root = _winreg.HKEY_CURRENT_USER
+        
+        if reg_root is not None:
+            try:
+                registry_key = _winreg.OpenKey(reg_root, reg_path)
+                value, regtype = _winreg.QueryValueEx(registry_key, reg_name)   #@UnusedVariable
+                _winreg.CloseKey(registry_key)
+                return value
+            except WindowsError:
+                return None
+    else:
+        return None
         
         
 def get_settings_value(settings, parameter):
@@ -303,11 +329,12 @@ def get_settings_value(settings, parameter):
     file_aux = ""
     try:
         file_aux = settings.value(parameter)
-        unit = file_aux[:1]
-        if unit != '\\' and file_aux[1] != ':':
-            path = file_aux[1:]
-            file_aux = unit+":"+path
+        if file_aux is not None:
+            unit = file_aux[:1]
+            if unit != '\\' and file_aux[1] != ':':
+                path = file_aux[1:]
+                file_aux = unit+":"+path
     except IndexError:
         pass   
     return file_aux           
-            
+

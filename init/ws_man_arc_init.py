@@ -293,21 +293,22 @@ class ManArcDialog(ParentDialog):
         sql_common+= " WHERE arc_id = '"+self.arc_id+"'" 
             
         element = None
-        sql = sql_common+" AND identif = 'element'"         
+        m2bottom = None
+        m3protec = None
+        
+        sql = sql_common + " AND identif = 'element'"         
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             element = row[0]
 
-        m2bottom = None
-        sql = sql_common+" AND identif = 'm2bottom'"          
+        sql = sql_common + " AND identif = 'm2bottom'"          
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             m2bottom = row[0]
         
-        m3protec = None
-        sql = sql_common+" AND identif = 'm3protec'"          
+        sql = sql_common + " AND identif = 'm3protec'"          
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             m3protec = row[0]
         
         arc_element = self.dialog.findChild(QLineEdit, "arc_element")
@@ -325,29 +326,29 @@ class ManArcDialog(ParentDialog):
         arc_protection.setText(m3protec)
         arc_protection.setAlignment(Qt.AlignJustify)
         
-        # Fill QLineEdit -> Soilcat
         m3exc = None
-        sql = sql_common+" AND identif = 'm3exc'" 
+        m3fill = None
+        m3excess = None
+        m2trenchl = None
+        
+        sql = sql_common + " AND identif = 'm3exc'" 
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             m3exc = row[0]
         
-        m3fill = None
-        sql = sql_common+" AND identif = 'm3fill'"         
+        sql = sql_common + " AND identif = 'm3fill'"         
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             m3fill = row[0]
         
-        m3excess = None
-        sql = sql_common+" AND identif = 'm3excess'"         
+        sql = sql_common + " AND identif = 'm3excess'"         
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             m3excess = row[0]
         
-        m2trenchl = None
-        sql = sql_common+" AND identif = 'm2trenchl'"            
+        sql = sql_common + " AND identif = 'm2trenchl'"            
         row = self.dao.get_row(sql)
-        if row is not None:
+        if row:
             m2trenchl = row[0]
         
         soil_excavation = self.dialog.findChild(QLineEdit, "soil_excavation")
@@ -380,10 +381,14 @@ class ManArcDialog(ParentDialog):
    
         # get pointer of node by ID
         aux = "\"node_id\" = "
-        aux += "'"+str(self.node_id)+"', "
-        aux = aux[:-2] 
+        aux += "'"+str(self.node_id)+"'"
         expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)            
+            return            
         
+        # TODO: Parametrize it        
         # List of nodes from node_type_cat_type - nodes which we are using
         nodes = ["Manhole", "Junction", "Valve", "Filter", "Reduction", "Waterwell", "Hydrant", "Tank", "Meter", "Pump", "Source", "Register", "Netwjoin", "Expantank", "Flexunion", "Netelement", "Netsamplepoint"]    
         #sql = "SELECT i18n FROM "+self.schema_name+".node_type_cat_type" 

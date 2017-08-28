@@ -157,3 +157,17 @@ class PgDao():
         except Exception as e:
             return e   
         
+        
+    def get_srid(self, schema_name, table_name):
+        ''' Find SRID of selected schema '''
+        
+        srid = None
+        schema_name = schema_name.replace('"', '')        
+        sql = "SELECT Find_SRID('"+schema_name+"', '"+table_name+"', 'the_geom');"
+        row = self.get_row(sql)
+        if row:
+            srid = row[0]   
+            
+        return srid        
+            
+        
