@@ -7,6 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QCompleter, QLineEdit, QStringListModel, QDateTimeEdit, QPushButton
+from PyQt4.QtCore import Qt
+from qgis.gui import QgsMapToolEmitPoint
 
 import os
 import sys
@@ -24,7 +26,7 @@ from parent import ParentAction
 class Ed(ParentAction):
    
     def __init__(self, iface, settings, controller, plugin_dir):     
-        ''' Class to control Management toolbar actions '''  
+        """ Class to control Management toolbar actions """
                   
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)        
@@ -78,9 +80,9 @@ class Ed(ParentAction):
         self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')  
         self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')   
         
-               
+
     def close_dialog(self, dlg=None): 
-        ''' Close dialog '''
+        """ Close dialog """
         
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
@@ -91,7 +93,7 @@ class Ed(ParentAction):
                   
             
     def ed_search_plus(self):   
-        ''' Button 32. Open search plus dialog ''' 
+        """ Button 32: Open search plus dialog """
         
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -105,7 +107,7 @@ class Ed(ParentAction):
             
                 
     def ed_check(self):
-        ''' Initial check for buttons 33 and 34 '''
+        """ Initial check for buttons 33 and 34 """
         
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -128,17 +130,17 @@ class Ed(ParentAction):
     
     
     def populate_combo(self, widget, table_name, field_name="id"): 
-        ''' Executes query and fill combo box ''' 
+        """ Executes query and fill combo box """
         
         sql = "SELECT "+field_name+" FROM "+self.schema_name+"."+table_name+" ORDER BY "+field_name
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:  
-            utils_giswater.setCurrentIndex(widget, 1);             
+            utils_giswater.setCurrentIndex(widget, 1)
 
 
     def ed_giswater_jar(self):   
-        ''' Button 36. Open giswater.jar with selected .gsw file '''
+        """ Button 36: Open giswater.jar with selected .gsw file """
         
         if 'nt' in sys.builtin_module_names: 
             self.execute_giswater("ed_giswater_jar", 36)
@@ -147,7 +149,7 @@ class Ed(ParentAction):
                                               
                           
     def ed_add_element(self):
-        ''' Button 33. Add element '''
+        """ Button 33: Add element """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -183,7 +185,7 @@ class Ed(ParentAction):
         model = QStringListModel()
         sql = "SELECT DISTINCT(element_id) FROM "+self.schema_name+".element "
         row = self.dao.get_rows(sql)
-        for i in range(0,len(row)):
+        for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
             
@@ -192,23 +194,37 @@ class Ed(ParentAction):
         
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_el_autocomplete)
-        
+        self.dlg.add_geom.pressed.connect(self.add_point)
         # Open the dialog
-        self.dlg.exec_()    
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.open()
+
         
-        
+    def add_point(self):
+        """ Create the appropriate map tool and connect to the corresponding signal """
+        map_canvas = self.iface.mapCanvas()
+        self.emit_point = QgsMapToolEmitPoint(map_canvas)
+        map_canvas.setMapTool(self.emit_point)
+        self.emit_point.canvasClicked.connect(partial(self.get_xy))
+
+
+    def get_xy(self, point):
+        self.x = point.x()
+        self.y = point.y()
+        self.emit_point.canvasClicked.disconnect()
+
+
     def get_date(self):
-        ''' Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value
-        '''
+        """ Get date_from and date_to from ComboBoxes
+        Filter the table related on selected value """
         
         # Get widgets
-        self.date_document_from = self.dlg.findChild(QDateTimeEdit, "builtdate") 
-        self.date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
+        date_document_from = self.dlg.findChild(QDateTimeEdit, "builtdate") 
+        date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
         
         # Get date
-        date_from = self.date_document_from.date() 
-        date_to = self.date_document_to.date() 
+        date_from = date_document_from.date() 
+        date_to = date_document_to.date() 
       
         # Check if interval is valid
         if date_from >= date_to:
@@ -218,16 +234,16 @@ class Ed(ParentAction):
 
         
     def ed_add_el_autocomplete(self):    
-        ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
+        """ Once we select 'element_id' using autocomplete, fill widgets with current values """
 
         self.dlg.element_id.setCompleter(self.completer)
         element_id = utils_giswater.getWidgetText("element_id") 
         
         # Get values from database       
         sql = "SELECT elementcat_id, location_type, ownercat_id, state, workcat_id," 
-        sql+= " buildercat_id, annotation, observ, comment, link, verified, rotation"
-        sql+= " FROM "+self.schema_name+".element" 
-        sql+= " WHERE element_id = '"+element_id+"'"
+        sql += " buildercat_id, annotation, observ, comment, link, verified, rotation"
+        sql += " FROM "+self.schema_name+".element"
+        sql += " WHERE element_id = '"+element_id+"'"
         row = self.dao.get_row(sql)
         
         # Fill widgets
@@ -238,8 +254,7 @@ class Ed(ParentAction):
 
     
     def ed_add_element_accept(self):
-        ''' Function for btn_accept of btn_33
-        Update or Insert values '''
+        """ Insert or update table 'element'. Add element to selected features """
            
         # Get values from dialog
         element_id = utils_giswater.getWidgetText("element_id")
@@ -266,37 +281,34 @@ class Ed(ParentAction):
         # Check if we already have data with selected element_id
         sql = "SELECT DISTINCT(element_id) FROM "+self.schema_name+".element WHERE element_id = '"+element_id+"'"    
         row = self.dao.get_row(sql)
+        # If element already exist perform an UPDATE        
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
-                # If data for selected element_id exist than UPDATE
+                # TODO: Parametrize SRID
                 sql = "UPDATE "+self.schema_name+".element"
-                sql+= " SET element_id = '"+element_id+"', elementcat_id= '"+elementcat_id+"',state = '"+state+"', location_type = '"+location_type+"'"
-                sql+= ", workcat_id_end= '"+workcat_id_end+"', workcat_id= '"+workcat_id+"',buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
-                sql+= ", rotation= '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ= '"+observ+"',link = '"+link+"', verified = '"+verified+"'"
-                sql+= " WHERE element_id = '"+element_id+"'" 
+                sql += " SET elementcat_id = '"+elementcat_id+"', state = '"+state+"', location_type = '"+location_type+"'"
+                sql += ", workcat_id_end = '"+workcat_id_end+"', workcat_id = '"+workcat_id+"', buildercat_id = '"+buildercat_id+"', ownercat_id = '"+ownercat_id+"'"
+                sql += ", rotation = '"+rotation+"',comment = '"+comment+"', annotation = '"+annotation+"', observ = '"+observ+"', link = '"+link+"', verified = '"+verified+"'"
+                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + '), 25831)'
+                sql += " WHERE element_id = '"+element_id+"'"
                 status = self.controller.execute_sql(sql)
                 if status:
-                    # Inserting value to table_name of feature
                     self.ed_add_to_feature("element", element_id)
-                    # Show message to user
                     message = "Values has been updated"
-                    self.controller.show_info(message) 
-                
-            else:
-                self.close_dialog(self.dlg)
+                    self.controller.show_info(message, context_name='ui_message')
+        
+        # If element doesn't exist perform an INSERT
         else:
-            # If data for selected element_id doesn't exist than INSERT
             sql = "INSERT INTO "+self.schema_name+".element (element_id, elementcat_id, state, location_type"
-            sql+= ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified,workcat_id_end) "
-            sql+= " VALUES ('"+element_id+"', '"+elementcat_id+"', '"+state+"', '"+location_type+"', '"
-            sql+= workcat_id+"', '"+buildercat_id+"', '"+ownercat_id+"', '"+rotation+"', '"+comment+"', '"
-            sql+= annotation+"','"+observ+"','"+link+"','"+verified+"','"+workcat_id_end+"')"
-            status = self.controller.execute_sql(sql) 
+            sql += ", workcat_id, buildercat_id, ownercat_id, rotation, comment, annotation, observ, link, verified, workcat_id_end, the_geom) "
+            sql += " VALUES ('"+element_id+"', '"+elementcat_id+"', '"+state+"', '"+location_type+"', '"
+            sql += workcat_id+"', '"+buildercat_id+"', '"+ownercat_id+"', '"+rotation+"', '"+comment+"', '"
+            sql += annotation+"','"+observ+"','"+link+"','"+verified+"','" + workcat_id_end + "',"
+            sql += "ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + '), 25831))'
+            status = self.controller.execute_sql(sql)
             if status:
-                # Inserting value to table_name of feature
                 self.ed_add_to_feature("element", element_id) 
-                # Show message to user
                 message = "Values has been updated"
                 self.controller.show_info(message, context_name='ui_message')
             if not status:
@@ -304,11 +316,12 @@ class Ed(ParentAction):
                 self.controller.show_warning(message, context_name='ui_message') 
                 return
 
-        self.close_dialog()
-    
+        self.close_dialog(self.dlg)
+        self.iface.mapCanvas().refreshAllLayers()
+
     
     def ed_add_file(self):
-        ''' Button 34. Add file '''
+        """ Button 34: Add document """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -322,7 +335,7 @@ class Ed(ParentAction):
         
         # Get widgets
         self.path = self.dlg.findChild(QLineEdit, "path")
-        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser ,self.path))
+        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser, self.path))
         self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog, self.path))
         
         # Manage i18n of the form
@@ -343,7 +356,7 @@ class Ed(ParentAction):
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc "
         row = self.dao.get_rows(sql)
-        for i in range(0,len(row)):
+        for i in range(0, len(row)):
             aux = row[i]
             row[i] = str(aux[0])
         
@@ -352,22 +365,21 @@ class Ed(ParentAction):
         
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_file_autocomplete)
-        # Refresh
         
         # Open the dialog
         self.dlg.exec_()
         
   
     def ed_add_file_autocomplete(self): 
-        ''' Once we select 'element_id' using autocomplete, fill widgets with current values '''
+        """ Once we select 'element_id' using autocomplete, fill widgets with current values """
         
         self.dlg.doc_id.setCompleter(self.completer)
         doc_id = utils_giswater.getWidgetText("doc_id") 
         
         # Get values from database           
         sql = "SELECT doc_type, tagcat_id, observ, path"
-        sql+= " FROM "+self.schema_name+".doc" 
-        sql+= " WHERE id = '"+doc_id+"'"
+        sql += " FROM "+self.schema_name+".doc"
+        sql += " WHERE id = '"+doc_id+"'"
         row = self.dao.get_row(sql)
         
         # Fill widgets
@@ -378,18 +390,18 @@ class Ed(ParentAction):
     
     
     def ed_add_to_feature(self, table_name, value_id):   
-        ''' Add document or element to selected features '''
+        """ Add document or element to selected features """
         
         # Get schema and table name of selected layer       
         layer_source = self.controller.get_layer_source(self.layer)
-        uri_table = layer_source['table'] 
-
+        uri_table = layer_source['table']
         if uri_table is None:
             msg = "Error getting table name from selected layer"
             self.controller.show_warning(msg, context_name='ui_message')
             return
         
-        field_id= None
+        elem_type = None
+        field_id = None
 
         if self.table_arc in uri_table:  
             elem_type = "arc"
@@ -494,7 +506,7 @@ class Ed(ParentAction):
         if self.table_outfall in uri_table:  
             elem_type = "node"
             field_id = "node_id"
-                
+
         if self.table_varc in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
@@ -507,19 +519,30 @@ class Ed(ParentAction):
         if self.table_waccel in uri_table:  
             elem_type = "arc"
             field_id = "arc_id"
+        if 'v_edit_man_pipe' in uri_table:
+            elem_type = "arc"
+            field_id = "arc_id"
 
+        if field_id is None:
+            self.controller.show_info("Current active layer is different than selected features")
+            return
+        
         # Get selected features
         features = self.layer.selectedFeatures()
         for feature in features:
             elem_id = feature.attribute(field_id)
-            sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
-            sql+= " VALUES ('"+elem_id+"', '"+value_id+"')"
-            
-            self.controller.execute_sql(sql) 
+
+            sql = "SELECT * FROM "+self.schema_name+"."+table_name+"_x_"+elem_type
+            sql += " WHERE "+field_id + " = '"+elem_id+"' AND " + value_id + " = "+table_name+"_id"
+            row = self.dao.get_row(sql)
+            if row is None:
+                sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
+                sql += " VALUES ('"+elem_id+"', '"+value_id+"')"
+                self.controller.execute_sql(sql)
             
                           
     def ed_add_file_accept(self): 
-        ''' Insert or update document. Add document to selected feature '''  
+        """ Insert or update table 'document'. Add document to selected feature """
         
         # Get values from dialog
         doc_id = utils_giswater.getWidgetText("doc_id") 
@@ -533,43 +556,36 @@ class Ed(ParentAction):
             message = "You need to insert doc_id"
             self.controller.show_warning(message, context_name='ui_message')   
             return
+        
         # Check if this document already exists
         sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".doc WHERE id = '"+doc_id+"'" 
         row = self.dao.get_row(sql)
+        # If document already exist perform an UPDATE
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
-            
             if answer:
-                # If document already exist than UPDATE
                 sql = "UPDATE "+self.schema_name+".doc "
-                sql+= " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"', observ = '"+observ+"', path = '"+path+"'"
-                sql+= " WHERE id = '"+doc_id+"'" 
+                sql += " SET doc_type = '"+doc_type+"', tagcat_id= '"+tagcat_id+"', observ = '"+observ+"', path = '"+path+"'"
+                sql += " WHERE id = '"+doc_id+"'"
                 status = self.controller.execute_sql(sql) 
                 if status:
-                    # Inserting value to table_name of feature
                     self.ed_add_to_feature("doc", doc_id)
-                    # Show message to user
                     message = "Values has been updated"
-                    self.controller.show_info(message)
-            else:
-                
-                self.close_dialog(self.dlg) 
+                    self.controller.show_info(message, context_name='ui_message')
+
+        # If document doesn't exist perform an INSERT
         else:
-            # If document doesnt exist than INSERT
             sql = "INSERT INTO "+self.schema_name+".doc (id, doc_type, path, observ, tagcat_id) "
-            sql+= " VALUES ('"+doc_id+"', '"+doc_type+"', '"+path+"', '"+observ+"', '"+tagcat_id+"')"
+            sql += " VALUES ('"+doc_id+"', '"+doc_type+"', '"+path+"', '"+observ+"', '"+tagcat_id+"')"
             status = self.controller.execute_sql(sql)
             if status:
-                # Inserting value to table_name of feature
                 self.ed_add_to_feature("doc", doc_id) 
-                # Show message to user
                 message = "Values has been updated"
-                self.controller.show_info(message)
+                self.controller.show_info(message, context_name='ui_message')
             if not status:
                 message = "Error inserting element in table, you need to review data"
                 self.controller.show_warning(message, context_name='ui_message')
                 return
 
         self.close_dialog()   
-            
-            
+

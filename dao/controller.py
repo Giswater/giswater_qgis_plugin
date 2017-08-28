@@ -392,8 +392,7 @@ class DaoController():
         return self.user   
     
 
-    def log_message(self, text=None, message_level=0, context_name=None, 
-                    log_to_file=True, stack_level=0, parameter=None):
+    def log_message(self, text=None, message_level=0, context_name=None, parameter=None):
         ''' Write message into QGIS Log Messages Panel with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
         msg = None
@@ -404,15 +403,15 @@ class DaoController():
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
         
 
-    def log_info(self, text=None, context_name=None, stack_level=0, parameter=None):
+    def log_info(self, text=None, context_name=None, parameter=None):
         ''' Write information message into QGIS Log Messages Panel
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.log_message(text, 0, context_name, stack_level=stack_level, parameter=parameter)      
+        self.log_message(text, 0, context_name, parameter=parameter)      
 
 
-    def log_warning(self, text=None, context_name=None, stack_level=0, parameter=None):
+    def log_warning(self, text=None, context_name=None, parameter=None):
         ''' Write warning message into QGIS Log Messages Panel
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.log_message(text, 1, context_name, stack_level=stack_level, parameter=parameter)          
+        self.log_message(text, 1, context_name, parameter=parameter)          
         
             
