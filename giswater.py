@@ -287,15 +287,7 @@ class Giswater(QObject):
     def manage_toolbars(self):
         ''' Manage actions of the different toolbars '''
         
-        parent = self.iface.mainWindow()        
-        if self.toolbar_ud_enabled:
-            self.toolbar_ud_name = self.tr('toolbar_ud_name')
-            self.toolbar_ud = self.iface.addToolBar(self.toolbar_ud_name)
-            self.toolbar_ud.setObjectName(self.toolbar_ud_name)   
-        if self.toolbar_ws_enabled:
-            self.toolbar_ws_name = self.tr('toolbar_ws_name')
-            self.toolbar_ws = self.iface.addToolBar(self.toolbar_ws_name)
-            self.toolbar_ws.setObjectName(self.toolbar_ws_name)   
+        parent = self.iface.mainWindow()         
         if self.toolbar_mg_enabled:
             self.toolbar_mg_name = self.tr('toolbar_mg_name')
             self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
@@ -306,22 +298,8 @@ class Giswater(QObject):
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
         # Set an action list for every toolbar    
-        list_actions_ud = ['02','04','05']
-        list_actions_ws = ['10','11','12','14','15','08','29','13']
         list_actions_mg = ['01','02','16','17','18','19','20','21','22','23','24','25','26','27','28','39','41','43','45','46','47','48','99','56','57']
         list_actions_ed = ['30','31','32','33','34','35','36','52']
-                
-        # UD toolbar   
-        if self.toolbar_ud_enabled:        
-            self.ag_ud = QActionGroup(parent)
-            for elem in list_actions_ud:
-                self.add_action(elem, self.toolbar_ud, self.ag_ud)            
-                
-        # WS toolbar 
-        if self.toolbar_ws_enabled:  
-            self.ag_ws = QActionGroup(parent)
-            for elem in list_actions_ws:
-                self.add_action(elem, self.toolbar_ws, self.ag_ws)
                 
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
@@ -408,8 +386,6 @@ class Giswater(QObject):
         self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
         
         # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
-        self.toolbar_ud_enabled = bool(int(self.settings.value('status/toolbar_ud_enabled', 1)))
-        self.toolbar_ws_enabled = bool(int(self.settings.value('status/toolbar_ws_enabled', 1)))
         self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
         self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
         
@@ -430,10 +406,6 @@ class Giswater(QObject):
             for action_index, action in self.actions.iteritems():   #@UnusedVariable
                 self.iface.removePluginMenu(self.menu_name, action)
                 self.iface.removeToolBarIcon(action)
-            if self.toolbar_ud_enabled:    
-                del self.toolbar_ud
-            if self.toolbar_ws_enabled:    
-                del self.toolbar_ws
             if self.toolbar_mg_enabled:    
                 del self.toolbar_mg
             if self.toolbar_ed_enabled:    
@@ -466,10 +438,6 @@ class Giswater(QObject):
         ''' Hide all toolbars from QGIS GUI '''
         
         try:
-            if self.toolbar_ud_enabled:            
-                self.toolbar_ud.setVisible(False)
-            if self.toolbar_ws_enabled:                
-                self.toolbar_ws.setVisible(False)
             if self.toolbar_mg_enabled:                
                 self.toolbar_mg.setVisible(False)
             if self.toolbar_ed_enabled:                
@@ -497,18 +465,14 @@ class Giswater(QObject):
                     self.actions['56'].setVisible(False)
                     self.actions['57'].setVisible(False)
                     self.actions['43'].setVisible(False)
-                    self.actions['52'].setVisible(False)
-                    if self.toolbar_ws_enabled:
-                        self.toolbar_ws.setVisible(True)                            
+                    self.actions['52'].setVisible(False)                         
                 elif wsoftware.lower() == 'ud':
                     self.actions['26'].setVisible(False)
                     self.actions['27'].setVisible(False)
                     self.actions['56'].setVisible(True)
                     self.actions['57'].setVisible(True)
                     self.actions['43'].setVisible(True)
-                    self.actions['52'].setVisible(True)
-                    if self.toolbar_ud_enabled:
-                        self.toolbar_ud.setVisible(True)                
+                    self.actions['52'].setVisible(True)               
 
             # Set visible MANAGEMENT and EDIT toolbar
             if self.toolbar_mg_enabled:         
