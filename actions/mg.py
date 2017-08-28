@@ -1558,6 +1558,7 @@ class Mg(ParentAction):
         self.emitPoint = QgsMapToolEmitPoint(map_canvas)
         map_canvas.setMapTool(self.emitPoint)
         self.dlg_new_psector.btn_add_arc_plan.setText('Editing')
+        self.dlg_new_psector.btn_add_node_plan.setText('Editing')
         self.emitPoint.canvasClicked.connect(partial(self.click_button_add, layer_view, tablename, table_view, elem_type))
 
 
@@ -1606,7 +1607,7 @@ class Mg(ParentAction):
                         # Get depth of feature
                         if feat_type == elem_type:
                             sql = "SELECT * FROM " + self.schema_name + "." + tablename
-                            sql+= " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
+                            sql += " WHERE " + feat_type+"_id = '" + element_id+"' AND psector_id = '" + self.psector_id.text() + "'"
                             row = self.dao.get_row(sql)
                             if not row:
                                 self.list_elemets[element_id] = feat_type
@@ -1621,12 +1622,13 @@ class Mg(ParentAction):
             for element_id, feat_type in self.list_elemets.items():
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
                 sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
+                self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
             table_view.model().select()
             self.emitPoint.canvasClicked.disconnect()
             self.list_elemets.clear()
             self.dlg_new_psector.btn_add_arc_plan.setText('Add')
-
+            self.dlg_new_psector.btn_add_node_plan.setText('Add')
 
     def cal_percent(self, widged_total, widged_percent, wided_result):
         wided_result.setText(str((float(widged_total.text())*float(widged_percent.text())/100)))
