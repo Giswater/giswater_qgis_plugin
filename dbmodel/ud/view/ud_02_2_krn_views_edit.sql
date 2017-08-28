@@ -482,6 +482,7 @@ node.address_02 AS junction_address_02,
 node.address_03 AS junction_address_03,
 node.descript AS junction_descript,
 node.rotation AS junction_rotation,
+cat_node.svg AS junction_cat_svg,
 node.link AS junction_link,
 node.verified,
 node.the_geom,
@@ -500,6 +501,7 @@ node.num_value as junction_num_value
 FROM selector_expl, node
 	JOIN man_junction ON man_junction.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -541,6 +543,7 @@ node.address_02 AS outfall_address_02,
 node.address_03 AS outfall_address_03,
 node.descript AS outfall_descript,
 node.rotation AS outfall_rotation,
+cat_node.svg AS outfall_cat_svg,
 node.link AS outfall_link,
 node.verified,
 node.the_geom,
@@ -561,6 +564,7 @@ man_outfall.name AS outfall_name
 FROM selector_expl, node
 	JOIN man_outfall ON man_outfall.node_id = node.node_id
 	JOIN v_node ON v_node.node_id = node.node_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -602,6 +606,7 @@ node.address_02 AS storage_address_02,
 node.address_03 AS storage_address_03,
 node.descript AS storage_descript,
 node.rotation AS storage_rotation,
+cat_node.svg AS storage_cat_svg,
 node.link AS storage_link,
 node.verified,
 node.the_geom,
@@ -629,6 +634,7 @@ man_storage.name AS storage_name
 FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -699,6 +705,7 @@ man_storage.name AS storage_name
 FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_storage.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -743,6 +750,7 @@ node.address_02 AS valve_address_02,
 node.address_03 AS valve_address_03,
 node.descript AS valve_descript,
 node.rotation AS valve_rotation,
+cat_node.svg AS valve_cat_svg,
 node.link AS valve_link,
 node.verified,
 node.the_geom,
@@ -761,6 +769,7 @@ node.num_value as valve_num_value,
 man_valve.name AS valve_name
 FROM selector_expl, node
 	JOIN man_valve ON man_valve.node_id = node.node_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -804,6 +813,7 @@ node.address_02 AS netinit_address_02,
 node.address_03 AS netinit_address_03,
 node.descript AS netinit_descript,
 node.rotation AS netinit_rotation,
+cat_node.svg AS netinit_cat_svg,
 node.link AS netinit_link,
 node.verified,
 node.the_geom,
@@ -827,6 +837,7 @@ man_netinit.accessibility AS netinit_accessibility,
 man_netinit.name AS netinit_name
 FROM selector_expl, node
 	JOIN man_netinit ON man_netinit.node_id = node.node_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -870,6 +881,7 @@ node.address_02 AS manhole_address_02,
 node.address_03 AS manhole_address_03,
 node.descript AS manhole_descript,
 node.rotation AS manhole_rotation,
+cat_node.svg AS manhole_cat_svg,
 node.link AS manhole_link,
 node.verified,
 node.the_geom,
@@ -894,6 +906,7 @@ man_manhole.bottom_channel AS manhole_bottom_channel,
 man_manhole.accessibility AS manhole_accessibility
 FROM selector_expl, node
 	JOIN man_manhole ON man_manhole.node_id = node.node_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -936,6 +949,7 @@ node.address_02 AS wjump_address_02,
 node.address_03 AS wjump_address_03,
 node.descript AS wjump_descript,
 node.rotation AS wjump_rotation,
+cat_node.svg AS wjump_cat_svg,
 node.link AS wjump_link,
 node.verified,
 node.the_geom,
@@ -960,6 +974,7 @@ man_wjump.name AS wjump_name
 FROM selector_expl, node
 	JOIN man_wjump ON man_wjump.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -1002,6 +1017,7 @@ node.address_02 AS netgully_address_02,
 node.address_03 AS netgully_address_03,
 node.descript AS netgully_descript,
 node.rotation AS netgully_rotation,
+cat_node.svg AS netgully_cat_svg,
 node.link AS netgully_link,
 node.verified,
 node.the_geom,
@@ -1029,6 +1045,7 @@ ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -1098,6 +1115,7 @@ ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_netgully.pol_id
@@ -1142,6 +1160,7 @@ node.address_02 AS chamber_address_02,
 node.address_03 AS chamber_address_03,
 node.descript AS chamber_descript,
 node.rotation AS chamber_rotation,
+cat_node.svg AS chamber_cat_svg,
 node.link AS chamber_link,
 node.verified,
 node.the_geom,
@@ -1170,6 +1189,7 @@ man_chamber.name AS chamber_name
 FROM selector_expl, node
     JOIN man_chamber ON man_chamber.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 	 
@@ -1240,6 +1260,7 @@ man_chamber.name AS chamber_name
 FROM selector_expl, node
 	JOIN man_chamber ON man_chamber.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_chamber.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id)	AND selector_expl.cur_user="current_user"(); 
@@ -1283,6 +1304,7 @@ node.address_02 AS wwtp_address_02,
 node.address_03 AS wwtp_address_03,
 node.descript AS wwtp_descript,
 node.rotation AS wwtp_rotation,
+cat_node.svg AS wwtp_cat_svg,
 node.link AS wwtp_link,
 node.verified,
 node.the_geom,
@@ -1303,6 +1325,7 @@ man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); ;
 
@@ -1365,6 +1388,7 @@ man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_wwtp.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); 
@@ -1407,6 +1431,7 @@ node.address_02 AS netelement_address_02,
 node.address_03 AS netelement_address_03,
 node.descript AS netelement_descript,
 node.rotation AS netelement_rotation,
+cat_node.svg AS netelement_cat_svg,
 node.link AS netelement_link,
 node.verified,
 node.the_geom,
@@ -1426,6 +1451,7 @@ man_netelement.serial_number as netelement_serial_number
 FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
 	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); 
 
