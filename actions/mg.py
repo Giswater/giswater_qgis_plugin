@@ -649,12 +649,12 @@ class Mg(ParentAction):
 
 
     def mg_config_master_accept(self):
-        """ """
+
         if utils_giswater.isChecked(self.chk_psector_enabled):
             self.insert_or_update_config_param_curuser(self.dlg_config_master.psector_vdefault, "psector_vdefault", "config_param_user")
         else:
             self.delete_row("psector_vdefault", "config_param_user")
-        self.update_conf_param_master(True,  "config",  self.dlg_config_master)
+        self.update_conf_param_master(True, "config", self.dlg_config_master)
 
         self.insert_or_update_config_param(self.dlg_config_master.om_visit_absolute_path, "om_visit_absolute_path", "config_param_system")
         self.insert_or_update_config_param(self.dlg_config_master.doc_absolute_path, "doc_absolute_path", "config_param_system")
@@ -673,6 +673,7 @@ class Mg(ParentAction):
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
             columns.append(column_name)
+            
         if update:
             if columns is not None:
                 sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
@@ -709,6 +710,7 @@ class Mg(ParentAction):
                                 value = value.replace(",", ".")
                             sql += column_name + " = '" + str(value) + "', "
                 sql = sql[:len(sql) - 2]
+                
         else:
             values = "VALUES("
             if columns is not None:
@@ -733,6 +735,7 @@ class Mg(ParentAction):
                 sql = sql[:len(sql) - 2] + ") "
                 values = values[:len(values) - 2] + ")"
                 sql += values
+                
         self.controller.execute_sql(sql)
 
 
@@ -773,7 +776,9 @@ class Mg(ParentAction):
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+                
         self.controller.execute_sql(sql)
+
 
     def insert_or_update_config_param(self, widget, parameter, tablename):
         """ Insert or update values in tables with out current_user control """
@@ -814,7 +819,6 @@ class Mg(ParentAction):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("verified_vdefault", rows)
         
-        self.builtdate_vdefault = self.dlg_config_edit.findChild(QDateEdit, "builtdate_vdefault")
         sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
         sql+= ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
         row = self.dao.get_row(sql)
@@ -1165,7 +1169,7 @@ class Mg(ParentAction):
             widget.model().select()
 
 
-    def multi_rows_delet(self, widget, table_name, column_id):
+    def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
         :param table_name: table origin
@@ -1601,12 +1605,12 @@ class Mg(ParentAction):
 
         # tab Elements
         self.dlg_new_psector.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector", self.tbl_arc_plan, "arc"))
-        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_arc_plan, "plan_arc_x_psector", "id"))
+        self.dlg_new_psector.btn_del_arc_plan.pressed.connect(partial(self.multi_rows_delete, self.tbl_arc_plan, "plan_arc_x_psector", "id"))
 
         self.dlg_new_psector.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", self.tbl_node_plan, "node" ))
-        self.dlg_new_psector.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_node_plan, "plan_node_x_psector", "id"))
+        self.dlg_new_psector.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delete, self.tbl_node_plan, "plan_node_x_psector", "id"))
 
-        self.dlg_new_psector.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delet, self.tbl_other_plan, "plan_other_x_psector", "id"))
+        self.dlg_new_psector.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delete, self.tbl_other_plan, "plan_other_x_psector", "id"))
 
         ##
         # if a row is selected from mg_psector_mangement(button 46)
@@ -1853,7 +1857,7 @@ class Mg(ParentAction):
         # Set signals
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
-        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delet, self.tbl_psm, table_name, column_id))
+        self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.tbl_psm, table_name, column_id))
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
