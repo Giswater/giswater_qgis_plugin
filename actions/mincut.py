@@ -57,11 +57,13 @@ class MincutParent(ParentAction):
         # Call ParentAction constructor
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
+        '''
         self.canvas = self.iface.mapCanvas()
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emitPoint = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emitPoint)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
+        '''
 
         # Get layers of node,arc,connec groupe
         self.node_group = []
@@ -69,23 +71,30 @@ class MincutParent(ParentAction):
         self.arc_group = []
 
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".node_type_cat_type "
-        nodes = self.controller.get_rows(sql)
+        nodes = self.dao.get_rows(sql)
         for node in nodes:
             self.node_group.append(str(node[0]))
 
-        sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".connec_type_cat_type "
-        connecs = self.controller.get_rows(sql)
+        sql = "SELECT DISTINCT(type) FROM " + self.schema_name + ".connec_type "
+        connecs = self.dao.get_rows(sql)
         for connec in connecs:
             self.connec_group.append(str(connec[0]))
 
+        self.connec_group = ["Wjoin"]
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".arc_type_cat_type "
-        arcs = self.controller.get_rows(sql)
+        arcs = self.dao.get_rows(sql)
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
 
 
     def mg_mincut(self):
         ''' Btn 26 - New Mincut '''
+
+        self.canvas = self.iface.mapCanvas()
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emitPoint)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
@@ -295,15 +304,26 @@ class MincutParent(ParentAction):
         timeEnd_real = self.cbx_hours_end.time()
         forecast_end_real = dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
 
+        mincut_result_state = "1"
+
         # Insert data to DB
-        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript,exec_start, exec_end,exec_limit_distance, exec_depth, exec_descript)"
-        sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "','" + forecast_start_real + "','" + forecast_end_real + "','" + exec_limit_distance + "','" + exec_depth + "','" + exec_descript + "')"
-        message = str(sql)
-        self.controller.show_info(message, context_name='ui_message')
+        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript)"
+        sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "')"
         status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message, context_name='ui_message')
+
+
+        if self.btn_end.isEnabled():
+            message = "active "
+            self.controller.show_warning(message, context_name='ui_message')
+            #sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (exec_start, exec_end, exec_from_plot, exec_depth, exec_descript)"
+            #sql += " VALUES ('" + forecast_start_real + "','" + forecast_end_real + "','" + exec_limit_distance + "','" + exec_depth + "','" + exec_descript + "') WHERE id ='" + id + "'"
+            sql = "UPDATE "+ self.schema_name + ".anl_mincut_result_cat SET exec_start ='" + forecast_start_real + "', exec_end = '" + forecast_end_real + "',exec_from_plot ='" + exec_limit_distance + "',exec_depth='" + exec_depth + "', exec_descript='" + exec_descript + "') WHERE id ='" + id + "'"
+            message = str(sql)
+            self.controller.show_info(message, context_name='ui_message')
+            status = self.controller.execute_sql(sql)
 
         self.dlg.close()
 
@@ -384,7 +404,10 @@ class MincutParent(ParentAction):
         self.dlg_connec.show()
 
     def snapping_init(self):
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),self.snappingConnec)
+        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),self.snappingConnec)
+        self.emitPoint.canvasClicked.connect(self.snappingConnec)
+        message = "init"
+        self.controller.show_info(message, context_name='ui_message')
 
 
     def snappingConnec(self, point, btn):
@@ -773,7 +796,8 @@ class MincutParent(ParentAction):
         else:
             pass
 
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingNodeArc)
+        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingNodeArc)
+        self.emitPoint.canvasClicked.connect(self.snappingNodeArc)
 
 
     def snappingNodeArc(self, point, btn):
@@ -864,8 +888,8 @@ class MincutParent(ParentAction):
         else:
             pass
 
-        QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingValveAnalytics)
-
+        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingValveAnalytics)
+        self.emitPoint.canvasClicked.connect(self.snappingValveAnalytics)
 
     def snappingValveAnalytics(self):
         # Set active layer

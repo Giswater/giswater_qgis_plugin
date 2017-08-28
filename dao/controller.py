@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
+from qgis.core import QgsMessageLog
 
 import subprocess
 from functools import partial
@@ -82,12 +83,14 @@ class DaoController():
         connection_settings.beginGroup(root_conn);           
         groups = connection_settings.childGroups();                                 
         if self.connection_name in groups:      
+        
             root = self.connection_name+"/"  
             host = connection_settings.value(root+"host", '')
             port = connection_settings.value(root+"port", '')            
             db = connection_settings.value(root+"database", '')
             self.user = connection_settings.value(root+"username", '')
             pwd = connection_settings.value(root+"password", '') 
+                        
             # We need to create this connections for Table Views
             self.db = QSqlDatabase.addDatabase("QPSQL")
             self.db.setHostName(host)
@@ -95,22 +98,20 @@ class DaoController():
             self.db.setDatabaseName(db)
             self.db.setUserName(self.user)
             self.db.setPassword(pwd)
-            self.status = self.db.open()    
-            if not self.status:
+            status = self.db.open() 
+            
+            # Connect to Database 
+            self.dao = PgDao()     
+            self.dao.set_params(host, port, db, self.user, pwd)
+            status = self.dao.init_db()                 
+            if not status:
                 msg = "Database connection error. Please check connection parameters"
-                self.show_warning(msg)
                 self.last_error = self.tr(msg)
                 return False           
         else:
             msg = "Database connection name not found. Please check configuration file 'giswater.config'"
-            self.show_warning(msg)
             self.last_error = self.tr(msg)
-            return False
-    
-        # Connect to Database 
-        self.dao = PgDao()     
-        self.dao.set_params(host, port, db, self.user, pwd)
-        status = self.dao.init_db()
+            return False   
        
         return status    
     
@@ -132,22 +133,20 @@ class DaoController():
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None):
-        ''' Show message to the user.
+        ''' Show message to the user with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
         self.iface.messageBar().pushMessage("", self.tr(text, context_name), message_level, duration)
         #QMessageBox.about(None, 'Ok', str(text))
             
     def show_info(self, text, duration=5, context_name=None):
-        ''' Show message to the user.
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        #self.show_message(text, 0, duration, context_name)
-        QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
+        ''' Show information message to the user '''
+        self.show_message(text, 0, duration, context_name)
+        #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
     def show_warning(self, text, duration=5, context_name=None):
-        ''' Show message to the user.
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        #self.show_message(text, 1, duration, context_name)
-        QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
+        ''' Show warning message to the user '''
+        self.show_message(text, 1, duration, context_name)
+        #QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
 
     def show_warning_detail(self, text, detail_text, context_name=None):
         ''' Show warning message with a button to show more details '''  
@@ -352,28 +351,28 @@ class DaoController():
         pos_end_schema = uri.rfind('.')
         pos_fi = uri.find('" ')
         if pos_ini <> -1 and pos_fi <> -1:
-            uri_table = uri[pos_end_schema+2:pos_fi ]
+            uri_table = uri[pos_end_schema+2:pos_fi]
 
         return uri_table    
         
         
-    def get_layer_source_key(self):
-        ''' Get table or view name of selected layer '''
-
-        uri_schema = None
+    def get_layer_primary_key(self):
+        ''' Get primary key of selected layer '''
+        
+        uri_pk = None
         layer = self.iface.activeLayer()  
         uri = layer.dataProvider().dataSourceUri().lower()
         pos_ini = uri.find('key=')
-        pos_end_schema = uri.rfind('srid=')
+        pos_end = uri.rfind('srid=')
         if pos_ini <> -1:
-            uri_schema = uri[pos_ini + 5:pos_end_schema-2]
+            uri_pk = uri[pos_ini + 5:pos_end-2]
 
-        return uri_schema
+        return uri_pk
         
    
     def get_project_user(self):
         ''' Set user '''
-		
+
         user = None
         #self.canvas = self.iface.mapCanvas() 
         # Check if we have any layer loaded
@@ -392,4 +391,28 @@ class DaoController():
 
         return self.user   
     
-    
+
+    def log_message(self, text=None, message_level=0, context_name=None, 
+                    log_to_file=True, stack_level=0, parameter=None):
+        ''' Write message into QGIS Log Messages Panel with selected message level
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        msg = None
+        if text is not None:
+            msg = self.tr(text, context_name)
+            if parameter is not None:
+                msg+= ": "+parameter            
+        QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
+        
+
+    def log_info(self, text=None, context_name=None, stack_level=0, parameter=None):
+        ''' Write information message into QGIS Log Messages Panel
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        self.log_message(text, 0, context_name, stack_level=stack_level, parameter=parameter)      
+
+
+    def log_warning(self, text=None, context_name=None, stack_level=0, parameter=None):
+        ''' Write warning message into QGIS Log Messages Panel
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        self.log_message(text, 1, context_name, stack_level=stack_level, parameter=parameter)          
+        
+            
