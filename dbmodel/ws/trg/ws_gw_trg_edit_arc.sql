@@ -23,7 +23,7 @@ BEGIN
     
         -- Arc ID
         IF (NEW.arc_id IS NULL) THEN
-            PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+          --  PERFORM setval('urn_id_seq', gw_fct_urn(),true);
             NEW.arc_id:= (SELECT nextval('urn_id_seq'));
         END IF;
 
@@ -32,11 +32,7 @@ BEGIN
 		NEW.code = NEW.arc_id;
 	END IF;
 
-        -- Arc type
-        IF (NEW.cat_arctype_id IS NULL) THEN
-            NEW.cat_arctype_id := (SELECT id FROM arc_type WHERE epa_default = 'PIPE' LIMIT 1);
-        END IF;
-        
+              
         -- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN

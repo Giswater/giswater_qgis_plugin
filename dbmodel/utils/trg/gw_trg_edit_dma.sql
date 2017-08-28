@@ -13,7 +13,7 @@ BEGIN
 	
     IF TG_OP = 'INSERT' THEN
 	
-			
+			/*
 	        -- Sector ID
         IF (NEW.sector_id IS NULL) THEN
             IF ((SELECT COUNT(*) FROM sector) = 0) THEN
@@ -24,7 +24,7 @@ BEGIN
                 RETURN audit_function(120,380);          
             END IF;            
         END IF;
-		
+		*/
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
@@ -37,18 +37,18 @@ BEGIN
             END IF;
 			
         -- FEATURE INSERT
-				INSERT INTO dma (dma_id, sector_id, presszonecat_id, descript, observ, the_geom, undelete,  macrodma_id,expl_id)
-				VALUES (NEW.dma_id, NEW.sector_id, NEW.presszonecat_id, NEW.descript, NEW.observ, NEW.the_geom, NEW.undelete, NEW.macrodma_id, expl_id_int);
+				INSERT INTO dma (dma_id, name, descript,  the_geom, undelete,  expl_id)
+				VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int);
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	-- FEATURE UPDATE
 			UPDATE dma 
-			SET dma_id=NEW.dma_id, sector_id=NEW.sector_id, presszonecat_id=NEW.presszonecat_id, descript=NEW.descript, observ=NEW.observ, the_geom=NEW.the_geom, undelete=NEW.undelete, macrodma_id=NEW.macrodma_id
+			SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id
 			WHERE dma_id=NEW.dma_id;
 		
-        PERFORM audit_function(2,340); 
+        --PERFORM audit_function(2,340); 
         RETURN NEW;
 
 		
@@ -57,7 +57,7 @@ BEGIN
 	 -- FEATURE DELETE
 		DELETE FROM dma WHERE dma_id = OLD.dma_id;		
 
-		PERFORM audit_function(3,340); 		
+		--PERFORM audit_function(3,340); 		
 		RETURN NULL;
      
      END IF;

@@ -18,8 +18,8 @@ CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
 	macrosector.undelete
 FROM inp_selector_sector, sector 
 JOIN macrosector ON macrosector.macrosector_id=sector.macrosector_id
-WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
-AND inp_selector_sector.cur_user="current_user"());  
+--WHERE ((sector.sector_id)=(inp_selector_sector.sector_id)
+--AND inp_selector_sector.cur_user="current_user"());  
 
 
 

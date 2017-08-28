@@ -32,7 +32,7 @@ BEGIN
     
 -- Node ID
 		IF (NEW.node_id IS NULL) THEN
-			PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+			--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
 
@@ -41,29 +41,25 @@ BEGIN
 		NEW.code = NEW.node_id;
 	END IF;
 
-        -- Node type
-        IF (NEW.node_type IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM node_type) = 0) THEN
-                RETURN audit_function(105,380);  
-            END IF;
-            NEW.node_type:= (SELECT id FROM node_type LIMIT 1);
-        END IF;
-
+      
          -- Epa type
-        IF (NEW.epa_type IS NULL) THEN
-			NEW.epa_type:= (SELECT epa_default FROM node_type WHERE node_type.id=NEW.node_type)::text;   
+		IF (NEW.epa_type IS NULL) THEN
+			NEW.epa_type:= (SELECT epa_default FROM node JOIN cat_node ON cat_node.id =node.nodecat_id JOIN node_type ON node_type.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;   
 		END IF;
 
 	-- Node Catalog ID
 
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
-                RETURN audit_function(110,430);  
+               RETURN audit_function(110,430);  
 			END IF;
-			NEW.nodecat_id:= (SELECT "value" FROM config_param_user JOIN cat_node ON config_vdefault.value=cat_node.id WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"() AND cat_node.nodetype_id=NEW.node_type);
-				IF (NEW.nodecat_id IS NULL) THEN
+				NEW.nodecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"());
+			/*IF (NEW.nodecat_id NOT IN (select cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2)) THEN 
+				RAISE EXCEPTION 'Your catalog is different than node type';
+			END IF;*/
+			IF (NEW.nodecat_id IS NULL) THEN
 					NEW.nodecat_id:= (SELECT cat_node.id FROM cat_node JOIN node_type ON cat_node.nodetype_id=node_type.id WHERE node_type.man_table=man_table_2 LIMIT 1);
-				END IF;
+			END IF;
 		END IF;
 
         -- Sector ID
@@ -132,11 +128,11 @@ BEGIN
         -- FEATURE INSERT      
 	INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom, undelete, label_x, 
-			label_y, label_rotation, expl_id, publish, inventory, num_value, hemisphere, num_value) 
+			label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
 			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,
-			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory,  NEW.num_value, NEW.hemisphere, NEW.num_value);
+			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
 
         -- EPA INSERT
         IF (NEW.epa_type = 'JUNCTION') THEN inp_table:= 'inp_junction';
@@ -152,7 +148,7 @@ BEGIN
         END IF;
 
         -- MANAGEMENT INSERT
-        man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
+      --  man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
 
         IF man_table IS NOT NULL THEN
             v_sql:= 'INSERT INTO '||man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
@@ -210,7 +206,7 @@ BEGIN
 
 		
     -- UPDATE management values
-		IF (NEW.node_type <> OLD.node_type) THEN 
+		/*IF (NEW.node_type <> OLD.node_type) THEN 
 			new_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = NEW.node_type);
 			old_man_table:= (SELECT node_type.man_table FROM node_type WHERE node_type.id = OLD.node_type);
 			IF new_man_table IS NOT NULL THEN
@@ -231,7 +227,7 @@ BEGIN
             END IF;
         END IF;
 
-
+*/
 	-- UPDATE values
 		UPDATE node 
 	SET node_id=NEW.node_id, code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
@@ -239,7 +235,7 @@ BEGIN
 		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id,
 		builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
 		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 
-		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, hemisphere=NEW.hemisphere,num_value=NEW.num_value
+		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.hemisphere,num_value=NEW.num_value
 		WHERE node_id = OLD.node_id;
             
         --PERFORM audit_function(2,380); 
