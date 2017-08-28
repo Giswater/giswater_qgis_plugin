@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
+from qgis.core import QgsMessageLog
 
 import subprocess
 from functools import partial
@@ -132,20 +133,18 @@ class DaoController():
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None):
-        ''' Show message to the user.
+        ''' Show message to the user with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
         self.iface.messageBar().pushMessage("", self.tr(text, context_name), message_level, duration)
         #QMessageBox.about(None, 'Ok', str(text))
             
     def show_info(self, text, duration=5, context_name=None):
-        ''' Show message to the user.
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        ''' Show information message to the user '''
         self.show_message(text, 0, duration, context_name)
         #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
     def show_warning(self, text, duration=5, context_name=None):
-        ''' Show message to the user.
-        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        ''' Show warning message to the user '''
         self.show_message(text, 1, duration, context_name)
         #QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
 
@@ -392,4 +391,28 @@ class DaoController():
 
         return self.user   
     
-    
+
+    def log_message(self, text=None, message_level=0, context_name=None, 
+                    log_to_file=True, stack_level=0, parameter=None):
+        ''' Write message into QGIS Log Messages Panel with selected message level
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        msg = None
+        if text is not None:
+            msg = self.tr(text, context_name)
+            if parameter is not None:
+                msg+= ": "+parameter            
+        QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
+        
+
+    def log_info(self, text=None, context_name=None, stack_level=0, parameter=None):
+        ''' Write information message into QGIS Log Messages Panel
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        self.log_message(text, 0, context_name, stack_level=stack_level, parameter=parameter)      
+
+
+    def log_warning(self, text=None, context_name=None, stack_level=0, parameter=None):
+        ''' Write warning message into QGIS Log Messages Panel
+        message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
+        self.log_message(text, 1, context_name, stack_level=stack_level, parameter=parameter)          
+        
+            
