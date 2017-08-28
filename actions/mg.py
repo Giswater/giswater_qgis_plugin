@@ -11,7 +11,8 @@ from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
+from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox
+from PyQt4.QtGui import QSpinBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.Qt import QDate, QTime
 
 from datetime import datetime
@@ -25,7 +26,8 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
-from ..ui.config import Config                                  # @UnresolvedImport
+from ..ui.config_master import ConfigMaster                     # @UnresolvedImport
+from ..ui.config_edit import ConfigEdit                         # @UnresolvedImport
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
 from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
@@ -46,14 +48,14 @@ from parent import ParentAction                                 # @UnresolvedImp
 class Mg(ParentAction):
    
     def __init__(self, iface, settings, controller, plugin_dir):
-        ''' Class to control Management toolbar actions '''  
+        """ Class to control Management toolbar actions """
                   
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
     
                   
     def close_dialog(self, dlg=None): 
-        ''' Close dialog '''
+        """ Close dialog """
 
         dlg.close()
         if dlg is None or type(dlg) is bool:
@@ -65,7 +67,7 @@ class Mg(ParentAction):
 
 
     def mg_arc_topo_repair(self):
-        ''' Button 19. Topology repair '''
+        """ Button 19. Topology repair """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -92,7 +94,7 @@ class Mg(ParentAction):
 
 
     def mg_arc_topo_repair_accept(self):
-        ''' Button 19. Executes functions that are selected '''
+        """ Button 19. Executes functions that are selected """
 
         # Review/Utils
         if self.dlg.check_node_orphan.isChecked():
@@ -159,8 +161,8 @@ class Mg(ParentAction):
 
 
     def mg_table_wizard(self):
-        ''' Button 21. WS/UD table wizard 
-        Create dialog to select CSV file and table to import contents to '''
+        """ Button 21. WS/UD table wizard
+        Create dialog to select CSV file and table to import contents to """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -188,13 +190,13 @@ class Mg(ParentAction):
 
 
     def mg_table_wizard_get_tables(self):
-        ''' Get available tables from configuration table 'config_csv_import' '''
+        """ Get available tables from configuration table 'config_csv_import' """
 
         self.table_dict = {}
         self.dlg.cbo_table.addItem('', '')
         sql = "SELECT gis_client_layer_name, table_name"
-        sql+= " FROM "+self.schema_name+".config_csv_import"
-        sql+= " ORDER BY gis_client_layer_name"
+        sql += " FROM "+self.schema_name+".config_csv_import"
+        sql += " ORDER BY gis_client_layer_name"
         rows = self.dao.get_rows(sql)
         if rows:
             for row in rows:
@@ -245,8 +247,8 @@ class Mg(ParentAction):
         rf = open(self.file_csv)
         sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
         if header_status == Qt.Checked:
-            sql+= " HEADER"
-        sql+= " DELIMITER AS '"+delimiter+"'"
+            sql += " HEADER"
+        sql += " DELIMITER AS '"+delimiter+"'"
         status = self.dao.copy_expert(sql, rf)
         if status:
             self.dao.rollback()
@@ -260,7 +262,7 @@ class Mg(ParentAction):
 
 
     def mg_go2epa(self):
-        ''' Button 23. Open form to set INP, RPT and project '''
+        """ Button 23. Open form to set INP, RPT and project """
 
         # Initialize variables
         self.file_inp = None
@@ -349,7 +351,7 @@ class Mg(ParentAction):
 
 
     def mg_go2epa_accept(self):
-        ''' Save INP, RPT and result name into GSW file '''
+        """ Save INP, RPT and result name into GSW file """
 
         # Get widgets values
         self.file_inp = utils_giswater.getWidgetText('txt_file_inp')
@@ -366,10 +368,10 @@ class Mg(ParentAction):
 
 
     def mg_go2epa_express(self):
-        ''' Button 24. Open giswater in silent mode
+        """ Button 24. Open giswater in silent mode
         Executes all options of File Manager: 
         Export INP, Execute EPA software and Import results
-        '''       
+        """
         self.execute_giswater("mg_go2epa_express", 24)
                         
 
@@ -504,7 +506,7 @@ class Mg(ParentAction):
 
 
     def mg_change_elem_type_get_value_2(self, index):
-        ''' Just select item to 'real' combo 'nodecat_id' (that is hidden) '''
+        """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
 
         if index == -1:
             return
@@ -529,7 +531,7 @@ class Mg(ParentAction):
 
 
     def mg_change_elem_type_accept(self):
-        ''' Update current type of node and save changes in database '''
+        """ Update current type of node and save changes in database """
 
         # Update node_type in the database
         sql = "UPDATE "+self.schema_name+".v_edit_node"
@@ -546,10 +548,10 @@ class Mg(ParentAction):
         # Close form
         self.close_dialog()
 
-
+    '''
     def mg_config(self):
-        ''' Button 99 - Open a dialog showing data from table "config" 
-        User can changge its values '''
+        """ Button 99 - Open a dialog showing data from table "config"
+        User can changge its values """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -602,7 +604,7 @@ class Mg(ParentAction):
         self.chk_state_vdefault = self.dlg.findChild(QCheckBox, 'chk_state_vdefault')
         self.chk_psector_vdefault = self.dlg.findChild(QCheckBox, 'chk_psector_vdefault')
         self.chk_workcat_vdefault = self.dlg.findChild(QCheckBox, 'chk_workcat_vdefault')
-        self.chk_cverified_vdefault = self.dlg.findChild(QCheckBox, 'chk_cverified_vdefault')
+        self.chk_verified_vdefault = self.dlg.findChild(QCheckBox, 'chk_verified_vdefault')
         self.chk_builtdate_vdefault = self.dlg.findChild(QCheckBox, 'chk_builtdate_vdefault')
         self.chk_arccat_vdefault = self.dlg.findChild(QCheckBox, 'chk_arccat_vdefault')
         self.chk_nodecat_vdefault = self.dlg.findChild(QCheckBox, 'chk_nodecat_vdefault')
@@ -628,39 +630,6 @@ class Mg(ParentAction):
             path = str(row['value'])
             self.doc_absolute_path.setText(path)
 
-        # Set values from widgets of type QComboBox
-        sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodeinsert_catalog_vdefault", rows)
-
-        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".value_state ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("state_vdefault", rows)
-        sql = "SELECT DISTINCT(psector_id) FROM" +self.schema_name+".plan_psector ORDER BY psector_id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("psector_vdefault", rows)
-
-        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_work ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("workcat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".value_verified ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("verified_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_arc ORDER BY id"
-        rows = self.dao.get_rows(sql)
-
-        utils_giswater.fillComboBox("arccat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_node ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodecat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM" +self.schema_name+".cat_connec ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("connecat_vdefault", rows)
-
-        # Set values from widgets of type QDateEdit
-        sql = "SELECT DISTINCT(builtdate_vdefault) FROM" + self.schema_name + ".config"
-        rows = self.dao.get_rows(sql)
-
         # Get data from tables: 'config', 'config_search_plus' and 'config_extract_raster_value'
         self.generic_columns=self.new_mg_config_get_data('config_vdefault')
         #self.generic_columns = self.mg_config_get_data('config')
@@ -671,11 +640,357 @@ class Mg(ParentAction):
         self.controller.translate_form(self.dlg, 'config')
         self.dlg.exec_()
 
+    '''
+    def mg_config_master(self):
+        """ Button 99 - Open a dialog showing data from table "config"
+        User can changge its values """
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 28)
+        self.controller.check_action(True, 99)
+        # Create the dialog and signals
+        self.dlg_config_master = ConfigMaster()
+        utils_giswater.setDialog(self.dlg_config_master)
+        self.dlg_config_master.btn_accept.pressed.connect(self.mg_config_master_accept)
+        self.dlg_config_master.btn_cancel.pressed.connect(self.dlg_config_master.close)
 
+        self.om_visit_absolute_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
+        self.doc_absolute_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
+        self.om_visit_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
+        self.doc_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
+
+        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
+
+        # Get om_visit_absolute_path and doc_absolute_path from config_param_text
+        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql += " WHERE parameter = 'om_visit_absolute_path'"
+        row = self.dao.get_row(sql)
+        if row:
+            path = str(row['value'])
+            self.om_visit_absolute_path.setText(path)
+
+        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql += " WHERE parameter = 'doc_absolute_path'"
+        row = self.dao.get_row(sql)
+        if row:
+            path = str(row['value'])
+            self.doc_absolute_path.setText(path)
+
+        # QCheckBox
+        self.chk_psector_enabled = self.dlg_config_master.findChild(QCheckBox, 'chk_psector_enabled')
+        self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
+
+        if self.project_type == 'ws':
+            self.slope_arc_direction.setEnabled(False)
+
+        sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("psector_vdefault", rows)
+
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user WHERE parameter ='psector_vdefault'"
+        row = self.dao.get_row(sql)
+        if row:
+            self.controller.show_info(str(row))
+            utils_giswater.setChecked(self.chk_psector_enabled, True)
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+        self.mg_options_get_data("config")
+        self.mg_options_get_data("config_param_system")
+
+        self.dlg_config_master.exec_()
+
+
+    def mg_options_get_data(self, tablename):
+        """ Get data from selected table and fill widgets according to the name of the columns """
+        sql = 'SELECT * FROM ' + self.schema_name + "." + tablename
+        row = self.dao.get_row(sql)
+
+        if not row:
+            self.controller.show_warning("Any data found in table "+tablename)
+            return None
+        # Iterate over all columns and populate its corresponding widget
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            widget_type = utils_giswater.getWidgetType(column_name)
+            if widget_type is QCheckBox:
+                utils_giswater.setChecked(column_name, row[column_name])
+            elif widget_type is QDateEdit:
+                utils_giswater.setCalendarDate(column_name, datetime.strptime(row[column_name], '%Y-%m-%d'))
+            elif widget_type is QTimeEdit:
+                timeparts = str(row[column_name]).split(':')
+                if len(timeparts) < 3:
+                    timeparts.append("0")
+                days = int(timeparts[0]) / 24
+                hours = int(timeparts[0]) % 24
+                minuts = int(timeparts[1])
+                seconds = int(timeparts[2])
+                time = QTime(hours, minuts, seconds)
+                utils_giswater.setTimeEdit(column_name, time)
+                utils_giswater.setText(column_name + "_day", days)
+
+            else:
+                utils_giswater.setWidgetText(column_name, row[column_name])
+            columns.append(column_name)
+        return columns
+
+    def mg_config_master_accept(self):
+        """ """
+        if utils_giswater.isChecked(self.chk_psector_enabled):
+            self.insert_or_update_config_param_curuser(self.dlg_config_master.psector_vdefault, "psector_vdefault", "config_param_user")
+        else:
+            self.delete_row("psector_vdefault", "config_param_user")
+        self.update_conf_param_master(True,  "config", self.dlg_config_master)
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message')
+        self.dlg_config_master.close()
+
+
+    def update_conf_param_master(self, update, tablename, dialog):
+        """ INSERT or UPDATE tables according :param update"""
+        sql = "SELECT *"
+        sql += " FROM " + self.schema_name + "." + tablename
+        row = self.dao.get_row(sql)
+        columns = []
+        for i in range(0, len(row)):
+            column_name = self.dao.get_column_name(i)
+            columns.append(column_name)
+        if update:
+            if columns is not None:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+                for column_name in columns:
+                    if column_name != 'id':
+                        widget_type = utils_giswater.getWidgetType(column_name)
+                        if widget_type is QCheckBox:
+                            value = utils_giswater.isChecked(column_name)
+                        elif widget_type is QDateEdit:
+                            date = dialog.findChild(QDateEdit, str(column_name))
+                            value = date.dateTime().toString('yyyy-MM-dd')
+                        elif widget_type is QTimeEdit:
+                            aux = 0
+                            widget_day = str(column_name) + "_day"
+                            day = utils_giswater.getText(widget_day)
+                            if day != "null":
+                                aux = int(day) * 24
+                            time = dialog.findChild(QTimeEdit, str(column_name))
+                            timeparts = time.dateTime().toString('HH:mm:ss').split(':')
+                            h = int(timeparts[0]) + int(aux)
+                            aux = str(h) + ":" + str(timeparts[1]) + ":00"
+                            value = aux
+                        elif widget_type is QSpinBox:
+                            x = dialog.findChild(QSpinBox, str(column_name))
+                            value = x.value()
+                        else:
+                            value = utils_giswater.getWidgetText(column_name)
+                        if value == 'null':
+                            sql += column_name + " = null, "
+                        elif value is None:
+                            pass
+                        else:
+                            if type(value) is not bool and widget_type is not QSpinBox:
+                                value = value.replace(",", ".")
+                            sql += column_name + " = '" + str(value) + "', "
+                sql = sql[:len(sql) - 2]
+        else:
+            values = "VALUES("
+            if columns is not None:
+                sql = "INSERT INTO " + self.schema_name + "." + tablename + " ("
+                for column_name in columns:
+                    if column_name != 'id':
+                        widget_type = utils_giswater.getWidgetType(column_name)
+                        if widget_type is not None:
+                            if widget_type is QCheckBox:
+                                values += utils_giswater.isChecked(column_name) + ", "
+                            elif widget_type is QDateEdit:
+                                date = dialog.findChild(QDateEdit, str(column_name))
+                                values += date.dateTime().toString('yyyy-MM-dd') + ", "
+                            else:
+                                value = utils_giswater.getWidgetText(column_name)
+                            if value is None or value == 'null':
+                                sql += column_name + ", "
+                                values += "null, "
+                            else:
+                                values += "'" + value + "',"
+                                sql += column_name + ", "
+                sql = sql[:len(sql) - 2] + ") "
+                values = values[:len(values) - 2] + ")"
+                sql += values
+        self.controller.execute_sql(sql)
+
+
+    def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
+        """ Insert or update values in tables with current_user control"""
+        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename + ' WHERE "cur_user" = current_user'
+        rows = self.controller.get_rows(sql)
+        self.exist = False
+        if type(widget) != QDateEdit:
+            if widget.currentText() != "":
+                for row in rows:
+                    if row[1] == parameter:
+                        self.exist = True
+                if self.exist:
+                    # self.controller.show_info(str(widget.objectName()))
+                    sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                    if widget.objectName() != 'state_vdefault':
+                        sql += "'"+widget.currentText() + "' WHERE parameter='" + parameter + "'"
+                    else:
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "')"
+                        sql += " WHERE parameter = 'state_vdefault' "
+                else:
+                    sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                    if widget.objectName() != 'state_vdefault':
+                        sql += " VALUES ('"+parameter+"', '" + widget.currentText() + "', current_user)"
+                    else:
+                        sql += " VALUES ('"+parameter+"', (SELECT id FROM "+self.schema_name + ".value_state WHERE name ='" + widget.currentText()+"'), current_user)"
+        else:
+            for row in rows:
+                if row[1] == parameter:
+                    self.exist = True
+            if self.exist:
+                sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += "'" + str(_date) + "' WHERE parameter='" + parameter + "'"
+            else:
+                sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
+                _date = widget.dateTime().toString('yyyy-MM-dd')
+                sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+        self.controller.execute_sql(sql)
+
+
+    def mg_config_edit(self):
+
+        # Create the dialog and signals
+        self.dlg_config_edit = ConfigEdit()
+        utils_giswater.setDialog(self.dlg_config_edit)
+        self.dlg_config_edit.btn_accept.pressed.connect(self.mg_config_edit_accept)
+        self.dlg_config_edit.btn_cancel.pressed.connect(self.dlg_config_edit.close)
+        # QCheckBox Utils
+        self.chk_state_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_state_vdefault')
+        self.chk_workcat_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_workcat_vdefault')
+        self.chk_verified_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_verified_vdefault')
+        self.chk_builtdate_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_builtdate_vdefault')
+        self.chk_arccat_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_arccat_vdefault')
+        self.chk_nodecat_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_nodecat_vdefault')
+        self.chk_connecat_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_connecat_vdefault')
+        # QCheckBox Ud
+        self.chk_nodetype_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_nodetype_vdefault')
+        self.chk_arctype_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_arctype_vdefault')
+        self.chk_connectype_vdefault = self.dlg_config_edit.findChild(QCheckBox, 'chk_connectype_vdefault')
+        # Set values from widgets of type QComboBox and dates
+        # QComboBox Utils
+        sql = "SELECT DISTINCT(name) FROM " + self.schema_name+".value_state ORDER BY name"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("state_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_work ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("workcat_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".value_verified ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("verified_vdefault", rows)
+        self.builtdate_vdefault = self.dlg_config_edit.findChild(QDateEdit, "builtdate_vdefault")
+        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user WHERE "cur_user" = current_user AND parameter = '+"'builtdate_vdefault'"
+        row = self.dao.get_row(sql)
+        if row is not None:
+            utils_giswater.setCalendarDate(self.builtdate_vdefault, datetime.strptime(row[0], '%Y-%m-%d'))
+        else:
+            self.builtdate_vdefault.setDate(QDate.currentDate())
+
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_arc ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("arccat_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_node ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("nodecat_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_connec ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("connecat_vdefault", rows)
+
+        # QComboBox Ud
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".node_type ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("nodetype_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".arc_type ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("arctype_vdefault", rows)
+        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".connec_type ORDER BY id"
+        rows = self.dao.get_rows(sql)
+        utils_giswater.fillComboBox("connectype_vdefault", rows)
+
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
+        rows = self.dao.get_rows(sql)
+        for row in rows:
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+            utils_giswater.setChecked("chk_"+str(row[0]), True)
+
+        sql = "SELECT name FROM "+self.schema_name + ".value_state WHERE id::text = "
+        sql += "(SELECT value FROM "+self.schema_name + ".config_param_user WHERE parameter ='state_vdefault')::text"
+        rows = self.dao.get_rows(sql)
+        if rows:
+            utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
+
+        if self.project_type == 'ws':
+            self.dlg_config_edit.chk_nodetype_vdefault.setEnabled(False)
+            self.dlg_config_edit.chk_arctype_vdefault.setEnabled(False)
+            self.dlg_config_edit.chk_connectype_vdefault.setEnabled(False)
+            self.dlg_config_edit.nodetype_vdefault.setEnabled(False)
+            self.dlg_config_edit.arctype_vdefault.setEnabled(False)
+            self.dlg_config_edit.connectype_vdefault.setEnabled(False)
+
+        self.dlg_config_edit.exec_()
+
+
+
+    def mg_config_edit_accept(self):
+        if utils_giswater.isChecked(self.chk_state_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.state_vdefault, "state_vdefault", "config_param_user")
+        else:
+            self.delete_row("state_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_workcat_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.workcat_vdefault, "workcat_vdefault", "config_param_user")
+        else:
+            self.delete_row("workcat_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_verified_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.verified_vdefault, "verified_vdefault", "config_param_user")
+        else:
+            self.delete_row("verified_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_builtdate_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
+        else:
+            self.delete_row("builtdate_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_arccat_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.arccat_vdefault, "arccat_vdefault", "config_param_user")
+        else:
+            self.delete_row("arccat_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_nodecat_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.nodecat_vdefault, "nodecat_vdefault", "config_param_user")
+        else:
+            self.delete_row("nodecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_connecat_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.connecat_vdefault, "connecat_vdefault", "config_param_user")
+        else:
+            self.delete_row("connecat_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_nodetype_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
+        else:
+            self.delete_row("nodetype_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_arctype_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.arctype_vdefault, "arctype_vdefault", "config_param_user")
+        else:
+            self.delete_row("arctype_vdefault", "config_param_user")
+        if utils_giswater.isChecked(self.chk_connectype_vdefault):
+            self.insert_or_update_config_param_curuser(self.dlg_config_edit.connectype_vdefault, "connectype_vdefault", "config_param_user")
+        else:
+            self.delete_row("connectype_vdefault", "config_param_user")
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message')
+        self.dlg_config_edit.close()
+
+    '''
     # Like def mf_config_get_date(....): but for multi user
     def new_mg_config_get_data(self,tablename):
         # Like def mf_config_get_date(....): but for multi user
-
         sql = 'SELECT * FROM ' + self.schema_name + "." + tablename +' WHERE "user"=current_user'
         rows = self.dao.get_rows(sql)
         if not rows:
@@ -689,10 +1004,10 @@ class Mg(ParentAction):
             utils_giswater.setChecked("chk_" + str(i[1]), True)
             columns.append(str(i[1]))
         return columns
-
+    '''
 
     def open_file_dialog(self, widget):
-        ''' Open File Dialog '''
+        """ Open File Dialog """
 
         # Set default value from QLine
         self.file_path = utils_giswater.getWidgetText(widget)
@@ -720,10 +1035,10 @@ class Mg(ParentAction):
 
 
     def open_web_browser(self, widget):
-        ''' Display url using the default browser '''
+        """ Display url using the default browser """
 
         url = utils_giswater.getWidgetText(widget)
-        if url == 'null' :
+        if url == 'null':
             url = 'www.giswater.org'
             webbrowser.open(url)
         else :
@@ -731,7 +1046,7 @@ class Mg(ParentAction):
 
                  
     def mg_config_get_data(self, tablename):                
-        ''' Get data from selected table '''
+        """ Get data from selected table """
 
         sql = "SELECT *"
         sql+= " FROM "+self.schema_name+"."+tablename
@@ -753,9 +1068,9 @@ class Mg(ParentAction):
 
         return columns
 
-
+    '''
     def mg_config_accept(self):
-        ''' Update current values to the configuration tables '''
+        """ Update current values to the configuration tables """
         #self.mg_config_accept_table('config', self.generic_columns)
 
         self.mg_config_accept_table('config_search_plus', self.search_plus_columns)
@@ -764,96 +1079,34 @@ class Mg(ParentAction):
         self.om_visit_absolute_path = utils_giswater.getWidgetText("om_visit_absolute_path")
         self.doc_absolute_path = utils_giswater.getWidgetText("doc_absolute_path")
 
-        sql = "UPDATE "+self.schema_name+".config_param_text "
+        sql = "UPDATE "+self.schema_name+".config_param_system "
         sql+= " SET value = '"+self.om_visit_absolute_path+"'"
-        sql+= " WHERE id = 'om_visit_absolute_path'"
+        sql+= " WHERE parameter = 'om_visit_absolute_path'"
         self.controller.execute_sql(sql)
 
-        sql = "UPDATE "+self.schema_name+".config_param_text "
+        sql = "UPDATE "+self.schema_name+".config_param_system "
         sql+= " SET value = '"+self.doc_absolute_path +"'"
-        sql+= " WHERE id = 'doc_absolute_path'"
+        sql+= " WHERE parameter = 'doc_absolute_path'"
         self.controller.execute_sql(sql)
 
         # Show message, insert in DB and close form
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
-        if utils_giswater.isChecked(self.chk_state_vdefault):
-            self.insert_or_update_config_vdefault(self.state_vdefault, "state_vdefault")
-        else:
-            self.delete_row("state_vdefault")
-        if utils_giswater.isChecked(self.chk_psector_vdefault):
-            self.insert_or_update_config_vdefault(self.psector_vdefault, "psector_vdefault")
-        else:
-            self.delete_row("psector_vdefault")
-        if utils_giswater.isChecked(self.chk_workcat_vdefault):
-            self.insert_or_update_config_vdefault(self.workcat_vdefault, "workcat_vdefault")
-        else:
-            self.delete_row("workcat_vdefault")
-        if utils_giswater.isChecked(self.chk_cverified_vdefault):
-            self.insert_or_update_config_vdefault(self.verified_vdefault, "verified_vdefault")
-        else:
-            self.delete_row("verified_vdefault")
 
-        if utils_giswater.isChecked(self.chk_builtdate_vdefault):
-            self.insert_or_update_config_vdefault(self.builtdate_vdefault, "builtdate_vdefault")
-        else:
-            self.delete_row("builtdate_vdefault")
-
-        if utils_giswater.isChecked(self.chk_arccat_vdefault):
-            self.insert_or_update_config_vdefault(self.arccat_vdefault, "arccat_vdefault")
-        else:
-            self.delete_row("arccat_vdefault")
-        if utils_giswater.isChecked(self.chk_nodecat_vdefault):
-            self.insert_or_update_config_vdefault(self.nodecat_vdefault, "nodecat_vdefault")
-        else:
-            self.delete_row("nodecat_vdefault")
-        if utils_giswater.isChecked(self.chk_connecat_vdefault):
-            self.insert_or_update_config_vdefault(self.connecat_vdefault, "connecat_vdefault")
-        else:
-            self.delete_row("connecat_vdefault")
 
         self.close_dialog(self.dlg)
+    '''
 
-
-    def delete_row(self,  parameter):
-        sql='DELETE FROM '+ self.schema_name + '.config_vdefault WHERE "user"=current_user and parameter='+"'"+ parameter+"'"
+    def delete_row(self,  parameter, tablename):
+        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename + ' WHERE "cur_user"=current_user and parameter='+"'" + parameter+"'"
         self.controller.execute_sql(sql)
 
 
-    def insert_or_update_config_vdefault(self, widget, parameter):
 
-        sql = 'SELECT * FROM '+ self.schema_name + '.config_vdefault WHERE "user" = current_user'
-        rows=self.controller.get_rows(sql)
-        self.exist = False
-        if type(widget) == QDateEdit:
-            if widget.date() != "":
-                for row in rows:
-                    if row[1] == parameter:
-                        self.exist = True
-                if self.exist:
-                    sql = "UPDATE " + self.schema_name + ".config_vdefault SET value='" + widget.date().toString('yyyy-MM-dd') + "'"
-                    sql += " WHERE parameter='"+parameter+"'"
-                    self.controller.execute_sql(sql)
-                else:
-                    sql = 'INSERT INTO ' + self.schema_name + '.config_vdefault (parameter, value, "user")'
-                    sql += " VALUES ('" + parameter + "', '" + widget.date().toString('yyyy-MM-dd') + "', current_user)"
-                    self.controller.execute_sql(sql)
-        elif widget.currentText() != "":
-            for row in rows:
-                if row[1] == parameter:
-                    self.exist = True
-            if self.exist:
-                sql = "UPDATE " + self.schema_name + ".config_vdefault SET value='" + widget.currentText() + "'"
-                sql += " WHERE parameter='" + parameter + "'"
-                self.controller.execute_sql(sql)
-            else:
-                sql = 'INSERT INTO ' + self.schema_name + '.config_vdefault (parameter, value, "user")'
-                sql += " VALUES ('"+parameter+"', '" + widget.currentText() + "', current_user)"
-                self.controller.execute_sql(sql)
 
 
     def mg_config_accept_table(self, tablename, columns):
-        ''' Update values of selected 'tablename' with the content of 'columns' '''
+        """ Update values of selected 'tablename' with the content of 'columns' """
         
         if columns is not None:
             sql = "UPDATE "+self.schema_name+"."+tablename+" SET "
@@ -879,7 +1132,7 @@ class Mg(ParentAction):
                        
        
     def multi_selector(self, table):  
-        ''' Execute form multi_selector ''' 
+        """ Execute form multi_selector """
         
         # Create the dialog and signals
         self.dlg_multi = Multi_selector()
@@ -1028,7 +1281,7 @@ class Mg(ParentAction):
 
 
     def fill_insert_menu(self,table):
-        ''' Insert menu on QPushButton->QMenu'''
+        """ Insert menu on QPushButton->QMenu"""
 
         self.menu.clear()
         sql = "SELECT id FROM "+self.schema_name+".value_state"
@@ -1046,7 +1299,7 @@ class Mg(ParentAction):
 
 
     def insert(self, id_action, table):
-        ''' On action(select value from menu) execute SQL '''
+        """ On action(select value from menu) execute SQL """
 
         # Insert value into database
         sql = "INSERT INTO "+self.schema_name+"."+table+" (id) "
@@ -1056,7 +1309,7 @@ class Mg(ParentAction):
 
 
     def delete_records(self, widget, table_name):
-        ''' Delete selected elements of the table '''
+        """ Delete selected elements of the table """
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
@@ -1115,7 +1368,7 @@ class Mg(ParentAction):
 
 
     def close_dialog_multi(self, dlg=None):
-        ''' Close dialog '''
+        """ Close dialog """
 
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg_multi
@@ -1126,8 +1379,8 @@ class Mg(ParentAction):
 
 
     def fill_table(self, widget, table_name):
-        ''' Set a model with selected filter.
-        Attach that model to selected table '''
+        """ Set a model with selected filter.
+        Attach that model to selected table """
 
         # Set model
         model = QSqlTableModel();
@@ -1436,12 +1689,12 @@ class Mg(ParentAction):
 
 
     def close(self, dlg = None):
-        ''' Close dialog '''
+        """ Close dialog """
         dlg.close()
 
 
     def mg_dimensions(self):
-        ''' Button_39: Dimensioning '''
+        """ Button_39: Dimensioning """
 
         layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
         self.iface.setActiveLayer(layer)
@@ -1451,7 +1704,7 @@ class Mg(ParentAction):
 
 
     def mg_new_psector(self, psector_id=None, enable_tabs=False):
-        ''' Button_45 : New psector '''
+        """ Button_45 : New psector """
         
         # Create the dialog and signals
         self.dlg_new_psector = Plan_psector()
@@ -1754,7 +2007,7 @@ class Mg(ParentAction):
 
 
     def mg_psector_mangement(self):
-        ''' Button_46 : Psector management '''
+        """ Button_46 : Psector management """
 
         # psm es abreviacion de psector_management
         # Create the dialog and signals
@@ -2000,4 +2253,3 @@ class Mg(ParentAction):
         model.setQuery(query)
         qtable.setModel(model)
         qtable.show()
-
