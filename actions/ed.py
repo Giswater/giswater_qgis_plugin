@@ -533,14 +533,22 @@ class Ed(ParentAction):
         if field_id is None:
             self.controller.show_info("Current active layer is different than slected features")
             return
-
         # Get selected features
         features = self.layer.selectedFeatures()
         for feature in features:
             elem_id = feature.attribute(field_id)
-            sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
-            sql += " VALUES ('"+elem_id+"', '"+value_id+"')"
-            self.controller.execute_sql(sql)
+
+            q = "SELECT * FROM "+self.schema_name+"."+table_name+"_x_"+elem_type+" WHERE "+field_id + " ='"+elem_id+"'"
+            q += " AND " + value_id + "= "+table_name+"_id"
+            row = self.dao.get_rows(q)
+            self.controller.log_info(str(table_name+"_x_"+elem_type))
+            self.controller.log_info(str(row))
+            if row is None or len(row) == 0:
+                sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
+                sql += " VALUES ('"+elem_id+"', '"+value_id+"')"
+                self.controller.log_info(str(sql))
+                self.controller.execute_sql(sql)
+
             
                           
     def ed_add_file_accept(self): 
