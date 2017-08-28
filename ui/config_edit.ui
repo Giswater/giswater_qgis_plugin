@@ -333,7 +333,7 @@
         <number>3</number>
        </property>
       </widget>
-      <widget class="QCheckBox" name="chk_cverified_vdefault">
+      <widget class="QCheckBox" name="chk_verified_vdefault">
        <property name="geometry">
         <rect>
          <x>200</x>
@@ -607,7 +607,7 @@
         <rect>
          <x>190</x>
          <y>50</y>
-         <width>20</width>
+         <width>16</width>
          <height>21</height>
         </rect>
        </property>
@@ -666,7 +666,7 @@
         <rect>
          <x>190</x>
          <y>80</y>
-         <width>20</width>
+         <width>16</width>
          <height>21</height>
         </rect>
        </property>

@@ -131,7 +131,7 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Management toolbar actions
-                if int(index_action) in (01, 02, 19, 25, 27, 28, 39, 41, 45, 46, 47, 48, 99):
+                if int(index_action) in (01, 02, 19, 25, 27, 28, 39, 41, 45, 46, 47, 48, 98, 99):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)
                 # Edit toolbar actions
@@ -297,7 +297,7 @@ class Giswater(QObject):
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
         # Set an action list for every toolbar    
-        list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','39','41','43','45','46','47','48','99','56','57']
+        list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','39','41','43','45','46','47','48','56','57','98','99']
         list_actions_ed = ['30','31','32','33','34','35','36','52']
                 
         # MANAGEMENT toolbar 
