@@ -11,7 +11,7 @@ from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
+from PyQt4.QtGui import QFileDialog, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QTabWidget, QDoubleValidator
 from PyQt4.Qt import QDate, QTime
 
 from datetime import datetime
@@ -27,7 +27,6 @@ import utils_giswater
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config import Config                                  # @UnresolvedImport
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
-from ..ui.table_wizard import TableWizard                       # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
 from ..ui.multiexpl_selector import Multiexpl_selector          # @UnresolvedImport
@@ -155,107 +154,6 @@ class Mg(ParentAction):
 
         # Refresh map canvas
         self.iface.mapCanvas().refresh()
-
-
-    def mg_table_wizard(self):
-        ''' Button 21. WS/UD table wizard 
-        Create dialog to select CSV file and table to import contents to '''
-
-        # Uncheck all actions (buttons) except this one
-        self.controller.check_actions(False)
-        self.controller.check_action(True, 21)
-
-        # Get CSV file path from settings file 
-        self.file_csv = self.controller.plugin_settings_value('file_csv')
-        if self.file_csv is None:
-            self.file_csv = self.plugin_dir+"/test.csv"
-
-        # Create dialog
-        self.dlg = TableWizard()
-        self.dlg.txt_file_path.setText(self.file_csv)
-
-        # Fill combo 'table' 
-        self.mg_table_wizard_get_tables()
-
-        # Set signals
-        self.dlg.btn_select_file.clicked.connect(self.mg_table_wizard_select_file)
-        self.dlg.btn_import_csv.clicked.connect(self.mg_table_wizard_import_csv)
-
-        # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg, 'table_wizard')
-        self.dlg.exec_()
-
-
-    def mg_table_wizard_get_tables(self):
-        ''' Get available tables from configuration table 'config_csv_import' '''
-
-        self.table_dict = {}
-        self.dlg.cbo_table.addItem('', '')
-        sql = "SELECT gis_client_layer_name, table_name"
-        sql+= " FROM "+self.schema_name+".config_csv_import"
-        sql+= " ORDER BY gis_client_layer_name"
-        rows = self.dao.get_rows(sql)
-        if rows:
-            for row in rows:
-                elem = [row[0], row[1]]
-                self.table_dict[row[0]] = row[1]
-                self.dlg.cbo_table.addItem(row[0], elem)
-        else:
-            self.controller.show_warning("Table 'config_csv_import' is empty")
-
-
-    def mg_table_wizard_select_file(self):
-
-        # Set default value if necessary
-        if self.file_csv == '':
-            self.file_csv = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_csv)
-        os.chdir(folder_path)
-        msg = "Select CSV file"
-        self.file_csv = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "", '*.csv')
-        self.dlg.txt_file_path.setText(self.file_csv)
-
-        # Save CSV file path into settings
-        self.controller.plugin_settings_set_value('file_csv', self.file_csv)
-
-
-    def mg_table_wizard_import_csv(self):
-
-        # Get selected table, delimiter, and header
-        alias = utils_giswater.getWidgetText(self.dlg.cbo_table)
-        if not alias:
-            self.controller.show_warning("Any table has been selected", context_name='ui_message')
-            return False
-
-        table_name = self.table_dict[alias]
-        delimiter = utils_giswater.getWidgetText(self.dlg.cbo_delimiter)
-        header_status = self.dlg.chk_header.checkState()
-
-        # Get CSV file. Check if file exists
-        self.file_csv = self.dlg.txt_file_path.toPlainText()
-        if not os.path.exists(self.file_csv):
-            message = "Selected file not found: "+self.file_csv
-            self.controller.show_warning(message, context_name='ui_message')
-            return False
-
-        # Open CSV file for read and copy into database
-        rf = open(self.file_csv)
-        sql = "COPY "+self.schema_name+"."+table_name+" FROM STDIN WITH CSV"
-        if header_status == Qt.Checked:
-            sql+= " HEADER"
-        sql+= " DELIMITER AS '"+delimiter+"'"
-        status = self.dao.copy_expert(sql, rf)
-        if status:
-            self.dao.rollback()
-            msg = "Cannot import CSV into table "+table_name+". Reason:\n"+str(status).decode('utf-8')
-            QMessageBox.warning(None, "Import CSV", self.controller.tr(msg))
-            return False
-        else:
-            self.dao.commit()
-            message = "Selected CSV has been imported successfully"
-            self.controller.show_info(message, context_name='ui_message')
 
 
     def mg_result_selector(self):
