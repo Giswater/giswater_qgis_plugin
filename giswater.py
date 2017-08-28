@@ -118,7 +118,6 @@ class Giswater(QObject):
     def set_signals(self): 
         ''' Define widget and event signals '''
         self.iface.projectRead.connect(self.project_read)                
-        self.iface.legendInterface().currentLayerChanged.connect(self.current_layer_changed) 
 
   
     def tr(self, message):
@@ -660,8 +659,9 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
-        # Set SRID from table node
-        self.manage_srid(self.schema_name)
+        # Get SRID from table node
+        self.srid = self.dao.get_srid(self.schema_name, self.table_node)
+        self.controller.plugin_settings_set_value("srid", self.srid)           
 
         # Search project type in table 'version'
         self.search_project_type()
@@ -671,9 +671,8 @@ class Giswater(QObject):
         # Set layer custom UI form and init function   
         if self.load_custom_forms:
             self.manage_custom_forms()
-
-        # Manage current layer selected     
-        self.current_layer_changed(self.iface.activeLayer())   
+            
+        self.custom_enable_actions()           
         
         # Set objects for map tools classes
         self.manage_map_tools()
@@ -682,18 +681,7 @@ class Giswater(QObject):
         self.set_search_plus()
         
         # Delete python compiled files
-        self.delete_pyc_files()
-                  
-              
-    def manage_srid(self, schema_name):
-        ''' Find SRID of selected schema '''
-        
-        schema_name = schema_name.replace('"', '')        
-        sql = "SELECT Find_SRID('"+schema_name+"', '"+self.table_node+"', 'the_geom');"
-        row = self.dao.get_row(sql)
-        if row:
-            self.srid = row[0]   
-            self.controller.plugin_settings_set_value("srid", self.srid)      
+        self.delete_pyc_files()  
                 
                       
     def manage_custom_forms(self):
@@ -835,133 +823,7 @@ class Giswater(QObject):
         except RuntimeError as e:
             self.controller.show_warning("Error setting searchplus button: "+str(e))
             self.actions['32'].setVisible(False)         
-            
-                   
-    def current_layer_changed(self, layer):
-        ''' Manage new layer selected '''
-
-        # Disable all actions (buttons)
-        self.enable_actions(False)
-        self.custom_enable_actions()     
-        
-        if layer is None:
-            layer = self.iface.activeLayer() 
-            if layer is None:
-                return            
-
-        # Check is selected layer is 'arc', 'node', 'connec' or 'gully'
-        setting_name = None
-        layer_source = self.controller.get_layer_source(layer)  
-        uri_table = layer_source['table']
-        if uri_table is not None:
-            
-            # buttons_arc            
-            if self.table_arc in uri_table:  
-                setting_name = 'buttons_arc'
-            elif self.table_varc in uri_table:  
-                setting_name = 'buttons_arc'  
-            elif self.table_siphon in uri_table:  
-                setting_name = 'buttons_arc' 
-            elif self.table_conduit in uri_table:  
-                setting_name = 'buttons_arc'   
-            elif self.table_waccel in uri_table:  
-                setting_name = 'buttons_arc'     
-            elif self.table_pipe in uri_table:  
-                setting_name = 'buttons_arc'    
-                                
-            # buttons_node
-            elif self.table_node in uri_table:  
-                setting_name = 'buttons_node'
-            elif self.table_tank in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_pump in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_source in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_meter in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_junction in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_waterwell in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_reduction in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_hydrant in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_valve in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_manhole in uri_table:  
-                setting_name = 'buttons_node'   
-            elif self.table_filter in uri_table:  
-                setting_name = 'buttons_node'
-            elif self.table_chamber in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_chamber_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_netgully in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_netgully_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_netinit in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_wjump in uri_table:  
-                setting_name = 'buttons_node'   
-            elif self.table_wwtp in uri_table:  
-                setting_name = 'buttons_node'     
-            elif self.table_wwtp_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_storage in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_storage_pol in uri_table:  
-                setting_name = 'buttons_node'  
-            elif self.table_outfall in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_register in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_netwjoin in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_expansiontank in uri_table:  
-                setting_name = 'buttons_node' 
-            elif self.table_flexunion in uri_table:  
-                setting_name = 'buttons_node'                
-            
-            # buttons_connec
-            elif self.table_connec in uri_table:  
-                setting_name = 'buttons_connec' 
-            elif self.table_wjoin in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_page in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_greentap in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_fountain in uri_table:  
-                setting_name = 'buttons_connec'
-            elif self.table_tap in uri_table:  
-                setting_name = 'buttons_connec'
-                
-            # buttons_gully
-            elif self.table_gully in uri_table:  
-                setting_name = 'buttons_gully' 
-            elif self.table_pgully in uri_table:  
-                setting_name = 'buttons_gully' 
-        
-        if setting_name is not None:
-            try:
-                list_index_action = self.settings.value('layers/'+setting_name, None)
-                if list_index_action:
-                    if type(list_index_action) is list:
-                        for index_action in list_index_action:
-                            if index_action != '-1' and str(index_action) in self.actions:
-                                self.actions[index_action].setEnabled(True)
-                    elif type(list_index_action) is unicode:
-                        index_action = str(list_index_action)
-                        if index_action != '-1' and str(index_action) in self.actions:
-                            self.actions[index_action].setEnabled(True)                
-            except AttributeError:
-                pass
-            except KeyError:
-                pass
-    
+               
         
     def custom_enable_actions(self):
         ''' Enable selected actions '''
