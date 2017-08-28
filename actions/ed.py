@@ -540,10 +540,10 @@ class Ed(ParentAction):
 
             q = "SELECT * FROM "+self.schema_name+"."+table_name+"_x_"+elem_type+" WHERE "+field_id + " ='"+elem_id+"'"
             q += " AND " + value_id + "= "+table_name+"_id"
-            row = self.dao.get_rows(q)
+            row = self.dao.get_row(q)
             self.controller.log_info(str(table_name+"_x_"+elem_type))
             self.controller.log_info(str(row))
-            if row is None or len(row) == 0:
+            if row is None:
                 sql = "INSERT INTO "+self.schema_name+"."+table_name+"_x_"+elem_type+" ("+field_id+", "+table_name+"_id) "
                 sql += " VALUES ('"+elem_id+"', '"+value_id+"')"
                 self.controller.log_info(str(sql))
