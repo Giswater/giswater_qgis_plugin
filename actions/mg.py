@@ -654,7 +654,10 @@ class Mg(ParentAction):
             self.insert_or_update_config_param_curuser(self.dlg_config_master.psector_vdefault, "psector_vdefault", "config_param_user")
         else:
             self.delete_row("psector_vdefault", "config_param_user")
-        self.update_conf_param_master(True,  "config", self.dlg_config_master)
+        self.update_conf_param_master(True,  "config",  self.dlg_config_master)
+
+        self.insert_or_update_config_param(self.dlg_config_master.om_visit_absolute_path, "om_visit_absolute_path", "config_param_system")
+        self.insert_or_update_config_param(self.dlg_config_master.doc_absolute_path, "doc_absolute_path", "config_param_system")
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
         self.dlg_config_master.close()
@@ -770,6 +773,23 @@ class Mg(ParentAction):
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
+        self.controller.execute_sql(sql)
+
+    def insert_or_update_config_param(self, widget, parameter, tablename):
+        """ Insert or update values in tables with out current_user control """
+
+        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename
+        rows = self.controller.get_rows(sql)
+        exist_param = False
+        for row in rows:
+            if row[1] == parameter:
+                exist_param = True
+        if exist_param:
+            sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
+            sql += "'" + widget.text() + "' WHERE parameter='" + parameter + "'"
+        else:
+            sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value)'
+            sql += " VALUES ('" + parameter + "', "+ widget.text() + "'))"
         self.controller.execute_sql(sql)
 
 
