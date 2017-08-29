@@ -215,8 +215,12 @@
 
 <context>
 
-    <name>ws_node</name>
+    <name>ws_man_node</name>
     
+    <message>
+        <source>label_node_id</source>
+        <translation>Node:</translation>
+    </message>            
     <message>
         <source>label_elevation</source>
         <translation>Elevation</translation>
@@ -848,15 +852,15 @@
 
  <context>
  
-    <name>ws_arc</name>
+    <name>ws_man_arc</name>
     
     <message>
-        <source>label_arc_node_1</source>
-        <translation>Node 1</translation>
+        <source>label_pipe_node_1</source>
+        <translation>Node 1:</translation>
     </message>  
     <message>
-        <source>label_arc_node_2</source>
-        <translation>Node 2</translation>
+        <source>label_pipe_node_2</source>
+        <translation>Node 2:</translation>
     </message>  
     <message>
         <source>label_arc_sector_id</source>
