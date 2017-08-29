@@ -32,10 +32,10 @@ class Dimensions(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
         ''' Constructor class '''
-        
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        dialog.parent().setFixedSize(320, 410)
+        if dialog.parent():        
+            dialog.parent().setFixedSize(320, 410)
         
         
     def init_config_form(self):

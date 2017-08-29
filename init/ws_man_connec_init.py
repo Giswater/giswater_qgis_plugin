@@ -41,7 +41,8 @@ class ManConnecDialog(ParentDialog):
         ''' Constructor class '''
         super(ManConnecDialog, self).__init__(dialog, layer, feature)
         self.init_config_form()
-        dialog.parent().setFixedSize(620,675)
+        if dialog.parent():        
+            dialog.parent().setFixedSize(620, 675)
 
         
     def init_config_form(self):

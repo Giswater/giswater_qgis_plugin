@@ -47,7 +47,8 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        dialog.parent().setFixedSize(625, 720)
+        if dialog.parent():
+            dialog.parent().setFixedSize(625, 720)
         
         
     def init_config_form(self):

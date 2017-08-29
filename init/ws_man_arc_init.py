@@ -36,7 +36,8 @@ class ManArcDialog(ParentDialog):
         ''' Constructor class '''
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        dialog.parent().setFixedSize(625, 685)
+        if dialog.parent():        
+            dialog.parent().setFixedSize(625, 685)
 
 
     def init_config_form(self):
