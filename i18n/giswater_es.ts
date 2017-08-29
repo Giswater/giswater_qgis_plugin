@@ -794,10 +794,6 @@
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_event_element_event_type</source>
-        <translation>Event:</translation>
-    </message>  
-    <message>
         <source>label_log_node_to</source>
         <translation>to</translation>
     </message>  
@@ -3405,7 +3401,8 @@
     <message>
         <source>Date interval not valid!</source>
         <translation>Date interval not valid!</translation>
-    </message>       
+    </message> 
+    <message>    
         <source>This id already exists</source>
         <translation>Este id ya existe</translation>
     </message>

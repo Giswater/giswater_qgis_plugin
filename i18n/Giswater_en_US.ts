@@ -794,10 +794,6 @@
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_event_element_event_type</source>
-        <translation>Event:</translation>
-    </message>  
-    <message>
         <source>label_log_node_to</source>
         <translation>to</translation>
     </message>  
@@ -3390,6 +3386,7 @@
         <source>You are trying to enter different types</source>
         <translation>You are trying to enter different types</translation>
     </message>
+    <message>    
         <source>Cannot get giswater folder from windows registry at: </source>
         <translation>Cannot get giswater folder from windows registry at: </translation>
     </message>   
