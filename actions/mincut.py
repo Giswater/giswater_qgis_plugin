@@ -86,9 +86,19 @@ class MincutParent(ParentAction):
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
 
+        self.init_config_form()
+
+
+    def init_config_form(self):
+        ''' Custom form initial configuration '''
+        #TO DO
+        pass
+
 
     def mg_mincut(self):
         ''' Btn 26 - New Mincut '''
+
+        self.action = "mg_mincut"
 
         self.canvas = self.iface.mapCanvas()
         # Create the appropriate map tool and connect the gotPoint() signal.
@@ -117,7 +127,7 @@ class MincutParent(ParentAction):
         self.btn_accept_main = self.dlg.findChild(QPushButton, "btn_accept")
         self.btn_cancel_main = self.dlg.findChild(QPushButton, "btn_cancel")
 
-        self.btn_accept_main.clicked.connect(self.accept_save_data)
+        self.btn_accept_main.clicked.connect(partial(self.accept_save_data,self.action))
         self.btn_cancel_main.clicked.connect(self.dlg.close)
 
         # Fill widgets
@@ -264,7 +274,10 @@ class MincutParent(ParentAction):
         self.dlg_fin.show()
 
 
-    def accept_save_data(self):
+    def accept_save_data(self,action):
+
+        message = str(action)
+        self.controller.show_warning(message, context_name='ui_message')
 
         anl_cause = " "
         mincut_result_state = self.state.text()
@@ -306,24 +319,46 @@ class MincutParent(ParentAction):
 
         mincut_result_state = "1"
 
-        # Insert data to DB
-        sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript)"
-        sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "')"
-        status = self.controller.execute_sql(sql)
-        if status:
-            message = "Values has been updated"
-            self.controller.show_info(message, context_name='ui_message')
+        if action == "mg_mincut" :
+            # Insert data to DB
+            #sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript)"
+            #sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "')"
 
+            # Insert data to DB
+            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript"
+            if self.btn_end.isEnabled():
+                sql += ",exec_start, exec_end, exec_from_plot, exec_depth, exec_descript)"
+            else :
+                sql += ")"
+            sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "'"
+            if self.btn_end.isEnabled():
+                sql += ",'" + forecast_start_real + "','" + forecast_end_real + "','" + exec_limit_distance + "','" + exec_depth + "','" + exec_descript + "')"
+            else :
+                sql += ")"
 
-        if self.btn_end.isEnabled():
-            message = "active "
-            self.controller.show_warning(message, context_name='ui_message')
-            #sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (exec_start, exec_end, exec_from_plot, exec_depth, exec_descript)"
-            #sql += " VALUES ('" + forecast_start_real + "','" + forecast_end_real + "','" + exec_limit_distance + "','" + exec_depth + "','" + exec_descript + "') WHERE id ='" + id + "'"
-            sql = "UPDATE "+ self.schema_name + ".anl_mincut_result_cat SET exec_start ='" + forecast_start_real + "', exec_end = '" + forecast_end_real + "',exec_from_plot ='" + exec_limit_distance + "',exec_depth='" + exec_depth + "', exec_descript='" + exec_descript + "') WHERE id ='" + id + "'"
-            message = str(sql)
-            self.controller.show_info(message, context_name='ui_message')
             status = self.controller.execute_sql(sql)
+            if status:
+                message = "Values has been updated"
+                self.controller.show_info(message, context_name='ui_message')
+            if not status:
+                message = "Error inserting element in table, you need to review data"
+                self.controller.show_warning(message, context_name='ui_message')
+                return
+
+        elif action == "mg_mincut_menagement" :
+            sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
+            sql += " SET id = '" + id_ + "', mincut_result_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
+                   "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_limit_distance = '" + \
+                   exec_limit_distance + "', forecast_start= '" + forecast_start_predict + "', forecast_end = '" + forecast_end_predict + "', exec_start ='" + forecast_start_real + "', exec_end ='" + forecast_end_real + "' , address ='" + street + "', address_num ='" + number + "', mincut_result_type ='" + mincut_result_type + "', anl_cause ='" + anl_cause + "' "
+            sql += " WHERE id = '" + id_ + "'"
+            status = self.controller.execute_sql(sql)
+            if status:
+                message = "Values has been updated"
+                self.controller.show_info(message, context_name='ui_message')
+            if not status:
+                message = "Error updating element in table, you need to review data"
+                self.controller.show_warning(message, context_name='ui_message')
+                return
 
         self.dlg.close()
 
@@ -962,6 +997,9 @@ class MincutParent(ParentAction):
     def mg_mincut_management(self):
         ''' Btn 27 - Mincut management'''
 
+        self.action = "mg_mincut_management"
+
+
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         utils_giswater.setDialog(self.dlg_min_edit)
@@ -993,8 +1031,8 @@ class MincutParent(ParentAction):
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
 
 
-        #self.btn_accept_min = self.dlg_min_edit.findChild(QPushButton, "btn_accept")
-        #self.btn_accept_min.clicked.connect(self.accept_min)
+        #self.btn_accept_min = self.dlg.findChild(QPushButton, "btn_accept")
+        #self.btn_accept_min.clicked.connect(partial(self.accept_save_data,self.action))
 
         #self.dlg_min_edit.btn_cancel.pressed.connect(partial(self.close, self.dlg_min_edit))
 
