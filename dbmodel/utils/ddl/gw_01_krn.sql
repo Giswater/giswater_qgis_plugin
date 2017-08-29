@@ -274,14 +274,14 @@ the_geom public.geometry(POINT, SRID_VALUE)
 CREATE TABLE "man_type_function" (
 "id" varchar(50) NOT NULL,
 "featurecat_id" varchar(30),
-"observ" varchar(50),
+"observ" varchar(150),
 CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE "man_type_category" (
 "id" varchar(50) NOT NULL,
 "featurecat_id" varchar(30),
-"observ" varchar(50),
+"observ" varchar(150),
 CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 );
 
@@ -289,7 +289,7 @@ CONSTRAINT man_type_category_pkey PRIMARY KEY (id)
 CREATE TABLE "man_type_fluid" (
 "id" varchar(50) NOT NULL,
 "featurecat_id" varchar(30),
-"observ" varchar(50),
+"observ" varchar(150),
 CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 );
 
@@ -297,7 +297,7 @@ CONSTRAINT man_type_fluid_pkey PRIMARY KEY (id)
 CREATE TABLE "man_type_location" (
 "id" varchar(50) NOT NULL,
 "featurecat_id" varchar(30),
-"observ" varchar(50),
+"observ" varchar(150),
 CONSTRAINT man_type_location_pkey PRIMARY KEY (id)
 );
 
