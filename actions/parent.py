@@ -236,3 +236,15 @@ class ParentAction():
         # Set text to QLineEdit
         widget.setText(abs_path[0]+'/')
 
+        
+    def close_dialog(self, dlg=None): 
+        """ Close dialog """
+
+        if dlg is None or type(dlg) is bool:
+            dlg = self.dlg
+        try:
+            dlg.close()
+        except AttributeError:
+            pass
+        
+        

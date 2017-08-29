@@ -38,18 +38,6 @@ class Go2Epa(ParentAction):
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
 
-    def close_dialog(self, dlg=None):
-        """ Close dialog """
-
-        dlg.close()
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass
-
-
     def set_project_type(self, project_type):
         self.project_type = project_type
 

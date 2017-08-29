@@ -80,17 +80,6 @@ class Ed(ParentAction):
         self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')  
         self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')   
         
-
-    def close_dialog(self, dlg=None): 
-        """ Close dialog """
-        
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-        try:
-            dlg.close()
-        except AttributeError:
-            pass    
-                  
             
     def ed_search_plus(self):   
         """ Button 32: Open search plus dialog """
