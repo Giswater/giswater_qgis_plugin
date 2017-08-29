@@ -165,44 +165,30 @@ class Giswater(QObject):
             action = QAction(text, parent) 
             
         else:
-        
+            
             action = QAction(icon, text, parent)  
             
-            # Button add_node: add drop down menu to button in toolbar
-            if self.schema_exists and index_action == '01':
+            # Button add_node or add_arc: add drop down menu to button in toolbar
+            if self.schema_exists and (index_action == '01' or index_action == '02'):
+                
+                if index_action == '01':
+                    geom_type = 'node'
+                elif index_action == '02':
+                    geom_type = 'arc'
+                    
+                # Get list of different node and arc types
                 menu = QMenu()
-                # Get translated type
-                sql = "SELECT DISTINCT(i18n) FROM "+self.schema_name+".node_type_cat_type "    
-                row_id = self.dao.get_rows(sql) 
-                for i in range(0, len(row_id)):
-                    # Get shortcut 
-                    sql = "SELECT DISTINCT(shortcut_key) FROM "+self.schema_name+".node_type_cat_type" 
-                    sql+= " WHERE i18n = '"+str(row_id[i][0])+"'" 
-                    row_shortcut = self.dao.get_rows(sql)
-                    obj_action = QAction(str(row_id[i][0]), self)
-                    obj_action.setShortcut(str(row_shortcut[0][0]))
-                    menu.addAction(obj_action)
-                    obj_action.triggered.connect(partial(self.menu_activate, str(row_id[i][0])))
+                sql = "SELECT i18n, shortcut_key"
+                sql += " FROM "+self.schema_name+"."+geom_type+"_type_cat_type ORDER BY i18n"    
+                rows = self.dao.get_rows(sql)
+                if rows: 
+                    for row in rows:
+                        obj_action = QAction(str(row["i18n"]), self)
+                        obj_action.setShortcut(str(row["shortcut_key"]))
+                        menu.addAction(obj_action)
+                        obj_action.triggered.connect(partial(self.menu_activate, str(row["i18n"])))
                 
                 action.setMenu(menu)
-                
-            # Button add_arc: add drop down menu to button in toolbar
-            elif self.schema_exists and index_action == '02':
-                menu_arc = QMenu()
-                # Get translated type
-                sql = "SELECT DISTINCT(i18n) FROM "+self.schema_name+".arc_type_cat_type "    
-                row_id = self.dao.get_rows(sql) 
-                for i in range(0, len(row_id)):
-                    # Get shortcut 
-                    sql = "SELECT DISTINCT(shortcut_key) FROM "+self.schema_name+".arc_type_cat_type"
-                    sql+= " WHERE i18n = '"+str(row_id[i][0])+"'" 
-                    row_shortcut = self.dao.get_rows(sql)
-                    obj_action = QAction(str(row_id[i][0]), self)
-                    obj_action.setShortcut(str(row_shortcut[0][0]))
-                    menu_arc.addAction(obj_action)
-                    obj_action.triggered.connect(partial(self.menu_activate, str(row_id[i][0])))
-                
-                action.setMenu(menu_arc)  
                   
         if toolbar is not None:
             toolbar.addAction(action)  
