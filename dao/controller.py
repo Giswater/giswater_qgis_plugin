@@ -11,6 +11,7 @@ from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import QgsMessageLog
 
+import os.path
 import subprocess
 from functools import partial
 
@@ -24,14 +25,10 @@ class DaoController():
         self.plugin_name = plugin_name               
         self.iface = iface               
         self.translator = None           
+        self.plugin_dir = None           
         
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name  
-    
-    def set_translator(self, locale_path):
-        self.translator = QTranslator()
-        self.translator.load(locale_path)
-        QCoreApplication.installTranslator(self.translator)
                 
     def tr(self, message, context_name=None):
         if context_name is None:
@@ -427,6 +424,37 @@ class DaoController():
     def log_warning(self, text=None, context_name=None, parameter=None):
         ''' Write warning message into QGIS Log Messages Panel
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.log_message(text, 1, context_name, parameter=parameter)          
+        self.log_message(text, 1, context_name, parameter=parameter)   
+        
+     
+    def add_translator(self, locale_path):
+        """ Add translation file to the list of translation files to be used for translations """
+        if os.path.exists(locale_path):        
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
+            self.log_info("Add translator", parameter=locale_path)            
+            
+                    
+    def manage_translation(self, locale_name, dialog=None):  
+        """ Manage locale and corresponding 'i18n' file """ 
+        
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale')
+        locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
+        # If user locale file not found, set English one by default
+        if not os.path.exists(locale_path):
+            self.log_info("Locale not found", parameter=locale_path)
+            locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_en_US.qm')
+            # If English locale file not found, just log it
+            if not os.path.exists(locale_path):            
+                self.log_info("Locale not found", parameter=locale_path)            
+        
+        # Add translation file
+        self.add_translator(locale_path) 
+        
+        # If dialog is set, then translate form
+        if dialog:
+            self.translate_form(dialog, locale_name)                                 
         
             

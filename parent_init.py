@@ -68,6 +68,7 @@ class ParentDialog(object):
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, iface)
+        self.controller.plugin_dir = self.plugin_dir
         self.controller.set_qgis_settings(self.qgis_settings)  
         status = self.controller.set_database_connection()      
         if not status:
@@ -75,6 +76,9 @@ class ParentDialog(object):
             self.controller.show_warning(message) 
             return 
              
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
+                     
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  

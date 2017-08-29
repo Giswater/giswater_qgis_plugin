@@ -80,6 +80,7 @@ class Giswater(QObject):
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller.plugin_dir = self.plugin_dir        
         self.controller.set_qgis_settings(self.qgis_settings)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
@@ -87,15 +88,8 @@ class Giswater(QObject):
             self.controller.show_warning(msg, 30) 
             return 
         
-        # Set locale
-        locale = QSettings().value('locale/userLocale')
-        locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
-        # If user locale not exists, set English one by default
-        if not os.path.exists(locale_path):
-            self.controller.log_info("Locale not found: "+locale_path)
-            locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_en_US.qm')
-        self.controller.log_info(locale_path)
-        self.controller.set_translator(locale_path)
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
                 
         # Get schema and check if exists
         self.dao = self.controller.dao 
