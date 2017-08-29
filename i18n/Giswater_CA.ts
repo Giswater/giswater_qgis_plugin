@@ -3422,7 +3422,11 @@
         <source>You need to upgrade your version of pg_routing!</source>
         <translation>You need to upgrade your version of pg_routing!</translation>
     </message>
-   
+    <message>
+        <source>Selected schema not found</source>
+        <translation>Esquema seleccionat no existeix</translation>
+    </message>        
+    
 
 </context>
 

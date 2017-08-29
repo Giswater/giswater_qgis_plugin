@@ -6,8 +6,8 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsProject, QCoreApplication, QgsExpressionContextUtils
-from PyQt4.QtCore import QObject, QSettings, QTranslator
+from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
+from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
@@ -62,17 +62,6 @@ class Giswater(QObject):
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
         QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
-
-        # Initialize locale
-        locale = QSettings().value('locale/userLocale')
-        locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
-        # If user locale not exists, load English
-        if not os.path.exists(locale_path):
-            locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_en_US.qm')
-
-        translator = QTranslator()
-        translator.load(locale_path)
-        QCoreApplication.installTranslator(translator)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
@@ -98,9 +87,22 @@ class Giswater(QObject):
             self.controller.show_warning(msg, 30) 
             return 
         
+        # Set locale
+        locale = QSettings().value('locale/userLocale')
+        locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
+        # If user locale not exists, set English one by default
+        if not os.path.exists(locale_path):
+            self.controller.log_info("Locale not found: "+locale_path)
+            locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_en_US.qm')
+        self.controller.log_info(locale_path)
+        self.controller.set_translator(locale_path)
+                
+        # Get schema and check if exists
         self.dao = self.controller.dao 
         self.schema_name = self.controller.get_schema_name()
         self.schema_exists = self.dao.check_schema(self.schema_name)
+        if not self.schema_exists:
+            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
