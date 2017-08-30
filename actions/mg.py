@@ -372,7 +372,6 @@ class Mg(ParentAction):
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'psector_vdefault'"
         row = self.dao.get_row(sql)
         if row:
-            self.controller.show_info(str(row))
             utils_giswater.setChecked(self.chk_psector_enabled, True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         self.mg_options_get_data("config")
@@ -521,7 +520,6 @@ class Mg(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    # self.controller.show_info(str(widget.objectName()))
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
                         sql += "'"+widget.currentText() + "' WHERE parameter='" + parameter + "'"
@@ -1589,7 +1587,6 @@ class Mg(ParentAction):
             for element_id, feat_type in self.list_elemets.items():
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
                 sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
-                self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
             table_view.model().select()
             self.emitPoint.canvasClicked.disconnect()
