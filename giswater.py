@@ -30,6 +30,7 @@ from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
 #from map_tools.dimensions import Dimensions
+from map_tools.replace_node import ReplaceNodeMapTool
 
 from search.search_plus import SearchPlus
 
@@ -251,6 +252,8 @@ class Giswater(QObject):
             #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
                 map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 44:
+                map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 52:
                 map_tool = FlowRegulator(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
@@ -280,7 +283,7 @@ class Giswater(QObject):
                 
         # Set an action list for every toolbar    
         list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','39','41','43','45','46','47','48','56','57','98','99']
-        list_actions_ed = ['30','31','32','33','34','35','36','52']
+        list_actions_ed = ['30','31','32','33','34','35','36','44','52']
                 
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
@@ -769,6 +772,7 @@ class Giswater(QObject):
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
         self.set_map_tool('mg_mincut')
+        self.set_map_tool('mg_replace_node')
         #self.set_map_tool('mg_dimensions')
                 
         
