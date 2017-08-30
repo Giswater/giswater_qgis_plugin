@@ -182,8 +182,8 @@ class ManNodeDialog(ParentDialog):
         rows = self.controller.get_rows(sql)
 
         # TODO: Get absolute path
-        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
-        sql +=" WHERE id = 'doc_absolute_path'"
+        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
 
         self.img_path_list = []
@@ -192,7 +192,7 @@ class ManNodeDialog(ParentDialog):
 
         # Fill 1D array with full path
         if row is None:
-            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
+            message = "Check doc_absolute_path in table config_param_system, value does not exist or is not defined!"
             self.dao.show_warning(message, context_name='ui_message')
             return
         else:

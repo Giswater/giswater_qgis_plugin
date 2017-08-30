@@ -343,7 +343,7 @@ class Mg(ParentAction):
         self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
         self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
 
-        # Get om_visit_absolute_path and doc_absolute_path from config_param_text
+        # Get om_visit_absolute_path and doc_absolute_path from config_param_system
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'om_visit_absolute_path'"
         row = self.dao.get_row(sql)

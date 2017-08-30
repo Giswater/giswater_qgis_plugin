@@ -318,8 +318,8 @@ class ParentDialog(object):
             # Get data from address in memory (pointer)
             self.path = self.tbl_event.selectedIndexes()[0].data()
 
-            sql = "SELECT value FROM "+self.schema_name+".config_param_text"
-            sql+= " WHERE id = 'om_visit_absolute_path'"
+            sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+            sql += " WHERE parameter = 'om_visit_absolute_path'"
             row = self.dao.get_row(sql)
             # Full path= path + value from row
             self.full_path = row[0]+self.path
@@ -360,11 +360,11 @@ class ParentDialog(object):
         inf_text = inf_text[:-2]
         self.path = inf_text 
         
-        sql = "SELECT value FROM "+self.schema_name+".config_param_text"
-        sql +=" WHERE id = 'doc_absolute_path'"
+        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
         if row is None:
-            message = "Check doc_absolute_path in table config_param_text, value does not exist or is not defined!"
+            message = "Check doc_absolute_path in table config_param_system, value does not exist or is not defined!"
             self.controller.show_warning(message, context_name='ui_message')
             return
         else:
@@ -459,9 +459,9 @@ class ParentDialog(object):
         # Set width and alias of visible columns
         columns_to_delete = []
         sql = "SELECT column_index, width, alias, status"
-        sql+= " FROM "+self.schema_name+".config_ui_forms"
-        sql+= " WHERE ui_table = '"+table_name+"'"
-        sql+= " ORDER BY column_index"
+        sql += " FROM "+self.schema_name+".config_client_forms"
+        sql += " WHERE table_id = '"+table_name+"'"
+        sql += " ORDER BY column_index"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
