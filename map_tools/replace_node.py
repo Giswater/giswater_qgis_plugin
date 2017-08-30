@@ -15,8 +15,7 @@ from map_tools.parent import ParentMapTool
 
 
 class ReplaceNodeMapTool(ParentMapTool):
-    ''' Button 44. User select one node.
-    Execute SQL function: 'gw_fct_node_replace' '''
+    ''' Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' '''
 
     def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
@@ -81,7 +80,6 @@ class ReplaceNodeMapTool(ParentMapTool):
             x = event.pos().x()
             y = event.pos().y()
             eventPoint = QPoint(x, y)
-
             snappFeat = None
 
             # Snapping
@@ -110,7 +108,6 @@ class ReplaceNodeMapTool(ParentMapTool):
                 layer = result[0].layer.name()
                 view_name = "v_edit_man_"+layer.lower()
                 message = str(view_name)
-                self.controller.show_warning(message, context_name='ui_message')
 
                 # Show message before executing
                 message = "Are you sure you want to replace selected node with a new one ?"
@@ -126,7 +123,6 @@ class ReplaceNodeMapTool(ParentMapTool):
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refreshAllLayers()
-
                 for layerRefresh in self.iface.mapCanvas().layers():
                     layerRefresh.triggerRepaint()
 
@@ -151,7 +147,7 @@ class ReplaceNodeMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be replaced"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_info(message, context_name='ui_message')
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:

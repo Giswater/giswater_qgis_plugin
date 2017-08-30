@@ -27,8 +27,7 @@ from map_tools.parent import ParentMapTool
 
 
 class DeleteNodeMapTool(ParentMapTool):
-    ''' Button 17. User select one node.
-    Execute SQL function: 'gw_fct_delete_node' '''
+    ''' Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' '''
 
     def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
@@ -72,7 +71,7 @@ class DeleteNodeMapTool(ParentMapTool):
             # Check Arc or Node
             for snapPoint in result:
 
-                exist=self.snapperManager.check_node_group(snapPoint.layer)
+                exist = self.snapperManager.check_node_group(snapPoint.layer)
                 if exist:
                 #if snapPoint.layer.name() == self.layer_node.name():
                     # Get the point
@@ -94,7 +93,6 @@ class DeleteNodeMapTool(ParentMapTool):
             x = event.pos().x()
             y = event.pos().y()
             eventPoint = QPoint(x, y)
-
             snappFeat = None
 
             # Snapping
@@ -121,7 +119,8 @@ class DeleteNodeMapTool(ParentMapTool):
                 node_id = feature.attribute('node_id')
                 
                 # Show message before executing
-                message = "The procedure will delete features on database. Please ensure that features has no undelete value on true. On the other hand you must know that traceability table will storage precedent information."
+                message = "The procedure will delete features on database. Please ensure that features has no undelete value on true." 
+                message+= " On the other hand you must know that traceability table will storage precedent information."
                 self.controller.show_info_box(message, "Info")
                   
                 # Execute SQL function and show result to the user
@@ -130,13 +129,13 @@ class DeleteNodeMapTool(ParentMapTool):
                 status = self.controller.execute_sql(sql)
                 if status:
                     message = "Node deleted successfully"
-                    self.controller.show_info(message, context_name='ui_message' )  
+                    self.controller.show_info(message, context_name='ui_message')  
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refreshAllLayers()
-
                 for layerRefresh in self.iface.mapCanvas().layers():
                     layerRefresh.triggerRepaint()
+
 
     def activate(self):
 
@@ -158,7 +157,7 @@ class DeleteNodeMapTool(ParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be removed"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.show_info(message, context_name='ui_message')
                
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
