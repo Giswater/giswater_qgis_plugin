@@ -35,21 +35,140 @@ class ReplaceNodeMapTool(ParentMapTool):
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
-        # TODO
-        pass
-                
+        
+        # Hide highlight
+        self.vertexMarker.hide()
+
+        # Get the click
+        x = event.pos().x()
+        y = event.pos().y()
+
+        # Plugin reloader bug, MapTool should be deactivated
+        try:
+            eventPoint = QPoint(x, y)
+        except(TypeError, KeyError):
+            self.iface.actionPan().trigger()
+            return
+
+        # Snapping
+        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+        # That's the snapped point
+        if result <> []:
+
+            # Check Arc or Node
+            for snapPoint in result:
+
+                exist = self.snapperManager.check_node_group(snapPoint.layer)
+                if exist:
+                    # if snapPoint.layer.name() == self.layer_node.name():
+                    # Get the point
+                    point = QgsPoint(result[0].snappedVertex)
+
+                    # Add marker
+                    self.vertexMarker.setCenter(point)
+                    self.vertexMarker.show()
+
+                    break
+
 
     def canvasReleaseEvent(self, event):
-        # TODO
-        pass
-                    
+
+        # With left click the digitizing is finished
+        if event.button() == Qt.LeftButton:
+
+            # Get the click
+            x = event.pos().x()
+            y = event.pos().y()
+            eventPoint = QPoint(x, y)
+
+            snappFeat = None
+
+            # Snapping
+            (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+
+            # That's the snapped point
+            if result <> []:
+
+                # Check Arc or Node
+                for snapPoint in result:
+
+                    exist = self.snapperManager.check_node_group(snapPoint.layer)
+                    # if snapPoint.layer.name() == self.layer_node.name():
+                    if exist:
+                        # Get the point
+                        point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
+                        snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                        result[0].layer.select([result[0].snappedAtGeometry])
+                        break
+
+            if snappFeat is not None:
+
+                # Get selected features and layer type: 'node'
+                feature = snappFeat
+                node_id = feature.attribute('node_id')
+                layer = result[0].layer.name()
+                view_name = "v_edit_man_"+layer.lower()
+                message = str(view_name)
+                self.controller.show_warning(message, context_name='ui_message')
+
+                # Show message before executing
+                message = "Are you sure you want to replace selected node with a new one ?"
+                self.controller.show_info_box(message, "Info")
+
+                # Execute SQL function and show result to the user
+                function_name = "gw_fct_node_replace"
+                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','" + str(view_name) + "');"
+                status = self.controller.execute_sql(sql)
+                if status:
+                    message = "Node replaced successfully"
+                    self.controller.show_info(message, context_name='ui_message')
+
+                # Refresh map canvas
+                self.iface.mapCanvas().refreshAllLayers()
+
+                for layerRefresh in self.iface.mapCanvas().layers():
+                    layerRefresh.triggerRepaint()
+
 
     def activate(self):
-        # TODO
-        pass
+
+        # Check button
+        self.action().setChecked(True)
+
+        # Store user snapping configuration
+        self.snapperManager.storeSnappingOptions()
+
+        # Clear snapping
+        self.snapperManager.clearSnapping()
+
+        # Set snapping to node
+        self.snapperManager.snapToNode()
+
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select the node inside a pipe by clicking on it and it will be replaced"
+            self.controller.show_warning(message, context_name='ui_message')
+
+        # Control current layer (due to QGIS bug in snapping system)
+        if self.canvas.currentLayer() == None:
+            self.iface.setActiveLayer(self.layer_node_man[0])
 
 
     def deactivate(self):
-        # TODO
-        pass
+
+        # Check button
+        self.action().setChecked(False)
+
+        # Restore previous snapping
+        self.snapperManager.recoverSnappingOptions()
+
+        # Recover cursor
+        self.canvas.setCursor(self.stdCursor)
+
+        # Removehighlight
+        self.h = None
     
