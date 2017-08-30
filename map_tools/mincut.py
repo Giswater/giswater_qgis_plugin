@@ -18,32 +18,29 @@
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtCore import QPoint, Qt
+from PyQt4.QtGui import QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit, QMenu,  QTableView, QCompleter,QStringListModel, QPixmap, QIcon
+from PyQt4.QtSql import QSqlTableModel
+from PyQt4.Qt import  QDate, QTime
 from qgis.core import QgsPoint, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker
-from PyQt4.QtCore import QPoint, Qt
-from PyQt4.QtGui import QApplication, QColor, QAction, QPushButton, QDateEdit, QTimeEdit, QLineEdit, QComboBox, QTextEdit, QMenu,  QTableView, QCompleter,QStringListModel, QPixmap, QIcon
-from qgis.core import QgsProject,QgsMapLayerRegistry,QgsExpression,QgsFeatureRequest
+from qgis.core import QgsProject,QgsMapLayerRegistry
 
+import os
+from functools import partial
+
+import utils_giswater
 from map_tools.parent import ParentMapTool
 
 from ..ui.mincut import Mincut
 #from ..ui.selector_hydro import SelectorHydro
 from ..ui.mincut_fin import Mincut_fin
 from ..ui.mincut_config import Mincut_config
-from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
+from ..ui.multi_selector import Multi_selector                  
 from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer
-
 from ..ui.flow_regulator import Flow_regulator
 
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
-import utils_giswater
-from functools import partial
-
-from PyQt4.Qt import  QDate, QTime
-
-
-import os
 
 class MincutMapTool(ParentMapTool):
     ''' Button 17. User select one node.
@@ -541,11 +538,6 @@ class MincutMapTool(ParentMapTool):
         model.setStringList(values)
         self.completer.setModel(model)
         
-        # Set signal to reach selected value from QCompleter
-        #self.completer.activated.connect(self.autocomplete)
-        
-       
-        #self.fill_table(self.tbl, self.schema_name+"."+table)
         self.dlg_hydro.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_hydro.show() 
         
@@ -553,29 +545,27 @@ class MincutMapTool(ParentMapTool):
     def fill_table(self, widget, table_name):
         ''' Set a model with selected filter.
         Attach that model to selected table '''
-        expr = ""
+        
         hydro_id = self.hydrometer.text()
         self.hydro_ids.append(hydro_id)
         message = str(self.hydro_ids)
-        self.controller.show_info(message, context_name='ui_message' )
+        self.controller.show_info(message, context_name='ui_message')
         if hydro_id == "":
             message = "You need to enter id"
             self.controller.show_info_box(message, context_name='ui_message')
             return
         expr = "hydrometer_id = '"+self.hydro_ids[0]+"'"
         if len(self.hydro_ids) > 1:
-            for id in range(1,len(self.hydro_ids)):
-                expr +=" OR hydrometer_id = '"+self.hydro_ids[id]+"'"
-        
-        #expr = "hydrometer_id = '368' OR hydrometer_id = '334' OR hydrometer_id = '675'"
+            for id_ in range(1,len(self.hydro_ids)):
+                expr +=" OR hydrometer_id = '"+self.hydro_ids[id_]+"'"
+
         # Set model
         message = str(expr)
-        self.controller.show_info(message, context_name='ui_message' )
+        self.controller.show_info(message, context_name='ui_message')
         
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-
         model.select()
 
         # Check for errors
@@ -584,8 +574,6 @@ class MincutMapTool(ParentMapTool):
 
         # Attach model to table view
         widget.setModel(model)
-        
-        
         widget.model().setFilter(expr)
         widget.model().select()
         
@@ -610,63 +598,45 @@ class MincutMapTool(ParentMapTool):
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
-
         if answer:
-            #self.hydro_ids.append(hydro_id)
-            #if b exists in array
-            #remove b and elements after
-            '''
-            if str(inf_text) in self.hydro_ids:
-                del self.hydro_ids[self.hydro_ids.index(str(inf_text)):]
-            '''
             if str(inf_text) in self.hydro_ids:
                 del self.hydro_ids[self.hydro_ids.index(str(inf_text)):]
 
         # Reload table
-        
         expr = "hydrometer_id = '"+self.hydro_ids[0]+"'"
         if len(self.hydro_ids) > 1:
-            for id in range(1,len(self.hydro_ids)):
-                expr +=" OR hydrometer_id = '"+self.hydro_ids[id]+"'"                
+            for id_ in range(1,len(self.hydro_ids)):
+                expr +=" OR hydrometer_id = '"+self.hydro_ids[id_]+"'"                
         
         widget.model().setFilter(expr)
         widget.model().select()
       
-	  
+
     def exec_hydro(self):
+        
         # delete * from anl_mincut_hydrometer
         sql = "DELETE FROM "+self.schema_name+".anl_mincut_result_hydrometer"
         self.controller.execute_sql(sql)
         
-        for id in self.hydro_ids:
+        for hydro_id in self.hydro_ids:
             #Insert into anl_mincut_hydrometer all selected connecs
             sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_hydrometer (hydrometer_id)"
-            sql+= " VALUES ('"+id+"')"
-            status_insert = self.controller.execute_sql(sql)
-            
-            if status_insert:
-                # Show message to user
-                #message = "Values has been updated"
-                #self.controller.show_info(message, context_name='ui_message')
-                            
+            sql+= " VALUES ('"+hydro_id+"')"
+            status_insert = self.controller.execute_sql(sql) 
+            if status_insert:        
                 # Execute SQL function
                 self.id = self.dlg.findChild(QLineEdit, "id")
                 self.id_text = self.id.text()
                 function_name = "gw_fct_mincut_result_catalog"
                 sql = "SELECT "+self.schema_name+"."+function_name+"('"+self.id_text+"');"
-                        
                 status = self.controller.execute_sql(sql)
-               
-            if status:
-                # Show message to user
-                message = "Values has been updated"
-                self.controller.show_info(message, context_name='ui_message')
-                
-                message = "Execute gw_fct_mincut_result_catalog done successfully"
-                self.controller.show_info(message, context_name='ui_message' )
+                if status:
+                    message = "Execute gw_fct_mincut_result_catalog done successfully"
+                    self.controller.show_info(message, context_name='ui_message' )
         
         
     def config(self):
+        
         # Create the dialog and signals config format
         self.dlg_config = Mincut_config()
         utils_giswater.setDialog(self.dlg_config)
@@ -676,12 +646,10 @@ class MincutMapTool(ParentMapTool):
         self.dlg_multi = Multi_selector()
         utils_giswater.setDialog(self.dlg_multi)
         
-        
         self.tbl_config = self.dlg_multi.findChild(QTableView, "tbl")
-        self.btn_insert =  self.dlg_multi.findChild(QPushButton, "btn_insert")
-        self.btn_delete =  self.dlg_multi.findChild(QPushButton, "btn_delete")
+        self.btn_insert = self.dlg_multi.findChild(QPushButton, "btn_insert")
+        self.btn_delete = self.dlg_multi.findChild(QPushButton, "btn_delete")
        
-
         # Dialog config
         self.btn_analysis_selector = self.dlg_config.findChild(QPushButton, "btn_analysis_selector")  
         self.btn_analysis_selector.clicked.connect(self.analysis_selector)
@@ -691,25 +659,20 @@ class MincutMapTool(ParentMapTool):
         
         self.dlg_config.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_config.open()
-        #self.dlg_config.show()
            
         
     def analysis_selector(self):
      
-        table= "anl_selector_state"
+        table = "anl_selector_state"
         self.fill_table_config(self.tbl_config, self.schema_name+"."+table)
-        self.menu_analysis=QMenu()
-        #self.menu_analysis.clear()
+        self.menu_analysis = QMenu()
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu,table)) 
-
-        #self.menu=QMenu()
-        #self.menu.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_analysis)
-
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))  
 
-        btn_cancel=self.dlg_multi.findChild(QPushButton,"btn_cancel")
+        btn_cancel = self.dlg_multi.findChild(QPushButton, "btn_cancel")
         btn_cancel.pressed.connect(self.dlg_multi.close)
+        
         # Open form
         self.dlg_multi.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_config.close()
@@ -718,21 +681,19 @@ class MincutMapTool(ParentMapTool):
         
     def valve_selector(self):
     
-        table= "man_selector_valve"
+        table = "man_selector_valve"
         self.fill_table_config(self.tbl_config, self.schema_name+"."+table)
         self.menu_valve=QMenu()
-        #self.menu_valve.clear()
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu,table)) 
         
-        btn_cancel=self.dlg_multi.findChild(QPushButton,"btn_cancel")
+        btn_cancel = self.dlg_multi.findChild(QPushButton,"btn_cancel")
         btn_cancel.pressed.connect(self.dlg_multi.close)
-        #self.menu=QMenu()
-        #self.menu_valve.clear()
+
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))  
+        
         # Open form
         self.dlg_config.close()
-        
         self.dlg_multi.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_multi.open()
         
@@ -740,48 +701,40 @@ class MincutMapTool(ParentMapTool):
     def fill_insert_menu(self,table):
         ''' Insert menu on QPushButton->QMenu''' 
 
-        #self.menu.clear()
-
         if table == "anl_selector_state":
             table = "anl_selector_state"
-            #self.menu_analysis.clear()
             sql = "SELECT id FROM "+self.schema_name+".value_state"
             sql+= " ORDER BY id"
             rows = self.controller.get_rows(sql) 
 
             # Fill menu
+            # TODO: variable 'rows' used twice
             for row in rows:   
                 elem = row[0]
                 # If not exist in table _selector_state isert to menu
                 # Check if we already have data with selected id
                 sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
                 rows = self.controller.get_rows(sql)  
-     
-                if not rows:
-                #if rows == None:
+                if not row:
                     self.menu_analysis.addAction(elem,partial(self.insert, elem,table))
-                    #self.menu.addAction(elem,self.test)
                  
-        if table == "man_selector_valve":
+        elif table == "man_selector_valve":
             table = "man_selector_valve"
-            #self.menu_valve.clear()
-            type = "VALVE"
-            sql = "SELECT id FROM "+self.schema_name+".node_type WHERE type = '"+type+"'"
+            node_type = "VALVE"
+            sql = "SELECT id FROM "+self.schema_name+".node_type WHERE type = '"+node_type+"'"
             sql+= " ORDER BY id"
             rows = self.controller.get_rows(sql) 
 
             # Fill menu
+            # TODO: variable 'rows' used twice            
             for row in rows:   
                 elem = row[0]
                 # If not exist in table _selector_state isert to menu
                 # Check if we already have data with selected id
                 sql = "SELECT id FROM "+self.schema_name+"."+table+" WHERE id = '"+elem+"'"    
                 rows = self.controller.get_rows(sql)  
-     
                 if not rows:
-                #if rows == None:
                     self.menu_valve.addAction(elem,partial(self.insert, elem,table))
-                    #self.menu.addAction(elem,self.test)
                     
                     
     def delete_records_config(self, widget, table_name):
@@ -813,6 +766,7 @@ class MincutMapTool(ParentMapTool):
             
     def insert(self, id_action, table):
         ''' On action(select value from menu) execute SQL '''
+        
         # Insert value into database
         sql = "INSERT INTO "+self.schema_name+"."+table+" (id) "
         sql+= " VALUES ('"+id_action+"')"
@@ -842,9 +796,8 @@ class MincutMapTool(ParentMapTool):
     ''' main DIALOG functions'''
     def accept_save_data(self):
         
-        anl_cause = " "
         mincut_result_state = self.state.text() 
-        id = self.id.text()
+        id_ = self.id.text()
         #exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
@@ -856,23 +809,20 @@ class MincutMapTool(ParentMapTool):
 
         #anl_descript = str(utils_giswater.getWidgetText("pred_description")) 
         anl_descript = self.pred_description.toPlainText()
-
-
         exec_limit_distance =  self.distance.text()
         exec_depth =  self.depth.text()
         
         #exec_descript =  str(utils_giswater.getWidgetText("real_description")) 
         exec_descript = self.real_description.toPlainText()
 
-
         # Get prediction date - start
-        dateStart_predict=self.cbx_date_start_predict.date()
-        timeStart_predict=self.cbx_hours_start_predict.time()
-        forecast_start_predict=dateStart_predict.toString('yyyy-MM-dd')+ " "+ timeStart_predict.toString('HH:mm:ss')
+        dateStart_predict = self.cbx_date_start_predict.date()
+        timeStart_predict = self.cbx_hours_start_predict.time()
+        forecast_start_predict = dateStart_predict.toString('yyyy-MM-dd')+ " "+ timeStart_predict.toString('HH:mm:ss')
         
         # Get prediction date - end
-        dateEnd_predict=self.cbx_date_end_predict.date()
-        timeEnd_predict=self.cbx_hours_end_predict.time()
+        dateEnd_predict = self.cbx_date_end_predict.date()
+        timeEnd_predict = self.cbx_hours_end_predict.time()
         forecast_end_predict=dateEnd_predict.toString('yyyy-MM-dd')+ " "+ timeEnd_predict.toString('HH:mm:ss')
         
         # Get real date - start
@@ -885,11 +835,13 @@ class MincutMapTool(ParentMapTool):
         timeEnd_real=self.cbx_hours_end.time()
         forecast_end_real=dateEnd_real.toString('yyyy-MM-dd')+ " "+ timeEnd_real.toString('HH:mm:ss')
 
-        
-        sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat (mincut_result_state,id,address,address_num,mincut_result_type,anl_cause,forecast_start,forecast_end,anl_descript,exec_start,exec_end,exec_limit_distance,exec_depth,exec_descript) "
-        sql+= " VALUES ('"+mincut_result_state+"','"+id+"','"+street+"','"+number+"','"+mincut_result_type+"','"+anl_cause+"','"+forecast_start_predict+"','"+forecast_end_predict+"','"+anl_descript+"','"+forecast_start_real+"','"+forecast_end_real+"','"+exec_limit_distance+"','"+exec_depth+"','"+exec_descript+"')"
+        sql = "INSERT INTO "+self.schema_name+".anl_mincut_result_cat"
+        sql+= " (mincut_result_state, id, address, address_num, mincut_result_type, anl_cause, forecast_start,"
+        sql+= " forecast_end, anl_descript, exec_start, exec_end, exec_limit_distance, exec_depth, exec_descript) "
+        sql+= " VALUES ('"+mincut_result_state+"', '"+id_+"', '"+street+"', '"+number+"', '"+mincut_result_type+"', '"+anl_cause+"', '"+forecast_start_predict+"', '"
+        sql+= forecast_end_predict+"', '"+anl_descript+"', '"+forecast_start_real+"', '"+forecast_end_real+"', '"+exec_limit_distance+"', '"+exec_depth+"', '"+exec_descript+"')"
         status = self.controller.execute_sql(sql)
-        if status :
+        if status:
             message = "Values has been updated"
             self.controller.show_info(message, context_name='ui_message')
                 
@@ -897,9 +849,6 @@ class MincutMapTool(ParentMapTool):
         
         
     def real_start(self):
-       
-        #date=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        #print date
         
         self.date_start = QDate.currentDate()
         self.cbx_date_start.setDate(self.date_start)
@@ -908,7 +857,6 @@ class MincutMapTool(ParentMapTool):
         self.cbx_hours_start.setTime(self.time_start)
         
         self.btn_end.setEnabled(True)  
-
         self.distance.setEnabled(True) 
         self.depth.setEnabled(True) 
         self.real_description.setEnabled(True) 
@@ -925,14 +873,11 @@ class MincutMapTool(ParentMapTool):
         self.time_end = QTime.currentTime()
         self.cbx_hours_end.setTime(self.time_end)
 
-        
         # Create the dialog and signals
         self.dlg_fin = Mincut_fin()
         utils_giswater.setDialog(self.dlg_fin)
         
-     
         self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
-
         self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
         self.cbx_date_start_fin.setDate(self.date_start)
         self.cbx_hours_start_fin.setTime(self.time_start)
@@ -942,13 +887,10 @@ class MincutMapTool(ParentMapTool):
         self.cbx_date_end_fin.setDate(self.date_end)
         self.cbx_hours_end_fin.setTime(self.time_end)   
         
-   
         self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
-        
         self.btn_accept.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
-
         
         # Set values mincut and address
         self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
@@ -969,6 +911,7 @@ class MincutMapTool(ParentMapTool):
         
         
     def accept(self):
+        
         # reach end_date and end_hour from mincut_fin dialog
         datestart = self.cbx_date_start_fin.date()
         timestart = self.cbx_hours_start_fin.time()
@@ -982,16 +925,14 @@ class MincutMapTool(ParentMapTool):
         self.cbx_hours_end.setTime(timeend)
 
         self.dlg_fin.close()
-		
-		
-    def setIcon(widget,icon_indx):
+
+
+    def setIcon(self, widget, icon_indx):
 
         plugin_dir = os.path.dirname(__file__)    
         pic_file = os.path.join(plugin_dir, 'icons', icon_indx+'.png') 
-		
         message = str(pic_file)
         self.controller.show_info(message, context_name='ui_message' ) 
-		
         pixmap = QPixmap(pic_file)
         widget.setPixmap(QIcon(pixmap))
         widget.show()  

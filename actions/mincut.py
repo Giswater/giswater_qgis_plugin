@@ -7,14 +7,21 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import Qt, QSettings, QObject, QTimer, QPoint, SIGNAL
-from PyQt4.QtGui import QFileDialog, QMessageBox, QCheckBox, QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAbstractItemView, QAction
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from PyQt4.QtCore import Qt, QPoint
+from PyQt4.QtGui import QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAction, QStringListModel, QCompleter, QIcon
 from PyQt4.Qt import QDate, QTime
-from qgis.core import QgsMapLayerRegistry
+from PyQt4.QtSql import QSqlTableModel
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper 
 
+import os
+import sys
+from functools import partial
 
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+import utils_giswater
+from parent import ParentAction
 
 from ..ui.mincut import Mincut
 from ..ui.mincut_fin import Mincut_fin
@@ -22,32 +29,6 @@ from ..ui.multi_selector import Multi_selector
 from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer
 from ..ui.mincut_add_connec import Mincut_add_connec
 from ..ui.mincut_edit import Mincut_edit
-
-from datetime import datetime, date
-import os
-import sys
-import webbrowser
-from functools import partial
-
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
-import utils_giswater
-
-
-from PyQt4.QtGui import QPushButton, QLineEdit
-from PyQt4.QtCore import QObject, QTimer, QPoint, SIGNAL
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsMapCanvasSnapper
-
-
-from qgis.core import *
-from qgis.gui import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
-from PyQt4.Qt import *
-
-from parent import ParentAction
 
 
 class MincutParent(ParentAction):
@@ -125,8 +106,7 @@ class MincutParent(ParentAction):
         sql += " FROM " + self.schema_name + ".exploitation"
         sql += " ORDER BY descript"
         rows = self.controller.get_rows(sql)
-        if rows != []:
-            utils_giswater.fillComboBox("exploitation", rows)
+        utils_giswater.fillComboBox("exploitation", rows)
 
         # Fill ComboBox type
         sql = "SELECT id"
@@ -141,8 +121,7 @@ class MincutParent(ParentAction):
         sql += " FROM " + self.schema_name + ".anl_mincut_cat_cause"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-        if rows != []:
-            utils_giswater.fillComboBoxDefault("cause", rows)
+        utils_giswater.fillComboBoxDefault("cause", rows)
 
         # Set all QDateEdit to current date
         self.cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
@@ -180,7 +159,7 @@ class MincutParent(ParentAction):
 
 
     def mg_mincut(self):
-        ''' Btn 26 - New Mincut '''
+        ''' Button 26: New Mincut '''
 
         self.init_mincut_form()
 
@@ -192,7 +171,7 @@ class MincutParent(ParentAction):
         self.canvas.setMapTool(self.emitPoint)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
-        self.btn_accept_main.clicked.connect(partial(self.accept_save_data,self.action))
+        self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
         #self.btn_cancel_main.clicked.connect(self.dlg.close)
 
         # Get current date
@@ -290,12 +269,8 @@ class MincutParent(ParentAction):
 
     def accept_save_data(self,action):
 
-        message = str(action)
-        self.controller.show_warning(message, context_name='ui_message')
-
-        anl_cause = " "
         mincut_result_state = self.state.text()
-        id = self.id.text()
+        id_ = self.id.text()
         # exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
@@ -336,20 +311,19 @@ class MincutParent(ParentAction):
         self.controller.show_info(message, context_name='ui_message')
         if action == "mg_mincut" :
             message = "inserting"
-            self.controller.show_warning(message, context_name='ui_message')
-            # Insert data to DB
-            #sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript)"
-            #sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "')"
+            self.controller.log_info(message)
 
             # Insert data to DB
-            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript"
+            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2," 
+            sql += " mincut_type, anl_cause, forecast_start, forecast_end, anl_descript"
             if self.btn_end.isEnabled():
                 sql += ",exec_start, exec_end, exec_from_plot, exec_depth, exec_descript)"
             else :
                 sql += ")"
-            sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "'"
+            sql += " VALUES ('" + mincut_result_state + "', '" + id_ + "', '" + street + "', '" + number + "', '" + mincut_result_type + "', '" + anl_cause + "', '"
+            sql += forecast_start_predict + "', '" + forecast_end_predict + "', '" + anl_descript + "'"
             if self.btn_end.isEnabled():
-                sql += ",'" + forecast_start_real + "','" + forecast_end_real + "','" + exec_limit_distance + "','" + exec_depth + "','" + exec_descript + "')"
+                sql += ",'" + forecast_start_real + "', '" + forecast_end_real + "', '" + exec_limit_distance + "', '" + exec_depth + "', '" + exec_descript + "')"
             else :
                 sql += ")"
 
@@ -364,7 +338,7 @@ class MincutParent(ParentAction):
 
         elif action == "mg_mincut_menagement" :
             message = "updating"
-            self.controller.show_warning(message, context_name='ui_message')
+            self.controller.log_info(message, context_name='ui_message')
             sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
             sql += " SET id = '" + id_ + "', mincut_result_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
                    "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_limit_distance = '" + \
@@ -401,6 +375,7 @@ class MincutParent(ParentAction):
 
     def addConnec(self):
         ''' B3-121: Connec selector  '''
+        
         self.ids = []
 
         # Check if user entered ID
@@ -414,18 +389,14 @@ class MincutParent(ParentAction):
         utils_giswater.setDialog(self.dlg_connec)
 
         table = "connec"
-
         self.tbl_connec = self.dlg_connec.findChild(QTableView, "tbl_mincut_connec")
-
-        #- self.btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
-        # -self.btn_cancel.pressed.connect(self.close_dialog_multi)
 
         self.btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
         self.btn_delete_connec.pressed.connect(partial(self.delete_records, self.tbl_connec, table, "connec_id"))
-        self.set_icon(self.btn_delete_connec,"112.png")
+        self.set_icon(self.btn_delete_connec, "112.png")
 
         self.btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
-        self.btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table,"connec_id",self.dlg_connec))
+        self.btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table, "connec_id", self.dlg_connec))
         self.set_icon(self.btn_insert_connec, "111.png")
 
         self.btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
@@ -457,14 +428,14 @@ class MincutParent(ParentAction):
         self.dlg_connec.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_connec.show()
 
+
     def snapping_init(self):
-        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"),self.snappingConnec)
-        self.emitPoint.canvasClicked.connect(self.snappingConnec)
+        self.emitPoint.canvasClicked.connect(self.snapping_connec)
         message = "init"
-        self.controller.show_info(message, context_name='ui_message')
+        self.controller.log_info(message)
 
 
-    def snappingConnec(self, point, btn):
+    def snapping_connec(self, point, btn):  #@UnusedVariable
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -537,12 +508,11 @@ class MincutParent(ParentAction):
         ''' Check if user entered ID '''
 
         self.id_text = self.id.text()
-
         if self.id_text == "id":
             message = "You need to enter id"
             self.controller.show_info_box(message, context_name='ui_message')
             return 0
-        else :
+        else:
             return 1
 
 
@@ -604,13 +574,11 @@ class MincutParent(ParentAction):
         self.dlg_hydro.show()
 
 
-    def fill_table(self, widget, table_name ,id, dialog) :
+    def fill_table(self, widget, table_name, id_, dialog) :
         ''' Set a model with selected filter.
         Attach that model to selected table '''
 
-        expr = ""
-        # el_id->hydro_id = self.hydrometer.text()
-        widget_id = dialog.findChild(QLineEdit, id )
+        widget_id = dialog.findChild(QLineEdit, id_)
         el_id = widget_id.text()
 
         # Check if user entered hydrometer_id
@@ -620,24 +588,22 @@ class MincutParent(ParentAction):
             return
 
         if el_id in self.ids:
-            message = str(id)+ ":"+el_id+" id already in the list!"
+            message = str(id_)+ ":"+el_id+" id already in the list!"
             self.controller.show_info_box(message, context_name='ui_message')
             return
         else :
             self.ids.append(el_id)
 
         # Reload table
-        expr = str(id) + " = '" + self.ids[0] + "'"
+        expr = str(id_) + " = '" + self.ids[0] + "'"
         if len(self.ids) > 1:
             for el in range(1, len(self.ids)):
-                expr += " OR " + str(id) + "= '" + self.ids[el] + "'"
+                expr += " OR " + str(id_) + "= '" + self.ids[el] + "'"
 
-        # expr = "hydrometer_id = '368' OR hydrometer_id = '334' OR hydrometer_id = '675'"
         # Set model
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-
         model.select()
 
         # Check for errors
@@ -646,7 +612,6 @@ class MincutParent(ParentAction):
 
         # Attach model to table view
         widget.setModel(model)
-
         widget.model().setFilter(expr)
         widget.model().select()
 
@@ -663,15 +628,12 @@ class MincutParent(ParentAction):
         self.btn_delete = self.dlg_multi.findChild(QPushButton, "btn_delete")
 
         table = "man_selector_valve"
-
         self.menu_valve = QMenu()
-
-        # self.menu_valve.clear()
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
 
         btn_cancel = self.dlg_multi.findChild(QPushButton, "btn_cancel")
         btn_cancel.pressed.connect(self.dlg_multi.close)
-        # self.menu=QMenu()
+
         self.menu_valve.clear()
         self.dlg_multi.btn_insert.setMenu(self.menu_valve)
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records_config, self.tbl_config, table))
@@ -685,16 +647,15 @@ class MincutParent(ParentAction):
 
     def fill_insert_menu(self, table):
         ''' Insert menu on QPushButton->QMenu'''
+        
         self.menu_valve.clear()
-
-
-        table = "man_selector_valve"
-        # self.menu_valve.clear()
-        type = "VALVE"
-        sql = "SELECT id FROM " + self.schema_name + ".node_type WHERE type = '" + type + "'"
+        node_type = "VALVE"
+        sql = "SELECT id FROM " + self.schema_name + ".node_type WHERE type = '" + node_type + "'"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
-
+        if not rows:
+            return
+        
         # Fill menu
         for row in rows:
             elem = row[0]
@@ -702,11 +663,8 @@ class MincutParent(ParentAction):
             # Check if we already have data with selected id
             sql = "SELECT id FROM " + self.schema_name + "." + table + " WHERE id = '" + elem + "'"
             rows = self.controller.get_rows(sql)
-
             if not rows:
-                # if rows == None:
                 self.menu_valve.addAction(elem, partial(self.insert, elem, table))
-                # self.menu.addAction(elem,self.test)
 
 
     def insert(self, id_action, table):
@@ -738,7 +696,7 @@ class MincutParent(ParentAction):
         widget.setModel(model)
 
 
-    def delete_records(self, widget, table_name, id) :
+    def delete_records(self, widget, table_name, id_):  
         ''' Delete selected elements of the table '''
 
         # Get selected rows
@@ -753,26 +711,23 @@ class MincutParent(ParentAction):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            #id_ = widget.model().record(row).value("hydrometer_id")
-            id_ = widget.model().record(row).value(id)
+            # TODO: Check if it works. Possible problems with variable 'id_'
+            id_ = widget.model().record(row).value(id_)
             inf_text += str(id_) + ", "
             list_id = list_id + "'" + str(id_) + "', "
-            #del_id.append(str(list_id))
             del_id.append(id_)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records",inf_text)
-
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
         if answer:
             for el in del_id:
                 self.ids.remove(el)
 
-        expr = ""
         # Reload table
-        expr = str(id)+" = '" + self.ids[0] + "'"
+        expr = str(id_)+" = '" + self.ids[0] + "'"
         if len(self.ids) > 1:
             for el in range(1, len(self.ids)):
-                expr += " OR "+str(id)+ "= '" + self.ids[el] + "'"
+                expr += " OR "+str(id_)+ "= '" + self.ids[el] + "'"
 
         widget.model().setFilter(expr)
         widget.model().select()
@@ -784,30 +739,19 @@ class MincutParent(ParentAction):
         sql = "DELETE FROM " + self.schema_name + ".anl_mincut_result_"+str(element)
         self.controller.execute_sql(sql)
 
-        for id in self.ids:
+        for id_ in self.ids:
             # Insert into anl_mincut_hydrometer all selected connecs
             sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_"+str(element)+" ("+str(id_el)+")"
-            sql += " VALUES ('" + id + "')"
+            sql += " VALUES ('" + id_ + "')"
             status = self.controller.execute_sql(sql)
-
             if status:
-                # Show message to user
-                # message = "Values has been updated"
-                # self.controller.show_info(message, context_name='ui_message')
-
                 # Execute SQL function
-                self.id = self.dlg.findChild(QLineEdit, "id")
-                self.id_text = self.id.text()
+                self.id_text = utils_giswater.getWidgetText("id")
                 function_name = "gw_fct_mincut_result_catalog"
                 sql = "SELECT " + self.schema_name + "." + function_name + "('" + self.id_text + "');"
-
                 status = self.controller.execute_sql(sql)
 
         if status:
-            # Show message to user
-            message = "Values has been updated"
-            self.controller.show_info(message, context_name='ui_message')
-
             message = "Execute gw_fct_mincut_result_catalog done successfully"
             self.controller.show_info(message, context_name='ui_message')
 
@@ -854,7 +798,7 @@ class MincutParent(ParentAction):
         self.emitPoint.canvasClicked.connect(self.snappingNodeArc)
 
 
-    def snappingNodeArc(self, point, btn):
+    def snappingNodeArc(self, point, btn):  #@UnusedVariable
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -945,11 +889,14 @@ class MincutParent(ParentAction):
         #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingValveAnalytics)
         self.emitPoint.canvasClicked.connect(self.snappingValveAnalytics)
 
+
     def snappingValveAnalytics(self):
+        
         # Set active layer
         layer = QgsMapLayerRegistry.instance().mapLayersByName("Valve analytics")[0]
         self.iface.setActiveLayer(layer)
 
+        # TODO
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -1079,7 +1026,7 @@ class MincutParent(ParentAction):
             return
         row = selected_list[0].row()
         # Get mincut_id from selected row
-        id = self.tbl_mincut_edit.model().record(row).value("id")
+        id_ = self.tbl_mincut_edit.model().record(row).value("id")
         self.dlg_min_edit.close()
 
         #self.mg_mincut()
@@ -1089,7 +1036,7 @@ class MincutParent(ParentAction):
 
         #TO DO-force fill form
         sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
-        sql += " WHERE id = '" + id + "'"
+        sql += " WHERE id = '" + id_ + "'"
         rows = self.controller.get_rows(sql)
 
         self.id.setText(rows[0]['id'])
@@ -1137,10 +1084,9 @@ class MincutParent(ParentAction):
 
     def filter_by_id(self, table, widget_txt, tablename):
 
-        #result_select = utils_giswater.getWidgetText(widget_txt)
-        id = utils_giswater.getWidgetText(widget_txt)
-        if id != 'null':
-            expr = " id LIKE '" + id + "'"
+        id_ = utils_giswater.getWidgetText(widget_txt)
+        if id_ != 'null':
+            expr = " id LIKE '" + id_ + "'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
@@ -1205,7 +1151,9 @@ class MincutParent(ParentAction):
             widget.model().select()
 
 
-    def set_icon(self,widget,indx):
+    def set_icon(self, widget, indx):
         self.plugin_dir = os.path.dirname(__file__)[:-7]
         self.icon_folder = self.plugin_dir + '\icons'
         widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
+        
+        
