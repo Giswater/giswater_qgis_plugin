@@ -9,7 +9,8 @@ or (at your option) any later version.
 import os
 import sys
 
-from PyQt4.QtGui import QComboBox, QLineEdit
+from PyQt4.QtGui import QComboBox, QLineEdit, QDoubleValidator
+
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -40,6 +41,7 @@ class Master(ParentAction):
         self.dlg.btn_close.clicked.connect(self.close_dialog)
         self.result_id = self.dlg.findChild(QComboBox, "result_id")
         self.text_prices_coeficient = self.dlg.findChild(QLineEdit, "text_prices_coeficient")
+        self.text_prices_coeficient.setValidator(QDoubleValidator())
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
 
@@ -53,7 +55,7 @@ class Master(ParentAction):
         """ Call function ws30.gw_fct_plan_estimate_result """
 
         # TODO revisar tablas
-        sql = "SELECT ws30.gw_fct_plan_estimate_result('" + self.result_id.currentText() + "', '"+self.text_prices_coeficient.text() + "')"
+        sql = "SELECT ws30.gw_fct_plan_estimate_result('" + utils_giswater.getWidgetText(self.result_id) + "', '"+utils_giswater.getWidgetText(self.text_prices_coeficient) + "')"
         status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
@@ -85,6 +87,6 @@ class Master(ParentAction):
 
     def master_estimate_result_selector_accept(self):
         # TODO
-
+        self.iface.mapCanvas().refreshAllLayers()
         pass
 
