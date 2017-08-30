@@ -349,19 +349,19 @@ class Mg(ParentAction):
         self.table_anl_selector = "anl_selector_state"
         self.table_plan_selector = "plan_selector_state"
 
-        self.dlg.btn_management.pressed.connect(partial(self.multi_selector,self.table_man_selector))
-        self.dlg.btn_analysis.pressed.connect(partial(self.multi_selector,self.table_anl_selector))
-        self.dlg.btn_planning.pressed.connect(partial(self.multi_selector,self.table_plan_selector))
+        self.dlg.btn_management.pressed.connect(partial(self.multi_selector, self.table_man_selector))
+        self.dlg.btn_analysis.pressed.connect(partial(self.multi_selector, self.table_anl_selector))
+        self.dlg.btn_planning.pressed.connect(partial(self.multi_selector, self.table_plan_selector))
 
         self.om_visit_absolute_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
         self.om_visit_path = self.dlg.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg.findChild(QLineEdit, "doc_absolute_path")
 
-        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser,self.om_visit_path))
-        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog,self.om_visit_path))
-        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser,self.doc_path))
-        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog,self.doc_path))
+        self.dlg.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
 
         self.state_vdefault=self.dlg.findChild(QComboBox,"state_vdefault")
         self.psector_vdefault = self.dlg.findChild(QComboBox, "psector_vdefault")
@@ -669,6 +669,7 @@ class Mg(ParentAction):
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
+        
         self.menu = QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))
@@ -685,7 +686,8 @@ class Mg(ParentAction):
 
 
     def mg_exploitation_selector(self):
-
+        """ Button 41: Explotation selector """
+        
         self.dlg_multiexp = Multiexpl_selector()
         utils_giswater.setDialog(self.dlg_multiexp)
 
@@ -761,9 +763,7 @@ class Mg(ParentAction):
             sql = "SELECT DISTINCT(expl_id) FROM "+self.schema_name+".expl_selector WHERE expl_id = '"+expl_id[i]+"'"
             row = self.dao.get_row(sql)
             if row:
-            # if exist - show warning
                 self.controller.show_info_box("Expl_id "+expl_id[i]+" is already selected!", "Info")
-                #self.controller.show_warning("Any data found in table "+tablename)
             else:
                 sql = "INSERT INTO "+self.schema_name+".expl_selector (expl_id,cur_user) "
                 sql+= " VALUES ('"+expl_id[i]+"', '"+cur_user+"')"
@@ -808,13 +808,15 @@ class Mg(ParentAction):
         self.iface.mapCanvas().refresh()
 
 
-    def fill_insert_menu(self,table):
+    def fill_insert_menu(self, table):
         ''' Insert menu on QPushButton->QMenu'''
 
         self.menu.clear()
         sql = "SELECT id FROM "+self.schema_name+".value_state"
         sql+= " ORDER BY id"
         rows = self.dao.get_rows(sql)
+        if not rows:
+            return
         # Fill menu
         for row in rows:
             elem = row[0]
