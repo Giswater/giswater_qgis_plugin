@@ -86,25 +86,9 @@ class MincutParent(ParentAction):
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
 
-        self.init_config_form()
 
-
-    def init_config_form(self):
+    def init_mincut_form(self):
         ''' Custom form initial configuration '''
-        #TO DO
-        pass
-
-
-    def mg_mincut(self):
-        ''' Btn 26 - New Mincut '''
-
-        self.action = "mg_mincut"
-
-        self.canvas = self.iface.mapCanvas()
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emitPoint)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
@@ -127,7 +111,7 @@ class MincutParent(ParentAction):
         self.btn_accept_main = self.dlg.findChild(QPushButton, "btn_accept")
         self.btn_cancel_main = self.dlg.findChild(QPushButton, "btn_cancel")
 
-        self.btn_accept_main.clicked.connect(partial(self.accept_save_data,self.action))
+        #self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
         self.btn_cancel_main.clicked.connect(self.dlg.close)
 
         # Fill widgets
@@ -141,7 +125,7 @@ class MincutParent(ParentAction):
         sql += " FROM " + self.schema_name + ".exploitation"
         sql += " ORDER BY descript"
         rows = self.controller.get_rows(sql)
-        if rows != [] :
+        if rows != []:
             utils_giswater.fillComboBox("exploitation", rows)
 
         # Fill ComboBox type
@@ -160,29 +144,21 @@ class MincutParent(ParentAction):
         if rows != []:
             utils_giswater.fillComboBoxDefault("cause", rows)
 
-        # Get current date
-        date_start = QDate.currentDate()
-
         # Set all QDateEdit to current date
         self.cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
-        self.cbx_date_start.setDate(date_start)
         self.cbx_hours_start = self.dlg.findChild(QTimeEdit, "cbx_hours_start")
 
         self.cbx_date_end = self.dlg.findChild(QDateEdit, "cbx_date_end")
-        self.cbx_date_end.setDate(date_start)
         self.cbx_hours_end = self.dlg.findChild(QTimeEdit, "cbx_hours_end")
 
         # Widgets for predict date
         self.cbx_date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
-        self.cbx_date_start_predict.setDate(date_start)
         self.cbx_hours_start_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict")
 
         self.cbx_date_start_predict_2 = self.dlg.findChild(QDateEdit, "cbx_date_start_predict_2")
-        self.cbx_date_start_predict_2.setDate(date_start)
 
         # Widgets for real date
         self.cbx_date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
-        self.cbx_date_end_predict.setDate(date_start)
         self.cbx_hours_end_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_end_predict")
 
         # Btn_end and btn_start
@@ -195,10 +171,48 @@ class MincutParent(ParentAction):
         # Toolbar actions
         self.dlg.findChild(QAction, "actionConfig").triggered.connect(self.config)
         self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincutInit)
-        #self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
-        #self.actionCustomMincut.triggered.connect(self.customMincatInit)
+        # self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
+        # self.actionCustomMincut.triggered.connect(self.customMincatInit)
         self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.addConnec)
         self.dlg.findChild(QAction, "actionAddHydrometer").triggered.connect(self.addHydrometer)
+
+        self.dlg.show()
+
+
+    def mg_mincut(self):
+        ''' Btn 26 - New Mincut '''
+
+        self.init_mincut_form()
+
+        self.action = "mg_mincut"
+
+        self.canvas = self.iface.mapCanvas()
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emitPoint)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
+
+        self.btn_accept_main.clicked.connect(partial(self.accept_save_data,self.action))
+        #self.btn_cancel_main.clicked.connect(self.dlg.close)
+
+        # Get current date
+        date_start = QDate.currentDate()
+
+        # Set all QDateEdit to current date
+        self.cbx_date_start.setDate(date_start)
+        self.cbx_date_end.setDate(date_start)
+
+        # Widgets for predict date
+        self.cbx_date_start_predict.setDate(date_start)
+        self.cbx_date_start_predict_2.setDate(date_start)
+
+        # Widgets for real date
+        self.cbx_date_end_predict.setDate(date_start)
+
+        # Btn_end and btn_start
+        self.btn_start.clicked.connect(self.real_start)
+
+        self.btn_end.clicked.connect(self.real_end)
 
         self.dlg.show()
 
@@ -318,8 +332,11 @@ class MincutParent(ParentAction):
         forecast_end_real = dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
 
         mincut_result_state = "1"
-
+        message = str(action)
+        self.controller.show_info(message, context_name='ui_message')
         if action == "mg_mincut" :
+            message = "inserting"
+            self.controller.show_warning(message, context_name='ui_message')
             # Insert data to DB
             #sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2, mincut_type, anl_cause, forecast_start, forecast_end, anl_descript)"
             #sql += " VALUES ('" + mincut_result_state + "','" + id + "','" + street + "','" + number + "','" + mincut_result_type + "','" + anl_cause + "','" + forecast_start_predict + "','" + forecast_end_predict + "','" + anl_descript + "')"
@@ -346,6 +363,8 @@ class MincutParent(ParentAction):
                 return
 
         elif action == "mg_mincut_menagement" :
+            message = "updating"
+            self.controller.show_warning(message, context_name='ui_message')
             sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
             sql += " SET id = '" + id_ + "', mincut_result_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
                    "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_limit_distance = '" + \
@@ -999,15 +1018,12 @@ class MincutParent(ParentAction):
 
         self.action = "mg_mincut_management"
 
-
         # Create the dialog and signals
         self.dlg_min_edit = Mincut_edit()
         utils_giswater.setDialog(self.dlg_min_edit)
 
         self.combo_state_edit = self.dlg_min_edit.findChild(QComboBox, "state_edit")
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
-
-
 
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
         # Adding auto-completion to a QLineEdit
@@ -1029,7 +1045,6 @@ class MincutParent(ParentAction):
         self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
         self.dlg_min_edit.btn_cancel.pressed.connect( self.dlg_min_edit.close)
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
-
 
         #self.btn_accept_min = self.dlg.findChild(QPushButton, "btn_accept")
         #self.btn_accept_min.clicked.connect(partial(self.accept_save_data,self.action))
@@ -1067,8 +1082,10 @@ class MincutParent(ParentAction):
         id = self.tbl_mincut_edit.model().record(row).value("id")
         self.dlg_min_edit.close()
 
-        self.mg_mincut()
+        #self.mg_mincut()
+        self.init_mincut_form()
 
+        self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
 
         #TO DO-force fill form
         sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
@@ -1076,10 +1093,11 @@ class MincutParent(ParentAction):
         rows = self.controller.get_rows(sql)
 
         self.id.setText(rows[0]['id'])
-        self.state.setText(rows[0]['mincut_result_state_unused'])
+        self.state.setText(str(rows[0]['mincut_state']))
         utils_giswater.setWidgetText("pred_description", rows[0]['anl_descript'])
         utils_giswater.setWidgetText("real_description", rows[0]['exec_descript'])
-        self.distance.setText(str(rows[0]['exec_limit_distance']))
+
+        self.distance.setText(str(rows[0]['exec_from_plot']))
         self.depth.setText(str(rows[0]['exec_depth']))
 
         # from address separate street and number
@@ -1099,47 +1117,8 @@ class MincutParent(ParentAction):
         self.cause.clear()
 
         # Fill comboBoxes
-        self.type.addItem(rows[0]['mincut_result_type'])
-        self.cause.addItem(rows[0]['anl_cause'])
-
-
-        '''
-        # Fill ComboBox type
-        sql = "SELECT id"
-        sql += " FROM " + self.schema_name + ".anl_mincut_result_cat_type"
-        sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        # utils_giswater.fillComboBox("type", rows)
-        for row in rows:
-            elem = str(row[0])
-            if elem != mincut_result_type:
-                self.type.addItem(elem)
-
-        # Fill ComboBox cause
-        sql = "SELECT id"
-        sql += " FROM " + self.schema_name + ".anl_mincut_result_cat_cause"
-        sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql)
-        # utils_giswater.fillComboBox("cause", rows)
-        for row in rows:
-            elem = str(row[0])
-            if elem != cause:
-                self.cause.addItem(elem)
-
-        self.old_id = self.id.text()
-
-        self.btn_start = self.dlg_mincut.findChild(QPushButton, "btn_start")
-        self.btn_start.clicked.connect(self.real_start)
-
-        self.btn_end = self.dlg_mincut.findChild(QPushButton, "btn_end")
-        self.btn_end.clicked.connect(self.real_end)
-
-        self.cbx_date_start = self.dlg_mincut.findChild(QDateEdit, "cbx_date_start")
-        self.cbx_hours_start = self.dlg_mincut.findChild(QTimeEdit, "cbx_hours_start")
-
-        self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
-        self.distance = self.dlg_mincut.findChild(QLineEdit, "distance")
-        self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
+        #self.type.addItem(rows[0]['mincut_result_type'])
+        #self.cause.addItem(rows[0]['anl_cause'])
 
         self.btn_end.setEnabled(True)
 
@@ -1154,7 +1133,6 @@ class MincutParent(ParentAction):
 
         # Disable to edit ID
         self.id.setEnabled(False)
-        '''
 
 
     def filter_by_id(self, table, widget_txt, tablename):
@@ -1178,7 +1156,6 @@ class MincutParent(ParentAction):
         # Refresh model with selected filter
         widget.model().setFilter(expr)
         widget.model().select()
-
 
 
     def fill_table_mincut_management(self, widget, table_name):
