@@ -320,7 +320,7 @@ class Mg(ParentAction):
 
 
     def mg_config_master(self):
-        """ Button 99 - Open a dialog showing data from table 'config_param_system' """     
+        """ Button 99: Open a dialog showing data from table 'config_param_system' """     
         
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
@@ -743,6 +743,7 @@ class Mg(ParentAction):
         self.tbl = self.dlg_multi.findChild(QTableView, "tbl")
         self.dlg_multi.btn_cancel.pressed.connect(self.close_dialog_multi)
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
+        
         self.menu = QMenu()
         self.dlg_multi.btn_insert.setMenu(self.menu)
         self.dlg_multi.btn_delete.pressed.connect(partial(self.delete_records, self.tbl, table))
@@ -759,7 +760,8 @@ class Mg(ParentAction):
 
 
     def mg_exploitation_selector(self):
-
+        """ Button 41: Explotation selector """
+        
         self.dlg_multiexp = Multiexpl_selector()
         utils_giswater.setDialog(self.dlg_multiexp)
 
@@ -830,7 +832,6 @@ class Mg(ParentAction):
             sql += " WHERE expl_id = '"+expl_id[i]+"'"
             row = self.dao.get_row(sql)
             if row:
-            # if exist - show warning
                 self.controller.show_info_box("Expl_id "+expl_id[i]+" is already selected!", "Info")
             else:
                 sql = "INSERT INTO "+self.schema_name+".expl_selector (expl_id, cur_user) "
@@ -882,6 +883,8 @@ class Mg(ParentAction):
         sql = "SELECT id FROM "+self.schema_name+".value_state"
         sql+= " ORDER BY id"
         rows = self.dao.get_rows(sql)
+        if not rows:
+            return
         # Fill menu
         for row in rows:
             elem = row[0]

@@ -17,6 +17,7 @@ from functools import partial
 from actions.ed import Ed
 from actions.mg import Mg
 from actions.go2epa import Go2Epa
+from actions.basic import Basic
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -101,10 +102,11 @@ class Giswater(QObject):
         if not self.schema_exists:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
-        # Set actions classes
+        # TODO: Set actions classes (define one class per plugin toolbar)
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)        
         
         # Define signals
         self.set_signals()
@@ -126,13 +128,18 @@ class Giswater(QObject):
     
     def manage_action(self, index_action, function_name):  
         
+        # TODO: Create an action class per plugin toolbar
         if function_name is not None:
             try:
                 action = self.actions[index_action]                
-                # Management toolbar actions
-                if int(index_action) in (01, 02, 19, 25, 27, 28, 39, 41, 45, 46, 47, 48, 98, 99):
-                    callback_function = getattr(self.mg, function_name)  
+                # Basic toolbar actions
+                if int(index_action) in (41, 47, 32):
+                    callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
+                # Management toolbar actions
+                elif int(index_action) in (01, 02, 19, 25, 27, 28, 39, 45, 46, 48, 99):
+                    callback_function = getattr(self.mg, function_name)  
+                    action.triggered.connect(callback_function)                    
                 # Edit toolbar actions
                 elif int(index_action) in (32, 33, 34, 36):                       
                     callback_function = getattr(self.ed, function_name)  
