@@ -309,6 +309,7 @@ class MincutParent(ParentAction):
         mincut_result_state = "1"
         message = str(action)
         self.controller.show_info(message, context_name='ui_message')
+
         if action == "mg_mincut" :
             message = "inserting"
             self.controller.log_info(message)
@@ -336,13 +337,13 @@ class MincutParent(ParentAction):
                 self.controller.show_warning(message, context_name='ui_message')
                 return
 
-        elif action == "mg_mincut_menagement" :
+        elif action == "mg_mincut_management" :
             message = "updating"
             self.controller.log_info(message, context_name='ui_message')
             sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
-            sql += " SET id = '" + id_ + "', mincut_result_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
-                   "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_limit_distance = '" + \
-                   exec_limit_distance + "', forecast_start= '" + forecast_start_predict + "', forecast_end = '" + forecast_end_predict + "', exec_start ='" + forecast_start_real + "', exec_end ='" + forecast_end_real + "' , address ='" + street + "', address_num ='" + number + "', mincut_result_type ='" + mincut_result_type + "', anl_cause ='" + anl_cause + "' "
+            sql += " SET id = '" + id_ + "', mincut_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
+                   "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_from_plot = '" + \
+                   exec_limit_distance + "', forecast_start= '" + forecast_start_predict + "', forecast_end = '" + forecast_end_predict + "', exec_start ='" + forecast_start_real + "', exec_end ='" + forecast_end_real + "' , address_1 ='" + street + "', address_2 ='" + number + "', mincut_type ='" + mincut_result_type + "', anl_cause ='" + anl_cause + "' "
             sql += " WHERE id = '" + id_ + "'"
             status = self.controller.execute_sql(sql)
             if status:
