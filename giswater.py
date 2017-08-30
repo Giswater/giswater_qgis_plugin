@@ -56,7 +56,7 @@ class Giswater(QObject):
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
-        self.plugin_name = os.path.basename(self.plugin_dir)   
+        self.plugin_name = os.path.basename(self.plugin_dir).lower()  
         self.icon_folder = self.plugin_dir+'/icons/'    
 
         # Initialize svg giswater directory
