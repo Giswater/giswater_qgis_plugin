@@ -1,11 +1,12 @@
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_dimensions();
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dimensions()
+CREATE OR REPLACE FUNCTION ws30.gw_trg_edit_dimensions()
   RETURNS trigger AS
 $BODY$
 DECLARE 
 dimensions_id_seq integer;
+expl_id_int integer;
 
 BEGIN
 
@@ -18,6 +19,17 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 	
+		--Exploitation ID
+            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+                --PERFORM audit_function(125,340);
+				RETURN NULL;				
+            END IF;
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            IF (expl_id_int IS NULL) THEN
+                --PERFORM audit_function(130,340);
+				RETURN NULL; 
+            END IF;
+			
 	
 	        -- dimension_id
         IF (NEW.id IS NULL) THEN
@@ -35,8 +47,8 @@ BEGIN
 
 
 		
-				INSERT INTO dimensions (id, distance, depth, the_geom, x_label, y_label, rotation_label, offset_label, direction_arrow, x_symbol, y_symbol, feature_id, feature_type)
-				VALUES (NEW.id, NEW.distance, NEW.depth, NEW.the_geom, NEW.x_label, NEW.y_label, NEW.rotation_label, NEW.offset_label, NEW.direction_arrow, NEW.x_symbol, NEW.y_symbol, NEW.feature_id, NEW.feature_type);
+				INSERT INTO dimensions (id, distance, depth, the_geom, x_label, y_label, rotation_label, offset_label, direction_arrow, x_symbol, y_symbol, feature_id, feature_type, expl_id)
+				VALUES (NEW.id, NEW.distance, NEW.depth, NEW.the_geom, NEW.x_label, NEW.y_label, NEW.rotation_label, NEW.offset_label, NEW.direction_arrow, NEW.x_symbol, NEW.y_symbol, NEW.feature_id, NEW.feature_type, expl_id_int);
 	
 		RETURN NEW;
 						
@@ -48,7 +60,7 @@ BEGIN
 
 			UPDATE dimensions
 			SET id=NEW.id, distance=NEW.distance, depth=NEW.depth, the_geom=NEW.the_geom, x_label=NEW.x_label, y_label=NEW.y_label, rotation_label=NEW.rotation_label, offset_label=NEW.offset_label, 
-			direction_arrow=NEW.direction_arrow, x_symbol=NEW.x_symbol, y_symbol=NEW.y_symbol, feature_id=NEW.feature_id, feature_type=NEW.feature_type
+			direction_arrow=NEW.direction_arrow, x_symbol=NEW.x_symbol, y_symbol=NEW.y_symbol, feature_id=NEW.feature_id, feature_type=NEW.feature_type, expl_id=NEW.expl_id
 			WHERE id=NEW.id;
         --PERFORM audit_function(2,430); 
         RETURN NEW;

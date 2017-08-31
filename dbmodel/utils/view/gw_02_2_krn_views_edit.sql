@@ -85,7 +85,8 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
     dimensions.y_symbol,
     dimensions.feature_id,
     dimensions.feature_type,
-    dimensions.state
+    dimensions.state,
+	dimensions.expl_id
 FROM selector_expl,dimensions
 WHERE ((dimensions.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
