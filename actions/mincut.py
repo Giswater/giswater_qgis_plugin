@@ -38,14 +38,6 @@ class MincutParent(ParentAction):
         # Call ParentAction constructor
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
-        '''
-        self.canvas = self.iface.mapCanvas()
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emitPoint)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
-        '''
-
         # Get layers of node,arc,connec groupe
         self.node_group = []
         self.connec_group = []
@@ -56,12 +48,11 @@ class MincutParent(ParentAction):
         for node in nodes:
             self.node_group.append(str(node[0]))
 
-        sql = "SELECT DISTINCT(type) FROM " + self.schema_name + ".connec_type "
+        sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".connec_type_cat_type "
         connecs = self.dao.get_rows(sql)
         for connec in connecs:
             self.connec_group.append(str(connec[0]))
 
-        self.connec_group = ["Wjoin"]
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".arc_type_cat_type "
         arcs = self.dao.get_rows(sql)
         for arc in arcs:
@@ -70,6 +61,12 @@ class MincutParent(ParentAction):
 
     def init_mincut_form(self):
         ''' Custom form initial configuration '''
+
+        self.canvas = self.iface.mapCanvas()
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emitPoint)
+        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.dlg = Mincut()
         utils_giswater.setDialog(self.dlg)
@@ -164,12 +161,6 @@ class MincutParent(ParentAction):
         self.init_mincut_form()
 
         self.action = "mg_mincut"
-
-        self.canvas = self.iface.mapCanvas()
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emitPoint)
-        self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
         #self.btn_cancel_main.clicked.connect(self.dlg.close)
@@ -311,9 +302,6 @@ class MincutParent(ParentAction):
         self.controller.show_info(message, context_name='ui_message')
 
         if action == "mg_mincut" :
-            message = "inserting"
-            self.controller.log_info(message)
-
             # Insert data to DB
             sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2," 
             sql += " mincut_type, anl_cause, forecast_start, forecast_end, anl_descript"
@@ -327,7 +315,6 @@ class MincutParent(ParentAction):
                 sql += ",'" + forecast_start_real + "', '" + forecast_end_real + "', '" + exec_limit_distance + "', '" + exec_depth + "', '" + exec_descript + "')"
             else :
                 sql += ")"
-
             status = self.controller.execute_sql(sql)
             if status:
                 message = "Values has been updated"
@@ -338,8 +325,6 @@ class MincutParent(ParentAction):
                 return
 
         elif action == "mg_mincut_management" :
-            message = "updating"
-            self.controller.log_info(message, context_name='ui_message')
             sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
             sql += " SET id = '" + id_ + "', mincut_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
                    "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_from_plot = '" + \
@@ -431,9 +416,8 @@ class MincutParent(ParentAction):
 
 
     def snapping_init(self):
+
         self.emitPoint.canvasClicked.connect(self.snapping_connec)
-        message = "init"
-        self.controller.log_info(message)
 
 
     def snapping_connec(self, point, btn):  #@UnusedVariable
@@ -468,9 +452,7 @@ class MincutParent(ParentAction):
                 # LEAVE SELECTION
                 snapPoint.layer.select([snapPoint.snappedAtGeometry])
 
-
                 # Add element
-                #self.addConnec(element_id)
                 table_name = self.schema_name + ".connec"
                 if element_id in self.ids:
                     message = " Connec_id :" + element_id + " id already in the list!"
@@ -498,7 +480,6 @@ class MincutParent(ParentAction):
                     self.controller.show_warning(model.lastError().text())
 
                 # Attach model to table view
-                #widget.setModel(model)
                 self.tbl_connec.setModel(model)
 
                 self.tbl_connec.model().setFilter(expr)
@@ -660,7 +641,7 @@ class MincutParent(ParentAction):
         # Fill menu
         for row in rows:
             elem = row[0]
-            # If not exist in table _selector_state isert to menu
+            # If not exist in table _selector_state insert to menu
             # Check if we already have data with selected id
             sql = "SELECT id FROM " + self.schema_name + "." + table + " WHERE id = '" + elem + "'"
             rows = self.controller.get_rows(sql)
@@ -712,11 +693,10 @@ class MincutParent(ParentAction):
         list_id = ""
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            # TODO: Check if it works. Possible problems with variable 'id_'
-            id_ = widget.model().record(row).value(id_)
-            inf_text += str(id_) + ", "
-            list_id = list_id + "'" + str(id_) + "', "
-            del_id.append(id_)
+            id_feature = widget.model().record(row).value(id_)
+            inf_text += str(id_feature) + ", "
+            list_id = list_id + "'" + str(id_feature) + "', "
+            del_id.append(id_feature)
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
@@ -879,7 +859,9 @@ class MincutParent(ParentAction):
 
 
     def customMincatInit(self):
-        ''' B2-123: Custom mincut analysis '''
+        ''' B2-123: Custom mincut analysis
+        Working just with layer Valve analytics '''
+
         # Check if user entered ID
         check = self.check_id()
         if check == 0:
@@ -887,7 +869,6 @@ class MincutParent(ParentAction):
         else:
             pass
 
-        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingValveAnalytics)
         self.emitPoint.canvasClicked.connect(self.snappingValveAnalytics)
 
 
