@@ -155,7 +155,14 @@ CREATE TABLE node_type_cat_type (
   CONSTRAINT node_type_cat_type_pkey PRIMARY KEY (id)
 );
 
-
+CREATE TABLE connec_type_cat_type (
+  id character varying(30) NOT NULL,
+  shortcut_key varchar(30),
+  orderby int2,
+  i18n character varying(30),
+  descript text,
+  CONSTRAINT connec_type_cat_type_pkey PRIMARY KEY (id)
+);
 
 -- ----------------------------
 -- Table: Catalogs
