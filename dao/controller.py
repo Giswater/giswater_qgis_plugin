@@ -222,23 +222,29 @@ class DaoController():
     def get_row(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
-        result = self.dao.get_row(sql)
-        self.dao.commit()        
-        if result is None:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))  
-            return False
-        elif result != 0:
-            if search_audit:
-                # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()
+        row = self.dao.get_row(sql)   
+        self.last_error = self.dao.last_error      
+        if not row:
+            # Check if any error has been raised
+            if self.last_error is not None:         
+                self.show_warning_detail(self.log_codes[-1], str(self.last_error))
+            else:
+                self.log_info("Any record found: "+sql)
           
-        return True  
+        return row  
     
     
     def get_rows(self, sql):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
-        rows = self.dao.get_rows(sql)   		
+        rows = self.dao.get_rows(sql)   
+        self.last_error = self.dao.last_error 
+        if not rows:
+            # Check if any error has been raised
+            if self.last_error is not None:                  
+                self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
+            else:
+                self.log_info("Any record found: "+sql)                        		
 
         return rows  
     
@@ -247,6 +253,7 @@ class DaoController():
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
+        self.last_error = self.dao.last_error         
         if not result:
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
             return False
