@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
-from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant   # @UnresolvedImport
+from PyQt4.QtCore import QObject, QPyNullVariant   # @UnresolvedImport
 
 from functools import partial
 import operator
@@ -33,65 +33,70 @@ class SearchPlus(QObject):
         if not self.load_config_data():
             self.enabled = False
             return      
-        
+
         # Set parameters that were located in removed file 'searchplus.config'
-        self.styles_folder = self.plugin_dir+"/styles/"          
+        current_dir = os.path.dirname(__file__)           
+        self.styles_folder = current_dir+"/styles/"          
         self.qml_portal = 'portal.qml'                              
         self.qml_hydrometer = 'hydrometer.qml'                
         self.scale_zoom = 5000      
         
-        # Set signals          
+        # Set signals             
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
-        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal)) 
-    
-        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))    
+        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))     
+        #self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))    
 
         self.enabled = True
+        
+        self.controller.log_info("searchplus enabled")        
     
       
     def load_config_data(self):
         ''' Load configuration data from tables '''
         
         self.params = {}
-        sql = "SELECT * FROM "+self.controller.schema_name+".config_search_plus"
-        row = self.controller.get_row(sql)
-        if not row:
-            self.controller.log_warning("No data found in configuration table 'config_search_plus'")
-            return False
-
-        for i in range(0, len(row)):
-            column_name = self.controller.dao.get_column_name(i)
-            self.params[column_name] = str(row[i])
-        
-        return True
+        sql = "SELECT parameter, value FROM "+self.controller.schema_name+".config_param_system"
+        sql += " WHERE context = 'searchplus' ORDER BY parameter"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                self.params[row['parameter']] = str(row['value'])
+            return True
+        else:
+            self.controller.log_warning("No data found in configuration table related with 'searchplus'")
+            return False            
 
             
     def get_layers(self): 
         ''' Iterate over all layers to get the ones set in config file '''
         
         # Initialize class variables        
-        self.portalMemLayer = None                      
-        self.hydrometerMemLayerTo = None
+        self.portal_mem_layer = None                      
+        self.hydrometer_mem_layer_to = None
         
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
             return            
         
-        # Iterate over all layers to get the ones specified in 'db' config section 
+        # Iterate over all layers to get the ones specified parameters '*_layer'
         self.layers = {}            
         for cur_layer in layers:     
             layer_source = self.controller.get_layer_source(cur_layer)  
             uri_table = layer_source['table']            
             if uri_table is not None:
                 if self.params['street_layer'] in uri_table: 
+                    self.controller.log_info("street_layer found")
                     self.layers['street_layer'] = cur_layer 
                 elif self.params['portal_layer'] in uri_table:    
+                    self.controller.log_info("portal_layer found")
                     self.layers['portal_layer'] = cur_layer  
                 elif self.params['hydrometer_layer'] in uri_table:   
+                    self.controller.log_info("hydrometer_layer found")
                     self.layers['hydrometer_layer'] = cur_layer        
                 if self.params['hydrometer_urban_propierties_layer'] in uri_table:
+                    self.controller.log_info("hydrometer_urban_propierties_layer found")
                     self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
      
      
@@ -269,14 +274,14 @@ class SearchPlus(QObject):
         layer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.portalMemLayer = self.copy_selected(layer, self.portalMemLayer, "Point")       
+        self.portal_mem_layer = self.copy_selected(layer, self.portal_mem_layer, "Point")       
 
         # Zoom to generated memory layer
         self.zoom_to_scale()
         
         # Load style
         if self.qml_portal is not None:        
-            self.load_style(self.portalMemLayer, self.qml_portal)    
+            self.load_style(self.portal_mem_layer, self.qml_portal)    
             
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -327,14 +332,14 @@ class SearchPlus(QObject):
         layer.setSelectedFeatures(ids)
         
         # Copy selected features to memory layer     
-        self.hydrometerMemLayerTo = self.copy_selected(layer, self.hydrometerMemLayerTo, "Point")       
+        self.hydrometer_mem_layer_to = self.copy_selected(layer, self.hydrometer_mem_layer_to, "Point")       
 
         # Zoom to generated memory layer
         self.zoom_to_scale()
         
         # Load style
         if self.qml_hydrometer is not None:
-            self.load_style(self.hydrometerMemLayerTo, self.qml_hydrometer)
+            self.load_style(self.hydrometer_mem_layer_to, self.qml_hydrometer)
             
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -424,8 +429,8 @@ class SearchPlus(QObject):
 
     def manage_mem_layers(self):
         ''' Delete previous features from all memory layers '''        
-        self.manage_mem_layer(self.portalMemLayer)
-        self.manage_mem_layer(self.hydrometerMemLayerTo)
+        self.manage_mem_layer(self.portal_mem_layer)
+        self.manage_mem_layer(self.hydrometer_mem_layer_to)
 
     
     def copy_selected(self, layer, mem_layer, geom_type):
