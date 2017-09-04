@@ -18,6 +18,8 @@ from actions.ed import Ed
 from actions.mg import Mg
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
+from actions.master import Master
+from actions.wsom import Wsom
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -106,8 +108,9 @@ class Giswater(QObject):
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)        
-        
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.wsom = Wsom(self.iface, self.settings, self.controller, self.plugin_dir)
         # Define signals
         self.set_signals()
         
@@ -133,20 +136,32 @@ class Giswater(QObject):
             try:
                 action = self.actions[index_action]                
                 # Basic toolbar actions
-                if int(index_action) in (41, 47, 32):
+                if int(index_action) in (41, 48, 32):
                     callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
+                # Go2epa toolbar actions
+                elif int(index_action) in (23, 24, 25, 36):
+                    callback_function = getattr(self.go2epa, function_name)
+                    action.triggered.connect(callback_function)
+                # Master toolbar actions
+                elif int(index_action) in (45, 46, 47, 38, 49, 99):
+                    callback_function = getattr(self.master, function_name)
+                    action.triggered.connect(callback_function)
+
+
+                # Wsom toolbar actions
+                elif int(index_action) in (26, 27):
+                    callback_function = getattr(self.wsom, function_name)
+                    action.triggered.connect(callback_function)
                 # Management toolbar actions
-                elif int(index_action) in (01, 02, 19, 25, 27, 28, 39, 45, 46, 48, 99):
+                elif int(index_action) in (01, 02, 19,  27, 28, 39):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)                    
                 # Edit toolbar actions
-                elif int(index_action) in (32, 33, 34, 36):                       
+                elif int(index_action) in (32, 33, 34):
                     callback_function = getattr(self.ed, function_name)  
                     action.triggered.connect(callback_function)
-                elif int(index_action) in (23, 24):
-                    callback_function = getattr(self.go2epa, function_name)
-                    action.triggered.connect(callback_function)
+
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -292,7 +307,7 @@ class Giswater(QObject):
         
         if toolbar_basic_enabled:
             toolbar_id = "basic"
-            list_actions = ['41', '47', '32']                
+            list_actions = ['41', '48', '32']
             self.manage_toolbar(toolbar_id, list_actions)  
             
         if toolbar_om_ws_enabled:

@@ -6,10 +6,8 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from datetime import datetime
-from PyQt4.QtCore import QSettings, QTime
-from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTableView, QTimeEdit, QSpinBox, QAbstractItemView
-from PyQt4.QtGui import QPushButton, QLineEdit
+
+from PyQt4.QtGui import QTableView, QAbstractItemView
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
 
 import os
@@ -22,13 +20,8 @@ plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-from ..ui.file_manager import FileManager   # @UnresolvedImport
+
 from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
-from ..ui.ws_options import WSoptions       # @UnresolvedImport
-from ..ui.ws_times import WStimes       # @UnresolvedImport
-from ..ui.ud_options import UDoptions       # @UnresolvedImport
-from ..ui.ud_times import UDtimes       # @UnresolvedImport
-from ..ui.hydrology_selector import HydrologySelector       # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -53,152 +46,73 @@ class Basic(ParentAction):
         dlg_multiexp = Multirow_selector()
         utils_giswater.setDialog(dlg_multiexp)
         dlg_multiexp.btn_ok.pressed.connect(dlg_multiexp.close)
-
+        dlg_multiexp.setWindowTitle("Explotation selector")
         tableleft = "exploitation"
         tableright = "selector_expl"
-        field_id = "expl_id"
-        # fill QTableView all_rows
-        tbl_all_rows = dlg_multiexp.findChild(QTableView, "all_rows")
-        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT * FROM "+self.controller.schema_name+"."+tableleft+" WHERE name NOT IN ("
-        sql += "SELECT name FROM "+self.controller.schema_name+"."+tableleft+"  RIGTH JOIN "
-        sql += self.controller.schema_name+"."+tableright+" ON "+tableleft+"."+field_id+" = "+tableright+"."+field_id
-        sql += " WHERE cur_user = current_user)"
-        self.fill_table_by_query(tbl_all_rows, sql)
-        self.hide_colums(tbl_all_rows, [0, 2, 3, 4])
-        tbl_all_rows.setColumnWidth(1, 200)
+        field_id_left = "expl_id"
+        field_id_right = "expl_id"
 
-        # fill QTableView selected_rows
-        tbl_selected_rows = dlg_multiexp.findChild(QTableView, "selected_rows")
-        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT name, cur_user, "+tableleft+"."+field_id+" FROM "+self.controller.schema_name+"."+tableleft
-        sql += " JOIN "+self.controller.schema_name+"."+tableright+" ON "+tableleft+"."+field_id+" = "+tableright+"."+field_id
-        sql += " WHERE cur_user=current_user"
-        self.fill_table_by_query(tbl_selected_rows, sql)
-        self.hide_colums(tbl_selected_rows, [1, 2])
-        tbl_selected_rows.setColumnWidth(0, 200)
-
-        # Button select
-        query_left = "SELECT * FROM "+self.controller.schema_name+"."+tableleft+" WHERE name NOT IN "
-        query_left += "(SELECT name FROM "+self.controller.schema_name+"."+tableleft
-        query_left += " RIGHT JOIN "+self.controller.schema_name+"."+tableright+" ON "+tableleft+"."+field_id+" = "+tableright+"."+field_id
-        query_left += " WHERE cur_user = current_user)"
-
-        query_right = "SELECT name, cur_user, "+tableleft+"."+field_id+" FROM "+self.controller.schema_name+"."+tableleft
-        query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        query_right += " WHERE cur_user = current_user"
-        dlg_multiexp.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id, tableright, "id", query_left, query_right, field_id))
-
-        # Button unselect
-        query_delete = "DELETE FROM "+self.controller.schema_name+"."+tableright
-        query_delete += " WHERE current_user = cur_user AND "+tableright+"."+field_id+"="
-        dlg_multiexp.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows,  query_delete, query_left, query_right, field_id))
-        # self.controller.log_info(str(sql))
-        # QLineEdit
-        dlg_multiexp.txt_name.textChanged.connect(partial(self.query_like_widget_text, dlg_multiexp.txt_name, tbl_all_rows, tableleft, tableright, field_id))
+        self.multi_row_selector(dlg_multiexp, tableleft, tableright, field_id_left, field_id_right)
         dlg_multiexp.exec_()
 
-    def mg_psector_selector(self):
-        """ Button 47: Psector selector """
 
-        # Create the dialog and signals
-        dlg_psector_sel = Multirow_selector()
-        utils_giswater.setDialog(dlg_psector_sel)
-        dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
-
-        tableleft = "plan_psector"
-        tableright = "selector_psector"
-        field_id = "psector_id"
-        # fill QTableView all_rows
-        tbl_all_rows = dlg_psector_sel.findChild(QTableView, "all_rows")
-        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN ("
-        sql += "SELECT name FROM " + self.controller.schema_name + "." + tableleft + "  RIGTH JOIN "
-        sql += self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        sql += " WHERE cur_user = current_user)"
-        self.fill_table_by_query(tbl_all_rows, sql)
-        self.hide_colums(tbl_all_rows, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-        tbl_all_rows.setColumnWidth(1, 200)
-        # fill QTableView selected_rows
-        tbl_selected_rows = dlg_psector_sel.findChild(QTableView, "selected_rows")
-        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT name, cur_user, " + tableleft + "." + field_id + " FROM " + self.controller.schema_name + "." + tableleft
-        sql += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        sql += " WHERE cur_user=current_user"
-        self.fill_table_by_query(tbl_selected_rows, sql)
-        self.hide_colums(tbl_selected_rows, [1, 2])
-        tbl_selected_rows.setColumnWidth(0, 200)
-        # Button select
-        query_left = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN "
-        query_left += "(SELECT name FROM " + self.controller.schema_name + "." + tableleft
-        query_left += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        query_left += " WHERE cur_user = current_user)"
-
-        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id + " FROM " + self.controller.schema_name + "." + tableleft
-        query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
-        query_right += " WHERE cur_user = current_user"
-        dlg_psector_sel.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id, tableright, "id", query_left, query_right, field_id))
-
-        # Button unselect
-        query_delete = "DELETE FROM " + self.controller.schema_name + "." + tableright
-        query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id + "="
-        dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id))
-        # self.controller.log_info(str(sql))
-        # QLineEdit
-        dlg_psector_sel.txt_name.textChanged.connect(partial(self.query_like_widget_text, dlg_psector_sel.txt_name, tbl_all_rows, tableleft, tableright, field_id))
-        dlg_psector_sel.exec_()
-    def mg_psector_selector(self):
+    def basic_state_selector(self):
         """ Button 48: State selector """
 
         # Create the dialog and signals
         dlg_psector_sel = Multirow_selector()
         utils_giswater.setDialog(dlg_psector_sel)
         dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
-
+        dlg_psector_sel.setWindowTitle("State selector")
         tableleft = "value_state"
         tableright = "selector_state"
-        field_id = "id"
+        field_id_left = "id"
+        field_id_right = "state_id"
+        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
+        dlg_psector_sel.exec_()
+
+
+
+
+    def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right):
         # fill QTableView all_rows
-        tbl_all_rows = dlg_psector_sel.findChild(QTableView, "all_rows")
+        tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         sql = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN ("
         sql += "SELECT name FROM " + self.controller.schema_name + "." + tableleft + "  RIGTH JOIN "
-        sql += self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
+        sql += self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         sql += " WHERE cur_user = current_user)"
         self.fill_table_by_query(tbl_all_rows, sql)
         self.hide_colums(tbl_all_rows, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
         tbl_all_rows.setColumnWidth(1, 200)
         # fill QTableView selected_rows
-        tbl_selected_rows = dlg_psector_sel.findChild(QTableView, "selected_rows")
+        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT name, cur_user, " + tableleft + "." + field_id + " FROM " + self.controller.schema_name + "." + tableleft
-        sql += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
+        sql = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", "+ tableright + "." + field_id_right + " FROM " + self.controller.schema_name + "." + tableleft
+        sql += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         sql += " WHERE cur_user=current_user"
         self.fill_table_by_query(tbl_selected_rows, sql)
-        self.hide_colums(tbl_selected_rows, [1, 2])
+        self.hide_colums(tbl_selected_rows, [1, 2, 3])
         tbl_selected_rows.setColumnWidth(0, 200)
         # Button select
         query_left = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN "
         query_left += "(SELECT name FROM " + self.controller.schema_name + "." + tableleft
-        query_left += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
+        query_left += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
 
-        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id + " FROM " + self.controller.schema_name + "." + tableleft
-        query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
+        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + " FROM " + self.controller.schema_name + "." + tableleft
+        query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
-        dlg_psector_sel.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id, tableright, "id", query_left, query_right, field_id))
+        dialog.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = "DELETE FROM " + self.controller.schema_name + "." + tableright
-        query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id + "="
-        dlg_psector_sel.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id))
-        # self.controller.log_info(str(sql))
+        query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
+        dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
-        dlg_psector_sel.txt_name.textChanged.connect(partial(self.query_like_widget_text, dlg_psector_sel.txt_name, tbl_all_rows, tableleft, tableright, field_id))
-        dlg_psector_sel.exec_()
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 
-
-    def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id):
+    def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
 
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -208,7 +122,7 @@ class Basic(ParentAction):
         expl_id = []
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
-            id_ = str(qtable_right.model().record(row).value(field_id))
+            id_ = str(qtable_right.model().record(row).value(field_id_right))
             expl_id.append(id_)
         for i in range(0, len(expl_id)):
             self.controller.execute_sql(query_delete + str(expl_id[i]))
@@ -297,5 +211,4 @@ class Basic(ParentAction):
         sql += "(SELECT name FROM " + self.controller.schema_name + "." + tableleft
         sql += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
         sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
-        self.controller.log_info(str(sql))
         self.fill_table_by_query(qtable, sql)
