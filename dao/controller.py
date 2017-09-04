@@ -510,6 +510,8 @@ class DaoController():
             locale = 'es'
         elif locale == 'es_ca':
             locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'
         locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
         # If user locale file not found, set English one by default
         if not os.path.exists(locale_path):

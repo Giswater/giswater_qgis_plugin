@@ -23,25 +23,8 @@ class SearchPlus(QObject):
         self.srid = srid
         self.controller = controller
         
-        # initialize plugin directory and locale
-        self.plugin_dir = os.path.dirname(__file__)
-        locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = os.path.join(self.plugin_dir, 'i18n', 'SearchPlus_{}.qm'.format(locale))
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)                
-        
-        # load local settings of the plugin
-        self.app_name = "searchplus"        
-        self.setting_file = os.path.join(self.plugin_dir, 'config', self.app_name+'.config')   
-        if not os.path.isfile(self.setting_file):
-            message = "Config file not found at: "+self.setting_file            
-            self.controller.show_warning(message)                
-            return False        
-        self.settings = QSettings(self.setting_file, QSettings.IniFormat)
-        self.stylesFolder = self.plugin_dir+"/styles/"          
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation('searchplus')           
     
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -51,30 +34,24 @@ class SearchPlus(QObject):
             self.enabled = False
             return      
         
+        # Set parameters that were located in removed file 'searchplus.config'
+        self.styles_folder = self.plugin_dir+"/styles/"          
+        self.qml_portal = 'portal.qml'                              
+        self.qml_hydrometer = 'hydrometer.qml'                
+        self.scale_zoom = 5000      
+        
         # Set signals          
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal)) 
-        
+    
         self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))    
 
         self.enabled = True
     
-    
-    def load_plugin_settings(self):
-        ''' Load plugin settings '''
-         
-        self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()                                
-        self.QML_HYDROMETER = self.settings.value('layers/QML_HYDROMETER', 'hydrometer.qml').lower()                 
-
-        # get initial Scale
-        self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
-                 
-    
+      
     def load_config_data(self):
         ''' Load configuration data from tables '''
-        
-        self.load_plugin_settings()
         
         self.params = {}
         sql = "SELECT * FROM "+self.controller.schema_name+".config_search_plus"
@@ -298,8 +275,8 @@ class SearchPlus(QObject):
         self.zoom_to_scale()
         
         # Load style
-        if self.QML_PORTAL is not None:        
-            self.load_style(self.portalMemLayer, self.QML_PORTAL)    
+        if self.qml_portal is not None:        
+            self.load_style(self.portalMemLayer, self.qml_portal)    
             
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -356,8 +333,8 @@ class SearchPlus(QObject):
         self.zoom_to_scale()
         
         # Load style
-        if self.QML_HYDROMETER is not None:
-            self.load_style(self.hydrometerMemLayerTo, self.QML_HYDROMETER)
+        if self.qml_hydrometer is not None:
+            self.load_style(self.hydrometerMemLayerTo, self.qml_hydrometer)
             
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -503,7 +480,7 @@ class SearchPlus(QObject):
         ''' Load QML style file into selected layer '''
         if layer is None:
             return
-        path_qml = self.stylesFolder+qml     
+        path_qml = self.styles_folder+qml     
         if os.path.exists(path_qml) and os.path.isfile(path_qml): 
             layer.loadNamedStyle(path_qml)      
             
