@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer
+from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
 from PyQt4.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, QPyNullVariant   # @UnresolvedImport
 
 from functools import partial
@@ -43,7 +43,7 @@ class SearchPlus(QObject):
         self.settings = QSettings(self.setting_file, QSettings.IniFormat)
         self.stylesFolder = self.plugin_dir+"/styles/"          
     
-        # create dialog
+        # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
         
         # Load configuration data from tables
@@ -51,19 +51,12 @@ class SearchPlus(QObject):
             self.enabled = False
             return      
         
-        # set signals
-        self.dlg.ppoint_field_zone.activated.connect(partial(self.ppoint_field_zone))         
-        self.dlg.ppoint_number.activated.connect(partial(self.ppoint_zoom))     
-           
+        # Set signals          
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal)) 
         
-        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))
-
-        self.dlg.urban_properties_zone.activated.connect(partial(self.urban_field_zone))               
-        self.dlg.urban_properties_block.activated.connect(partial(self.urban_field_block))       
-        self.dlg.urban_properties_number.activated.connect(partial(self.urban_zoom))        
+        self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))    
 
         self.enabled = True
     
@@ -71,10 +64,8 @@ class SearchPlus(QObject):
     def load_plugin_settings(self):
         ''' Load plugin settings '''
          
-        self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()                       
-        self.QML_PPOINT = self.settings.value('layers/QML_PPOINT', 'point.qml').lower()             
-        self.QML_HYDROMETER = self.settings.value('layers/QML_HYDROMETER', 'hydrometer.qml').lower()             
-        self.QML_URBAN = self.settings.value('layers/QML_URBAN', 'urban.qml').lower()       
+        self.QML_PORTAL = self.settings.value('layers/QML_PORTAL', 'portal.qml').lower()                                
+        self.QML_HYDROMETER = self.settings.value('layers/QML_HYDROMETER', 'hydrometer.qml').lower()                 
 
         # get initial Scale
         self.scale_zoom = self.settings.value('status/scale_zoom', 2500)
@@ -103,10 +94,8 @@ class SearchPlus(QObject):
         ''' Iterate over all layers to get the ones set in config file '''
         
         # Initialize class variables        
-        self.portalMemLayer = None            
-        self.ppointMemLayer = None            
+        self.portalMemLayer = None                      
         self.hydrometerMemLayerTo = None
-        self.urbanMemLayer = None
         
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
@@ -122,13 +111,9 @@ class SearchPlus(QObject):
                 if self.params['street_layer'] in uri_table: 
                     self.layers['street_layer'] = cur_layer 
                 elif self.params['portal_layer'] in uri_table:    
-                    self.layers['portal_layer'] = cur_layer 
-                elif self.params['ppoint_layer'] in uri_table: 
-                    self.layers['ppoint_layer'] = cur_layer     
+                    self.layers['portal_layer'] = cur_layer  
                 elif self.params['hydrometer_layer'] in uri_table:   
-                    self.layers['hydrometer_layer'] = cur_layer      
-                if self.params['urban_propierties_layer'] in uri_table:
-                    self.layers['urban_propierties_layer'] = cur_layer      
+                    self.layers['hydrometer_layer'] = cur_layer        
                 if self.params['hydrometer_urban_propierties_layer'] in uri_table:
                     self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
      
@@ -151,18 +136,7 @@ class SearchPlus(QObject):
         # Tab 'Address'      
         status = self.address_populate('street_layer')
         if not status:
-            self.dlg.tab_main.removeTab(2)                       
-        
-        # Tab 'Ppoint'      
-        status = self.populate_combo('ppoint_layer', self.dlg.ppoint_field_zone, self.params['ppoint_field_zone'])
-        status_2 = self.populate_combo('ppoint_layer', self.dlg.ppoint_number, self.params['ppoint_field_number'])
-        if not status or not status_2:
-            self.dlg.tab_main.removeTab(1)              
-              
-        # Tab 'Urban Properties'      
-        status = self.urban_populate('urban_propierties_layer')
-        if not status:
-            self.dlg.tab_main.removeTab(0)              
+            self.dlg.tab_main.removeTab(2)                              
             
         return True
         
@@ -357,73 +331,6 @@ class SearchPlus(QObject):
         
         return expr
     
-    
-    def ppoint_field_zone(self):
-        ''' Executed when field_zone is activated '''
-
-        # Filter combo 'ppoint_number' with value selected in combo 'ppoint_field_zone'
-        text = utils_giswater.getSelectedItem(self.dlg.ppoint_field_zone) 
-        sql = "SELECT DISTINCT("+self.params['ppoint_field_number']+"::int4)"
-        sql+= " FROM "+self.controller.schema_name+"."+self.params['ppoint_layer']
-        if text != 'null':
-            sql+= " WHERE "+self.params['ppoint_field_zone']+" = '"+str(text)+"'"
-        sql+= " ORDER BY "+self.params['ppoint_field_number']
-        rows = self.controller.dao.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg.ppoint_number, rows)
-        
-        # Make zoom to selected elements
-        self.ppoint_zoom()   
-             
-            
-    def ppoint_zoom(self):
-        ''' Zoom to layer 'point' filtering values of all combos '''  
-         
-        # Build expresion search
-        aux = ""
-        layer = self.layers['ppoint_layer']      
-        fieldname = self.params['ppoint_field_zone']
-        combo =  self.dlg.ppoint_field_zone
-        text = utils_giswater.getSelectedItem(combo)
-        if text != "null":
-            if aux != "":
-                aux+= " AND "
-            aux+= fieldname+" = '"+str(text)+"'"
-            
-        fieldname = self.params['ppoint_field_number']
-        combo =  self.dlg.ppoint_number
-        text = utils_giswater.getSelectedItem(combo)
-        if text != "null":
-            if aux != "":
-                aux+= " AND "
-            aux+= fieldname+" = '"+str(text)+"'"
-         
-        # Build a list of feature id's from the expression and select them       
-        if aux != '':
-            expr = QgsExpression(aux)    
-            if expr.hasParserError():   
-                message = expr.parserErrorString() + ": " + aux
-                self.controller.show_warning(message)        
-                return              
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            ids = [i.id() for i in it]
-            layer.setSelectedFeatures(ids)
-        # Select all features
-        else:
-            layer.selectAll()       
-        
-        # Copy selected features to memory layer     
-        self.ppointMemLayer = self.copy_selected(layer, self.ppointMemLayer, "Point")       
-
-        # Zoom to generated memory layer
-        self.zoom_to_scale()
-        
-        # Load style
-        if self.QML_PPOINT is not None:
-            self.load_style(self.ppointMemLayer, self.QML_PPOINT)
-            
-        # Toggles 'Show feature count'
-        self.show_feature_count()                  
-  
   
     def hydrometer_zoom(self, fieldname, combo):
         ''' Zoom to layer 'v_edit_connec' '''  
@@ -456,118 +363,6 @@ class SearchPlus(QObject):
         self.show_feature_count()                  
             
             
-    def urban_populate(self, layer):
-        ''' Populate combos tab 'urban properties' '''
-        
-        status = self.populate_combo(layer, self.dlg.urban_properties_zone, self.params['urban_propierties_field_pzone'])
-        if not status:
-            return False        
-        status = self.populate_combo(layer, self.dlg.urban_properties_block, self.params['urban_propierties_field_block'])
-        if not status:
-            return False
-        status = self.populate_combo(layer, self.dlg.urban_properties_number, self.params['urban_propierties_field_number'])   
-        if not status:
-            return False
-
-        return True
-                       
-    
-    def urban_field_zone(self):
-        ''' Executed when 'urban_propierties_field_pzone' is activated '''
-        
-        # Filter combo 'urban_properties_block' with value selected in combo 'urban_properties_zone'
-        text = utils_giswater.getSelectedItem(self.dlg.urban_properties_zone)
-        sql = "SELECT DISTINCT("+self.params['urban_propierties_field_block']+"::int4)"
-        sql+= " FROM "+self.controller.schema_name+"."+self.params['urban_propierties_layer']
-        if text != 'null':
-            sql+= " WHERE "+self.params['urban_propierties_field_pzone']+" = '"+str(text)+"'"
-        sql+= " ORDER BY "+self.params['urban_propierties_field_block']
-        rows = self.controller.dao.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg.urban_properties_block, rows)
-        
-        # Make zoom to selected elements
-        self.urban_zoom()   
-    
-    
-    def urban_field_block(self):
-        ''' Executed when 'urban_propierties_field_block' is activated '''
-
-        text_zone = utils_giswater.getSelectedItem(self.dlg.urban_properties_zone)
-        text_block = utils_giswater.getSelectedItem(self.dlg.urban_properties_block)
-            
-        # Filter combo 'urban_properties_number' with values selected in combos 'urban_properties_zone' and 'urban_properties_block'
-        sql = "SELECT DISTINCT("+self.params['urban_propierties_field_number']+"::int4)"
-        sql+= " FROM "+self.controller.schema_name+"."+self.params['urban_propierties_layer']
-        if text_zone != 'null':
-            sql+= " WHERE "+self.params['urban_propierties_field_pzone']+" = '"+str(text_zone)+"'"
-        if text_block != 'null':
-            sql+= " AND "+self.params['urban_propierties_field_block']+" = '"+str(text_block)+"'"
-        sql+= " ORDER BY "+self.params['urban_propierties_field_number']
-        rows = self.controller.dao.get_rows(sql)
-        utils_giswater.fillComboBox(self.dlg.urban_properties_number, rows)
-        
-        # Make zoom to selected elements
-        self.urban_zoom()   
-             
-                 
-    def urban_zoom(self):
-        ''' Zoom to layer 'urban' filtering values of all combos '''  
-
-        # Build expresion search
-        aux = ""
-        layer = self.layers['urban_propierties_layer']      
-        fieldname = self.params['urban_propierties_field_pzone']
-        combo =  self.dlg.urban_properties_zone
-        text = utils_giswater.getSelectedItem(combo)
-        if text != "null":
-            if aux != "":
-                aux+= " AND "
-            aux+= fieldname+" = '"+str(text)+"'"
-            
-        fieldname = self.params['urban_propierties_field_block']
-        combo =  self.dlg.urban_properties_block
-        text = utils_giswater.getSelectedItem(combo)
-        if text != "null":
-            if aux != "":
-                aux+= " AND "
-            aux+= fieldname+" = '"+str(text)+"'"
-            
-        fieldname = self.params['urban_propierties_field_number']
-        combo =  self.dlg.urban_properties_number
-        text = utils_giswater.getSelectedItem(combo)
-        if text != "null":
-            if aux != "":
-                aux+= " AND "
-            aux+= fieldname+" = '"+str(text)+"'"
-         
-        # Build a list of feature id's from the expression and select them       
-        if aux != '':
-            expr = QgsExpression(aux)    
-            if expr.hasParserError():   
-                message = expr.parserErrorString() + ": " + aux
-                self.controller.show_warning(message)        
-                return              
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            ids = [i.id() for i in it]
-            layer.setSelectedFeatures(ids)
-        # Select all features
-        else:
-            layer.selectAll()       
-        
-        # Copy selected features to memory layer     
-        self.urbanMemLayer = self.copy_selected(layer, self.urbanMemLayer, "Polygon")       
-
-        # Zoom to generated memory layer
-        self.zoom_to_scale()
-        
-        # Load style
-        if self.QML_URBAN is not None:
-            self.load_style(self.urbanMemLayer, self.QML_URBAN) 
-              
-        # Toggles 'Show feature count'
-        self.show_feature_count()                             
-            
-          
     def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
         ''' Populate selected combo from features of selected layer '''        
         
@@ -653,10 +448,8 @@ class SearchPlus(QObject):
     def manage_mem_layers(self):
         ''' Delete previous features from all memory layers '''        
         self.manage_mem_layer(self.portalMemLayer)
-        self.manage_mem_layer(self.ppointMemLayer)
         self.manage_mem_layer(self.hydrometerMemLayerTo)
-        self.manage_mem_layer(self.urbanMemLayer)
-      
+
     
     def copy_selected(self, layer, mem_layer, geom_type):
         ''' Copy from selected layer to memory layer '''
