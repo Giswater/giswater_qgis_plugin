@@ -17,6 +17,7 @@ from functools import partial
 from actions.ed import Ed
 from actions.mg import Mg
 from actions.go2epa import Go2Epa
+from actions.master import Master
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -103,6 +104,7 @@ class Giswater(QObject):
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         
         # Define signals
         self.set_signals()
@@ -137,6 +139,9 @@ class Giswater(QObject):
                     action.triggered.connect(callback_function)
                 elif int(index_action) in (23, 24):
                     callback_function = getattr(self.go2epa, function_name)
+                    action.triggered.connect(callback_function)
+                elif int(index_action) in (38, 49):
+                    callback_function = getattr(self.master, function_name)
                     action.triggered.connect(callback_function)
                 # Generic function
                 else:        
@@ -282,7 +287,7 @@ class Giswater(QObject):
             self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
                 
         # Set an action list for every toolbar    
-        list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','39','41','43','45','46','47','48','56','57','98','99']
+        list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','38','39','41','43','44','45','46','47','48','49','56','57','98','99']
         list_actions_ed = ['30','31','32','33','34','35','36','44','52']
                 
         # MANAGEMENT toolbar 
