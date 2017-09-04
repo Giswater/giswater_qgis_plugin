@@ -137,6 +137,16 @@ class DaoController():
             self.log_codes[log_code_id] = result[0]    
         else:
             self.log_codes[log_code_id] = "Error message not found in the database: "+str(log_code_id)
+            
+            
+    def get_postgresql_version(self):    
+        ''' Get PostgreSQL version (integer value) '''    
+
+        self.postgresql_version = None
+        sql = "SELECT current_setting('server_version_num');"
+        row = self.dao.get_row(sql)  
+        if row:
+            self.postgresql_version = row[0]            
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
@@ -261,6 +271,54 @@ class DaoController():
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
                 return self.get_error_from_audit()    
+
+        return True
+           
+            
+    def execute_upsert(self, tablename, unique_field, unique_value, fields, values):
+        ''' Execute UPSERT sentence '''
+         
+        # Check PostgreSQL version
+        if int(self.postgresql_version) < 90500:   
+            self.show_warning("UPSERT sentence not valid in PostgreSQL versions <9.5")
+            return
+         
+        # Set SQL for INSERT               
+        sql = " INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
+        
+        # Iterate over fields
+        sql_fields = "" 
+        for fieldname in fields:
+            sql_fields += fieldname + ", "
+        sql += sql_fields[:-2] + ") VALUES ("   
+          
+        # Manage value 'current_user'   
+        if unique_value != 'current_user':
+            unique_value = "'" + unique_value + "'" 
+            
+        # Iterate over values            
+        sql_values = ""
+        for value in values:
+            if value != 'current_user':
+                sql_values += "'" + value + "', "
+            else:
+                sql_values += value + ", "
+        sql += unique_value + ", " + sql_values[:-2] + ")"         
+        
+        # Set SQL for UPDATE
+        sql += " ON CONFLICT (" + unique_field + ") DO UPDATE"
+        sql += " SET ("
+        sql += sql_fields[:-2] + ") = (" 
+        sql += sql_values[:-2] + ")" 
+        sql += " WHERE " + tablename + "." + unique_field + " = " + unique_value          
+        
+        # Execute UPSERT
+        self.log_info(sql)
+        result = self.dao.execute_sql(sql)
+        self.last_error = self.dao.last_error         
+        if not result:
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            return False
 
         return True
     

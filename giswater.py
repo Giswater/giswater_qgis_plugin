@@ -649,6 +649,9 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
+        # Get PostgreSQL version
+        self.controller.get_postgresql_version()        
+        
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           

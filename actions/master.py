@@ -113,13 +113,9 @@ class Master(ParentAction):
     
         # Get selected value and upsert the table
         result_id = utils_giswater.getWidgetText("rpt_selector_result_id")
-        sql = " INSERT INTO "+self.schema_name+".plan_selector_result (result_id, cur_user) VALUES ("
-        sql += "'" + result_id + "', current_user)"
-        sql += " ON CONFLICT (cur_user) DO UPDATE"
-        sql += " SET result_id = '" + result_id + "'"
-        sql += " WHERE plan_selector_result.cur_user = current_user"
-        self.controller.log_info(sql)
-        status = self.controller.execute_sql(sql)
+        fields = ['result_id']
+        values = [result_id]
+        status = self.controller.execute_upsert('plan_selector_result', 'cur_user', 'current_user', fields, values)
         if status:
             message = "Values has been updated"
             self.controller.show_info(message, context_name='ui_message')        
