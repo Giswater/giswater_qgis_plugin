@@ -19,7 +19,7 @@ from actions.mg import Mg
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.master import Master
-from actions.wsom import Wsom
+from actions.om_ws import OmWs
 from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
@@ -110,7 +110,7 @@ class Giswater(QObject):
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.wsom = Wsom(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.om_ws = OmWs(self.iface, self.settings, self.controller, self.plugin_dir)
         # Define signals
         self.set_signals()
         
@@ -149,9 +149,9 @@ class Giswater(QObject):
                     action.triggered.connect(callback_function)
 
 
-                # Wsom toolbar actions
+                # om_ws toolbar actions
                 elif int(index_action) in (26, 27):
-                    callback_function = getattr(self.wsom, function_name)
+                    callback_function = getattr(self.om_ws, function_name)
                     action.triggered.connect(callback_function)
                 # Management toolbar actions
                 elif int(index_action) in (01, 02, 19,  27, 28, 39):
@@ -704,7 +704,7 @@ class Giswater(QObject):
         self.manage_map_tools()
 
         # Set SearchPlus object
-        self.set_search_plus()
+        #self.set_search_plus()
         
         # Delete python compiled files
         self.delete_pyc_files()  

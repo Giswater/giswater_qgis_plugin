@@ -26,7 +26,7 @@ from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
 from parent import ParentAction
 
 
-class Wsom(ParentAction):
+class OmWs(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control Management toolbar actions """
