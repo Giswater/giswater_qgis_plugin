@@ -215,8 +215,12 @@
 
 <context>
 
-    <name>ws_node</name>
+    <name>ws_man_node</name>
     
+    <message>
+        <source>label_node_id</source>
+        <translation>Node:</translation>
+    </message>            
     <message>
         <source>label_elevation</source>
         <translation>Elevation</translation>
@@ -794,10 +798,6 @@
         <translation>Type</translation>
     </message>  
     <message>
-        <source>label_event_element_event_type</source>
-        <translation>Event:</translation>
-    </message>  
-    <message>
         <source>label_log_node_to</source>
         <translation>to</translation>
     </message>  
@@ -852,15 +852,15 @@
 
  <context>
  
-    <name>ws_arc</name>
+    <name>ws_man_arc</name>
     
     <message>
-        <source>label_arc_node_1</source>
-        <translation>Node 1</translation>
+        <source>label_pipe_node_1</source>
+        <translation>Node 1:</translation>
     </message>  
     <message>
-        <source>label_arc_node_2</source>
-        <translation>Node 2</translation>
+        <source>label_pipe_node_2</source>
+        <translation>Node 2:</translation>
     </message>  
     <message>
         <source>label_arc_sector_id</source>
@@ -3386,6 +3386,7 @@
         <source>You are trying to enter different types</source>
         <translation>Estàs intentant introduir tipus diferents</translation>
     </message>
+    <message>    
         <source>Any table has been selected</source>
         <translation>Any table has been selected</translation>
     </message>   
@@ -3425,7 +3426,11 @@
         <source>You need to upgrade your version of pg_routing!</source>
         <translation>You need to upgrade your version of pg_routing!</translation>
     </message>
-   
+    <message>
+        <source>Selected schema not found</source>
+        <translation>Esquema seleccionat no existeix</translation>
+    </message>        
+    
 
 </context>
 

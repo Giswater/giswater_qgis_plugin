@@ -34,6 +34,7 @@ class Dimensions(ParentDialog):
         ''' Constructor class '''
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
+        self.controller.manage_translation('dimensions', dialog)             
         if dialog.parent():        
             dialog.parent().setFixedSize(320, 410)
         

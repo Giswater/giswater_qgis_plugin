@@ -6,8 +6,8 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsProject, QCoreApplication, QgsExpressionContextUtils
-from PyQt4.QtCore import QObject, QSettings, QTranslator
+from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
+from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
@@ -31,6 +31,7 @@ from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
 #from map_tools.dimensions import Dimensions
+from map_tools.replace_node import ReplaceNodeMapTool
 
 from search.search_plus import SearchPlus
 
@@ -57,23 +58,12 @@ class Giswater(QObject):
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
-        self.plugin_name = os.path.basename(self.plugin_dir)   
+        self.plugin_name = os.path.basename(self.plugin_dir).lower()  
         self.icon_folder = self.plugin_dir+'/icons/'    
 
         # Initialize svg giswater directory
         svg_plugin_dir = os.path.join(self.plugin_dir, 'svg')
         QgsExpressionContextUtils.setProjectVariable('svg_path', svg_plugin_dir)   
-
-        # Initialize locale
-        locale = QSettings().value('locale/userLocale')
-        locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_{}.qm'.format(locale))
-        # If user locale not exists, load English
-        if not os.path.exists(locale_path):
-            locale_path = os.path.join(self.plugin_dir, 'i18n', self.plugin_name+'_en_US.qm')
-
-        translator = QTranslator()
-        translator.load(locale_path)
-        QCoreApplication.installTranslator(translator)
             
         # Check if config file exists    
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name+'.config')
@@ -92,6 +82,7 @@ class Giswater(QObject):
         
         # Set controller to handle settings and database connection
         self.controller = DaoController(self.settings, self.plugin_name, self.iface)
+        self.controller.plugin_dir = self.plugin_dir        
         self.controller.set_qgis_settings(self.qgis_settings)
         connection_status = self.controller.set_database_connection()
         if not connection_status:
@@ -99,9 +90,15 @@ class Giswater(QObject):
             self.controller.show_warning(msg, 30) 
             return 
         
+        # Manage locale and corresponding 'i18n' file
+        self.controller.manage_translation(self.plugin_name)
+                
+        # Get schema and check if exists
         self.dao = self.controller.dao 
         self.schema_name = self.controller.get_schema_name()
         self.schema_exists = self.dao.check_schema(self.schema_name)
+        if not self.schema_exists:
+            self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
         # Set actions classes
         self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -260,6 +257,8 @@ class Giswater(QObject):
             #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
                 map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 44:
+                map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 52:
                 map_tool = FlowRegulator(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
@@ -289,7 +288,7 @@ class Giswater(QObject):
                 
         # Set an action list for every toolbar    
         list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','38','39','41','43','44','45','46','47','48','49','56','57','98','99']
-        list_actions_ed = ['30','31','32','33','34','35','36','52']
+        list_actions_ed = ['30','31','32','33','34','35','36','44','52']
                 
         # MANAGEMENT toolbar 
         if self.toolbar_mg_enabled:      
@@ -778,6 +777,7 @@ class Giswater(QObject):
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
         self.set_map_tool('mg_mincut')
+        self.set_map_tool('mg_replace_node')
         #self.set_map_tool('mg_dimensions')
                 
         

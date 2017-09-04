@@ -6,11 +6,12 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QCoreApplication, QSettings, Qt 
+from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import QgsMessageLog
 
+import os.path
 import subprocess
 from functools import partial
 
@@ -23,14 +24,20 @@ class DaoController():
         self.settings = settings      
         self.plugin_name = plugin_name               
         self.iface = iface               
+        self.translator = None           
+        self.plugin_dir = None           
         
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name  
-    
+                
     def tr(self, message, context_name=None):
         if context_name is None:
             context_name = self.plugin_name
-        return QCoreApplication.translate(context_name, message)                            
+        value = QCoreApplication.translate(context_name, message)
+        # If not translation has been found, check into 'ui_message' context
+        if value == message:
+            value = QCoreApplication.translate('ui_message', message)
+        return value                            
     
     def set_qgis_settings(self, qgis_settings):
         self.qgis_settings = qgis_settings       
@@ -132,20 +139,25 @@ class DaoController():
             self.log_codes[log_code_id] = "Error message not found in the database: "+str(log_code_id)
         
     
-    def show_message(self, text, message_level=1, duration=5, context_name=None):
+    def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
         ''' Show message to the user with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.iface.messageBar().pushMessage("", self.tr(text, context_name), message_level, duration)
+        msg = None        
+        if text is not None:        
+            msg = self.tr(text, context_name)
+            if parameter is not None:
+                msg+= ": "+str(parameter)             
+        self.iface.messageBar().pushMessage("", msg, message_level, duration)
         #QMessageBox.about(None, 'Ok', str(text))
             
-    def show_info(self, text, duration=5, context_name=None):
+    def show_info(self, text, duration=5, context_name=None, parameter=None):
         ''' Show information message to the user '''
-        self.show_message(text, 0, duration, context_name)
+        self.show_message(text, 0, duration, context_name, parameter)
         #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
-    def show_warning(self, text, duration=5, context_name=None):
+    def show_warning(self, text, duration=5, context_name=None, parameter=None):
         ''' Show warning message to the user '''
-        self.show_message(text, 1, duration, context_name)
+        self.show_message(text, 1, duration, context_name, parameter)
         #QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
 
     def show_warning_detail(self, text, detail_text, context_name=None):
@@ -399,7 +411,7 @@ class DaoController():
         if text is not None:
             msg = self.tr(text, context_name)
             if parameter is not None:
-                msg+= ": "+parameter            
+                msg+= ": "+str(parameter)            
         QgsMessageLog.logMessage(msg, self.plugin_name, message_level)
         
 
@@ -412,6 +424,42 @@ class DaoController():
     def log_warning(self, text=None, context_name=None, parameter=None):
         ''' Write warning message into QGIS Log Messages Panel
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
-        self.log_message(text, 1, context_name, parameter=parameter)          
+        self.log_message(text, 1, context_name, parameter=parameter)   
+        
+     
+    def add_translator(self, locale_path):
+        """ Add translation file to the list of translation files to be used for translations """
+        if os.path.exists(locale_path):        
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
+            self.log_info("Add translator", parameter=locale_path)            
+            
+                    
+    def manage_translation(self, locale_name, dialog=None):  
+        """ Manage locale and corresponding 'i18n' file """ 
+        
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale').lower()
+        if locale == 'es_es':
+            locale = 'es'
+        elif locale == 'es_ca':
+            locale = 'ca'
+        locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
+        # If user locale file not found, set English one by default
+        if not os.path.exists(locale_path):
+            self.log_info("Locale not found", parameter=locale_path)
+            locale_default = 'en_us'
+            locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale_default))
+            # If English locale file not found, just log it
+            if not os.path.exists(locale_path):            
+                self.log_info("Locale not found", parameter=locale_path)            
+        
+        # Add translation file
+        self.add_translator(locale_path) 
+        
+        # If dialog is set, then translate form
+        if dialog:
+            self.translate_form(dialog, locale_name)                                 
         
             

@@ -1,20 +1,8 @@
 """
-/***************************************************************************
-        begin                : 2016-01-05
-        copyright            : (C) 2016 by BGEO SL
-        email                : vicente.medina@gits.ws
-        git sha              : $Format:%H$
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
@@ -26,14 +14,14 @@ from PyQt4.QtGui import QColor
 from map_tools.parent import ParentMapTool
 
 
-class DeleteNodeMapTool(ParentMapTool):
-    ''' Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' '''
+class ReplaceNodeMapTool(ParentMapTool):
+    ''' Button 44: User select one node. Execute SQL function: 'gw_fct_node_replace' '''
 
     def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
 
         # Call ParentMapTool constructor
-        super(DeleteNodeMapTool, self).__init__(iface, settings, action, index_action)
+        super(ReplaceNodeMapTool, self).__init__(iface, settings, action, index_action)
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -43,11 +31,10 @@ class DeleteNodeMapTool(ParentMapTool):
         self.vertexMarker.setPenWidth(5)
 
 
-
     ''' QgsMapTools inherited event functions '''
 
     def canvasMoveEvent(self, event):
-
+        
         # Hide highlight
         self.vertexMarker.hide()
 
@@ -55,7 +42,7 @@ class DeleteNodeMapTool(ParentMapTool):
         x = event.pos().x()
         y = event.pos().y()
 
-        #Plugin reloader bug, MapTool should be deactivated
+        # Plugin reloader bug, MapTool should be deactivated
         try:
             eventPoint = QPoint(x, y)
         except(TypeError, KeyError):
@@ -73,7 +60,7 @@ class DeleteNodeMapTool(ParentMapTool):
 
                 exist = self.snapperManager.check_node_group(snapPoint.layer)
                 if exist:
-                #if snapPoint.layer.name() == self.layer_node.name():
+                    # if snapPoint.layer.name() == self.layer_node.name():
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
 
@@ -82,7 +69,7 @@ class DeleteNodeMapTool(ParentMapTool):
                     self.vertexMarker.show()
 
                     break
-                
+
 
     def canvasReleaseEvent(self, event):
 
@@ -104,12 +91,13 @@ class DeleteNodeMapTool(ParentMapTool):
                 # Check Arc or Node
                 for snapPoint in result:
 
-                    exist=self.snapperManager.check_node_group(snapPoint.layer)
-                    #if snapPoint.layer.name() == self.layer_node.name():
-                    if exist : 
+                    exist = self.snapperManager.check_node_group(snapPoint.layer)
+                    # if snapPoint.layer.name() == self.layer_node.name():
+                    if exist:
                         # Get the point
-                        point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
+                        point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
                         snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                        result[0].layer.select([result[0].snappedAtGeometry])
                         break
 
             if snappFeat is not None:
@@ -117,19 +105,21 @@ class DeleteNodeMapTool(ParentMapTool):
                 # Get selected features and layer type: 'node'
                 feature = snappFeat
                 node_id = feature.attribute('node_id')
-                
+                layer = result[0].layer.name()
+                view_name = "v_edit_man_"+layer.lower()
+                message = str(view_name)
+
                 # Show message before executing
-                message = "The procedure will delete features on database. Please ensure that features has no undelete value on true." 
-                message+= " On the other hand you must know that traceability table will storage precedent information."
+                message = "Are you sure you want to replace selected node with a new one ?"
                 self.controller.show_info_box(message, "Info")
-                  
+
                 # Execute SQL function and show result to the user
-                function_name = "gw_fct_delete_node"
-                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "');"
+                function_name = "gw_fct_node_replace"
+                sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(node_id) + "','" + str(view_name) + "');"
                 status = self.controller.execute_sql(sql)
                 if status:
-                    message = "Node deleted successfully"
-                    self.controller.show_info(message, context_name='ui_message')  
+                    message = "Node replaced successfully"
+                    self.controller.show_info(message, context_name='ui_message')
 
                 # Refresh map canvas
                 self.iface.mapCanvas().refreshAllLayers()
@@ -156,9 +146,9 @@ class DeleteNodeMapTool(ParentMapTool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be removed"
+            message = "Select the node inside a pipe by clicking on it and it will be replaced"
             self.controller.show_info(message, context_name='ui_message')
-               
+
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() == None:
             self.iface.setActiveLayer(self.layer_node_man[0])
@@ -176,5 +166,5 @@ class DeleteNodeMapTool(ParentMapTool):
         self.canvas.setCursor(self.stdCursor)
 
         # Removehighlight
-        self.h = None   
+        self.h = None
     

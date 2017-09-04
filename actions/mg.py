@@ -82,6 +82,11 @@ class Mg(ParentAction):
     def mg_arc_topo_repair_accept(self):
         """ Button 19. Executes functions that are selected """
 
+        # Builder
+        if self.dlg.check_create_nodes_from_arcs.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
+            self.controller.execute_sql(sql)
+
         # Review/Utils
         if self.dlg.check_node_orphan.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_orphan();"
@@ -91,11 +96,11 @@ class Mg(ParentAction):
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_duplicated();"
             self.controller.execute_sql(sql)
 
-        if self.dlg.check_node_state_coherence.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_state_coherence();"
+        if self.dlg.check_topology_coherence.isChecked():
+            sql = "SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();"
             self.controller.execute_sql(sql)
 
-        if self.dlg.check_arc_same_startend.isChecked():
+        if self.dlg.check_arc_same_start_end.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_arc_same_startend();"
             self.controller.execute_sql(sql)
 
@@ -106,7 +111,6 @@ class Mg(ParentAction):
         if self.dlg.check_connec_duplicated.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_connec_duplicated();"
             self.controller.execute_sql(sql)
-
         # Review/WS
         if self.dlg.check_topology_coherence.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_topological_consistency();"
@@ -129,18 +133,17 @@ class Mg(ParentAction):
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_sink();"
             self.controller.execute_sql(sql)
 
-        # Builder
-        if self.dlg.create_nodes_from_arcs.isChecked():
-            sql = "SELECT "+self.schema_name+".gw_fct_built_nodefromarc();"
-            self.controller.execute_sql(sql)
         '''
         if self.dlg.check_topology_repair.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_anl_node_arc_topology();"
             self.controller.execute_sql(sql)
         '''
-
+        # Repair
+        if self.dlg.check_arc_searchnodes.isChecked():
+            sql = "SELECT " + self.schema_name + ".gw_fct_topo_arc_searchnodes();"
+            self.controller.execute_sql(sql)
         # Close the dialog
-        self.close_dialog()
+        self.close_dialog(self.dlg)
 
         # Refresh map canvas
         self.iface.mapCanvas().refresh()
@@ -343,7 +346,7 @@ class Mg(ParentAction):
         self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
         self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
 
-        # Get om_visit_absolute_path and doc_absolute_path from config_param_text
+        # Get om_visit_absolute_path and doc_absolute_path from config_param_system
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'om_visit_absolute_path'"
         row = self.dao.get_row(sql)
@@ -372,7 +375,6 @@ class Mg(ParentAction):
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'psector_vdefault'"
         row = self.dao.get_row(sql)
         if row:
-            self.controller.show_info(str(row))
             utils_giswater.setChecked(self.chk_psector_enabled, True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         self.mg_options_get_data("config")
@@ -521,7 +523,6 @@ class Mg(ParentAction):
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
-                    # self.controller.show_info(str(widget.objectName()))
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
                         sql += "'"+widget.currentText() + "' WHERE parameter='" + parameter + "'"
@@ -1589,7 +1590,6 @@ class Mg(ParentAction):
             for element_id, feat_type in self.list_elemets.items():
                 sql = "INSERT INTO " + self.schema_name + "." + tablename + "(" + feat_type + "_id, psector_id)"
                 sql += "VALUES (" + element_id + ", " + self.psector_id.text() + ")"
-                self.controller.log_info(str(sql))
                 self.controller.execute_sql(sql)
             table_view.model().select()
             self.emitPoint.canvasClicked.disconnect()
