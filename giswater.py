@@ -671,7 +671,7 @@ class Giswater(QObject):
         self.manage_map_tools()
 
         # Set SearchPlus object
-        self.set_search_plus()
+        #self.set_search_plus()
         
         # Delete python compiled files
         self.delete_pyc_files()  

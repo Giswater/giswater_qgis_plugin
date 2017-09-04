@@ -87,9 +87,9 @@ class SearchPlus(QObject):
         
         self.params = {}
         sql = "SELECT * FROM "+self.controller.schema_name+".config_search_plus"
-        row = self.controller.dao.get_row(sql)
+        row = self.controller.get_row(sql)
         if not row:
-            self.controller.show_warning("No data found in configuration table 'config_search_plus'")
+            self.controller.log_warning("No data found in configuration table 'config_search_plus'")
             return False
 
         for i in range(0, len(row)):
