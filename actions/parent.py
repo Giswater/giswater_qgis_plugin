@@ -1,9 +1,9 @@
-'''
+"""
 This file is part of Giswater 2.0
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
 General Public License as published by the Free Software Foundation, either version 3 of the License, 
 or (at your option) any later version.
-'''
+"""
 
 # -*- coding: utf-8 -*-
 from functools import partial
@@ -16,7 +16,7 @@ import sys
 import webbrowser
 import ConfigParser
 
-from PyQt4.QtGui import QMessageBox
+
 from PyQt4.QtGui import QTableView
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
@@ -26,7 +26,6 @@ import utils_giswater
 
 
 class ParentAction():
-
 
     def __init__(self, iface, settings, controller, plugin_dir):  
         ''' Class constructor '''
@@ -204,7 +203,7 @@ class ParentAction():
         
         
     def open_web_browser(self, widget):
-        ''' Display url using the default browser '''
+        """ Display url using the default browser """
         
         url = utils_giswater.getWidgetText(widget) 
         if url == 'null':
@@ -213,7 +212,7 @@ class ParentAction():
                 
                 
     def open_file_dialog(self, widget):
-        ''' Open File Dialog '''
+        """ Open File Dialog """
         
         # Get default value from widget
         file_path = utils_giswater.getWidgetText(widget)

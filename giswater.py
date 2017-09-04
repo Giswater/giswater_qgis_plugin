@@ -18,6 +18,7 @@ from actions.ed import Ed
 from actions.mg import Mg
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
+from actions.edit import Edit
 from actions.master import Master
 from actions.om_ws import OmWs
 from dao.controller import DaoController
@@ -109,6 +110,7 @@ class Giswater(QObject):
         self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         self.om_ws = OmWs(self.iface, self.settings, self.controller, self.plugin_dir)
         # Define signals
@@ -139,6 +141,10 @@ class Giswater(QObject):
                 if int(index_action) in (41, 48, 32):
                     callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
+                # Edit toolbar actions
+                if int(index_action) in (01, 02, 19, 33, 34, 98):
+                    callback_function = getattr(self.edit, function_name)
+                    action.triggered.connect(callback_function)
                 # Go2epa toolbar actions
                 elif int(index_action) in (23, 24, 25, 36):
                     callback_function = getattr(self.go2epa, function_name)
@@ -154,11 +160,11 @@ class Giswater(QObject):
                     callback_function = getattr(self.om_ws, function_name)
                     action.triggered.connect(callback_function)
                 # Management toolbar actions
-                elif int(index_action) in (01, 02, 19,  27, 28, 39):
+                elif int(index_action) in (27, 28, 39):
                     callback_function = getattr(self.mg, function_name)  
                     action.triggered.connect(callback_function)                    
                 # Edit toolbar actions
-                elif int(index_action) in (32, 33, 34):
+                elif int(index_action) in (32,  32):
                     callback_function = getattr(self.ed, function_name)  
                     action.triggered.connect(callback_function)
 
@@ -207,7 +213,7 @@ class Giswater(QObject):
                         obj_action = QAction(str(row["i18n"]), self)
                         obj_action.setShortcut(str(row["shortcut_key"]))
                         menu.addAction(obj_action)
-                        obj_action.triggered.connect(partial(self.menu_activate, str(row["i18n"])))
+                        obj_action.triggered.connect(partial(self.edit.menu_activate, str(row["i18n"])))
                 
                 action.setMenu(menu)
                   
@@ -225,18 +231,7 @@ class Giswater(QObject):
         return action
           
         
-    def menu_activate(self, node_type):
-        
-        # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)
-        if layer:
-            layer = layer[0]
-            self.iface.setActiveLayer(layer)
-            layer.startEditing()
-            # Implement the Add Feature button
-            self.iface.actionAddFeature().trigger()
-        else:
-            self.controller.show_warning("Selected layer name not found: "+str(node_type))
+
 
     
     def add_action(self, index_action, toolbar, parent):
@@ -308,8 +303,8 @@ class Giswater(QObject):
         if toolbar_basic_enabled:
             toolbar_id = "basic"
             list_actions = ['41', '48', '32']
-            self.manage_toolbar(toolbar_id, list_actions)  
-            
+            self.manage_toolbar(toolbar_id, list_actions)
+
         if toolbar_om_ws_enabled:
             toolbar_id = "om_ws"
             list_actions = ['26', '27']                
@@ -441,8 +436,7 @@ class Giswater(QObject):
                 self.iface.removeToolBarIcon(action)
                 
             for plugin_toolbar in self.plugin_toolbars.itervalues():
-                self.controller.log_info(plugin_toolbar.toolbar_id)
-                if plugin_toolbar.enabled:                
+                if plugin_toolbar.enabled:
                     plugin_toolbar.toolbar.setVisible(False)                
                     del plugin_toolbar.toolbar
 
@@ -497,6 +491,8 @@ class Giswater(QObject):
                 wsoftware = feature['wsoftware']
                 self.mg.set_project_type(wsoftware.lower())
                 self.go2epa.set_project_type(wsoftware.lower())
+                self.edit.set_project_type(wsoftware.lower())
+                self.master.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   

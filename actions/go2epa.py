@@ -97,7 +97,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.mg_go2epa_accept)
         self.dlg_go2epa.btn_cancel.pressed.connect(self.dlg_go2epa.close)
-
+        self.controller.log_info(str(self.project_type))
         if self.project_type == 'ws':
             self.dlg_go2epa.btn_opt_hs.setText("Options")
             self.dlg_go2epa.btn_time_opt.setText("Times")

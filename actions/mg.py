@@ -27,7 +27,7 @@ import utils_giswater
 
 from ..ui.change_node_type import ChangeNodeType                # @UnresolvedImport
 from ..ui.config_master import ConfigMaster                     # @UnresolvedImport
-from ..ui.config_edit import ConfigEdit                         # @UnresolvedImport
+
 from ..ui.result_compare_selector import ResultCompareSelector  # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport
@@ -48,7 +48,7 @@ class Mg(ParentAction):
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
     
-
+    '''
     def mg_arc_topo_repair(self):
         """ Button 19. Topology repair """
 
@@ -74,7 +74,7 @@ class Mg(ParentAction):
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'topology_tools')
         self.dlg.exec_()
-
+    '''
 
     def mg_arc_topo_repair_accept(self):
         """ Button 19. Executes functions that are selected """
@@ -563,80 +563,9 @@ class Mg(ParentAction):
         self.controller.execute_sql(sql)
     '''
 
-    def mg_config_edit(self):
-        """ Button 98: Open a dialog showing data from table 'config_param_user' """     
-
-        # Create the dialog and signals
-        self.dlg_config_edit = ConfigEdit()
-        utils_giswater.setDialog(self.dlg_config_edit)
-        self.dlg_config_edit.btn_accept.pressed.connect(self.mg_config_edit_accept)
-        self.dlg_config_edit.btn_cancel.pressed.connect(self.dlg_config_edit.close)
-        
-        # Set values from widgets of type QComboBox and dates
-        # QComboBox Utils
-        sql = "SELECT DISTINCT(name) FROM " + self.schema_name+".value_state ORDER BY name"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("state_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_work ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("workcat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".value_verified ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("verified_vdefault", rows)
-        
-        sql = 'SELECT value FROM ' + self.schema_name + '.config_param_user'
-        sql+= ' WHERE "cur_user" = current_user AND parameter = ' + "'builtdate_vdefault'"
-        row = self.dao.get_row(sql)
-        if row is not None:
-            date_value = datetime.strptime(row[0], '%Y-%m-%d')
-        else:
-            date_value = QDate.currentDate()
-        utils_giswater.setCalendarDate("builtdate_vdefault", date_value)
-
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_arc ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("arccat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_node ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodecat_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".cat_connec ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("connecat_vdefault", rows)
-
-        # QComboBox Ud
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".node_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("nodetype_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".arc_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("arctype_vdefault", rows)
-        sql = "SELECT DISTINCT(id) FROM " + self.schema_name+".connec_type ORDER BY id"
-        rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("connectype_vdefault", rows)
-
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user"
-        rows = self.dao.get_rows(sql)
-        for row in rows:
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-            utils_giswater.setChecked("chk_"+str(row[0]), True)
-
-        sql = "SELECT name FROM "+self.schema_name + ".value_state WHERE id::text = "
-        sql += "(SELECT value FROM "+self.schema_name + ".config_param_user WHERE parameter = 'state_vdefault')::text"
-        rows = self.dao.get_rows(sql)
-        if rows:
-            utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
-
-        if self.project_type == 'ws':
-            self.dlg_config_edit.chk_nodetype_vdefault.setEnabled(False)
-            self.dlg_config_edit.chk_arctype_vdefault.setEnabled(False)
-            self.dlg_config_edit.chk_connectype_vdefault.setEnabled(False)
-            self.dlg_config_edit.nodetype_vdefault.setEnabled(False)
-            self.dlg_config_edit.arctype_vdefault.setEnabled(False)
-            self.dlg_config_edit.connectype_vdefault.setEnabled(False)
-
-        self.dlg_config_edit.exec_()
 
 
+    '''
     def mg_config_edit_accept(self):
         
         if utils_giswater.isChecked("chk_state_vdefault"):
@@ -683,7 +612,7 @@ class Mg(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
         self.dlg_config_edit.close()
-
+    '''
 
     def open_file_dialog(self, widget):
         """ Open File Dialog """
@@ -724,10 +653,7 @@ class Mg(ParentAction):
             webbrowser.open(url)
     '''
     '''
-    def delete_row(self,  parameter, tablename):
-        sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user and parameter = '+ "'" + parameter + "'"
-        self.controller.execute_sql(sql)
+
     '''
 
     #def multi_selector(self, table):

@@ -46,12 +46,6 @@ class Master(ParentAction):
     def set_project_type(self, project_type):
         self.project_type = project_type
 
-    def hide_colums(self, widget, comuns_to_hide):
-        for i in range(0, len(comuns_to_hide)):
-            widget.hideColumn(comuns_to_hide[i])
-
-
-
 
     def master_new_psector(self, psector_id=None, enable_tabs=False):
         """ Button 45: New psector """

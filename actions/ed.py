@@ -94,7 +94,7 @@ class Ed(ParentAction):
         except RuntimeError:
             pass
             
-                
+    '''
     def ed_check(self):
         """ Initial check for buttons 33 and 34 """
         
@@ -116,7 +116,7 @@ class Ed(ParentAction):
             return False  
 
         return True
-    
+    '''
     
     def populate_combo(self, widget, table_name, field_name="id"): 
         """ Executes query and fill combo box """
@@ -136,7 +136,7 @@ class Ed(ParentAction):
         else:
             self.controller.show_info("Function not supported in this Operating System")
     '''
-                          
+    '''
     def ed_add_element(self):
         """ Button 33: Add element """
 
@@ -187,7 +187,8 @@ class Ed(ParentAction):
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
-
+    '''
+    '''
         
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
@@ -196,32 +197,14 @@ class Ed(ParentAction):
         map_canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
-
+    '''
+    '''
     def get_xy(self, point):
         self.x = point.x()
         self.y = point.y()
         self.emit_point.canvasClicked.disconnect()
-
-
-    def get_date(self):
-        """ Get date_from and date_to from ComboBoxes
-        Filter the table related on selected value """
-        
-        # Get widgets
-        date_document_from = self.dlg.findChild(QDateTimeEdit, "builtdate") 
-        date_document_to = self.dlg.findChild(QDateTimeEdit, "enddate")     
-        
-        # Get date
-        date_from = date_document_from.date() 
-        date_to = date_document_to.date() 
-      
-        # Check if interval is valid
-        if date_from >= date_to:
-            message = "Date interval not valid!"
-            self.controller.show_warnings(message, context_name='ui_message') 
-            return
-
-        
+    '''
+    '''
     def ed_add_el_autocomplete(self):    
         """ Once we select 'element_id' using autocomplete, fill widgets with current values """
 
@@ -240,8 +223,8 @@ class Ed(ParentAction):
         for i in range(0, columns_length):
             column_name = self.dao.get_column_name(i)
             utils_giswater.setWidgetText(column_name, row[column_name]) 
-
-    
+    '''
+    '''
     def ed_add_element_accept(self):
         """ Insert or update table 'element'. Add element to selected features """
            
@@ -307,8 +290,8 @@ class Ed(ParentAction):
 
         self.close_dialog(self.dlg)
         self.iface.mapCanvas().refreshAllLayers()
-
-    
+    '''
+    '''
     def ed_add_file(self):
         """ Button 34: Add document """
 
@@ -358,7 +341,8 @@ class Ed(ParentAction):
         # Open the dialog
         self.dlg.exec_()
         
-  
+    '''
+    '''
     def ed_add_file_autocomplete(self): 
         """ Once we select 'element_id' using autocomplete, fill widgets with current values """
         
@@ -376,8 +360,8 @@ class Ed(ParentAction):
         for i in range(0, columns_length):
             column_name = self.dao.get_column_name(i)
             utils_giswater.setWidgetText(column_name, row[column_name])       
-    
-    
+    '''
+    '''
     def ed_add_to_feature(self, table_name, value_id):   
         """ Add document or element to selected features """
         
@@ -529,7 +513,8 @@ class Ed(ParentAction):
                 sql += " VALUES ('"+elem_id+"', '"+value_id+"')"
                 self.controller.execute_sql(sql)
             
-                          
+    '''
+    '''
     def ed_add_file_accept(self): 
         """ Insert or update table 'document'. Add document to selected feature """
         
@@ -576,5 +561,6 @@ class Ed(ParentAction):
                 self.controller.show_warning(message, context_name='ui_message')
                 return
 
-        self.close_dialog()   
+        self.close_dialog()
+    '''
 
