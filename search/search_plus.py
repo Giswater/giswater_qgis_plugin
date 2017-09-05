@@ -17,7 +17,7 @@ class SearchPlus(QObject):
 
 
     def __init__(self, iface, srid, controller):
-        ''' Constructor '''
+        """ Constructor """
         
         self.iface = iface
         self.srid = srid
@@ -44,7 +44,7 @@ class SearchPlus(QObject):
     
       
     def load_config_data(self):
-        ''' Load configuration data from tables '''
+        """ Load configuration data from tables """
         
         self.params = {}
         sql = "SELECT parameter, value FROM "+self.controller.schema_name+".config_param_system"
@@ -84,7 +84,7 @@ class SearchPlus(QObject):
      
      
     def populate_dialog(self):
-        ''' Populate the interface with values get from layers '''                      
+        """ Populate the interface with values get from layers """                      
           
         if not self.enabled:
             return False
@@ -110,16 +110,13 @@ class SearchPlus(QObject):
     
     
     def hydrometer_get_hydrometers(self):
-        ''' Populate hydrometers depending on selected connec. 
-            Available hydrometers are linked with self.street_field_code column code in self.portal_layer and self.street_layer
-        '''   
+        """ Populate hydrometers depending on selected connec """   
                                 
         # Get selected connec
-        selected = self.dlg.hydrometer_connec.currentText()
+        selected = utils_giswater.getWidgetText(self.dlg.hydrometer_connec)
         
         # If any conenc selected, get again all hydrometers
-        if selected == '':        
-            self.controller.log_info("hydrometer_get_hydrometers")
+        if selected == 'null':        
             self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
             return
         
@@ -134,8 +131,7 @@ class SearchPlus(QObject):
         idx_field_number = layer.fieldNameIndex(self.params['hydrometer_field_code'])   
         aux = self.params['hydrometer_field_urban_propierties_code'] +"  = '" + str(code) + "'" 
         
-        # Check filter and existence of fields
-        self.controller.log_info(aux)        
+        # Check filter and existence of fields       
         expr = QgsExpression(aux)     
         if expr.hasParserError():    
             message = expr.parserErrorString() + ": " + aux
@@ -172,7 +168,7 @@ class SearchPlus(QObject):
                 
         
     def hydrometer_zoom(self, fieldname, combo):
-        ''' Zoom to layer 'v_edit_connec' '''  
+        """ Zoom to layer set in parameter 'hydrometer_urban_propierties_layer' """  
 
         expr = self.generic_zoom(fieldname, combo)
         if expr is None:
@@ -196,7 +192,7 @@ class SearchPlus(QObject):
                 
                 
     def address_populate(self, parameter):
-        ''' Populate combo 'address_street' '''
+        """ Populate combo 'address_street' """
         
         # Check if we have this search option available
         if not parameter in self.layers:  
@@ -231,16 +227,16 @@ class SearchPlus(QObject):
            
     
     def address_get_numbers(self):
-        ''' Populate civic numbers depending on selected street. 
-            Available civic numbers are linked with self.street_field_code column code in self.portal_layer and self.street_layer
-        '''   
+        """ Populate civic numbers depending on selected street. 
+            Available civic numbers are linked with 'street_field_code' column code in 'portal_layer' and 'street_layer' 
+        """   
                            
-        # get selected street
-        selected = self.dlg.adress_street.currentText()
-        if selected == '':        
+        # Get selected street
+        selected = utils_giswater.getWidgetText(self.dlg.adress_street)        
+        if selected == 'null':        
             return
         
-        # get street code
+        # Get street code
         elem = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
         code = elem[0] # to know the index see the query that populate the combo
         records = [[-1, '']]
@@ -288,11 +284,11 @@ class SearchPlus(QObject):
         
                  
     def address_zoom_street(self):
-        ''' Zoom on the street with the prefined scale '''
+        """ Zoom on the street with the defined scale """
         
         # Get selected street
-        selected = self.dlg.adress_street.currentText()
-        if selected == '':       
+        selected = utils_giswater.getWidgetText(self.dlg.adress_street)        
+        if selected == 'null':        
             return
 
         data = self.dlg.adress_street.itemData(self.dlg.adress_street.currentIndex())
@@ -314,11 +310,12 @@ class SearchPlus(QObject):
         
                 
     def address_zoom_portal(self):
-        ''' Show street data on the canvas when selected street and number in street tab '''  
+        """ Show street data on the canvas when selected street and number in street tab """  
                 
-        street = self.dlg.adress_street.currentText()
-        civic = self.dlg.adress_number.currentText()
-        if street == '' or civic == '':
+        # Get selected street
+        street = utils_giswater.getWidgetText(self.dlg.adress_street)                 
+        civic = utils_giswater.getWidgetText(self.dlg.adress_number)                 
+        if street == 'null' or civic == 'null':
             return  
                 
         # Get selected portal
@@ -354,11 +351,11 @@ class SearchPlus(QObject):
           
     
     def generic_zoom(self, fieldname, combo, field_index=0):  
-        ''' Get selected element from the combo, and returns a feature request expression '''
+        """ Get selected element from the combo, and returns a feature request expression """
         
-        # Get selected element from combo    
-        element = combo.currentText()
-        if element.strip() == '':
+        # Get selected element from combo
+        element = utils_giswater.getWidgetText(combo)                    
+        if element == 'null':
             return None
                 
         elem = combo.itemData(combo.currentIndex())
@@ -381,7 +378,7 @@ class SearchPlus(QObject):
                         
             
     def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
-        ''' Populate selected combo from features of selected layer '''        
+        """ Populate selected combo from features of selected layer """        
         
         # Check if we have this search option available
         if not parameter in self.layers: 
@@ -431,7 +428,7 @@ class SearchPlus(QObject):
                     
         
     def show_feature_count(self):
-        ''' Toggles 'Show Feature Count' of all the layers in the root path of the TOC '''   
+        """ Toggles 'Show Feature Count' of all the layers in the root path of the TOC """   
                      
         root = QgsProject.instance().layerTreeRoot()
         for child in root.children():
@@ -452,9 +449,8 @@ class SearchPlus(QObject):
                                                         
                      
     def unload(self):
-        ''' Removes dialog '''       
+        """ Removes dialog """       
         if self.dlg:
             self.dlg.deleteLater()
-            del self.dlg            
-                                                            
+            del self.dlg                                                           
     
