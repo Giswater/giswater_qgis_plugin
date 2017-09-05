@@ -70,7 +70,7 @@
     <attribute name="title">
      <string>Hydrometer</string>
     </attribute>
-    <widget class="QComboBox" name="hydrometer_code">
+    <widget class="QComboBox" name="hydrometer_id">
      <property name="geometry">
       <rect>
        <x>8</x>

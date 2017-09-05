@@ -39,14 +39,14 @@ class SearchPlus(QObject):
         self.scale_zoom = 5000      
         
         # Set signals             
-        self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
-        self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
-        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))     
-        #self.dlg.hydrometer_code.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_code))    
-
-        self.enabled = True
+        self.dlg.adress_street.activated.connect(self.address_get_numbers)
+        self.dlg.adress_street.activated.connect(self.address_zoom_street)
+        self.dlg.adress_number.activated.connect(self.address_zoom_portal)     
         
-        self.controller.log_info("searchplus enabled")        
+        self.dlg.hydrometer_connec.activated.connect(self.hydrometer_get_hydrometers)        
+        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))    
+
+        self.enabled = True     
     
       
     def load_config_data(self):
@@ -61,7 +61,7 @@ class SearchPlus(QObject):
                 self.params[row['parameter']] = str(row['value'])
             return True
         else:
-            self.controller.log_warning("No data found in configuration table related with 'searchplus'")
+            self.controller.log_warning("No data found in table 'config_param_system' related with 'searchplus'")
             return False            
 
             
@@ -84,16 +84,12 @@ class SearchPlus(QObject):
             uri_table = layer_source['table']            
             if uri_table is not None:
                 if self.params['street_layer'] == uri_table: 
-                    self.controller.log_info("street_layer found")
                     self.layers['street_layer'] = cur_layer 
                 elif self.params['portal_layer'] == uri_table:    
-                    self.controller.log_info("portal_layer found")
                     self.layers['portal_layer'] = cur_layer  
                 elif self.params['hydrometer_layer'] == uri_table:   
-                    self.controller.log_info("hydrometer_layer found")
                     self.layers['hydrometer_layer'] = cur_layer        
-                if self.params['hydrometer_urban_propierties_layer'] == uri_table:
-                    self.controller.log_info("hydrometer_urban_propierties_layer found")
+                elif self.params['hydrometer_urban_propierties_layer'] == uri_table:
                     self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
      
      
@@ -105,20 +101,116 @@ class SearchPlus(QObject):
                      
         # Get layers and full extent
         self.get_layers()       
-        
-        # Tab 'Hydrometer'             
-        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_code, 
-                                     self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
-        if not status:
-            self.dlg.tab_main.removeTab(3)
                  
         # Tab 'Address'      
         status = self.address_populate('street_layer')
         if not status:
             self.dlg.tab_main.removeTab(2)                              
+        
+        # Tab 'Hydrometer'             
+        status = self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])  
+        status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
+        if not status:
+            self.dlg.tab_main.removeTab(1)
+            
+        # TODO: Tab 'Network'
+        self.dlg.tab_main.removeTab(0)
             
         return True
+    
+    
+    def hydrometer_get_hydrometers(self):
+        ''' Populate hydrometers depending on selected connec. 
+            Available hydrometers are linked with self.street_field_code column code in self.portal_layer and self.street_layer
+        '''   
+                                
+        # Get selected connec
+        selected = self.dlg.hydrometer_connec.currentText()
         
+        # If any conenc selected, get again all hydrometers
+        if selected == '':        
+            self.controller.log_info("hydrometer_get_hydrometers")
+            self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])            
+            return
+        
+        # Get connec_id
+        elem = self.dlg.hydrometer_connec.itemData(self.dlg.hydrometer_connec.currentIndex())
+        code = elem[0] # to know the index see the query that populate the combo   
+        records = [[-1, '']]
+        
+        # Set filter expression
+        layer = self.layers['hydrometer_layer'] 
+        idx_field_code = layer.fieldNameIndex(self.params['hydrometer_field_urban_propierties_code'])            
+        idx_field_number = layer.fieldNameIndex(self.params['hydrometer_field_code'])   
+        aux = self.params['hydrometer_field_urban_propierties_code'] +"  = '" + str(code) + "'" 
+        
+        # Check filter and existence of fields
+        self.controller.log_info(aux)        
+        expr = QgsExpression(aux)     
+        if expr.hasParserError():    
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)    
+            return               
+        if idx_field_code == -1:    
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.params['hydrometer_field_urban_propierties_code'], layer.name(), self.setting_file, 'hydrometer_field_urban_propierties_code')            
+            self.controller.show_warning(message)         
+            return      
+        if idx_field_number == -1:    
+            message = "Field '{}' not found in layer '{}'. Open '{}' and check parameter '{}'" \
+                .format(self.params['hydrometer_field_code'], layer.name(), self.setting_file, 'hydrometer_field_code')            
+            self.controller.show_warning(message)         
+            return      
+            
+        # Get a featureIterator from an expression:
+        # Get features from the iterator and do something
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        for feature in it: 
+            attrs = feature.attributes() 
+            field_number = attrs[idx_field_number]    
+            if not type(field_number) is QPyNullVariant:
+                elem = [code, field_number]
+                records.append(elem)
+                  
+        # Fill hydrometers
+        records_sorted = sorted(records, key = operator.itemgetter(1))           
+        self.dlg.hydrometer_id.blockSignals(True)
+        self.dlg.hydrometer_id.clear()
+        for record in records_sorted:
+            self.dlg.hydrometer_id.addItem(str(record[1]), record)
+        self.dlg.hydrometer_id.blockSignals(False)  
+                
+        
+    def hydrometer_zoom(self, fieldname, combo):
+        ''' Zoom to layer 'v_edit_connec' '''  
+
+        expr = self.generic_zoom(fieldname, combo)
+        if expr is None:
+            return        
+  
+        # Build a list of feature id's from the expression and select them  
+        try:
+            layer = self.layers['hydrometer_urban_propierties_layer']
+        except KeyError as e:
+            self.controller.show_warning(str(e))    
+            return False      
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        ids = [i.id() for i in it]
+        layer.selectByIds(ids)
+        
+        # Copy selected features to memory layer     
+        self.hydrometer_mem_layer_to = self.copy_selected(layer, self.hydrometer_mem_layer_to, "Point")       
+
+        # Zoom to generated memory layer
+        self.zoom_to_scale()
+        
+        # Load style
+        if self.qml_hydrometer is not None:
+            self.load_style(self.hydrometer_mem_layer_to, self.qml_hydrometer)
+            
+        # Toggles 'Show feature count'
+        self.show_feature_count()    
+                
                 
     def address_populate(self, parameter):
         ''' Populate combo 'address_street' '''
@@ -309,38 +401,7 @@ class SearchPlus(QObject):
             return     
         
         return expr
-    
-  
-    def hydrometer_zoom(self, fieldname, combo):
-        ''' Zoom to layer 'v_edit_connec' '''  
-
-        expr = self.generic_zoom(fieldname, combo)
-        if expr is None:
-            return        
-  
-        # Build a list of feature id's from the expression and select them  
-        try:
-            layer = self.layers['hydrometer_urban_propierties_layer']
-        except KeyError as e:
-            self.controller.show_warning(str(e))    
-            return False      
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-        
-        # Copy selected features to memory layer     
-        self.hydrometer_mem_layer_to = self.copy_selected(layer, self.hydrometer_mem_layer_to, "Point")       
-
-        # Zoom to generated memory layer
-        self.zoom_to_scale()
-        
-        # Load style
-        if self.qml_hydrometer is not None:
-            self.load_style(self.hydrometer_mem_layer_to, self.qml_hydrometer)
-            
-        # Toggles 'Show feature count'
-        self.show_feature_count()                  
-            
+                        
             
     def populate_combo(self, parameter, combo, fieldname, fieldname_2=None):
         ''' Populate selected combo from features of selected layer '''        
@@ -482,7 +543,7 @@ class SearchPlus(QObject):
         ''' Load QML style file into selected layer '''
         if layer is None:
             return
-        path_qml = self.styles_folder+qml     
+        path_qml = self.styles_folder + qml     
         if os.path.exists(path_qml) and os.path.isfile(path_qml): 
             layer.loadNamedStyle(path_qml)      
             
