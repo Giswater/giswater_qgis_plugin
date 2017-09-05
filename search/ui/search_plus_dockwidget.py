@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-from PyQt4 import QtGui
-from search.ui.search_plus_dialog import Ui_searchPlusDockWidget
+from PyQt4 import QtGui, uic
+import os
 
-# cannot apply dynamic loading because cannot promote widget 
-# belongin to othe modules
-# import os
-# from PyQt4 import uic
-# FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'ui', 'search_plus_dialog.ui'))
-# class SearchPlusDockWidget(QtGui.QDockWidget, FORM_CLASS):
 
-class SearchPlusDockWidget(QtGui.QDockWidget, Ui_searchPlusDockWidget):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'search_plus_dialog.ui'))
+
+
+class SearchPlusDockWidget(QtGui.QDockWidget, FORM_CLASS):
     
     def __init__(self, parent=None):
         ''' Constructor '''
@@ -17,3 +14,7 @@ class SearchPlusDockWidget(QtGui.QDockWidget, Ui_searchPlusDockWidget):
         
         # Set up the user interface from Designer.
         self.setupUi(self)
+        
+        
+    def initGui(self):
+        pass   
