@@ -277,7 +277,7 @@ class ParentAction():
         query_left += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
 
-        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + " FROM " + self.controller.schema_name + "." + tableleft
+        query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.controller.schema_name + "." + tableleft
         query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
         dialog.btn_select.pressed.connect(
@@ -299,6 +299,8 @@ class ParentAction():
             widget.hideColumn(comuns_to_hide[i])
 
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
+        """ """
+
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
