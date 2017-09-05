@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsVectorLayer, QgsFeature, QgsMapLayerRegistry, QgsField, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
+from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
 from PyQt4.QtCore import QObject, QPyNullVariant   # @UnresolvedImport
 
 from functools import partial
@@ -22,6 +22,7 @@ class SearchPlus(QObject):
         self.iface = iface
         self.srid = srid
         self.controller = controller    
+        self.scale_zoom = 5000      
     
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -30,13 +31,6 @@ class SearchPlus(QObject):
         if not self.load_config_data():
             self.enabled = False
             return      
-
-        # Set parameters that were located in removed file 'searchplus.config'
-        current_dir = os.path.dirname(__file__)           
-        self.styles_folder = current_dir+"/styles/"          
-        self.qml_portal = 'portal.qml'                              
-        self.qml_hydrometer = 'hydrometer.qml'                
-        self.scale_zoom = 5000      
         
         # Set signals             
         self.dlg.adress_street.activated.connect(self.address_get_numbers)
@@ -67,10 +61,6 @@ class SearchPlus(QObject):
             
     def get_layers(self): 
         ''' Iterate over all layers to get the ones set in config file '''
-        
-        # Initialize class variables        
-        self.portal_mem_layer = None                      
-        self.hydrometer_mem_layer_to = None
         
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
@@ -196,18 +186,11 @@ class SearchPlus(QObject):
             return False      
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-        
-        # Copy selected features to memory layer     
-        self.hydrometer_mem_layer_to = self.copy_selected(layer, self.hydrometer_mem_layer_to, "Point")       
+        layer.selectByIds(ids)    
 
         # Zoom to generated memory layer
         self.zoom_to_scale()
-        
-        # Load style
-        if self.qml_hydrometer is not None:
-            self.load_style(self.hydrometer_mem_layer_to, self.qml_hydrometer)
-            
+                    
         # Toggles 'Show feature count'
         self.show_feature_count()    
                 
@@ -360,18 +343,11 @@ class SearchPlus(QObject):
         layer = self.layers['portal_layer']    
         it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        layer.selectByIds(ids)
-        
-        # Copy selected features to memory layer     
-        self.portal_mem_layer = self.copy_selected(layer, self.portal_mem_layer, "Point")       
+        layer.selectByIds(ids)   
 
         # Zoom to generated memory layer
         self.zoom_to_scale()
-        
-        # Load style
-        if self.qml_portal is not None:        
-            self.load_style(self.portal_mem_layer, self.qml_portal)    
-            
+                    
         # Toggles 'Show feature count'
         self.show_feature_count()                  
           
@@ -467,95 +443,7 @@ class SearchPlus(QObject):
         scale = self.iface.mapCanvas().scale()
         if int(scale) < int(self.scale_zoom):
             self.iface.mapCanvas().zoomScale(float(self.scale_zoom))                 
-                                    
-                
-    def manage_mem_layer(self, layer):
-        ''' Delete previous features from all memory layers 
-            Make layer not visible '''
-        
-        if layer is not None:
-            try:
-                layer.startEditing()        
-                it = layer.getFeatures()
-                ids = [i.id() for i in it]
-                layer.dataProvider().deleteFeatures(ids)    
-                layer.commitChanges()     
-                self.iface.legendInterface().setLayerVisible(layer, False)
-            except RuntimeError as e:
-                self.controller.show_warning(str(e)) 
-
-
-    def manage_mem_layers(self):
-        ''' Delete previous features from all memory layers '''        
-        self.manage_mem_layer(self.portal_mem_layer)
-        self.manage_mem_layer(self.hydrometer_mem_layer_to)
-
-    
-    def copy_selected(self, layer, mem_layer, geom_type):
-        ''' Copy from selected layer to memory layer '''
-        
-        self.manage_mem_layers()
-        
-        # Create memory layer if not already set
-        if mem_layer is None: 
-            uri = geom_type+"?crs=epsg:"+str(self.srid) 
-            mem_layer = QgsVectorLayer(uri, "selected_"+layer.name(), "memory")                     
-         
-            # Copy attributes from main layer to memory layer
-            attrib_names = layer.dataProvider().fields()
-            names_list = attrib_names.toList()
-            newattributeList = []
-            for attrib in names_list:
-                aux = mem_layer.fieldNameIndex(attrib.name())
-                if aux == -1:
-                    newattributeList.append(QgsField(attrib.name(), attrib.type()))
-            mem_layer.dataProvider().addAttributes(newattributeList)
-            mem_layer.updateFields()
-           
-     
-        # Prepare memory layer for editing
-        mem_layer.startEditing()
-        
-        # Iterate over selected features   
-        cfeatures = []
-        for sel_feature in layer.selectedFeatures():
-            attributes = []
-            attributes.extend(sel_feature.attributes())
-            cfeature = QgsFeature()    
-            if sel_feature.geometry() is not None:
-                cfeature.setGeometry(sel_feature.geometry())
-            cfeature.setAttributes(attributes)
-            cfeatures.append(cfeature)
-                     
-        # Add features, commit changes and refresh canvas
-        mem_layer.dataProvider().addFeatures(cfeatures)             
-        mem_layer.commitChanges()
-        self.iface.mapCanvas().refresh() 
-        self.iface.mapCanvas().zoomToSelected(layer)
-        
-        # Make sure layer is always visible 
-        self.iface.legendInterface().setLayerVisible(mem_layer, True)
-                    
-        return mem_layer  
-          
-
-    def load_style(self, layer, qml):
-        ''' Load QML style file into selected layer '''
-        if layer is None:
-            return
-        path_qml = self.styles_folder + qml     
-        if os.path.exists(path_qml) and os.path.isfile(path_qml): 
-            layer.loadNamedStyle(path_qml)      
-            
-                
-    def remove_memory_layers(self):
-        ''' Iterate over all layers and remove memory ones '''         
-        layers = self.iface.legendInterface().layers()
-        for cur_layer in layers:     
-            layer_name = cur_layer.name().lower()         
-            if "selected_" in layer_name:
-                QgsMapLayerRegistry.instance().removeMapLayer(cur_layer.id())  
-                     
+                                                        
                      
     def unload(self):
         ''' Removes dialog '''       

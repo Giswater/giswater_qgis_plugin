@@ -805,7 +805,6 @@ class Giswater(QObject):
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
-                self.search_plus.remove_memory_layers() 
             self.ed.search_plus = self.search_plus             
             status = self.search_plus.populate_dialog()
             self.actions['32'].setVisible(status) 
