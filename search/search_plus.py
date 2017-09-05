@@ -6,7 +6,7 @@ from functools import partial
 import operator
 import os
 import sys
-from search_plus_dockwidget import SearchPlusDockWidget
+from search.ui.search_plus_dockwidget import SearchPlusDockWidget
   
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -21,10 +21,7 @@ class SearchPlus(QObject):
         
         self.iface = iface
         self.srid = srid
-        self.controller = controller
-        
-        # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation('searchplus')           
+        self.controller = controller    
     
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -86,16 +83,16 @@ class SearchPlus(QObject):
             layer_source = self.controller.get_layer_source(cur_layer)  
             uri_table = layer_source['table']            
             if uri_table is not None:
-                if self.params['street_layer'] in uri_table: 
+                if self.params['street_layer'] == uri_table: 
                     self.controller.log_info("street_layer found")
                     self.layers['street_layer'] = cur_layer 
-                elif self.params['portal_layer'] in uri_table:    
+                elif self.params['portal_layer'] == uri_table:    
                     self.controller.log_info("portal_layer found")
                     self.layers['portal_layer'] = cur_layer  
-                elif self.params['hydrometer_layer'] in uri_table:   
+                elif self.params['hydrometer_layer'] == uri_table:   
                     self.controller.log_info("hydrometer_layer found")
                     self.layers['hydrometer_layer'] = cur_layer        
-                if self.params['hydrometer_urban_propierties_layer'] in uri_table:
+                if self.params['hydrometer_urban_propierties_layer'] == uri_table:
                     self.controller.log_info("hydrometer_urban_propierties_layer found")
                     self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
      
@@ -152,7 +149,7 @@ class SearchPlus(QObject):
         records_sorted = sorted(records, key = operator.itemgetter(1))            
         for i in range(len(records_sorted)):
             record = records_sorted[i]
-            self.dlg.adress_street.addItem(record[1], record)
+            self.dlg.adress_street.addItem(str(record[1]), record)
         self.dlg.adress_street.blockSignals(False)    
         
         return True
@@ -177,7 +174,7 @@ class SearchPlus(QObject):
         layer = self.layers['portal_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['portal_field_code'])            
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])   
-        aux = self.params['portal_field_code']+" = '"+str(code)+"'" 
+        aux = self.params['portal_field_code'] +"  = '" + str(code) + "'" 
         
         # Check filter and existence of fields
         expr = QgsExpression(aux)     
@@ -258,7 +255,7 @@ class SearchPlus(QObject):
             return
         
         # select this feature in order to copy to memory layer        
-        aux = self.params['portal_field_code']+"='"+str(elem[0])+"' AND "+self.params['portal_field_number']+"='"+str(elem[1])+"'"
+        aux = self.params['portal_field_code'] + " = '" + str(elem[0]) + "' AND " + self.params['portal_field_number'] + " = '" + str(elem[1]) + "'"
         expr = QgsExpression(aux)     
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux
@@ -271,7 +268,7 @@ class SearchPlus(QObject):
         layer = self.layers['portal_layer']    
         it = self.layers['portal_layer'].getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        layer.setSelectedFeatures(ids)
+        layer.selectByIds(ids)
         
         # Copy selected features to memory layer     
         self.portal_mem_layer = self.copy_selected(layer, self.portal_mem_layer, "Point")       
@@ -329,7 +326,7 @@ class SearchPlus(QObject):
             return False      
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        layer.setSelectedFeatures(ids)
+        layer.selectByIds(ids)
         
         # Copy selected features to memory layer     
         self.hydrometer_mem_layer_to = self.copy_selected(layer, self.hydrometer_mem_layer_to, "Point")       

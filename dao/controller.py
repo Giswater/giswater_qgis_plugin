@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
+from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
 from qgis.core import QgsMessageLog
 
@@ -363,13 +363,30 @@ class DaoController():
         widget_list = dialog.findChildren(QCheckBox)
         for widget in widget_list:
             self.translate_widget(context_name, widget)
+             
+        # Get objects of type: QTabWidget            
+        widget_list = dialog.findChildren(QTabWidget)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
             
             
     def translate_widget(self, context_name, widget):
         ''' Translate widget text '''
         
-        if widget:
-            widget_name = widget.objectName()
+        if not widget:
+            return
+        
+        if type(widget) is QTabWidget:
+            num_tabs = widget.count()
+            for i in range(0, num_tabs):
+                tab_page = widget.widget(i)
+                widget_name = tab_page.objectName()                   
+                text = self.tr(widget_name, context_name)  
+                if text != widget_name:                              
+                    widget.setTabText(i, text)
+            
+        else:  
+            widget_name = widget.objectName()  
             text = self.tr(widget_name, context_name)
             if text != widget_name:
                 widget.setText(text)    

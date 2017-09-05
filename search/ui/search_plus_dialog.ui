@@ -23,13 +23,13 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
-   <widget class="QWidget" name="tab_6">
+   <widget class="QWidget" name="tab_network">
     <attribute name="title">
      <string>Network</string>
     </attribute>
-    <widget class="QComboBox" name="ppoint_field_zone_4">
+    <widget class="QComboBox" name="network_code">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -47,7 +47,7 @@
       </property>
      </item>
     </widget>
-    <widget class="QComboBox" name="ppoint_field_zone_5">
+    <widget class="QComboBox" name="network_type">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -66,7 +66,7 @@
      </item>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_4">
+   <widget class="QWidget" name="tab_hydrometer">
     <attribute name="title">
      <string>Hydrometer</string>
     </attribute>
@@ -88,7 +88,7 @@
       </property>
      </item>
     </widget>
-    <widget class="QComboBox" name="hydrometer_code_2">
+    <widget class="QComboBox" name="hydrometer_connec">
      <property name="geometry">
       <rect>
        <x>8</x>
@@ -107,16 +107,16 @@
      </item>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_3">
+   <widget class="QWidget" name="tab_address">
     <attribute name="title">
      <string>Address</string>
     </attribute>
     <widget class="QComboBox" name="adress_street">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>84</x>
        <y>10</y>
-       <width>245</width>
+       <width>171</width>
        <height>20</height>
       </rect>
      </property>
@@ -132,9 +132,9 @@
     <widget class="QComboBox" name="adress_number">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>84</x>
        <y>40</y>
-       <width>245</width>
+       <width>171</width>
        <height>20</height>
       </rect>
      </property>
@@ -146,6 +146,32 @@
        <string>Number</string>
       </property>
      </item>
+    </widget>
+    <widget class="QLabel" name="lbl_street">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Street:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbl_number">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Number:</string>
+     </property>
     </widget>
    </widget>
   </widget>

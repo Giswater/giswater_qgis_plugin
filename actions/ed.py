@@ -90,7 +90,9 @@ class Ed(ParentAction):
         
         try:
             if self.search_plus is not None:         
-                self.search_plus.dlg.setVisible(True)             
+                # Manage 'i18n' of the form and make it visible
+                self.controller.translate_form(self.search_plus.dlg, 'search_plus')                            
+                self.search_plus.dlg.setVisible(True)   
         except RuntimeError:
             pass
             
