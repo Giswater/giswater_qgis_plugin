@@ -22,7 +22,7 @@ class SearchPlus(QObject):
         self.iface = iface
         self.srid = srid
         self.controller = controller    
-        self.scale_zoom = 5000      
+        self.scale_zoom = 2500      
     
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -188,8 +188,8 @@ class SearchPlus(QObject):
         ids = [i.id() for i in it]
         layer.selectByIds(ids)    
 
-        # Zoom to generated memory layer
-        self.zoom_to_scale()
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_feature(self.layers['hydrometer_urban_propierties_layer'])
                     
         # Toggles 'Show feature count'
         self.show_feature_count()    
@@ -303,8 +303,9 @@ class SearchPlus(QObject):
             self.controller.show_warning(message) 
             return
         
-        # zoom on it's centroid
+        # Zoom on it's centroid
         centroid = geom.centroid()
+        self.iface.setActiveLayer(self.layers['street_layer'])        
         self.iface.mapCanvas().setCenter(centroid.asPoint())
         self.iface.mapCanvas().zoomScale(float(self.scale_zoom))
         
@@ -345,8 +346,8 @@ class SearchPlus(QObject):
         ids = [i.id() for i in it]
         layer.selectByIds(ids)   
 
-        # Zoom to generated memory layer
-        self.zoom_to_scale()
+        # Zoom to selected feature of the layer
+        self.zoom_to_selected_feature(self.layers['portal_layer'])
                     
         # Toggles 'Show feature count'
         self.show_feature_count()                  
@@ -438,8 +439,13 @@ class SearchPlus(QObject):
                 child.setCustomProperty("showFeatureCount", True)     
         
                 
-    def zoom_to_scale(self):
-        ''' Zoom to scale '''
+    def zoom_to_selected_feature(self, layer):
+        """ Zoom to selected feature of the layer """
+        
+        if not layer:
+            return
+        self.iface.setActiveLayer(layer)
+        self.iface.actionZoomToSelected().trigger()        
         scale = self.iface.mapCanvas().scale()
         if int(scale) < int(self.scale_zoom):
             self.iface.mapCanvas().zoomScale(float(self.scale_zoom))                 
