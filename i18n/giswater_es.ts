@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ES">
+<TS version="2.0" language="es">
 
 
 <context>
@@ -210,6 +210,38 @@
   
 </context>
 
+
+
+<context>
+
+    <name>search_plus</name> 
+    
+    <message>
+        <source>searchplus</source>
+        <translation>Searchplus</translation>
+    </message>
+    <message>
+        <source>tab_network</source>
+        <translation>Red</translation>
+    </message>
+    <message>
+        <source>tab_hydrometer</source>
+        <translation>Hidrómetro</translation>
+    </message>
+    <message>
+        <source>tab_address</source>
+        <translation>Callejero</translation>
+    </message>
+    <message>
+        <source>lbl_street</source>
+        <translation>Calle:</translation>
+    </message>
+    <message>
+        <source>lbl_number</source>
+        <translation>Número:</translation>
+    </message>
+    
+</context>
 
 
 
