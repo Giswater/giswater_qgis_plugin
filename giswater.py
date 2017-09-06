@@ -20,20 +20,14 @@ from actions.edit import Edit
 from actions.master import Master
 from actions.om_ws import OmWs
 from dao.controller import DaoController
-from map_tools.line import LineMapTool
-from map_tools.point import PointMapTool
 from map_tools.move_node import MoveNodeMapTool
 from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
-#from map_tools.valve_analytics import ValveAnalytics
-from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
-from map_tools.flow_regulator import FlowRegulator
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
-
 from search.search_plus import SearchPlus
 
 
@@ -231,29 +225,20 @@ class Giswater(QObject):
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-                            
-            if int(index_action) in (3, 5, 13):
-                map_tool = LineMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) in (1, 4, 10, 11, 12, 14, 15, 8, 29):
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
-            elif int(index_action) == 16:
+                   
+            # Manage Map Tools         
+            if int(index_action) == 16:
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.srid)
             elif int(index_action) == 17:
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 18:
-                map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
             elif int(index_action) == 26:
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            #elif int(index_action) == 27:
-            #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
                 map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
             elif int(index_action) == 44:
                 map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 52:
-                map_tool = FlowRegulator(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 57:
@@ -788,7 +773,6 @@ class Giswater(QObject):
         self.set_map_tool('mg_flow_trace')
         self.set_map_tool('mg_flow_exit')
         self.set_map_tool('mg_connec_tool')
-        self.set_map_tool('mg_extract_raster_value')
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
         self.set_map_tool('mg_mincut')
@@ -807,8 +791,6 @@ class Giswater(QObject):
             else:
                 map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud)
                 map_tool.set_controller(self.controller)
-            if map_tool_name == 'mg_extract_raster_value':
-                map_tool.set_config_action(self.actions['99'])                
 
        
     def set_search_plus(self):

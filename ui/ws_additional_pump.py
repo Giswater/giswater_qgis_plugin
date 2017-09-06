@@ -6,7 +6,7 @@ import os
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'ws_additional_pump.ui'))
 
 
-class Flow_regulator(QtGui.QDialog, FORM_CLASS):
+class FlowRegulator(QtGui.QDialog, FORM_CLASS):
 
     def __init__(self, parent=None):
         """ Constructor """

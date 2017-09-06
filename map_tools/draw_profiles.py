@@ -27,7 +27,7 @@ from ..ui.load_profiles import LoadProfiles     #@UnresolvedImport
 
 
 class DrawProfiles(ParentMapTool):
-    ''' Button 1. Draw_profiles '''
+    ''' Button 43. Draw_profiles '''
 
     def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''
