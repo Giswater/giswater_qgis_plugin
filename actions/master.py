@@ -6,27 +6,28 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QTime, Qt, QPoint
+from PyQt4.QtCore import QTime
+from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QPushButton, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QDoubleValidator, QLineEdit, QTabWidget, QTableView, QAbstractItemView
+
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
-
 import os
 import sys
 from datetime import datetime
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
-import utils_giswater
-
-from ..ui.config_master import ConfigMaster                 # @UnresolvedImport
+from ..ui.config_master import ConfigMaster
 from ..ui.psector_management import Psector_management      # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector        # @UnresolvedImport
 from ..ui.plan_psector import Plan_psector                  # @UnresolvedImport
 from ..ui.plan_estimate_result_new import EstimateResultNew                # @UnresolvedImport
 from ..ui.plan_estimate_result_selector import EstimateResultSelector      # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
+
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+import utils_giswater
 
 from parent import ParentAction
 
@@ -221,8 +222,10 @@ class Master(ParentAction):
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
+
+
+
         self.dlg_psector_mangement.exec_()
-        
 
     def master_config_master(self):
         """ Button 99: Open a dialog showing data from table 'config_param_system' """
@@ -238,30 +241,19 @@ class Master(ParentAction):
         self.dlg_config_master.btn_accept.pressed.connect(self.master_config_master_accept)
         self.dlg_config_master.btn_cancel.pressed.connect(self.dlg_config_master.close)
 
+        # Fill all QLineEdit
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_system"
+        rows = self.dao.get_rows(sql)
+        self.master_options_fill_textview(rows)
+
         self.om_visit_absolute_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
-        self.om_visit_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
-        self.doc_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
 
-        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
-        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_absolute_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_absolute_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_absolute_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_absolute_path))
 
-        # Get om_visit_absolute_path and doc_absolute_path from config_param_system
-        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
-        sql += " WHERE parameter = 'om_visit_absolute_path'"
-        row = self.dao.get_row(sql)
-        if row:
-            path = str(row['value'])
-            self.om_visit_absolute_path.setText(path)
-
-        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
-        sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
-        if row:
-            path = str(row['value'])
-            self.doc_absolute_path.setText(path)
 
         # QCheckBox
         self.chk_psector_enabled = self.dlg_config_master.findChild(QCheckBox, 'chk_psector_enabled')
@@ -281,8 +273,12 @@ class Master(ParentAction):
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         self.master_options_get_data("config")
         self.master_options_get_data("config_param_system")
-
         self.dlg_config_master.exec_()
+
+
+    def master_options_fill_textview(self, rows):
+        for row in rows:
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
 
 
     def master_options_get_data(self, tablename):
@@ -430,7 +426,6 @@ class Master(ParentAction):
 
         self.controller.execute_sql(sql)
 
-
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
@@ -488,7 +483,6 @@ class Master(ParentAction):
         else:
             self.fill_table(self.tbl_psm, self.schema_name + "." + tablename)
 
-
     def charge_psector(self):
 
         selected_list = self.tbl_psm.selectionModel().selectedRows()
@@ -500,7 +494,6 @@ class Master(ParentAction):
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
         self.dlg_psector_mangement.close()
         self.master_new_psector(psector_id, True)
-
 
     def snapping(self, layer_view, tablename, table_view, elem_type):
         map_canvas = self.iface.mapCanvas()
