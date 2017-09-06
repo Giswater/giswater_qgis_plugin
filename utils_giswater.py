@@ -21,13 +21,14 @@ def setDialog(p_dialog):
     _dialog = p_dialog
     
 
-def fillComboBox(widget, rows, allow_nulls=True):
+def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
 
     if rows is None:
         return
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
-    widget.clear()
+    if clear_combo:
+        widget.clear()
     if allow_nulls:
         widget.addItem('')
     for row in rows:       

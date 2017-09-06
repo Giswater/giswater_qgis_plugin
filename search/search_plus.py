@@ -40,6 +40,8 @@ class SearchPlus(QObject):
         self.dlg.hydrometer_connec.activated.connect(self.hydrometer_get_hydrometers)        
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))    
 
+        self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
+        
         self.enabled = True     
     
       
@@ -81,6 +83,16 @@ class SearchPlus(QObject):
                     self.layers['hydrometer_layer'] = cur_layer        
                 elif self.params['hydrometer_urban_propierties_layer'] == uri_table:
                     self.layers['hydrometer_urban_propierties_layer'] = cur_layer               
+                elif self.params['network_layer_arc'] == uri_table:
+                    self.layers['network_layer_arc'] = cur_layer               
+                elif self.params['network_layer_connec'] == uri_table:
+                    self.layers['network_layer_connec'] = cur_layer               
+                elif self.params['network_layer_element'] == uri_table:
+                    self.layers['network_layer_element'] = cur_layer               
+                elif self.params['network_layer_gully'] == uri_table:
+                    self.layers['network_layer_gully'] = cur_layer               
+                elif self.params['network_layer_node'] == uri_table:
+                    self.layers['network_layer_node'] = cur_layer               
      
      
     def populate_dialog(self):
@@ -103,11 +115,106 @@ class SearchPlus(QObject):
         if not status:
             self.dlg.tab_main.removeTab(1)
             
-        # TODO: Tab 'Network'
-        self.dlg.tab_main.removeTab(0)
+        # Tab 'Network'
+        self.network_code_populate()
+        status = self.network_geom_type_populate()     
+        if not status:           
+            self.dlg.tab_main.removeTab(0)
             
         return True
     
+     
+    def network_code_populate(self):
+        """ Populate combo 'network_code' """
+     
+        # Check which layers are available and get its list of codes
+        self.dlg.network_code.clear()       
+        if 'network_layer_arc' in self.layers:  
+            self.network_code_layer('network_layer_arc')
+        if 'network_layer_connec' in self.layers:  
+            self.network_code_layer('network_layer_connec')
+        if 'network_layer_element' in self.layers:  
+            self.network_code_layer('network_layer_element')
+        if 'network_layer_gully' in self.layers:  
+            self.network_code_layer('network_layer_gully')
+        if 'network_layer_node' in self.layers:  
+            self.network_code_layer('network_layer_node')
+        
+        return True
+    
+    
+    def network_code_layer(self, layername):
+        """ Get codes of selected layer and add them to the combo 'network_code' """
+        
+        sql = "SELECT DISTINCT(code) FROM " + self.controller.schema_name + "." + self.params[layername]
+        sql += " WHERE code IS NOT NULL ORDER BY code"      
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBox(self.dlg.network_code, rows, allow_nulls=False, clear_combo=False)         
+        
+     
+    def network_geom_type_populate(self):
+        """ Populate combo 'network_geom_type' """
+        
+        # Add null value
+        self.dlg.network_geom_type.clear() 
+        self.dlg.network_geom_type.addItem('')   
+                   
+        # Check which layers are available
+        if 'network_layer_arc' in self.layers:  
+            self.dlg.network_geom_type.addItem(self.controller.tr('Arc'))
+        if 'network_layer_connec' in self.layers:  
+            self.dlg.network_geom_type.addItem(self.controller.tr('Connec'))
+        if 'network_layer_element' in self.layers:  
+            self.dlg.network_geom_type.addItem(self.controller.tr('Element'))
+        if 'network_layer_gully' in self.layers:  
+            self.dlg.network_geom_type.addItem(self.controller.tr('Gully'))
+        if 'network_layer_node' in self.layers:  
+            self.dlg.network_geom_type.addItem(self.controller.tr('Node')) 
+        
+        return self.dlg.network_geom_type > 0
+    
+
+    def network_zoom(self, fieldname, network_code, network_geom_type):
+        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """  
+  
+        # Get selected code from combo
+        element = utils_giswater.getWidgetText(network_code)                    
+        if element == 'null':
+            return None
+        
+        # Check if the expression is valid
+        aux = fieldname + " = '" + str(element) + "'"
+        expr = QgsExpression(aux)    
+        if expr.hasParserError():   
+            message = expr.parserErrorString() + ": " + aux
+            self.controller.show_warning(message)        
+            return 
+        
+        # Get selected layer          
+        geom_type = utils_giswater.getWidgetText(network_geom_type).lower()
+        layer_name = 'network_layer_' + geom_type                
+        
+        # If any layer is set, look in all layers related with 'network'
+        if geom_type == 'null':
+            layer_name = 'network_layer_'      
+          
+        # Build a list of feature id's from the expression and select them  
+        for layername in self.layers:
+            self.controller.log_info(layername)            
+            if layer_name in layername:
+                self.controller.log_info(layer_name)              
+                layer = self.layers[layer_name]
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+                ids = [i.id() for i in it]         
+                self.controller.log_info(str(ids))            
+                layer.selectByIds(ids)    
+    
+                # Zoom to selected feature of the layer
+                self.zoom_to_selected_feature(layer)
+                            
+                # Toggles 'Show feature count'
+                self.show_feature_count()        
+        
     
     def hydrometer_get_hydrometers(self):
         """ Populate hydrometers depending on selected connec """   
@@ -366,8 +473,8 @@ class SearchPlus(QObject):
             self.controller.show_warning(message) 
             return None
         
-        # Select this feature in order to copy to memory layer   
-        aux = fieldname+" = '"+str(elem[field_index])+"'"
+        # Check if the expression is valid
+        aux = fieldname + " = '" + str(elem[field_index]) + "'"
         expr = QgsExpression(aux)    
         if expr.hasParserError():   
             message = expr.parserErrorString() + ": " + aux

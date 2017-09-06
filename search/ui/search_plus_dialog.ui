@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
-    <height>160</height>
+    <width>283</width>
+    <height>146</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>271</width>
-     <height>111</height>
+     <width>261</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -32,9 +32,9 @@
     <widget class="QComboBox" name="network_code">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>80</x>
        <y>10</y>
-       <width>241</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -47,12 +47,12 @@
       </property>
      </item>
     </widget>
-    <widget class="QComboBox" name="network_type">
+    <widget class="QComboBox" name="network_geom_type">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>80</x>
        <y>40</y>
-       <width>243</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -73,9 +73,9 @@
     <widget class="QComboBox" name="hydrometer_id">
      <property name="geometry">
       <rect>
-       <x>8</x>
+       <x>80</x>
        <y>40</y>
-       <width>247</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -91,9 +91,9 @@
     <widget class="QComboBox" name="hydrometer_connec">
      <property name="geometry">
       <rect>
-       <x>8</x>
+       <x>80</x>
        <y>10</y>
-       <width>247</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -114,9 +114,9 @@
     <widget class="QComboBox" name="adress_street">
      <property name="geometry">
       <rect>
-       <x>84</x>
+       <x>80</x>
        <y>10</y>
-       <width>171</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -132,9 +132,9 @@
     <widget class="QComboBox" name="adress_number">
      <property name="geometry">
       <rect>
-       <x>84</x>
+       <x>80</x>
        <y>40</y>
-       <width>171</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
