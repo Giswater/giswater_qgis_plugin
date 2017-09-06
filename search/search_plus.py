@@ -33,11 +33,11 @@ class SearchPlus(QObject):
             return      
         
         # Set signals             
-        self.dlg.adress_street.activated.connect(self.address_get_numbers)
-        self.dlg.adress_street.activated.connect(self.address_zoom_street)
-        self.dlg.adress_number.activated.connect(self.address_zoom_portal)     
+        self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
+        self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
+        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))    
         
-        self.dlg.hydrometer_connec.activated.connect(self.hydrometer_get_hydrometers)        
+        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))      
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))    
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
@@ -247,7 +247,6 @@ class SearchPlus(QObject):
                 self.zoom_to_selected_feature(layer)
                         
         
-    
     def hydrometer_get_hydrometers(self):
         """ Populate hydrometers depending on selected connec """   
                                 
