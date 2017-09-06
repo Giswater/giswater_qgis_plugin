@@ -12,7 +12,9 @@ from PyQt4.QtGui import QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QT
 from PyQt4.Qt import QDate, QTime
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint
-from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper 
+from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper
+
+from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
 
 import os
 import sys
@@ -23,6 +25,8 @@ sys.path.append(plugin_path)
 import utils_giswater
 from parent import ParentAction
 
+#from ..map_tools import mincut_connec
+from mincut_connec import MincutConnec
 from ..ui.mincut import Mincut
 from ..ui.mincut_fin import Mincut_fin
 from ..ui.multi_selector import Multi_selector
@@ -30,13 +34,26 @@ from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer
 from ..ui.mincut_add_connec import Mincut_add_connec
 from ..ui.mincut_edit import Mincut_edit
 
+from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
+from qgis.gui import QgsRubberBand, QgsVertexMarker
+from PyQt4.QtCore import QPoint, QRect, Qt
+from PyQt4.QtGui import QApplication, QColor
 
-class MincutParent(ParentAction):
+
+
+
+
+class MincutParent(ParentAction, MincutConnec):
     def __init__(self, iface, settings, controller, plugin_dir):
         ''' Class to control Management toolbar actions '''
 
         # Call ParentAction constructor
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+
+        self.tool = MincutConnec(iface, settings, controller, plugin_dir)
+
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
 
         # Get layers of node,arc,connec groupe
         self.node_group = []
@@ -57,6 +74,8 @@ class MincutParent(ParentAction):
         arcs = self.dao.get_rows(sql)
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
+
+
 
 
     def init_mincut_form(self):
@@ -93,8 +112,11 @@ class MincutParent(ParentAction):
         self.btn_cancel_main.clicked.connect(self.dlg.close)
 
         # Fill widgets
-        sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_cat_state"
+        #sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_cat_state"
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0 "
+        # 1= in progress, 2= finished, 0=planified
         self.state_values = self.controller.get_rows(sql)
+
         if self.state_values != []:
             self.state.setText(str(self.state_values[0][0]))
 
@@ -202,7 +224,13 @@ class MincutParent(ParentAction):
         self.real_description.setEnabled(True)
 
         # Set status
-        self.state.setText(str(self.state_values[1][0]))
+        #self.state.setText(str(self.state_values[1][0]))
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1 "
+        # 1= in progress, 2= finished, 0=planified
+        self.state_values = self.controller.get_rows(sql)
+
+        if self.state_values != []:
+            self.state.setText(str(self.state_values[0][0]))
 
 
     def real_end(self):
@@ -249,8 +277,15 @@ class MincutParent(ParentAction):
         self.street_fin.setText(street_fin)
         self.number_fin.setText(number_fin)
         # set status
+        #if self.state_values != []:
+        #    self.state.setText(str(self.state_values[2][0]))
+
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2 "
+        # 1= in progress, 2= finished, 0=planified
+        self.state_values = self.controller.get_rows(sql)
+
         if self.state_values != []:
-            self.state.setText(str(self.state_values[2][0]))
+            self.state.setText(str(self.state_values[0][0]))
 
         self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -296,10 +331,6 @@ class MincutParent(ParentAction):
         dateEnd_real = self.cbx_date_end.date()
         timeEnd_real = self.cbx_hours_end.time()
         forecast_end_real = dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
-
-        mincut_result_state = "1"
-        message = str(action)
-        self.controller.show_info(message, context_name='ui_message')
 
         if action == "mg_mincut" :
             # Insert data to DB
@@ -417,7 +448,7 @@ class MincutParent(ParentAction):
 
     def snapping_init(self):
 
-        self.emitPoint.canvasClicked.connect(self.snapping_connec)
+        self.iface.mapCanvas().setMapTool(self.tool)
 
 
     def snapping_connec(self, point, btn):  #@UnusedVariable
@@ -1137,5 +1168,53 @@ class MincutParent(ParentAction):
         self.plugin_dir = os.path.dirname(__file__)[:-7]
         self.icon_folder = self.plugin_dir + '\icons'
         widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
+
+
+    def check_colision(self) :
+        ''' Check if there is temporal colision '''
+        #TO DO
+        pass
+
+'''
+class MyMapToolEmitPoint( QgsMapTool ):
+  canvasClicked = pyqtSignal( ['QgsPoint', 'Qt::MouseButton'] )
+  def canvasReleaseEvent( self, mouseEvent ):
+    pnt = self.toMapCoordinates( mouseEvent.pos() )
+    self.canvasClicked.emit( pnt, mouseEvent.button() )
+'''
+''' 
+class MincutConnec(QgsMapTool):
+
+
+    def init_min(self, iface):
+        self.canvas = iface.mapCanvas()
+        # Create the appropriate map tool and connect the gotPoint() signal.
+        self.emitPoint = QgsMapTool(self.canvas)
+        self.canvas.setMapTool(self.emitPoint)
+        #self.snapper = QgsMapCanvasSnapper(self.canvas)
+
+
+        self.dragging = False
+
+        # Vertex marker
+        self.vertexMarker = QgsVertexMarker(self.canvas)
+        self.vertexMarker.setColor(QColor(255, 25, 25))
+        self.vertexMarker.setIconSize(11)
+        self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
+        self.vertexMarker.setPenWidth(5)
+
+        # Rubber band
+        self.rubberBand = QgsRubberBand(self.canvas, True)
+        mFillColor = QColor(100, 0, 0);
+        self.rubberBand.setColor(mFillColor)
+        self.rubberBand.setWidth(3)
+        mBorderColor = QColor(254, 58, 29)
+        self.rubberBand.setBorderColor(mBorderColor)
+
+        # Select rectangle
+        self.selectRect = QRect()
         
-        
+        message = "lalal"
+        return message
+'''
+

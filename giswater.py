@@ -21,7 +21,6 @@ from dao.controller import DaoController
 from map_tools.line import LineMapTool
 from map_tools.point import PointMapTool
 from map_tools.move_node import MoveNodeMapTool
-from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
