@@ -1,20 +1,15 @@
-from qgis.core import QgsMessageLog
-from qgis.gui import QgsMapTool
-from PyQt4.QtCore import Qt, pyqtSignal
-#from qgis.core import QgsPoint
-from qgis.core import *
-from qgis.gui import  *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+'''
+This file is part of Giswater 2.0
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU 
+General Public License as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+'''
 
-from PyQt4.QtGui import QProgressBar
-from qgis.gui import QgsMessageBar
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
-
-from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
-from qgis.gui import QgsRubberBand, QgsVertexMarker
-from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor
+# -*- coding: utf-8 -*-
+from PyQt4.QtCore import pyqtSignal, QPoint, QRect, Qt
+from PyQt4.QtGui import QColor
+from qgis.core import QgsMessageLog, QgsPoint, QgsVectorLayer, QgsRectangle, QGis
+from qgis.gui import QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMapCanvasSnapper
 
 
 class MincutConnec(QgsMapTool):
@@ -81,13 +76,10 @@ class MincutConnec(QgsMapTool):
     def canvasMoveEvent(self, event):
         ''' With left click the digitizing is finished '''
 
-
         if event.buttons() == Qt.LeftButton:
-            #QgsMessageLog.logMessage("left button pressed")
             if not self.dragging:
                 self.dragging = True
                 self.selectRect.setTopLeft(event.pos())
-
             self.selectRect.setBottomRight(event.pos())
             self.set_rubber_band()
 
@@ -143,7 +135,6 @@ class MincutConnec(QgsMapTool):
                     for snapPoint in result:
 
                         element_type = snapPoint.layer.name()
-
                         if element_type in self.connec_group:
                             feat_type = 'connec'
                         else:
@@ -155,7 +146,6 @@ class MincutConnec(QgsMapTool):
 
                         #snapPoint.layer.removeSelection()
                         snapPoint.layer.select([snapPoint.snappedAtGeometry])
-
 
                         # Create link
                         #self.link_connec()
@@ -172,14 +162,10 @@ class MincutConnec(QgsMapTool):
                 if self.selectRect.height() == 1:
                     self.selectRect.setBottom(self.selectRect.bottom() + 1)
 
-
                 self.set_rubber_band()
-
                 selectGeom = self.rubberBand.asGeometry()  # @UnusedVariable
-
                 self.select_multiple_features(self.selectRectMapCoord)
                 self.dragging = False
-
 
                 # Create link
                 #self.link_connec()
@@ -190,6 +176,7 @@ class MincutConnec(QgsMapTool):
 
             for layerRefresh in self.iface.mapCanvas().layers():
                 layerRefresh.triggerRepaint()
+
 
     def set_rubber_band(self):
 
@@ -210,7 +197,7 @@ class MincutConnec(QgsMapTool):
         self.rubberBand.addPoint(ul, False)
         self.rubberBand.addPoint(ll, True)
 
-        self.selectRectMapCoord = 	QgsRectangle(ll, ur)
+        self.selectRectMapCoord = QgsRectangle(ll, ur)
 
 
     def select_multiple_features(self, selectGeometry):
@@ -231,16 +218,12 @@ class MincutConnec(QgsMapTool):
                 QgsMessageLog.logMessage(layer)
                 layer.selectByRect(selectGeometry, behaviour)
 
-
         else:
 
             for layer in self.connec_group:
                 layer.removeSelection()
                 layer.select(selectGeometry, True)
 
-
         # Old cursor
         #QApplication.restoreOverrideCursor()
-
-
 

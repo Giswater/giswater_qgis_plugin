@@ -6,15 +6,12 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-
+from PyQt4.Qt import QDate, QTime
 from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAction, QStringListModel, QCompleter, QIcon
-from PyQt4.Qt import QDate, QTime
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapToolEmitPoint, QgsMapCanvasSnapper
-
-from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
 
 import os
 import sys
@@ -25,7 +22,6 @@ sys.path.append(plugin_path)
 import utils_giswater
 from parent import ParentAction
 
-#from ..map_tools import mincut_connec
 from mincut_connec import MincutConnec
 from ..ui.mincut import Mincut
 from ..ui.mincut_fin import Mincut_fin
@@ -33,14 +29,6 @@ from ..ui.multi_selector import Multi_selector
 from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer
 from ..ui.mincut_add_connec import Mincut_add_connec
 from ..ui.mincut_edit import Mincut_edit
-
-from qgis.core import QgsPoint, QgsVectorLayer, QgsRectangle, QGis
-from qgis.gui import QgsRubberBand, QgsVertexMarker
-from PyQt4.QtCore import QPoint, QRect, Qt
-from PyQt4.QtGui import QApplication, QColor
-
-
-
 
 
 class MincutParent(ParentAction, MincutConnec):
@@ -74,8 +62,6 @@ class MincutParent(ParentAction, MincutConnec):
         arcs = self.dao.get_rows(sql)
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
-
-
 
 
     def init_mincut_form(self):
@@ -168,11 +154,11 @@ class MincutParent(ParentAction, MincutConnec):
 
         # Toolbar actions
         self.dlg.findChild(QAction, "actionConfig").triggered.connect(self.config)
-        self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincutInit)
+        self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincut_init)
         # self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
-        # self.actionCustomMincut.triggered.connect(self.customMincatInit)
-        self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.addConnec)
-        self.dlg.findChild(QAction, "actionAddHydrometer").triggered.connect(self.addHydrometer)
+        # self.actionCustomMincut.triggered.connect(self.custom_mincut_init)
+        self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.add_connec)
+        self.dlg.findChild(QAction, "actionAddHydrometer").triggered.connect(self.add_hydrometer)
 
         self.dlg.show()
 
@@ -358,8 +344,10 @@ class MincutParent(ParentAction, MincutConnec):
         elif action == "mg_mincut_management" :
             sql = "UPDATE " + self.schema_name + ".anl_mincut_result_cat "
             sql += " SET id = '" + id_ + "', mincut_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
-                   "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_from_plot = '" + \
-                   exec_limit_distance + "', forecast_start= '" + forecast_start_predict + "', forecast_end = '" + forecast_end_predict + "', exec_start ='" + forecast_start_real + "', exec_end ='" + forecast_end_real + "' , address_1 ='" + street + "', address_2 ='" + number + "', mincut_type ='" + mincut_result_type + "', anl_cause ='" + anl_cause + "' "
+                   "', exec_descript= '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_from_plot = '" + exec_limit_distance + \
+                   "', forecast_start= '" + forecast_start_predict + "', forecast_end = '" + forecast_end_predict + \
+                   "', exec_start ='" + forecast_start_real + "', exec_end ='" + forecast_end_real + "' , address_1 ='" + street + \
+                   "', address_2 ='" + number + "', mincut_type ='" + mincut_result_type + "', anl_cause ='" + anl_cause + "' "
             sql += " WHERE id = '" + id_ + "'"
             status = self.controller.execute_sql(sql)
             if status:
@@ -390,7 +378,7 @@ class MincutParent(ParentAction, MincutConnec):
         self.dlg_fin.close()
 
 
-    def addConnec(self):
+    def add_connec(self):
         ''' B3-121: Connec selector  '''
         
         self.ids = []
@@ -529,7 +517,7 @@ class MincutParent(ParentAction, MincutConnec):
             return 1
 
 
-    def addHydrometer(self):
+    def add_hydrometer(self):
         ''' B4-122: Hydrometer selector '''
 
         self.ids = []
@@ -796,7 +784,7 @@ class MincutParent(ParentAction, MincutConnec):
             widget.model().select()
 
 
-    def mincutInit(self):
+    def mincut_init(self):
         ''' B1-126: Automatic mincut analysis '''
 
         # Check if user entered ID
@@ -806,11 +794,11 @@ class MincutParent(ParentAction, MincutConnec):
         else:
             pass
 
-        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snappingNodeArc)
-        self.emitPoint.canvasClicked.connect(self.snappingNodeArc)
+        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snapping_node_arc)
+        self.emitPoint.canvasClicked.connect(self.snapping_node_arc)
 
 
-    def snappingNodeArc(self, point, btn):  #@UnusedVariable
+    def snapping_node_arc(self, point, btn):  #@UnusedVariable
 
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
@@ -889,7 +877,7 @@ class MincutParent(ParentAction, MincutConnec):
             layerRefresh.triggerRepaint()
 
 
-    def customMincatInit(self):
+    def custom_mincut_init(self):
         ''' B2-123: Custom mincut analysis
         Working just with layer Valve analytics '''
 
@@ -900,10 +888,10 @@ class MincutParent(ParentAction, MincutConnec):
         else:
             pass
 
-        self.emitPoint.canvasClicked.connect(self.snappingValveAnalytics)
+        self.emitPoint.canvasClicked.connect(self.snapping_valve_analytics)
 
 
-    def snappingValveAnalytics(self):
+    def snapping_valve_analytics(self):
         
         # Set active layer
         layer = QgsMapLayerRegistry.instance().mapLayersByName("Valve analytics")[0]
@@ -930,13 +918,11 @@ class MincutParent(ParentAction, MincutConnec):
                     snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                     # LEAVE SELECTION
                     result[0].layer.select([result[0].snappedAtGeometry])
-
                     element_id = feature.attribute(feat_type + '_id')
+                    self.custom_mincut(element_id)
 
-                    self.customMincut(element_id)
 
-
-    def customMincut(self,elem_id):
+    def custom_mincut(self,elem_id):
         ''' Init function of custom mincut - Valve analytics
         Working just with layer Valve analytics '''
 
@@ -1081,7 +1067,6 @@ class MincutParent(ParentAction, MincutConnec):
         #self.cause.addItem(rows[0]['anl_cause'])
 
         self.btn_end.setEnabled(True)
-
         self.distance.setEnabled(True)
         self.depth.setEnabled(True)
         self.real_description.setEnabled(True)
@@ -1174,47 +1159,4 @@ class MincutParent(ParentAction, MincutConnec):
         ''' Check if there is temporal colision '''
         #TO DO
         pass
-
-'''
-class MyMapToolEmitPoint( QgsMapTool ):
-  canvasClicked = pyqtSignal( ['QgsPoint', 'Qt::MouseButton'] )
-  def canvasReleaseEvent( self, mouseEvent ):
-    pnt = self.toMapCoordinates( mouseEvent.pos() )
-    self.canvasClicked.emit( pnt, mouseEvent.button() )
-'''
-''' 
-class MincutConnec(QgsMapTool):
-
-
-    def init_min(self, iface):
-        self.canvas = iface.mapCanvas()
-        # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapTool(self.canvas)
-        self.canvas.setMapTool(self.emitPoint)
-        #self.snapper = QgsMapCanvasSnapper(self.canvas)
-
-
-        self.dragging = False
-
-        # Vertex marker
-        self.vertexMarker = QgsVertexMarker(self.canvas)
-        self.vertexMarker.setColor(QColor(255, 25, 25))
-        self.vertexMarker.setIconSize(11)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)
-
-        # Rubber band
-        self.rubberBand = QgsRubberBand(self.canvas, True)
-        mFillColor = QColor(100, 0, 0);
-        self.rubberBand.setColor(mFillColor)
-        self.rubberBand.setWidth(3)
-        mBorderColor = QColor(254, 58, 29)
-        self.rubberBand.setBorderColor(mBorderColor)
-
-        # Select rectangle
-        self.selectRect = QRect()
-        
-        message = "lalal"
-        return message
-'''
 
