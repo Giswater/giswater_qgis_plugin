@@ -8,21 +8,21 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import pyqtSignal, QPoint, QRect, Qt
 from PyQt4.QtGui import QColor
-from qgis.core import QgsMessageLog, QgsPoint, QgsVectorLayer, QgsRectangle, QGis
+from qgis.core import QgsPoint, QgsRectangle, QGis, QgsMapLayerRegistry
 from qgis.gui import QgsMapTool, QgsRubberBand, QgsVertexMarker, QgsMapCanvasSnapper
 
 
 class MincutConnec(QgsMapTool):
     #canvasClicked = pyqtSignal(['QgsPoint', 'Qt::MouseButton'])
     canvasClicked = pyqtSignal()
-    QgsMessageLog.logMessage("test_move11")
 
 
-    def __init__(self, iface, settings, controller, plugin_dir):
-        # Class constructor
+    def __init__(self, iface, controller):
+        """ Class constructor """
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
+        self.controller = controller
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
@@ -46,6 +46,7 @@ class MincutConnec(QgsMapTool):
         # Select rectangle
         self.selectRect = QRect()
 
+        # TODO: Parametrize
         self.connec_group = ["Wjoin"]
         #self.snapperManager = SnappingConfigManager(self.iface)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
@@ -67,8 +68,6 @@ class MincutConnec(QgsMapTool):
 
 
     def canvasPressEvent(self, event):   #@UnusedVariable
-        QgsMessageLog.logMessage("canvas pressed")
-
         self.selectRect.setRect(0, 0, 0, 0)
         self.rubberBand.reset()
 
@@ -124,12 +123,12 @@ class MincutConnec(QgsMapTool):
 
             # Not dragging, just simple selection
             if not self.dragging:
+                
                 # Snap to node
                 (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
                 # That's the snapped point
                 if result <> []:
-
 
                     # Check feature
                     for snapPoint in result:
@@ -162,9 +161,8 @@ class MincutConnec(QgsMapTool):
                 if self.selectRect.height() == 1:
                     self.selectRect.setBottom(self.selectRect.bottom() + 1)
 
-                self.set_rubber_band()
-                selectGeom = self.rubberBand.asGeometry()  # @UnusedVariable
-                self.select_multiple_features(self.selectRectMapCoord)
+                self.set_rubber_band()               
+                self.select_multiple_features(self.selected_rectangle)
                 self.dragging = False
 
                 # Create link
@@ -197,11 +195,11 @@ class MincutConnec(QgsMapTool):
         self.rubberBand.addPoint(ul, False)
         self.rubberBand.addPoint(ll, True)
 
-        self.selectRectMapCoord = QgsRectangle(ll, ur)
+        self.selected_rectangle = QgsRectangle(ll, ur)
 
 
-    def select_multiple_features(self, selectGeometry):
-
+    def select_multiple_features(self, rectangle):
+       
         if self.connec_group is None:
             return
 
@@ -210,19 +208,22 @@ class MincutConnec(QgsMapTool):
 
         if QGis.QGIS_VERSION_INT >= 21600:
 
-            # Default choice
-            behaviour = QgsVectorLayer.SetSelection
-
             # Selection for all connec group layers
-            for layer in self.connec_group:
-                QgsMessageLog.logMessage(layer)
-                layer.selectByRect(selectGeometry, behaviour)
+            for layer_name in self.connec_group:
+                # Get layer by his name
+                layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_name)
+                if layer:
+                    layer = layer[0]  
+                else:
+                    self.controller.log_info("Layer not found")
+                layer.selectByRect(rectangle)
 
         else:
 
-            for layer in self.connec_group:
+            for layer_name in self.connec_group:
+                self.iface.setActiveLayer(layer)                
                 layer.removeSelection()
-                layer.select(selectGeometry, True)
+                layer.select(rectangle, True)
 
         # Old cursor
         #QApplication.restoreOverrideCursor()

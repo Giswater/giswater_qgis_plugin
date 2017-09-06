@@ -32,36 +32,40 @@ from ..ui.mincut_edit import Mincut_edit
 
 
 class MincutParent(ParentAction, MincutConnec):
+    
     def __init__(self, iface, settings, controller, plugin_dir):
         ''' Class to control Management toolbar actions '''
 
         # Call ParentAction constructor
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-
-        self.tool = MincutConnec(iface, settings, controller, plugin_dir)
-
+        
+        self.tool = MincutConnec(iface, controller)
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
 
-        # Get layers of node,arc,connec groupe
+        # Get layers of node, arc, connec group
         self.node_group = []
         self.connec_group = []
         self.arc_group = []
 
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".node_type_cat_type "
-        nodes = self.dao.get_rows(sql)
-        for node in nodes:
-            self.node_group.append(str(node[0]))
+        rows = self.dao.get_rows(sql)
+        if rows:
+            for row in rows:
+                self.node_group.append(str(row[0]))
 
+        # TODO: Table not exists
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".connec_type_cat_type "
-        connecs = self.dao.get_rows(sql)
-        for connec in connecs:
-            self.connec_group.append(str(connec[0]))
+        rows = self.controller.get_rows(sql)
+        if rows:
+            for row in rows:
+                self.connec_group.append(str(row[0]))
 
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".arc_type_cat_type "
-        arcs = self.dao.get_rows(sql)
-        for arc in arcs:
-            self.arc_group.append(str(arc[0]))
+        rows = self.dao.get_rows(sql)
+        if rows:
+            for row in rows:
+                self.arc_group.append(str(row[0]))
 
 
     def init_mincut_form(self):
@@ -486,7 +490,6 @@ class MincutParent(ParentAction, MincutConnec):
                     for el in range(1, len(self.ids)):
                         expr += " OR connec_id= '" + self.ids[el] + "'"
 
-                # expr = "hydrometer_id = '368' OR hydrometer_id = '334' OR hydrometer_id = '675'"
                 # Set model
                 model = QSqlTableModel();
                 model.setTable(table_name)
@@ -500,7 +503,6 @@ class MincutParent(ParentAction, MincutConnec):
 
                 # Attach model to table view
                 self.tbl_connec.setModel(model)
-
                 self.tbl_connec.model().setFilter(expr)
                 self.tbl_connec.model().select()
 
@@ -628,6 +630,7 @@ class MincutParent(ParentAction, MincutConnec):
         self.btn_insert = self.dlg_multi.findChild(QPushButton, "btn_insert")
         self.btn_delete = self.dlg_multi.findChild(QPushButton, "btn_delete")
 
+        # TODO: Table not exists
         table = "man_selector_valve"
         self.menu_valve = QMenu()
         self.dlg_multi.btn_insert.pressed.connect(partial(self.fill_insert_menu, table))
@@ -926,6 +929,7 @@ class MincutParent(ParentAction, MincutConnec):
         ''' Init function of custom mincut - Valve analytics
         Working just with layer Valve analytics '''
 
+        # TODO: Check column names
         sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_valve_unaccess (mincut_result_cat_id, valve_id)"
         sql += " VALUES ('" + self.id_text + "', '" + elem_id + "')"
 
