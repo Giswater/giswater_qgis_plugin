@@ -44,7 +44,7 @@ class Go2Epa(ParentAction):
 
 
     def go2epa(self):
-        """ Button 23. Open form to set INP, RPT and project """
+        """ Button 23: Open form to set INP, RPT and project """
 
         # Initialize variables
         self.file_inp = None
@@ -496,9 +496,8 @@ class Go2Epa(ParentAction):
 
 
     def go2epa_express(self):
-        """ Button 24. Open giswater in silent mode
-        Executes all options of File Manager: 
-        Export INP, Execute EPA software and Import results
+        """ Button 24: Open giswater in silent mode
+        Executes all options of File Manager: Export INP, Execute EPA software and Import results
         """
         self.execute_giswater("go2epa_express", 24)
 

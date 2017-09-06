@@ -9,7 +9,7 @@ or (at your option) any later version.
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
 from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog
+from qgis.core import QgsMessageLog # @UnresolvedImport
 
 import os.path
 import subprocess
@@ -466,23 +466,6 @@ class DaoController():
    
     def get_project_user(self):
         ''' Set user '''
-
-        user = None
-        #self.canvas = self.iface.mapCanvas() 
-        # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
-        
-        # Control current layer (due to QGIS bug in snapping system)
-        #if self.canvas.currentLayer() == None:
-        #    self.iface.setActiveLayer(layers[0])
-        #layer = self.iface.activeLayer()  
-        #uri = layer.dataProvider().dataSourceUri().lower()
-        uri = layers[0].dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('user=')
-        pos_end_schema = uri.rfind('password=')
-        if pos_ini <> -1:
-            user = uri[pos_ini + 6:pos_end_schema-2]
-
         return self.user   
     
 

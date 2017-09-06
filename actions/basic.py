@@ -7,19 +7,14 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-
-
 import os
 import sys
-
-
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
 
-
-from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector       
 
 from parent import ParentAction
 
@@ -38,6 +33,7 @@ class Basic(ParentAction):
 
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
+        
         dlg_multiexp = Multirow_selector()
         utils_giswater.setDialog(dlg_multiexp)
         dlg_multiexp.btn_ok.pressed.connect(dlg_multiexp.close)
@@ -65,3 +61,5 @@ class Basic(ParentAction):
         dlg_psector_sel.txt_name.setVisible(False)
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
         dlg_psector_sel.exec_()
+        
+

@@ -6,19 +6,16 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from functools import partial
 
-from PyQt4.QtGui import QAbstractItemView
+from PyQt4.QtGui import QAbstractItemView, QTableView
 from PyQt4.QtGui import QFileDialog
+from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
 import sys
 import webbrowser
 import ConfigParser
-
-
-from PyQt4.QtGui import QTableView
-from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
+from functools import partial
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)

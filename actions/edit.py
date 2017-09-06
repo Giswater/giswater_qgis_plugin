@@ -7,25 +7,25 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
-from PyQt4.QtCore import Qt, QPoint
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit,QPushButton
-
-from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
-from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
+from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
+from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
 import os
 import sys
 from datetime import datetime
 from functools import partial
 
-from ..ui.change_node_type import ChangeNodeType
-from ..ui.add_doc import Add_doc
-from ..ui.add_element import Add_element
-from ..ui.config_edit import ConfigEdit                         # @UnresolvedImport
-from ..ui.topology_tools import TopologyTools                   # @UnresolvedImport
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
+
+from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
+from ..ui.add_doc import Add_doc                    # @UnresolvedImport
+from ..ui.add_element import Add_element            # @UnresolvedImport             
+from ..ui.config_edit import ConfigEdit             # @UnresolvedImport
+from ..ui.topology_tools import TopologyTools       # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -180,8 +180,6 @@ class Edit(ParentAction):
         if self.dlg.check_arc_searchnodes.isChecked():
             sql = "SELECT "+self.schema_name+".gw_fct_repair_arc_searchnodes();"
             self.controller.execute_sql(sql)
-
-
 
         # Close the dialog
         self.close_dialog()
@@ -423,6 +421,7 @@ class Edit(ParentAction):
             column_name = self.dao.get_column_name(i)
             utils_giswater.setWidgetText(column_name, row[column_name])
 
+
     def edit_add_file_accept(self):
         """ Insert or update table 'document'. Add document to selected feature """
 
@@ -471,6 +470,7 @@ class Edit(ParentAction):
 
         self.close_dialog()
 
+
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
         map_canvas = self.iface.mapCanvas()
@@ -478,10 +478,12 @@ class Edit(ParentAction):
         map_canvas.setMapTool(self.emit_point)
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
+
     def get_xy(self, point):
         self.x = point.x()
         self.y = point.y()
         self.emit_point.canvasClicked.disconnect()
+
 
     def ed_add_el_autocomplete(self):
         """ Once we select 'element_id' using autocomplete, fill widgets with current values """
@@ -501,6 +503,7 @@ class Edit(ParentAction):
         for i in range(0, columns_length):
             column_name = self.dao.get_column_name(i)
             utils_giswater.setWidgetText(column_name, row[column_name])
+
 
     def ed_add_element_accept(self):
         """ Insert or update table 'element'. Add element to selected features """
@@ -567,6 +570,7 @@ class Edit(ParentAction):
 
         self.close_dialog(self.dlg)
         self.iface.mapCanvas().refreshAllLayers()
+
 
     def ed_add_to_feature(self, table_name, value_id):
         """ Add document or element to selected features """
@@ -926,3 +930,5 @@ class Edit(ParentAction):
         layer.startEditing()
         # Implement the Add Feature button
         self.iface.actionAddFeature().trigger()
+        
+        

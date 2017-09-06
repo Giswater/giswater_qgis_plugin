@@ -6,11 +6,11 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-import os
-import sys
 
 from PyQt4.QtGui import QDoubleValidator
 
+import os
+import sys
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
@@ -29,6 +29,10 @@ class Master(ParentAction):
         # Call ParentAction constructor      
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
     
+    
+    def set_project_type(self, project_type):
+        self.project_type = project_type
+            
 
     def master_estimate_result_new(self):
         """ Button 38: New estimate result """
