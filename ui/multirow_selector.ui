@@ -16,7 +16,7 @@
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <widget class="QPushButton" name="btn_cancel">
+  <widget class="QPushButton" name="btn_ok">
    <property name="geometry">
     <rect>
      <x>440</x>
@@ -26,10 +26,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Cancel</string>
+    <string>Ok</string>
    </property>
   </widget>
-  <widget class="QTableView" name="all_row">
+  <widget class="QTableView" name="all_rows">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -39,7 +39,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTableView" name="selected_row">
+  <widget class="QTableView" name="selected_rows">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -87,8 +87,8 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>all_row</tabstop>
-  <tabstop>btn_cancel</tabstop>
+  <tabstop>all_rows</tabstop>
+  <tabstop>btn_ok</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -330,15 +330,15 @@ class DaoController():
             return                  
         
         sql = "SELECT audit_function_actions.id, error_message, log_level, show_user "
-        sql+= " FROM "+self.schema_name+".audit_function_actions"
-        sql+= " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
-        sql+= " WHERE audit_cat_error.id != 0 AND debug_info is null"
-        sql+= " ORDER BY audit_function_actions.id DESC LIMIT 1"
+        sql += " FROM "+self.schema_name+".audit_function_actions"
+        sql += " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
+        sql += " WHERE audit_cat_error.id != 0 AND debug_info is null"
+        sql += " ORDER BY audit_function_actions.id DESC LIMIT 1"
         result = self.dao.get_row(sql)
         if result is not None:
             if result['log_level'] <= 2:
                 sql = "UPDATE "+self.schema_name+".audit_function_actions"
-                sql+= " SET debug_info = 'showed'"
+                sql += " SET debug_info = 'showed'"
                 sql+= " WHERE id = "+str(result['id'])
                 self.dao.execute_sql(sql)
                 if result['show_user']:
