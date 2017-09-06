@@ -8,8 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from PyQt4.QtCore import QSettings, QTime
-from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTableView, QTimeEdit, QSpinBox, QAbstractItemView
-from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
+from PyQt4.QtGui import QDoubleValidator, QIntValidator, QFileDialog, QCheckBox, QDateEdit,  QTimeEdit, QSpinBox
 
 import os
 import sys
@@ -93,9 +92,9 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.txt_result_name.setText(self.project_name)
 
         # Set signals
-        self.dlg_go2epa.btn_file_inp.clicked.connect(self.mg_go2epa_select_file_inp)
-        self.dlg_go2epa.btn_file_rpt.clicked.connect(self.mg_go2epa_select_file_rpt)
-        self.dlg_go2epa.btn_accept.clicked.connect(self.mg_go2epa_accept)
+        self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
+        self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
+        self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
         self.dlg_go2epa.btn_cancel.pressed.connect(self.dlg_go2epa.close)
         self.controller.log_info(str(self.project_type))
         if self.project_type == 'ws':
@@ -143,9 +142,6 @@ class Go2Epa(ParentAction):
         dlg_psector_sel.setWindowTitle("Selector")
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
         dlg_psector_sel.exec_()
-
-
-
 
 
     def ws_options(self):
@@ -448,7 +444,7 @@ class Go2Epa(ParentAction):
         dialog.close()
 
 
-    def mg_go2epa_select_file_inp(self):
+    def go2epa_select_file_inp(self):
         """ Select INP file """
         
         # Set default value if necessary
@@ -465,7 +461,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
 
 
-    def mg_go2epa_select_file_rpt(self):
+    def go2epa_select_file_rpt(self):
         """ Select RPT file """
         
         # Set default value if necessary
@@ -482,7 +478,7 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
 
-    def mg_go2epa_accept(self):
+    def go2epa_accept(self):
         """ Save INP, RPT and result name into GSW file """
 
         # Get widgets values
@@ -506,6 +502,7 @@ class Go2Epa(ParentAction):
         """
         self.execute_giswater("go2epa_express", 24)
 
+
     def go2epa_result_selector(self):
         """ Button 25. Result selector """
 
@@ -516,7 +513,7 @@ class Go2Epa(ParentAction):
         # Create the dialog and signals
         self.dlg = ResultCompareSelector()
         utils_giswater.setDialog(self.dlg)
-        self.dlg.btn_accept.pressed.connect(self.mg_result_selector_accept)
+        self.dlg.btn_accept.pressed.connect(self.result_selector_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Set values from widgets of type QComboBox
@@ -538,6 +535,7 @@ class Go2Epa(ParentAction):
         # Open the dialog
         self.dlg.exec_()
 
+
     def go2epa_giswater_jar(self):
         """ Button 36: Open giswater.jar with selected .gsw file """
 
@@ -545,7 +543,9 @@ class Go2Epa(ParentAction):
             self.execute_giswater("go2epa_giswater_jar", 36)
         else:
             self.controller.show_info("Function not supported in this Operating System")
-    def mg_result_selector_accept(self):
+
+
+    def result_selector_accept(self):
         """ Update current values to the table """
 
         # Get new values from widgets of type QComboBox
@@ -573,6 +573,7 @@ class Go2Epa(ParentAction):
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
         self.close_dialog(self.dlg)
+
 
     def go2epa_options_get_data(self, tablename):
         """ Get data from selected table """

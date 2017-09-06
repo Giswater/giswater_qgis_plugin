@@ -7,12 +7,10 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QTableView, QAbstractItemView
-from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
+
 
 import os
 import sys
-from functools import partial
 
 
 
@@ -48,7 +46,6 @@ class Basic(ParentAction):
         tableright = "selector_expl"
         field_id_left = "expl_id"
         field_id_right = "expl_id"
-
         self.multi_row_selector(dlg_multiexp, tableleft, tableright, field_id_left, field_id_right)
         dlg_multiexp.exec_()
 
@@ -65,7 +62,6 @@ class Basic(ParentAction):
         tableright = "selector_state"
         field_id_left = "id"
         field_id_right = "state_id"
+        dlg_psector_sel.txt_name.setVisible(False)
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
         dlg_psector_sel.exec_()
-
-

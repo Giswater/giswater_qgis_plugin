@@ -255,44 +255,33 @@ class ParentAction():
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN ("
-        sql += "SELECT name FROM " + self.controller.schema_name + "." + tableleft + "  RIGTH JOIN "
-        sql += self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
-        sql += " WHERE cur_user = current_user)"
-        self.fill_table_by_query(tbl_all_rows, sql)
-        self.hide_colums(tbl_all_rows, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-        tbl_all_rows.setColumnWidth(1, 200)
-        # fill QTableView selected_rows
-        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
-        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-        sql = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.controller.schema_name + "." + tableleft
-        sql += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
-        sql += " WHERE cur_user=current_user"
-        self.fill_table_by_query(tbl_selected_rows, sql)
-        self.hide_colums(tbl_selected_rows, [1, 2, 3])
-        tbl_selected_rows.setColumnWidth(0, 200)
-        # Button select
+
         query_left = "SELECT * FROM " + self.controller.schema_name + "." + tableleft + " WHERE name NOT IN "
         query_left += "(SELECT name FROM " + self.controller.schema_name + "." + tableleft
         query_left += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_left += " WHERE cur_user = current_user)"
+        self.fill_table_by_query(tbl_all_rows, query_left)
+        self.hide_colums(tbl_all_rows, [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+        tbl_all_rows.setColumnWidth(1, 200)
 
+        # fill QTableView selected_rows
+        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
+        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         query_right = "SELECT name, cur_user, " + tableleft + "." + field_id_left + ", " + tableright + "." + field_id_right + " FROM " + self.controller.schema_name + "." + tableleft
         query_right += " JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + " = " + tableright + "." + field_id_right
         query_right += " WHERE cur_user = current_user"
-        dialog.btn_select.pressed.connect(
-            partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left,
-                    query_right, field_id_right))
+        self.fill_table_by_query(tbl_selected_rows, query_right)
+        self.hide_colums(tbl_selected_rows, [1, 2, 3])
+        tbl_selected_rows.setColumnWidth(0, 200)
+        # Button select
+        dialog.btn_select.pressed.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows, field_id_left, tableright, "id", query_left, query_right, field_id_right))
 
         # Button unselect
         query_delete = "DELETE FROM " + self.controller.schema_name + "." + tableright
         query_delete += " WHERE current_user = cur_user AND " + tableright + "." + field_id_right + "="
-        dialog.btn_unselect.pressed.connect(
-            partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right,
-                    field_id_right))
+        dialog.btn_unselect.pressed.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete, query_left, query_right, field_id_right))
         # QLineEdit
-        dialog.txt_name.textChanged.connect(
-            partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 
     def hide_colums(self, widget, comuns_to_hide):
         for i in range(0, len(comuns_to_hide)):

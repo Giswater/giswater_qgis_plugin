@@ -10,8 +10,11 @@ from PyQt4.QtCore import QTime
 from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QPushButton, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QDoubleValidator, QLineEdit, QTabWidget, QTableView, QAbstractItemView
+from PyQt4.QtGui import QTableWidget
+from PyQt4.QtGui import QTableWidgetItem
 
 from PyQt4.QtSql import QSqlQueryModel, QSqlTableModel
+from PyQt4.uic.properties import QtGui
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
 import os
@@ -34,7 +37,12 @@ from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
 
 from parent import ParentAction
 
+class CustomQTableView(QTableView):
+    def __init__(self, *args, **kwargs):
+        QTableView.__init__(self, *args, **kwargs) #Use QTableView constructor
 
+    def keyPressEvent(self, event): #Reimplement the event here, in your case, do nothing
+        return
 class Master(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
@@ -225,8 +233,10 @@ class Master(ParentAction):
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
-        self.dlg_psector_mangement.exec_()
 
+
+
+        self.dlg_psector_mangement.exec_()
 
     def master_config_master(self):
         """ Button 99: Open a dialog showing data from table 'config_param_system' """
@@ -247,14 +257,10 @@ class Master(ParentAction):
         self.om_visit_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
 
-        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(
-            partial(self.open_web_browser, self.om_visit_path))
-        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(
-            partial(self.open_file_dialog, self.om_visit_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(
-            partial(self.open_web_browser, self.doc_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(
-            partial(self.open_file_dialog, self.doc_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
 
         # Get om_visit_absolute_path and doc_absolute_path from config_param_system
         sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
@@ -291,6 +297,7 @@ class Master(ParentAction):
         self.master_options_get_data("config_param_system")
 
         self.dlg_config_master.exec_()
+
 
     def master_options_get_data(self, tablename):
         """ Get data from selected table and fill widgets according to the name of the columns """

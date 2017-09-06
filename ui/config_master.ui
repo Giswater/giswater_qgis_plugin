@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -84,7 +84,7 @@
       <widget class="QLabel" name="label_psector">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>10</x>
          <y>20</y>
          <width>141</width>
          <height>22</height>
@@ -147,7 +147,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_17">
       <attribute name="title">
@@ -781,7 +781,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_18">
       <attribute name="title">
@@ -986,13 +986,13 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_12">
         <attribute name="title">
          <string>Arc</string>
         </attribute>
-        <widget class="QLineEdit" name="arc_code">
+        <widget class="QLineEdit" name="network_field_arc_code">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1162,7 +1162,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLineEdit" name="arc_layer">
+        <widget class="QLineEdit" name="network_layer_arc">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1301,7 +1301,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QLineEdit" name="node_code">
+        <widget class="QLineEdit" name="network_field_node_code">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1314,7 +1314,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLineEdit" name="node_layer">
+        <widget class="QLineEdit" name="network_layer_node">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1528,7 +1528,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QLineEdit" name="connec_layer">
+        <widget class="QLineEdit" name="network_layer_connec">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1541,7 +1541,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLineEdit" name="connec_code">
+        <widget class="QLineEdit" name="network_field_connec_code">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1729,7 +1729,7 @@
           <number>3</number>
          </property>
         </widget>
-        <widget class="QLineEdit" name="gully_layer">
+        <widget class="QLineEdit" name="network_layer_gully">
          <property name="geometry">
           <rect>
            <x>160</x>
@@ -1742,7 +1742,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLineEdit" name="gully_code">
+        <widget class="QLineEdit" name="network_field_gully_code">
          <property name="geometry">
           <rect>
            <x>160</x>

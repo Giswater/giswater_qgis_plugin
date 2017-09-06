@@ -14,8 +14,6 @@ import os.path
 import sys  
 from functools import partial
 
-from actions.ed import Ed
-from actions.mg import Mg
 from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.edit import Edit
@@ -105,9 +103,7 @@ class Giswater(QObject):
         if not self.schema_exists:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
-        # TODO: Set actions classes (define one class per plugin toolbar)
-        self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
+        # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -133,7 +129,6 @@ class Giswater(QObject):
     
     def manage_action(self, index_action, function_name):  
         
-        # TODO: Create an action class per plugin toolbar
         if function_name is not None:
             try:
                 action = self.actions[index_action]                
@@ -141,8 +136,12 @@ class Giswater(QObject):
                 if int(index_action) in (41, 48, 32):
                     callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
+                # om_ws toolbar actions
+                elif int(index_action) in (26, 27):
+                    callback_function = getattr(self.om_ws, function_name)
+                    action.triggered.connect(callback_function)
                 # Edit toolbar actions
-                if int(index_action) in (01, 02, 19, 33, 34, 98):
+                elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
                     callback_function = getattr(self.edit, function_name)
                     action.triggered.connect(callback_function)
                 # Go2epa toolbar actions
@@ -153,21 +152,6 @@ class Giswater(QObject):
                 elif int(index_action) in (45, 46, 47, 38, 49, 99):
                     callback_function = getattr(self.master, function_name)
                     action.triggered.connect(callback_function)
-
-
-                # om_ws toolbar actions
-                elif int(index_action) in (26, 27):
-                    callback_function = getattr(self.om_ws, function_name)
-                    action.triggered.connect(callback_function)
-                # Management toolbar actions
-                elif int(index_action) in (27, 28, 39):
-                    callback_function = getattr(self.mg, function_name)  
-                    action.triggered.connect(callback_function)                    
-                # Edit toolbar actions
-                elif int(index_action) in (32,  32):
-                    callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)
-
                 # Generic function
                 else:        
                     water_soft = function_name[:2] 
@@ -229,9 +213,6 @@ class Giswater(QObject):
         self.manage_action(index_action, function_name)
             
         return action
-          
-        
-
 
     
     def add_action(self, index_action, toolbar, parent):
@@ -245,11 +226,12 @@ class Giswater(QObject):
         if function_name:
             
             map_tool = None
-            if int(index_action) != 99:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-            else:
-                # 99 should be not checkable
+            # TODO: Bug checking actions randomly
+            #if int(index_action) in (19, 23, 24, 25, 36, 41, 48, 98, 99):
+            if int(index_action) in (98, 99):
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
+            else:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
                             
             if int(index_action) in (3, 5, 13):
                 map_tool = LineMapTool(self.iface, self.settings, action, index_action)
@@ -483,13 +465,14 @@ class Giswater(QObject):
         
         try:
             self.show_toolbars(True)
-            self.mg.set_project_type(None)
             self.go2epa.set_project_type(None)
-            self.ed.search_plus = self.search_plus                   
+            self.basic.set_project_type(None)
+            self.edit.set_project_type(None)
+            self.master.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
-                self.mg.set_project_type(wsoftware.lower())
+                self.basic.set_project_type(wsoftware.lower())
                 self.go2epa.set_project_type(wsoftware.lower())
                 self.edit.set_project_type(wsoftware.lower())
                 self.master.set_project_type(wsoftware.lower())
@@ -759,11 +742,11 @@ class Giswater(QObject):
     def set_layer_custom_form(self, layer, name):
         ''' Set custom UI form and init python code of selected layer '''
         
-        name_ui = self.mg.project_type+'_'+name+'.ui'
-        name_init = self.mg.project_type+'_'+name+'_init.py'
+        name_ui = self.basic.project_type+'_'+name+'.ui'
+        name_init = self.basic.project_type+'_'+name+'_init.py'
         name_function = 'formOpen'
         file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
+        file_init = os.path.join(self.plugin_dir, 'init', name_init)
         layer.editFormConfig().setUiForm(file_ui) 
         layer.editFormConfig().setInitCodeSource(1)
         layer.editFormConfig().setInitFilePath(file_init)           
@@ -818,7 +801,7 @@ class Giswater(QObject):
 
         if map_tool_name in self.map_tools:
             map_tool = self.map_tools[map_tool_name]
-            if self.mg.project_type == 'ws':
+            if self.basic.project_type == 'ws':
                 map_tool.set_layers(self.layer_arc_man_ws, self.layer_connec_man_ws, self.layer_node_man_ws)
                 map_tool.set_controller(self.controller)
             else:
@@ -835,7 +818,7 @@ class Giswater(QObject):
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
                 self.search_plus.remove_memory_layers() 
-            self.ed.search_plus = self.search_plus             
+            self.basic.search_plus = self.search_plus
             status = self.search_plus.populate_dialog()
             self.actions['32'].setVisible(status) 
             self.actions['32'].setEnabled(status) 
@@ -915,4 +898,4 @@ class Giswater(QObject):
         filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
         for f in filelist:
             os.remove(f)
-            
+
