@@ -8,6 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+from searchable_combobox import SearchableComboBox
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -118,4 +119,3 @@ class Ui_searchPlusDockWidget(object):
         self.label_code.setText(_translate("searchPlusDockWidget", "Code:", None))
         self.tab_main.setTabText(self.tab_main.indexOf(self.tab_4), _translate("searchPlusDockWidget", "Hydrometer", None))
 
-from custom_widgets.searchable_combobox import SearchableComboBox

@@ -212,6 +212,38 @@
 
 
 
+<context>
+
+    <name>search_plus</name>
+    
+    <message>
+        <source>searchplus</source>
+        <translation>Searchplus</translation>
+    </message>
+    <message>
+        <source>tab_network</source>
+        <translation>Network</translation>
+    </message>
+    <message>
+        <source>tab_hydrometer</source>
+        <translation>Hydrometer</translation>
+    </message>
+    <message>
+        <source>tab_address</source>
+        <translation>Adress</translation>
+    </message>
+    <message>
+        <source>lbl_street</source>
+        <translation>Street:</translation>
+    </message>
+    <message>
+        <source>lbl_number</source>
+        <translation>Number:</translation>
+    </message>
+    
+</context>
+
+
 
 <context>
 

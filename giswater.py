@@ -664,6 +664,9 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
+        # Get PostgreSQL version
+        self.controller.get_postgresql_version()        
+        
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
@@ -817,7 +820,6 @@ class Giswater(QObject):
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
-                self.search_plus.remove_memory_layers() 
             self.basic.search_plus = self.search_plus
             status = self.search_plus.populate_dialog()
             self.actions['32'].setVisible(status) 
