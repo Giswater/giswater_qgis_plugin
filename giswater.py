@@ -31,7 +31,6 @@ from map_tools.connec import ConnecMapTool
 from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
-#from map_tools.dimensions import Dimensions
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 
@@ -247,8 +246,6 @@ class Giswater(QObject):
                 map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
-            #elif int(index_action) == 39:
-            #    map_tool = Dimensions(self.iface, self.settings, action, index_action)
             #elif int(index_action) == 27:
             #    map_tool = ValveAnalytics(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
@@ -686,7 +683,7 @@ class Giswater(QObject):
         self.manage_map_tools()
 
         # Set SearchPlus object
-        #self.set_search_plus()
+        self.set_search_plus()
         
         # Delete python compiled files
         self.delete_pyc_files()  
@@ -836,13 +833,8 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         ''' Enable selected actions '''
         
-        # Enable MG toolbar
-        self.enable_actions(True, 1, 27)
-        self.enable_action(True, 29)
-        self.enable_action(False, 22)            
-        
-        # Enable ED toolbar
-        self.enable_actions(True, 30, 100)
+        # Enable all actions
+        self.enable_actions(True, 1, 100)
         
         # Linux: Disable actions related with go2epa and giswater.jar
         if 'nt' not in sys.builtin_module_names:

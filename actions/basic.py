@@ -24,6 +24,7 @@ class Basic(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control Management toolbar actions """
         self.minor_version = "3.0"
+        self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
 
@@ -63,3 +64,22 @@ class Basic(ParentAction):
         dlg_psector_sel.exec_()
         
 
+    def basic_search_plus(self):   
+        """ Button 32: Open search plus dialog """
+        
+        # Uncheck all actions (buttons) except this one
+        self.controller.check_actions(False)
+        self.controller.check_action(True, 32)
+        
+        try:
+            if self.search_plus is not None:  
+                if self.search_plus.dlg.tab_main.count() > 0:
+                    # Manage 'i18n' of the form and make it visible
+                    self.controller.translate_form(self.search_plus.dlg, 'search_plus')                            
+                    self.search_plus.dlg.setVisible(True)
+                else:
+                    message = "Search Plus: Any layer has been found. Check parameters in table 'config_param_system'"
+                    self.controller.show_warning(message, duration=20)   
+        except RuntimeError:
+            pass
+        
