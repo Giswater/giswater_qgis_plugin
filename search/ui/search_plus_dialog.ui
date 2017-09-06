@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>283</width>
-    <height>146</height>
+    <height>162</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>20</y>
+     <y>30</y>
      <width>261</width>
-     <height>101</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -35,7 +35,7 @@
        <x>80</x>
        <y>10</y>
        <width>161</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="editable">
@@ -53,7 +53,7 @@
        <x>80</x>
        <y>40</y>
        <width>161</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="editable">
@@ -76,7 +76,7 @@
        <x>80</x>
        <y>40</y>
        <width>161</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="editable">
@@ -94,7 +94,7 @@
        <x>80</x>
        <y>10</y>
        <width>161</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="editable">
@@ -117,7 +117,7 @@
        <x>80</x>
        <y>10</y>
        <width>161</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="editable">
@@ -135,7 +135,7 @@
        <x>80</x>
        <y>40</y>
        <width>161</width>
-       <height>20</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="editable">
@@ -153,7 +153,7 @@
        <x>10</x>
        <y>10</y>
        <width>71</width>
-       <height>21</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -166,7 +166,7 @@
        <x>10</x>
        <y>40</y>
        <width>71</width>
-       <height>21</height>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">

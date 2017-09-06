@@ -75,6 +75,21 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
         for elem in aux:
             if elem[0] == dict_field:
                 widget.addItem(elem[1])          
+        
+        
+def fillComboBoxList(widget, list_object, allow_nulls=True, clear_combo=True):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QComboBox, widget)    
+    if widget is None:
+        return None
+
+    if clear_combo:
+        widget.clear()
+    if allow_nulls:
+        widget.addItem('') 
+    for elem in list_object: 
+        widget.addItem(str(elem))          
 
 
 def getText(widget):
