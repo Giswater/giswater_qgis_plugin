@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit,QPushButton
+from PyQt4.QtGui import QIcon
 from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
@@ -238,6 +239,10 @@ class Edit(ParentAction):
         self.controller.translate_form(dlg, 'change_node_type')
         dlg.exec_()
 
+    def set_icon(self, widget, indx):
+        self.plugin_dir = os.path.dirname(__file__)[:-7]
+        self.icon_folder = self.plugin_dir + '\icons'
+        widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
 
     def edit_add_element(self):
         """ Button 33: Add element """
@@ -252,6 +257,7 @@ class Edit(ParentAction):
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'element')
@@ -287,6 +293,7 @@ class Edit(ParentAction):
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
+        self.set_icon(self.dlg.add_geom, "129.png")
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
