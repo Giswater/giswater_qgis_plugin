@@ -231,7 +231,7 @@ class DaoController():
         ret = msg_box.exec_()   #@UnusedVariable
                           
             
-    def get_row(self, sql, search_audit=True):
+    def get_row(self, sql):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         row = self.dao.get_row(sql)   

@@ -18,15 +18,12 @@ from actions.go2epa import Go2Epa
 from actions.basic import Basic
 from actions.edit import Edit
 from actions.master import Master
-from actions.om_ws import OmWs
 from actions.mincut import MincutParent
 from dao.controller import DaoController
 from map_tools.move_node import MoveNodeMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
-from map_tools.draw_profiles import DrawProfiles
-from map_tools.flow_regulator import FlowRegulator
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
@@ -87,6 +84,9 @@ class Giswater(QObject):
             self.controller.show_warning(msg, 30) 
             return 
         
+        # Cache error message with log_code = -1 (uncatched error)
+        self.controller.get_error_message(-1)       
+                
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
                 
@@ -102,7 +102,6 @@ class Giswater(QObject):
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.om_ws = OmWs(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)        
 
@@ -661,9 +660,6 @@ class Giswater(QObject):
         # Set schema_name in controller and in config file
         self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
         self.controller.set_schema_name(self.schema_name)   
-        
-        # Cache error message with log_code = -1 (uncatched error)
-        self.controller.get_error_message(-1)        
         
         # Get PostgreSQL version
         self.controller.get_postgresql_version()        
