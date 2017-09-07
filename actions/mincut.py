@@ -101,14 +101,11 @@ class MincutParent(ParentAction, MincutConnec):
         #self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
         self.btn_cancel_main.clicked.connect(self.dlg.close)
 
-        # Fill widgets
-        #sql = "SELECT id FROM " + self.schema_name + ".anl_mincut_cat_state"
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0 "
-        # 1= in progress, 2= finished, 0=planified
-        self.state_values = self.controller.get_rows(sql)
-
-        if self.state_values != []:
-            self.state.setText(str(self.state_values[0][0]))
+        # Get status 'planified' (id = 0)
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 0"
+        row = self.controller.get_row(sql)
+        if row:
+            self.state.setText(str(row[0]))
 
         # Fill ComboBox exploitation
         sql = "SELECT descript"
@@ -142,7 +139,6 @@ class MincutParent(ParentAction, MincutConnec):
         # Widgets for predict date
         self.cbx_date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
         self.cbx_hours_start_predict = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict")
-
         self.cbx_date_start_predict_2 = self.dlg.findChild(QDateEdit, "cbx_date_start_predict_2")
 
         # Widgets for real date
@@ -193,7 +189,6 @@ class MincutParent(ParentAction, MincutConnec):
 
         # Btn_end and btn_start
         self.btn_start.clicked.connect(self.real_start)
-
         self.btn_end.clicked.connect(self.real_end)
 
         self.dlg.show()
@@ -213,21 +208,18 @@ class MincutParent(ParentAction, MincutConnec):
         self.depth.setEnabled(True)
         self.real_description.setEnabled(True)
 
-        # Set status
-        #self.state.setText(str(self.state_values[1][0]))
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1 "
-        # 1= in progress, 2= finished, 0=planified
-        self.state_values = self.controller.get_rows(sql)
-
-        if self.state_values != []:
-            self.state.setText(str(self.state_values[0][0]))
+        # Get status 'in progress' (id = 1)
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 1"
+        row = self.controller.get_row(sql)
+        if row:
+            self.state.setText(str(row[0]))
 
 
     def real_end(self):
 
+        # Set current date and time
         self.date_end = QDate.currentDate()
         self.cbx_date_end.setDate(self.date_end)
-
         self.time_end = QTime.currentTime()
         self.cbx_hours_end.setTime(self.time_end)
 
@@ -236,7 +228,6 @@ class MincutParent(ParentAction, MincutConnec):
         utils_giswater.setDialog(self.dlg_fin)
 
         self.cbx_date_start_fin = self.dlg_fin.findChild(QDateEdit, "cbx_date_start_fin")
-
         self.cbx_hours_start_fin = self.dlg_fin.findChild(QTimeEdit, "cbx_hours_start_fin")
         self.cbx_date_start_fin.setDate(self.date_start)
         self.cbx_hours_start_fin.setTime(self.time_start)
@@ -249,33 +240,22 @@ class MincutParent(ParentAction, MincutConnec):
         self.btn_accept = self.dlg_fin.findChild(QPushButton, "btn_accept")
         self.btn_cancel = self.dlg_fin.findChild(QPushButton, "btn_cancel")
 
+        # TODO:
         self.btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
-
+        
         self.btn_accept.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
 
         # Set values mincut and address
-        self.mincut_fin = self.dlg_fin.findChild(QLineEdit, "mincut")
-        self.street_fin = self.dlg_fin.findChild(QLineEdit, "street")
-        self.number_fin = self.dlg_fin.findChild(QLineEdit, "number")
+        utils_giswater.setText("mincut", str(self.id.text()))
+        utils_giswater.setText("street", str(self.street.text()))
+        utils_giswater.setText("number", str(self.number.text()))
 
-        id_fin = str(self.id.text())
-        street_fin = str(self.street.text())
-        number_fin = str(self.number.text())
-
-        self.mincut_fin.setText(id_fin)
-        self.street_fin.setText(street_fin)
-        self.number_fin.setText(number_fin)
-        # set status
-        #if self.state_values != []:
-        #    self.state.setText(str(self.state_values[2][0]))
-
-        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2 "
-        # 1= in progress, 2= finished, 0=planified
-        self.state_values = self.controller.get_rows(sql)
-
-        if self.state_values != []:
-            self.state.setText(str(self.state_values[0][0]))
+        # Get status 'finished' (id = 2)
+        sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2"
+        row = self.controller.get_row(sql)
+        if row:
+            self.state.setText(str(row[0]))
 
         self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -389,10 +369,8 @@ class MincutParent(ParentAction, MincutConnec):
 
         # Check if user entered ID
         check = self.check_id()
-        if check == 0:
+        if not check:
             return
-        else:
-            pass
 
         self.dlg_connec = Mincut_add_connec()
         utils_giswater.setDialog(self.dlg_connec)
@@ -514,9 +492,9 @@ class MincutParent(ParentAction, MincutConnec):
         if self.id_text == "id":
             message = "You need to enter id"
             self.controller.show_info_box(message, context_name='ui_message')
-            return 0
+            return False
         else:
-            return 1
+            return True
 
 
     def add_hydrometer(self):
@@ -526,10 +504,8 @@ class MincutParent(ParentAction, MincutConnec):
 
         # Check if user entered ID
         check = self.check_id()
-        if check == 0 :
+        if not check:
             return
-        else :
-            pass
 
         self.dlg_hydro = Mincut_add_hydrometer()
         utils_giswater.setDialog(self.dlg_hydro)
@@ -792,12 +768,9 @@ class MincutParent(ParentAction, MincutConnec):
 
         # Check if user entered ID
         check = self.check_id()
-        if check == 0:
+        if not check:
             return
-        else:
-            pass
 
-        #QObject.connect(self.emitPoint, SIGNAL("canvasClicked(const QgsPoint &, Qt::MouseButton)"), self.snapping_node_arc)
         self.emitPoint.canvasClicked.connect(self.snapping_node_arc)
 
 
@@ -811,73 +784,52 @@ class MincutParent(ParentAction, MincutConnec):
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
 
-        # That's the snapped point
-        if result <> []:
+        # If any feature snapped return
+        if result == []:
+            return
 
-            # Check feature
-            for snapPoint in result:
+        # Check snapped features
+        for snap_point in result:
 
-                element_type = snapPoint.layer.name()
-                if element_type in self.node_group:
-                    feat_type = 'node'
-                #else:
-                #    continue
+            # Get feature type
+            elem_type = None            
+            layer_name = snap_point.layer.name()
+            if layer_name in self.node_group:
+                elem_type = 'node'
+            elif layer_name in self.arc_group:
+                elem_type = 'arc'
 
-                    # Get the point
-                    point = QgsPoint(snapPoint.snappedVertex)
-                    snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
-                    feature = snappFeat
-                    element_id = feature.attribute(feat_type + '_id')
+            if elem_type is not None:
+                point = QgsPoint(snap_point.snappedVertex)
+                snapped_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
+                elem_id = snapped_feature.attribute(elem_type + '_id')
 
-                    # LEAVE SELECTION
-                    snapPoint.layer.select([snapPoint.snappedAtGeometry])
-
-                    self.mincut(element_id,feat_type)
-
-            for snapPoint in result:
-
-                element_type = snapPoint.layer.name()
-                if element_type in self.arc_group :
-                    feat_type = 'arc'
-                #else:
-                #    continue
-
-                    # Get the point
-                    point = QgsPoint(snapPoint.snappedVertex)
-                    snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
-                    feature = snappFeat
-                    element_id = feature.attribute(feat_type + '_id')
-
-                    # LEAVE SELECTION
-                    snapPoint.layer.select([snapPoint.snappedAtGeometry])
-
-                    self.mincut(element_id,feat_type)
+                # LEAVE SELECTION
+                snap_point.layer.select([snap_point.snappedAtGeometry])
+                self.mincut(elem_id, elem_type)
 
 
-    def mincut(self,elem_id,elem_type):
+    def mincut(self, elem_id, elem_type):
 
-        # Execute SQL function
-        function_name = "gw_fct_mincut"
-        sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(elem_id) + "', '" + str(elem_type) + "', '" + self.id_text + "');"
+        # Execute SQL function 'gw_fct_mincut'
+        sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + self.id_text + "');"
 
         self.hold_elem_id = elem_id
-        self.hold_elem_type = self.elem_type
+        self.hold_elem_type = elem_type
         self.hold_id_text = self.id_text
         status = self.controller.execute_sql(sql)
+        if status:
+            message = "Mincut function executed successfully"
+            self.controller.show_info(message, context_name='ui_message')
+            # TODO: If mincut is done enable CustomMincut
+            #self.actionCustomMincut.setDisabled(False)
 
         # Refresh map canvas
         self.iface.mapCanvas().refreshAllLayers()
-
-        if status:
-            message = "Mincut done successfully"
-            self.controller.show_info(message, context_name='ui_message')
-
-            # If mincut is done enable CustomMincut
-            self.actionCustomMincut.setDisabled(False)
-
+        
         # TRRIGER REPAINT
-        for layerRefresh in self.iface.mapCanvas().layers():
-            layerRefresh.triggerRepaint()
+        for layer in self.iface.mapCanvas().layers():
+            layer.triggerRepaint()
 
 
     def custom_mincut_init(self):
@@ -886,21 +838,26 @@ class MincutParent(ParentAction, MincutConnec):
 
         # Check if user entered ID
         check = self.check_id()
-        if check == 0:
+        if not check:
             return
-        else:
-            pass
 
         self.emitPoint.canvasClicked.connect(self.snapping_valve_analytics)
 
 
     def snapping_valve_analytics(self):
         
+        # TODO: Get layer 'Valve analytics'
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("Valve analytics")
+        if layer:
+            layer = layer[0]
+        else:
+            self.controller.show_warning("Layer 'Valve analytics' not found")
+            return
+        
         # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("Valve analytics")[0]
         self.iface.setActiveLayer(layer)
 
-        # TODO
+        # TODO: Variable not defined
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -935,17 +892,15 @@ class MincutParent(ParentAction, MincutConnec):
 
         status = self.controller.execute_sql(sql)
         if status:
-            # Show message to user
             message = "Values has been updated"
             self.controller.show_info(message, context_name='ui_message')
 
         # After executing SQL call mincut action again
         # Execute SQL function
-        function_name = "gw_fct_mincut"
-        # Use elem id of previous element - repeatin automatic mincut
-        sql = "SELECT " + self.schema_name + "." + function_name + "('" + str(self.hold_elem_id) + "', '" + str(self.hold_elem_type) + "', '" + str(self.hold_id_text) + "');"
-        message = str(sql)
-        self.controller.show_info(message, context_name='ui_message')
+        # Use elem id of previous element - repeating automatic mincut
+        sql = "SELECT " + self.schema_name + ".gw_fct_mincut"
+        sql += "('" + str(self.hold_elem_id) + "', '" + str(self.hold_elem_type) + "', '" + str(self.hold_id_text) + "');"
+        self.controller.log_info(sql, context_name='ui_message')
         status = self.controller.execute_sql(sql)
 
         # Refresh map canvas
@@ -954,13 +909,12 @@ class MincutParent(ParentAction, MincutConnec):
         if status:
             message = "Mincut done successfully"
             self.controller.show_info(message, context_name='ui_message')
-
-            # If mincut is done enable CustomMincut
-            self.actionCustomMincut.setDisabled(False)
+            # TODO: If mincut is done enable CustomMincut
+            #self.actionCustomMincut.setDisabled(False)
 
         # TRRIGER REPAINT
-        for layerRefresh in self.iface.mapCanvas().layers():
-            layerRefresh.triggerRepaint()
+        for layer in self.iface.mapCanvas().layers():
+            layer.triggerRepaint()
 
 
     def mg_mincut_management(self):
@@ -980,20 +934,18 @@ class MincutParent(ParentAction, MincutConnec):
         self.completer = QCompleter()
         self.txt_mincut_id.setCompleter(self.completer)
         model = QStringListModel()
-
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
-        row = self.controller.get_rows(sql)
-
+        rows = self.controller.get_rows(sql)
         values = []
-        for value in row:
-            values.append(str(value[0]))
+        for row in rows:
+            values.append(str(row[0]))
 
         model.setStringList(values)
         self.completer.setModel(model)
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit, self.txt_mincut_id, "anl_mincut_result_cat"))
 
         self.dlg_min_edit.btn_accept.pressed.connect(self.open_mincut)
-        self.dlg_min_edit.btn_cancel.pressed.connect( self.dlg_min_edit.close)
+        self.dlg_min_edit.btn_cancel.pressed.connect(self.dlg_min_edit.close)
         self.dlg_min_edit.btn_delete.clicked.connect(partial(self.delete_mincut_management, self.tbl_mincut_edit, "anl_mincut_result_cat", "id"))
 
         #self.btn_accept_min = self.dlg.findChild(QPushButton, "btn_accept")
@@ -1019,49 +971,48 @@ class MincutParent(ParentAction, MincutConnec):
 
 
     def open_mincut(self):
-        ''' Open form of mincut
-        Fill form with selested mincut'''
+        ''' Open form of mincut. Fill form with selected mincut '''
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             self.controller.show_warning(message, context_name='ui_message')
             return
-        row = selected_list[0].row()
+        
         # Get mincut_id from selected row
+        row = selected_list[0].row()
         id_ = self.tbl_mincut_edit.model().record(row).value("id")
         self.dlg_min_edit.close()
 
-        #self.mg_mincut()
         self.init_mincut_form()
 
         self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
 
-        #TO DO-force fill form
+        # TODO: Force fill form
         sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
         sql += " WHERE id = '" + id_ + "'"
-        rows = self.controller.get_rows(sql)
+        row = self.controller.get_row(sql)
+        if not row:
+            return
 
-        self.id.setText(rows[0]['id'])
-        self.state.setText(str(rows[0]['mincut_state']))
-        utils_giswater.setWidgetText("pred_description", rows[0]['anl_descript'])
-        utils_giswater.setWidgetText("real_description", rows[0]['exec_descript'])
-
-        self.distance.setText(str(rows[0]['exec_from_plot']))
-        self.depth.setText(str(rows[0]['exec_depth']))
+        self.id.setText(row['id'])
+        self.state.setText(str(row['mincut_state']))
+        utils_giswater.setWidgetText("pred_description", row['anl_descript'])
+        utils_giswater.setWidgetText("real_description", row['exec_descript'])
+        self.distance.setText(str(row['exec_from_plot']))
+        self.depth.setText(str(row['exec_depth']))
 
         # from address separate street and number
-        address_db = rows[0]['address_1']
+        self.street.setText(str(row['address_1']))
+        self.number.setText(str(row['address_2']))
 
-        self.street.setText(address_db)
-        number_db = rows[0]['address_2']
-        self.number.setText(number_db)
-
+        # TODO: Unused variables
         # Set values from mincut to comboBox
         # utils_giswater.fillComboBox("type", rows['mincut_result_type'])
         # utils_giswater.fillComboBox("cause", rows['anl_cause'])
-        mincut_result_type = rows[0]['mincut_type']
-        cause = rows[0]['anl_cause']
+        mincut_result_type = row['mincut_type']
+        cause = row['anl_cause']
+        
         # Clear comboBoxes
         self.type.clear()
         self.cause.clear()
@@ -1096,7 +1047,7 @@ class MincutParent(ParentAction, MincutConnec):
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + "." + tablename)
 
 
-    def filter_by_state(self,widget):
+    def filter_by_state(self, widget):
 
         result_select = utils_giswater.getWidgetText("state_edit")
         expr = " mincut_result_state = '"+result_select+"'"
@@ -1125,8 +1076,7 @@ class MincutParent(ParentAction, MincutConnec):
 
 
     def delete_mincut_management(self, widget, table_name, column_id):
-        ''' Delete selected elements of the table
-         Delete by id '''
+        ''' Delete selected elements of the table (by id) '''
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
@@ -1161,6 +1111,6 @@ class MincutParent(ParentAction, MincutConnec):
 
     def check_colision(self) :
         ''' Check if there is temporal colision '''
-        #TO DO
+        # TODO
         pass
 
