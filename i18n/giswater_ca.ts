@@ -212,6 +212,38 @@
 
 
 
+<context>
+
+    <name>search_plus</name>
+    
+    <message>
+        <source>searchplus</source>
+        <translation>Searchplus</translation>
+    </message>
+    <message>
+        <source>tab_network</source>
+        <translation>Xarxa</translation>
+    </message>
+    <message>
+        <source>tab_hydrometer</source>
+        <translation>Hidròmetre</translation>
+    </message>
+    <message>
+        <source>tab_address</source>
+        <translation>Carrerer</translation>
+    </message>
+    <message>
+        <source>lbl_street</source>
+        <translation>Carrer:</translation>
+    </message>
+    <message>
+        <source>lbl_number</source>
+        <translation>Portal:</translation>
+    </message>
+    
+</context>
+
+
 
 <context>
 

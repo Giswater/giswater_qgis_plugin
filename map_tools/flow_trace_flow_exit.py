@@ -27,14 +27,12 @@ from map_tools.parent import ParentMapTool
 
 
 class FlowTraceFlowExitMapTool(ParentMapTool):
-    ''' Button 26. User select one node or arc.
-    Execute SQL function: 'gw_fct_mincut'
-    This function fills 3 temporary tables with id's: node_id, arc_id and valve_id
-    Returns and integer: error code
-    Get these id's and select them in its corresponding layers '''    
+    """ Button 56: Flow trace
+        Button 57: Flow exit
+    """    
 
     def __init__(self, iface, settings, action, index_action):  
-        ''' Class constructor '''
+        """ Class constructor """
         
         # Call ParentMapTool constructor     
         super(FlowTraceFlowExitMapTool, self).__init__(iface, settings, action, index_action)
@@ -47,7 +45,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
         self.vertexMarker.setPenWidth(5)
 
 
-    ''' QgsMapTools inherited event functions '''
+    """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
 
@@ -96,7 +94,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
 
 
     def canvasReleaseEvent(self, event):
-        ''' With left click the digitizing is finished '''
+        """ With left click the digitizing is finished """
         
         if event.button() == Qt.LeftButton and self.current_layer is not None:
 

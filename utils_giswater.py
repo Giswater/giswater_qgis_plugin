@@ -21,13 +21,14 @@ def setDialog(p_dialog):
     _dialog = p_dialog
     
 
-def fillComboBox(widget, rows, allow_nulls=True):
+def fillComboBox(widget, rows, allow_nulls=True, clear_combo=True):
 
     if rows is None:
         return
     if type(widget) is str:
         widget = _dialog.findChild(QComboBox, widget)        
-    widget.clear()
+    if clear_combo:
+        widget.clear()
     if allow_nulls:
         widget.addItem('')
     for row in rows:       
@@ -74,6 +75,21 @@ def fillComboBoxDict(widget, dict_object, dict_field, allow_nulls=True):
         for elem in aux:
             if elem[0] == dict_field:
                 widget.addItem(elem[1])          
+        
+        
+def fillComboBoxList(widget, list_object, allow_nulls=True, clear_combo=True):
+
+    if type(widget) is str:
+        widget = _dialog.findChild(QComboBox, widget)    
+    if widget is None:
+        return None
+
+    if clear_combo:
+        widget.clear()
+    if allow_nulls:
+        widget.addItem('') 
+    for elem in list_object: 
+        widget.addItem(str(elem))          
 
 
 def getText(widget):

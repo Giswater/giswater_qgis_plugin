@@ -14,21 +14,22 @@ import os.path
 import sys  
 from functools import partial
 
-from actions.ed import Ed
-from actions.mg import Mg
 from actions.go2epa import Go2Epa
+from actions.basic import Basic
+from actions.edit import Edit
+from actions.master import Master
+from actions.om_ws import OmWs
+from actions.mincut import MincutParent
 from dao.controller import DaoController
-from map_tools.line import LineMapTool
-from map_tools.point import PointMapTool
 from map_tools.move_node import MoveNodeMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
-from map_tools.extract_raster_value import ExtractRasterValue
 from map_tools.draw_profiles import DrawProfiles
 from map_tools.flow_regulator import FlowRegulator
-from actions.mincut import MincutParent
-
+from map_tools.draw_profiles import DrawProfiles
+from map_tools.replace_node import ReplaceNodeMapTool
+from models.plugin_toolbar import PluginToolbar
 from search.search_plus import SearchPlus
 
 
@@ -50,6 +51,7 @@ class Giswater(QObject):
         self.search_plus = None
         self.map_tools = {}
         self.srid = None  
+        self.plugin_toolbars = {}
             
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)    
@@ -95,13 +97,15 @@ class Giswater(QObject):
         if not self.schema_exists:
             self.controller.show_warning("Selected schema not found", parameter=self.schema_name)
         
-        # Set actions classes
-        self.ed = Ed(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mg = Mg(self.iface, self.settings, self.controller, self.plugin_dir)
+        # Set actions classes (define one class per plugin toolbar)
         self.go2epa = Go2Epa(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.om_ws = OmWs(self.iface, self.settings, self.controller, self.plugin_dir)
         self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
-        
+        self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)        
+
         # Define signals
         self.set_signals()
         
@@ -125,22 +129,28 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action = self.actions[index_action]                
-                # Management toolbar actions
-                if int(index_action) in (01, 02, 19, 25, 28, 39, 41, 45, 46, 47, 48, 98, 99):
-                    callback_function = getattr(self.mg, function_name)  
+
+                # Basic toolbar actions
+                if int(index_action) in (41, 48, 32):
+                    callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
-                # Edit toolbar actions
-                elif int(index_action) in (32, 33, 34, 36):                       
-                    callback_function = getattr(self.ed, function_name)  
-                    action.triggered.connect(callback_function)
-                elif int(index_action) in (23, 24):
-                    callback_function = getattr(self.go2epa, function_name)
-                    action.triggered.connect(callback_function)
+                # Mincut toolbar actions
                 elif int(index_action) == 26:
                     callback_function = getattr(self.mincut, 'mg_mincut')
                     action.triggered.connect(callback_function)
                 elif int(index_action) == 27:
-                    callback_function = getattr(self.mincutManagement, 'mg_mincut_management')
+                    callback_function = getattr(self.mincutManagement, 'mg_mincut_management')                    
+                # Edit toolbar actions
+                elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
+                    callback_function = getattr(self.edit, function_name)
+                    action.triggered.connect(callback_function)
+                # Go2epa toolbar actions
+                elif int(index_action) in (23, 24, 25, 36):
+                    callback_function = getattr(self.go2epa, function_name)
+                    action.triggered.connect(callback_function)
+                # Master toolbar actions
+                elif int(index_action) in (45, 46, 47, 38, 49, 99):
+                    callback_function = getattr(self.master, function_name)
                     action.triggered.connect(callback_function)
                 # Generic function
                 else:        
@@ -187,7 +197,7 @@ class Giswater(QObject):
                         obj_action = QAction(str(row["i18n"]), self)
                         obj_action.setShortcut(str(row["shortcut_key"]))
                         menu.addAction(obj_action)
-                        obj_action.triggered.connect(partial(self.menu_activate, str(row["i18n"])))
+                        obj_action.triggered.connect(partial(self.edit.menu_activate, str(row["i18n"])))
                 
                 action.setMenu(menu)
                   
@@ -230,28 +240,24 @@ class Giswater(QObject):
         if function_name:
             
             map_tool = None
-            if int(index_action) != 99:
-                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
-            else:
-                # 99 should be not checkable
+            # TODO: Bug checking actions randomly
+            #if int(index_action) in (19, 23, 24, 25, 36, 41, 48, 98, 99):
+            if int(index_action) in (98, 99):
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
-                            
-            if int(index_action) in (3, 5, 13):
-                map_tool = LineMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) in (1, 4, 10, 11, 12, 14, 15, 8, 29):
-                map_tool = PointMapTool(self.iface, self.settings, action, index_action, self.controller, self.srid)   
-            elif int(index_action) == 16:
+            else:
+                action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
+                   
+            # Manage Map Tools         
+            if int(index_action) == 16:
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.srid)
             elif int(index_action) == 17:
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 18:
-                map_tool = ExtractRasterValue(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
                 map_tool = DrawProfiles(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 52:
-                map_tool = FlowRegulator(self.iface, self.settings, action, index_action)
+            elif int(index_action) == 44:
+                map_tool = ReplaceNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 56:
                 map_tool = FlowTraceFlowExitMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 57:
@@ -265,38 +271,69 @@ class Giswater(QObject):
 
      
     def manage_toolbars(self):
-        ''' Manage actions of the different toolbars '''
+        ''' Manage actions of the different plugin toolbars '''
         
-        parent = self.iface.mainWindow()         
-        if self.toolbar_mg_enabled:
-            self.toolbar_mg_name = self.tr('toolbar_mg_name')
-            self.toolbar_mg = self.iface.addToolBar(self.toolbar_mg_name)
-            self.toolbar_mg.setObjectName(self.toolbar_mg_name)      
-        if self.toolbar_ed_enabled:
-            self.toolbar_ed_name = self.tr('toolbar_ed_name')
-            self.toolbar_ed = self.iface.addToolBar(self.toolbar_ed_name)
-            self.toolbar_ed.setObjectName(self.toolbar_ed_name)      
-                
-        # Set an action list for every toolbar    
-        list_actions_mg = ['01','02','16','17','18','19','20','22','23','24','25','26','27','28','39','41','43','45','46','47','48','56','57','98','99']
-        list_actions_ed = ['30','31','32','33','34','35','36','52']
-                
-        # MANAGEMENT toolbar 
-        if self.toolbar_mg_enabled:      
-            self.ag_mg = QActionGroup(parent)
-            for elem in list_actions_mg:
-                self.add_action(elem, self.toolbar_mg, self.ag_mg)
-                    
-        # EDIT toolbar 
-        if self.toolbar_ed_enabled:      
-            self.ag_ed = QActionGroup(parent);
-            for elem in list_actions_ed:
-                self.add_action(elem, self.toolbar_ed, self.ag_ed)                                      
-         
-        # Disable and hide all toolbars
+        parent = self.iface.mainWindow()    
+        
+        # TODO: It should be managed trough database roles
+        toolbar_basic_enabled = bool(int(self.settings.value('status/toolbar_basic_enabled', 1)))
+        toolbar_om_ws_enabled = bool(int(self.settings.value('status/toolbar_om_ws_enabled', 1)))
+        toolbar_om_ud_enabled = bool(int(self.settings.value('status/toolbar_om_ud_enabled', 1)))
+        toolbar_edit_enabled = bool(int(self.settings.value('status/toolbar_edit_enabled', 1)))
+        toolbar_epa_enabled = bool(int(self.settings.value('status/toolbar_epa_enabled', 1)))
+        toolbar_master_enabled = bool(int(self.settings.value('status/toolbar_master_enabled', 1)))  
+        
+        if toolbar_basic_enabled:
+            toolbar_id = "basic"
+            list_actions = ['41', '48', '32']
+            self.manage_toolbar(toolbar_id, list_actions)
+
+        if toolbar_om_ws_enabled:
+            toolbar_id = "om_ws"
+            list_actions = ['26', '27']                
+            self.manage_toolbar(toolbar_id, list_actions) 
+            
+        if toolbar_om_ud_enabled:
+            toolbar_id = "om_ud"
+            list_actions = ['43', '56', '57']                
+            self.manage_toolbar(toolbar_id, list_actions)                           
+            
+        if toolbar_edit_enabled:
+            toolbar_id = "edit"
+            list_actions = ['01', '02', '44', '16', '17', '28', '19', '20', '33', '34', '39', '98']               
+            self.manage_toolbar(toolbar_id, list_actions)   
+            
+        if toolbar_epa_enabled:
+            toolbar_id = "epa"
+            list_actions = ['23', '24', '25', '36']               
+            self.manage_toolbar(toolbar_id, list_actions)    
+            
+        if toolbar_master_enabled:
+            toolbar_id = "master"
+            list_actions = ['45', '46', '47', '38', '49', '99']               
+            self.manage_toolbar(toolbar_id, list_actions)                             
+
+        # Manage action group of every toolbar
+        for plugin_toolbar in self.plugin_toolbars.itervalues():
+            ag = QActionGroup(parent)
+            for elem in plugin_toolbar.list_actions:
+                self.add_action(elem, plugin_toolbar.toolbar, ag)                                       
+
+        # Disable and hide all plugin_toolbars
         self.enable_actions(False)
-        self.hide_toolbars() 
+        self.show_toolbars(False) 
+           
+           
+    def manage_toolbar(self, toolbar_id, list_actions): 
+        ''' Manage action of selected plugin toolbar '''
                 
+        toolbar_name = self.tr('toolbar_' + toolbar_id + '_name')        
+        plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
+        plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+        plugin_toolbar.toolbar.setObjectName(toolbar_name)  
+        plugin_toolbar.list_actions = list_actions           
+        self.plugin_toolbars[toolbar_id] = plugin_toolbar 
+                        
            
     def initGui(self):
         ''' Create the menu entries and toolbar icons inside the QGIS GUI ''' 
@@ -353,7 +390,6 @@ class Giswater(QObject):
         self.table_netwjoin = self.settings.value('db/table_netwjoin', 'v_edit_man_netwjoin')
         self.table_expansiontank = self.settings.value('db/table_expansiontank', 'v_edit_man_expansiontank')
         self.table_flexunion = self.settings.value('db/table_flexunion', 'v_edit_man_flexunion')
-          
         self.table_filter =  self.settings.value('db/table_filter', 'v_edit_man_filter')
       
         # Tables arc
@@ -361,15 +397,10 @@ class Giswater(QObject):
         self.table_siphon = self.settings.value('db/table_siphon', 'v_edit_man_siphon')
         self.table_conduit = self.settings.value('db/table_conduit', 'v_edit_man_conduit')
         self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
-        
         self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
         self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
         
-        # Create UD, WS, MANAGEMENT and EDIT toolbars or not?
-        self.toolbar_mg_enabled = bool(int(self.settings.value('status/toolbar_mg_enabled', 1)))
-        self.toolbar_ed_enabled = bool(int(self.settings.value('status/toolbar_ed_enabled', 1)))
-        
-        # Manage actions of the different toolbars
+        # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
                          
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'? 
@@ -383,16 +414,19 @@ class Giswater(QObject):
         ''' Removes the plugin menu item and icon from QGIS GUI '''
         
         try:
-            for action_index, action in self.actions.iteritems():   #@UnusedVariable
+            for action in self.actions.itervalues():
                 self.iface.removePluginMenu(self.menu_name, action)
                 self.iface.removeToolBarIcon(action)
-            if self.toolbar_mg_enabled:    
-                del self.toolbar_mg
-            if self.toolbar_ed_enabled:    
-                del self.toolbar_ed
-                if self.search_plus is not None:
-                    self.search_plus.unload()
+                
+            for plugin_toolbar in self.plugin_toolbars.itervalues():
+                if plugin_toolbar.enabled:
+                    plugin_toolbar.toolbar.setVisible(False)                
+                    del plugin_toolbar.toolbar
+
+            if self.search_plus is not None:
+                self.search_plus.unload()
         except AttributeError:
+            self.controller.log_info("unload - AttributeError")
             pass
         except KeyError:
             pass
@@ -414,14 +448,13 @@ class Giswater(QObject):
             action.setEnabled(enable)                   
 
 
-    def hide_toolbars(self):
-        ''' Hide all toolbars from QGIS GUI '''
+    def show_toolbars(self, visible=True):
+        ''' Show/Hide all plugin toolbars from QGIS GUI '''
         
         try:
-            if self.toolbar_mg_enabled:                
-                self.toolbar_mg.setVisible(False)
-            if self.toolbar_ed_enabled:                
-                self.toolbar_ed.setVisible(False)
+            for plugin_toolbar in self.plugin_toolbars.itervalues():
+                if plugin_toolbar.enabled:                
+                    plugin_toolbar.toolbar.setVisible(visible)
         except AttributeError:
             pass
         except KeyError:
@@ -432,35 +465,27 @@ class Giswater(QObject):
         ''' Search in table 'version' project type of current QGIS project '''
         
         try:
-            self.mg.set_project_type(None)
+            self.show_toolbars(True)
             self.go2epa.set_project_type(None)
+            self.basic.set_project_type(None)
+            self.edit.set_project_type(None)
+            self.master.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
-                self.mg.set_project_type(wsoftware.lower())
+                self.basic.set_project_type(wsoftware.lower())
                 self.go2epa.set_project_type(wsoftware.lower())
+                self.edit.set_project_type(wsoftware.lower())
+                self.master.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
-                    self.actions['26'].setVisible(True)
-                    self.actions['27'].setVisible(True)
-                    self.actions['56'].setVisible(False)
-                    self.actions['57'].setVisible(False)
-                    self.actions['43'].setVisible(False)
-                    self.actions['52'].setVisible(False)                         
+                    self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
+                    self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   
                 elif wsoftware.lower() == 'ud':
-                    self.actions['26'].setVisible(False)
-                    self.actions['27'].setVisible(False)
-                    self.actions['56'].setVisible(True)
-                    self.actions['57'].setVisible(True)
-                    self.actions['43'].setVisible(True)
-                    self.actions['52'].setVisible(True)               
-
-            # Set visible MANAGEMENT and EDIT toolbar
-            if self.toolbar_mg_enabled:         
-                self.toolbar_mg.setVisible(True)
-            if self.toolbar_ed_enabled: 
-                self.toolbar_ed.setVisible(True)
-            self.ed.search_plus = self.search_plus                   
-        except:
+                    self.plugin_toolbars['om_ud'].toolbar.setVisible(True)                   
+                    self.plugin_toolbars['om_ws'].toolbar.setVisible(False)          
+            
+        except Exception as e:
+            self.controller.log_info("search_project_type - Exception: "+str(e))
             pass                  
 
                           
@@ -470,8 +495,8 @@ class Giswater(QObject):
         if self.dao is None:
             return
                 
-        # Hide all toolbars
-        self.hide_toolbars()
+        # Hide all plugin_toolbars
+        self.show_toolbars(False)
 
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
@@ -640,6 +665,9 @@ class Giswater(QObject):
         # Cache error message with log_code = -1 (uncatched error)
         self.controller.get_error_message(-1)        
         
+        # Get PostgreSQL version
+        self.controller.get_postgresql_version()        
+        
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
         self.controller.plugin_settings_set_value("srid", self.srid)           
@@ -718,11 +746,11 @@ class Giswater(QObject):
     def set_layer_custom_form(self, layer, name):
         ''' Set custom UI form and init python code of selected layer '''
         
-        name_ui = self.mg.project_type+'_'+name+'.ui'
-        name_init = self.mg.project_type+'_'+name+'_init.py'
+        name_ui = self.basic.project_type+'_'+name+'.ui'
+        name_init = self.basic.project_type+'_'+name+'_init.py'
         name_function = 'formOpen'
         file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
+        file_init = os.path.join(self.plugin_dir, 'init', name_init)
         layer.editFormConfig().setUiForm(file_ui) 
         layer.editFormConfig().setInitCodeSource(1)
         layer.editFormConfig().setInitFilePath(file_init)           
@@ -764,10 +792,10 @@ class Giswater(QObject):
         self.set_map_tool('mg_flow_trace')
         self.set_map_tool('mg_flow_exit')
         self.set_map_tool('mg_connec_tool')
-        self.set_map_tool('mg_extract_raster_value')
         self.set_map_tool('mg_draw_profiles')
         self.set_map_tool('ed_flow_regulator')
         self.set_map_tool('mg_mincut')
+        self.set_map_tool('mg_replace_node')
         #self.set_map_tool('mg_dimensions')
                 
         
@@ -776,14 +804,12 @@ class Giswater(QObject):
 
         if map_tool_name in self.map_tools:
             map_tool = self.map_tools[map_tool_name]
-            if self.mg.project_type == 'ws':
+            if self.basic.project_type == 'ws':
                 map_tool.set_layers(self.layer_arc_man_ws, self.layer_connec_man_ws, self.layer_node_man_ws)
                 map_tool.set_controller(self.controller)
             else:
                 map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud)
                 map_tool.set_controller(self.controller)
-            if map_tool_name == 'mg_extract_raster_value':
-                map_tool.set_config_action(self.actions['99'])                
 
        
     def set_search_plus(self):
@@ -792,8 +818,7 @@ class Giswater(QObject):
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
-                self.search_plus.remove_memory_layers() 
-            self.ed.search_plus = self.search_plus             
+            self.basic.search_plus = self.search_plus
             status = self.search_plus.populate_dialog()
             self.actions['32'].setVisible(status) 
             self.actions['32'].setEnabled(status) 
@@ -809,13 +834,8 @@ class Giswater(QObject):
     def custom_enable_actions(self):
         ''' Enable selected actions '''
         
-        # Enable MG toolbar
-        self.enable_actions(True, 1, 27)
-        self.enable_action(True, 29)
-        self.enable_action(False, 22)            
-        
-        # Enable ED toolbar
-        self.enable_actions(True, 30, 100)
+        # Enable all actions
+        self.enable_actions(True, 1, 100)
         
         # Linux: Disable actions related with go2epa and giswater.jar
         if 'nt' not in sys.builtin_module_names:
@@ -873,4 +893,4 @@ class Giswater(QObject):
         filelist = [ f for f in os.listdir(".") if f.endswith(".pyc") ]
         for f in filelist:
             os.remove(f)
-            
+

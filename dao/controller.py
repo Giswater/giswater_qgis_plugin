@@ -7,9 +7,9 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QCoreApplication, QSettings, Qt, QTranslator 
-from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton
+from PyQt4.QtGui import QCheckBox, QLabel, QMessageBox, QPushButton, QTabWidget
 from PyQt4.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog
+from qgis.core import QgsMessageLog # @UnresolvedImport
 
 import os.path
 import subprocess
@@ -137,8 +137,18 @@ class DaoController():
             self.log_codes[log_code_id] = result[0]    
         else:
             self.log_codes[log_code_id] = "Error message not found in the database: "+str(log_code_id)
+            
+            
+    def get_postgresql_version(self):    
+        ''' Get PostgreSQL version (integer value) '''    
 
-
+        self.postgresql_version = None
+        sql = "SELECT current_setting('server_version_num');"
+        row = self.dao.get_row(sql)  
+        if row:
+            self.postgresql_version = row[0]            
+        
+    
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
         ''' Show message to the user with selected message level
         message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3} '''
@@ -224,23 +234,29 @@ class DaoController():
     def get_row(self, sql, search_audit=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
-        result = self.dao.get_row(sql)
-        self.dao.commit()        
-        if result is None:
-            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))  
-            return False
-        elif result != 0:
-            if search_audit:
-                # Get last record from audit tables (searching for a possible error)
-                return self.get_error_from_audit()
+        row = self.dao.get_row(sql)   
+        self.last_error = self.dao.last_error      
+        if not row:
+            # Check if any error has been raised
+            if self.last_error is not None:         
+                self.show_warning_detail(self.log_codes[-1], str(self.last_error))
+            else:
+                self.log_info("Any record found: "+sql)
           
-        return True  
+        return row  
     
     
     def get_rows(self, sql):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
-        rows = self.dao.get_rows(sql)   		
+        rows = self.dao.get_rows(sql)   
+        self.last_error = self.dao.last_error 
+        if not rows:
+            # Check if any error has been raised
+            if self.last_error is not None:                  
+                self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
+            else:
+                self.log_info("Any record found: "+sql)                        		
 
         return rows  
     
@@ -249,6 +265,7 @@ class DaoController():
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         result = self.dao.execute_sql(sql)
+        self.last_error = self.dao.last_error         
         if not result:
             self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
             return False
@@ -256,6 +273,54 @@ class DaoController():
             if search_audit:
                 # Get last record from audit tables (searching for a possible error)
                 return self.get_error_from_audit()    
+
+        return True
+           
+            
+    def execute_upsert(self, tablename, unique_field, unique_value, fields, values):
+        ''' Execute UPSERT sentence '''
+         
+        # Check PostgreSQL version
+        if int(self.postgresql_version) < 90500:   
+            self.show_warning("UPSERT sentence not valid in PostgreSQL versions <9.5")
+            return
+         
+        # Set SQL for INSERT               
+        sql = " INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
+        
+        # Iterate over fields
+        sql_fields = "" 
+        for fieldname in fields:
+            sql_fields += fieldname + ", "
+        sql += sql_fields[:-2] + ") VALUES ("   
+          
+        # Manage value 'current_user'   
+        if unique_value != 'current_user':
+            unique_value = "'" + unique_value + "'" 
+            
+        # Iterate over values            
+        sql_values = ""
+        for value in values:
+            if value != 'current_user':
+                sql_values += "'" + value + "', "
+            else:
+                sql_values += value + ", "
+        sql += unique_value + ", " + sql_values[:-2] + ")"         
+        
+        # Set SQL for UPDATE
+        sql += " ON CONFLICT (" + unique_field + ") DO UPDATE"
+        sql += " SET ("
+        sql += sql_fields[:-2] + ") = (" 
+        sql += sql_values[:-2] + ")" 
+        sql += " WHERE " + tablename + "." + unique_field + " = " + unique_value          
+        
+        # Execute UPSERT
+        self.log_info(sql)
+        result = self.dao.execute_sql(sql)
+        self.last_error = self.dao.last_error         
+        if not result:
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            return False
 
         return True
     
@@ -267,15 +332,15 @@ class DaoController():
             return                  
         
         sql = "SELECT audit_function_actions.id, error_message, log_level, show_user "
-        sql+= " FROM "+self.schema_name+".audit_function_actions"
-        sql+= " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
-        sql+= " WHERE audit_cat_error.id != 0 AND debug_info is null"
-        sql+= " ORDER BY audit_function_actions.id DESC LIMIT 1"
+        sql += " FROM "+self.schema_name+".audit_function_actions"
+        sql += " INNER JOIN "+self.schema_name+".audit_cat_error ON audit_function_actions.audit_cat_error_id = audit_cat_error.id"
+        sql += " WHERE audit_cat_error.id != 0 AND debug_info is null"
+        sql += " ORDER BY audit_function_actions.id DESC LIMIT 1"
         result = self.dao.get_row(sql)
         if result is not None:
             if result['log_level'] <= 2:
                 sql = "UPDATE "+self.schema_name+".audit_function_actions"
-                sql+= " SET debug_info = 'showed'"
+                sql += " SET debug_info = 'showed'"
                 sql+= " WHERE id = "+str(result['id'])
                 self.dao.execute_sql(sql)
                 if result['show_user']:
@@ -300,13 +365,30 @@ class DaoController():
         widget_list = dialog.findChildren(QCheckBox)
         for widget in widget_list:
             self.translate_widget(context_name, widget)
+             
+        # Get objects of type: QTabWidget            
+        widget_list = dialog.findChildren(QTabWidget)
+        for widget in widget_list:
+            self.translate_widget(context_name, widget)
             
             
     def translate_widget(self, context_name, widget):
         ''' Translate widget text '''
         
-        if widget:
-            widget_name = widget.objectName()
+        if not widget:
+            return
+        
+        if type(widget) is QTabWidget:
+            num_tabs = widget.count()
+            for i in range(0, num_tabs):
+                tab_page = widget.widget(i)
+                widget_name = tab_page.objectName()                   
+                text = self.tr(widget_name, context_name)  
+                if text != widget_name:                              
+                    widget.setTabText(i, text)
+            
+        else:  
+            widget_name = widget.objectName()  
             text = self.tr(widget_name, context_name)
             if text != widget_name:
                 widget.setText(text)    
@@ -386,23 +468,6 @@ class DaoController():
    
     def get_project_user(self):
         ''' Set user '''
-
-        user = None
-        #self.canvas = self.iface.mapCanvas() 
-        # Check if we have any layer loaded
-        layers = self.iface.legendInterface().layers()
-        
-        # Control current layer (due to QGIS bug in snapping system)
-        #if self.canvas.currentLayer() == None:
-        #    self.iface.setActiveLayer(layers[0])
-        #layer = self.iface.activeLayer()  
-        #uri = layer.dataProvider().dataSourceUri().lower()
-        uri = layers[0].dataProvider().dataSourceUri().lower()
-        pos_ini = uri.find('user=')
-        pos_end_schema = uri.rfind('password=')
-        if pos_ini <> -1:
-            user = uri[pos_ini + 6:pos_end_schema-2]
-
         return self.user   
     
 
@@ -447,6 +512,8 @@ class DaoController():
             locale = 'es'
         elif locale == 'es_ca':
             locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'
         locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale))
         # If user locale file not found, set English one by default
         if not os.path.exists(locale_path):

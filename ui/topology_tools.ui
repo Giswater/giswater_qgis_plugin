@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -96,7 +96,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_7">
       <attribute name="title">
@@ -145,7 +145,7 @@
          <rect>
           <x>20</x>
           <y>30</y>
-          <width>165</width>
+          <width>211</width>
           <height>17</height>
          </rect>
         </property>
@@ -189,7 +189,7 @@
          </rect>
         </property>
         <property name="text">
-         <string> Node topological consistency</string>
+         <string>Node topological consistency</string>
         </property>
        </widget>
       </widget>
