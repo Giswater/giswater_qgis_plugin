@@ -54,18 +54,18 @@ class MincutParent(ParentAction, MincutConnec):
             for row in rows:
                 self.node_group.append(str(row[0]))
 
-        # TODO: Table not exists
-        sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".connec_type_cat_type "
-        rows = self.controller.get_rows(sql)
-        if rows:
-            for row in rows:
-                self.connec_group.append(str(row[0]))
-
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".arc_type_cat_type "
         rows = self.dao.get_rows(sql)
         if rows:
             for row in rows:
                 self.arc_group.append(str(row[0]))
+
+        # TODO: Table not exists
+#         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".connec_type_cat_type "
+#         rows = self.controller.get_rows(sql)
+#         if rows:
+#             for row in rows:
+#                 self.connec_group.append(str(row[0]))
 
 
     def init_mincut_form(self):
@@ -73,8 +73,8 @@ class MincutParent(ParentAction, MincutConnec):
 
         self.canvas = self.iface.mapCanvas()
         # Create the appropriate map tool and connect the gotPoint() signal.
-        self.emitPoint = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emitPoint)
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
         self.dlg = Mincut()
@@ -82,7 +82,7 @@ class MincutParent(ParentAction, MincutConnec):
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         self.state = self.dlg.findChild(QLineEdit, "state")
-        self.id = self.dlg.findChild(QLineEdit, "id")
+        self.result_id = self.dlg.findChild(QLineEdit, "result_id")
         self.street = self.dlg.findChild(QLineEdit, "street")
         self.number = self.dlg.findChild(QLineEdit, "number")
         self.pred_description = self.dlg.findChild(QTextEdit, "pred_description")
@@ -247,7 +247,7 @@ class MincutParent(ParentAction, MincutConnec):
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
 
         # Set values mincut and address
-        utils_giswater.setText("mincut", str(self.id.text()))
+        utils_giswater.setText("mincut", str(self.result_id.text()))
         utils_giswater.setText("street", str(self.street.text()))
         utils_giswater.setText("number", str(self.number.text()))
 
@@ -266,7 +266,7 @@ class MincutParent(ParentAction, MincutConnec):
     def accept_save_data(self,action):
 
         mincut_result_state = self.state.text()
-        id_ = self.id.text()
+        id_ = self.result_id.text()
         # exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
@@ -488,13 +488,15 @@ class MincutParent(ParentAction, MincutConnec):
     def check_id(self):
         ''' Check if user entered ID '''
 
-        self.id_text = self.id.text()
-        if self.id_text == "id":
-            message = "You need to enter id"
-            self.controller.show_info_box(message, context_name='ui_message')
-            return False
-        else:
-            return True
+        # TODO: Disabled temporarily during testing
+        self.result_id_text = self.result_id.text()
+        return True        
+#         if self.result_id_text == "result_id":
+#             message = "You need to enter a reult_id"
+#             self.controller.show_info_box(message, context_name='ui_message')
+#             return False
+#         else:
+#             return True
 
 
     def add_hydrometer(self):
@@ -725,14 +727,14 @@ class MincutParent(ParentAction, MincutConnec):
             status = self.controller.execute_sql(sql)
             if status:
                 # Execute SQL function
-                self.id_text = utils_giswater.getWidgetText("id")
+                self.result_id_text = utils_giswater.getWidgetText("result_id")
                 function_name = "gw_fct_mincut_result_catalog"
-                sql = "SELECT " + self.schema_name + "." + function_name + "('" + self.id_text + "');"
+                sql = "SELECT " + self.schema_name + "." + function_name + "('" + self.result_id_text + "');"
                 status = self.controller.execute_sql(sql)
 
         if status:
-            message = "Execute gw_fct_mincut_result_catalog done successfully"
-            self.controller.show_info(message, context_name='ui_message')
+            message = "Function executed successfully"
+            self.controller.show_info(message, parameter=function_name)
 
 
     def delete_records_config(self, widget, table_name):
@@ -771,7 +773,7 @@ class MincutParent(ParentAction, MincutConnec):
         if not check:
             return
 
-        self.emitPoint.canvasClicked.connect(self.snapping_node_arc)
+        self.emit_point.canvasClicked.connect(self.snapping_node_arc)
 
 
     def snapping_node_arc(self, point, btn):  #@UnusedVariable
@@ -779,13 +781,14 @@ class MincutParent(ParentAction, MincutConnec):
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
-        eventPoint = QPoint(x, y)
+        event_point = QPoint(x, y)
 
         # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
+        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
         # If any feature snapped return
         if result == []:
+            self.controller.log_info("Any feature snapped")
             return
 
         # Check snapped features
@@ -812,11 +815,12 @@ class MincutParent(ParentAction, MincutConnec):
     def mincut(self, elem_id, elem_type):
 
         # Execute SQL function 'gw_fct_mincut'
-        sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + self.id_text + "');"
+        sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + self.result_id_text + "');"
 
         self.hold_elem_id = elem_id
         self.hold_elem_type = elem_type
-        self.hold_id_text = self.id_text
+        self.hold_id_text = self.result_id_text
+        self.controller.log_info(sql)
         status = self.controller.execute_sql(sql)
         if status:
             message = "Mincut function executed successfully"
@@ -841,7 +845,7 @@ class MincutParent(ParentAction, MincutConnec):
         if not check:
             return
 
-        self.emitPoint.canvasClicked.connect(self.snapping_valve_analytics)
+        self.emit_point.canvasClicked.connect(self.snapping_valve_analytics)
 
 
     def snapping_valve_analytics(self):
@@ -888,7 +892,7 @@ class MincutParent(ParentAction, MincutConnec):
 
         # TODO: Check column names
         sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_valve_unaccess (mincut_result_cat_id, valve_id)"
-        sql += " VALUES ('" + self.id_text + "', '" + elem_id + "')"
+        sql += " VALUES ('" + self.result_id_text + "', '" + elem_id + "')"
 
         status = self.controller.execute_sql(sql)
         if status:
@@ -900,7 +904,7 @@ class MincutParent(ParentAction, MincutConnec):
         # Use elem id of previous element - repeating automatic mincut
         sql = "SELECT " + self.schema_name + ".gw_fct_mincut"
         sql += "('" + str(self.hold_elem_id) + "', '" + str(self.hold_elem_type) + "', '" + str(self.hold_id_text) + "');"
-        self.controller.log_info(sql, context_name='ui_message')
+        self.controller.log_info(sql)
         status = self.controller.execute_sql(sql)
 
         # Refresh map canvas
@@ -995,7 +999,7 @@ class MincutParent(ParentAction, MincutConnec):
         if not row:
             return
 
-        self.id.setText(row['id'])
+        self.result_id.setText(row['id'])
         self.state.setText(str(row['mincut_state']))
         utils_giswater.setWidgetText("pred_description", row['anl_descript'])
         utils_giswater.setWidgetText("real_description", row['exec_descript'])
@@ -1032,7 +1036,7 @@ class MincutParent(ParentAction, MincutConnec):
         self.cbx_hours_start.setEnabled(True)
 
         # Disable to edit ID
-        self.id.setEnabled(False)
+        self.result_id.setEnabled(False)
 
 
     def filter_by_id(self, table, widget_txt, tablename):
