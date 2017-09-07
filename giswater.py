@@ -7,7 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
-from PyQt4.QtCore import QObject, QSettings
+from PyQt4 import uic
+from PyQt4.QtCore import QObject, QSettings, Qt
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
@@ -812,12 +813,23 @@ class Giswater(QObject):
 
        
     def set_search_plus(self):
-        ''' Set SearchPlus object '''
-        
+        """ Set SearchPlus object """
+        # TODO: descargar (o no cargar) al inicio de la aplicacion ???
         try:
             if self.search_plus is None:
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
             self.basic.search_plus = self.search_plus
+            # Set Dockwidget in Area
+            path = os.path.dirname(os.path.abspath(__file__))
+            self.controller.log_info(str(path))
+            self.dock = uic.loadUi(os.path.join(path, "search\ui\search_plus_dialog.ui"))
+            self.iface.addDockWidget(Qt.LeftDockWidgetArea,  self.search_plus.dlg)
+            self.search_plus.dlg.setFixedSize(283, 162)
+            # Set backgroudcolor to dialog
+            p = self.search_plus.dlg.palette()
+            p.setColor(self.search_plus.dlg.backgroundRole(), Qt.white)
+            self.search_plus.dlg.setPalette(p)
+
             status = self.search_plus.populate_dialog()
             self.actions['32'].setVisible(status) 
             self.actions['32'].setEnabled(status) 

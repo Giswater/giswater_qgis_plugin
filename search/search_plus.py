@@ -7,7 +7,7 @@ import operator
 import os
 import sys
 from search.ui.search_plus_dockwidget import SearchPlusDockWidget
-  
+
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater      
@@ -26,26 +26,26 @@ class SearchPlus(QObject):
     
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-        
+
         # Load configuration data from tables
         if not self.load_config_data():
             self.enabled = False
-            return      
-        
-        # Set signals             
+            return
+
+        # Set signals
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))    
         
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))      
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))    
+        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
         
-        self.enabled = True     
-    
-      
+        self.enabled = True
+
+
     def load_config_data(self):
         """ Load configuration data from tables """
         
