@@ -19,17 +19,18 @@ from actions.basic import Basic
 from actions.edit import Edit
 from actions.master import Master
 from actions.om_ws import OmWs
+from actions.mincut import MincutParent
 from dao.controller import DaoController
 from map_tools.move_node import MoveNodeMapTool
-from map_tools.mincut import MincutMapTool
 from map_tools.flow_trace_flow_exit import FlowTraceFlowExitMapTool
 from map_tools.delete_node import DeleteNodeMapTool
 from map_tools.connec import ConnecMapTool
 from map_tools.draw_profiles import DrawProfiles
+from map_tools.flow_regulator import FlowRegulator
+from map_tools.draw_profiles import DrawProfiles
 from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from search.search_plus import SearchPlus
-
 
 
 class Giswater(QObject):  
@@ -102,6 +103,9 @@ class Giswater(QObject):
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
         self.om_ws = OmWs(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)        
+
         # Define signals
         self.set_signals()
         
@@ -125,14 +129,17 @@ class Giswater(QObject):
         if function_name is not None:
             try:
                 action = self.actions[index_action]                
+
                 # Basic toolbar actions
                 if int(index_action) in (41, 48, 32):
                     callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
-                # om_ws toolbar actions
-                elif int(index_action) in (26, 27):
-                    callback_function = getattr(self.om_ws, function_name)
+                # Mincut toolbar actions
+                elif int(index_action) == 26:
+                    callback_function = getattr(self.mincut, 'mg_mincut')
                     action.triggered.connect(callback_function)
+                elif int(index_action) == 27:
+                    callback_function = getattr(self.mincutManagement, 'mg_mincut_management')                    
                 # Edit toolbar actions
                 elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
                     callback_function = getattr(self.edit, function_name)
@@ -206,6 +213,20 @@ class Giswater(QObject):
         self.manage_action(index_action, function_name)
             
         return action
+          
+
+    def menu_activate(self, node_type):
+        
+        # Set active layer
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)
+        if layer:
+            layer = layer[0]
+            self.iface.setActiveLayer(layer)
+            layer.startEditing()
+            # Implement the Add Feature button
+            self.iface.actionAddFeature().trigger()
+        else:
+            self.controller.show_warning("Selected layer name not found: "+str(node_type))
 
     
     def add_action(self, index_action, toolbar, parent):
@@ -231,8 +252,6 @@ class Giswater(QObject):
                 map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.srid)
             elif int(index_action) == 17:
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
-            elif int(index_action) == 26:
-                map_tool = MincutMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:
                 map_tool = ConnecMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 43:
