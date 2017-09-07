@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Search plus</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>

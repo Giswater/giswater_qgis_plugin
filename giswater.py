@@ -814,6 +814,7 @@ class Giswater(QObject):
        
     def set_search_plus(self):
         """ Set SearchPlus object """
+
         # TODO: descargar (o no cargar) al inicio de la aplicacion ???
         try:
             if self.search_plus is None:
@@ -827,6 +828,7 @@ class Giswater(QObject):
             self.search_plus.dlg.setFixedSize(283, 162)
             # Set backgroudcolor to dialog
             p = self.search_plus.dlg.palette()
+            self.search_plus.dlg.setAutoFillBackground(True)
             p.setColor(self.search_plus.dlg.backgroundRole(), Qt.white)
             self.search_plus.dlg.setPalette(p)
 
