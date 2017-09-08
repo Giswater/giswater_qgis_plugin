@@ -8,26 +8,27 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import QTime
 from PyQt4.QtCore import Qt, QPoint
-from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QPushButton, QSpinBox, QTimeEdit
+from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QDoubleValidator, QLineEdit, QTabWidget, QTableView, QAbstractItemView
-
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
-from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
+from qgis.core import QgsFeatureRequest
+
 import os
 import sys
 from datetime import datetime
 from functools import partial
 
-from ..ui.config_master import ConfigMaster
-from ..ui.psector_management import Psector_management      # @UnresolvedImport
-from ..ui.plan_psector import Plan_psector                  # @UnresolvedImport
-from ..ui.plan_estimate_result_new import EstimateResultNew                # @UnresolvedImport
-from ..ui.plan_estimate_result_selector import EstimateResultSelector      # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
-
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater
+
+from ..ui.config_master import ConfigMaster                             # @UnresolvedImport
+from ..ui.psector_management import Psector_management                  # @UnresolvedImport
+from ..ui.plan_psector import Plan_psector                              # @UnresolvedImport
+from ..ui.plan_estimate_result_new import EstimateResultNew             # @UnresolvedImport
+from ..ui.plan_estimate_result_selector import EstimateResultSelector   # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector                    # @UnresolvedImport
+from ..models.config_param_system import ConfigParamSystem              # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -37,6 +38,7 @@ class Master(ParentAction):
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control Management toolbar actions """
         self.minor_version = "3.0"
+        self.config_dict = {}
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
 
@@ -223,9 +225,8 @@ class Master(ParentAction):
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
 
-
-
         self.dlg_psector_mangement.exec_()
+
 
     def master_config_master(self):
         """ Button 99: Open a dialog showing data from table 'config_param_system' """
@@ -241,26 +242,18 @@ class Master(ParentAction):
         self.dlg_config_master.btn_accept.pressed.connect(self.master_config_master_accept)
         self.dlg_config_master.btn_cancel.pressed.connect(self.dlg_config_master.close)
 
-        # Fill all QLineEdit
-        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_system"
-        rows = self.dao.get_rows(sql)
-        self.master_options_fill_textview(rows)
+        # Get records from tables 'config' and 'config_param_system' and fill corresponding widgets
+        self.select_config("config")
+        self.select_config_param_system("config_param_system") 
 
-        self.om_visit_absolute_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
-        self.doc_absolute_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
-
-        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_absolute_path))
-        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_absolute_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_absolute_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_absolute_path))
-
-
-        # QCheckBox
-        self.chk_psector_enabled = self.dlg_config_master.findChild(QCheckBox, 'chk_psector_enabled')
-        self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
+        self.dlg_config_master.om_path_url.clicked.connect(partial(self.open_web_browser, "om_visit_absolute_path"))
+        self.dlg_config_master.om_path_doc.clicked.connect(partial(self.open_file_dialog, "om_visit_absolute_path"))
+        self.dlg_config_master.doc_path_url.clicked.connect(partial(self.open_web_browser, "doc_absolute_path"))
+        self.dlg_config_master.doc_path_doc.clicked.connect(partial(self.open_file_dialog, "doc_absolute_path"))
 
         if self.project_type == 'ws':
-            self.slope_arc_direction.setEnabled(False)
+            slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
+            slope_arc_direction.setEnabled(False)
 
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.dao.get_rows(sql)
@@ -269,27 +262,35 @@ class Master(ParentAction):
         sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_user WHERE parameter = 'psector_vdefault'"
         row = self.dao.get_row(sql)
         if row:
-            utils_giswater.setChecked(self.chk_psector_enabled, True)
+            utils_giswater.setChecked("chk_psector_enabled", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
-        self.master_options_get_data("config")
-        self.master_options_get_data("config_param_system")
+            
+        
         self.dlg_config_master.exec_()
 
 
-    def master_options_fill_textview(self, rows):
+    def select_config_param_system(self, tablename): 
+        """ Get data from table 'config_param_system' and fill widgets according to the name of the field 'parameter' """
+        
+        self.config_dict = {}
+        sql = "SELECT parameter, value, context "
+        sql += " FROM " + self.schema_name + "." + tablename + " ORDER BY parameter"     
+        rows = self.controller.get_rows(sql)
         for row in rows:
-            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+            config = ConfigParamSystem(row['parameter'], row['value'], row['context'])
+            self.config_dict[row['parameter']] = config
+        utils_giswater.fillWidgets(rows)       
+        
 
+    def select_config(self, tablename):
+        """ Get data from table 'config' and fill widgets according to the name of the columns """
 
-    def master_options_get_data(self, tablename):
-        """ Get data from selected table and fill widgets according to the name of the columns """
-
-        sql = 'SELECT * FROM ' + self.schema_name + "." + tablename
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.dao.get_row(sql)
-
         if not row:
             self.controller.show_warning("Any data found in table " + tablename)
             return None
+        
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
@@ -319,117 +320,92 @@ class Master(ParentAction):
 
 
     def master_config_master_accept(self):
-
-        if utils_giswater.isChecked(self.chk_psector_enabled):
+        """ Button 99: Slot for 'btn_accept' """
+        
+        if utils_giswater.isChecked("chk_psector_enabled"):
             self.insert_or_update_config_param_curuser(self.dlg_config_master.psector_vdefault, "psector_vdefault", "config_param_user")
         else:
             self.delete_row("psector_vdefault", "config_param_user")
-        self.update_conf_param_master(True, "config", self.dlg_config_master)
-
-        self.insert_or_update_config_param(self.dlg_config_master.om_visit_absolute_path, "om_visit_absolute_path", "config_param_system")
-        self.insert_or_update_config_param(self.dlg_config_master.doc_absolute_path, "doc_absolute_path", "config_param_system")
+            
+        # Update tables 'confog' and 'config_param_system'            
+        self.update_config("config", self.dlg_config_master)
+        self.update_config_param_system("config_param_system")
+        
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
         self.dlg_config_master.close()
 
 
-    def insert_or_update_config_param(self, widget, parameter, tablename):
-        """ Insert or update values in tables with out current_user control """
+    def update_config_param_system(self, tablename):
+        """ Update table @tablename """
+        
+        # Get all parameters from dictionary object
+        for config in self.config_dict.itervalues():
+            value = utils_giswater.getWidgetText(str(config.parameter))      
+            if value is not None:           
+                value = value.replace('null', '')
+                sql = "UPDATE " + self.schema_name + "." + tablename
+                sql += " SET value = '" + str(value) + "'"
+                sql += " WHERE parameter = '" + str(config.parameter) + "';"            
+                self.controller.execute_sql(sql)      
+                
+                
+    def update_config(self, tablename, dialog):
+        """ Update table @tablename from values get from @dialog """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename
-        rows = self.controller.get_rows(sql)
-        exist_param = False
-        for row in rows:
-            if row[1] == parameter:
-                exist_param = True
-        if exist_param:
-            sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
-            sql += "'" + widget.text() + "' WHERE parameter='" + parameter + "'"
-        else:
-            sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value)'
-            sql += " VALUES ('" + parameter + "', " + widget.text() + "'))"
-        self.controller.execute_sql(sql)
-
-
-    def update_conf_param_master(self, update, tablename, dialog):
-        """ INSERT or UPDATE tables according :param update """
-
-        sql = "SELECT *"
-        sql += " FROM " + self.schema_name + "." + tablename
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
         row = self.dao.get_row(sql)
         columns = []
         for i in range(0, len(row)):
             column_name = self.dao.get_column_name(i)
-            columns.append(column_name)
+            if column_name != 'id': 
+                columns.append(column_name)
 
-        if update:
-            if columns is not None:
-                sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
-                for column_name in columns:
-                    if column_name != 'id':
-                        widget_type = utils_giswater.getWidgetType(column_name)
-                        if widget_type is QCheckBox:
-                            value = utils_giswater.isChecked(column_name)
-                        elif widget_type is QDateEdit:
-                            date = dialog.findChild(QDateEdit, str(column_name))
-                            value = date.dateTime().toString('yyyy-MM-dd')
-                        elif widget_type is QTimeEdit:
-                            aux = 0
-                            widget_day = str(column_name) + "_day"
-                            day = utils_giswater.getText(widget_day)
-                            if day != "null":
-                                aux = int(day) * 24
-                            time = dialog.findChild(QTimeEdit, str(column_name))
-                            timeparts = time.dateTime().toString('HH:mm:ss').split(':')
-                            h = int(timeparts[0]) + int(aux)
-                            aux = str(h) + ":" + str(timeparts[1]) + ":00"
-                            value = aux
-                        elif widget_type is QSpinBox:
-                            x = dialog.findChild(QSpinBox, str(column_name))
-                            value = x.value()
-                        else:
-                            value = utils_giswater.getWidgetText(column_name)
-                        if value == 'null':
-                            sql += column_name + " = null, "
-                        elif value is None:
-                            pass
-                        else:
-                            if type(value) is not bool and widget_type is not QSpinBox:
-                                value = value.replace(",", ".")
-                            sql += column_name + " = '" + str(value) + "', "
-                sql = sql[:len(sql) - 2]
+        if columns is None:
+            return
+        
+        sql = "UPDATE " + self.schema_name + "." + tablename + " SET "
+        for column_name in columns:         
+            widget_type = utils_giswater.getWidgetType(column_name)
+            if widget_type is QCheckBox:
+                value = utils_giswater.isChecked(column_name)
+            elif widget_type is QDateEdit:
+                date = dialog.findChild(QDateEdit, str(column_name))
+                value = date.dateTime().toString('yyyy-MM-dd')
+            elif widget_type is QTimeEdit:
+                aux = 0
+                widget_day = str(column_name) + "_day"
+                day = utils_giswater.getText(widget_day)
+                if day != "null":
+                    aux = int(day) * 24
+                time = dialog.findChild(QTimeEdit, str(column_name))
+                timeparts = time.dateTime().toString('HH:mm:ss').split(':')
+                h = int(timeparts[0]) + int(aux)
+                aux = str(h) + ":" + str(timeparts[1]) + ":00"
+                value = aux
+            elif widget_type is QSpinBox:
+                x = dialog.findChild(QSpinBox, str(column_name))
+                value = x.value()
+            else:
+                value = utils_giswater.getWidgetText(column_name)
+              
+            if value is not None:  
+                if value == 'null':
+                    sql += column_name + " = null, "
+                else:
+                    if type(value) is not bool and widget_type is not QSpinBox:
+                        value = value.replace(",", ".")
+                    sql += column_name + " = '" + str(value) + "', "
 
-        else:
-            values = "VALUES("
-            if columns is not None:
-                sql = "INSERT INTO " + self.schema_name + "." + tablename + " ("
-                for column_name in columns:
-                    if column_name != 'id':
-                        widget_type = utils_giswater.getWidgetType(column_name)
-                        if widget_type is not None:
-                            if widget_type is QCheckBox:
-                                values += utils_giswater.isChecked(column_name) + ", "
-                            elif widget_type is QDateEdit:
-                                date = dialog.findChild(QDateEdit, str(column_name))
-                                values += date.dateTime().toString('yyyy-MM-dd') + ", "
-                            else:
-                                value = utils_giswater.getWidgetText(column_name)
-                            if value is None or value == 'null':
-                                sql += column_name + ", "
-                                values += "null, "
-                            else:
-                                values += "'" + value + "',"
-                                sql += column_name + ", "
-                sql = sql[:len(sql) - 2] + ") "
-                values = values[:len(values) - 2] + ")"
-                sql += values
-
+        sql = sql[:- 2]          
         self.controller.execute_sql(sql)
+                        
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
-        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename + ' WHERE "cur_user" = current_user'
+        sql = 'SELECT * FROM ' + self.schema_name + '.' + tablename 
+        sql += ' WHERE "cur_user" = current_user'
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
@@ -483,6 +459,7 @@ class Master(ParentAction):
         else:
             self.fill_table(self.tbl_psm, self.schema_name + "." + tablename)
 
+
     def charge_psector(self):
 
         selected_list = self.tbl_psm.selectionModel().selectedRows()
@@ -494,6 +471,7 @@ class Master(ParentAction):
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
         self.dlg_psector_mangement.close()
         self.master_new_psector(psector_id, True)
+
 
     def snapping(self, layer_view, tablename, table_view, elem_type):
         map_canvas = self.iface.mapCanvas()
@@ -666,12 +644,15 @@ class Master(ParentAction):
             widget.model().select()
 
 
-    def cal_percent(self, widged_total, widged_percent, wided_result):
-        wided_result.setText(str((float(widged_total.text())*float(widged_percent.text())/100)))
+    # TODO: Enhance using utils_giswater
+    def cal_percent(self, widged_total, widged_percent, widget_result):
+        text = str((float(widged_total.text()) * float(widged_percent.text())/100))
+        widget_result.setText(text)
 
 
-    def sum_total(self, widget_total, widged_percent, wided_result):
-        wided_result.setText(str((float(widget_total.text()) + float(widged_percent.text()))))
+    def sum_total(self, widget_total, widged_percent, widget_result):
+        text = str((float(widget_total.text()) + float(widged_percent.text())))
+        widget_result.setText(text)
 
 
     def master_psector_selector(self):
