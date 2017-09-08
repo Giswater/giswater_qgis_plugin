@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
-from PyQt4.QtCore import QObject, QPyNullVariant   # @UnresolvedImport
+from PyQt4.QtCore import QObject, QPyNullVariant, Qt   # @UnresolvedImport
+from PyQt4 import uic
 
 from functools import partial
 import operator
@@ -61,6 +62,29 @@ class SearchPlus(QObject):
             self.controller.log_warning("No data found in table 'config_param_system' related with 'searchplus'")
             return False            
 
+
+    def dock_dialog(self):
+        """ Dock dialog into left dock widget area """
+        
+        # Get path of .ui file
+        ui_path = os.path.join(self.controller.plugin_dir, 'search', 'ui', 'search_plus_dialog.ui')
+        if not os.path.exists(ui_path):
+            self.controller.show_warning("File not found", parameter=ui_path)
+            return False
+        
+        # Make it dockable in left dock widget area
+        self.dock = uic.loadUi(ui_path)
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg)
+        self.dlg.setFixedHeight(162)
+        
+        # Set his backgroundcolor
+        p = self.dlg.palette()
+        self.dlg.setAutoFillBackground(True)
+        p.setColor(self.dlg.backgroundRole(), Qt.white)
+        self.dlg.setPalette(p)   
+        
+        return True
+    
             
     def get_layers(self): 
         ''' Iterate over all layers to get the ones set in config file '''
