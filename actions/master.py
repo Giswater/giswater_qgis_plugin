@@ -224,8 +224,33 @@ class Master(ParentAction):
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.tbl_psm, table_name, column_id))
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
+        self.dlg_psector_mangement.btn_current_psector.clicked.connect(self.update_current_psector)
         self.fill_table_psector(self.tbl_psm, "plan_psector", column_id)
         self.dlg_psector_mangement.exec_()
+
+    def update_current_psector(self):
+        selected_list = self.tbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        row = selected_list[0].row()
+        psector_id = self.tbl_psm.model().record(row).value("psector_id")
+        sql = "SELECT * FROM " + self.schema_name + ".selector_psector WHERE cur_user = current_user"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            sql = "UPDATE " + self.schema_name + ".selector_psector SET psector_id="
+            sql += "'" + str(psector_id) + "' WHERE cur_user=current_user"
+        else:
+            sql = 'INSERT INTO ' + self.schema_name + '.selector_psector (psector_id, cur_user)'
+            sql += " VALUES ('" + str(psector_id) + "', current_user)"
+
+        aux_widget = QLineEdit()
+        aux_widget.setText(str(psector_id))
+        self.insert_or_update_config_param(aux_widget, "psector_vdefault", "config_param_system")
+
+
+        self.controller.execute_sql(sql)
 
 
     def master_config_master(self):
@@ -348,7 +373,7 @@ class Master(ParentAction):
             sql += "'" + widget.text() + "' WHERE parameter='" + parameter + "'"
         else:
             sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value)'
-            sql += " VALUES ('" + parameter + "', " + widget.text() + "'))"
+            sql += " VALUES ('" + parameter + "',  " + widget.text() + ")"
         self.controller.execute_sql(sql)
 
 
