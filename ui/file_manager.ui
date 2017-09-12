@@ -26,7 +26,7 @@
     <string>Sector Selection</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_scensel_time">
+  <widget class="QPushButton" name="btn_times">
    <property name="geometry">
     <rect>
      <x>435</x>
@@ -39,7 +39,7 @@
     <string>Times</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_time_opt">
+  <widget class="QPushButton" name="btn_options">
    <property name="geometry">
     <rect>
      <x>290</x>
@@ -78,7 +78,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_opt_hs">
+  <widget class="QPushButton" name="btn_hs_ds">
    <property name="geometry">
     <rect>
      <x>150</x>
