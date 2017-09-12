@@ -167,11 +167,22 @@ CONSTRAINT cat_grate_pkey PRIMARY KEY (id)
 
 CREATE TABLE "dma" (
 "dma_id" serial NOT NULL PRIMARY KEY,
-"name" character varying(30)NOT NULL,
-"expl_id" integer NOT NULL,
+"name" character varying(30),
+"expl_id" integer,
+"macrodma_id" integer,
 "descript" text,
 "undelete" boolean,
 "the_geom" public.geometry (POLYGON, SRID_VALUE)
+);
+
+
+CREATE TABLE "macrodma"(
+macrodma_id serial NOT NULL PRIMARY KEY,
+name character varying(50),
+expl_id integer,
+descript character varying(100),
+undelete boolean,
+the_geom geometry(POLYGON,SRID_VALUE)
 );
 
 
@@ -459,7 +470,8 @@ CREATE TABLE "man_netinit" (
 "inlet" boolean,
 "bottom_channel" boolean,
 "accessibility" varchar(16),
-"name" varchar(50)
+"name" varchar(50),
+"sander_depth" numeric(12,3)
 );
 
 

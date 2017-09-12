@@ -514,7 +514,6 @@ CREATE TABLE "man_fountain"(
 "pump_number" integer,
 "power" numeric(12,3),
 "regulation_tank" character varying(150),
-"connection" character varying(100),
 "chlorinator" character varying(100),
 "arq_patrimony" boolean,
 "name" character varying(254),

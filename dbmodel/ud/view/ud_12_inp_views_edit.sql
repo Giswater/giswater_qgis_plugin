@@ -24,6 +24,7 @@ node.custom_elev,
 v_node.elev AS sys_elev,
 node.nodecat_id, 
 node.sector_id, 
+sector.macrosector_id,
 node."state", 
 node.the_geom,
 node.annotation, 
@@ -33,6 +34,7 @@ inp_junction.apond
 FROM inp_selector_sector, node
 	JOIN v_node ON v_node.node_id=node.node_id
 	JOIN inp_junction ON inp_junction.node_id = node.node_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -49,6 +51,7 @@ node.custom_elev,
 v_node.elev AS sys_elev,
 node.nodecat_id, 
 node.sector_id, 
+sector.macrosector_id,
 node."state", 
 node.annotation, 
 node.the_geom,
@@ -64,6 +67,7 @@ inp_divider.apond
 FROM inp_selector_sector, node
 	JOIN v_node ON v_node.node_id=node.node_id
 	JOIN inp_divider ON (((node.node_id) = (inp_divider.node_id)))
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -80,6 +84,7 @@ node.custom_elev,
 v_node.elev AS sys_elev,
 node.nodecat_id, 
 node.sector_id, 
+sector.macrosector_id,
 node."state", 
 node.the_geom,
 node.annotation, 
@@ -91,6 +96,7 @@ inp_outfall.gate
 FROM inp_selector_sector, node
 	JOIN v_node ON v_node.node_id=node.node_id
 	JOIN inp_outfall ON (((node.node_id) = (inp_outfall.node_id)))
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -107,6 +113,7 @@ node.custom_elev,
 v_node.elev AS sys_elev,
 node.nodecat_id, 
 node.sector_id, 
+sector.macrosector_id,
 node."state", 
 node.the_geom,
 inp_storage.storage_type, 
@@ -123,6 +130,7 @@ inp_storage.ysur
 FROM inp_selector_sector, node
 	JOIN v_node ON v_node.node_id=node.node_id
 	JOIN inp_storage ON (((node.node_id) = (inp_storage.node_id)))
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE ((node.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -154,6 +162,7 @@ cat_arc.shape AS cat_shape,
 cat_arc.geom1 AS cat_geom1,
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
 arc.annotation,
 arc.inverted_slope,
@@ -173,6 +182,7 @@ FROM inp_selector_sector,arc
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	JOIN inp_conduit ON (((arc.arc_id) = (inp_conduit.arc_id)))
 	JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -195,6 +205,7 @@ v_arc_x_node.elevmax2 as sys_elev2,
 arc.arccat_id,
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
 arc.annotation,
 arc.inverted_slope,
@@ -214,6 +225,7 @@ arc.expl_id
 FROM inp_selector_sector,arc
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	JOIN inp_orifice ON (((arc.arc_id) = (inp_orifice.arc_id)))
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -236,6 +248,7 @@ v_arc_x_node.elevmax2 as sys_elev2,
 arc.arccat_id,
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
 arc.annotation,
 arc.inverted_slope,
@@ -251,6 +264,7 @@ arc.expl_id
 FROM inp_selector_sector,arc
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	JOIN inp_outlet ON (((arc.arc_id) = (inp_outlet.arc_id)))
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -273,6 +287,7 @@ v_arc_x_node.elevmax2 as sys_elev2,
 arc.arccat_id,
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
 arc.annotation,
 arc.inverted_slope,
@@ -286,6 +301,7 @@ arc.expl_id
 FROM inp_selector_sector,arc
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	JOIN inp_pump ON (((arc.arc_id) = (inp_pump.arc_id)))
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
 
@@ -308,6 +324,7 @@ v_arc_x_node.elevmax2 as sys_elev2,
 arc.arccat_id,
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
 arc.annotation,
 arc.inverted_slope,
@@ -328,6 +345,7 @@ arc.expl_id
 FROM inp_selector_sector,arc
 	JOIN v_arc_x_node ON arc.arc_id=v_arc_x_node.arc_id
 	JOIN inp_weir ON (((arc.arc_id) = (inp_weir.arc_id)))
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	WHERE ((arc.sector_id)=(inp_selector_sector.sector_id) AND inp_selector_sector.cur_user="current_user"());
 
   

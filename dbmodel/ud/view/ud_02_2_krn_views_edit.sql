@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
-
 DROP VIEW IF EXISTS v_edit_macrosector CASCADE;
 CREATE VIEW v_edit_macrosector AS SELECT DISTINCT on (macrosector_id)
 	sector.macrosector_id,
@@ -50,7 +48,6 @@ CREATE VIEW v_edit_dma AS SELECT
 WHERE ((dma.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
   
-
 
 
 -- ----------------------------
@@ -108,12 +105,13 @@ node.inventory,
 node.uncertain,
 node.xyz_date,
 node.unconnected,
+dma.macrodma_id,
 node.expl_id,
 node.num_value
 FROM selector_expl,node
 	JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	WHERE ((node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"());
 
 
@@ -182,13 +180,13 @@ arc.label_rotation,
 arc.publish,
 arc.inventory,
 arc.uncertain,	
-sector.macrosector_id,
+dma.macrodma_id,
 arc.expl_id,
 arc.num_value
 FROM selector_expl, arc
 	JOIN v_arc_x_node ON (((v_arc_x_node.arc_id) = (arc.arc_id)))
 	LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
+	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
 
@@ -249,7 +247,7 @@ connec.diagonal,
 connec.publish,
 connec.inventory,
 connec.uncertain,
-sector.macrosector_id,
+dma.macrodma_id,
 connec.expl_id,
 connec.num_value
 FROM selector_expl, connec 
@@ -257,7 +255,7 @@ FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
 	LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id) = (ext_streetaxis.id)))
 	LEFT JOIN link ON connec.connec_id = link.feature_id
-	LEFT JOIN sector ON connec.sector_id = sector.sector_id
+	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	WHERE connec.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
@@ -316,18 +314,18 @@ gully.label_y,
 gully.label_rotation,
 gully.publish,
 gully.inventory,
-sector.macrosector_id,
 gully.streetaxis_id,
 ext_streetaxis.name AS streetname,
 gully.postnumber,
 gully.expl_id,
+dma.macrodma_id,
 gully.uncertain,
 gully.num_value
 FROM selector_expl, gully
 	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON gully.streetaxis_id = ext_streetaxis.id
-	LEFT JOIN sector ON gully.sector_id = sector.sector_id
+	LEFT JOIN dma ON gully.dma_id = dma.dma_id
 	WHERE gully.the_geom is not null AND
 	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
@@ -384,10 +382,10 @@ gully.label_y,
 gully.label_rotation,
 gully.publish,
 gully.inventory,
-sector.macrosector_id,
 gully.streetaxis_id,
 ext_streetaxis.name AS streetname,
 gully.postnumber,
+dma.macrodma_id,
 gully.expl_id,
 gully.uncertain,
 gully.num_value
@@ -395,7 +393,7 @@ FROM selector_expl, gully
 	JOIN v_state_gully ON gully.gully_id=v_state_gully.gully_id 
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON streetaxis_id=ext_streetaxis.id
-	LEFT JOIN sector ON gully.sector_id = sector.sector_id
+	LEFT JOIN dma ON gully.dma_id = dma.dma_id
 	WHERE gully.the_geom_pol is not null AND
 	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
@@ -495,12 +493,12 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS junction_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as junction_num_value
 FROM selector_expl, node
 	JOIN man_junction ON man_junction.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -557,7 +555,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS outfall_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as outfall_num_value,
 man_outfall.name AS outfall_name
@@ -565,7 +563,7 @@ FROM selector_expl, node
 	JOIN man_outfall ON man_outfall.node_id = node.node_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
 	 
@@ -619,7 +617,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS storage_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as storage_num_value,
 man_storage.pol_id as storage_pol_id,
@@ -633,7 +631,7 @@ man_storage.accessibility AS storage_accessibility,
 man_storage.name AS storage_name
 FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -690,7 +688,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS storage_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as storage_num_value,
 man_storage.pol_id as storage_pol_id,
@@ -704,7 +702,7 @@ man_storage.accessibility AS storage_accessibility,
 man_storage.name AS storage_name
 FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_storage.pol_id
@@ -763,14 +761,14 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS valve_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as valve_num_value,
 man_valve.name AS valve_name
 FROM selector_expl, node
 	JOIN man_valve ON man_valve.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -826,7 +824,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS netinit_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as netinit_num_value,
 man_netinit.length AS netinit_length,
@@ -834,11 +832,12 @@ man_netinit.width AS netinit_width,
 man_netinit.inlet AS netinit_inlet,
 man_netinit.bottom_channel AS netinit_bottom_channel,
 man_netinit.accessibility AS netinit_accessibility,
-man_netinit.name AS netinit_name
+man_netinit.name AS netinit_name,
+man_netinit.sander_depth AS netinit_sander_depth
 FROM selector_expl, node
 	JOIN man_netinit ON man_netinit.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -894,7 +893,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS manhole_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as manhole_num_value,
 man_manhole.length AS manhole_length,
@@ -907,7 +906,7 @@ man_manhole.accessibility AS manhole_accessibility
 FROM selector_expl, node
 	JOIN man_manhole ON man_manhole.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -962,7 +961,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS wjump_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as wjump_num_value,
 man_wjump.length AS wjump_length,
@@ -973,7 +972,7 @@ man_wjump.accessibility AS wjump_accessibility,
 man_wjump.name AS wjump_name
 FROM selector_expl, node
 	JOIN man_wjump ON man_wjump.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -1030,7 +1029,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS netgully_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as netgully_num_value,
 man_netgully.pol_id AS netgully_pol_id,
@@ -1044,7 +1043,7 @@ man_netgully.postnumber AS netgully_postnumber,
 ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1100,7 +1099,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS netgully_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as netgully_num_value,
 man_netgully.pol_id AS netgully_pol_id,
@@ -1114,7 +1113,7 @@ man_netgully.postnumber AS netgully_postnumber,
 ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1173,7 +1172,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS chamber_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as chamber_num_value,
 man_chamber.pol_id AS chamber_pol_id,
@@ -1188,7 +1187,7 @@ man_chamber.accessibility AS chamber_accessibility,
 man_chamber.name AS chamber_name
 FROM selector_expl, node
     JOIN man_chamber ON man_chamber.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -1244,7 +1243,7 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS chamber_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as chamber_num_value,
 man_chamber.pol_id  AS chamber_pol_id,
@@ -1259,7 +1258,7 @@ man_chamber.accessibility AS chamber_accessibility,
 man_chamber.name AS chamber_name
 FROM selector_expl, node
 	JOIN man_chamber ON man_chamber.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_chamber.pol_id
@@ -1317,14 +1316,14 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS wwtp_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as wwtp_num_value,
 man_wwtp.pol_id AS wwtp_pol_id,
 man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); ;
@@ -1380,14 +1379,14 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS wwtp_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as wwtp_num_value,
 man_wwtp.pol_id AS wwtp_pol_id, 
 man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_wwtp.pol_id
@@ -1444,13 +1443,13 @@ node.inventory,
 node.uncertain,
 node.xyz_date AS netelement_xyz_date,
 node.unconnected,
-sector.macrosector_id,
+dma.macrodma_id,
 node.expl_id,
 node.num_value as netelement_num_value,
 man_netelement.serial_number as netelement_serial_number
 FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
-	LEFT JOIN sector ON node.sector_id = sector.sector_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); 
@@ -1520,13 +1519,13 @@ arc.label_rotation AS conduit_label_rotation,
 arc.publish,
 arc.inventory,
 arc.uncertain,
-sector.macrosector_id,
+dma.macrodma_id,
 arc.expl_id,
 arc.num_value as conduit_num_value
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
+	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	JOIN man_conduit ON man_conduit.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -1595,14 +1594,14 @@ arc.label_rotation AS siphon_label_rotation,
 arc.publish,
 arc.inventory,
 arc.uncertain,
-sector.macrosector_id,
+dma.macrodma_id,
 arc.expl_id,
 arc.num_value as siphon_num_value,
 man_siphon.name AS siphon_name
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
+	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	JOIN man_siphon ON man_siphon.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -1673,7 +1672,7 @@ arc.code AS waccel_code,
 arc.publish,
 arc.inventory,
 arc.uncertain,
-sector.macrosector_id,
+dma.macrodma_id,
 arc.expl_id,
 arc.num_value as waccel_num_value,
 man_waccel.sander_length AS waccel_sander_length,
@@ -1684,7 +1683,7 @@ man_waccel.accessibility AS waccel_accessibility
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
+	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	JOIN man_waccel ON man_waccel.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();;
 
@@ -1752,13 +1751,13 @@ arc.label_rotation AS varc_label_rotation,
 arc.publish,
 arc.inventory,
 arc.uncertain,
-sector.macrosector_id,
+dma.macrodma_id,
 arc.expl_id,
 arc.num_value as varc_num_value
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
-	LEFT JOIN sector ON arc.sector_id = sector.sector_id
+	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	JOIN man_varc ON man_varc.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
