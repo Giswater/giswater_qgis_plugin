@@ -115,14 +115,7 @@ class Edit(ParentAction):
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()
         if self.project_type == 'ws':
-            self.dlg.check_node_sink.setEnabled(False)
-            self.dlg.check_node_flow_regulator.setEnabled(False)
-            self.dlg.check_node_exit_upper_node_entry.setEnabled(False)
-            self.dlg.check_arc_intersection_without_node.setEnabled(False)
-            self.dlg.check_inverted_arcs.setEnabled(False)
-        if self.project_type == 'ud':
-            self.dlg.check_topology_coherence.setEnabled(False)
-
+            self.dlg.tab_review.removeTab(1)
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.edit_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
@@ -818,7 +811,8 @@ class Edit(ParentAction):
             utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
 
         if self.project_type == 'ws':
-            self.dlg_config_edit.tab_config.removeTab(2)
+            self.dlg_config_edit.tab_config.removeTab(1)
+            self.dlg_config_edit.tab_config.removeTab(1)
         elif self.project_type == 'ud':
             self.dlg_config_edit.tab_config.removeTab(1)
 

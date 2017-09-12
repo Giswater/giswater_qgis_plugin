@@ -286,7 +286,8 @@ class Master(ParentAction):
         self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
 
         if self.project_type == 'ws':
-            self.slope_arc_direction.setEnabled(False)
+            self.dlg_config_master.tab_config.removeTab(1)
+            self.dlg_config_master.tab_config.removeTab(1)
 
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.dao.get_rows(sql)

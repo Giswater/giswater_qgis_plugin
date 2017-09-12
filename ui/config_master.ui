@@ -137,7 +137,7 @@
     <attribute name="title">
      <string>Topology</string>
     </attribute>
-    <widget class="QTabWidget" name="Utils_2">
+    <widget class="QTabWidget" name="tab_config">
      <property name="geometry">
       <rect>
        <x>10</x>
