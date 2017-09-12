@@ -6,11 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
-from PyQt4.QtGui import QAbstractItemView, QTableView
-from PyQt4.QtGui import QComboBox
-from PyQt4.QtGui import QFileDialog
-
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
@@ -18,7 +14,6 @@ import sys
 import webbrowser
 import ConfigParser
 from functools import partial
-
 
 
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -357,20 +352,12 @@ class ParentAction():
         self.iface.mapCanvas().refresh()
 
 
-    def save_table(self, widget, table_name):
-        if self.model.submitAll():
-            self.model.database().commit()
-        else:
-            self.model.database().rollback()
-        self.fill_table_psector(widget, table_name)
-
-    def fill_table_psector(self, widget, table_name):
+    def fill_table_psector(self, widget, table_name, column_id):
         """ Set a model with selected filter.
         Attach that model to selected table """
-
         # Set model
         self.model = QSqlTableModel()
-        self.model.setTable(table_name)
+        self.model.setTable(self.schema_name+"."+table_name)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         self.model.setSort(0, 0)
         self.model.select()
@@ -381,11 +368,11 @@ class ParentAction():
         # Attach model to table view
         widget.setModel(self.model)
         # put combobox in qtableview
-        sql = "SELECT * FROM " + table_name
+        sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
         rows = self.controller.get_rows(sql)
         for x in range(len(rows)):
             combo = QComboBox()
-            sql = "SELECT DISTINCT(priority) FROM " + table_name
+            sql = "SELECT DISTINCT(priority) FROM " + self.schema_name+"."+table_name
             row = self.controller.get_rows(sql)
             utils_giswater.fillComboBox(combo, row, False)
             row = rows[x]
@@ -393,12 +380,24 @@ class ParentAction():
             utils_giswater.setSelectedItem(combo, str(priority))
             i = widget.model().index(x, 4)
             widget.setIndexWidget(i, combo)
+            combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
 
+    def update_combobox_values(self, widget, combo, x):
+        """ Insert combobox.currentText into widget (QTableView) """
+
+        index = widget.model().index(x, 4)
+        widget.model().setData(index, combo.currentText())
 
 
+    def save_table(self, widget, table_name, column_id):
+        """ Save widget (QTableView) into model"""
 
-
+        if self.model.submitAll():
+            self.model.database().commit()
+        else:
+            self.model.database().rollback()
+        self.fill_table_psector(widget, table_name, column_id)
 
 
     def fill_table(self, widget, table_name):

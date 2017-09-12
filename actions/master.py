@@ -220,12 +220,11 @@ class Master(ParentAction):
         # Set signals
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
-        self.dlg_psector_mangement.btn_save.pressed.connect(partial(self.save_table, self.tbl_psm, self.schema_name + ".plan_psector"))
+        self.dlg_psector_mangement.btn_save.pressed.connect(partial(self.save_table, self.tbl_psm, "plan_psector", column_id))
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.tbl_psm, table_name, column_id))
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
-        self.fill_table_psector(self.tbl_psm, self.schema_name + ".plan_psector")
-
+        self.fill_table_psector(self.tbl_psm, "plan_psector", column_id)
         self.dlg_psector_mangement.exec_()
 
 
