@@ -16,8 +16,8 @@
   <widget class="QLabel" name="label_owner">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>156</y>
+     <x>276</x>
+     <y>129</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -49,8 +49,8 @@
   <widget class="QDateTimeEdit" name="builtdate">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>124</y>
+     <x>106</x>
+     <y>97</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -65,8 +65,8 @@
   <widget class="QLabel" name="label_comment">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>290</y>
+     <x>6</x>
+     <y>263</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -98,8 +98,8 @@
   <widget class="QLabel" name="label_builtdate">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>124</y>
+     <x>6</x>
+     <y>97</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -131,7 +131,7 @@
   <widget class="QComboBox" name="elementcat_id">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>245</x>
      <y>35</y>
      <width>261</width>
      <height>20</height>
@@ -146,8 +146,8 @@
   <widget class="QLineEdit" name="annotation">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>220</y>
+     <x>106</x>
+     <y>193</y>
      <width>431</width>
      <height>26</height>
     </rect>
@@ -156,8 +156,8 @@
   <widget class="QLabel" name="label_enddate">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>124</y>
+     <x>276</x>
+     <y>97</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -189,8 +189,8 @@
   <widget class="QLabel" name="label_observ">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>255</y>
+     <x>6</x>
+     <y>228</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -222,8 +222,8 @@
   <widget class="QComboBox" name="location_type">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>94</y>
+     <x>106</x>
+     <y>67</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -232,8 +232,8 @@
   <widget class="QComboBox" name="buildercat_id">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>94</y>
+     <x>376</x>
+     <y>67</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -242,8 +242,8 @@
   <widget class="QLineEdit" name="observ">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>255</y>
+     <x>106</x>
+     <y>228</y>
      <width>431</width>
      <height>26</height>
     </rect>
@@ -252,7 +252,7 @@
   <widget class="QLabel" name="label_elementcat_id">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>245</x>
      <y>15</y>
      <width>90</width>
      <height>22</height>
@@ -288,8 +288,8 @@
   <widget class="QComboBox" name="workcat_id_end">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>186</y>
+     <x>376</x>
+     <y>159</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -298,8 +298,8 @@
   <widget class="QLabel" name="label_buildercat_id">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>94</y>
+     <x>276</x>
+     <y>67</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -331,8 +331,8 @@
   <widget class="QLabel" name="label_state">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>154</y>
+     <x>6</x>
+     <y>127</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -364,8 +364,8 @@
   <widget class="QLabel" name="label_rotation">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>358</y>
+     <x>146</x>
+     <y>331</y>
      <width>46</width>
      <height>13</height>
     </rect>
@@ -377,8 +377,8 @@
   <widget class="QLineEdit" name="rotation">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>378</y>
+     <x>146</x>
+     <y>351</y>
      <width>76</width>
      <height>20</height>
     </rect>
@@ -390,8 +390,8 @@
   <widget class="QLabel" name="label_workcat_id_end">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>186</y>
+     <x>276</x>
+     <y>159</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -423,8 +423,8 @@
   <widget class="QLineEdit" name="link">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>325</y>
+     <x>106</x>
+     <y>298</y>
      <width>431</width>
      <height>26</height>
     </rect>
@@ -469,8 +469,8 @@
   <widget class="QLabel" name="label_location_type">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>94</y>
+     <x>6</x>
+     <y>67</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -502,8 +502,8 @@
   <widget class="QComboBox" name="ownercat_id">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>156</y>
+     <x>376</x>
+     <y>129</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -512,8 +512,8 @@
   <widget class="QLabel" name="label_link">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>325</y>
+     <x>6</x>
+     <y>298</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -545,8 +545,8 @@
   <widget class="QDateTimeEdit" name="enddate">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>124</y>
+     <x>376</x>
+     <y>97</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -561,8 +561,8 @@
   <widget class="QLineEdit" name="comment">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>290</y>
+     <x>106</x>
+     <y>263</y>
      <width>431</width>
      <height>26</height>
     </rect>
@@ -573,7 +573,7 @@
     <rect>
      <x>10</x>
      <y>35</y>
-     <width>261</width>
+     <width>211</width>
      <height>20</height>
     </rect>
    </property>
@@ -584,8 +584,8 @@
   <widget class="QLabel" name="label_annotation">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>220</y>
+     <x>6</x>
+     <y>193</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -617,8 +617,8 @@
   <widget class="QLabel" name="label_workcat_id">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>184</y>
+     <x>6</x>
+     <y>157</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -650,8 +650,8 @@
   <widget class="QComboBox" name="state">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>154</y>
+     <x>106</x>
+     <y>127</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -660,8 +660,8 @@
   <widget class="QComboBox" name="workcat_id">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>184</y>
+     <x>106</x>
+     <y>157</y>
      <width>160</width>
      <height>20</height>
     </rect>
@@ -670,8 +670,8 @@
   <widget class="QComboBox" name="verified">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>378</y>
+     <x>6</x>
+     <y>351</y>
      <width>119</width>
      <height>20</height>
     </rect>
@@ -680,8 +680,8 @@
   <widget class="QLabel" name="label_verified">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>358</y>
+     <x>6</x>
+     <y>331</y>
      <width>90</width>
      <height>22</height>
     </rect>
@@ -716,8 +716,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>379</x>
-     <y>402</y>
+     <x>375</x>
+     <y>375</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -729,8 +729,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>464</x>
-     <y>402</y>
+     <x>460</x>
+     <y>375</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -742,8 +742,8 @@
   <widget class="QPushButton" name="add_geom">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>380</y>
+     <x>515</x>
+     <y>35</y>
      <width>21</width>
      <height>21</height>
     </rect>
@@ -754,6 +754,19 @@
    <property name="icon">
     <iconset>
      <normaloff>../icons/129.png</normaloff>../icons/129.png</iconset>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="undelete">
+   <property name="geometry">
+    <rect>
+     <x>245</x>
+     <y>355</y>
+     <width>77</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Undelete</string>
    </property>
   </widget>
  </widget>
