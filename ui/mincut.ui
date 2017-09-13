@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>470</width>
-    <height>656</height>
+    <width>469</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,7 +69,7 @@
       <x>15</x>
       <y>25</y>
       <width>440</width>
-      <height>81</height>
+      <height>106</height>
      </rect>
     </property>
     <property name="title">
@@ -79,7 +79,7 @@
      <property name="geometry">
       <rect>
        <x>360</x>
-       <y>50</y>
+       <y>80</y>
        <width>51</width>
        <height>20</height>
       </rect>
@@ -92,7 +92,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>80</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -128,7 +128,7 @@
      <property name="geometry">
       <rect>
        <x>305</x>
-       <y>50</y>
+       <y>80</y>
        <width>51</width>
        <height>22</height>
       </rect>
@@ -160,12 +160,12 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="street">
+    <widget class="QLineEdit" name="streetname">
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>50</y>
-       <width>160</width>
+       <y>80</y>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -219,14 +219,60 @@
       </rect>
      </property>
     </widget>
+    <widget class="QLabel" name="label_label_x_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>90</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="text">
+      <string>Postcode:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="margin">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="exploitation_2">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>50</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>225</y>
+      <y>235</y>
       <width>440</width>
-      <height>141</height>
+      <height>126</height>
      </rect>
     </property>
     <property name="title">
@@ -236,7 +282,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>50</y>
+       <y>45</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -269,7 +315,7 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>50</y>
+       <y>45</y>
        <width>161</width>
        <height>22</height>
       </rect>
@@ -282,7 +328,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>20</y>
+       <y>15</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -315,7 +361,7 @@
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>50</y>
+       <y>45</y>
        <width>118</width>
        <height>22</height>
       </rect>
@@ -325,7 +371,7 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>20</y>
+       <y>15</y>
        <width>161</width>
        <height>22</height>
       </rect>
@@ -338,7 +384,7 @@
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>20</y>
+       <y>15</y>
        <width>118</width>
        <height>22</height>
       </rect>
@@ -348,9 +394,9 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>80</y>
+       <y>75</y>
        <width>296</width>
-       <height>51</height>
+       <height>41</height>
       </rect>
      </property>
     </widget>
@@ -358,7 +404,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>80</y>
+       <y>75</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -392,7 +438,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>370</y>
+      <y>360</y>
       <width>440</width>
       <height>201</height>
      </rect>
@@ -495,7 +541,7 @@
       <rect>
        <x>110</x>
        <y>85</y>
-       <width>160</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -553,7 +599,7 @@
       <rect>
        <x>110</x>
        <y>115</y>
-       <width>160</width>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -664,9 +710,9 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>110</y>
+      <y>130</y>
       <width>440</width>
-      <height>111</height>
+      <height>106</height>
      </rect>
     </property>
     <property name="title">
@@ -676,7 +722,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>50</y>
+       <y>45</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -712,8 +758,8 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>20</y>
-       <width>156</width>
+       <y>15</y>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -722,7 +768,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>20</y>
+       <y>15</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -758,8 +804,8 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>50</y>
-       <width>156</width>
+       <y>45</y>
+       <width>161</width>
        <height>20</height>
       </rect>
      </property>
@@ -768,7 +814,7 @@
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>80</y>
+       <y>75</y>
        <width>90</width>
        <height>22</height>
       </rect>
@@ -804,7 +850,7 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>80</y>
+       <y>75</y>
        <width>161</width>
        <height>22</height>
       </rect>
@@ -817,7 +863,7 @@
    <widget class="QLabel" name="label_label_x_11">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>140</x>
       <y>5</y>
       <width>90</width>
       <height>22</height>
@@ -856,7 +902,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>185</x>
       <y>5</y>
       <width>101</width>
       <height>20</height>
@@ -870,7 +916,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>580</y>
+      <y>565</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -883,13 +929,117 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>580</y>
+      <y>565</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>OK</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_label_x_12">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>5</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Work order:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="state_2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>355</x>
+      <y>5</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>65</x>
+      <y>5</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_label_x_9">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>5</y>
+      <width>51</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Id:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
     </property>
    </widget>
   </widget>
