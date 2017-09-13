@@ -73,15 +73,18 @@ BEGIN
             END IF;
         END IF;
 
-	    -- State
-		
+	    -- State	
 		        IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());
             IF (NEW.state IS NULL) THEN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
-
+		
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
 	
 		-- Verified
         IF (NEW.verified IS NULL) THEN

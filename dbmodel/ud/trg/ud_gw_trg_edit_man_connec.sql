@@ -102,7 +102,12 @@ BEGIN
 			IF (NEW.code IS NULL AND code_autofill_bool IS TRUE) THEN 
 				NEW.code=NEW.connec_id;
 			END IF;
-			
+
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
+		
         -- FEATURE INSERT
 		INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state", connec_arccat_id, connec_depth, connec_length, arc_id, annotation, "observ",
 					"comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02,

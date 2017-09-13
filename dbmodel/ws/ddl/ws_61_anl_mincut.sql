@@ -30,14 +30,16 @@ CREATE SEQUENCE "anl_mincut_result_cat_seq"
 
 
 CREATE TABLE "anl_mincut_result_cat" (
-id varchar (30) DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL PRIMARY KEY,
+id integer DEFAULT nextval('"SCHEMA_NAME".anl_mincut_result_cat_seq'::regclass) NOT NULL PRIMARY KEY,
+work_order character varying (30) NOT NULL,
 mincut_state int2,
 mincut_class int2,
 mincut_type varchar (30),
 received_date date,
 expl_id integer,
-address_1 character varying (250),
-address_2 character varying (250),
+postnumber character varying (16),
+street character varying (250),
+"number"  character varying (16),
 anl_cause character varying (30),
 anl_tstamp timestamp default now(),
 anl_user varchar(30),

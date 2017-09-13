@@ -76,7 +76,11 @@ BEGIN
             END IF;
         END IF;
 		
-
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
+		
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());

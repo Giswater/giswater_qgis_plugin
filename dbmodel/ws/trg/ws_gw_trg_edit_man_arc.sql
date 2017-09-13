@@ -87,7 +87,11 @@ BEGIN
                 NEW.state := (SELECT id FROM value_state limit 1);
             END IF;
         END IF;
-				
+
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 		
 			
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN

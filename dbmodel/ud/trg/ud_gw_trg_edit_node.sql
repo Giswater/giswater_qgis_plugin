@@ -118,7 +118,12 @@ BEGIN
                 NEW.workcat_id := (SELECT id FROM cat_work limit 1);
             END IF;
         END IF;
-	
+
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
+		
 
 		--Builtdate
 		IF (NEW.builtdate IS NULL) THEN

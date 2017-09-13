@@ -108,7 +108,12 @@
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-		
+
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
+			
 			-- FEATURE INSERT
 			
 			

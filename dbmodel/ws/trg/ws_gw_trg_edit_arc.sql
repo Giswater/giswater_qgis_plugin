@@ -93,8 +93,12 @@ BEGIN
             END IF;
         END IF;
 		
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
+		
 		--Exploitation ID
-
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
                 --PERFORM audit_function(125,340);
 				RETURN NULL;				

@@ -100,7 +100,12 @@ BEGIN
                 NEW.verified := (SELECT id FROM value_verified limit 1);
             END IF;
         END IF;
-
+		
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
+		
 		-- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='state_vdefault' AND "cur_user"="current_user"());

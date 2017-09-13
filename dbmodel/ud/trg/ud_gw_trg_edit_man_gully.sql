@@ -94,6 +94,11 @@ BEGIN
 		IF (NEW.builtdate IS NULL) THEN
 			NEW.builtdate :=(SELECT "value" FROM config_param_user WHERE "parameter"='builtdate_vdefault' AND "cur_user"="current_user"());
 		END IF;  
+
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
 		
 	--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
@@ -110,7 +115,16 @@ BEGIN
                 --PERFORM audit_function(130,340);
 				RETURN NULL; 
             END IF;
-	
+			
+		--Units
+		IF (NEW.units IS NULL) THEN
+			NEW.units :='1';
+		END IF; 
+
+		--Inventory
+		IF (NEW.inventory IS NULL) THEN
+			NEW.inventory :='TRUE';
+		END IF; 
 		
         -- FEATURE INSERT
  IF gully_geometry = 'gully' THEN
