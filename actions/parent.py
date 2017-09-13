@@ -380,6 +380,8 @@ class ParentAction():
             utils_giswater.setSelectedItem(combo, str(priority))
             i = widget.model().index(x, 4)
             widget.setIndexWidget(i, combo)
+            #combo.setStyleSheet("background:#F2F2F2")
+            combo.setStyleSheet("background:#E6E6E6")
             combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
 
 

@@ -222,11 +222,12 @@ class Master(ParentAction):
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
         self.dlg_psector_mangement.btn_save.pressed.connect(partial(self.save_table, self.tbl_psm, "plan_psector", column_id))
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.tbl_psm, table_name, column_id))
+        self.dlg_psector_mangement.btn_current_psector.clicked.connect(self.update_current_psector)
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
-        self.dlg_psector_mangement.btn_current_psector.clicked.connect(self.update_current_psector)
         self.fill_table_psector(self.tbl_psm, "plan_psector", column_id)
         self.dlg_psector_mangement.exec_()
+
 
     def update_current_psector(self):
         selected_list = self.tbl_psm.selectionModel().selectedRows()
@@ -247,9 +248,7 @@ class Master(ParentAction):
 
         aux_widget = QLineEdit()
         aux_widget.setText(str(psector_id))
-        self.insert_or_update_config_param(aux_widget, "psector_vdefault", "config_param_system")
-
-
+        self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
         self.controller.execute_sql(sql)
 
 
@@ -283,7 +282,7 @@ class Master(ParentAction):
 
         # QCheckBox
         self.chk_psector_enabled = self.dlg_config_master.findChild(QCheckBox, 'chk_psector_enabled')
-        self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
+        #self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
 
         if self.project_type == 'ws':
             self.dlg_config_master.tab_config.removeTab(1)
@@ -460,23 +459,23 @@ class Master(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if widget.currentText() != "":
+            if utils_giswater.getWidgetText(widget) != "":
                 for row in rows:
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + widget.currentText() + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "')"
                         sql += " WHERE parameter = 'state_vdefault' "
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -489,7 +488,6 @@ class Master(ParentAction):
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
-
         self.controller.execute_sql(sql)
 
 
@@ -810,4 +808,3 @@ class Master(ParentAction):
         
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
-        
