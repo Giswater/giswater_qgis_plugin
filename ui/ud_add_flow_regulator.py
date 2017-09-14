@@ -2,11 +2,11 @@
 from PyQt4 import QtGui, uic
 import os
 
-form_name = 'ws_additional_pump.ui'
+form_name = 'ud_add_flow_regulator.ui'
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), form_name))
 
 
-class AdditionalPump(QtGui.QDialog, FORM_CLASS):
+class AddFlowRegulator(QtGui.QDialog, FORM_CLASS):
 
     def __init__(self):
         """ Constructor """
