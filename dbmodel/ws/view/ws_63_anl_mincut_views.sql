@@ -75,6 +75,8 @@ GROUP BY anl_mincut_result_connec.id, anl_mincut_result_selector.result_id, conn
 ORDER BY anl_mincut_result_connec.connec_id;
 
 
+
+
 DROP VIEW IF EXISTS "v_anl_mincut_result_polygon";
 CREATE OR REPLACE VIEW "v_anl_mincut_result_polygon" AS 
 SELECT
@@ -102,5 +104,73 @@ WHERE ((anl_mincut_result_selector.result_id) = (anl_mincut_result_hydrometer.re
 AND anl_mincut_result_selector.cur_user="current_user"() 
 GROUP BY anl_mincut_result_hydrometer.id, anl_mincut_result_selector.result_id
 ORDER BY anl_mincut_result_hydrometer.hydrometer_id;
+
+
+
+
+
+DROP VIEW IF EXISTS "v_ui_mincut_hydrometer";
+CREATE OR REPLACE VIEW "v_ui_mincut_hydrometer" AS 
+SELECT
+anl_mincut_result_hydrometer.id,
+anl_mincut_result_hydrometer.connec_id,
+anl_mincut_result_hydrometer.result_id,
+work_order,
+mincut_state,
+mincut_class,
+mincut_type,
+received_date,
+expl_id,
+postnumber,
+street,
+number,
+anl_cause,
+anl_tstamp,
+anl_user,
+anl_descript,
+forecast_start,
+forecast_end,
+exec_start,
+exec_end,
+exec_user,
+exec_descript,
+exec_appropiate 
+FROM anl_mincut_result_hydrometer
+JOIN anl_mincut_result_cat ON anl_mincut_result_hydrometer.result_id = anl_mincut_result_cat.id;
+
+
+
+
+DROP VIEW IF EXISTS "v_ui_mincut_connec";
+CREATE OR REPLACE VIEW "v_ui_mincut_connec" AS 
+SELECT
+anl_mincut_result_connec.id,
+anl_mincut_result_connec.connec_id,
+anl_mincut_result_connec.result_id,
+work_order,
+mincut_state,
+mincut_class,
+mincut_type,
+received_date,
+expl_id,
+postnumber,
+street,
+number,
+anl_cause,
+anl_tstamp,
+anl_user,
+anl_descript,
+forecast_start,
+forecast_end,
+exec_start,
+exec_end,
+exec_user,
+exec_descript,
+exec_appropiate 
+FROM anl_mincut_result_connec
+JOIN anl_mincut_result_cat ON anl_mincut_result_connec.result_id = anl_mincut_result_cat.id;
+
+
+
 
 
