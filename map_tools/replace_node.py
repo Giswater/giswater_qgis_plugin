@@ -24,11 +24,11 @@ class ReplaceNodeMapTool(ParentMapTool):
         super(ReplaceNodeMapTool, self).__init__(iface, settings, action, index_action)
 
         # Vertex marker
-        self.vertexMarker = QgsVertexMarker(self.canvas)
-        self.vertexMarker.setColor(QColor(255, 25, 25))
-        self.vertexMarker.setIconSize(12)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 25, 25))
+        self.vertex_marker.setIconSize(12)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
+        self.vertex_marker.setPenWidth(5)
 
 
     ''' QgsMapTools inherited event functions '''
@@ -36,7 +36,7 @@ class ReplaceNodeMapTool(ParentMapTool):
     def canvasMoveEvent(self, event):
         
         # Hide highlight
-        self.vertexMarker.hide()
+        self.vertex_marker.hide()
 
         # Get the click
         x = event.pos().x()
@@ -58,15 +58,15 @@ class ReplaceNodeMapTool(ParentMapTool):
             # Check Arc or Node
             for snapPoint in result:
 
-                exist = self.snapperManager.check_node_group(snapPoint.layer)
+                exist = self.snapper_manager.check_node_group(snapPoint.layer)
                 if exist:
                     # if snapPoint.layer.name() == self.layer_node.name():
                     # Get the point
                     point = QgsPoint(result[0].snappedVertex)
 
                     # Add marker
-                    self.vertexMarker.setCenter(point)
-                    self.vertexMarker.show()
+                    self.vertex_marker.setCenter(point)
+                    self.vertex_marker.show()
 
                     break
 
@@ -80,7 +80,7 @@ class ReplaceNodeMapTool(ParentMapTool):
             x = event.pos().x()
             y = event.pos().y()
             eventPoint = QPoint(x, y)
-            snappFeat = None
+            snapped_feat = None
 
             # Snapping
             (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
@@ -91,26 +91,26 @@ class ReplaceNodeMapTool(ParentMapTool):
                 # Check Arc or Node
                 for snapPoint in result:
 
-                    exist = self.snapperManager.check_node_group(snapPoint.layer)
+                    exist = self.snapper_manager.check_node_group(snapPoint.layer)
                     # if snapPoint.layer.name() == self.layer_node.name():
                     if exist:
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)  # @UnusedVariable
-                        snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                        snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                         result[0].layer.select([result[0].snappedAtGeometry])
                         break
 
-            if snappFeat is not None:
+            if snapped_feat is not None:
 
                 # Get selected features and layer type: 'node'
-                feature = snappFeat
+                feature = snapped_feat
                 node_id = feature.attribute('node_id')
                 layer = result[0].layer.name()
                 view_name = "v_edit_man_"+layer.lower()
                 message = str(view_name)
 
                 # Show message before executing
-                message = "Are you sure you want to replace selected node with a new one ?"
+                message = "Are you sure you want to replace selected node with a new one?"
                 self.controller.show_info_box(message, "Info")
 
                 # Execute SQL function and show result to the user
@@ -133,13 +133,13 @@ class ReplaceNodeMapTool(ParentMapTool):
         self.action().setChecked(True)
 
         # Store user snapping configuration
-        self.snapperManager.storeSnappingOptions()
+        self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapperManager.clearSnapping()
+        self.snapper_manager.clear_snapping()
 
         # Set snapping to node
-        self.snapperManager.snapToNode()
+        self.snapper_manager.snap_to_node()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -155,16 +155,7 @@ class ReplaceNodeMapTool(ParentMapTool):
 
 
     def deactivate(self):
-
-        # Check button
-        self.action().setChecked(False)
-
-        # Restore previous snapping
-        self.snapperManager.recoverSnappingOptions()
-
-        # Recover cursor
-        self.canvas.setCursor(self.stdCursor)
-
-        # Removehighlight
-        self.h = None
+          
+        # Call parent method     
+        ParentMapTool.deactivate(self)
     

@@ -27,7 +27,7 @@ from map_tools.parent import ParentMapTool
 
 
 class ConnecMapTool(ParentMapTool):
-    ''' Button 20. User select connections from layer 'connec'
+    ''' Button 20: User select connections from layer 'connec'
     Execute SQL function: 'gw_fct_connect_to_network' '''    
 
     def __init__(self, iface, settings, action, index_action):
@@ -39,22 +39,22 @@ class ConnecMapTool(ParentMapTool):
         self.dragging = False
 
         # Vertex marker
-        self.vertexMarker = QgsVertexMarker(self.canvas)
-        self.vertexMarker.setColor(QColor(255, 25, 25))
-        self.vertexMarker.setIconSize(11)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 25, 25))
+        self.vertex_marker.setIconSize(11)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_BOX)  # or ICON_CROSS, ICON_X
+        self.vertex_marker.setPenWidth(5)
 
         # Rubber band
-        self.rubberBand = QgsRubberBand(self.canvas, True)
+        self.rubber_band = QgsRubberBand(self.canvas, True)
         mFillColor = QColor(100, 0, 0);
-        self.rubberBand.setColor(mFillColor)
-        self.rubberBand.setWidth(3)
+        self.rubber_band.setColor(mFillColor)
+        self.rubber_band.setWidth(3)
         mBorderColor = QColor(254, 58, 29)
-        self.rubberBand.setBorderColor(mBorderColor)
+        self.rubber_band.setBorderColor(mBorderColor)
 
         # Select rectangle
-        self.selectRect = QRect()
+        self.select_rect = QRect()
 
 
     def reset(self):
@@ -65,7 +65,7 @@ class ConnecMapTool(ParentMapTool):
             layer.removeSelection()
 
         # Graphic elements
-        self.rubberBand.reset()
+        self.rubber_band.reset()
 
 
 
@@ -83,15 +83,15 @@ class ConnecMapTool(ParentMapTool):
 
             if not self.dragging:
                 self.dragging = True
-                self.selectRect.setTopLeft(event.pos())
+                self.select_rect.setTopLeft(event.pos())
 
-            self.selectRect.setBottomRight(event.pos())
+            self.select_rect.setBottomRight(event.pos())
             self.set_rubber_band()
 
         else:
 
             # Hide highlight
-            self.vertexMarker.hide()
+            self.vertex_marker.hide()
 
             # Get the click
             x = event.pos().x()
@@ -105,25 +105,25 @@ class ConnecMapTool(ParentMapTool):
             if result <> []:
 
                 # Check Arc or Node
-                for snapPoint in result:
+                for snapped_feat in result:
                     
-                    exist=self.snapperManager.check_connec_group(snapPoint.layer)
-                    if exist : 
+                    exist = self.snapper_manager.check_connec_group(snapped_feat.layer)
+                    if exist: 
 
                         # Get the point
                         point = QgsPoint(result[0].snappedVertex)
 
                         # Add marker
-                        self.vertexMarker.setCenter(point)
-                        self.vertexMarker.show()
+                        self.vertex_marker.setCenter(point)
+                        self.vertex_marker.show()
 
                         break
 
 
     def canvasPressEvent(self, event):   #@UnusedVariable
 
-        self.selectRect.setRect(0, 0, 0, 0)
-        self.rubberBand.reset()
+        self.select_rect.setRect(0, 0, 0, 0)
+        self.rubber_band.reset()
 
 
     def canvasReleaseEvent(self, event):
@@ -144,12 +144,10 @@ class ConnecMapTool(ParentMapTool):
 
                 # That's the snapped point
                 if result <> [] :
-                    exist=self.snapperManager.check_connec_group(result[0].layer)
+                    exist = self.snapper_manager.check_connec_group(result[0].layer)
 
-                    if exist :
+                    if exist:
                         point = QgsPoint(result[0].snappedVertex)   #@UnusedVariable
-                        #layer.removeSelection()
-                        #layer.select([result[0].snappedAtGeometry])
                         result[0].layer.removeSelection()
                         result[0].layer.select([result[0].snappedAtGeometry])
     
@@ -157,20 +155,20 @@ class ConnecMapTool(ParentMapTool):
                         self.link_connec()
     
                         # Hide highlight
-                        self.vertexMarker.hide()
+                        self.vertex_marker.hide()
 
             else:
 
                 # Set valid values for rectangle's width and height
-                if self.selectRect.width() == 1:
-                    self.selectRect.setLeft( self.selectRect.left() + 1 )
+                if self.select_rect.width() == 1:
+                    self.select_rect.setLeft( self.select_rect.left() + 1 )
 
-                if self.selectRect.height() == 1:
-                    self.selectRect.setBottom( self.selectRect.bottom() + 1 )
+                if self.select_rect.height() == 1:
+                    self.select_rect.setBottom( self.select_rect.bottom() + 1 )
 
                 self.set_rubber_band()
-                selectGeom = self.rubberBand.asGeometry()   #@UnusedVariable
-                self.select_multiple_features(self.selectRectMapCoord)
+                selected_geom = self.rubber_band.asGeometry()   #@UnusedVariable
+                self.select_multiple_features(self.selected_rectangle)
                 self.dragging = False
 
                 # Create link
@@ -179,16 +177,15 @@ class ConnecMapTool(ParentMapTool):
         elif event.button() == Qt.RightButton:
 
             # Check selected records
-            numberFeatures = 0
+            number_features = 0
 
             for layer in self.layer_connec_man:
-                numberFeatures += layer.selectedFeatureCount()
+                number_features += layer.selectedFeatureCount()
 
-            if numberFeatures > 0:
-                answer = self.controller.ask_question("There are " + str(numberFeatures) + " features selected in the connec group, do you want to update values on them?", "Interpolate value")
-
+            if number_features > 0:
+                message = "There are " + str(number_features) + " features selected in the connec group, do you want to update values on them?"
+                answer = self.controller.ask_question(message, "Interpolate value")
                 if answer:
-
                     # Create link
                     self.link_connec()
 
@@ -199,17 +196,16 @@ class ConnecMapTool(ParentMapTool):
         self.action().setChecked(True)
 
         # Rubber band
-        self.rubberBand.reset()
+        self.rubber_band.reset()
 
         # Store user snapping configuration
-        self.snapperManager.storeSnappingOptions()
+        self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapperManager.clearSnapping()
+        self.snapper_manager.clear_snapping()
 
         # Set snapping to arc and node
-        self.snapperManager.snapToConnec()
-
+        self.snapper_manager.snap_to_connec()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -226,28 +222,19 @@ class ConnecMapTool(ParentMapTool):
 
     def deactivate(self):
 
-        # Check button
-        self.action().setChecked(False)
-
-        # Rubber band
-        self.rubberBand.reset()
-
-        # Restore previous snapping
-        self.snapperManager.recoverSnappingOptions()
-
-        # Recover cursor
-        self.canvas.setCursor(self.stdCursor)
+        # Call parent method     
+        ParentMapTool.deactivate(self)
 
 
     def link_connec(self):
         ''' Link selected connec to the pipe '''
 
         # Check features selected
-        numberFeatures = 0
-
+        number_features = 0
         for layer in self.layer_connec_man:
-            numberFeatures += layer.selectedFeatureCount()
-        if numberFeatures == 0:
+            number_features += layer.selectedFeatureCount()
+            
+        if number_features == 0:
             message = "You have to select at least one feature!"
             self.controller.show_warning(message, context_name='ui_message')
             return
@@ -267,16 +254,15 @@ class ConnecMapTool(ParentMapTool):
         
                 # Execute function
                 function_name = "gw_fct_connect_to_network"
-
                 sql = "SELECT "+self.schema_name+"."+function_name+"('"+connec_array+"');"
                 self.controller.execute_sql(sql)
         
                 # Refresh map canvas
-                self.rubberBand.reset()
+                self.rubber_band.reset()
                 self.iface.mapCanvas().refreshAllLayers()
 
-                for layerRefresh in self.iface.mapCanvas().layers():
-                    layerRefresh.triggerRepaint()
+                for layer_refresh in self.iface.mapCanvas().layers():
+                    layer_refresh.triggerRepaint()
 
 
     def set_rubber_band(self):
@@ -285,20 +271,20 @@ class ConnecMapTool(ParentMapTool):
         transform = self.canvas.getCoordinateTransform()
 
         # Coordinates
-        ll = transform.toMapCoordinates(self.selectRect.left(), self.selectRect.bottom())
-        lr = transform.toMapCoordinates(self.selectRect.right(), self.selectRect.bottom())
-        ul = transform.toMapCoordinates(self.selectRect.left(), self.selectRect.top())
-        ur = transform.toMapCoordinates(self.selectRect.right(), self.selectRect.top())
+        ll = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.bottom())
+        lr = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.bottom())
+        ul = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.top())
+        ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
 
         # Rubber band
-        self.rubberBand.reset()
-        self.rubberBand.addPoint(ll, False)
-        self.rubberBand.addPoint(lr, False)
-        self.rubberBand.addPoint(ur, False)
-        self.rubberBand.addPoint(ul, False)
-        self.rubberBand.addPoint(ll, True)
+        self.rubber_band.reset()
+        self.rubber_band.addPoint(ll, False)
+        self.rubber_band.addPoint(lr, False)
+        self.rubber_band.addPoint(ur, False)
+        self.rubber_band.addPoint(ul, False)
+        self.rubber_band.addPoint(ll, True)
 
-        self.selectRectMapCoord = 	QgsRectangle(ll, ur)
+        self.selected_rectangle = QgsRectangle(ll, ur)
 
 
     def select_multiple_features(self, selectGeometry):

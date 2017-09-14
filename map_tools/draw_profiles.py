@@ -36,11 +36,11 @@ class DrawProfiles(ParentMapTool):
         super(DrawProfiles, self).__init__(iface, settings, action, index_action)
 
         # Vertex marker
-        self.vertexMarker = QgsVertexMarker(self.canvas)
-        self.vertexMarker.setColor(QColor(255, 25, 25))
-        self.vertexMarker.setIconSize(12)
-        self.vertexMarker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
-        self.vertexMarker.setPenWidth(5)
+        self.vertex_marker = QgsVertexMarker(self.canvas)
+        self.vertex_marker.setColor(QColor(255, 25, 25))
+        self.vertex_marker.setIconSize(12)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)  # or ICON_CROSS, ICON_X
+        self.vertex_marker.setPenWidth(5)
         self.list_of_selected_nodes = []
         self.nodes = []
 
@@ -48,7 +48,7 @@ class DrawProfiles(ParentMapTool):
     def canvasMoveEvent(self, event):
         
         # Hide highlight
-        self.vertexMarker.hide()
+        self.vertex_marker.hide()
 
         # Get the click
         x = event.pos().x()
@@ -69,13 +69,13 @@ class DrawProfiles(ParentMapTool):
 
             # Check Arc or Node
             for snapPoint in result:
-                exist = self.snapperManager.check_node_group(snapPoint.layer)
+                exist = self.snapper_manager.check_node_group(snapPoint.layer)
                 
                 if exist:
                     point = QgsPoint(result[0].snappedVertex)
                     # Add marker
-                    self.vertexMarker.setCenter(point)
-                    self.vertexMarker.show()
+                    self.vertex_marker.setCenter(point)
+                    self.vertex_marker.show()
                     break
 
 
@@ -93,18 +93,18 @@ class DrawProfiles(ParentMapTool):
             (retval, result) = self.snapper.snapToBackgroundLayers(eventPoint)  # @UnusedVariable
        
             if result <> []:
-                self.snappFeat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
+                self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
  
                 # Leave last selection - SHOW ALL SELECTIONS
                 result[0].layer.select([result[0].snappedAtGeometry])
                 #a=result[0].layer.select([result[0].snappedAtGeometry])
                 #feat = QgsFeature()
-                geometry = self.snappFeat.geometry()
+                geometry = self.snapped_feat.geometry()
                 x=geometry.asPoint().x()
                 y=geometry.asPoint().y()
                 
                 # Get selected feature (at this moment it will have one and only one)
-                feature = self.snappFeat
+                feature = self.snapped_feat
                 node_id = feature.attribute('node_id')
 
                 # Check if one node is not selected two or more times
@@ -251,13 +251,13 @@ class DrawProfiles(ParentMapTool):
     def btn_activate_snapping(self):
 
         # Store user snapping configuration
-        self.snapperManager.storeSnappingOptions()
+        self.snapper_manager.store_snapping_options()
 
         # Clear snapping
-        self.snapperManager.clearSnapping()
+        self.snapper_manager.clear_snapping()
 
         # Set snapping to node
-        self.snapperManager.snapToNode()
+        self.snapper_manager.snap_to_node()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -265,17 +265,8 @@ class DrawProfiles(ParentMapTool):
         
     def deactivate(self):
 
-        # Check button
-        self.action().setChecked(False)
-
-        # Restore previous snapping
-        self.snapperManager.recoverSnappingOptions()
-
-        # Recover cursor
-        self.canvas.setCursor(self.stdCursor)
-
-        # Removehighlight
-        self.h = None
+        # Call parent method     
+        ParentMapTool.deactivate(self)
 
         
     def paint_event(self, arc_id, node_id):

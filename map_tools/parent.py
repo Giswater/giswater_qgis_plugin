@@ -54,7 +54,7 @@ class ParentMapTool(QgsMapTool):
         self.setAction(action)
 
         # Snapper
-        self.snapperManager = SnappingConfigManager(self.iface)
+        self.snapper_manager = SnappingConfigManager(self.iface)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
         
         # Change map tool cursor
@@ -62,7 +62,7 @@ class ParentMapTool(QgsMapTool):
         self.cursor.setShape(Qt.CrossCursor)
 
         # Get default cursor
-        self.stdCursor = self.parent().cursor()    
+        self.std_cursor = self.parent().cursor()    
         
         # Set default encoding 
         reload(sys)
@@ -75,10 +75,25 @@ class ParentMapTool(QgsMapTool):
         self.layer_arc_man = layer_arc_man
         self.layer_connec_man = layer_connec_man
         self.layer_node_man = layer_node_man
-        self.snapperManager.set_layers(layer_arc_man, layer_connec_man, layer_node_man)
+        self.snapper_manager.set_layers(layer_arc_man, layer_connec_man, layer_node_man)
 
 
     def set_controller(self, controller):
         self.controller = controller
         self.schema_name = controller.schema_name
         
+        
+    def deactivate(self):
+        
+        # Check button
+        self.action().setChecked(False)
+
+        # Restore previous snapping
+        self.snapper_manager.recover_snapping_options()
+
+        # Recover cursor
+        self.canvas.setCursor(self.std_cursor)
+
+        # Removehighlight
+        self.h = None
+                
