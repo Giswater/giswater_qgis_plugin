@@ -63,7 +63,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Macrosector:</string>
+     <string>Macrodma:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -244,7 +244,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="macrosector_id">
+   <widget class="QLineEdit" name="macrodma_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -2256,8 +2256,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>375</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2716,8 +2716,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>375</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4576,8 +4576,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>375</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5036,8 +5036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6275,8 +6275,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6864,8 +6864,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6932,8 +6932,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7398,8 +7398,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>348</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -12708,7 +12708,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>C:/Users/usuario/.designer/png/ud_section_circular.png</pixmap>
+         <pixmap>../../../../usuario/.designer/png/ud_section_circular.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -13693,7 +13693,7 @@
   <action name="actionZoom">
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/usuario/.designer/icons/103.png</normaloff>C:/Users/usuario/.designer/icons/103.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/103.png</normaloff>../../../../usuario/.designer/icons/103.png</iconset>
    </property>
    <property name="text">
     <string>Zoom</string>
@@ -13702,7 +13702,7 @@
   <action name="actionCentered">
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/usuario/.designer/icons/104.png</normaloff>C:/Users/usuario/.designer/icons/104.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/104.png</normaloff>../../../../usuario/.designer/icons/104.png</iconset>
    </property>
    <property name="text">
     <string>Centered</string>
@@ -13714,8 +13714,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/usuario/.designer/icons/101.png</normaloff>
-     <normalon>C:/Users/usuario/.designer/icons/102.png</normalon>C:/Users/usuario/.designer/icons/101.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/101.png</normaloff>
+     <normalon>../../../../usuario/.designer/icons/102.png</normalon>../../../../usuario/.designer/icons/101.png</iconset>
    </property>
    <property name="text">
     <string>Enabled</string>
@@ -13724,7 +13724,7 @@
   <action name="actionZoomOut">
    <property name="icon">
     <iconset>
-     <normaloff>C:/Users/usuario/.designer/icons/107.png</normaloff>C:/Users/usuario/.designer/icons/107.png</iconset>
+     <normaloff>../../../../usuario/.designer/icons/107.png</normaloff>../../../../usuario/.designer/icons/107.png</iconset>
    </property>
    <property name="text">
     <string>zoomOut</string>

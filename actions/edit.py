@@ -184,36 +184,37 @@ class Edit(ParentAction):
 
     def edit_change_elem_type(self):
         """ Button 28: User select one node. A form is opened showing current node_type.type
-        Combo to select new node_type.type
-        Combo to select new node_type.id
-        Combo to select new cat_node.id
+            Combo to select new node_type.type
+            Combo to select new node_type.id
+            Combo to select new cat_node.id
         """
+
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 28)
-        # Check if at least one node is checked
+        
+        # Check if any active layer
         layer = self.iface.activeLayer()
         if layer is None:
             message = "You have to select a layer"
             self.controller.show_info(message, context_name='ui_message')
-            return False
+            return
 
+        # Check if at least one node is checked          
         count = layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return
         elif count > 1:
             message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
 
         # Get selected features (nodes)
-        features = layer.selectedFeatures()
-        feature = features[0]
-
-        # Get node_id form current node
+        feature = layer.selectedFeatures()[0]
+        
+        # Get node_id and nodetype_id from current node
         self.node_id = feature.attribute('node_id')
-        # Get node_type from current node
         node_type = feature.attribute('nodetype_id')
 
         # Create the dialog, fill node_type and define its signals
@@ -223,12 +224,12 @@ class Edit(ParentAction):
         dlg.node_node_type.setText(node_type)
         dlg.node_type_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
         dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value_2)
-        dlg.node_nodecat_id.currentIndexChanged.connect(self.edit_change_elem_type_get_value_3)
         dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
-        dlg.btn_cancel.pressed.connect(dlg.close)
+        dlg.btn_cancel.pressed.connect(dlg.close)        
 
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
+        self.controller.log_info(sql)
         rows = self.dao.get_rows(sql)
 
         utils_giswater.fillComboBox("node_type_type_new", rows)
@@ -354,13 +355,16 @@ class Edit(ParentAction):
         """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
 
         # Get selected value from 1st combobox
-        self.value_combo1 = utils_giswater.getWidgetText("node_type_type_new")
+        node_type_type_new = utils_giswater.getWidgetText("node_type_type_new")
+        self.controller.log_info(node_type_type_new)        
 
         # When value is selected, enabled 2nd combo box
-        if self.value_combo1 != 'null':
-            self.dlg.node_node_type_new.setEnabled(True)
+        if node_type_type_new != 'null':
+            utils_giswater.setWidgetEnabled("node_node_type_new")
             # Fill 2nd combo_box-custom node type
-            sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type WHERE type='"+self.value_combo1+"'"
+            sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type"
+            sql += " WHERE type = '" + node_type_type_new + "'"
+            self.controller.log_info(sql)        
             rows = self.dao.get_rows(sql)
             utils_giswater.fillComboBox("node_node_type_new", rows)
 
@@ -372,38 +376,41 @@ class Edit(ParentAction):
             return
 
         # Get selected value from 2nd combobox
-        self.value_combo2 = utils_giswater.getWidgetText("node_node_type_new")
+        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
 
         # When value is selected, enabled 3rd combo box
-        if self.value_combo2 != 'null':
+        if node_node_type_new != 'null':
             # Get selected value from 2nd combobox
-            self.dlg.node_nodecat_id.setEnabled(True)
+            utils_giswater.setWidgetEnabled("node_nodecat_id")
             # Fill 3rd combo_box-catalog_id
             sql = "SELECT DISTINCT(id)"
-            sql += " FROM "+self.schema_name+".cat_node"
-            sql += " WHERE nodetype_id='"+self.value_combo2+"'"
+            sql += " FROM " + self.schema_name + ".cat_node"
+            sql += " WHERE nodetype_id = '" + node_node_type_new + "'"
             rows = self.dao.get_rows(sql)
             utils_giswater.fillComboBox("node_nodecat_id", rows)
-
-
-    def edit_change_elem_type_get_value_3(self, index):   #@UnusedVariable
-        self.value_combo3 = utils_giswater.getWidgetText("node_nodecat_id")
 
 
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
 
-        # Update node_type in the database
-        sql = "UPDATE "+self.schema_name+".v_edit_node"
-        sql += " SET node_type ='"+self.value_combo2+"'"
-        if self.value_combo3 != 'null':
-            sql += ", nodecat_id='"+self.value_combo3+"'"
-        sql += " WHERE node_id ='"+self.node_id+"'"
-        self.controller.execute_sql(sql)
+        self.controller.log_info("edit_change_elem_type_accept")
+        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
+        node_nodecat_id = utils_giswater.getWidgetText("node_nodecat_id")        
+        if node_node_type_new != "null":
+            
+            # TODO: Check SQL field names
+            # Update node_type in the database
+            sql = "UPDATE "+self.schema_name+".v_edit_node"
+            sql += " SET node_type = '" + node_node_type_new + "'"
+            if node_nodecat_id != 'null':
+                sql += ", nodecat_id = '" + node_nodecat_id + "'"
+            sql += " WHERE node_id = '" + self.node_id + "'"
+            self.controller.log_info(sql)
+            self.controller.execute_sql(sql)
 
-        # Show message to the user
-        message = "Node type has been update!"
-        self.controller.show_info(message, context_name='ui_message')
+            # Show message to the user
+            message = "Node type has been update!"
+            self.controller.show_info(message)
 
         # Close form
         self.close_dialog()

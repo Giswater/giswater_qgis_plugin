@@ -98,12 +98,10 @@ class Go2Epa(ParentAction):
         self.dlg_go2epa.btn_cancel.pressed.connect(self.dlg_go2epa.close)
         self.controller.log_info(str(self.project_type))
         if self.project_type == 'ws':
-            self.dlg_go2epa.btn_opt_hs.setText("Options")
-            self.dlg_go2epa.btn_time_opt.setText("Times")
-            self.dlg_go2epa.btn_scensel_time.setText("Dscenario Selector")
+            self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
-            self.dlg_go2epa.btn_opt_hs.clicked.connect(self.ws_options)
-            self.dlg_go2epa.btn_time_opt.clicked.connect(self.ws_times)
+            self.dlg_go2epa.btn_options.clicked.connect(self.ws_options)
+            self.dlg_go2epa.btn_times.clicked.connect(self.ws_times)
             tableleft = "sector"
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
@@ -113,15 +111,13 @@ class Go2Epa(ParentAction):
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
-            self.dlg_go2epa.btn_scensel_time.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg_go2epa.btn_hs_ds.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         if self.project_type == 'ud':
-            self.dlg_go2epa.btn_opt_hs.setText("Hydrology selector")
-            self.dlg_go2epa.btn_time_opt.setText("Options")
-            self.dlg_go2epa.btn_scensel_time.setText("Times")
-            self.dlg_go2epa.btn_opt_hs.clicked.connect(self.ud_hydrology_selector)
-            self.dlg_go2epa.btn_time_opt.clicked.connect(self.ud_options)
-            self.dlg_go2epa.btn_scensel_time.clicked.connect(self.ud_times)
+            self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
+            self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
+            self.dlg_go2epa.btn_options.clicked.connect(self.ud_options)
+            self.dlg_go2epa.btn_times.clicked.connect(self.ud_times)
             tableleft = "sector"
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"

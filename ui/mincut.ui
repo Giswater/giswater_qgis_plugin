@@ -50,7 +50,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="id">
+   <widget class="QLineEdit" name="result_id">
     <property name="geometry">
      <rect>
       <x>395</x>
@@ -60,7 +60,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>id</string>
+     <string>result_id</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
