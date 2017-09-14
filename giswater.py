@@ -248,7 +248,7 @@ class Giswater(QObject):
                    
             # Manage Map Tools         
             if int(index_action) == 16:
-                map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action, self.srid)
+                map_tool = MoveNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 17:
                 map_tool = DeleteNodeMapTool(self.iface, self.settings, action, index_action)
             elif int(index_action) == 20:

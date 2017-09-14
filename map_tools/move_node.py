@@ -30,12 +30,11 @@ class MoveNodeMapTool(ParentMapTool):
     ''' Button 16. Move node
     Execute SQL function: 'gw_fct_node2arc' '''        
 
-    def __init__(self, iface, settings, action, index_action, srid):
+    def __init__(self, iface, settings, action, index_action):
         ''' Class constructor '''        
         
         # Call ParentMapTool constructor     
         super(MoveNodeMapTool, self).__init__(iface, settings, action, index_action)  
-        self.srid = srid  
 
         # Vertex marker
         self.vertexMarker = QgsVertexMarker(self.canvas)
@@ -64,15 +63,13 @@ class MoveNodeMapTool(ParentMapTool):
     def move_node(self, node_id, point):
         ''' Move selected node to the current point '''  
            
-        if self.srid is None:
-            self.srid = self.settings.value('db/srid')  
-        if self.schema_name is None:
-            self.schema_name = self.settings.value('db/schema_name')               
+        srid = self.plugin_settings_value('srid')                 
                    
         # Update node geometry
-        the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(self.srid) + ")";
-        sql = "UPDATE "+self.schema_name+".node SET the_geom = "+the_geom
-        sql+= " WHERE node_id = '"+node_id+"'"
+        the_geom = "ST_GeomFromText('POINT(" + str(point.x()) + " " + str(point.y()) + ")', " + str(srid) + ")";
+        sql = "UPDATE "+self.schema_name+".node SET the_geom = " + the_geom
+        sql+= " WHERE node_id = '" + node_id + "'"
+        self.controller.log_info(sql)
         status = self.controller.execute_sql(sql) 
         if status:
             # Show message before executing

@@ -541,20 +541,24 @@ class Edit(ParentAction):
             self.controller.show_warning(message, context_name='ui_message')
             return
 
+        # Get SRID
+        srid = self.controller.plugin_settings_value('srid')   
+        self.controller.log_info(str(srid)) 
+        
         # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + element_id + "'"
+        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + str(element_id) + "'"
         row = self.dao.get_row(sql)
+        
         # If element already exist perform an UPDATE
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
-                # TODO: Parametrize SRID
                 sql = "UPDATE " + self.schema_name + ".element"
                 sql += " SET elementcat_id = '" + elementcat_id + "', state = '" + state + "', location_type = '" + location_type + "'"
                 sql += ", workcat_id_end = '" + workcat_id_end + "', workcat_id = '" + workcat_id + "', buildercat_id = '" + buildercat_id + "', ownercat_id = '" + ownercat_id + "'"
                 sql += ", rotation = '" + rotation + "',comment = '" + comment + "', annotation = '" + annotation + "', observ = '" + observ + "', link = '" + link + "', verified = '" + verified + "'"
-                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + '), 25831)'
-                sql += " WHERE element_id = '" + element_id + "'"
+                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+                sql += " WHERE element_id = '" + element_id + "'"              
                 status = self.controller.execute_sql(sql)
                 if status:
                     self.ed_add_to_feature("element", element_id)
@@ -568,7 +572,7 @@ class Edit(ParentAction):
             sql += " VALUES ('" + element_id + "', '" + elementcat_id + "', '" + state + "', '" + location_type + "', '"
             sql += workcat_id + "', '" + buildercat_id + "', '" + ownercat_id + "', '" + rotation + "', '" + comment + "', '"
             sql += annotation + "','" + observ + "','" + link + "','" + verified + "','" + workcat_id_end + "',"
-            sql += "ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + '), 25831))'
+            sql += "ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"         
             status = self.controller.execute_sql(sql)
             if status:
                 self.ed_add_to_feature("element", element_id)
