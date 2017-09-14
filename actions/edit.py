@@ -326,8 +326,6 @@ class Edit(ParentAction):
 
         # Fill combo boxes
         self.populate_combo("doc_type", "doc_type")
-        # TODO la tabla cat_tag no exixte
-        # self.populate_combo("tagcat_id", "cat_tag")
 
         # Adding auto-completion to a QLineEdit
         self.edit = self.dlg.findChild(QLineEdit, "doc_id")

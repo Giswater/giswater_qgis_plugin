@@ -250,6 +250,8 @@ class Master(ParentAction):
         aux_widget.setText(str(psector_id))
         self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
         self.controller.execute_sql(sql)
+        message = "Values has been updated"
+        self.controller.show_info(message, context_name='ui_message')
 
 
     def master_config_master(self):
