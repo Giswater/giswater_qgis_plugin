@@ -73,10 +73,10 @@ CREATE SEQUENCE "element_x_connec_seq"
 -- Table: system structure 
 -- ----------------------------
 
-CREATE TABLE cat_feature(
+CREATE TABLE "cat_feature"(
 id character varying(30) NOT NULL,
+system_id character varying(30),
 feature_type character varying(30),
-"descript" text,
 CONSTRAINT cat_feature_pkey PRIMARY KEY (id)
 );
 
