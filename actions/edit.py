@@ -188,13 +188,16 @@ class Edit(ParentAction):
         Combo to select new node_type.id
         Combo to select new cat_node.id
         """
-
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 28)
-
         # Check if at least one node is checked
         layer = self.iface.activeLayer()
+        if layer is None:
+            message = "You have to select a layer"
+            self.controller.show_info(message, context_name='ui_message')
+            return False
+
         count = layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
@@ -207,29 +210,32 @@ class Edit(ParentAction):
         # Get selected features (nodes)
         features = layer.selectedFeatures()
         feature = features[0]
+
         # Get node_id form current node
         self.node_id = feature.attribute('node_id')
-
         # Get node_type from current node
-        node_type = feature.attribute('node_type')
+        node_type = feature.attribute('nodetype_id')
 
         # Create the dialog, fill node_type and define its signals
         dlg = ChangeNodeType()
+        utils_giswater.setDialog(dlg)
+
         dlg.node_node_type.setText(node_type)
         dlg.node_type_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
         dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value_2)
         dlg.node_nodecat_id.currentIndexChanged.connect(self.edit_change_elem_type_get_value_3)
         dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
-        dlg.btn_cancel.pressed.connect(self.close_dialog)
+        dlg.btn_cancel.pressed.connect(dlg.close)
 
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         rows = self.dao.get_rows(sql)
-        utils_giswater.setDialog(dlg)
+
         utils_giswater.fillComboBox("node_type_type_new", rows)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(dlg, 'change_node_type')
+
         dlg.exec_()
 
     def set_icon(self, widget, indx):
