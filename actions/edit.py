@@ -9,6 +9,7 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit,QPushButton
+from PyQt4.QtGui import QIcon
 from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
@@ -114,14 +115,7 @@ class Edit(ParentAction):
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()
         if self.project_type == 'ws':
-            self.dlg.check_node_sink.setEnabled(False)
-            self.dlg.check_node_flow_regulator.setEnabled(False)
-            self.dlg.check_node_exit_upper_node_entry.setEnabled(False)
-            self.dlg.check_arc_intersection_without_node.setEnabled(False)
-            self.dlg.check_inverted_arcs.setEnabled(False)
-        if self.project_type == 'ud':
-            self.dlg.check_topology_coherence.setEnabled(False)
-
+            self.dlg.tab_review.removeTab(1)
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.edit_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
@@ -194,13 +188,19 @@ class Edit(ParentAction):
             Combo to select new node_type.id
             Combo to select new cat_node.id
         """
-        
+
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 28)
-
-        # Check if at least one node is checked
+        
+        # Check if any active layer
         layer = self.iface.activeLayer()
+        if layer is None:
+            message = "You have to select a layer"
+            self.controller.show_info(message, context_name='ui_message')
+            return
+
+        # Check if at least one node is checked          
         count = layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
@@ -219,24 +219,30 @@ class Edit(ParentAction):
 
         # Create the dialog, fill node_type and define its signals
         dlg = ChangeNodeType()
+        utils_giswater.setDialog(dlg)
+
         dlg.node_node_type.setText(node_type)
         dlg.node_type_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
         dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value_2)
         dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
         dlg.btn_cancel.pressed.connect(dlg.close)        
-           
 
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
         self.controller.log_info(sql)
         rows = self.dao.get_rows(sql)
-        utils_giswater.setDialog(dlg)
+
         utils_giswater.fillComboBox("node_type_type_new", rows)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(dlg, 'change_node_type')
+
         dlg.exec_()
 
+    def set_icon(self, widget, indx):
+        self.plugin_dir = os.path.dirname(__file__)[:-7]
+        self.icon_folder = self.plugin_dir + '\icons'
+        widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
 
     def edit_add_element(self):
         """ Button 33: Add element """
@@ -251,6 +257,7 @@ class Edit(ParentAction):
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
+
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'element')
@@ -286,6 +293,7 @@ class Edit(ParentAction):
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
+        self.set_icon(self.dlg.add_geom, "129.png")
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
@@ -816,7 +824,8 @@ class Edit(ParentAction):
             utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
 
         if self.project_type == 'ws':
-            self.dlg_config_edit.tab_config.removeTab(2)
+            self.dlg_config_edit.tab_config.removeTab(1)
+            self.dlg_config_edit.tab_config.removeTab(1)
         elif self.project_type == 'ud':
             self.dlg_config_edit.tab_config.removeTab(1)
 

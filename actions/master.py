@@ -6,27 +6,30 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QTime, Qt, QPoint
+from PyQt4.QtCore import QTime
+from PyQt4.QtCore import Qt, QPoint
 from PyQt4.QtGui import QComboBox, QCheckBox, QDateEdit, QPushButton, QSpinBox, QTimeEdit
 from PyQt4.QtGui import QDoubleValidator, QLineEdit, QTabWidget, QTableView, QAbstractItemView
+from PyQt4.QtGui import QTableWidget
+from PyQt4.QtGui import QTableWidgetItem
+
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest
-
 import os
 import sys
 from datetime import datetime
 from functools import partial
 
-plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(plugin_path)
-import utils_giswater
-
-from ..ui.config_master import ConfigMaster                 # @UnresolvedImport
+from ..ui.config_master import ConfigMaster
 from ..ui.psector_management import Psector_management      # @UnresolvedImport
-from ..ui.multirow_selector import Multirow_selector        # @UnresolvedImport
 from ..ui.plan_psector import Plan_psector                  # @UnresolvedImport
 from ..ui.plan_estimate_result_new import EstimateResultNew                # @UnresolvedImport
 from ..ui.plan_estimate_result_selector import EstimateResultSelector      # @UnresolvedImport
+from ..ui.multirow_selector import Multirow_selector       # @UnresolvedImport
+
+plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(plugin_path)
+import utils_giswater
 
 from parent import ParentAction
 
@@ -217,12 +220,37 @@ class Master(ParentAction):
         # Set signals
         self.dlg_psector_mangement.btn_accept.pressed.connect(self.charge_psector)
         self.dlg_psector_mangement.btn_cancel.pressed.connect(self.dlg_psector_mangement.close)
+        self.dlg_psector_mangement.btn_save.pressed.connect(partial(self.save_table, self.tbl_psm, "plan_psector", column_id))
         self.dlg_psector_mangement.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.tbl_psm, table_name, column_id))
+        self.dlg_psector_mangement.btn_current_psector.clicked.connect(self.update_current_psector)
         self.dlg_psector_mangement.txt_name.textChanged.connect(partial(self.filter_by_text, self.tbl_psm, self.dlg_psector_mangement.txt_name, "plan_psector"))
 
-        self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
+        self.fill_table_psector(self.tbl_psm, "plan_psector", column_id)
         self.dlg_psector_mangement.exec_()
-        
+
+
+    def update_current_psector(self):
+        selected_list = self.tbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message, context_name='ui_message')
+            return
+        row = selected_list[0].row()
+        psector_id = self.tbl_psm.model().record(row).value("psector_id")
+        sql = "SELECT * FROM " + self.schema_name + ".selector_psector WHERE cur_user = current_user"
+        rows = self.controller.get_rows(sql)
+        if rows:
+            sql = "UPDATE " + self.schema_name + ".selector_psector SET psector_id="
+            sql += "'" + str(psector_id) + "' WHERE cur_user=current_user"
+        else:
+            sql = 'INSERT INTO ' + self.schema_name + '.selector_psector (psector_id, cur_user)'
+            sql += " VALUES ('" + str(psector_id) + "', current_user)"
+
+        aux_widget = QLineEdit()
+        aux_widget.setText(str(psector_id))
+        self.insert_or_update_config_param_curuser(aux_widget, "psector_vdefault", "config_param_user")
+        self.controller.execute_sql(sql)
+
 
     def master_config_master(self):
         """ Button 99: Open a dialog showing data from table 'config_param_system' """
@@ -238,37 +266,27 @@ class Master(ParentAction):
         self.dlg_config_master.btn_accept.pressed.connect(self.master_config_master_accept)
         self.dlg_config_master.btn_cancel.pressed.connect(self.dlg_config_master.close)
 
+        # Fill all QLineEdit
+        sql = "SELECT parameter, value FROM " + self.schema_name + ".config_param_system"
+        rows = self.dao.get_rows(sql)
+        self.master_options_fill_textview(rows)
+
         self.om_visit_absolute_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
         self.doc_absolute_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
-        self.om_visit_path = self.dlg_config_master.findChild(QLineEdit, "om_visit_absolute_path")
-        self.doc_path = self.dlg_config_master.findChild(QLineEdit, "doc_absolute_path")
 
-        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_path))
-        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_path))
-        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_url").clicked.connect(partial(self.open_web_browser, self.om_visit_absolute_path))
+        self.dlg_config_master.findChild(QPushButton, "om_path_doc").clicked.connect(partial(self.open_file_dialog, self.om_visit_absolute_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_url").clicked.connect(partial(self.open_web_browser, self.doc_absolute_path))
+        self.dlg_config_master.findChild(QPushButton, "doc_path_doc").clicked.connect(partial(self.open_file_dialog, self.doc_absolute_path))
 
-        # Get om_visit_absolute_path and doc_absolute_path from config_param_system
-        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
-        sql += " WHERE parameter = 'om_visit_absolute_path'"
-        row = self.dao.get_row(sql)
-        if row:
-            path = str(row['value'])
-            self.om_visit_absolute_path.setText(path)
-
-        sql = "SELECT value FROM " + self.schema_name + ".config_param_system"
-        sql += " WHERE parameter = 'doc_absolute_path'"
-        row = self.dao.get_row(sql)
-        if row:
-            path = str(row['value'])
-            self.doc_absolute_path.setText(path)
 
         # QCheckBox
         self.chk_psector_enabled = self.dlg_config_master.findChild(QCheckBox, 'chk_psector_enabled')
-        self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
+        #self.slope_arc_direction = self.dlg_config_master.findChild(QCheckBox, 'slope_arc_direction')
 
         if self.project_type == 'ws':
-            self.slope_arc_direction.setEnabled(False)
+            self.dlg_config_master.tab_config.removeTab(1)
+            self.dlg_config_master.tab_config.removeTab(1)
 
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.dao.get_rows(sql)
@@ -281,8 +299,12 @@ class Master(ParentAction):
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
         self.master_options_get_data("config")
         self.master_options_get_data("config_param_system")
-
         self.dlg_config_master.exec_()
+
+
+    def master_options_fill_textview(self, rows):
+        for row in rows:
+            utils_giswater.setWidgetText(str(row[0]), str(row[1]))
 
 
     def master_options_get_data(self, tablename):
@@ -351,7 +373,7 @@ class Master(ParentAction):
             sql += "'" + widget.text() + "' WHERE parameter='" + parameter + "'"
         else:
             sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value)'
-            sql += " VALUES ('" + parameter + "', " + widget.text() + "'))"
+            sql += " VALUES ('" + parameter + "',  " + widget.text() + ")"
         self.controller.execute_sql(sql)
 
 
@@ -430,7 +452,6 @@ class Master(ParentAction):
 
         self.controller.execute_sql(sql)
 
-
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
         """ Insert or update values in tables with current_user control """
 
@@ -438,23 +459,23 @@ class Master(ParentAction):
         rows = self.controller.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
-            if widget.currentText() != "":
+            if utils_giswater.getWidgetText(widget) != "":
                 for row in rows:
                     if row[1] == parameter:
                         exist_param = True
                 if exist_param:
                     sql = "UPDATE " + self.schema_name + "." + tablename + " SET value="
                     if widget.objectName() != 'state_vdefault':
-                        sql += "'" + widget.currentText() + "' WHERE parameter='" + parameter + "'"
+                        sql += "'" + utils_giswater.getWidgetText(widget) + "' WHERE parameter='" + parameter + "'"
                     else:
-                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "')"
+                        sql += "(SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "')"
                         sql += " WHERE parameter = 'state_vdefault' "
                 else:
                     sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                     if widget.objectName() != 'state_vdefault':
-                        sql += " VALUES ('" + parameter + "', '" + widget.currentText() + "', current_user)"
+                        sql += " VALUES ('" + parameter + "', '" + utils_giswater.getWidgetText(widget) + "', current_user)"
                     else:
-                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + widget.currentText() + "'), current_user)"
+                        sql += " VALUES ('" + parameter + "', (SELECT id FROM " + self.schema_name + ".value_state WHERE name ='" + utils_giswater.getWidgetText(widget) + "'), current_user)"
         else:
             for row in rows:
                 if row[1] == parameter:
@@ -467,7 +488,6 @@ class Master(ParentAction):
                 sql = 'INSERT INTO ' + self.schema_name + '.' + tablename + '(parameter, value, cur_user)'
                 _date = widget.dateTime().toString('yyyy-MM-dd')
                 sql += " VALUES ('" + parameter + "', '" + _date + "', current_user)"
-
         self.controller.execute_sql(sql)
 
 
@@ -500,7 +520,6 @@ class Master(ParentAction):
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
         self.dlg_psector_mangement.close()
         self.master_new_psector(psector_id, True)
-
 
     def snapping(self, layer_view, tablename, table_view, elem_type):
         map_canvas = self.iface.mapCanvas()
@@ -789,4 +808,3 @@ class Master(ParentAction):
         
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
-        
