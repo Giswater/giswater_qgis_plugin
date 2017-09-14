@@ -974,7 +974,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="state_2">
+   <widget class="QLineEdit" name="customer_state">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -990,7 +990,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="id">
+   <widget class="QLineEdit" name="result_id_2">
     <property name="enabled">
      <bool>false</bool>
     </property>

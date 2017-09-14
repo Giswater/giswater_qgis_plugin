@@ -100,7 +100,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.group_layers_arc = ["Pipe"]
 
         self.state = self.dlg.findChild(QLineEdit, "state")
-        self.id = self.dlg.findChild(QLineEdit, "id")
+        self.result_id = self.dlg.findChild(QLineEdit, "result_id")
+        self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
         self.work_order = self.dlg.findChild(QLineEdit, "work_order")
         self.street = self.dlg.findChild(QLineEdit, "street")
         self.number = self.dlg.findChild(QLineEdit, "number")
@@ -278,7 +279,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.street_fin = self.dlg_fin.findChild(QLineEdit, "street")
         self.number_fin = self.dlg_fin.findChild(QLineEdit, "number")
 
-        id_fin = str(self.id.text())
+        id_fin = str(self.result_id.text())
         street_fin = str(self.street.text())
         number_fin = str(self.number.text())
 
@@ -305,7 +306,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def accept_save_data(self,action):
 
         mincut_result_state = self.state.text()
-        id_ = self.id.text()
+        id_ = self.result_id.text()
         # exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
@@ -496,10 +497,10 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def check_id(self):
         ''' Check if user entered ID '''
-
-        self.id_text = self.id.text()
-        if self.id_text == "id":
-            message = "You need to enter id"
+        self.controller.log_info(str(self.customer_state.text()))
+        customer_state = self.customer_state.text()
+        if customer_state == "":
+            message = "You need to enter customer code"
             self.controller.show_info_box(message, context_name='ui_message')
             return 0
         else:
