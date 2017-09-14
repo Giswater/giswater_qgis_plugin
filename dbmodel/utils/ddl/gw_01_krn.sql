@@ -109,15 +109,6 @@ CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE "element_type" (
-"id" varchar(30)   NOT NULL,
-"type" varchar(30),
-"active" boolean,
-"code_autofill" boolean,
-"descript" text,
-CONSTRAINT element_type_pkey PRIMARY KEY (id)
-);
-
 
 CREATE TABLE "connec_type" (
 "id" varchar(30)   NOT NULL,
@@ -130,39 +121,37 @@ CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
 
 
+CREATE TABLE "element_type" (
+"id" varchar(30)   NOT NULL,
+"type" varchar(30),
+"active" boolean,
+"code_autofill" boolean,
+"descript" text,
+CONSTRAINT element_type_pkey PRIMARY KEY (id)
+);
+
 
 -- ----------------------------
 -- Table: domain value system structure 
 -- ----------------------------
 
 
-CREATE TABLE arc_type_cat_type (
-  id character varying(30) NOT NULL,
-  shortcut_key varchar(30) ,
-  orderby int2,
-  i18n character varying(30),
-  descript text,
-  CONSTRAINT arc_type_cat_type_pkey PRIMARY KEY (id)
+CREATE TABLE sys_feature_type (
+  id character varying(30)  PRIMARY KEY
 );
 
 
-CREATE TABLE node_type_cat_type (
-  id character varying(30) NOT NULL,
-  shortcut_key varchar(30),
-  orderby int2,
+CREATE TABLE sys_feature_cat (
+  id character varying(30) PRIMARY KEY,
+  type character varying(30),
+  orderby integer,
   i18n character varying(30),
-  descript text,
-  CONSTRAINT node_type_cat_type_pkey PRIMARY KEY (id)
+  shortcut_key character varying(100)
 );
 
-CREATE TABLE connec_type_cat_type (
-  id character varying(30) NOT NULL,
-  shortcut_key varchar(30),
-  orderby int2,
-  i18n character varying(30),
-  descript text,
-  CONSTRAINT connec_type_cat_type_pkey PRIMARY KEY (id)
-);
+
+
+
 
 -- ----------------------------
 -- Table: Catalogs
