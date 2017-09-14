@@ -43,8 +43,50 @@ class SearchPlus(QObject):
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
-        
+
+        #self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_text))
+
+        self.dlg.lineEdit.textChanged.connect(partial(self.filter_by_editline))
+
         self.enabled = True
+        self.times = 0
+
+    def filter_by_text(self):
+        self.times += 1
+        list_filter = []
+
+
+        # # No funciona
+        # for x in range(self.dlg.network_code.count()-1):
+        #     self.controller.log_info(str(x))
+        #     self.dlg.network_code.removeItem(x)
+
+
+        curtext = self.dlg.network_code.currentText()
+        for item in self.list_all:
+            if self.dlg.network_code.currentText() in item:
+                list_filter.append(item)
+
+        if len(list_filter) > 0:
+            self.controller.log_info(str(list_filter))
+            self.controller.log_info(str("t1"))
+
+            utils_giswater.fillComboBoxList(self.dlg.network_code, list_filter, allow_nulls=True, clear_combo=False)
+            self.dlg.network_code.setText(curtext)
+
+            self.controller.log_info(str("t2"))
+
+
+
+    def filter_by_editline(self):
+        list_filter = []
+        for item in self.list_all:
+            if self.dlg.lineEdit.text() in item:
+                list_filter.append(item)
+        if len(list_filter) > 0:
+            self.controller.log_info(str(list_filter))
+            utils_giswater.fillComboBoxList(self.dlg.network_code, list_filter, allow_nulls=True, clear_combo=True)
+
 
 
     def load_config_data(self):
