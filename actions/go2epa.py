@@ -34,7 +34,7 @@ from parent import ParentAction
 class Go2Epa(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """
+        """ Class to control toolbar 'go2epa' """
         self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
 
@@ -82,51 +82,51 @@ class Go2Epa(ParentAction):
         self.project_name = self.gsw_settings.value('PROJECT_NAME')
 
         # Create dialog
-        self.dlg_go2epa = FileManager()
-        utils_giswater.setDialog(self.dlg_go2epa)
-        # self.dlg_go2epa.setWindowTitle("Options Table")
+        self.dlg = FileManager()
+        utils_giswater.setDialog(self.dlg)
+        # self.dlg.setWindowTitle("Options Table")
 
         # Set widgets
-        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
-        self.dlg_go2epa.txt_result_name.setText(self.project_name)
+        self.dlg.txt_file_inp.setText(self.file_inp)
+        self.dlg.txt_file_rpt.setText(self.file_rpt)
+        self.dlg.txt_result_name.setText(self.project_name)
 
         # Set signals
-        self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
-        self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
-        self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg_go2epa.btn_cancel.pressed.connect(self.dlg_go2epa.close)
+        self.dlg.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
+        self.dlg.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
+        self.dlg.btn_accept.clicked.connect(self.go2epa_accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
         self.controller.log_info(str(self.project_type))
         if self.project_type == 'ws':
-            self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
-            self.dlg_go2epa.chk_export_subcatch.setVisible(False)
-            self.dlg_go2epa.btn_options.clicked.connect(self.ws_options)
-            self.dlg_go2epa.btn_times.clicked.connect(self.ws_times)
+            self.dlg.btn_hs_ds.setText("Dscenario Selector")
+            self.dlg.chk_export_subcatch.setVisible(False)
+            self.dlg.btn_options.clicked.connect(self.ws_options)
+            self.dlg.btn_times.clicked.connect(self.ws_times)
             tableleft = "sector"
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
             tableleft = "cat_dscenario"
             tableright = "inp_selector_dscenario"
             field_id_left = "dscenario_id"
             field_id_right = "dscenario_id"
-            self.dlg_go2epa.btn_hs_ds.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_hs_ds.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         if self.project_type == 'ud':
-            self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
-            self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
-            self.dlg_go2epa.btn_options.clicked.connect(self.ud_options)
-            self.dlg_go2epa.btn_times.clicked.connect(self.ud_times)
+            self.dlg.btn_hs_ds.setText("Hydrology selector")
+            self.dlg.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
+            self.dlg.btn_options.clicked.connect(self.ud_options)
+            self.dlg.btn_times.clicked.connect(self.ud_times)
             tableleft = "sector"
             tableright = "inp_selector_sector"
             field_id_left = "sector_id"
             field_id_right = "sector_id"
-            self.dlg_go2epa.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
+            self.dlg.btn_sector_selection.pressed.connect(partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right))
 
         # Manage i18n of the form and open it
-        self.controller.translate_form(self.dlg_go2epa, 'file_manager')
-        self.dlg_go2epa.exec_()
+        self.controller.translate_form(self.dlg, 'file_manager')
+        self.dlg.exec_()
 
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right):
@@ -454,7 +454,7 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select INP file")
         self.file_inp = QFileDialog.getSaveFileName(None, msg, "", '*.inp')
-        self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
+        self.dlg.txt_file_inp.setText(self.file_inp)
 
 
     def go2epa_select_file_rpt(self):
@@ -471,7 +471,7 @@ class Go2Epa(ParentAction):
         os.chdir(folder_path)
         msg = self.controller.tr("Select RPT file")
         self.file_rpt = QFileDialog.getSaveFileName(None, msg, "", '*.rpt')
-        self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
+        self.dlg.txt_file_rpt.setText(self.file_rpt)
 
 
     def go2epa_accept(self):
@@ -488,7 +488,7 @@ class Go2Epa(ParentAction):
         self.gsw_settings.setValue('PROJECT_NAME', self.project_name)
 
         # Close form
-        self.close_dialog(self.dlg_go2epa)
+        self.close_dialog()
 
 
     def go2epa_express(self):

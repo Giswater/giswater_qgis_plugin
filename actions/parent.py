@@ -244,10 +244,16 @@ class ParentAction():
             dlg = self.dlg
         try:
             dlg.close()
+            map_tool = self.iface.mapCanvas().mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one 
+            if map_tool.toolName() == '':
+                self.iface.actionPan().trigger() 
         except AttributeError:
             pass
         
+        
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right):
+        
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -279,9 +285,11 @@ class ParentAction():
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 
+
     def hide_colums(self, widget, comuns_to_hide):
         for i in range(0, len(comuns_to_hide)):
             widget.hideColumn(comuns_to_hide[i])
+
 
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
         """ """

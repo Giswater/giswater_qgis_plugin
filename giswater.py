@@ -102,8 +102,7 @@ class Giswater(QObject):
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)        
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
 
         # Define signals
         self.set_signals()
@@ -125,39 +124,40 @@ class Giswater(QObject):
     
     def manage_action(self, index_action, function_name):  
         
-        if function_name is not None:
-            try:
-                action = self.actions[index_action]                
+        if function_name is None:
+            return 
+        
+        try:
+            action = self.actions[index_action]                
 
-                # Basic toolbar actions
-                if int(index_action) in (41, 48, 32):
-                    callback_function = getattr(self.basic, function_name)  
-                    action.triggered.connect(callback_function)
-                # Mincut toolbar actions
-                elif int(index_action) == 26:
-                    callback_function = getattr(self.mincut, 'mg_mincut')
-                    action.triggered.connect(callback_function)
-                elif int(index_action) == 27:
-                    callback_function = getattr(self.mincutManagement, 'mg_mincut_management')                    
-                # Edit toolbar actions
-                elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
-                    callback_function = getattr(self.edit, function_name)
-                    action.triggered.connect(callback_function)
-                # Go2epa toolbar actions
-                elif int(index_action) in (23, 24, 25, 36):
-                    callback_function = getattr(self.go2epa, function_name)
-                    action.triggered.connect(callback_function)
-                # Master toolbar actions
-                elif int(index_action) in (45, 46, 47, 38, 49, 99):
-                    callback_function = getattr(self.master, function_name)
-                    action.triggered.connect(callback_function)
-                # Generic function
-                else:        
-                    water_soft = function_name[:2] 
-                    callback_function = getattr(self, water_soft+'_generic')  
-                    action.triggered.connect(partial(callback_function, function_name))
-            except AttributeError:
-                action.setEnabled(False)                
+            # Basic toolbar actions
+            if int(index_action) in (41, 48, 32):
+                callback_function = getattr(self.basic, function_name)  
+                action.triggered.connect(callback_function)
+            # Mincut toolbar actions
+            elif int(index_action) in (26, 27):
+                callback_function = getattr(self.mincut, function_name)
+                action.triggered.connect(callback_function)            
+            # Edit toolbar actions
+            elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
+                callback_function = getattr(self.edit, function_name)
+                action.triggered.connect(callback_function)
+            # Go2epa toolbar actions
+            elif int(index_action) in (23, 24, 25, 36):
+                callback_function = getattr(self.go2epa, function_name)
+                action.triggered.connect(callback_function)
+            # Master toolbar actions
+            elif int(index_action) in (45, 46, 47, 38, 49, 99):
+                callback_function = getattr(self.master, function_name)
+                action.triggered.connect(callback_function)
+            # Generic function
+            else:        
+                callback_function = getattr(self, 'action_triggered')  
+                self.controller.log_info(function_name)
+                action.triggered.connect(partial(callback_function, function_name))
+                
+        except AttributeError:
+            action.setEnabled(False)                
 
      
     def create_action(self, index_action=None, text='', toolbar=None, menu=None, is_checkable=True, function_name=None, parent=None):
@@ -239,9 +239,7 @@ class Giswater(QObject):
         if function_name:
             
             map_tool = None
-            # TODO: Bug checking actions randomly
-            #if int(index_action) in (19, 23, 24, 25, 36, 41, 48, 98, 99):
-            if int(index_action) in (98, 99):
+            if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 36, 41, 45, 46, 47, 48, 49, 98, 99):
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
@@ -782,17 +780,13 @@ class Giswater(QObject):
     def manage_map_tools(self):
         ''' Manage map tools '''
         
-        self.set_map_tool('mg_move_node')
-        self.set_map_tool('mg_delete_node')
-        self.set_map_tool('mg_mincut')
-        self.set_map_tool('mg_flow_trace')
-        self.set_map_tool('mg_flow_exit')
-        self.set_map_tool('mg_connec_tool')
-        self.set_map_tool('mg_draw_profiles')
-        self.set_map_tool('ed_flow_regulator')
-        self.set_map_tool('mg_mincut')
-        self.set_map_tool('mg_replace_node')
-        #self.set_map_tool('mg_dimensions')
+        self.set_map_tool('map_tool_move_node')
+        self.set_map_tool('map_tool_delete_node')
+        self.set_map_tool('map_tool_flow_trace')
+        self.set_map_tool('map_tool_flow_exit')
+        self.set_map_tool('map_tool_connec_tool')
+        self.set_map_tool('map_tool_draw_profiles')
+        self.set_map_tool('map_tool_replace_node')
                 
         
     def set_map_tool(self, map_tool_name):
@@ -838,36 +832,10 @@ class Giswater(QObject):
             self.enable_action(False, 23)
             self.enable_action(False, 24) 
             self.enable_action(False, 36)                          
-                
-                    
-    def ws_generic(self, function_name):   
-        ''' Water supply generic callback function '''
-        
-        try:
-            self.controller.check_actions(False)
-            map_tool = self.map_tools[function_name]
-            self.iface.mapCanvas().setMapTool(map_tool)             
-        except AttributeError as e:
-            self.controller.show_warning("AttributeError: "+str(e))            
-        except KeyError as e:
-            self.controller.show_warning("KeyError: "+str(e))    
+                        
             
-            
-    def ud_generic(self, function_name):   
-        ''' Urban drainage generic callback function '''
-        
-        try:        
-            self.controller.check_actions(False)
-            map_tool = self.map_tools[function_name]
-            self.iface.mapCanvas().setMapTool(map_tool)     
-        except AttributeError as e:
-            self.controller.show_warning("AttributeError: "+str(e))            
-        except KeyError as e:
-            self.controller.show_warning("KeyError: "+str(e))             
-            
-            
-    def mg_generic(self, function_name):   
-        ''' Management generic callback function '''
+    def action_triggered(self, function_name):   
+        ''' Action with corresponding funcion name has been triggered '''
         
         try:   
             if function_name in self.map_tools:          

@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit,QPushButton
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit
 from PyQt4.QtGui import QIcon
 from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
@@ -23,8 +23,8 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
-from ..ui.add_doc import Add_doc                    # @UnresolvedImport
-from ..ui.add_element import Add_element            # @UnresolvedImport             
+from ..ui.add_doc import AddDoc                    # @UnresolvedImport
+from ..ui.add_element import AddElement            # @UnresolvedImport             
 from ..ui.config_edit import ConfigEdit             # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools       # @UnresolvedImport
 
@@ -35,7 +35,7 @@ from parent import ParentAction
 class Edit(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """
+        """ Class to control toolbar 'edit' """
         self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         # Get tables or views specified in 'db' config section
@@ -239,25 +239,25 @@ class Edit(ParentAction):
 
         dlg.exec_()
 
+
     def set_icon(self, widget, indx):
         self.plugin_dir = os.path.dirname(__file__)[:-7]
         self.icon_folder = self.plugin_dir + '\icons'
         widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
+
 
     def edit_add_element(self):
         """ Button 33: Add element """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
 
         # Create the dialog and signals
-        self.dlg = Add_element()
+        self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
-
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'element')
@@ -304,18 +304,16 @@ class Edit(ParentAction):
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
 
         # Create the dialog and signals
-        self.dlg = Add_doc()
+        self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.edit_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Get widgets
-        self.path = self.dlg.findChild(QLineEdit, "path")
-        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser, self.path))
-        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog, self.path))
+        self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
+        self.dlg.path_doc.clicked.connect(partial(self.open_file_dialog, "path"))
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')
@@ -328,9 +326,8 @@ class Edit(ParentAction):
         self.populate_combo("doc_type", "doc_type")
 
         # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit, "doc_id")
         self.completer = QCompleter()
-        self.edit.setCompleter(self.completer)
+        self.dlg.doc_id.setCompleter(self.completer)
 
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc "
@@ -452,6 +449,7 @@ class Edit(ParentAction):
         # Check if this document already exists
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc WHERE id = '" + doc_id + "'"
         row = self.dao.get_row(sql)
+        
         # If document already exist perform an UPDATE
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
@@ -563,7 +561,7 @@ class Edit(ParentAction):
                 if status:
                     self.ed_add_to_feature("element", element_id)
                     message = "Values has been updated"
-                    self.controller.show_info(message, context_name='ui_message')
+                    self.controller.show_info(message)
 
         # If element doesn't exist perform an INSERT
         else:
@@ -577,10 +575,10 @@ class Edit(ParentAction):
             if status:
                 self.ed_add_to_feature("element", element_id)
                 message = "Values has been updated"
-                self.controller.show_info(message, context_name='ui_message')
+                self.controller.show_info(message)
             if not status:
                 message = "Error inserting element in table, you need to review data"
-                self.controller.show_warning(message, context_name='ui_message')
+                self.controller.show_warning(message)
                 return
 
         self.close_dialog(self.dlg)
@@ -766,10 +764,10 @@ class Edit(ParentAction):
         """ Button 98: Open a dialog showing data from table 'config_param_user' """
 
         # Create the dialog and signals
-        self.dlg_config_edit = ConfigEdit()
-        utils_giswater.setDialog(self.dlg_config_edit)
-        self.dlg_config_edit.btn_accept.pressed.connect(self.edit_config_edit_accept)
-        self.dlg_config_edit.btn_cancel.pressed.connect(self.dlg_config_edit.close)
+        self.dlg = ConfigEdit()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_accept.pressed.connect(self.edit_config_edit_accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Set values from widgets of type QComboBox and dates
         # QComboBox Utils
@@ -826,60 +824,60 @@ class Edit(ParentAction):
             utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
 
         if self.project_type == 'ws':
-            self.dlg_config_edit.tab_config.removeTab(1)
-            self.dlg_config_edit.tab_config.removeTab(1)
+            self.dlg.tab_config.removeTab(1)
+            self.dlg.tab_config.removeTab(1)
         elif self.project_type == 'ud':
-            self.dlg_config_edit.tab_config.removeTab(1)
+            self.dlg.tab_config.removeTab(1)
 
-        self.dlg_config_edit.exec_()
+        self.dlg.exec_()
 
 
     def edit_config_edit_accept(self):
 
         if utils_giswater.isChecked("chk_state_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.state_vdefault, "state_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.state_vdefault, "state_vdefault", "config_param_user")
         else:
             self.delete_row("state_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_workcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.workcat_vdefault, "workcat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.workcat_vdefault, "workcat_vdefault", "config_param_user")
         else:
             self.delete_row("workcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_verified_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.verified_vdefault, "verified_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.verified_vdefault, "verified_vdefault", "config_param_user")
         else:
             self.delete_row("verified_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_builtdate_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
         else:
             self.delete_row("builtdate_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arccat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.arccat_vdefault, "arccat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.arccat_vdefault, "arccat_vdefault", "config_param_user")
         else:
             self.delete_row("arccat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_nodecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.nodecat_vdefault, "nodecat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.nodecat_vdefault, "nodecat_vdefault", "config_param_user")
         else:
             self.delete_row("nodecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_connecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.connecat_vdefault, "connecat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.connecat_vdefault, "connecat_vdefault", "config_param_user")
         else:
             self.delete_row("connecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
         else:
             self.delete_row("nodetype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arctype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.arctype_vdefault, "arctype_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.arctype_vdefault, "arctype_vdefault", "config_param_user")
         else:
             self.delete_row("arctype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_connectype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.connectype_vdefault, "connectype_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.connectype_vdefault, "connectype_vdefault", "config_param_user")
         else:
             self.delete_row("connectype_vdefault", "config_param_user")
 
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
-        self.dlg_config_edit.close()
+        self.close_dialog()
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
