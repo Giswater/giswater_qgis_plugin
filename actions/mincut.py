@@ -62,6 +62,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.connec_group = []
         self.arc_group = []
 
+        '''
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".node_type_cat_type "
         nodes = self.controller.get_rows(sql)
         for node in nodes:
@@ -76,7 +77,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         arcs = self.controller.get_rows(sql)
         for arc in arcs:
             self.arc_group.append(str(arc[0]))
-
+        '''
 
 
     def init_mincut_form(self):
@@ -446,7 +447,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.connec.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(connec_id) FROM " + self.schema_name + ".connec "
+        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec "
         row = self.controller.get_rows(sql)
 
         values = []
@@ -574,7 +575,14 @@ class MincutParent(ParentAction, MultipleSnapping):
         Attach that model to selected table '''
 
         widget_id = dialog.findChild(QLineEdit, id_)
-        element_id = widget_id.text()
+        #element_id = widget_id.text()
+        customer_code = widget_id.text()
+
+        sql = "SELECT connec_id FROM " + self.schema_name + ".connec WHERE customer_code = '" + customer_code + "'"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        element_id = str(rows[0][0])
 
         # Get all selected features
         for layer in self.group_pointers_connec:
