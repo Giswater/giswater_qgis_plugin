@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>162</height>
+    <width>348</width>
+    <height>115</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>30</y>
-     <width>261</width>
-     <height>111</height>
+     <y>10</y>
+     <width>331</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -32,9 +32,9 @@
     <widget class="QComboBox" name="network_code">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>20</x>
        <y>10</y>
-       <width>161</width>
+       <width>291</width>
        <height>25</height>
       </rect>
      </property>
@@ -50,9 +50,9 @@
     <widget class="QComboBox" name="network_geom_type">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>20</x>
        <y>40</y>
-       <width>161</width>
+       <width>291</width>
        <height>25</height>
       </rect>
      </property>
@@ -73,9 +73,9 @@
     <widget class="QComboBox" name="hydrometer_id">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>20</x>
        <y>40</y>
-       <width>161</width>
+       <width>291</width>
        <height>25</height>
       </rect>
      </property>
@@ -91,9 +91,9 @@
     <widget class="QComboBox" name="hydrometer_connec">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>20</x>
        <y>10</y>
-       <width>161</width>
+       <width>291</width>
        <height>25</height>
       </rect>
      </property>
@@ -114,9 +114,9 @@
     <widget class="QComboBox" name="adress_street">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>10</y>
-       <width>161</width>
+       <x>10</x>
+       <y>40</y>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
@@ -132,9 +132,9 @@
     <widget class="QComboBox" name="adress_number">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>220</x>
        <y>40</y>
-       <width>161</width>
+       <width>91</width>
        <height>25</height>
       </rect>
      </property>
@@ -147,31 +147,64 @@
       </property>
      </item>
     </widget>
-    <widget class="QLabel" name="lbl_street">
+    <widget class="QComboBox" name="adress_postal_code">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>10</y>
+       <width>91</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>PostCode</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QComboBox" name="adress_exploitation">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>71</width>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Street:</string>
+     <property name="editable">
+      <bool>true</bool>
      </property>
+     <item>
+      <property name="text">
+       <string>Exploitation</string>
+      </property>
+     </item>
     </widget>
-    <widget class="QLabel" name="lbl_number">
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>WorkCat</string>
+    </attribute>
+    <widget class="QComboBox" name="workcat_id">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>71</width>
+       <x>30</x>
+       <y>20</y>
+       <width>281</width>
        <height>25</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Number:</string>
+     <property name="editable">
+      <bool>true</bool>
      </property>
+     <item>
+      <property name="text">
+       <string>WorkCat</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>
