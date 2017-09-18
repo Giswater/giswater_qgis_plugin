@@ -12,24 +12,23 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 CREATE TABLE man_addfields_parameter (
 id serial PRIMARY KEY,
-name varchar(50),
+param_name varchar(50),
 featurecat_id varchar (30),
-nul boolean,
+is_null boolean,
+is_mandatory boolean,
 data_type text,
 field_length integer,
-decimals integer,
-units varchar(10),
+num_decimals integer,
 default_value text,
 form_label text,
-mandatory boolean,
-unique_value boolean, 
+form_widget text,
 dv_table text,
 dv_key_column text,
 dv_value_column text,
 sql_text text
 );
 --unique:  	name,featurecat_id
---fk: 		featurecat_id, data_type, units, dv_table, dv_key_column, dv_value_column
+--fk: 		featurecat_id, data_type, for_widget, dv_table, dv_key_column, dv_value_column
 
 
 CREATE TABLE man_addfields_value (
@@ -48,7 +47,7 @@ descript text
 );
 
 
-CREATE TABLE man_addfields_cat_units (
+CREATE TABLE man_addfields_cat_widgettype (
 id varchar(30) PRIMARY KEY,
 descript text
 );
