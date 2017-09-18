@@ -1040,43 +1040,34 @@ BEGIN
 		
 	
     ELSIF TG_OP = 'DELETE' THEN
-
-	IF man_table ='man_storage' THEN 
-		IF OLD.storage_pol_id IS NOT NULL THEN
-			DELETE FROM polygon WHERE pol_id = OLD.storage_pol_id;
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		ELSE
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		END IF;
+	
+	IF man_table='man_chamber_pol' THEN
+		DELETE FROM polygon WHERE pol_id=OLD.chamber_pol_id;
 	ELSIF man_table='man_chamber' THEN
-		IF OLD.chamber_pol_id IS NOT NULL THEN
-			DELETE FROM polygon WHERE pol_id = OLD.chamber_pol_id;
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		ELSE
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		END IF;
+		DELETE FROM node WHERE node_id=OLD.node_id;
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_chamber WHERE node_id=OLD.node_id );
+	ELSIF man_table='man_storage_pol' THEN
+		DELETE FROM polygon WHERE pol_id=OLD.storage_pol_id;
+	ELSIF man_table='man_storage' THEN
+		DELETE FROM node WHERE node_id=OLD.node_id;
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_storage WHERE node_id=OLD.node_id );
+	ELSIF man_table='man_wwtp_pol' THEN
+		DELETE FROM polygon WHERE pol_id=OLD.wwtp_pol_id;
 	ELSIF man_table='man_wwtp' THEN
-		IF OLD.wwtp_pol_id IS NOT NULL THEN
-			DELETE FROM polygon WHERE pol_id = OLD.wwtp_pol_id;
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		ELSE
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		END IF;
+		DELETE FROM node WHERE node_id=OLD.node_id;
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_wwtp WHERE node_id=OLD.node_id );
+	ELSIF man_table='man_netgully_pol' THEN
+		DELETE FROM polygon WHERE pol_id=OLD.netgully_pol_id;
 	ELSIF man_table='man_netgully' THEN
-		IF OLD.netgully_pol_id IS NOT NULL THEN
-			DELETE FROM polygon WHERE pol_id = OLD.netgully_pol_id;
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		ELSE
-			DELETE FROM node WHERE node_id = OLD.node_id;
-		END IF;
-	ELSE
+		DELETE FROM node WHERE node_id=OLD.node_id;
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_netgully WHERE node_id=OLD.node_id );
+	ELSE 
 		DELETE FROM node WHERE node_id = OLD.node_id;
 	END IF;
-
-		--PERFORM audit_function (3,830);
-        RETURN NULL;
+	-- PERFORM audit_function(3,830);   
+  RETURN NULL;
    
-    END IF;
+  END IF;
 
 
 END;
