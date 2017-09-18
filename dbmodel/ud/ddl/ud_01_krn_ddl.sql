@@ -51,8 +51,6 @@ CREATE TABLE "cat_arc" (
 "id" varchar (30) DEFAULT nextval ('"SCHEMA_NAME".cat_arc_seq'::regclass) NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" varchar(16),
-"tsect_id" varchar(16)  ,
-"curve_id" varchar(16)  ,
 "geom1" numeric(12,4),
 "geom2" numeric(12,4) DEFAULT 0.00,
 "geom3" numeric(12,4) DEFAULT 0.00,
@@ -87,6 +85,8 @@ CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 CREATE TABLE "cat_arc_shape" (
 "id" varchar (30) NOT NULL PRIMARY KEY,
 "epa" varchar(30),
+"tsect_id" varchar(16),
+"curve_id" varchar(16),
 "image" varchar(50),
 "descript" text,
 "active" boolean
