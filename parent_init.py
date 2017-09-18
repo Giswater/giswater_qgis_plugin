@@ -24,6 +24,8 @@ from dao.controller import DaoController
 from init.add_sum import Add_sum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
+
+from models.sys_feature_cat import SysFeatureCat
         
 
 class ParentDialog(object):   
@@ -1002,6 +1004,70 @@ class ParentDialog(object):
         elif geom_type == 'arc':
             utils_giswater.setWidgetText(self.arccat_id, catalog_id)                    
         else:
-            utils_giswater.setWidgetText(self.connecat_id, catalog_id)                    
-                
-        
+            utils_giswater.setWidgetText(self.connecat_id, catalog_id)
+
+
+    def go_child(self, idx):
+        self.controller.log_info("goooo child")
+        selected_layer = self.layer.name()
+        widget = str(selected_layer.lower()) + "_node_" + str(idx)
+
+        self.node_widget = self.dialog.findChild(QLineEdit, widget)
+        self.node_id = self.node_widget.text()
+
+        # get pointer of node by ID
+        aux = "\"node_id\" = "
+        aux += "'" + str(self.node_id) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
+
+        self.controller.log_info(str(self.feature_cat))
+        # List of nodes from node_type_cat_type - nodes which we are using
+        for key, feature_cat in self.feature_cat.iteritems():
+            if feature_cat.type == 'NODE':
+                layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
+                if layer:
+                    layer = layer[0]
+                    # Get a featureIterator from this expression:
+                    it = layer.getFeatures(QgsFeatureRequest(expr))
+                    id_list = [i for i in it]
+                    if id_list != []:
+                        self.iface.openFeatureForm(layer, id_list[0])
+
+
+    def manage_feature_cat(self):
+
+        # Dictionary to keep every record of table 'sys_feature_cat'
+        # Key: field tablename
+        # Value: Object of the class SysFeatureCat
+        sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
+        rows = self.dao.get_rows(sql)
+        if not rows:
+            return
+
+        for row in rows:
+            tablename = row['tablename']
+            elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            self.feature_cat[tablename] = elem
+
+    def project_read(self):
+
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return
+
+        self.manage_feature_cat()
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
+            if uri_table is not None:
+
+                if uri_table in self.feature_cat.keys():
+                    elem = self.feature_cat[uri_table]
+                    elem.layername = cur_layer.name()
+

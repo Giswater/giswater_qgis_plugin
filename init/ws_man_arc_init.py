@@ -15,6 +15,8 @@ from functools import partial
 import utils_giswater
 from parent_init import ParentDialog
 
+from models.sys_feature_cat import SysFeatureCat
+
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -117,7 +119,11 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))        
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))        
-  
+
+        self.feature_cat = {}
+
+        self.project_read()
+
    
     def fill_costs(self):
         ''' Fill tab costs '''
@@ -373,35 +379,3 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
         
-    def go_child(self, idx):
-        
-        selected_layer = self.layer.name()
-        widget = str(selected_layer.lower())+"_node_"+str(idx)  
-  
-        self.node_widget = self.dialog.findChild(QLineEdit, widget)
-        self.node_id = self.node_widget.text()
-   
-        # get pointer of node by ID
-        aux = "\"node_id\" = "
-        aux += "'"+str(self.node_id)+"'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)            
-            return            
-        
-        # TODO: Parametrize it        
-        # List of nodes from node_type_cat_type - nodes which we are using
-        nodes = ["Manhole", "Junction", "Valve", "Filter", "Reduction", "Waterwell", "Hydrant", "Tank", "Meter", "Pump", "Source", "Register", "Netwjoin", "Expantank", "Flexunion", "Netelement", "Netsamplepoint"]    
-        #sql = "SELECT i18n FROM "+self.schema_name+".node_type_cat_type" 
-        #row = self.dao.get_rows(sql)
-
-        for i in range(0, len(nodes)):
-            layer = QgsMapLayerRegistry.instance().mapLayersByName(nodes[i])[0]
-            # Get a featureIterator from this expression:
-            it = layer.getFeatures(QgsFeatureRequest(expr))
-            id_list = [i for i in it]
-            if id_list != []:
-                self.iface.openFeatureForm(layer, id_list[0])
-                            
-                
