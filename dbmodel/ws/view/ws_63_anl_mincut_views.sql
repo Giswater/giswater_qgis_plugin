@@ -151,6 +151,7 @@ work_order,
 mincut_state,
 mincut_class,
 mincut_type,
+virtual,
 received_date,
 expl_id,
 postcode,
@@ -168,7 +169,8 @@ exec_user,
 exec_descript,
 exec_appropiate 
 FROM anl_mincut_result_connec
-JOIN anl_mincut_result_cat ON anl_mincut_result_connec.result_id = anl_mincut_result_cat.id;
+JOIN anl_mincut_result_cat ON anl_mincut_result_connec.result_id = anl_mincut_result_cat.id
+JOIN anl_mincut_cat_type ON mincut_type=anl_mincut_cat_type.id;
 
 
 

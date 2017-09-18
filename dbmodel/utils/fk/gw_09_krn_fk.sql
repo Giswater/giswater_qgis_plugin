@@ -130,6 +130,7 @@ ALTER TABLE "samplepoint" DROP CONSTRAINT IF EXISTS "samplepoint_featurecat_id_f
 --CREATE FK
 ---
 
+ALTER TABLE "cat_arc" ADD CONSTRAINT "cat_arc_matcat_id_fkey" FOREIGN KEY ("matcat_id") REFERENCES "cat_mat_arc" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
 
@@ -225,15 +226,30 @@ ALTER TABLE "element_x_connec" ADD CONSTRAINT "element_x_connec_connec_id_fkey" 
 --ALTER TABLE db_cat_table_x_column ADD CONSTRAINT db_cat_table_x_column_db_cat_table_fkey FOREIGN KEY (table_id) REFERENCES db_cat_table (id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
--- TODO: CONSTRAINTS ON arc_type & node_type man_table & epa_table
-
 ALTER TABLE link ADD CONSTRAINT link_featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
---ALTER TABLE man_custom_field ADD CONSTRAINT man_custom_field_man_custom_field_parameter_fkey FOREIGN KEY (field_id) REFERENCES man_custom_field_parameter (field_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
---ALTER TABLE man_custom_field_parameter ADD CONSTRAINT man_custom_field_parameter_cat_feature_fkey FOREIGN KEY (feature_type) REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
---ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "arc_type_cat_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
---ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "node_type_cat_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+---------------------
+-- TODO: CONSTRAINTS ON arc_type & node_type man_table & epa_table
+----------------------
+
+--ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_cat_fkey" FOREIGN KEY ("system_id") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "cat_feature" ADD CONSTRAINT "cat_feature_type_fkey" FOREIGN KEY ("type) REFERENCES "sys_feature_type" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "arc_type" ADD CONSTRAINT "arc_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--ALTER TABLE "node_type" ADD CONSTRAINT "node_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "node_type" ADD CONSTRAINT "node_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_id_fkey" FOREIGN KEY ("id") REFERENCES "cat_feature" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--ALTER TABLE "connec_type" ADD CONSTRAINT "connec_type_type_fkey" FOREIGN KEY ("type") REFERENCES "sys_feature_cat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+
 
 ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_type_fkey" FOREIGN KEY ("type") REFERENCES "ext_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 --ALTER TABLE "ext_urban_plot" ADD CONSTRAINT "ext_urban_plot_streetaxis_fkey" FOREIGN KEY ("streetaxis") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;

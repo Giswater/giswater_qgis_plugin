@@ -139,6 +139,7 @@ descript text
 
 CREATE TABLE "anl_mincut_cat_type" (
 id varchar(30) NOT NULL PRIMARY KEY,
+virtual boolean DEFAULT true NOT NULL,
 descript text
 );
 
