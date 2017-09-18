@@ -215,7 +215,7 @@ CREATE TABLE "node" (
 "custom_top_elev" numeric(12,3),
 "custom_ymax" numeric(12,3),
 "custom_elev" numeric(12,3),
-"node_type" varchar(18)  ,
+"node_type" varchar(30)  ,
 "nodecat_id" varchar(30)  ,
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,

@@ -32,12 +32,12 @@ CREATE TABLE "ext_streetaxis" (
 -- Postnumber
 CREATE TABLE "ext_address"(
 id character varying(16) PRIMARY KEY NOT NULL,
+expl_id integer,
 postcode character varying(16),
 streetaxis character varying(16),
 "number" character varying(16),
-urban_properties_id character varying(16),
-the_geom geometry(Point,SRID_VALUE),
-expl_id integer
+plot_id character varying(16),
+the_geom geometry(Point,SRID_VALUE)
   );
 
 
