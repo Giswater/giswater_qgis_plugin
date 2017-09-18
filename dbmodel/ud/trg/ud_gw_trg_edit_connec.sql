@@ -99,11 +99,11 @@ BEGIN
 
 
         -- FEATURE INSERT
- INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state", connec_arccat_id, connec_depth, connec_length, arc_id, annotation, "observ",
+ INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,connecat_id, connec_type, sector_id, demand, "state", connec_depth, connec_length, arc_id, annotation, "observ",
 								"comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02,address_03, 
 								streetaxis_id, postnumber, descript, rotation, link, verified, the_geom,  undelete, featurecat_id, feature_id,  label_x, label_y, label_rotation, accessibility,diagonal, expl_id, publish, 
 								inventory, uncertain, num_value, private_connecat_id)
-		VALUES (NEW.connec_id, NEW.code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.connec_arccat_id, NEW.connec_depth, 
+		VALUES (NEW.connec_id, NEW.code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.connecat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.connec_depth, 
 								NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, 
 								NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.streetaxis_id, NEW.postnumber, NEW.descript, NEW.rotation, NEW.link, 
 								NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,NEW.feature_id, NEW.label_x, NEW.label_y, NEW.label_rotation,
@@ -123,7 +123,7 @@ BEGIN
 
         UPDATE connec 
         SET connec_id=NEW.connec_id, code=NEW.code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, connecat_id=NEW.connecat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
-			"state"=NEW."state", connec_arccat_id=NEW.connec_arccat_id, connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, arc_id=NEW.arc_id, annotation=NEW.annotation, "observ"=NEW."observ", 
+			"state"=NEW."state", connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, arc_id=NEW.arc_id, annotation=NEW.annotation, "observ"=NEW."observ", 
 			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
             ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, streetaxis_id=NEW.streetaxis_id, postnumber=NEW.postnumber, descript=NEW.descript,

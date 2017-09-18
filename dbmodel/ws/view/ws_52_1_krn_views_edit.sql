@@ -61,7 +61,7 @@ connec.descript,
 vnode.arc_id,
 cat_connec.svg AS cat_svg,
 connec.rotation,
-connec.link,
+concat(connec_type.link_path,connec.link),
 connec.verified,
 connec.the_geom,
 connec.undelete,
@@ -75,6 +75,7 @@ connec.expl_id,
 connec.num_value
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -130,7 +131,7 @@ connec.rotation AS wjoin_rotation,
 connec.label_x AS wjoin_label_x,
 connec.label_y AS wjoin_label_y,
 connec.label_rotation AS wjoin_label_rotation,
-connec.link AS wjoin_link,
+concat(connec_type.link_path,connec.link) AS wjoin_link,
 connec.connec_length AS wjoin_connec_length,
 connec.verified,
 connec.the_geom,
@@ -144,6 +145,7 @@ man_wjoin.top_floor AS wjoin_top_floor,
 man_wjoin.cat_valve AS wjoin_cat_valve
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -201,7 +203,7 @@ connec.rotation AS tap_rotation,
 connec.label_x AS tap_label_x,
 connec.label_y AS tap_label_y,
 connec.label_rotation AS tap_label_rotation,
-connec.link AS tap_link,
+concat(connec_type.link_path,connec.link) AS tap_link,
 connec.connec_length AS tap_connec_length,
 connec.verified,
 connec.the_geom,
@@ -221,6 +223,7 @@ man_tap.arq_patrimony AS tap_arq_patrimony,
 man_tap.com_state AS tap_com_state
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -278,7 +281,7 @@ connec.rotation AS fountain_rotation,
 connec.label_x AS fountain_label_x,
 connec.label_y AS fountain_label_y,
 connec.label_rotation AS fountain_label_rotation,
-connec.link AS fountain_link,
+concat(connec_type.link_path,connec.link) AS fountain_link,
 connec.connec_length  as fountain_connec_length,
 connec.verified,
 connec.the_geom,
@@ -301,6 +304,7 @@ man_fountain.arq_patrimony AS fountain_arq_patrimony,
 man_fountain.name AS fountain_name
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -359,7 +363,7 @@ connec.rotation AS fountain_rotation,
 connec.label_x AS fountain_label_x,
 connec.label_y AS fountain_label_y,
 connec.label_rotation AS fountain_label_rotation,
-connec.link AS fountain_link,
+concat(connec_type.link_path,connec.link) AS fountain_link,
 connec.connec_length as fountain_connec_length,
 connec.verified,
 connec.undelete,
@@ -382,6 +386,7 @@ man_fountain.arq_patrimony AS fountain_arq_patrimony,
 man_fountain.name AS fountain_name
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id
@@ -439,7 +444,7 @@ connec.rotation AS greentap_rotation,
 connec.label_x AS greentap_label_x,
 connec.label_y AS greentap_label_y,
 connec.label_rotation AS greentap_label_rotation,
-connec.link AS greentap_link,
+concat(connec_type.link_path,connec.link) AS greentap_link,
 connec.connec_length AS greentap_connec_length,
 connec.verified,
 connec.the_geom,
@@ -452,6 +457,7 @@ connec.num_value as greentap_num_value,
 man_greentap.linked_connec AS greentap_linked_connec
 FROM selector_expl, connec
 	JOIN cat_connec ON connec.connecat_id = cat_connec.id
+	JOIN connec_type ON connec_type.id=cat_connec.connectype_id
 	LEFT JOIN v_rtc_hydrometer_x_connec ON connec.connec_id = v_rtc_hydrometer_x_connec.connec_id
 	LEFT JOIN ext_streetaxis ON connec.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN link ON connec.connec_id = link.feature_id

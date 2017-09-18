@@ -78,6 +78,7 @@ CREATE TABLE "cat_arc" (
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
 "active" boolean,
+"inventory" boolean
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
@@ -328,7 +329,6 @@ CREATE TABLE "connec" (
 "private_connecat_id" varchar(30),
 "demand" numeric(12,8),
 "state" int2  NOT NULL,
-"connec_arccat_id" varchar(18),
 "connec_depth" numeric(12,3),
 "connec_length" numeric(12,3),
 "arc_id" varchar(16)  ,

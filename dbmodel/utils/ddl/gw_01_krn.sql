@@ -90,6 +90,7 @@ CREATE TABLE "arc_type" (
 "active" boolean,
 "code_autofill" boolean,
 "descript" text,
+"link_path" varchar(254),
 CONSTRAINT arc_type_pkey PRIMARY KEY (id)
 );
 
@@ -105,6 +106,7 @@ CREATE TABLE "node_type" (
 "num_arcs" integer,
 "choose_hemisphere" boolean,
 "descript" text,
+"link_path" varchar(254),
 CONSTRAINT node_type_pkey PRIMARY KEY (id)
 );
 
@@ -117,6 +119,7 @@ CREATE TABLE "connec_type" (
 "active" boolean,
 "code_autofill" boolean,
 "descript" text,
+"link_path" varchar(254),
 CONSTRAINT connec_type_pkey PRIMARY KEY (id)
 );
 
@@ -127,6 +130,7 @@ CREATE TABLE "element_type" (
 "active" boolean,
 "code_autofill" boolean,
 "descript" text,
+"link_path" varchar(254),
 CONSTRAINT element_type_pkey PRIMARY KEY (id)
 );
 

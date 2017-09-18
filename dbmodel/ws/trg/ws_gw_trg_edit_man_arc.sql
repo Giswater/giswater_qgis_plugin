@@ -133,11 +133,11 @@ BEGIN
 			END IF;
 			
 				INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
-					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01,address_02,address_03,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation, 
+					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01,address_02,address_03,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
 					publish, inventory, expl_id,num_value)
 					VALUES (NEW.arc_id, NEW.pipe_code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.pipe_annotation, NEW.pipe_observ, NEW.pipe_comment, NEW.pipe_custom_length,NEW.dma_id,NEW. presszonecat_id, 
 					NEW.pipe_soilcat_id, NEW.pipe_function_type, NEW.pipe_category_type, NEW.pipe_fluid_type, NEW.pipe_location_type, NEW.pipe_workcat_id, NEW.pipe_workcat_id_end, NEW.pipe_buildercat_id, NEW.pipe_builtdate,
-					NEW.pipe_enddate, NEW.pipe_ownercat_id, NEW.pipe_address_01, NEW.pipe_address_02, NEW.pipe_address_03, NEW.pipe_descript, NEW.pipe_link, NEW.verified, NEW.the_geom,NEW.undelete, 
+					NEW.pipe_enddate, NEW.pipe_ownercat_id, NEW.pipe_address_01, NEW.pipe_address_02, NEW.pipe_address_03, NEW.pipe_descript, NEW.verified, NEW.the_geom,NEW.undelete, 
 					NEW.pipe_label_x,NEW.pipe_label_y,NEW.pipe_label_rotation, NEW.publish, NEW.inventory, expl_id_int, NEW.pipe_num_value);
 				
 				INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
@@ -164,11 +164,11 @@ BEGIN
 			END IF;
 			
 				INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
-					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01,address_02,address_03,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation, 
+					workcat_id, workcat_id_end, buildercat_id, builtdate,enddate, ownercat_id, address_01,address_02,address_03,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
 					publish, inventory, expl_id, num_value)
 					VALUES (NEW.arc_id, NEW.varc_code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW."state", NEW.varc_annotation, NEW.varc_observ, NEW.varc_comment, NEW.varc_custom_length,NEW.dma_id,NEW. presszonecat_id, 
 					NEW.varc_soilcat_id, NEW.varc_function_type, NEW.varc_category_type, NEW.varc_fluid_type, NEW.varc_location_type, NEW.varc_workcat_id, NEW.varc_workcat_id_end, NEW.varc_buildercat_id, NEW.varc_builtdate,
-					NEW.varc_enddate, NEW.varc_ownercat_id, NEW.varc_address_01, NEW.varc_address_02, NEW.varc_address_03, NEW.varc_descript, NEW.varc_link, NEW.verified, NEW.the_geom,NEW.undelete, 
+					NEW.varc_enddate, NEW.varc_ownercat_id, NEW.varc_address_01, NEW.varc_address_02, NEW.varc_address_03, NEW.varc_descript,  NEW.verified, NEW.the_geom,NEW.undelete, 
 					NEW.varc_label_x,NEW.varc_label_y,NEW.varc_label_rotation, NEW.publish, NEW.inventory, expl_id_int, NEW.varc_num_value);
 				
 					INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
@@ -221,7 +221,7 @@ BEGIN
 				"comment"=NEW.pipe_comment, custom_length=NEW.pipe_custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pipe_soilcat_id, function_type=NEW.pipe_function_type,
 				category_type=NEW.pipe_category_type, fluid_type=NEW.pipe_fluid_type, location_type=NEW.pipe_location_type, workcat_id=NEW.pipe_workcat_id, workcat_id_end=NEW.pipe_workcat_id_end, 
 				buildercat_id=NEW.pipe_buildercat_id, builtdate=NEW.pipe_builtdate, enddate=NEW.pipe_enddate, ownercat_id=NEW.pipe_ownercat_id, address_01=NEW.pipe_address_01, address_02=NEW.pipe_address_02, 
-				address_03=NEW.pipe_address_03, descript=NEW.pipe_descript, link=NEW.pipe_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.pipe_label_x,
+				address_03=NEW.pipe_address_03, descript=NEW.pipe_descript, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.pipe_label_x,
 				label_y=NEW.pipe_label_y,label_rotation=NEW.pipe_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id,num_value=NEW.pipe_num_value
 			WHERE arc_id=OLD.arc_id;
 			
@@ -235,7 +235,7 @@ BEGIN
 				"comment"=NEW.varc_comment, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.varc_soilcat_id, function_type=NEW.varc_function_type,
 				category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type, location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, workcat_id_end=NEW.varc_workcat_id_end, 
 				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate, enddate=NEW.varc_enddate, ownercat_id=NEW.varc_ownercat_id, address_01=NEW.varc_address_01, address_02=NEW.varc_address_02, 
-				address_03=NEW.varc_address_03, descript=NEW.varc_descript, link=NEW.varc_link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.varc_label_x,
+				address_03=NEW.varc_address_03, descript=NEW.varc_descript, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.varc_label_x,
 				label_y=NEW.varc_label_y,label_rotation=NEW.varc_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.varc_num_value
 			WHERE arc_id=OLD.arc_id;
 			

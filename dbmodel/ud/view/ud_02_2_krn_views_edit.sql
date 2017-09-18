@@ -93,7 +93,7 @@ node.address_03,
 node.descript,
 cat_node.svg AS "cat_svg",
 node.rotation,
-node.link,
+concat(node_type.link_path,node.link) as link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -111,6 +111,7 @@ node.num_value
 FROM selector_expl,node
 	JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	WHERE ((node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"());
 
@@ -170,7 +171,7 @@ arc.address_01,
 arc.address_02,
 arc.address_03,
 arc.descript,
-arc.link,
+concat(arc_type.link_path,arc.link) as link,
 arc.verified,
 arc.the_geom,
 arc.undelete,
@@ -186,6 +187,7 @@ arc.num_value
 FROM selector_expl, arc
 	JOIN v_arc_x_node ON (((v_arc_x_node.arc_id) = (arc.arc_id)))
 	LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
+	JOIN arc_type ON arc_type.id=arc.arc_type
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -233,7 +235,7 @@ connec.postnumber,
 connec.descript,
 cat_connec.svg AS "cat_svg",
 connec.rotation,
-connec.link,
+concat(connec_type.link_path,connec.link) as link,
 connec.verified,
 connec.the_geom,
 connec.undelete,
@@ -257,6 +259,7 @@ FROM selector_expl, connec
 	LEFT JOIN link ON connec.connec_id = link.feature_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
 	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
+	JOIN connec_type ON connec.connec_type=connec_type.id
 	WHERE connec.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
 
@@ -481,7 +484,7 @@ node.address_03 AS junction_address_03,
 node.descript AS junction_descript,
 node.rotation AS junction_rotation,
 cat_node.svg AS junction_cat_svg,
-node.link AS junction_link,
+concat(node_type.link_path,node.link) AS junction_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -500,6 +503,7 @@ FROM selector_expl, node
 	JOIN man_junction ON man_junction.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -542,7 +546,7 @@ node.address_03 AS outfall_address_03,
 node.descript AS outfall_descript,
 node.rotation AS outfall_rotation,
 cat_node.svg AS outfall_cat_svg,
-node.link AS outfall_link,
+concat(node_type.link_path,node.link) AS outfall_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -563,6 +567,7 @@ FROM selector_expl, node
 	JOIN man_outfall ON man_outfall.node_id = node.node_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -605,7 +610,7 @@ node.address_03 AS storage_address_03,
 node.descript AS storage_descript,
 node.rotation AS storage_rotation,
 cat_node.svg AS storage_cat_svg,
-node.link AS storage_link,
+concat(node_type.link_path,node.link) AS storage_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -633,6 +638,7 @@ FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -676,7 +682,7 @@ node.address_02 AS storage_address_02,
 node.address_03 AS storage_address_03,
 node.descript AS storage_descript,
 node.rotation AS storage_rotation,
-node.link AS storage_link,
+concat(node_type.link_path,node.link) AS storage_link,
 node.verified,
 polygon.the_geom,
 node.undelete,
@@ -704,6 +710,7 @@ FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_storage.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -749,7 +756,7 @@ node.address_03 AS valve_address_03,
 node.descript AS valve_descript,
 node.rotation AS valve_rotation,
 cat_node.svg AS valve_cat_svg,
-node.link AS valve_link,
+concat(node_type.link_path,node.link) AS valve_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -768,6 +775,7 @@ man_valve.name AS valve_name
 FROM selector_expl, node
 	JOIN man_valve ON man_valve.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -812,7 +820,7 @@ node.address_03 AS netinit_address_03,
 node.descript AS netinit_descript,
 node.rotation AS netinit_rotation,
 cat_node.svg AS netinit_cat_svg,
-node.link AS netinit_link,
+concat(node_type.link_path,node.link) AS netinit_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -837,6 +845,7 @@ man_netinit.sander_depth AS netinit_sander_depth
 FROM selector_expl, node
 	JOIN man_netinit ON man_netinit.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -881,7 +890,7 @@ node.address_03 AS manhole_address_03,
 node.descript AS manhole_descript,
 node.rotation AS manhole_rotation,
 cat_node.svg AS manhole_cat_svg,
-node.link AS manhole_link,
+concat(node_type.link_path,node.link) AS manhole_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -906,6 +915,7 @@ man_manhole.accessibility AS manhole_accessibility
 FROM selector_expl, node
 	JOIN man_manhole ON man_manhole.node_id = node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -949,7 +959,7 @@ node.address_03 AS wjump_address_03,
 node.descript AS wjump_descript,
 node.rotation AS wjump_rotation,
 cat_node.svg AS wjump_cat_svg,
-node.link AS wjump_link,
+concat(node_type.link_path,node.link) AS wjump_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -974,6 +984,7 @@ FROM selector_expl, node
 	JOIN man_wjump ON man_wjump.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -1017,7 +1028,7 @@ node.address_03 AS netgully_address_03,
 node.descript AS netgully_descript,
 node.rotation AS netgully_rotation,
 cat_node.svg AS netgully_cat_svg,
-node.link AS netgully_link,
+concat(node_type.link_path,node.link) AS netgully_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -1045,6 +1056,7 @@ FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -1087,7 +1099,7 @@ node.address_02 AS netgully_address_02,
 node.address_03 AS netgully_address_03,
 node.descript AS netgully_descript,
 node.rotation AS netgully_rotation,
-node.link AS netgully_link,
+concat(node_type.link_path,node.link) AS netgully_link,
 node.verified,
 polygon.the_geom,
 node.undelete,
@@ -1115,6 +1127,7 @@ FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_netgully.pol_id
@@ -1160,7 +1173,7 @@ node.address_03 AS chamber_address_03,
 node.descript AS chamber_descript,
 node.rotation AS chamber_rotation,
 cat_node.svg AS chamber_cat_svg,
-node.link AS chamber_link,
+concat(node_type.link_path,node.link) AS chamber_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -1189,6 +1202,7 @@ FROM selector_expl, node
     JOIN man_chamber ON man_chamber.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 	 
@@ -1231,7 +1245,7 @@ node.address_02 AS chamber_address_02,
 node.address_03 AS chamber_address_03,
 node.descript AS chamber_descript,
 node.rotation AS chamber_rotation,
-node.link AS chamber_link,
+concat(node_type.link_path,node.link) AS chamber_link,
 node.verified,
 polygon.the_geom,
 node.undelete,
@@ -1260,6 +1274,7 @@ FROM selector_expl, node
 	JOIN man_chamber ON man_chamber.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_chamber.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id)	AND selector_expl.cur_user="current_user"(); 
@@ -1304,7 +1319,7 @@ node.address_03 AS wwtp_address_03,
 node.descript AS wwtp_descript,
 node.rotation AS wwtp_rotation,
 cat_node.svg AS wwtp_cat_svg,
-node.link AS wwtp_link,
+concat(node_type.link_path,node.link) AS wwtp_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -1325,6 +1340,7 @@ FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); ;
 
@@ -1367,7 +1383,7 @@ node.address_02 AS wwtp_address_02,
 node.address_03 AS wwtp_address_03,
 node.descript AS wwtp_descript,
 node.rotation AS wwtp_rotation,
-node.link AS wwtp_link,
+concat(node_type.link_path,node.link) AS wwtp_link,
 node.verified,
 polygon.the_geom,
 node.undelete,
@@ -1388,6 +1404,7 @@ FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	JOIN polygon ON polygon.pol_id = man_wwtp.pol_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); 
@@ -1431,7 +1448,7 @@ node.address_03 AS netelement_address_03,
 node.descript AS netelement_descript,
 node.rotation AS netelement_rotation,
 cat_node.svg AS netelement_cat_svg,
-node.link AS netelement_link,
+concat(node_type.link_path,node.link) AS netelement_link,
 node.verified,
 node.the_geom,
 node.undelete,
@@ -1451,6 +1468,7 @@ FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
+	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"(); 
 
@@ -1509,7 +1527,7 @@ arc.address_01 AS conduit_address_01,
 arc.address_02 AS conduit_address_02,
 arc.address_03 AS conduit_address_03,
 arc.descript AS conduit_descript,
-arc.link AS conduit_link,
+concat(arc_type.link_path,arc.link) AS conduit_link,
 arc.verified,
 arc.the_geom,
 arc.undelete,
@@ -1526,6 +1544,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_conduit ON man_conduit.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -1584,7 +1603,7 @@ arc.address_01 AS siphon_address_01,
 arc.address_02 AS siphon_address_02,
 arc.address_03 AS siphon_address_03,
 arc.descript AS siphon_descript,
-arc.link AS siphon_link,
+concat(arc_type.link_path,arc.link) AS siphon_link,
 arc.verified,
 arc.the_geom,
 arc.undelete,
@@ -1602,6 +1621,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_siphon ON man_siphon.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -1661,7 +1681,7 @@ arc.address_01 AS waccel_address_01,
 arc.address_02 AS waccel_address_02,
 arc.address_03 AS waccel_address_03,
 arc.descript AS waccel_descript,
-arc.link AS waccel_link,
+concat(arc_type.link_path,arc.link) AS waccel_link,
 arc.verified,
 arc.the_geom,
 arc.undelete,
@@ -1684,6 +1704,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_waccel ON man_waccel.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();;
 
@@ -1741,7 +1762,7 @@ arc.address_01 AS varc_address_01,
 arc.address_02 AS varc_address_02,
 arc.address_03 AS varc_address_03,
 arc.descript AS varc_descript,
-arc.link AS varc_link,
+concat(arc_type.link_path,arc.link) AS varc_link,
 arc.verified,
 arc.the_geom,
 arc.undelete,
@@ -1758,6 +1779,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_varc ON man_varc.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
