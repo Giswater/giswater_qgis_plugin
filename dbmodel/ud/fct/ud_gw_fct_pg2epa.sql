@@ -20,7 +20,7 @@ BEGIN
 	-- PROCESSES
 	-- 1) RESULT MANAGEMENT INSERT
 		-- INSERT INTO inp_selector_result (result_id_var, cur_user)
-		-- INSERT INTO rpt_input_node & rpt_input_arc TABLES
+		-- INSERT INTO rpt_input_node & rpt_input_arc TABLES. SELECT FROM arc, node, JOIN man_type_function WHERE is_operative IS NULL or is_operative IS TRUE
 	
 	-- 2) EXPORT SUBCATCHMENT
 	
