@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
 from PyQt4.QtCore import QObject, QPyNullVariant, Qt   # @UnresolvedImport
 from PyQt4 import uic
@@ -36,57 +37,16 @@ class SearchPlus(QObject):
         # Set signals
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
-        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))    
-        
-        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))      
+        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
+
+
+        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
-
-        #self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_text))
-
-        self.dlg.lineEdit.textChanged.connect(partial(self.filter_by_editline))
-
+        self.dlg.network_code.editTextChanged.connect(self.filter_by_list)
         self.enabled = True
-        self.times = 0
-
-    def filter_by_text(self):
-        self.times += 1
-        list_filter = []
-
-
-        # # No funciona
-        # for x in range(self.dlg.network_code.count()-1):
-        #     self.controller.log_info(str(x))
-        #     self.dlg.network_code.removeItem(x)
-
-
-        curtext = self.dlg.network_code.currentText()
-        for item in self.list_all:
-            if self.dlg.network_code.currentText() in item:
-                list_filter.append(item)
-
-        if len(list_filter) > 0:
-            self.controller.log_info(str(list_filter))
-            self.controller.log_info(str("t1"))
-
-            utils_giswater.fillComboBoxList(self.dlg.network_code, list_filter, allow_nulls=True, clear_combo=False)
-            self.dlg.network_code.setText(curtext)
-
-            self.controller.log_info(str("t2"))
-
-
-
-    def filter_by_editline(self):
-        list_filter = []
-        for item in self.list_all:
-            if self.dlg.lineEdit.text() in item:
-                list_filter.append(item)
-        if len(list_filter) > 0:
-            self.controller.log_info(str(list_filter))
-            utils_giswater.fillComboBoxList(self.dlg.network_code, list_filter, allow_nulls=True, clear_combo=True)
-
 
 
     def load_config_data(self):
@@ -163,36 +123,36 @@ class SearchPlus(QObject):
      
      
     def populate_dialog(self):
-        """ Populate the interface with values get from layers """                      
-          
+        """ Populate the interface with values get from layers """
+
         if not self.enabled:
             return False
-                     
+
         # Get layers and full extent
-        self.get_layers()       
-                 
-        # Tab 'Address'      
+        self.get_layers()
+
+        # Tab 'Address'
         status = self.address_populate('street_layer')
         if not status:
-            self.dlg.tab_main.removeTab(2)                              
-        
-        # Tab 'Hydrometer'             
-        status = self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])  
+            self.dlg.tab_main.removeTab(2)
+
+        # Tab 'Hydrometer'
+        status = self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             self.dlg.tab_main.removeTab(1)
-            
+
         # Tab 'Network'
-        self.network_code_populate()
-        status = self.network_geom_type_populate()     
-        if not status:           
+        self.network_code_create_lists()
+        status = self.network_geom_type_populate()
+        if not status:
             self.dlg.tab_main.removeTab(0)
-            
+
         return True
     
      
-    def network_code_populate(self):
-        """ Populate combo 'network_code' """
+    def network_code_create_lists(self):
+        """ Create one list for each geom type and other one with all geom types """
      
         self.list_arc = []     
         self.list_connec = []     
@@ -215,8 +175,8 @@ class SearchPlus(QObject):
         
         self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
         self.list_all = sorted(set(self.list_all))
-        utils_giswater.fillComboBoxList(self.dlg.network_code, self.list_all)
 
+        self.set_model_by_list(self.list_all)
         return True
     
     
@@ -249,8 +209,8 @@ class SearchPlus(QObject):
         if 'network_layer_gully' in self.layers:  
             self.dlg.network_geom_type.addItem(self.controller.tr('Gully'))
         if 'network_layer_node' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Node')) 
-        
+            self.dlg.network_geom_type.addItem(self.controller.tr('Node'))
+
         return self.dlg.network_geom_type > 0
     
     
@@ -258,7 +218,7 @@ class SearchPlus(QObject):
         """ Get 'geom_type' to filter 'code' values """
            
         geom_type = utils_giswater.getWidgetText(self.dlg.network_geom_type)
-        list_codes = []    
+        list_codes = []
         if geom_type == self.controller.tr('Arc'):
             list_codes = self.list_arc
         elif geom_type == self.controller.tr('Connec'):
@@ -271,11 +231,33 @@ class SearchPlus(QObject):
             list_codes = self.list_node
         else:
             list_codes = self.list_all
-         
-        utils_giswater.fillComboBoxList(self.dlg.network_code, list_codes)
+
+        self.set_model_by_list(list_codes)
         
         return True
-    
+
+
+    def set_model_by_list(self, list):
+        model = QStringListModel()
+        model.setStringList(list)
+        self.proxyModel = QSortFilterProxyModel()
+        self.proxyModel.setSourceModel(model)
+        self.proxyModel.setFilterKeyColumn(0)
+        proxy_model1 = QSortFilterProxyModel()
+        proxy_model1.setSourceModel(model)
+        proxy_model1.setFilterKeyColumn(0)
+        self.dlg.network_code.setModel(proxy_model1)
+        self.dlg.network_code.setModelColumn(0)
+        mycompletear = QCompleter()
+        mycompletear.setModel(self.proxyModel)
+        mycompletear.setCompletionColumn(0)
+        mycompletear.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        self.dlg.network_code.setCompleter(mycompletear)
+
+
+    def filter_by_list(self):
+        self.proxyModel.setFilterFixedString(self.dlg.network_code.currentText())
+
 
     def network_zoom(self, fieldname, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """  

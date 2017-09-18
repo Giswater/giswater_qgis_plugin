@@ -44,11 +44,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Code</string>
-      </property>
-     </item>
     </widget>
     <widget class="QComboBox" name="network_geom_type">
      <property name="geometry">
@@ -67,16 +62,6 @@
        <string>Type</string>
       </property>
      </item>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>61</width>
-       <height>20</height>
-      </rect>
-     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_hydrometer">
