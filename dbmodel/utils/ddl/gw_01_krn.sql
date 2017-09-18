@@ -275,6 +275,7 @@ CREATE TABLE "man_type_function" (
 "id" varchar(50) NOT NULL,
 "featurecat_id" varchar(30),
 "observ" varchar(150),
+"is_operative" boolean,
 CONSTRAINT man_type_function_pkey PRIMARY KEY (id)
 );
 
