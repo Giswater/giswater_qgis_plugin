@@ -392,11 +392,10 @@ class Edit(ParentAction):
         node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
         node_nodecat_id = utils_giswater.getWidgetText("node_nodecat_id")        
         if node_node_type_new != "null":
-            
-            # TODO: Check SQL field names
+
             # Update node_type in the database
             sql = "UPDATE "+self.schema_name+".v_edit_node"
-            sql += " SET node_type = '" + node_node_type_new + "'"
+            sql += " SET nodetype_id = '" + node_node_type_new + "'"
             if node_nodecat_id != 'null':
                 sql += ", nodecat_id = '" + node_nodecat_id + "'"
             sql += " WHERE node_id = '" + self.node_id + "'"
