@@ -51,6 +51,7 @@ class MultipleSnapping(QgsMapTool):
 
 
     def canvasPressEvent(self, e):
+
         if e.button() == Qt.LeftButton:
             self.startPoint = self.toMapCoordinates(e.pos())
             self.endPoint = self.startPoint
@@ -68,7 +69,9 @@ class MultipleSnapping(QgsMapTool):
         numberFeatures = 0
         if e.button() == Qt.LeftButton:
             for layer in self.group_pointers:
-
+                # Check number of selections
+                #numberFeatures = layer.selectedFeatureCount()
+                #self.controller.log_info(str(numberFeature))
                 if r is not None:
                     # Selection by rectange
                     lRect = self.canvas.mapSettings().mapToLayerCoordinates(layer, r)
@@ -86,7 +89,6 @@ class MultipleSnapping(QgsMapTool):
 
                         # Check feature
                         for snapPoint in result:
-
                             # Get the point
                             #point = QgsPoint(snapPoint.snappedVertex)
                             snappFeat = next(snapPoint.layer.getFeatures(QgsFeatureRequest().setFilterFid(snapPoint.snappedAtGeometry)))
@@ -94,29 +96,6 @@ class MultipleSnapping(QgsMapTool):
                             # LEAVE SELECTION
                             snapPoint.layer.select([snapPoint.snappedAtGeometry])
 
-
-                # Get all slected features
-                #numberFeatures += layer.selectedFeatureCount()
-
-            #if numberFeatures == 0:
-            #    message = "You have to select at least one feature!"
-            #    self.controller.show_warning(message, context_name='ui_message')
-            #    return
-
-            '''
-            for layer in self.group_pointers:
-
-                if layer.selectedFeatureCount() > 0:
-
-                    features = layer.selectedFeatures()
-    
-                    for feature in features:
-                        connec_id = feature.attribute('connec_id')
-                        #self.controller.log_info(str(connec_id))
-                        self.selected_features.append(str(connec_id))
-
-            self.selected_features = []
-            '''
             self.rubberBand.hide()
 
 
@@ -163,8 +142,6 @@ class MultipleSnapping(QgsMapTool):
 
         for layer in self.group_layers:
             self.group_pointers.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
-
-        self.controller.log_info("activate")
 
         #QgsMapTool.activate(self)
 

@@ -93,7 +93,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setDialog(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-        self.group_layers_connec = ["Wjoin", "Fountain", "Tap"]
+        self.group_layers_connec = ["Wjoin", "Tap" , "Fountain"]
         self.group_pointers_connec = []
         for layer in self.group_layers_connec:
             self.group_pointers_connec.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
@@ -428,7 +428,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
         #self.btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table, "connec_id", self.dlg_connec))
-        self.btn_insert_connec.pressed.connect(partial(self.manual_init, self.tbl_connec, self.schema_name + "." + table, "connec_id", self.dlg_connec))
+        self.btn_insert_connec.pressed.connect(partial(self.manual_init, self.tbl_connec, table, "connec_id", self.dlg_connec, self.group_pointers_connec))
         self.set_icon(self.btn_insert_connec, "111.png")
 
         self.btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
@@ -470,24 +470,24 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir,self.group_layers_connec)
         self.canvas.setMapTool(self.tool)
-        self.iface.mapCanvas().selectionChanged.connect(self.snapping_selection)
+        self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection,self.group_pointers_connec,"connec_id"))
 
 
-    def snapping_selection(self):
-        table_name = self.schema_name + ".connec"
+    def snapping_selection(self, group_pointers,attribute):
+
         self.ids = []
-        for layer in self.group_pointers_connec:
+        for layer in group_pointers:
             if layer.selectedFeatureCount() > 0:
 
                 # Get all selected features at layer
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
-                    element_id = feature.attribute('connec_id')
+                    element_id = feature.attribute(attribute)
 
                     # Add element
                     if element_id in self.ids:
-                        message = " Connec_id :" + element_id + " id already in the list!"
+                        message = " Feature :" + element_id + " id already in the list!"
                         self.controller.show_info_box(message, context_name='ui_message')
                         return
                     else:
@@ -569,30 +569,33 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.dlg_hydro.show()
 
 
-    def manual_init(self, widget, table_name, id_, dialog) :
+    def manual_init(self, widget, table, attribute, dialog, group_pointers) :
         '''  Select feature with entered id
         Set a model with selected filter.
         Attach that model to selected table '''
 
-        widget_id = dialog.findChild(QLineEdit, id_)
+        widget_id = dialog.findChild(QLineEdit, attribute)
         #element_id = widget_id.text()
         customer_code = widget_id.text()
+        # Clear list of ids
+        self.ids = []
 
-        sql = "SELECT connec_id FROM " + self.schema_name + ".connec WHERE customer_code = '" + customer_code + "'"
+
+        # Attribute = "connec_id"
+        sql = "SELECT " + attribute + " FROM " + self.schema_name + "." + table + " WHERE customer_code = '" + customer_code + "'"
         rows = self.controller.get_rows(sql)
         if not rows:
             return
         element_id = str(rows[0][0])
 
         # Get all selected features
-        for layer in self.group_pointers_connec:
+        for layer in group_pointers:
             if layer.selectedFeatureCount() > 0:
-                self.controller.log_info("loop")
                 # Get all selected features at layer
                 features = layer.selectedFeatures()
                 # Get id from all selected features
                 for feature in features:
-                    feature_id = feature.attribute('connec_id')
+                    feature_id = feature.attribute(attribute)
                     # List of all selected features
                     self.ids.append(str(feature_id))
 
@@ -602,35 +605,36 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.controller.show_info_box(message, context_name='ui_message')
             return
         if element_id in self.ids:
-            message = str(id_)+ ":"+el_id+" id already in the list!"
+            message = str(attribute)+ ":"+element_id+" id already in the list!"
             self.controller.show_info_box(message, context_name='ui_message')
             return
         else :
             # If feature id doesn't exist in list -> add
             self.ids.append(element_id)
-            # Get the active layer (must be a vector layer)
-            self.controller.log_info(str(self.ids))
-            #layer = self.iface.activeLayer()
-            for layer in self.group_pointers_connec:
+
+            #if len(self.ids) <> []:
+            for layer in group_pointers:
                 # SELECT features which are in the list
                 aux = "\"connec_id\" IN ("
                 for i in range(len(self.ids)):
                     aux += "'" + str(self.ids[i]) + "', "
                 aux = aux[:-2] + ")"
-                self.controller.log_info(str(aux))
 
                 expr = QgsExpression(aux)
                 if expr.hasParserError():
                     message = "Expression Error: " + str(expr.parserErrorString())
                     self.controller.show_warning(message, context_name='ui_message')
                     return
+
                 it = layer.getFeatures(QgsFeatureRequest(expr))
+
 
                 # Build a list of feature id's from the previous result
                 id_list = [i.id() for i in it]
-                self.controller.log_info(str(id_list))
+
                 # Select features with these id's
                 layer.setSelectedFeatures(id_list)
+
 
         # Reload table
         self.reload_table()
@@ -651,6 +655,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # self.ids = []
         # Set model
+
         model = QSqlTableModel();
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
@@ -664,6 +669,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         widget.setModel(model)
         widget.model().setFilter(expr)
         widget.model().select()
+
+
+
+        #widget.model().setFilter(expr)
+        #widget.model().select()
 
 
     def config(self):
@@ -780,7 +790,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             for i in range(len(self.ids)):
                 aux += "'" + str(self.ids[i]) + "', "
             aux = aux[:-2] + ")"
-            self.controller.log_info(str(aux))
 
             expr = QgsExpression(aux)
             if expr.hasParserError():
@@ -791,7 +800,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
             # Build a list of feature id's from the previous result
             id_list = [i.id() for i in it]
-            self.controller.log_info(str(id_list))
+
             # Select features with these id's
             layer.setSelectedFeatures(id_list)
 
