@@ -7,7 +7,8 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
-from PyQt4.QtCore import QObject, QSettings
+from PyQt4 import uic
+from PyQt4.QtCore import QObject, QSettings, Qt
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
@@ -803,10 +804,10 @@ class Giswater(QObject):
 
        
     def set_search_plus(self):
-        ''' Set SearchPlus object '''
-        
-        try:
-            if self.search_plus is None:
+        """ Set SearchPlus object """
+
+        try:         
+            if self.search_plus is None:        
                 self.search_plus = SearchPlus(self.iface, self.srid, self.controller)
             self.basic.search_plus = self.search_plus
             status = self.search_plus.populate_dialog()
