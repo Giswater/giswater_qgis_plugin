@@ -23,9 +23,10 @@ class SearchPlus(QObject):
         
         self.iface = iface
         self.srid = srid
-        self.controller = controller    
-        self.scale_zoom = 2500      
-    
+        self.controller = controller
+        sql = "SELECT value FROM "+self.controller.schema_name + ".config_param_system WHERE parameter = 'scale_zoom'"
+        self.scale_zoom = self.controller.get_rows(sql)
+
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
 
@@ -253,6 +254,8 @@ class SearchPlus(QObject):
         mycompletear.setCompletionColumn(0)
         mycompletear.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
         self.dlg.network_code.setCompleter(mycompletear)
+        # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
+        self.controller.log_info(str(self.proxyModel.filterCaseSensitivity()))
 
 
     def filter_by_list(self):
