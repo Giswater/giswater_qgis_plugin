@@ -53,10 +53,10 @@ class Master(ParentAction):
         utils_giswater.setDialog(self.dlg)
         self.list_elemets = {}
         update = False  # if false: insert; if true: update
-        self.tab_arc_node_other = self.dlg.findChild(QTabWidget, "tabWidget_2")
-        self.tab_arc_node_other.setTabEnabled(0, enable_tabs)
-        self.tab_arc_node_other.setTabEnabled(1, enable_tabs)
-        self.tab_arc_node_other.setTabEnabled(2, enable_tabs)
+        tab_arc_node_other = self.dlg.findChild(QTabWidget, "tabWidget_2")
+        tab_arc_node_other.setTabEnabled(0, enable_tabs)
+        tab_arc_node_other.setTabEnabled(1, enable_tabs)
+        tab_arc_node_other.setTabEnabled(2, enable_tabs)
 
         # tab General elements
         self.psector_id = self.dlg.findChild(QLineEdit, "psector_id")
@@ -99,26 +99,26 @@ class Master(ParentAction):
 
         # Tables
         # tab Elements
-        self.tbl_arc_plan = self.dlg.findChild(QTableView, "tbl_arc_plan")
-        self.tbl_arc_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
+        tbl_arc_plan = self.dlg.findChild(QTableView, "tbl_arc_plan")
+        tbl_arc_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.fill_table(tbl_arc_plan, self.schema_name + ".plan_arc_x_psector")
 
-        self.tbl_node_plan = self.dlg.findChild(QTableView, "tbl_node_plan")
-        self.tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.tbl_node_plan, self.schema_name + ".plan_node_x_psector")
+        tbl_node_plan = self.dlg.findChild(QTableView, "tbl_node_plan")
+        tbl_node_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.fill_table(tbl_node_plan, self.schema_name + ".plan_node_x_psector")
 
-        self.tbl_other_plan = self.dlg.findChild(QTableView, "tbl_other_plan")
-        self.tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.tbl_other_plan, self.schema_name + ".plan_other_x_psector")
+        tbl_other_plan = self.dlg.findChild(QTableView, "tbl_other_plan")
+        tbl_other_plan.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.fill_table(tbl_other_plan, self.schema_name + ".plan_other_x_psector")
 
         # tab Elements
-        self.dlg.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector", self.tbl_arc_plan, "arc"))
-        self.dlg.btn_del_arc_plan.pressed.connect(partial(self.multi_rows_delete, self.tbl_arc_plan, "plan_arc_x_psector", "id"))
+        self.dlg.btn_add_arc_plan.pressed.connect(partial(self.snapping, "v_edit_arc", "plan_arc_x_psector", tbl_arc_plan, "arc"))
+        self.dlg.btn_del_arc_plan.pressed.connect(partial(self.multi_rows_delete, tbl_arc_plan, "plan_arc_x_psector", "id"))
 
-        self.dlg.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", self.tbl_node_plan, "node"))
-        self.dlg.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delete, self.tbl_node_plan, "plan_node_x_psector", "id"))
+        self.dlg.btn_add_node_plan.pressed.connect(partial(self.snapping, "v_edit_node", "plan_node_x_psector", tbl_node_plan, "node"))
+        self.dlg.btn_del_node_plan.pressed.connect(partial(self.multi_rows_delete, tbl_node_plan, "plan_node_x_psector", "id"))
 
-        self.dlg.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delete, self.tbl_other_plan, "plan_other_x_psector", "id"))
+        self.dlg.btn_del_other_plan.pressed.connect(partial(self.multi_rows_delete, tbl_other_plan, "plan_other_x_psector", "id"))
 
         ##
         # if a row is selected from mg_psector_mangement(button 46)
@@ -154,12 +154,12 @@ class Master(ParentAction):
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
-            self.tbl_arc_plan.model().setFilter(expr)
-            self.tbl_arc_plan.model().select()
+            tbl_arc_plan.model().setFilter(expr)
+            tbl_arc_plan.model().select()
 
             expr = " psector_id = " + str(psector_id)
-            self.tbl_node_plan.model().setFilter(expr)
-            self.tbl_node_plan.model().select()
+            tbl_node_plan.model().setFilter(expr)
+            tbl_node_plan.model().select()
 
             # Total other Prices
             total_other_price = 0
@@ -240,7 +240,7 @@ class Master(ParentAction):
         rows = self.controller.get_rows(sql)
         if rows:
             sql = "UPDATE " + self.schema_name + ".selector_psector SET psector_id="
-            sql += "'" + str(psector_id) + "' WHERE cur_user=current_user"
+            sql += "'" + str(psector_id) + "' WHERE cur_user = current_user"
         else:
             sql = 'INSERT INTO ' + self.schema_name + '.selector_psector (psector_id, cur_user)'
             sql += " VALUES ('" + str(psector_id) + "', current_user)"
@@ -254,7 +254,7 @@ class Master(ParentAction):
 
         self.fill_table(self.tbl_psm, self.schema_name + ".plan_psector")
 
-        self.dlg_psector_mangement.exec_()
+        self.dlg.exec_()
 
 
     def master_config_master(self):
@@ -349,12 +349,12 @@ class Master(ParentAction):
         """ Button 99: Slot for 'btn_accept' """
         
         if utils_giswater.isChecked("chk_psector_enabled"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_master.psector_vdefault, "psector_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.psector_vdefault, "psector_vdefault", "config_param_user")
         else:
             self.delete_row("psector_vdefault", "config_param_user")
             
         # Update tables 'confog' and 'config_param_system'            
-        self.update_config("config", self.dlg_config_master)
+        self.update_config("config", self.dlg)
         self.update_config_param_system("config_param_system")
         
         message = "Values has been updated"
