@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
-from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
-from PyQt4.QtCore import QObject, QPyNullVariant, Qt   # @UnresolvedImport
 from PyQt4 import uic
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
+from PyQt4.QtCore import QObject, QPyNullVariant, Qt
+from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
 
 from functools import partial
 import operator
@@ -24,8 +24,6 @@ class SearchPlus(QObject):
         self.iface = iface
         self.srid = srid
         self.controller = controller
-        sql = "SELECT value FROM "+self.controller.schema_name + ".config_param_system WHERE parameter = 'scale_zoom'"
-        self.scale_zoom = self.controller.get_rows(sql)
 
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
@@ -39,7 +37,6 @@ class SearchPlus(QObject):
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
-
 
         self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
         self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
@@ -64,6 +61,14 @@ class SearchPlus(QObject):
         else:
             self.controller.log_warning("No data found in table 'config_param_system' related with 'searchplus'")
             return False            
+
+        # Get scale zoom
+        self.scale_zoom = 2500
+        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql += " WHERE parameter = 'scale_zoom'"
+        row = self.dao.get_row(sql)
+        if row:
+            self.scale_zoom = row['value']
 
 
     def dock_dialog(self):
@@ -90,7 +95,7 @@ class SearchPlus(QObject):
     
             
     def get_layers(self): 
-        ''' Iterate over all layers to get the ones set in config file '''
+        """ Iterate over all layers to get the ones set in config file """
         
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
@@ -239,27 +244,29 @@ class SearchPlus(QObject):
 
 
     def set_model_by_list(self, list):
+        
         model = QStringListModel()
         model.setStringList(list)
-        self.proxyModel = QSortFilterProxyModel()
-        self.proxyModel.setSourceModel(model)
-        self.proxyModel.setFilterKeyColumn(0)
-        proxy_model1 = QSortFilterProxyModel()
-        proxy_model1.setSourceModel(model)
-        proxy_model1.setFilterKeyColumn(0)
-        self.dlg.network_code.setModel(proxy_model1)
+        self.proxy_model = QSortFilterProxyModel()
+        self.proxy_model.setSourceModel(model)
+        self.proxy_model.setFilterKeyColumn(0)
+        proxy_model_aux = QSortFilterProxyModel()
+        proxy_model_aux.setSourceModel(model)
+        proxy_model_aux.setFilterKeyColumn(0)
+        self.dlg.network_code.setModel(proxy_model_aux)
         self.dlg.network_code.setModelColumn(0)
-        mycompletear = QCompleter()
-        mycompletear.setModel(self.proxyModel)
-        mycompletear.setCompletionColumn(0)
-        mycompletear.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-        self.dlg.network_code.setCompleter(mycompletear)
+        completer = QCompleter()
+        completer.setModel(self.proxy_model)
+        completer.setCompletionColumn(0)
+        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        self.dlg.network_code.setCompleter(completer)
+        
         # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
-        self.controller.log_info(str(self.proxyModel.filterCaseSensitivity()))
+        self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
 
 
     def filter_by_list(self):
-        self.proxyModel.setFilterFixedString(self.dlg.network_code.currentText())
+        self.proxy_model.setFilterFixedString(self.dlg.network_code.currentText())
 
 
     def network_zoom(self, fieldname, network_code, network_geom_type):
