@@ -22,7 +22,7 @@ from parent import ParentAction
 class Basic(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """
+        """ Class to control toolbar 'basic' """
         self.minor_version = "3.0"
         self.search_plus = None
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
@@ -35,33 +35,33 @@ class Basic(ParentAction):
     def basic_exploitation_selector(self):
         """ Button 41: Explotation selector """
         
-        dlg_multiexp = Multirow_selector()
-        utils_giswater.setDialog(dlg_multiexp)
-        dlg_multiexp.btn_ok.pressed.connect(dlg_multiexp.close)
-        dlg_multiexp.setWindowTitle("Explotation selector")
+        self.dlg = Multirow_selector()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.setWindowTitle("Explotation selector")
         tableleft = "exploitation"
         tableright = "selector_expl"
         field_id_left = "expl_id"
         field_id_right = "expl_id"
-        self.multi_row_selector(dlg_multiexp, tableleft, tableright, field_id_left, field_id_right)
-        dlg_multiexp.exec_()
+        self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
+        self.dlg.exec_()
 
 
     def basic_state_selector(self):
         """ Button 48: State selector """
 
         # Create the dialog and signals
-        dlg_psector_sel = Multirow_selector()
-        utils_giswater.setDialog(dlg_psector_sel)
-        dlg_psector_sel.btn_ok.pressed.connect(dlg_psector_sel.close)
-        dlg_psector_sel.setWindowTitle("State selector")
+        self.dlg = Multirow_selector()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_ok.pressed.connect(self.close_dialog)
+        self.dlg.setWindowTitle("State selector")
         tableleft = "value_state"
         tableright = "selector_state"
         field_id_left = "id"
         field_id_right = "state_id"
-        dlg_psector_sel.txt_name.setVisible(False)
-        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right)
-        dlg_psector_sel.exec_()
+        self.dlg.txt_name.setVisible(False)
+        self.multi_row_selector(self.dlg, tableleft, tableright, field_id_left, field_id_right)
+        self.dlg.exec_()
         
 
     def basic_search_plus(self):   

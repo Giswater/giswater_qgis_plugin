@@ -52,7 +52,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="macrosector_id">
+   <widget class="QLineEdit" name="macrodma_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -260,7 +260,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>Macrosector:</string>
+     <string>Macrodma:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

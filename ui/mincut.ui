@@ -50,7 +50,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="id">
+   <widget class="QLineEdit" name="result_id">
     <property name="geometry">
      <rect>
       <x>395</x>
@@ -60,7 +60,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>id</string>
+     <string>result_id</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
@@ -644,6 +644,19 @@
      </property>
      <property name="margin">
       <number>3</number>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="appropiate">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>120</y>
+       <width>121</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Appropiate</string>
      </property>
     </widget>
    </widget>

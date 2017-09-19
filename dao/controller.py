@@ -160,15 +160,17 @@ class DaoController():
         self.iface.messageBar().pushMessage("", msg, message_level, duration)
         #QMessageBox.about(None, 'Ok', str(text))
             
+
     def show_info(self, text, duration=5, context_name=None, parameter=None):
         ''' Show information message to the user '''
         self.show_message(text, 0, duration, context_name, parameter)
         #QMessageBox.information(None, self.tr('Info', context_name), self.tr(text, context_name))
 
+
     def show_warning(self, text, duration=5, context_name=None, parameter=None):
         ''' Show warning message to the user '''
         self.show_message(text, 1, duration, context_name, parameter)
-        #QMessageBox.warning(None, self.tr('Warning', context_name), self.tr(text, context_name))
+        
 
     def show_warning_detail(self, text, detail_text, context_name=None):
         ''' Show warning message with a button to show more details '''  
@@ -229,7 +231,7 @@ class DaoController():
         ret = msg_box.exec_()   #@UnusedVariable
                           
             
-    def get_row(self, sql, search_audit=True):
+    def get_row(self, sql):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         row = self.dao.get_row(sql)   
@@ -527,6 +529,6 @@ class DaoController():
         
         # If dialog is set, then translate form
         if dialog:
-            self.translate_form(dialog, locale_name)                                 
+            self.translate_form(dialog, locale_name)                              
         
             

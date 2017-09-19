@@ -59,16 +59,6 @@
     <number>3</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="tagcat_id">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>172</y>
-     <width>160</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_observ">
    <property name="geometry">
     <rect>
@@ -113,39 +103,6 @@
    </property>
    <property name="text">
     <string>Ok</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_tag">
-   <property name="geometry">
-    <rect>
-     <x>16</x>
-     <y>172</y>
-     <width>59</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <property name="text">
-    <string>Tag:</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::AutoText</enum>
-   </property>
-   <property name="scaledContents">
-    <bool>false</bool>
-   </property>
-   <property name="margin">
-    <number>3</number>
    </property>
   </widget>
   <widget class="QLineEdit" name="observ">
@@ -294,7 +251,6 @@
   <tabstop>doc_type</tabstop>
   <tabstop>observ</tabstop>
   <tabstop>path</tabstop>
-  <tabstop>tagcat_id</tabstop>
   <tabstop>path_doc</tabstop>
   <tabstop>path_url</tabstop>
   <tabstop>btn_accept</tabstop>

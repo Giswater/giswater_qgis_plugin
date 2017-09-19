@@ -3,14 +3,14 @@ from PyQt4 import QtGui, uic
 import os
 
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'ud_add_flow_regulator.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'mincut_add_connec.ui'))
 
 
-class Flow_regulator(QtGui.QDialog, FORM_CLASS):
+class Mincut_add_connec(QtGui.QDialog, FORM_CLASS):
 
     def __init__(self, parent=None):
         """ Constructor """
-        super(FlowRegulator, self).__init__(parent)
+        super(Mincut_add_connec, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
