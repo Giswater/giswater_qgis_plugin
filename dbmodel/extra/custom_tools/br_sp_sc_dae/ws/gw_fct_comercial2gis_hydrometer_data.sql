@@ -16,24 +16,7 @@ int_new_hydrometer integer;
 int_real_hydrometer integer;
 int_old_hydrometer integer;
 
-/*
-EXT_RTC_HYDROMETER
-hydrometer_id
-code (iptu)
-hydrometer_category (id from EXT_RTC_HYDROMETER_CATEGORY)
 
--- CONNEC
-connec_id (iptu)
-category_type  (observ from EXT_RTC_HYDROMETER_CATEGORY)
-
--- ext_urban_propierties
-iptu
-
---EXT_RTC_HYDROMETER_CATEGORY
-id
-observ
-
-*/
 
 BEGIN
 
@@ -64,7 +47,7 @@ VALUES (int_new_hydrometer,int_real_hydrometer,int_old_hydrometer,now());
 FOR rec_hydrometer IN SELECT DISTINCT ON (ext_rtc_hydrometer.code)
 connec.connec_id,
 ext_rtc_hydrometer.code,
-ext_hydrometer_category.observ,
+ext_hydrometer_category.observ::text,
 ext_urban_propierties.the_geom as v_the_geom
 FROM ext_rtc_hydrometer 
 LEFT JOIN connec ON connec.connec_id = ext_rtc_hydrometer.code 
@@ -89,7 +72,7 @@ connec.category_type,
 connec.state,
 connec.the_geom as c_the_geom,
 ext_rtc_hydrometer.code,
-ext_hydrometer_category.observ,
+ext_hydrometer_category.observ::text,
 hydrometer_id::integer,
 hydrometer_category,
 ext_urban_propierties.the_geom as v_the_geom
@@ -113,7 +96,7 @@ LOOP
     
     -- existing connec
     IF rec_hydrometer.state='EM_SERVIÇO' THEN
-	IF rec_hydrometer.observ <> rec_hydrometer.category_type THEN
+	IF rec_hydrometer.observ != rec_hydrometer.category_type THEN
 		UPDATE connec SET category_type='MISTA' WHERE connec_id=rec_hydrometer.connec_id;
 	END IF;
 	INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id::varchar(16));
@@ -140,13 +123,13 @@ LOOP
         counter=0;
         FOR rec_connec IN SELECT * FROM rtc_hydrometer_x_connec JOIN connec ON connec.connec_id=rtc_hydrometer_x_connec.connec_id WHERE connec.connec_id=id_last
         LOOP
-            SELECT observ INTO text_hydrometer_category FROM ext_rtc_hydrometer 
+            SELECT observ::text INTO text_hydrometer_category FROM ext_rtc_hydrometer 
             JOIN ext_hydrometer_category ON ext_hydrometer_category.id::text=ext_rtc_hydrometer.hydrometer_category::text;
             counter=counter+1;
             IF counter=1 THEN
                 rec_connec.category_type=text_hydrometer_category;
             ELSE
-		    IF rec_connec.category_type <> text_hydrometer_category THEN
+		    IF rec_connec.category_type != text_hydrometer_category THEN
                       rec_connec.category_type='MISTA';
                     END IF;
             END IF;
@@ -156,7 +139,34 @@ LOOP
     END IF;
 END LOOP;
 
-    RETURN;
+
+-- UPDATE CATEGORY_TYPE
+INSERT INTO man_type_category
+SELECT DISTINCT 
+observ::text
+FROM ext_hydrometer_category 
+WHERE observ::text NOT IN (SELECT id FROM man_type_category);
+
+
+FOR rec_hydrometer IN SELECT
+connec.connec_id,
+rtc_hydrometer_x_connec.hydrometer_id,
+ext_hydrometer_category.observ::text,
+category_type
+from rtc_hydrometer_x_connec
+join ext_rtc_hydrometer on rtc_hydrometer_x_connec.hydrometer_id=ext_rtc_hydrometer.hydrometer_id::text
+JOIN ext_hydrometer_category ON ext_hydrometer_category.id=ext_rtc_hydrometer.hydrometer_category::text
+JOIN connec ON connec.connec_id=rtc_hydrometer_x_connec.connec_id
+
+LOOP
+	IF rec_hydrometer.category_type IS NULL OR rec_hydrometer.category_type = rec_hydrometer.observ THEN
+		UPDATE connec SET category_type=rec_hydrometer.observ WHERE connec_id=rec_hydrometer.connec_id;
+	ELSIF rec_hydrometer.category_type != rec_hydrometer.observ::text THEN
+		UPDATE connec SET category_type='MISTA' WHERE connec_id=rec_hydrometer.connec_id;
+	END IF;
+END LOOP;
+
+RETURN;
             
 END;
 $BODY$
@@ -164,8 +174,8 @@ $BODY$
   COST 100;
 ALTER FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data()
   OWNER TO gisadmin;
-GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO public;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO gisadmin;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO public;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_editor;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_editor_saa;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_supereditor;
