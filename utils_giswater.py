@@ -92,6 +92,13 @@ def fillComboBoxList(widget, list_object, allow_nulls=True, clear_combo=True):
         widget.addItem(str(elem))          
 
 
+def fillWidgets(rows, index_widget=0, index_text=1):
+    
+    if rows:
+        for row in rows:
+            setWidgetText(str(row[index_widget]), str(row[index_text]))
+            
+
 def getText(widget):
     
     if type(widget) is str:
@@ -207,7 +214,7 @@ def isChecked(widget):
     return checked    
 
 
-def setChecked(widget, checked):
+def setChecked(widget, checked=True):
     
     if type(widget) is str:
         widget = _dialog.findChild(QWidget, widget)       

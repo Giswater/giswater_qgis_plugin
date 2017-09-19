@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+from PyQt4 import uic
+from PyQt4.QtGui import QCompleter, QSortFilterProxyModel, QStringListModel
+from PyQt4.QtCore import QObject, QPyNullVariant, Qt
 from qgis.core import QgsGeometry, QgsExpression, QgsFeatureRequest, QgsProject, QgsLayerTreeLayer   # @UnresolvedImport
-from PyQt4.QtCore import QObject, QPyNullVariant   # @UnresolvedImport
 
 from functools import partial
 import operator
 import os
 import sys
 from search.ui.search_plus_dockwidget import SearchPlusDockWidget
-  
+
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater      
@@ -21,31 +23,30 @@ class SearchPlus(QObject):
         
         self.iface = iface
         self.srid = srid
-        self.controller = controller    
-        self.scale_zoom = 2500      
-    
+        self.controller = controller
+
         # Create dialog
         self.dlg = SearchPlusDockWidget(self.iface.mainWindow())
-        
+
         # Load configuration data from tables
         if not self.load_config_data():
             self.enabled = False
-            return      
-        
-        # Set signals             
+            return
+
+        # Set signals
         self.dlg.adress_street.activated.connect(partial(self.address_get_numbers))
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
-        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))    
-        
-        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))      
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))    
+        self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
+
+        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
+        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
-        
-        self.enabled = True     
-    
-      
+        self.dlg.network_code.editTextChanged.connect(self.filter_by_list)
+        self.enabled = True
+
+
     def load_config_data(self):
         """ Load configuration data from tables """
         
@@ -58,12 +59,43 @@ class SearchPlus(QObject):
                 self.params[row['parameter']] = str(row['value'])
             return True
         else:
-            self.controller.log_warning("No data found in table 'config_param_system' related with 'searchplus'")
+            self.controller.log_warning("Parameters related with 'searchplus' not set in table 'config_param_system'")
             return False            
 
+        # Get scale zoom
+        self.scale_zoom = 2500
+        sql = "SELECT value FROM "+self.schema_name+".config_param_system"
+        sql += " WHERE parameter = 'scale_zoom'"
+        row = self.dao.get_row(sql)
+        if row:
+            self.scale_zoom = row['value']
+
+
+    def dock_dialog(self):
+        """ Dock dialog into left dock widget area """
+        
+        # Get path of .ui file
+        ui_path = os.path.join(self.controller.plugin_dir, 'search', 'ui', 'search_plus_dialog.ui')
+        if not os.path.exists(ui_path):
+            self.controller.show_warning("File not found", parameter=ui_path)
+            return False
+        
+        # Make it dockable in left dock widget area
+        self.dock = uic.loadUi(ui_path)
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg)
+        self.dlg.setFixedHeight(162)
+        
+        # Set his backgroundcolor
+        p = self.dlg.palette()
+        self.dlg.setAutoFillBackground(True)
+        p.setColor(self.dlg.backgroundRole(), Qt.white)
+        self.dlg.setPalette(p)   
+        
+        return True
+    
             
     def get_layers(self): 
-        ''' Iterate over all layers to get the ones set in config file '''
+        """ Iterate over all layers to get the ones set in config file """
         
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
@@ -97,36 +129,36 @@ class SearchPlus(QObject):
      
      
     def populate_dialog(self):
-        """ Populate the interface with values get from layers """                      
-          
+        """ Populate the interface with values get from layers """
+
         if not self.enabled:
             return False
-                     
+
         # Get layers and full extent
-        self.get_layers()       
-                 
-        # Tab 'Address'      
+        self.get_layers()
+
+        # Tab 'Address'
         status = self.address_populate('street_layer')
         if not status:
-            self.dlg.tab_main.removeTab(2)                              
-        
-        # Tab 'Hydrometer'             
-        status = self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])  
+            self.dlg.tab_main.removeTab(2)
+
+        # Tab 'Hydrometer'
+        status = self.populate_combo('hydrometer_urban_propierties_layer', self.dlg.hydrometer_connec, self.params['hydrometer_field_urban_propierties_code'])
         status = self.populate_combo('hydrometer_layer', self.dlg.hydrometer_id, self.params['hydrometer_field_urban_propierties_code'], self.params['hydrometer_field_code'])
         if not status:
             self.dlg.tab_main.removeTab(1)
-            
+
         # Tab 'Network'
-        self.network_code_populate()
-        status = self.network_geom_type_populate()     
-        if not status:           
+        self.network_code_create_lists()
+        status = self.network_geom_type_populate()
+        if not status:
             self.dlg.tab_main.removeTab(0)
-            
+
         return True
     
      
-    def network_code_populate(self):
-        """ Populate combo 'network_code' """
+    def network_code_create_lists(self):
+        """ Create one list for each geom type and other one with all geom types """
      
         self.list_arc = []     
         self.list_connec = []     
@@ -149,8 +181,8 @@ class SearchPlus(QObject):
         
         self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
         self.list_all = sorted(set(self.list_all))
-        utils_giswater.fillComboBoxList(self.dlg.network_code, self.list_all)
 
+        self.set_model_by_list(self.list_all)
         return True
     
     
@@ -183,8 +215,8 @@ class SearchPlus(QObject):
         if 'network_layer_gully' in self.layers:  
             self.dlg.network_geom_type.addItem(self.controller.tr('Gully'))
         if 'network_layer_node' in self.layers:  
-            self.dlg.network_geom_type.addItem(self.controller.tr('Node')) 
-        
+            self.dlg.network_geom_type.addItem(self.controller.tr('Node'))
+
         return self.dlg.network_geom_type > 0
     
     
@@ -192,7 +224,7 @@ class SearchPlus(QObject):
         """ Get 'geom_type' to filter 'code' values """
            
         geom_type = utils_giswater.getWidgetText(self.dlg.network_geom_type)
-        list_codes = []    
+        list_codes = []
         if geom_type == self.controller.tr('Arc'):
             list_codes = self.list_arc
         elif geom_type == self.controller.tr('Connec'):
@@ -205,11 +237,37 @@ class SearchPlus(QObject):
             list_codes = self.list_node
         else:
             list_codes = self.list_all
-         
-        utils_giswater.fillComboBoxList(self.dlg.network_code, list_codes)
+
+        self.set_model_by_list(list_codes)
         
         return True
-    
+
+
+    def set_model_by_list(self, list):
+        
+        model = QStringListModel()
+        model.setStringList(list)
+        self.proxy_model = QSortFilterProxyModel()
+        self.proxy_model.setSourceModel(model)
+        self.proxy_model.setFilterKeyColumn(0)
+        proxy_model_aux = QSortFilterProxyModel()
+        proxy_model_aux.setSourceModel(model)
+        proxy_model_aux.setFilterKeyColumn(0)
+        self.dlg.network_code.setModel(proxy_model_aux)
+        self.dlg.network_code.setModelColumn(0)
+        completer = QCompleter()
+        completer.setModel(self.proxy_model)
+        completer.setCompletionColumn(0)
+        completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        self.dlg.network_code.setCompleter(completer)
+        
+        # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
+        self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
+
+
+    def filter_by_list(self):
+        self.proxy_model.setFilterFixedString(self.dlg.network_code.currentText())
+
 
     def network_zoom(self, fieldname, network_code, network_geom_type):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """  
