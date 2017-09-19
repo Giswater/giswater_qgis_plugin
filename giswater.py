@@ -30,6 +30,8 @@ from map_tools.replace_node import ReplaceNodeMapTool
 from models.plugin_toolbar import PluginToolbar
 from search.search_plus import SearchPlus
 
+from models.sys_feature_cat import SysFeatureCat
+
 
 class Giswater(QObject):  
     
@@ -181,26 +183,31 @@ class Giswater(QObject):
             
             # Button add_node or add_arc: add drop down menu to button in toolbar
             if self.schema_exists and (index_action == '01' or index_action == '02'):
-                
-                if index_action == '01':
-                    geom_type = 'node'
-                elif index_action == '02':
-                    geom_type = 'arc'
-                    
+
                 # Get list of different node and arc types
-                menu = QMenu()
-                sql = "SELECT i18n, shortcut_key"
-                sql += " FROM "+self.schema_name+"."+geom_type+"_type_cat_type ORDER BY i18n"    
-                rows = self.dao.get_rows(sql)
-                if rows: 
-                    for row in rows:
-                        obj_action = QAction(str(row["i18n"]), self)
-                        obj_action.setShortcut(str(row["shortcut_key"]))
-                        menu.addAction(obj_action)
-                        obj_action.triggered.connect(partial(self.edit.menu_activate, str(row["i18n"])))
-                
-                action.setMenu(menu)
-                  
+                menu_node = QMenu()
+                menu_arc = QMenu()
+
+                # List of nodes from node_type_cat_type - nodes which we are using
+                for key, feature_cat in self.feature_cat.iteritems():
+                    if index_action == '01':
+                        if feature_cat.type == 'NODE':
+                            obj_action = QAction(str(feature_cat.layername), self)
+                            obj_action.setShortcut(str(feature_cat.shortcut_key))
+                            menu_node.addAction(obj_action)
+                            obj_action.triggered.connect(partial(self.edit.menu_activate, str(feature_cat.layername)))
+                    elif index_action == '02':
+                        if feature_cat.type == 'ARC':
+                            obj_action = QAction(str(feature_cat.layername), self)
+                            obj_action.setShortcut(str(feature_cat.shortcut_key))
+                            menu_arc.addAction(obj_action)
+                            obj_action.triggered.connect(partial(self.edit.menu_activate, str(feature_cat.layername)))
+
+                if index_action == '01':
+                    action.setMenu(menu_node)
+                elif index_action == '02':
+                    action.setMenu(menu_arc)
+
         if toolbar is not None:
             toolbar.addAction(action)  
             
@@ -397,7 +404,10 @@ class Giswater(QObject):
         self.table_waccel = self.settings.value('db/table_waccel', 'v_edit_man_waccel')
         self.table_tap = self.settings.value('db/table_tap', 'v_edit_man_tap')
         self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
-        
+
+        self.feature_cat = {}
+        self.project_read_features()
+
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
                          
@@ -405,7 +415,42 @@ class Giswater(QObject):
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
                                  
         # Project initialization
-        self.project_read()               
+        self.project_read()
+
+
+    def manage_feature_cat(self):
+
+        # Dictionary to keep every record of table 'sys_feature_cat'
+        # Key: field tablename
+        # Value: Object of the class SysFeatureCat
+        sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
+        rows = self.dao.get_rows(sql)
+        if not rows:
+            return
+
+        for row in rows:
+            tablename = row['tablename']
+            elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            self.feature_cat[tablename] = elem
+
+
+    def project_read_features(self):
+
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return
+
+        self.manage_feature_cat()
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
+            if uri_table is not None:
+
+                if uri_table in self.feature_cat.keys():
+                    elem = self.feature_cat[uri_table]
+                    elem.layername = cur_layer.name()
 
 
     def unload(self):
