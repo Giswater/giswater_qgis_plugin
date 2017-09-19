@@ -15,8 +15,6 @@ from functools import partial
 import utils_giswater
 from parent_init import ParentDialog
 
-from models.sys_feature_cat import SysFeatureCat
-
 
 def formOpen(dialog, layer, feature):
     ''' Function called when a connec is identified in the map '''
@@ -377,7 +375,6 @@ class ManArcDialog(ParentDialog):
         soil_excess.setAlignment(Qt.AlignJustify)
         soil_trenchlining.setText(m2trenchl)
         soil_trenchlining.setAlignment(Qt.AlignJustify)
-
 
 
     def go_child(self, idx):

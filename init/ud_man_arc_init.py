@@ -123,37 +123,6 @@ class ManArcDialog(ParentDialog):
 
         self.project_read()
 
-        
-    def go_child(self, idx):
-
-        selected_layer = self.layer.name()
-        widget = str(selected_layer.lower()) + "_node_" + str(idx)
-
-        self.node_widget = self.dialog.findChild(QLineEdit, widget)
-        self.node_id = self.node_widget.text()
-
-        # get pointer of node by ID
-        aux = "\"node_id\" = "
-        aux += "'" + str(self.node_id) + "'"
-        expr = QgsExpression(aux)
-        if expr.hasParserError():
-            message = "Expression Error: " + str(expr.parserErrorString())
-            self.controller.show_warning(message)
-            return
-
-        self.controller.log_info(str(self.feature_cat))
-        # List of nodes from node_type_cat_type - nodes which we are using
-        for key, feature_cat in self.feature_cat.iteritems():
-            if feature_cat.type == 'NODE':
-                layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
-                if layer:
-                    layer = layer[0]
-                    # Get a featureIterator from this expression:
-                    it = layer.getFeatures(QgsFeatureRequest(expr))
-                    id_list = [i for i in it]
-                    if id_list != []:
-                        self.iface.openFeatureForm(layer, id_list[0])
-
     
     def fill_costs(self):
         ''' Fill tab costs '''
@@ -410,4 +379,35 @@ class ManArcDialog(ParentDialog):
         soil_trenchlining.setText(m2trenchl)
         soil_trenchlining.setAlignment(Qt.AlignJustify)
         
-        
+
+    def go_child(self, idx):
+
+        selected_layer = self.layer.name()
+        widget = str(selected_layer.lower()) + "_node_" + str(idx)
+
+        self.node_widget = self.dialog.findChild(QLineEdit, widget)
+        self.node_id = self.node_widget.text()
+
+        # get pointer of node by ID
+        aux = "\"node_id\" = "
+        aux += "'" + str(self.node_id) + "'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error: " + str(expr.parserErrorString())
+            self.controller.show_warning(message)
+            return
+
+        self.controller.log_info(str(self.feature_cat))
+        # List of nodes from node_type_cat_type - nodes which we are using
+        for key, feature_cat in self.feature_cat.iteritems():
+            if feature_cat.type == 'NODE':
+                layer = QgsMapLayerRegistry.instance().mapLayersByName(feature_cat.layername)
+                if layer:
+                    layer = layer[0]
+                    # Get a featureIterator from this expression:
+                    it = layer.getFeatures(QgsFeatureRequest(expr))
+                    id_list = [i for i in it]
+                    if id_list != []:
+                        self.iface.openFeatureForm(layer, id_list[0])
+                        
+                                
