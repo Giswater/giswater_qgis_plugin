@@ -14,7 +14,6 @@ CREATE TABLE man_addfields_parameter (
 id serial PRIMARY KEY,
 param_name varchar(50),
 featurecat_id varchar (30),
-is_null boolean,
 is_mandatory boolean,
 data_type text,
 field_length integer,
