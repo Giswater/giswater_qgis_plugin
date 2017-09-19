@@ -34,8 +34,7 @@ class ParentDialog(object):
         ''' Constructor class '''     
         self.dialog = dialog
         self.layer = layer
-        self.feature = feature
-        self.context_name = "ws_parent"    
+        self.feature = feature  
         self.iface = iface    
         self.init_config()     
         self.set_signals()    
@@ -323,6 +322,11 @@ class ParentDialog(object):
             sql = "SELECT value FROM "+self.schema_name+".config_param_system"
             sql += " WHERE parameter = 'om_visit_absolute_path'"
             row = self.dao.get_row(sql)
+            if not row:
+                message = "Parameter not set in table 'config_param_system'"
+                self.controller.show_warning(message, parameter='om_visit_absolute_path')
+                return
+            
             # Full path= path + value from row
             self.full_path = row[0]+self.path
             
@@ -337,7 +341,7 @@ class ParentDialog(object):
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
                     message = "File not found!"
-                    self.controller.show_warning(message, context_name='ui_message')
+                    self.controller.show_warning(message)
                 else:
                     # Open the document
                     os.startfile(self.full_path)          
@@ -351,7 +355,7 @@ class ParentDialog(object):
         selected_list = self.tbl_document.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message) 
             return
         
         inf_text = ""
@@ -366,28 +370,28 @@ class ParentDialog(object):
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
         if row is None:
-            message = "Check doc_absolute_path in table config_param_system, value does not exist or is not defined!"
-            self.controller.show_warning(message, context_name='ui_message')
+            message = "Parameter not set in table 'config_param_system'"
+            self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-        else:
-            # Full path= path + value from row
-            self.full_path =row[0]+self.path
-           
-            # Parse a URL into components
-            url=urlparse.urlsplit(self.full_path)
-    
-            # Check if path is URL
-            if url.scheme=="http":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found:"+self.full_path 
-                    self.controller.show_warning(message, context_name='ui_message')
-                else:
-                    # Open the document
-                    os.startfile(self.full_path)    
+
+        # Full path= path + value from row
+        self.full_path =row[0]+self.path
+       
+        # Parse a URL into components
+        url=urlparse.urlsplit(self.full_path)
+
+        # Check if path is URL
+        if url.scheme=="http":
+            # If path is URL open URL in browser
+            webbrowser.open(self.full_path) 
+        else: 
+            # If its not URL ,check if file exist
+            if not os.path.exists(self.full_path):
+                message = "File not found:"+self.full_path 
+                self.controller.show_warning(message, context_name='ui_message')
+            else:
+                # Open the document
+                os.startfile(self.full_path)    
                 
 
     def set_filter_table(self, widget):
@@ -398,7 +402,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)                   
             return
         
         # Set filter
@@ -429,7 +433,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)                   
             return
         
         # Set filter
@@ -541,8 +545,8 @@ class ParentDialog(object):
         date = QDate.currentDate()
         self.date_document_to.setDate(date)
 
-        self.btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
-        self.btn_open_path.clicked.connect(self.open_selected_document_from_table) 
+        btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
+        btn_open_path.clicked.connect(self.open_selected_document_from_table) 
         
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
@@ -558,7 +562,7 @@ class ParentDialog(object):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
-        # Fill ComboBox doccat_id
+        # Fill ComboBox doc_type
         sql = "SELECT DISTINCT(doc_type)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY doc_type"
@@ -759,7 +763,7 @@ class ParentDialog(object):
                 self.tab_main.removeTab(i) 
 
         # For virtual arc remove tab Costs
-        if self.layer.name() == "Varc" :
+        if self.layer.name() == "Varc":
             self.tab_main.removeTab(4)          
                 
                 

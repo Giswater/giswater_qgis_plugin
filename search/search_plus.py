@@ -58,7 +58,7 @@ class SearchPlus(QObject):
                 self.params[row['parameter']] = str(row['value'])
             return True
         else:
-            self.controller.log_warning("No data found in table 'config_param_system' related with 'searchplus'")
+            self.controller.log_warning("Parameters related with 'searchplus' not set in table 'config_param_system'")
             return False            
 
             

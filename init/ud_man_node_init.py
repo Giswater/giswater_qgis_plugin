@@ -145,7 +145,7 @@ class ManNodeDialog(ParentDialog):
         layer = self.iface.activeLayer()
         
         # Toolbar actions
-        action = self.dialog.findChild(QAction, "actionEnable")
+        action = self.dialog.findChild(QAction, "actionEnabled")
         self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered,feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
@@ -190,8 +190,8 @@ class ManNodeDialog(ParentDialog):
 
         # Fill 1D array with full path
         if row is None:
-            message = "Check doc_absolute_path in table config_param_system, value does not exist or is not defined!"
-            self.dao.show_warning(message, context_name='ui_message')
+            message = "Parameter not set in table 'config_param_system'"
+            self.controller.show_warning(message, parameter='doc_absolute_path')
             return
         else:
             for value in rows:
