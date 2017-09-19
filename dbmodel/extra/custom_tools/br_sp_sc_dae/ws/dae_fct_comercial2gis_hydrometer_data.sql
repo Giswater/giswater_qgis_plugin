@@ -1,9 +1,4 @@
-/*
-This file is part of Giswater 3
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
-*/
-
+﻿
 CREATE OR REPLACE FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data()
   RETURNS void AS
 $BODY$
@@ -64,7 +59,29 @@ VALUES (int_new_hydrometer,int_real_hydrometer,int_old_hydrometer,now());
 
 
 
--- INSERT NEW HYDROMETER (AND CONNEC IF NOT EXISTS)
+-- INSERT CONNEC IF NOT EXISTS
+
+FOR rec_hydrometer IN SELECT DISTINCT ON (ext_rtc_hydrometer.code)
+connec.connec_id,
+ext_rtc_hydrometer.code,
+ext_hydrometer_category.observ,
+ext_urban_propierties.the_geom as v_the_geom
+FROM ext_rtc_hydrometer 
+LEFT JOIN connec ON connec.connec_id = ext_rtc_hydrometer.code 
+LEFT JOIN ext_urban_propierties ON ext_urban_propierties.code=ext_rtc_hydrometer.code
+JOIN ext_hydrometer_category ON ext_hydrometer_category.id=ext_rtc_hydrometer.hydrometer_category::text
+WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer) AND (connec.the_geom is not null or ext_urban_propierties.the_geom is not null)
+LOOP
+    -- new connec
+    IF rec_hydrometer.connec_id IS NULL THEN
+	INSERT INTO v_edit_connec (connec_id, connecat_id, state, category_type, verified, the_geom) 
+	VALUES (rec_hydrometer.code, '8', 'EM_SERVIÇO', rec_hydrometer.observ, 'A VERIFICAR', st_centroid (rec_hydrometer.v_the_geom));
+    END IF;     
+END LOOP;
+
+
+
+-- INSERT NEW HYDROMETER
 
 FOR rec_hydrometer IN SELECT 
 connec.connec_id,
@@ -77,20 +94,14 @@ hydrometer_id::integer,
 hydrometer_category,
 ext_urban_propierties.the_geom as v_the_geom
 FROM ext_rtc_hydrometer 
-JOIN connec ON connec.connec_id = ext_rtc_hydrometer.code 
-JOIN ext_urban_propierties ON ext_urban_propierties.code=ext_rtc_hydrometer.code
+LEFT JOIN connec ON connec.connec_id = ext_rtc_hydrometer.code 
+LEFT JOIN ext_urban_propierties ON ext_urban_propierties.code=ext_rtc_hydrometer.code
 JOIN ext_hydrometer_category ON ext_hydrometer_category.id=ext_rtc_hydrometer.hydrometer_category::text
-WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer)
+WHERE hydrometer_id::integer NOT IN (SELECT hydrometer_id::integer FROM rtc_hydrometer) AND (connec.the_geom is not null or ext_urban_propierties.the_geom is not null)
 LOOP
-    -- new connec
-    IF rec_hydrometer.connec_id IS NULL THEN
-        text_sector:= (SELECT sector_id FROM sector WHERE ST_DWithin(rec_hydrometer.v_the_geom.the_geom, sector.the_geom,0.001) LIMIT 1);
-        text_dma:= (SELECT dma_id FROM dma WHERE ST_DWithin(rec_hydrometer.v_the_geom.the_geom, sector.the_geom,0.001) LIMIT 1);     	
-        INSERT INTO connec (connec_id, sector_id, dma_id, category_type, to_review, the_geom) 
-        VALUES (rec_hydrometer.code, text_sector, text_dma, rec_hydrometer.observ, 'A VERIFICAR', st_centroid (rec_hydrometer.v_the_geom));
-        INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
-	INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
-    END IF;
+    --insert new hydrometer (on recently created connec)
+    --INSERT INTO rtc_hydrometer (hydrometer_id) VALUES (rec_hydrometer.hydrometer_id);
+    --INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id) VALUES (rec_hydrometer.hydrometer_id, rec_hydrometer.connec_id);
         
     -- existing connec but desactivated
     IF rec_hydrometer.state='DESATIVADO' THEN
@@ -127,10 +138,10 @@ LOOP
         UPDATE connec SET state='DESATIVADO' WHERE connec_id=id_last;
     ELSE
         counter=0;
-        FOR rec_connec IN SELECT * FROM rtc_hydrometer_x_connec WHERE connec_id=id_last
+        FOR rec_connec IN SELECT * FROM rtc_hydrometer_x_connec JOIN connec ON connec.connec_id=rtc_hydrometer_x_connec.connec_id WHERE connec.connec_id=id_last
         LOOP
             SELECT observ INTO text_hydrometer_category FROM ext_rtc_hydrometer 
-            JOIN ext_hydrometer_category ON ext_hydrometer_category.id=ext_rtc_hydrometer.hydrometer_category;
+            JOIN ext_hydrometer_category ON ext_hydrometer_category.id::text=ext_rtc_hydrometer.hydrometer_category::text;
             counter=counter+1;
             IF counter=1 THEN
                 rec_connec.category_type=text_hydrometer_category;
@@ -155,5 +166,7 @@ ALTER FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data()
   OWNER TO gisadmin;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO public;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO gisadmin;
-GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_supereditor;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_editor;
 GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_editor_saa;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_supereditor;
+GRANT EXECUTE ON FUNCTION gw_saa.gw_fct_comercial2gis_hydrometer_data() TO rol_supereditor_saa;
