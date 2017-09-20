@@ -131,10 +131,10 @@ BEGIN
 		END IF;  
         
         -- FEATURE INSERT      
-	INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
+	INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, state, state_type, annotation, observ,comment, dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, 
 			location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, verified, the_geom, undelete, label_x, 
 			label_y, label_rotation, expl_id, publish, inventory, hemisphere, num_value) 
-			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.annotation, NEW.observ, NEW.comment, 
+			VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id,	NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW.comment, 
 			NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type,NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.verified, NEW.the_geom,NEW.undelete,
 			NEW.label_x, NEW.label_y,NEW.label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.hemisphere, NEW.num_value);
@@ -236,7 +236,7 @@ BEGIN
 	-- UPDATE values
 		UPDATE node 
 	SET node_id=NEW.node_id, code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
+		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type,
 		category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id,
 		builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
 		rotation=NEW.rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, 

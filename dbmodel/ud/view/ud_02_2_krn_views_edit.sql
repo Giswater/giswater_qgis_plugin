@@ -71,7 +71,9 @@ node.nodecat_id,
 cat_node.matcat_id AS "cat_matcat_id",
 node.epa_type,
 node.sector_id, 
+sector.macrosector_id,
 node."state", 
+node.state_type,
 node.annotation, 
 node.observ, 
 node."comment",
@@ -112,7 +114,8 @@ FROM selector_expl,node
 	JOIN v_node ON node.node_id=v_node.node_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
-	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN dma ON node.dma_id = dma.dma_id	
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE ((node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"());
 
 
@@ -149,7 +152,9 @@ cat_arc.width AS "cat_width",
 st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
 arc.epa_type,
 arc.sector_id, 
+sector.macrosector_id,
 arc."state", 
+arc.state_type,
 arc.annotation, 
 arc.observ, 
 arc."comment",
@@ -189,6 +194,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON (((arc.arccat_id) = (cat_arc.id)))
 	JOIN arc_type ON arc_type.id=arc.arc_type
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
 
@@ -205,8 +211,10 @@ connec.connec_type,
 connec.private_connecat_id,
 cat_connec.matcat_id AS "cat_matcat_id",
 connec.sector_id,
+sector.macrosector_id,
 connec.demand,
 connec."state", 
+connec.state_type,
 connec_arccat_id,
 connec_depth,
 connec_length,
@@ -258,6 +266,7 @@ FROM selector_expl, connec
 	LEFT JOIN ext_streetaxis ON (((connec.streetaxis_id) = (ext_streetaxis.id)))
 	LEFT JOIN link ON connec.connec_id = link.feature_id
 	LEFT JOIN dma ON connec.dma_id = dma.dma_id
+	LEFT JOIN sector ON connec.sector_id = sector.sector_id
 	LEFT JOIN vnode ON vnode.vnode_id = link.vnode_id
 	JOIN connec_type ON connec.connec_type=connec_type.id
 	WHERE connec.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
@@ -284,7 +293,9 @@ gully.connec_length,
 gully.connec_depth,
 gully.arc_id,
 gully.sector_id, 
+sector.macrosector_id,
 gully."state", 
+gully.state_type,
 gully.annotation, 
 gully.observ, 
 gully."comment",
@@ -329,6 +340,7 @@ FROM selector_expl, gully
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON gully.streetaxis_id = ext_streetaxis.id
 	LEFT JOIN dma ON gully.dma_id = dma.dma_id
+	LEFT JOIN sector ON gully.sector_id = sector.sector_id
 	WHERE gully.the_geom is not null AND
 	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
@@ -352,7 +364,9 @@ gully.connec_length,
 gully.connec_depth,
 gully.arc_id,
 gully.sector_id, 
+sector.macrosector_id,
 gully."state", 
+gully.state_type,
 gully.annotation, 
 gully.observ, 
 gully."comment",
@@ -397,6 +411,7 @@ FROM selector_expl, gully
 	LEFT JOIN cat_grate ON (((gully.gratecat_id) = (cat_grate.id)))
 	LEFT JOIN ext_streetaxis ON streetaxis_id=ext_streetaxis.id
 	LEFT JOIN dma ON gully.dma_id = dma.dma_id
+	LEFT JOIN sector ON gully.sector_id = sector.sector_id
 	WHERE gully.the_geom_pol is not null AND
 	gully.expl_id=selector_expl.expl_id AND selector_expl.cur_user="current_user"();
 
@@ -462,7 +477,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS junction_annotation,
 node.observ AS junction_observ,
 node.comment AS junction_comment,
@@ -502,6 +519,7 @@ node.num_value as junction_num_value
 FROM selector_expl, node
 	JOIN man_junction ON man_junction.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -524,7 +542,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS outfall_annotation,
 node.observ AS outfall_observ,
 node.comment AS outfall_comment,
@@ -569,6 +589,7 @@ FROM selector_expl, node
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
 	 
@@ -588,7 +609,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS storage_annotation,
 node.observ AS storage_observ,
 node.comment AS storage_comment,
@@ -637,6 +660,7 @@ man_storage.name AS storage_name
 FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -661,7 +685,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS storage_annotation,
 node.observ AS storage_observ,
 node.comment AS storage_comment,
@@ -709,6 +735,7 @@ man_storage.name AS storage_name
 FROM selector_expl, node
 	JOIN man_storage ON man_storage.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -734,7 +761,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS valve_annotation,
 node.observ AS valve_observ,
 node.comment AS valve_comment,
@@ -777,6 +806,7 @@ FROM selector_expl, node
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -798,7 +828,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS netinit_annotation,
 node.observ AS netinit_observ,
 node.comment AS netinit_comment,
@@ -847,6 +879,7 @@ FROM selector_expl, node
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -868,7 +901,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS manhole_annotation,
 node.observ AS manhole_observ,
 node.comment AS manhole_comment,
@@ -917,6 +952,7 @@ FROM selector_expl, node
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	JOIN v_node ON v_node.node_id = node.node_id
 	WHERE (node.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
 
@@ -937,7 +973,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS wjump_annotation,
 node.observ AS wjump_observ,
 node.comment AS wjump_comment,
@@ -983,6 +1021,7 @@ man_wjump.name AS wjump_name
 FROM selector_expl, node
 	JOIN man_wjump ON man_wjump.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1006,7 +1045,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS netgully_annotation,
 node.observ AS netgully_observ,
 node.comment AS netgully_comment,
@@ -1055,6 +1096,7 @@ ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
@@ -1078,7 +1120,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS netgully_annotation,
 node.observ AS netgully_observ,
 node.comment AS netgully_comment,
@@ -1126,6 +1170,7 @@ ext_streetaxis.name AS netgully_streetname
 FROM selector_expl, node
 	JOIN man_netgully ON man_netgully.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	LEFT JOIN ext_streetaxis ON man_netgully.streetaxis_id = ext_streetaxis.id
@@ -1151,7 +1196,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS chamber_annotation,
 node.observ AS chamber_observ,
 node.comment AS chamber_comment,
@@ -1201,6 +1248,7 @@ man_chamber.name AS chamber_name
 FROM selector_expl, node
     JOIN man_chamber ON man_chamber.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1224,7 +1272,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS chamber_annotation,
 node.observ AS chamber_observ,
 node.comment AS chamber_comment,
@@ -1273,6 +1323,7 @@ man_chamber.name AS chamber_name
 FROM selector_expl, node
 	JOIN man_chamber ON man_chamber.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1297,7 +1348,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS wwtp_annotation,
 node.observ AS wwtp_observ,
 node.comment AS wwtp_comment,
@@ -1339,6 +1392,7 @@ man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1363,6 +1417,7 @@ node.nodecat_id,
 node.epa_type,
 node.sector_id,
 node.state,
+node.state_type,
 node.annotation AS wwtp_annotation,
 node.observ AS wwtp_observ,
 node.comment AS wwtp_comment,
@@ -1403,6 +1458,7 @@ man_wwtp.name AS wwtp_name
 FROM selector_expl, node
 	JOIN man_wwtp ON man_wwtp.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1426,7 +1482,9 @@ node.node_type,
 node.nodecat_id,
 node.epa_type,
 node.sector_id,
+sector.macrosector_id,
 node.state,
+node.state_type,
 node.annotation AS netelement_annotation,
 node.observ AS netelement_observ,
 node.comment AS netelement_comment,
@@ -1467,6 +1525,7 @@ man_netelement.serial_number as netelement_serial_number
 FROM selector_expl, node
 	JOIN man_netelement ON man_netelement.node_id = node.node_id
 	LEFT JOIN dma ON node.dma_id = dma.dma_id
+	LEFT JOIN sector ON node.sector_id = sector.sector_id
 	LEFT JOIN cat_node ON ((node.nodecat_id) = (cat_node.id))
 	JOIN node_type ON node_type.id=node.node_type
 	JOIN v_node ON v_node.node_id = node.node_id
@@ -1505,7 +1564,9 @@ cat_arc.width AS conduit_cat_width,
 st_length2d(arc.the_geom)::numeric(12,2) AS conduit_gis_length,
 arc.epa_type,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
+arc.state_type,
 arc.annotation AS conduit_annotation,
 arc.observ AS conduit_observ,
 arc.comment AS conduit_comment,
@@ -1544,6 +1605,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_conduit ON man_conduit.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -1581,7 +1643,9 @@ cat_arc.width AS siphon_cat_width,
 st_length2d(arc.the_geom)::numeric(12,2) AS siphon_gis_length,
 arc.epa_type,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
+arc.state_type,
 arc.annotation AS siphon_annotation,
 arc.observ AS siphon_observ,
 arc.comment AS siphon_comment,
@@ -1621,6 +1685,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_siphon ON man_siphon.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();
@@ -1659,7 +1724,9 @@ cat_arc.width AS waccel_cat_width,
 st_length2d(arc.the_geom)::numeric(12,2) AS waccel_gis_length,
 arc.epa_type,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
+arc.state_type,
 arc.annotation AS waccel_annotation,
 arc.observ AS waccel_observ,
 arc.comment AS waccel_comment,
@@ -1704,6 +1771,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_waccel ON man_waccel.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();;
@@ -1740,7 +1808,9 @@ cat_arc.geom1 AS varc_cat_geom1,
 st_length2d(arc.the_geom)::numeric(12,2) AS varc_gis_length,
 arc.epa_type,
 arc.sector_id,
+sector.macrosector_id,
 arc.state,
+arc.state_type,
 arc.annotation AS varc_annotation,
 arc.observ AS varc_observ,
 arc.comment AS varc_comment,
@@ -1779,6 +1849,7 @@ FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
 	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
+	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	JOIN arc_type ON arc_type.id=arc.arc_type
 	JOIN man_varc ON man_varc.arc_id = arc.arc_id
 	WHERE (arc.expl_id)=(selector_expl.expl_id) AND selector_expl.cur_user="current_user"();

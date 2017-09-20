@@ -428,6 +428,12 @@ name varchar(30) NOT NULL,
 "observ" text
 );
 
+CREATE TABLE "value_state_type" (
+"id" int2 NOT NULL PRIMARY KEY, 
+state int2,
+name varchar(30) NOT NULL,
+is_operative boolean
+);
 
 CREATE TABLE "value_verified" (
 "id" varchar(30) NOT NULL PRIMARY KEY, 
