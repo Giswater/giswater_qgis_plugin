@@ -160,6 +160,10 @@ class ManNodeDialog(ParentDialog):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = QgsMapCanvasSnapper(self.canvas)
 
+        # Event
+        self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
+        self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
+
         
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
