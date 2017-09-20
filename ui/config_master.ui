@@ -49,13 +49,13 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
      <string>Vdefault</string>
     </attribute>
-    <widget class="QTabWidget" name="Utils">
+    <widget class="QTabWidget" name="tab_vdefault">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -137,7 +137,7 @@
     <attribute name="title">
      <string>Topology</string>
     </attribute>
-    <widget class="QTabWidget" name="tab_config">
+    <widget class="QTabWidget" name="tab_topology">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -771,7 +771,7 @@
     <attribute name="title">
      <string>Functions</string>
     </attribute>
-    <widget class="QTabWidget" name="Utils_3">
+    <widget class="QTabWidget" name="tab_functions">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -948,11 +948,6 @@
         <double>0.010000000000000</double>
        </property>
       </widget>
-     </widget>
-     <widget class="QWidget" name="tab_26">
-      <attribute name="title">
-       <string>Repair</string>
-      </attribute>
      </widget>
     </widget>
    </widget>

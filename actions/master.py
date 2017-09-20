@@ -280,8 +280,7 @@ class Master(ParentAction):
         self.dlg.doc_path_doc.clicked.connect(partial(self.open_file_dialog, "doc_absolute_path"))
 
         if self.project_type == 'ws':
-            slope_arc_direction = self.dlg.findChild(QCheckBox, 'slope_arc_direction')
-            slope_arc_direction.setEnabled(False)
+            self.dlg.tab_topology.removeTab(1)
 
         sql = "SELECT name FROM" + self.schema_name + ".plan_psector ORDER BY name"
         rows = self.dao.get_rows(sql)
@@ -293,6 +292,8 @@ class Master(ParentAction):
         if row:
             utils_giswater.setChecked("chk_psector_enabled", True)
             utils_giswater.setWidgetText(str(row[0]), str(row[1]))
+
+        self.dlg.exec_()
 
 
     def select_config_param_system(self, tablename): 
