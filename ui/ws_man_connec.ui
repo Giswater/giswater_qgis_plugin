@@ -75,7 +75,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_connec_type">
+   <widget class="QLabel" name="label_connectype_id">
     <property name="geometry">
      <rect>
       <x>124</x>
@@ -8903,21 +8903,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="connec_type">
-    <property name="geometry">
-     <rect>
-      <x>124</x>
-      <y>20</y>
-      <width>139</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_catalog">
     <property name="geometry">
      <rect>
@@ -9395,6 +9380,19 @@
     </property>
     <property name="frame">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="connectype_id">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>125</x>
+      <y>20</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
     </property>
    </widget>
   </widget>
