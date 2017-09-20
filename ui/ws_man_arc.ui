@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>613</width>
-    <height>662</height>
+    <width>604</width>
+    <height>670</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>276</x>
-      <y>546</y>
-      <width>121</width>
+      <x>405</x>
+      <y>541</y>
+      <width>186</width>
       <height>20</height>
      </rect>
     </property>
@@ -27,8 +27,8 @@
    <widget class="QLabel" name="label_macrodma">
     <property name="geometry">
      <rect>
-      <x>275</x>
-      <y>481</y>
+      <x>145</x>
+      <y>480</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -822,8 +822,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>327</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5918,7 +5918,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>546</y>
+      <y>541</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -5930,8 +5930,8 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>145</x>
-      <y>481</y>
+      <x>270</x>
+      <y>480</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6016,14 +6016,14 @@
    <widget class="QCheckBox" name="undelete_3">
     <property name="geometry">
      <rect>
-      <x>404</x>
-      <y>546</y>
+      <x>20</x>
+      <y>570</y>
       <width>71</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Inven.</string>
+     <string>Inventory</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_arccat_id">
@@ -6068,7 +6068,7 @@
     <property name="geometry">
      <rect>
       <x>435</x>
-      <y>570</y>
+      <y>595</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -6080,21 +6080,21 @@
    <widget class="QCheckBox" name="undelete_2">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>546</y>
+      <x>530</x>
+      <y>570</y>
       <width>56</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Publ.</string>
+     <string>Publish</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_pressurezone">
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>526</y>
+      <y>521</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6170,7 +6170,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>481</y>
+      <y>480</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6218,7 +6218,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>501</y>
+      <y>500</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -6274,8 +6274,8 @@
    <widget class="QComboBox" name="dma_id">
     <property name="geometry">
      <rect>
-      <x>145</x>
-      <y>501</y>
+      <x>275</x>
+      <y>500</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -6293,8 +6293,8 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>276</x>
-      <y>526</y>
+      <x>405</x>
+      <y>521</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6329,14 +6329,14 @@
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
-      <x>474</x>
-      <y>546</y>
+      <x>260</x>
+      <y>570</y>
       <width>73</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Undel</string>
+     <string>Undelete</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="macrodma_id">
@@ -6345,8 +6345,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>275</x>
-      <y>504</y>
+      <x>145</x>
+      <y>500</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -6362,7 +6362,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>501</y>
+      <y>500</y>
       <width>186</width>
       <height>20</height>
      </rect>
@@ -6398,7 +6398,7 @@
     <property name="geometry">
      <rect>
       <x>146</x>
-      <y>545</y>
+      <y>540</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -6408,7 +6408,7 @@
     <property name="geometry">
      <rect>
       <x>146</x>
-      <y>525</y>
+      <y>520</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6426,6 +6426,52 @@
     </property>
     <property name="text">
      <string>State</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="state_type">
+    <property name="geometry">
+     <rect>
+      <x>275</x>
+      <y>540</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_state_type">
+    <property name="geometry">
+     <rect>
+      <x>275</x>
+      <y>520</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>State type:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>

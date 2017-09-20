@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>618</width>
-    <height>711</height>
+    <width>622</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,8 +30,8 @@
    <widget class="QCheckBox" name="publish">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>596</y>
+      <x>455</x>
+      <y>620</y>
       <width>79</width>
       <height>17</height>
      </rect>
@@ -43,8 +43,8 @@
    <widget class="QLabel" name="label_macrosector">
     <property name="geometry">
      <rect>
-      <x>142</x>
-      <y>538</y>
+      <x>310</x>
+      <y>535</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -81,8 +81,8 @@
    <widget class="QLabel" name="label_sector">
     <property name="geometry">
      <rect>
-      <x>15</x>
-      <y>538</y>
+      <x>165</x>
+      <y>535</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -120,14 +120,14 @@
    <widget class="QCheckBox" name="undelete">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>596</y>
+      <x>310</x>
+      <y>620</y>
       <width>77</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Undel.</string>
+     <string>Undelete</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_arccat_id">
@@ -250,9 +250,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>142</x>
-      <y>556</y>
-      <width>121</width>
+      <x>310</x>
+      <y>555</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -266,8 +266,8 @@
    <widget class="QCheckBox" name="uncertain">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>596</y>
+      <x>20</x>
+      <y>620</y>
       <width>79</width>
       <height>17</height>
      </rect>
@@ -279,9 +279,9 @@
    <widget class="QComboBox" name="dma_id">
     <property name="geometry">
      <rect>
-      <x>272</x>
-      <y>556</y>
-      <width>121</width>
+      <x>455</x>
+      <y>555</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -311,8 +311,8 @@
    <widget class="QLabel" name="label_verified">
     <property name="geometry">
      <rect>
-      <x>145</x>
-      <y>576</y>
+      <x>455</x>
+      <y>575</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -347,8 +347,8 @@
    <widget class="QLabel" name="label_dma">
     <property name="geometry">
      <rect>
-      <x>282</x>
-      <y>538</y>
+      <x>460</x>
+      <y>535</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -387,7 +387,7 @@
     <property name="geometry">
      <rect>
       <x>445</x>
-      <y>620</y>
+      <y>645</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -424,7 +424,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1667,8 +1667,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2256,8 +2256,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>560</width>
+         <height>375</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13515,9 +13515,9 @@
    <widget class="QComboBox" name="sector_id">
     <property name="geometry">
      <rect>
-      <x>15</x>
-      <y>556</y>
-      <width>119</width>
+      <x>165</x>
+      <y>555</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -13534,22 +13534,22 @@
    <widget class="QCheckBox" name="inventory">
     <property name="geometry">
      <rect>
-      <x>369</x>
-      <y>596</y>
+      <x>165</x>
+      <y>620</y>
       <width>71</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Invent.</string>
+     <string>Inventory</string>
     </property>
    </widget>
    <widget class="QComboBox" name="verified">
     <property name="geometry">
      <rect>
-      <x>145</x>
-      <y>596</y>
-      <width>119</width>
+      <x>455</x>
+      <y>595</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -13557,8 +13557,8 @@
    <widget class="QLabel" name="label_expl_name">
     <property name="geometry">
      <rect>
-      <x>405</x>
-      <y>538</y>
+      <x>20</x>
+      <y>575</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -13598,9 +13598,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>405</x>
-      <y>556</y>
-      <width>191</width>
+      <x>20</x>
+      <y>595</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -13640,7 +13640,7 @@
    <widget class="QLabel" name="label_state">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>165</x>
       <y>575</y>
       <width>90</width>
       <height>22</height>
@@ -13658,7 +13658,7 @@
      <enum>QFrame::Plain</enum>
     </property>
     <property name="text">
-     <string>State</string>
+     <string>State:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::AutoText</enum>
@@ -13676,11 +13676,115 @@
    <widget class="QComboBox" name="state">
     <property name="geometry">
      <rect>
-      <x>14</x>
+      <x>165</x>
       <y>595</y>
-      <width>119</width>
+      <width>141</width>
       <height>20</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="macrosector_id">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>555</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="maxVisibleItems">
+     <number>8</number>
+    </property>
+    <property name="frame">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_macrosector_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>535</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>Macrosector:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="state_type">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>595</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_state_type">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>575</y>
+      <width>90</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="text">
+     <string>State type:</string>
+    </property>
+    <property name="textFormat">
+     <enum>Qt::AutoText</enum>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+    <property name="margin">
+     <number>3</number>
     </property>
    </widget>
   </widget>
