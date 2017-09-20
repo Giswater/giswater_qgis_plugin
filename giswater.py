@@ -156,7 +156,6 @@ class Giswater(QObject):
             # Generic function
             else:        
                 callback_function = getattr(self, 'action_triggered')  
-                self.controller.log_info(function_name)
                 action.triggered.connect(partial(callback_function, function_name))
                 
         except AttributeError:
@@ -178,35 +177,11 @@ class Giswater(QObject):
             action = QAction(text, parent) 
             
         else:
-            
             action = QAction(icon, text, parent)  
             
-            # Button add_node or add_arc: add drop down menu to button in toolbar
-            if self.schema_exists and (index_action == '01' or index_action == '02'):
-
-                # Get list of different node and arc types
-                menu_node = QMenu()
-                menu_arc = QMenu()
-
-                # List of nodes from node_type_cat_type - nodes which we are using
-                for key, feature_cat in self.feature_cat.iteritems():
-                    if index_action == '01':
-                        if feature_cat.type == 'NODE':
-                            obj_action = QAction(str(feature_cat.layername), self)
-                            obj_action.setShortcut(str(feature_cat.shortcut_key))
-                            menu_node.addAction(obj_action)
-                            obj_action.triggered.connect(partial(self.edit.menu_activate, str(feature_cat.layername)))
-                    elif index_action == '02':
-                        if feature_cat.type == 'ARC':
-                            obj_action = QAction(str(feature_cat.layername), self)
-                            obj_action.setShortcut(str(feature_cat.shortcut_key))
-                            menu_arc.addAction(obj_action)
-                            obj_action.triggered.connect(partial(self.edit.menu_activate, str(feature_cat.layername)))
-
-                if index_action == '01':
-                    action.setMenu(menu_node)
-                elif index_action == '02':
-                    action.setMenu(menu_arc)
+        # Button add_node or add_arc: add drop down menu to button in toolbar
+        if self.schema_exists and (index_action == '01' or index_action == '02'):
+            action = self.manage_dropdown_menu(action, index_action)
 
         if toolbar is not None:
             toolbar.addAction(action)  
@@ -220,7 +195,26 @@ class Giswater(QObject):
         self.manage_action(index_action, function_name)
             
         return action
-          
+      
+      
+    def manage_dropdown_menu(self, action, index_action):
+        """ Create dropdown menu for insert management of nodes and arcs """        
+               
+        # Get list of different node and arc types
+        menu = QMenu()
+
+        # List of nodes from node_type_cat_type - nodes which we are using
+        for feature_cat in self.feature_cat.itervalues():
+            if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
+                obj_action = QAction(str(feature_cat.layername), self)
+                obj_action.setShortcut(str(feature_cat.shortcut_key))
+                menu.addAction(obj_action)
+                obj_action.triggered.connect(partial(self.edit.menu_activate, str(feature_cat.layername)))
+
+            action.setMenu(menu)
+        
+        return action
+                         
 
     def menu_activate(self, node_type):
         
@@ -406,7 +400,6 @@ class Giswater(QObject):
         self.table_pipe = self.settings.value('db/table_pipe', 'v_edit_man_pipe')
 
         self.feature_cat = {}
-        self.project_read_features()
 
         # Manage actions of the different plugin_toolbars
         self.manage_toolbars()
@@ -414,40 +407,48 @@ class Giswater(QObject):
         # Load automatically custom forms for layers 'arc', 'node', and 'connec'? 
         self.load_custom_forms = bool(int(self.settings.value('status/load_custom_forms', 1)))   
                                  
+        # Delete python compiled files
+        self.delete_pyc_files()  
+                                         
         # Project initialization
         self.project_read()
 
 
     def manage_feature_cat(self):
-
+        """ Manage records from table 'sys_feature_type' """
+        
         # Dictionary to keep every record of table 'sys_feature_cat'
         # Key: field tablename
         # Value: Object of the class SysFeatureCat
+        self.feature_cat = {}             
         sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
         rows = self.dao.get_rows(sql)
         if not rows:
-            return
+            return False
 
         for row in rows:
             tablename = row['tablename']
             elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
             self.feature_cat[tablename] = elem
 
+        return True
+    
 
     def project_read_features(self):
-
+        
+        # Manage records from table 'sys_feature_type'
+        if not self.manage_feature_cat():
+            return
+        
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
         if len(layers) == 0:
             return
 
-        self.manage_feature_cat()
-
-        # Iterate over all layers to get the ones specified in 'db' config section
+        # Iterate over all layers. Set the layer_name to the ones related with table 'sys_feature_cat'
         for cur_layer in layers:
             uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
             if uri_table is not None:
-
                 if uri_table in self.feature_cat.keys():
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
@@ -537,16 +538,65 @@ class Giswater(QObject):
         
         if self.dao is None:
             return
-                
-        # Hide all plugin_toolbars
-        self.show_toolbars(False)
 
+        # Manage layers
+        if not self.manage_layers():
+            return
+              
+        self.project_read_features()
+               
+        # Manage actions of the different plugin_toolbars
+        self.manage_toolbars()
+                      
+        # Hide all plugin_toolbars
+        self.show_toolbars(False)        
+
+        # Get schema name from table 'version'
+        # Check if really exists
+        layer_source = self.controller.get_layer_source(self.layer_version)  
+        self.schema_name = layer_source['schema']
+        if self.schema_name is None or not self.dao.check_schema(self.schema_name):
+            self.controller.show_warning("Schema not found", parameter=self.schema_name)            
+            return
+
+        # Set schema_name in controller and in config file
+        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
+        self.controller.set_schema_name(self.schema_name)   
+        
+        # Get PostgreSQL version
+        self.controller.get_postgresql_version()        
+        
+        # Get SRID from table node
+        self.srid = self.dao.get_srid(self.schema_name, self.table_node)
+        self.controller.plugin_settings_set_value("srid", self.srid)           
+
+        # Search project type in table 'version'
+        self.search_project_type()              
+        
+        self.controller.set_actions(self.actions)
+
+        # Set layer custom UI form and init function   
+        if self.load_custom_forms:
+            self.manage_custom_forms()
+            
+        self.custom_enable_actions()           
+        
+        # Set objects for map tools classes
+        self.manage_map_tools()
+
+        # Set SearchPlus object
+        self.set_search_plus()
+         
+         
+    def manage_layers(self):
+        """ Iterate over all layers to get the ones specified in 'db' config section """ 
+        
         # Check if we have any layer loaded
         layers = self.iface.legendInterface().layers()
             
         if len(layers) == 0:
-            return    
-        
+            return False   
+                
         # Initialize variables
         self.layer_arc_man_ud = []
         self.layer_arc_man_ws = []
@@ -560,15 +610,11 @@ class Giswater(QObject):
 
         self.layer_gully = None
         self.layer_pgully = None
-
         self.layer_man_gully = None
         self.layer_man_pgully = None
-        
         self.layer_version = None
         self.layer_dimensions = None
-
-        #exists_version = False
-        #exists_man_junction = False
+        self.layer_man_junction = None
 
         # Iterate over all layers to get the ones specified in 'db' config section
         for cur_layer in layers:
@@ -589,6 +635,7 @@ class Giswater(QObject):
                     self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_junction' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
+                    self.layer_man_junction = cur_layer                  
                 if 'v_edit_man_outfall' == uri_table:
                     self.layer_node_man_ud.append(cur_layer)
                 if 'v_edit_man_valve' == uri_table:
@@ -673,65 +720,15 @@ class Giswater(QObject):
                 
                 if self.table_version == uri_table:
                     self.layer_version = cur_layer
-            
-        proj = QgsProject.instance()
-        proj.writeEntry("myplugin","myint",10)
-        
+                 
         # Check if table 'version' and man_junction exists
-        exists = False
-        for layer in layers:
-            layer_DB = self.controller.get_layer_source_table_name(layer) 
-            if layer_DB == 'v_edit_man_junction':
-                exists = True
-
-        if self.layer_version is None and exists == False:
-            pass
-        elif self.layer_version is not None and exists == True:
-            pass
-        else:
+        if self.layer_version is None or self.layer_man_junction is None:
             message = "To use this project with Giswater, layers man_junction and version must exist. Please check your project!"
             self.controller.show_warning(message)
-            return
-
-        # Get schema name from table 'version'
-        # Check if really exists
-        layer_source = self.controller.get_layer_source(self.layer_version)  
-        self.schema_name = layer_source['schema']
-        if self.schema_name is None or not self.dao.check_schema(self.schema_name):
-            self.controller.show_warning("Schema not found: "+self.schema_name)            
-            return
-
-        # Set schema_name in controller and in config file
-        self.controller.plugin_settings_set_value("schema_name", self.schema_name)   
-        self.controller.set_schema_name(self.schema_name)   
+            return False
         
-        # Get PostgreSQL version
-        self.controller.get_postgresql_version()        
-        
-        # Get SRID from table node
-        self.srid = self.dao.get_srid(self.schema_name, self.table_node)
-        self.controller.plugin_settings_set_value("srid", self.srid)           
-
-        # Search project type in table 'version'
-        self.search_project_type()
-        
-        self.controller.set_actions(self.actions)
-
-        # Set layer custom UI form and init function   
-        if self.load_custom_forms:
-            self.manage_custom_forms()
-            
-        self.custom_enable_actions()           
-        
-        # Set objects for map tools classes
-        self.manage_map_tools()
-
-        # Set SearchPlus object
-        self.set_search_plus()
-        
-        # Delete python compiled files
-        self.delete_pyc_files()  
-                
+        return True
+                                           
                       
     def manage_custom_forms(self):
         ''' Set layer custom UI form and init function '''
