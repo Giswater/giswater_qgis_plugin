@@ -18,13 +18,16 @@
 """
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QIcon
 from qgis.gui import QgsMapCanvasSnapper, QgsMapTool
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCursor
 
 from snapping_utils import SnappingConfigManager
 
+import os
 import sys
+
 
 class ParentMapTool(QgsMapTool):
 
@@ -96,4 +99,12 @@ class ParentMapTool(QgsMapTool):
 
         # Removehighlight
         self.h = None
-                
+
+
+    def set_icon(self, widget, icon):
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        giswater_dir = os.path.dirname(this_dir)
+        icon_folder = giswater_dir + '\\icons\\widgets'
+        icon_path = icon_folder + "\\" + str(icon) + ".png"
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))

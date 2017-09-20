@@ -375,16 +375,18 @@ class MincutParent(ParentAction, MincutConnec):
         self.dlg_connec = Mincut_add_connec()
         utils_giswater.setDialog(self.dlg_connec)
 
+        self.set_icon(self.dlg_connec.btn_insert, "111")
+        self.set_icon(self.dlg_connec.btn_delete, "112")
+        self.set_icon(self.dlg_connec.btn_snapping, "129")
+
         table = "connec"
         self.tbl_connec = self.dlg_connec.findChild(QTableView, "tbl_mincut_connec")
 
         self.btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
         self.btn_delete_connec.pressed.connect(partial(self.delete_records, self.tbl_connec, table, "connec_id"))
-        self.set_icon(self.btn_delete_connec, "112.png")
 
         self.btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
         self.btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table, "connec_id", self.dlg_connec))
-        self.set_icon(self.btn_insert_connec, "111.png")
 
         self.btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
         self.btn_insert_connec_snap.pressed.connect(self.snapping_init)
@@ -511,6 +513,8 @@ class MincutParent(ParentAction, MincutConnec):
 
         self.dlg_hydro = Mincut_add_hydrometer()
         utils_giswater.setDialog(self.dlg_hydro)
+        self.set_icon(self.dlg_hydro.btn_insert, "111")
+        self.set_icon(self.dlg_hydro.btn_delete, "112")
 
         table = "rtc_hydrometer"
 
@@ -523,11 +527,9 @@ class MincutParent(ParentAction, MincutConnec):
 
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table,"hydrometer_id"))
-        self.set_icon(self.btn_delete_hydro, "112.png")
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
         self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
-        self.set_icon(self.btn_insert_hydro, "111.png")
 
         self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
         self.btn_accept.pressed.connect(partial(self.exec_sql,"hydrometer_id", "hydrometer"))
@@ -1106,11 +1108,6 @@ class MincutParent(ParentAction, MincutConnec):
             self.controller.execute_sql(sql)
             widget.model().select()
 
-
-    def set_icon(self, widget, indx):
-        self.plugin_dir = os.path.dirname(__file__)[:-7]
-        self.icon_folder = self.plugin_dir + '\icons'
-        widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
 
 
     def check_colision(self) :

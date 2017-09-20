@@ -140,7 +140,10 @@ class DrawProfiles(ParentMapTool):
         self.dlg = DrawProfile()
         utils_giswater.setDialog(self.dlg)
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        
+        self.set_icon(self.dlg.add_start_point, "111")
+        self.set_icon(self.dlg.add_end_point, "111")
+        self.set_icon(self.dlg.btn_add_arc, "112")
+        self.set_icon(self.dlg.btn_delete_arc, "111")
         self.dlg.findChild(QPushButton, "add_start_point").clicked.connect(self.btn_activate_snapping)
 
         self.btn_save_profile = self.dlg.findChild(QPushButton, "btn_save_profile")  

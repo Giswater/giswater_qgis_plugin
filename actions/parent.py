@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
@@ -447,3 +447,13 @@ class ParentAction():
         sql += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
         sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
         self.fill_table_by_query(qtable, sql)
+
+
+    def set_icon(self, widget, icon):
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        giswater_dir = os.path.dirname(this_dir)
+        icon_folder = giswater_dir + '\\icons\\widgets'
+        icon_path = icon_folder + "\\" + str(icon) + ".png"
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
+

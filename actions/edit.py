@@ -240,12 +240,6 @@ class Edit(ParentAction):
         dlg.exec_()
 
 
-    def set_icon(self, widget, indx):
-        self.plugin_dir = os.path.dirname(__file__)[:-7]
-        self.icon_folder = self.plugin_dir + '\icons'
-        widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
-
-
     def edit_add_element(self):
         """ Button 33: Add element """
 
@@ -255,6 +249,8 @@ class Edit(ParentAction):
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.set_icon(self.dlg.add_geom, "129")
+
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
