@@ -1,7 +1,7 @@
 
 -- DROP FUNCTION "SCHEMA_NAME".gw_trg_edit_dimensions();
 
-CREATE OR REPLACE FUNCTION ws30.gw_trg_edit_dimensions()
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dimensions()
   RETURNS trigger AS
 $BODY$
 DECLARE 
