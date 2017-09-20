@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
-from PyQt4.QtCore import Qt, QPoint
+from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
 
@@ -50,7 +50,27 @@ class ManNodeDialog(ParentDialog):
         self.controller.manage_translation('ws_man_node', dialog)       
         if dialog.parent():
             dialog.parent().setFixedSize(625, 720)
-        
+
+
+    def clickable(self, widget):
+
+        class Filter(QObject):
+
+            clicked = pyqtSignal()
+
+            def eventFilter(self, obj, event):
+                if obj == widget:
+                    if event.type() == QEvent.MouseButtonRelease:
+                        if obj.rect().contains(event.pos()):
+                            self.clicked.emit()
+                            return True
+
+                return False
+
+        filter_ = Filter(widget)
+        widget.installEventFilter(filter_)
+        return filter_.clicked
+
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
@@ -203,7 +223,9 @@ class ManNodeDialog(ParentDialog):
             for value in rows:
                 full_path = str(row[0]) + str(value[0])
                 self.img_path_list1D.append(full_path)
-         
+
+        self.controller.log_info("aaa")
+
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
@@ -217,8 +239,10 @@ class ManNodeDialog(ParentDialog):
         # Add picture to gallery
        
         # Fill one-dimensional array till the end with "0"
-        self.num_events = len(self.img_path_list1D) 
-        
+        self.num_events = len(self.img_path_list1D)
+
+        self.controller.log_info("bbb")
+
         limit = self.num_events % 9
         for k in range(0, limit):   # @UnusedVariable
             self.img_path_list1D.append(0)
@@ -228,7 +252,7 @@ class ManNodeDialog(ParentDialog):
         columns = 9 
         self.img_path_list = [[0 for x in range(columns)] for x in range(rows)] # @UnusedVariable
         message = str(self.img_path_list)
-        self.controller.show_warning(message, context_name='ui_message')
+
         # Convert one-dimensional array to two-dimensional array
         idx = 0 
         if rows == 1:
@@ -241,44 +265,38 @@ class ManNodeDialog(ParentDialog):
                     idx=idx+1
 
         # List of pointers(in memory) of clicableLabels
-        self.list_widgetExtended=[]
+        self.list_widget=[]
         self.list_labels=[]
-        
+
         for i in range(0, 9):
-            # Set image to QLabel
-            pixmap = QPixmap(str(self.img_path_list[0][i]))
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
 
             widget_name = "img_"+str(i)
             widget = self.dlg_gallery.findChild(QLabel, widget_name)
-
-            # Set QLabel like ExtendedQLabel(ClickableLabel)
-            self.widget_extended = ExtendedQLabel.ExtendedQLabel(widget)
-            self.widget_extended.setPixmap(pixmap)
-            self.start_indx = 0
-            
-            # Set signal of ClickableLabel   
-            #self.dlg_gallery.connect(self.widget_extended, SIGNAL('clicked()'), (partial(self.zoom_img,i)))
-            self.widget_extended.clicked.connect(partial(self.zoom_img, i))
-            
-            self.list_widgetExtended.append(self.widget_extended)
-            self.list_labels.append(widget)
+            if widget:
+                # Set image to QLabel
+                pixmap = QPixmap(str(self.img_path_list[0][i]))
+                pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+                widget.setPixmap(pixmap)
+                self.start_indx = 0
+                self.clickable(widget).connect(partial(self.zoom_img, i))
+                self.list_widget.append(widget)
+                self.list_labels.append(widget)
       
         self.start_indx = 0
         self.btn_next = self.dlg_gallery.findChild(QPushButton,"btn_next")
         self.btn_next.clicked.connect(self.next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
-        
+
         self.dlg_gallery.exec_()
-        
-        
+
+
     def next_gallery(self):
 
         self.start_indx = self.start_indx+1
         
         # Clear previous
-        for i in self.list_widgetExtended:
+        for i in self.list_widget:
             i.clear()
             #i.clicked.disconnect(self.zoom_img) #this disconnect all!
   
@@ -286,7 +304,7 @@ class ManNodeDialog(ParentDialog):
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            self.list_widgetExtended[i].setPixmap(pixmap)
+            self.list_widget[i].setPixmap(pixmap)
 
         # Control sliding buttons
         if self.start_indx > 0 :
@@ -365,14 +383,14 @@ class ManNodeDialog(ParentDialog):
         self.start_indx = self.start_indx-1
         
         # First clear previous
-        for i in self.list_widgetExtended:
+        for i in self.list_widget:
             i.clear()
 
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
             pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            self.list_widgetExtended[i].setPixmap(pixmap)
+            self.list_widget[i].setPixmap(pixmap)
 
         # Control sliding buttons
         if self.start_indx == 0 :
