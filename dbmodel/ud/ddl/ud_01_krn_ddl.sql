@@ -23,7 +23,19 @@ CREATE SEQUENCE "element_x_gully_seq"
     CACHE 1;
 
 
-
+-- ----------------------------
+-- Table structure for gully type
+-- ----------------------------
+CREATE TABLE "gully_type" (
+"id" varchar(30)   ,
+"type" character varying(30) ,
+"man_table" character varying(30) ,
+"active" boolean,
+"code_autofill" boolean,
+"descript" text,
+"link_path" varchar(254),
+CONSTRAINT gully_type_pkey PRIMARY KEY (id)
+);
 
 
 -- ----------------------------
@@ -385,6 +397,7 @@ CREATE TABLE "gully" (
 "ymax" numeric(12,4),
 "sandbox" numeric(12,4),
 "matcat_id" varchar(18)  ,
+"gully_type" varchar(30),
 "gratecat_id" varchar(18)  ,
 "units" int2,
 "groove" boolean  ,
