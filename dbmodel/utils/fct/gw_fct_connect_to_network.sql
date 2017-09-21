@@ -28,7 +28,7 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Main loop
-    FOREACH connec_id_aux IN ARRAY connec_array
+    FOR EACH connec_id_aux IN ARRAY connec_array
     LOOP
 
         -- Control user defined
@@ -65,28 +65,28 @@ BEGIN
                 vnode_geom := ST_EndPoint(link_geom);
 
                 -- Delete old vnode
-                DELETE FROM vnode AS a WHERE a.vnode_id = vnode_id_aux;
+                DELETE FROM vnode AS a WHERE a.vnode_id::text = vnode_id_aux;
 
                 -- Detect vnode sector
-                SELECT sector_id INTO sector_aux FROM sector WHERE (the_geom @ sector.the_geom) LIMIT 1;
+                --SELECT sector_id INTO sector_aux FROM sector WHERE (the_geom @ sector.the_geom) LIMIT 1;
             
 			-- New id
-				PERFORM setval('urn_id_seq', gw_fct_urn(),true);
+				--PERFORM setval('urn_id_seq', gw_fct_urn(),true);
 				link_id:= (SELECT nextval('urn_id_seq'));
 				vnode_id:= (SELECT nextval('urn_id_seq'));
 
 			--Exploitation ID
-				expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(connect_geom, exploitation.the_geom,0.001) LIMIT 1);
-				RAISE NOTICE 'expl_id_int %', expl_id_int;
+				--expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(connect_geom, exploitation.the_geom,0.001) LIMIT 1);
+				--RAISE NOTICE 'expl_id_int %', expl_id_int;
 				
                 -- Insert new vnode
-                INSERT INTO vnode (vnode_id,sector_id, arc_id, vnode_type, userdefined_pos, the_geom,expl_id) VALUES (vnode_id,sector_aux, arc_id_aux, featurecat_id, FALSE, vnode_geom,expl_id_int);
+                INSERT INTO vnode (vnode_id, arc_id, vnode_type, userdefined_pos, the_geom) VALUES (vnode_id, arc_id_aux, featurecat_id, FALSE, vnode_geom);
 			RAISE NOTICE 'featurecat_id %', featurecat_id;	
                 -- Delete old link
                 DELETE FROM link WHERE feature_id = connec_id_aux;
 					
                 -- Insert new link
-                INSERT INTO link (link_id, the_geom, feature_id, vnode_id,expl_id,featurecat_id) VALUES (link_id,link_geom, connec_id_aux, vnode_id,expl_id_int,featurecat_id);
+                INSERT INTO link (link_id, the_geom, feature_id, vnode_id,featurecat_id) VALUES (link_id,link_geom, connec_id_aux, vnode_id,featurecat_id);
 			RAISE NOTICE 'featurecat_id %', featurecat_id;	
             END IF;
             

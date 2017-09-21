@@ -224,7 +224,7 @@ BEGIN
 				  NEW.fountain_observ, NEW.fountain_comment, NEW.dma_id, NEW.presszonecat_id, NEW.fountain_soilcat_id, NEW.fountain_function_type, NEW.fountain_category_type, NEW.fountain_fluid_type, NEW.fountain_location_type, NEW.fountain_workcat_id, 
 				  NEW.fountain_workcat_id_end, NEW.fountain_buildercat_id, NEW.fountain_builtdate, NEW.fountain_enddate, NEW.fountain_ownercat_id, NEW.fountain_address_01, NEW.fountain_address_02, NEW.fountain_address_03, NEW.fountain_streetname, NEW.fountain_postnumber, 
 				  NEW.fountain_descript, NEW.fountain_rotation, NEW.verified, (SELECT ST_Centroid(polygon.the_geom) FROM "SCHEMA_NAME".polygon where pol_id=NEW.fountain_pol_id), NEW.undelete, NEW.fountain_label_x,NEW.fountain_label_y,NEW.fountain_label_rotation, 
-				  expl_id_int, NEW.publish, NEW.inventory, NEW.fountain_num_value, NEW.connec_length);
+				  expl_id_int, NEW.publish, NEW.inventory, NEW.fountain_num_value, NEW.fountain_connec_length);
 				  
 				END IF;
 			
@@ -254,7 +254,7 @@ BEGIN
 		  VALUES (NEW.connec_id, NEW.tap_code, NEW.tap_elevation, NEW.tap_depth, NEW.connecat_id, NEW.sector_id, NEW.tap_customer_code, NEW.tap_demand, NEW."state", NEW.state_type, NEW.tap_annotation, NEW.tap_observ, 
 		  NEW.tap_comment, NEW.dma_id, NEW.presszonecat_id, NEW.tap_soilcat_id, NEW.tap_function_type, NEW.tap_category_type, NEW.tap_fluid_type, NEW.tap_location_type, NEW.tap_workcat_id, NEW.tap_workcat_id_end, NEW.tap_buildercat_id,
 		  NEW.tap_builtdate, NEW.tap_enddate, NEW.tap_ownercat_id, NEW.tap_address_01, NEW.tap_address_02, NEW.tap_address_03, NEW.tap_streetname, NEW.tap_postnumber, NEW.tap_descript, NEW.tap_rotation, 
-		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.tap_num_value, NEW.connec_length);
+		  NEW.verified, NEW.the_geom, NEW.undelete, NEW.tap_label_x,NEW.tap_label_y,NEW.tap_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.tap_num_value, NEW.tap_connec_length);
 		  
 		  INSERT INTO man_tap(connec_id, linked_connec, cat_valve, drain_diam, drain_exit, drain_gully, drain_distance, arq_patrimony, com_state) 
 		  VALUES (NEW.connec_id,  NEW.tap_linked_connec, NEW.tap_cat_valve,  NEW.tap_drain_diam, NEW.tap_drain_exit,  NEW.tap_drain_gully, NEW.tap_drain_distance, NEW.tap_arq_patrimony, NEW.tap_com_state);
@@ -285,7 +285,7 @@ BEGIN
 		  VALUES (NEW.connec_id, NEW.wjoin_code, NEW.wjoin_elevation, NEW.wjoin_depth, NEW.connecat_id, NEW.sector_id, NEW.wjoin_customer_code,  NEW.wjoin_demand, NEW."state", NEW.state_type, NEW.wjoin_annotation, NEW.wjoin_observ, 
 		  NEW.wjoin_comment, NEW.dma_id,NEW.presszonecat_id, NEW.wjoin_soilcat_id, NEW.wjoin_function_type, NEW.wjoin_category_type, NEW.wjoin_fluid_type, NEW.wjoin_location_type, NEW.wjoin_workcat_id, NEW.wjoin_workcat_id_end, NEW.wjoin_buildercat_id, 
 		  NEW.wjoin_builtdate, NEW.wjoin_enddate, NEW.wjoin_ownercat_id, NEW.wjoin_address_01, NEW.wjoin_address_02, NEW.wjoin_address_03, NEW.wjoin_streetaxis_id, NEW.wjoin_postnumber, NEW.wjoin_descript, NEW.wjoin_rotation,  NEW.verified, 
-		  NEW.the_geom, NEW.undelete, NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.wjoin_num_value, NEW.connec_length); 
+		  NEW.the_geom, NEW.undelete, NEW.wjoin_label_x,NEW.wjoin_label_y,NEW.wjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.wjoin_num_value, NEW.wjoin_connec_length); 
 		 
 		 INSERT INTO man_wjoin (connec_id, top_floor, cat_valve) 
 		 VALUES (NEW.connec_id, NEW.wjoin_top_floor, NEW.wjoin_cat_valve);
