@@ -825,7 +825,7 @@ class ParentDialog(object):
             layer.rollBack()
        
             
-    def catalog(self, wsoftware, geom_type):
+    def catalog(self, wsoftware, geom_type, node_type=None):
 
         # Set dialog depending water software
         if wsoftware == 'ws':
@@ -851,21 +851,22 @@ class ParentDialog(object):
 
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
-            self.node_type_text = utils_giswater.getWidgetText(self.node_type)           
+            self.controller.log_info(str(node_type))
+            self.node_type_text = node_type
                   
         sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
-        sql+= " ORDER BY matcat_id"
+            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
         sql = "SELECT DISTINCT("+self.field2+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"        
-        sql+= " ORDER BY "+self.field2        
+            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
 
