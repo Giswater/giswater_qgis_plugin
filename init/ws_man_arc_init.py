@@ -54,75 +54,80 @@ class ManArcDialog(ParentDialog):
         self.table_waccel = self.schema_name+'."v_edit_man_waccel"'
 
         # Define class variables
-        self.field_id = "arc_id"        
-        self.id = utils_giswater.getWidgetText(self.field_id, False)  
-        self.filter = self.field_id+" = '"+str(self.id)+"'"                    
-        self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)        
-        self.connecat_id = utils_giswater.getWidgetText("arccat_id", False) 
-        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')        
-        
-        # Get widget controls      
-        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")  
-        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")   
-        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document") 
-        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")  
+        self.field_id = "arc_id"
+        self.id = utils_giswater.getWidgetText(self.field_id, False)
+        self.filter = self.field_id+" = '"+str(self.id)+"'"
+        self.connec_type = utils_giswater.getWidgetText("cat_arctype_id", False)
+        self.connecat_id = utils_giswater.getWidgetText("arccat_id", False)
+        self.arccat_id = self.dialog.findChild(QLineEdit, 'arccat_id')
+
+        # Get widget controls
+        self.tab_main = self.dialog.findChild(QTabWidget, "tab_main")
+        self.tbl_element = self.dialog.findChild(QTableView, "tbl_element")
+        self.tbl_document = self.dialog.findChild(QTableView, "tbl_document")
+        self.tbl_event = self.dialog.findChild(QTableView, "tbl_event_arc")
         self.tbl_price_arc = self.dialog.findChild(QTableView, "tbl_price_arc")
 
         self.btn_node_class1 = self.dialog.findChild(QPushButton, "btn_node_class1")
         self.btn_node_class2 = self.dialog.findChild(QPushButton, "btn_node_class2")
-        
+
         # Load data from related tables
         self.load_data()
-        
+
         # Fill the info table
         self.fill_table(self.tbl_element, self.schema_name+"."+table_element, self.filter)
-        
+
         # Configuration of info table
-        self.set_configuration(self.tbl_element, table_element)    
-        
+        self.set_configuration(self.tbl_element, table_element)
+
         # Fill the tab Document
         self.fill_tbl_document_man(self.tbl_document, self.schema_name+"."+table_document, self.filter)
         #self.tbl_document.doubleClicked.connect(self.open_selected_document)
-        
+
         # Configuration of table Document
         self.set_configuration(self.tbl_document, table_document)
-        
+
         # Fill tab event | arc
         self.fill_tbl_event(self.tbl_event, self.schema_name+"."+table_event_arc, self.filter)
         self.tbl_event.doubleClicked.connect(self.open_selected_document_event)
 
         # Configuration of table event | arc
         self.set_configuration(self.tbl_event, table_event_arc)
-  
-        # Fill tab costs 
+
+        # Fill tab costs
         self.fill_costs()
 
         # Manage tab visibility
         self.set_tabs_visibility(2)
-        
-        # Set signals          
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
+
+        # Set signals
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'arc'))
-        self.dialog.findChild(QPushButton, "btn_node1").clicked.connect(partial(self.go_child, 1))
-        self.dialog.findChild(QPushButton, "btn_node2").clicked.connect(partial(self.go_child, 2))
+        btn_node1 = self.dialog.findChild(QPushButton, "btn_node1")
+        btn_node2 = self.dialog.findChild(QPushButton, "btn_node2")
+        btn_node1.clicked.connect(partial(self.go_child, 1))
+        btn_node2.clicked.connect(partial(self.go_child, 2))
+        self.set_icon(btn_node1, "131")
+        self.set_icon(btn_node2, "131")
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
         layer = self.iface.activeLayer()
-        
+
         # Toolbar actions
-        action = self.dialog.findChild(QAction, "actionEnabled")        
-        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))        
-        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))        
+        action = self.dialog.findChild(QAction, "actionEnabled")
+        self.dialog.findChild(QAction, "actionZoom").triggered.connect(partial(self.action_zoom_in, feature, canvas, layer))
+        self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
+
 
         self.feature_cat = {}
 
         self.project_read()
 
-   
+
     def fill_costs(self):
         ''' Fill tab costs '''
         

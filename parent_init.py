@@ -6,6 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
+from PyQt4.QtGui import QIcon
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
@@ -1044,4 +1045,12 @@ class ParentDialog(object):
                 if uri_table in self.feature_cat.keys():
                     elem = self.feature_cat[uri_table]
                     elem.layername = cur_layer.name()
+
+
+    def set_icon(self, widget, icon):
+        giswater_dir = os.path.dirname(os.path.abspath(__file__))
+        icon_folder = giswater_dir + '\\icons\\widgets'
+        icon_path = icon_folder + "\\" + str(icon) + ".png"
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
 
