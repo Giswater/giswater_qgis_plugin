@@ -121,8 +121,6 @@ CREATE TABLE "cat_connec" (
 "id" varchar(30)   NOT NULL,
 "matcat_id" varchar (16)  ,
 "shape" varchar(16)  ,
-"tsect_id" varchar(16)  ,
-"curve_id" varchar(16)  ,
 "geom1" numeric(12,4),
 "geom2" numeric(12,4) DEFAULT 0.00,
 "geom3" numeric(12,4) DEFAULT 0.00,
