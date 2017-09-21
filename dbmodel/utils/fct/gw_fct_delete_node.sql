@@ -107,13 +107,13 @@ BEGIN
 			--PASSING DOCUMENTS FROM DELETED NODE TO THE NEW ARC
 			
 			FOR rec_doc_node IN SELECT * FROM doc_x_node WHERE node_id=node_id_arg LOOP
-				INSERT INTO doc_x_arc (id,doc_id, arc_id) VALUES (nextval('doc_x_node_seq'),rec_doc_node.doc_id, myRecord2.arc_id);
+				INSERT INTO doc_x_arc (id,doc_id, arc_id) VALUES (nextval('doc_x_node_id_seq'),rec_doc_node.doc_id, myRecord2.arc_id);
 			END LOOP;
 			
 			--PASSING DOCUMENTS FROM DELETED ARC TO THE NEW ARC
 					
 			FOR rec_doc_arc IN SELECT * FROM doc_x_arc WHERE arc_id=myRecord1.arc_id  LOOP
-				INSERT INTO doc_x_arc (id,doc_id, arc_id) VALUES (nextval('doc_x_arc_seq'),rec_doc_arc.doc_id, myRecord2.arc_id);
+				INSERT INTO doc_x_arc (id,doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_doc_arc.doc_id, myRecord2.arc_id);
 			END LOOP;
 
 			--PASSING VISITS FROM DELETED NODE TO THE NEW ARC

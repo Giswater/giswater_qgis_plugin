@@ -118,10 +118,10 @@ BEGIN
        NEW.epa_type = 'PIPE';        
     
         -- FEATURE INSERT
-    		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
+    		INSERT INTO arc (arc_id, code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszonecat_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 					workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01,address_02,address_03,descript,verified,the_geom,undelete,label_x,label_y,label_rotation, 
 					publish, inventory, expl_id,num_value)
-					VALUES (NEW.arc_id,NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, 
+					VALUES (NEW.arc_id,NEW.code, null, null, NEW.arccat_id, NEW.epa_type, NEW.sector_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ, NEW."comment", NEW.custom_length,NEW.dma_id, NEW.presszonecat_id, NEW.soilcat_id, NEW.function_type, 
 					NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, 
 					NEW.descript, NEW.verified, NEW.the_geom,NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation, 
 					NEW.publish, NEW.inventory, expl_id_int, NEW.num_value);
@@ -165,7 +165,7 @@ BEGIN
         END IF;
     
 UPDATE arc 
-			SET arc_id=NEW.arc_id, code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, annotation= NEW.annotation, "observ"=NEW.observ, 
+			SET arc_id=NEW.arc_id, code=NEW.code, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation= NEW.annotation, "observ"=NEW.observ, 
 				"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, 
 				location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
 				ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,

@@ -47,6 +47,7 @@ anl_descript text,
 anl_the_geom public.geometry(POINT, SRID_VALUE),
 forecast_start timestamp,
 forecast_end timestamp,
+assigned_to varchar(50),
 exec_start timestamp,
 exec_end timestamp,
 exec_user varchar(30),
@@ -149,9 +150,10 @@ id varchar(30) NOT NULL PRIMARY KEY,
 descript text
 );
 
-
-
-
+CREATE TABLE "cat_mincut_users"(
+id varchar(50) NOT NULL PRIMARY KEY,
+"name" varchar(150)
+);
 
 -- ----------------------------
 -- SELECTOR

@@ -105,19 +105,19 @@ BEGIN
 		
 		        -- FEATURE INSERT
  IF gully_geometry = 'gully' THEN
-        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state",annotation, "observ", "comment", dma_id, 
+        INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id, sector_id, "state", state_type, annotation, "observ", "comment", dma_id, 
 					soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript,rotation, link, verified, the_geom,
 					undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory,  streetaxis_id, postnumber,  uncertain,num_value)
-					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
+					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", NEW.state_type,
 					NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
                     NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,NEW.featurecat_id,
 					NEW.feature_id,NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int , NEW.publish, NEW.inventory, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain,NEW.num_value);
 
 
         ELSIF gully_geometry = 'pgully' THEN
-        INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", annotation, "observ", "comment", 
+        INSERT INTO gully (gully_id, code,top_elev, "ymax",sandbox, matcat_id, gully_type, gratecat_id, units, groove, connec_arccat_id, connec_length, connec_depth, siphon, arc_id,sector_id, "state", state_type, annotation, "observ", "comment", 
                     dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,buildercat_id, builtdate, enddate, ownercat_id, address_01, address_02, address_03, descript, rotation, link, verified, the_geom_pol, undelete,featurecat_id, feature_id,label_x, label_y,label_rotation, expl_id, publish, inventory, streetaxis_id, postnumber, uncertain,num_value)
-					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", 
+					VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove, NEW.connec_arccat_id,  NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state", state_type,
 					NEW.annotation, NEW."observ", NEW."comment", NEW.rotation, NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, 
 					NEW.builtdate, NEW.enddate,NEW.ownercat_id, NEW.address_01, NEW.address_02, NEW.address_03, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete, NEW.featurecat_id, NEW.feature_id,
 					NEW.label_x, NEW.label_y,NEW.label_rotation,  expl_id_int, NEW.publish, NEW.inventory, NEW.streetaxis_id, NEW.postnumber, NEW.uncertain, NEW.num_value);
@@ -140,9 +140,9 @@ BEGIN
        -- UPDATE values
 		IF gully_geometry = 'gully' THEN
 			UPDATE gully 
-			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, 
-			connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", 
-			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
+			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, 
+			connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, 
+			annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
             ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,
             rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom,undelete=NEW.undelete,featurecat_id=NEW.featurecat_id, feature_id=NEW.feature_id,
@@ -152,8 +152,8 @@ BEGIN
 
         ELSIF gully_geometry = 'gully_pol' THEN
 			UPDATE gully 
-			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, 
-			connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  annotation=NEW.annotation, "observ"=NEW."observ", 
+			SET gully_id=NEW.gully_id, code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type,gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, 
+			connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, arc_id=NEW.arc_id, sector_id=NEW.sector_id, "state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", 
 			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, 
             fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate,
             ownercat_id=NEW.ownercat_id, address_01=NEW.address_01, address_02=NEW.address_02, address_03=NEW.address_03, descript=NEW.descript,

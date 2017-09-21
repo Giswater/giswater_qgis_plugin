@@ -64,11 +64,11 @@ BEGIN
         SELECT * INTO rec_aux2 FROM arc WHERE arc_id = arc_id_aux;
 
         --    New arc_id
-        rec_aux2.arc_id := nextval('SCHEMA_NAME.arc_id_seq');
+        rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
 
         -- Check id
         WHILE EXISTS(SELECT 1 FROM arc WHERE arc_id = rec_aux2.arc_id) LOOP
-                rec_aux2.arc_id := nextval('SCHEMA_NAME.arc_id_seq');
+                rec_aux2.arc_id := nextval('SCHEMA_NAME.urn_id_seq');
         END LOOP;
 
         --    Check longest
@@ -113,13 +113,13 @@ BEGIN
 			--PASSING DOCUMENTS FROM DIVIDED ARC TO NODE
 	
 			FOR rec_doc IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux LOOP
-				INSERT INTO doc_x_node (id,doc_id, node_id) VALUES (nextval('doc_x_node_seq'),rec_doc.doc_id, node_id_arg);
+				INSERT INTO doc_x_node (id,doc_id, node_id) VALUES (nextval('doc_x_node_id_seq'),rec_doc.doc_id, node_id_arg);
 			END LOOP;
 			
 			--PASSING DOCUMENTS FROM DIVIDED ARC TO THE NEW ARC
 					
 			FOR rec_doc IN SELECT * FROM doc_x_arc WHERE arc_id=arc_id_aux  LOOP
-				INSERT INTO doc_x_arc (id,doc_id, arc_id) VALUES (nextval('doc_x_arc_seq'),rec_doc.doc_id, rec_aux2.arc_id);
+				INSERT INTO doc_x_arc (id,doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_doc.doc_id, rec_aux2.arc_id);
 			END LOOP;
 
 			--PASSING VISITS FROM DIVIDED ARC TO NODE

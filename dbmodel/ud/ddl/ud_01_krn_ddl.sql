@@ -23,7 +23,19 @@ CREATE SEQUENCE "element_x_gully_seq"
     CACHE 1;
 
 
-
+-- ----------------------------
+-- Table structure for gully type
+-- ----------------------------
+CREATE TABLE "gully_type" (
+"id" varchar(30)   ,
+"type" character varying(30) ,
+"man_table" character varying(30) ,
+"active" boolean,
+"code_autofill" boolean,
+"descript" text,
+"link_path" varchar(254),
+CONSTRAINT gully_type_pkey PRIMARY KEY (id)
+);
 
 
 -- ----------------------------
@@ -76,7 +88,7 @@ CREATE TABLE "cat_arc" (
 "m2bottom_cost" varchar (16),
 "m3protec_cost" varchar (16),
 "active" boolean,
-"inventory" boolean
+"inventory" boolean,
 CONSTRAINT cat_arc_pkey PRIMARY KEY (id)
 );
 
@@ -219,6 +231,7 @@ CREATE TABLE "node" (
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
+"state_type" int2,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
@@ -276,6 +289,7 @@ CREATE TABLE "arc" (
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
+"state_type" int2,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
@@ -327,6 +341,7 @@ CREATE TABLE "connec" (
 "private_connecat_id" varchar(30),
 "demand" numeric(12,8),
 "state" int2  NOT NULL,
+"state_type" int2,
 "connec_depth" numeric(12,3),
 "connec_length" numeric(12,3),
 "arc_id" varchar(16)  ,
@@ -380,6 +395,7 @@ CREATE TABLE "gully" (
 "ymax" numeric(12,4),
 "sandbox" numeric(12,4),
 "matcat_id" varchar(18)  ,
+"gully_type" varchar(30),
 "gratecat_id" varchar(18)  ,
 "units" int2,
 "groove" boolean  ,
@@ -390,6 +406,7 @@ CREATE TABLE "gully" (
 "arc_id" varchar(16)  ,
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
+"state_type" int2,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
