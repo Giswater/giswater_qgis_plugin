@@ -85,8 +85,18 @@ CREATE TABLE "config_client_forms" (
 );
 
 
+CREATE TABLE "config_client_forms_web" (
+id serial NOT NULL,
+table_id character varying(50),
+query_mobil text,
+query_tablet text,
+query_pc text,
+CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
+);
 
-CREATE TABLE config_client_dvalue(
+
+
+CREATE TABLE "config_client_dvalue" (
 id serial NOT NULL,
 table_id text,
 column_id text,
@@ -95,8 +105,14 @@ dv_key_column text,
 dv_value_column text,
 orderby_value boolean,
 allow_null boolean,
+data_type text,
+form_widget text,
+sql_text text,
 CONSTRAINT config_client_dvalue_pkey PRIMARY KEY (id)
 );
+
+
+
 
 
 
