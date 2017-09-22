@@ -45,6 +45,7 @@ CREATE TABLE "om_visit" (
 "webclient_id" character varying(50),
 "expl_id" integer,
 "the_geom" public.geometry (POINT, SRID_VALUE),
+"descript" text,
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );
 
