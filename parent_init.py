@@ -6,16 +6,15 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QIcon
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
-import os.path
+import os
 import sys  
 import urlparse
 import webbrowser
@@ -1049,9 +1048,13 @@ class ParentDialog(object):
 
 
     def set_icon(self, widget, icon):
-        giswater_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_folder = giswater_dir + '\\icons\\widgets'
-        icon_path = icon_folder + "\\" + str(icon) + ".png"
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
 

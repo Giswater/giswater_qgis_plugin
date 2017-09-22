@@ -15,7 +15,6 @@ import webbrowser
 import ConfigParser
 from functools import partial
 
-
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(plugin_path)
 import utils_giswater    
@@ -458,10 +457,13 @@ class ParentAction():
 
 
     def set_icon(self, widget, icon):
-        this_dir = os.path.dirname(os.path.abspath(__file__))
-        giswater_dir = os.path.dirname(this_dir)
-        icon_folder = giswater_dir + '\\icons\\widgets'
-        icon_path = icon_folder + "\\" + str(icon) + ".png"
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
 
