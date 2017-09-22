@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QIcon
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
@@ -17,10 +17,7 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
-
-import sys
-import os
-import inspect
+import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):
@@ -41,9 +38,9 @@ def init_config():
      
     # Manage 'nodecat_id'
     nodecat_id = utils_giswater.getWidgetText("nodecat_id") 
-    utils_giswater.setSelectedItem("nodecat_id", nodecat_id)
-
-
+    utils_giswater.setSelectedItem("nodecat_id", nodecat_id)   
+      
+     
 class ManNodeDialog(ParentDialog):   
     
     def __init__(self, dialog, layer, feature):
@@ -77,10 +74,8 @@ class ManNodeDialog(ParentDialog):
         
     def init_config_form(self):
         ''' Custom form initial configuration '''
-
-        self.controller.log_info(str(self.plugin_name))
-
-        table_element = "v_ui_element_x_node"
+      
+        table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
         table_costs = "v_price_x_node"
         
@@ -159,8 +154,7 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
         
         # Configuration of table Costs
-        self.set_configuration(self.tbl_costs, table_element)
-
+        self.set_configuration(self.tbl_costs, table_element) 
   
         # Set signals          
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
@@ -205,12 +199,13 @@ class ManNodeDialog(ParentDialog):
         row = selected_list[0].row()
         self.visit_id = self.tbl_event.model().record(row).value("visit_id")
         self.event_id = self.tbl_event.model().record(row).value("event_id")
-
+        
         # Get all events | pictures for visit_id
         sql = "SELECT value FROM "+self.schema_name+".v_ui_om_visit_x_node"
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
+        # TODO: Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
@@ -292,30 +287,19 @@ class ManNodeDialog(ParentDialog):
         self.btn_next.clicked.connect(self.next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
-        self.set_icon(self.btn_previous, "109")
-        self.set_icon(self.btn_next, "108")
 
         self.dlg_gallery.exec_()
 
 
-    def set_icon(self, widget, icon):
-
-        icon_path = self.plugin_dir + "\icons\widgets"+"\\"+ str(icon) + ".png"
-        widget.setIcon(QIcon(icon_path))
-
-
     def next_gallery(self):
 
-        self.start_indx = self.start_indx + 1
-        self.controller.log_info("next gal start index")
-        self.controller.log_info(str(self.start_indx))
+        self.start_indx = self.start_indx+1
+        
         # Clear previous
         for i in self.list_widget:
             i.clear()
             #i.clicked.disconnect(self.zoom_img) #this disconnect all!
-
-
-        self.controller.log_info(str(self.img_path_list))
+  
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
@@ -330,38 +314,8 @@ class ManNodeDialog(ParentDialog):
             self.btn_previous.setEnabled(False)
      
         control = len(self.img_path_list1D) / 9
-        self.controller.log_info("control")
-        self.controller.log_info(str(control))
         if self.start_indx == (control-1):
             self.btn_next.setEnabled(False)
-
-
-
-
-    def previous_gallery(self):
-
-        self.start_indx = self.start_indx - 1
-
-        self.controller.log_info("previous gal start index")
-        self.controller.log_info(str(self.start_indx))
-
-        # First clear previous
-        for i in self.list_widget:
-            i.clear()
-
-        # Add new 9 images
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-            self.list_widget[i].setPixmap(pixmap)
-
-        # Control sliding buttons
-        if self.start_indx == 0:
-            self.btn_previous.setEnabled(False)
-
-        control = len(self.img_path_list1D) / 9
-        if self.start_indx < (control - 1):
-            self.btn_next.setEnabled(True)
             
         
     def zoom_img(self, i):
@@ -382,10 +336,8 @@ class ManNodeDialog(ParentDialog):
         zoom_event_id.setText(str(self.event_id))
     
         self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
-        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
-        self.set_icon(self.btn_slidePrevious, "109")
-        self.set_icon(self.btn_slideNext, "108")
-
+        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
+        
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
@@ -423,7 +375,30 @@ class ManNodeDialog(ParentDialog):
             self.btn_slidePrevious.setEnabled(True) 
             
         if indx == (self.num_events - 1):
-            self.btn_slideNext.setEnabled(False)
+            self.btn_slideNext.setEnabled(False) 
+
+        
+    def previous_gallery(self):
+    
+        self.start_indx = self.start_indx-1
+        
+        # First clear previous
+        for i in self.list_widget:
+            i.clear()
+
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
+            self.list_widget[i].setPixmap(pixmap)
+
+        # Control sliding buttons
+        if self.start_indx == 0 :
+            self.btn_previous.setEnabled(False)
+            
+        control = len(self.img_path_list1D) / 9
+        if self.start_indx < (control-1):
+            self.btn_next.setEnabled(True)
             
      
     def action_rotation(self):
@@ -517,5 +492,4 @@ class ManNodeDialog(ParentDialog):
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
                 self.dialog.refreshFeature()
-
 
