@@ -6,9 +6,8 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
-from PyQt4 import uic
-from PyQt4.QtCore import QObject, QSettings, Qt
+from qgis.core import QgsMapLayerRegistry, QgsExpressionContextUtils
+from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path

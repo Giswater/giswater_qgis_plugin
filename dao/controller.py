@@ -238,8 +238,11 @@ class DaoController():
         self.last_error = self.dao.last_error      
         if not row:
             # Check if any error has been raised
-            if self.last_error is not None:         
-                self.show_warning_detail(self.log_codes[-1], str(self.last_error))
+            if self.last_error is not None:
+                text = "Undefined error" 
+                if '-1' in self.log_codes:   
+                    text = self.log_codes[-1]   
+                self.show_warning_detail(text, str(self.last_error))
             else:
                 self.log_info("Any record found: "+sql)
           
