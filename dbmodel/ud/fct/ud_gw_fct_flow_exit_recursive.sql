@@ -26,7 +26,7 @@ BEGIN
         (node_id_arg, (SELECT expl_id FROM v_edit_node WHERE node_id = node_id_arg), 'Flow exit', (SELECT the_geom FROM v_edit_node WHERE node_id = node_id_arg));
         
         -- Loop for all the upstream nodes
-        FOR rec_table IN SELECT arc_id, node_2, the_geom FROM v_edit_arc WHERE node_1 = node_id_arg
+        FOR rec_table IN SELECT arc_id, node_2, the_geom, expl_id FROM v_edit_arc WHERE node_1 = node_id_arg
         LOOP
 
             -- Insert into tables
