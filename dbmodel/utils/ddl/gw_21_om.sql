@@ -46,6 +46,7 @@ CREATE TABLE "om_visit" (
 "expl_id" integer,
 "the_geom" public.geometry (POINT, SRID_VALUE),
 "descript" text,
+"is_done" boolean,
 CONSTRAINT om_visit_pkey PRIMARY KEY (id)
 );
 
@@ -67,7 +68,6 @@ CREATE TABLE "om_visit_event" (
 "ycoord" float,
 "compass" float,
 "tstamp" timestamp(6) WITHOUT TIME ZONE DEFAULT now(),
-"status" float,
 "text" text,
 CONSTRAINT om_visit_event_pkey PRIMARY KEY (id)
 );
