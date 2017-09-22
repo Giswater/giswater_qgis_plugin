@@ -11,7 +11,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QWidget
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -1055,3 +1055,71 @@ class ParentDialog(object):
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
 
+
+    def manage_custom_fields(self, featurecat_id=None, tab_to_remove=None):
+        
+        self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')    
+        if not self.form_layout_widget:
+            self.controller.log_info("widget not found")
+            return             
+                
+        self.form_layout = self.form_layout_widget.layout()
+        if self.form_layout is None:
+            self.controller.log_info("layout not found") 
+            return            
+                    
+        sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter" 
+        if featurecat_id is not None:
+            sql += " WHERE featurecat_id = '" + featurecat_id + "'"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            if tab_to_remove is not None:
+                self.controller.log_info("remove not found")                 
+                self.tab_main.removeTab(tab_to_remove)
+            return
+    
+        for row in rows:
+            self.manage_widget(row)
+        
+    
+    def manage_widget(self, row):
+        
+        # Check widget type   
+        widget = None         
+        if row['form_widget'] == 'QLineEdit':
+            widget = QLineEdit()         
+            
+        elif row['form_widget'] == 'QComboBox':
+            widget = QComboBox() 
+        
+        if widget is None:
+            return
+        
+        # Create label of custom field
+        label = QLabel()
+        label.setText(row['form_label'])
+        widget.setObjectName(row['param_name'])
+        
+        # Check if selected feature has value in table 'man_addfields_value'
+        value_param = self.get_param_value(row['id'], self.id)
+        if value_param is None:
+            value_param = str(row['default_value'])
+        utils_giswater.setWidgetText(widget, value_param)
+              
+        # Add row with custom label and widget
+        self.form_layout.addRow(label, widget)
+
+
+    def get_param_value(self, parameter_id, feature_id):
+        
+        value_param = None
+        sql = "SELECT value_param FROM " + self.schema_name + ".man_addfields_value"
+        sql += " WHERE parameter_id = " + str(parameter_id) + " AND feature_id = '" + str(feature_id) + "'"
+        row = self.controller.get_row(sql, log_info=False)
+        if row:   
+            value_param = row[0]     
+            
+        return value_param
+    
+    

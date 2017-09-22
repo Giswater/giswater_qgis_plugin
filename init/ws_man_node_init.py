@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QWidget
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
@@ -17,7 +17,6 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
-import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):
@@ -47,7 +46,7 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ws_man_node', dialog)       
+        #self.controller.manage_translation('ws_man_node', dialog)       
         if dialog.parent():
             dialog.parent().setFixedSize(625, 720)
 
@@ -111,9 +110,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-
-        # Manage tab visibility
-        self.set_tabs_visibility(16)
               
         # Load data from related tables
         self.load_data()
@@ -185,6 +181,13 @@ class ManNodeDialog(ParentDialog):
         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
+        # Manage custom fields                                     
+        self.manage_custom_fields()
+        #self.manage_custom_fields(featurecat_id='aa', tab_to_remove=18)
+        
+        # Manage tab visibility
+        self.set_tabs_visibility(16)        
+        
         
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
@@ -206,7 +209,7 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
-        # TODO: Get absolute path
+        # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
@@ -225,8 +228,6 @@ class ManNodeDialog(ParentDialog):
                 full_path = str(row[0]) + str(value[0])
                 self.img_path_list1D.append(full_path)
 
-        self.controller.log_info("aaa")
-
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
         utils_giswater.setDialog(self.dlg_gallery)
@@ -241,8 +242,6 @@ class ManNodeDialog(ParentDialog):
        
         # Fill one-dimensional array till the end with "0"
         self.num_events = len(self.img_path_list1D)
-
-        self.controller.log_info("bbb")
 
         limit = self.num_events % 9
         for k in range(0, limit):   # @UnusedVariable
@@ -493,4 +492,3 @@ class ManNodeDialog(ParentDialog):
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
                 self.dialog.refreshFeature()
-
