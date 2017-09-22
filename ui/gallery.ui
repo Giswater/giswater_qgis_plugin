@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>610</width>
-    <height>584</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -249,7 +249,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Previous</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_next">
@@ -265,7 +265,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Next</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLineEdit" name="visit_id">
