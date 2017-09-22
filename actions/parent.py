@@ -204,38 +204,46 @@ class ParentAction():
         url = utils_giswater.getWidgetText(widget) 
         if url == 'null':
             url = 'www.giswater.org'
-        webbrowser.open(url)        
-                
-                
-    def open_file_dialog(self, widget):
-        """ Open File Dialog """
+        webbrowser.open(url)    
         
-        # Get default value from widget
+
+    def get_file_dialog(self, widget):
+        """ Get file dialog """
+        
+        # Check if selected file exists. Set default value if necessary
         file_path = utils_giswater.getWidgetText(widget)
-
-        # Set default value if necessary
-        if file_path == 'null': 
-            file_path = self.plugin_dir
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
+            folder_path = self.plugin_dir   
+        else:     
+            folder_path = os.path.dirname(file_path) 
                 
-        # Check if file exists
-        if not os.path.exists(file_path):
-            message = "File path doesn't exist"
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            file_path = self.plugin_dir
-                
-        # Get directory of that file
-        folder_path = os.path.dirname(file_path)
-        self.controller.show_warning("folder_path: "+folder_path)
+        # Open dialog to select file
         os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.AnyFile)        
         msg = "Select file"
-        file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
-
-        # Separate path to components
-        abs_path = os.path.split(file_path)
-
-        # Set text to QLineEdit
-        widget.setText(abs_path[0]+'/')
-
+        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
+        if folder_path:
+            utils_giswater.setWidgetText(widget, str(folder_path))            
+                
+                
+    def get_folder_dialog(self, widget):
+        """ Get folder dialog """
+        
+        # Check if selected folder exists. Set default value if necessary
+        folder_path = utils_giswater.getWidgetText(widget)
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
+            folder_path = self.plugin_dir
+                
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)      
+        msg = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
+        if folder_path:
+            utils_giswater.setWidgetText(widget, str(folder_path))
+        
         
     def close_dialog(self, dlg=None): 
         """ Close dialog """

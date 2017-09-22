@@ -309,7 +309,7 @@ class Edit(ParentAction):
 
         # Get widgets
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
-        self.dlg.path_doc.clicked.connect(partial(self.open_file_dialog, "path"))
+        self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')
