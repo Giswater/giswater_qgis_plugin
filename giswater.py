@@ -563,7 +563,8 @@ class Giswater(QObject):
         self.controller.set_schema_name(self.schema_name)   
         
         # Get PostgreSQL version
-        self.controller.get_postgresql_version()        
+        postgresql_version = self.controller.get_postgresql_version() 
+        self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
