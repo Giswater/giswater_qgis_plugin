@@ -907,32 +907,43 @@ class DrawProfiles(ParentMapTool):
         self.rnode_id = []
         self.rarc_id = []
 
+        rstart_point = None
         sql = "SELECT rid"
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + start_point + "'"
         row = self.controller.get_rows(sql)
-        rstart_point = int(row[0][0])
+        if row:
+            rstart_point = int(row[0])
 
+        rend_point = None
         sql = "SELECT rid"
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + end_point + "'"
         row = self.controller.get_rows(sql)
-        rend_point = int(row[0][0])
+        if row:
+            rend_point = int(row[0])
 
+        # Check starting and end points
+        if rstart_point is None or rend_point is None:
+            message = "Start point or end point not found"
+            self.controller.show_warning(message)
+            return
+                    
         # Clear list of arcs and nodes - preparing for new profile
-
-        if self.version == '2' :
-            sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM "+self.schema_name+".v_anl_pgrouting_arc', " + str(rstart_point) + ", " +str(rend_point) + ", false, false)"
-        elif self.version == '3' :
-            sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost FROM " + self.schema_name + ".v_anl_pgrouting_arc', " + str(rstart_point) + ", " + str(rend_point) + ", false)"
-        else :
+        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost" 
+        sql += " FROM "+self.schema_name+".v_anl_pgrouting_arc', " + str(rstart_point) + ", " +str(rend_point) + ", false"
+        if self.version == '2':
+            sql += ", false"
+        elif self.version == '3':
+            pass
+        else:
             message = "You need to upgrade your version of pg_routing!"
             self.controller.show_info(message)
             return
 
+        sql += ")"
         rows = self.controller.get_rows(sql)
-        number_nodes = len(rows)
-        for i in range(0, number_nodes):
+        for i in range(0, len(rows)):
             if self.version == '2':
                 self.rnode_id.append(str(rows[i][1]))
                 self.rarc_id.append(str(rows[i][2]))
@@ -944,23 +955,23 @@ class DrawProfiles(ParentMapTool):
         self.arc_id= []
         self.node_id= []
  
-        for n in range(0,len(self.rarc_id)):
+        for n in range(0, len(self.rarc_id)):
             # convert arc_ids   
             sql = "SELECT arc_id"
             sql += " FROM "+self.schema_name+".v_anl_pgrouting_arc"
-            sql += " WHERE id='" +str(self.rarc_id[n]) + "'"
+            sql += " WHERE id = '" +str(self.rarc_id[n]) + "'"
             rows = self.controller.get_rows(sql)
             self.arc_id.append(str(rows[0][0]))
         
-        for m in range(0,len(self.rnode_id)):
+        for m in range(0, len(self.rnode_id)):
             # convert node_ids
             sql = "SELECT node_id"
             sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
-            sql += " WHERE rid='" + str(self.rnode_id[m]) + "'"
+            sql += " WHERE rid = '" + str(self.rnode_id[m]) + "'"
             row = self.controller.get_rows(sql)
             self.node_id.append(str(row[0][0]))
 
-        # SELECT ARCS OF SHORTEST PATH
+        # Select arcs of the shortest path
         if rows:
             # Build an expression to select them
             m = len(self.arc_id)
@@ -974,8 +985,7 @@ class DrawProfiles(ParentMapTool):
                 self.controller.show_warning(message, context_name='ui_message')
                 return
 
-            # Loop which is pasing trought all layer of arc_group searching for feature
-            #layer_arc = self.iface.activeLayer() 
+            # Loop which is pasing trough all layer of arc_group searching for feature
             for layer_arc in self.layer_arc_man:
                 it = layer_arc.getFeatures(QgsFeatureRequest(expr))
         
@@ -985,8 +995,7 @@ class DrawProfiles(ParentMapTool):
                 # Select features with these id's
                 layer_arc.setSelectedFeatures(id_list)
 
-            
-        # SELECT NODES OF SHORTEST PATH
+        # Select nodes of shortest path
         aux = "\"node_id\" IN ("
         for i in range(len(self.node_id)):
             aux += "'" + str(self.node_id[i]) + "', "
@@ -997,7 +1006,7 @@ class DrawProfiles(ParentMapTool):
             self.controller.show_warning(message, context_name='ui_message')
             return
 
-        # Loop which is pasing trought all layer of node_group searching for feature
+        # Loop which is pasing trough all layers of node_group searching for feature
         for layer_node in self.layer_node_man:
 
             it = layer_node.getFeatures(QgsFeatureRequest(expr))
@@ -1018,7 +1027,6 @@ class DrawProfiles(ParentMapTool):
         layer.setSelectedFeatures([center_widget])
         canvas.zoomToSelected(layer)
 
-        #layer = iface.activeLayer()
         self.tbl_list_arc = self.dlg.findChild(QListWidget, "tbl_list_arc")
         list_arc = []
 
