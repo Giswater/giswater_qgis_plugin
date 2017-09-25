@@ -85,7 +85,7 @@ CREATE TABLE "config_client_forms" (
 );
 
 
-CREATE TABLE "config_client_forms_web" (
+CREATE TABLE "config_web_forms" (
 id serial NOT NULL,
 table_id character varying(50),
 query_mobil text,
@@ -96,7 +96,7 @@ CONSTRAINT config_client_forms_web_pkey PRIMARY KEY (id)
 
 
 
-CREATE TABLE "config_client_dvalue" (
+CREATE TABLE "config_web_fields" (
 id serial NOT NULL,
 table_id text,
 column_id text,
