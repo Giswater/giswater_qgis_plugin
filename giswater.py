@@ -505,7 +505,7 @@ class Giswater(QObject):
                                   
         
     def search_project_type(self):
-        ''' Search in table 'version' project type of current QGIS project '''
+        ''' Search in layer 'version' project type (field 'wsoftware') of current QGIS project '''
         
         try:
             self.show_toolbars(True)
@@ -513,7 +513,6 @@ class Giswater(QObject):
             self.basic.set_project_type(None)
             self.edit.set_project_type(None)
             self.master.set_project_type(None)
-            self.controller.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
@@ -521,14 +520,14 @@ class Giswater(QObject):
                 self.go2epa.set_project_type(wsoftware.lower())
                 self.edit.set_project_type(wsoftware.lower())
                 self.master.set_project_type(wsoftware.lower())
-                self.controller.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   
                 elif wsoftware.lower() == 'ud':
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(True)                   
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(False)          
-            
+                self.wsoftware = wsoftware.lower()
+                
         except Exception as e:
             self.controller.log_info("search_project_type - Exception: "+str(e))
             pass                  
@@ -805,21 +804,30 @@ class Giswater(QObject):
         name_init = 'dimensions.py'
         name_function = 'formOpen'
         file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
+        file_init = os.path.join(self.plugin_dir, 'init', name_init)                     
         layer.editFormConfig().setUiForm(file_ui) 
         layer.editFormConfig().setInitCodeSource(1)
         layer.editFormConfig().setInitFilePath(file_init)           
         layer.editFormConfig().setInitFunction(name_function)
         
+        if self.wsoftware == 'ws':
+            fieldname_node = "depth"
+            fieldname_connec = "depth"
+        elif self.wsoftware == 'ud':
+            fieldname_node = "ymax"
+            fieldname_connec = "connec_depth"
+            
         layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
         if layer_node:
             layer_node = layer_node[0]
-            layer_node.setDisplayField('depth : [% "depth" %]')
+            display_field = 'depth : [% "' + fieldname_node + '" %]'
+            layer_node.setDisplayField(display_field)
         
         layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
         if layer_connec:
             layer_connec = layer_connec[0]
-            layer_connec.setDisplayField('depth : [% "depth" %]')
+            display_field = 'depth : [% "' + fieldname_connec + '" %]'
+            layer_connec.setDisplayField(display_field)
 
     
     def manage_map_tools(self):

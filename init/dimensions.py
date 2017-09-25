@@ -15,7 +15,7 @@ from parent_init import ParentDialog
 
 
 def formOpen(dialog, layer, feature):
-    ''' Function called when a connec is identified in the map '''
+    """ Function called when a connec is identified in the map """
     
     global feature_dialog
     utils_giswater.setDialog(dialog)
@@ -31,7 +31,7 @@ def init_config():
 class Dimensions(ParentDialog):
     
     def __init__(self, dialog, layer, feature):
-        ''' Constructor class '''
+        """ Constructor class """
         super(Dimensions, self).__init__(dialog, layer, feature)      
         self.init_config_form()
         self.controller.manage_translation('dimensions', dialog)             
@@ -139,29 +139,30 @@ class Dimensions(ParentDialog):
                 # Get the point
                 point = QgsPoint(snap_point.snappedVertex)   
                 snapp_feature = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                feature = snapp_feature
-                element_id = feature.attribute(feat_type+'_id')
+                element_id = snapp_feature.attribute(feat_type+'_id')
  
-                # LEAVE SELECTION
+                # Leave selection
                 snap_point.layer.select([snap_point.snappedAtGeometry])
 
-                # TODO: Get depth of feature
-                # WS: depth - UD: ymax"
-                sql = "SELECT depth"
-                sql+= " FROM "+self.schema_name+"."+feat_type 
-                sql+= " WHERE "+feat_type+"_id = '"+element_id+"'"  
+                # Get depth of the feature 
+                if self.project_type == 'ws':
+                    fieldname = "depth"
+                elif self.project_type == 'ud' and feat_type == 'node':
+                    fieldname = "ymax"             
+                elif self.project_type == 'ud' and feat_type == 'connec':
+                    fieldname = "connec_depth"                    
+                    
+                sql = "SELECT " + fieldname
+                sql+= " FROM " + self.schema_name + "." + feat_type 
+                sql+= " WHERE " + feat_type + "_id = '" + element_id + "'"  
+                self.controller.log_info(sql)
                 row = self.dao.get_row(sql)
                 if not row:
                     return
-                depth = self.dialog.findChild(QLineEdit, "depth")
-                depth.setText(str(row[0]))
-                feature_id = self.dialog.findChild(QLineEdit, "feature_id")
-                feature_id.setText(str(element_id))
-                feature_type = self.dialog.findChild(QLineEdit, "feature_type")
-                feature_type.setText(str(element_type))
-            
-                # Reset snapping
-                point = []
+                
+                utils_giswater.setText("depth", row[0])
+                utils_giswater.setText("feature_id", element_id)
+                utils_giswater.setText("feature_type", element_type)
                
     
     def create_map_tips(self):
@@ -178,7 +179,7 @@ class Dimensions(ParentDialog):
 
             
     def map_tip_changed(self, p):
-        ''' SLOT. Initialize the Timer to show MapTips on the map '''
+        """ SLOT. Initialize the Timer to show MapTips on the map """
         
         if self.canvas.underMouse(): 
             self.last_map_position = QgsPoint(p.x(), p.y())
@@ -188,7 +189,7 @@ class Dimensions(ParentDialog):
 
             
     def show_map_tip(self):
-        ''' SLOT. Show MapTips on the map '''
+        """ SLOT. Show MapTips on the map """
         
         self.timer_map_tips.stop()
         if self.canvas.underMouse(): 
@@ -202,7 +203,8 @@ class Dimensions(ParentDialog):
                                             
             
     def clear_map_tip(self):
-        ''' SLOT. Show MapTips on the map '''
+        """ SLOT. Clear MapTips """
+        
         self.timer_map_tips_clear.stop()
         self.map_tip_node.clear(self.canvas)         
         self.map_tip_connec.clear(self.canvas)    

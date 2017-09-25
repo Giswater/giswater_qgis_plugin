@@ -29,9 +29,6 @@ class DaoController():
         
     def set_schema_name(self, schema_name):
         self.schema_name = schema_name
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
                 
     def tr(self, message, context_name=None):
         if context_name is None:
@@ -592,5 +589,18 @@ class DaoController():
         # If dialog is set, then translate form
         if dialog:
             self.translate_form(dialog, locale_name)                              
+      
+      
+    def get_project_type(self):
+        """ Get water software from table 'version' """
         
+        project_type = None
+        sql = "SELECT lower(wsoftware)"
+        sql += " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1" 
+        row = self.get_row(sql)
+        if row:
+            project_type = row[0]
+            
+        return project_type
+         
             
