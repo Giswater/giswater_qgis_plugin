@@ -50,25 +50,12 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="result_id">
-    <property name="geometry">
-     <rect>
-      <x>395</x>
-      <y>5</y>
-      <width>61</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>result_id</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>15</x>
       <y>25</y>
-      <width>440</width>
+      <width>441</width>
       <height>106</height>
      </rect>
     </property>
@@ -265,6 +252,16 @@
       </rect>
      </property>
     </widget>
+    <zorder>number</zorder>
+    <zorder>label_label_x_2</zorder>
+    <zorder>label_label_x_3</zorder>
+    <zorder>streetname</zorder>
+    <zorder>label_label_x</zorder>
+    <zorder>exploitation</zorder>
+    <zorder>label_label_x_6</zorder>
+    <zorder>exploitation_2</zorder>
+    <zorder>customer_state</zorder>
+    <zorder>customer_state</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -479,6 +476,17 @@
       </rect>
      </property>
     </widget>
+    <zorder>label_builtdate_4</zorder>
+    <zorder>cbx_date_end_predict</zorder>
+    <zorder>label_builtdate_3</zorder>
+    <zorder>cbx_hours_end_predict</zorder>
+    <zorder>cbx_date_start_predict</zorder>
+    <zorder>cbx_hours_start_predict</zorder>
+    <zorder>pred_description</zorder>
+    <zorder>label_builtdate_5</zorder>
+    <zorder>label_assigned_to</zorder>
+    <zorder>assigned_to</zorder>
+    <zorder>groupBox</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
@@ -749,6 +757,19 @@
      </property>
      <property name="text">
       <string>Appropiate</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="result_id">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>90</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>result_id</string>
      </property>
     </widget>
    </widget>
@@ -1026,9 +1047,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>355</x>
+      <x>395</x>
       <y>5</y>
-      <width>101</width>
+      <width>61</width>
       <height>20</height>
      </rect>
     </property>

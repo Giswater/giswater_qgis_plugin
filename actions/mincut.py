@@ -90,6 +90,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.state = self.dlg.findChild(QLineEdit, "state")
         self.result_id = self.dlg.findChild(QLineEdit, "result_id")
+        self.result_id.setVisible(False)
         self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
         self.work_order = self.dlg.findChild(QLineEdit, "work_order")
         self.street = self.dlg.findChild(QLineEdit, "street")
@@ -163,12 +164,22 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.btn_end.clicked.connect(self.real_end)
 
         # Toolbar actions
-        self.dlg.findChild(QAction, "actionConfig").triggered.connect(self.config)
-        self.dlg.findChild(QAction, "actionMincut").triggered.connect(self.mincut_init)
-        # self.actionCustomMincut = self.dlg.findChild(QAction, "actionCustomMincut")
-        # self.actionCustomMincut.triggered.connect(self.custom_mincut_init)
-        self.dlg.findChild(QAction, "actionAddConnec").triggered.connect(self.add_connec)
-        self.dlg.findChild(QAction, "actionAddHydrometer").triggered.connect(self.add_hydrometer)
+        action = self.dlg.findChild(QAction, "actionConfig")
+        action.triggered.connect(self.config)
+        self.set_icon(action, "99")
+        action = self.dlg.findChild(QAction, "actionMincut")
+        action.triggered.connect(self.mincut_init)
+        self.set_icon(action, "126")
+        action = self.dlg.findChild(QAction, "actionCustomMincut")
+        #action.triggered.connect(self.custom_mincut_init)
+        self.set_icon(action, "123")
+        self.actionCustomMincut = action
+        action = self.dlg.findChild(QAction, "actionAddConnec")
+        action.triggered.connect(self.add_connec)
+        self.set_icon(action, "121")
+        action = self.dlg.findChild(QAction, "actionAddHydrometer")
+        action.triggered.connect(self.add_hydrometer)
+        self.set_icon(action, "122")
 
         self.dlg.show()
 
@@ -1198,10 +1209,10 @@ class MincutParent(ParentAction, MultipleSnapping):
             widget.model().select()
 
 
-    def set_icon(self, widget, indx):
-        self.plugin_dir = os.path.dirname(__file__)[:-7]
-        self.icon_folder = self.plugin_dir + '\icons'
-        widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
+#     def set_icon(self, widget, indx):
+#         self.plugin_dir = os.path.dirname(__file__)[:-7]
+#         self.icon_folder = self.plugin_dir + '\icons'
+#         widget.setIcon(QIcon(self.icon_folder + "\\" + indx))
 
 
     def remove_selection(self):

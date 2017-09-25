@@ -7,8 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtGui import QAbstractItemView, QTableView
-from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
@@ -389,3 +388,16 @@ class ParentAction():
         sql += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
         sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
         self.fill_table_by_query(qtable, sql)
+        
+        
+    def set_icon(self, widget, icon):
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
+                    
