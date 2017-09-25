@@ -513,6 +513,7 @@ class Giswater(QObject):
             self.basic.set_project_type(None)
             self.edit.set_project_type(None)
             self.master.set_project_type(None)
+            self.controller.set_project_type(None)
             features = self.layer_version.getFeatures()
             for feature in features:
                 wsoftware = feature['wsoftware']
@@ -520,6 +521,7 @@ class Giswater(QObject):
                 self.go2epa.set_project_type(wsoftware.lower())
                 self.edit.set_project_type(wsoftware.lower())
                 self.master.set_project_type(wsoftware.lower())
+                self.controller.set_project_type(wsoftware.lower())
                 if wsoftware.lower() == 'ws':
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(True)          
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(False)                   

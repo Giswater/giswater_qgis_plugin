@@ -28,7 +28,10 @@ class DaoController():
         self.plugin_dir = None           
         
     def set_schema_name(self, schema_name):
-        self.schema_name = schema_name  
+        self.schema_name = schema_name
+
+    def set_project_type(self, project_type):
+        self.project_type = project_type
                 
     def tr(self, message, context_name=None):
         if context_name is None:

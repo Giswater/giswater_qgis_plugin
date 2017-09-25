@@ -44,8 +44,10 @@ class Dimensions(ParentDialog):
         
         btn_orientation = self.dialog.findChild(QPushButton, "btn_orientation")
         btn_orientation.clicked.connect(self.orientation)
+        self.set_icon(btn_orientation, "132")
         btn_snapping = self.dialog.findChild(QPushButton, "btn_snapping")
         btn_snapping.clicked.connect(self.snapping)
+        self.set_icon(btn_snapping, "129")
         
         # Set layers dimensions, node and connec
         self.layer_dimensions = None
@@ -109,9 +111,9 @@ class Dimensions(ParentDialog):
         layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
         layer.startEditing()
-        
+
+        # TODO:
         node_group = ["Junction","Valve","Reduction","Tank","Meter","Manhole","Source","Hydrant"]
-        connec_group = ["Wjoin","Fountain"]
         
         snapper = QgsMapCanvasSnapper(self.canvas)
         map_point = self.canvas.getCoordinateTransform().transform(point)
@@ -131,8 +133,6 @@ class Dimensions(ParentDialog):
                 element_type = snap_point.layer.name()
                 if element_type in node_group:
                     feat_type = 'node'
-                elif element_type in connec_group:
-                    feat_type = 'connec'
                 else:
                     continue
                         
@@ -144,8 +144,9 @@ class Dimensions(ParentDialog):
  
                 # LEAVE SELECTION
                 snap_point.layer.select([snap_point.snappedAtGeometry])
-           
-                # Get depth of feature
+
+                # TODO: Get depth of feature
+                # WS: depth - UD: ymax"
                 sql = "SELECT depth"
                 sql+= " FROM "+self.schema_name+"."+feat_type 
                 sql+= " WHERE "+feat_type+"_id = '"+element_id+"'"  
