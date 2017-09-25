@@ -48,7 +48,6 @@ class SnappingConfigManager():
         ''' Function that collects all the snapping options and put it in an array '''
 
         snapping_layers_options = []
-
         layers = self.iface.legendInterface().layers()
         for layer in layers:
             options = QgsProject.instance().snapSettingsForLayer(layer.id())
@@ -62,7 +61,7 @@ class SnappingConfigManager():
     def store_snapping_options(self):
         ''' Store the project user snapping configuration '''
         # Get an array containing the snapping options for all the layers
-        self.previousSnapping = self.get_snapping_options()
+        self.previous_snapping = self.get_snapping_options()
 
 
     def clear_snapping(self):
@@ -138,7 +137,7 @@ class SnappingConfigManager():
 
     def recover_snapping_options(self):
         ''' Function to restore user configuration '''
-        self.apply_snapping_options(self.previousSnapping)
+        self.apply_snapping_options(self.previous_snapping)
         
 
     def check_node_group(self, snapped_layer):
