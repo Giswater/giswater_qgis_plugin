@@ -179,11 +179,15 @@ class DrawProfiles(ParentMapTool):
         if row:
             self.controller.show_info_box("Profile_id "+profile_id+" exist in data base!", "Info")
             return
-        
-        n = len(self.arc_id)
+
+        list_arc = []
+        n = self.tbl_list_arc.count()
+        for i in range(n):
+            list_arc.append(str(self.tbl_list_arc.item(i).text()))
+
         for i in range(n):
             sql = "INSERT INTO "+self.schema_name+".anl_arc_profile_value (profile_id, arc_id, start_point, end_point) "
-            sql+= " VALUES ('"+profile_id+"', '"+self.arc_id[i]+"', '"+start_point+"', '"+end_point+"')"
+            sql+= " VALUES ('"+profile_id+"', '"+list_arc[i]+"', '"+start_point+"', '"+end_point+"')"
             status = self.controller.execute_sql(sql) 
             if not status:
                 message = "Error inserting profile table, you need to review data"
@@ -301,7 +305,7 @@ class DrawProfiles(ParentMapTool):
 
         # Draw last node
         self.draw_last_node(self.memory[self.n - 1][0], self.memory[self.n - 1][1], self.memory[self.n - 1][2], self.memory[self.n - 1][3],
-                            self.memory[self.n - 1][4], self.memory[self.n - 1][5], self.memory[self.n - 1][6], self.n - 1)
+                            self.memory[self.n - 1][4], self.memory[self.n - 1][5], self.memory[self.n - 1][6], self.n - 1,self.memory[self.n - 2][4], self.memory[self.n - 2][5])
         self.draw_arc()
         self.draw_ground()
 
@@ -407,7 +411,7 @@ class DrawProfiles(ParentMapTool):
 
             # Get data z1, z2 ,cat_geom1 ,elev1 ,elev2 , y1 ,y2 ,slope from v_edit_arc
             # Change to elevmax1 and elevmax2
-            sql = "SELECT z1, z2, cat_geom1, elevmax1, elevmax2, y1, y2, slope"
+            sql = "SELECT z1, z2, cat_geom1, sys_elev1, sys_elev2, y1, y2, slope"
             sql += " FROM "+self.schema_name+".v_edit_arc"
             sql += " WHERE node_1='" + str(node_id) + "' OR node_2='" + str(node_id) + "'"
             row = self.controller.get_rows(sql)
@@ -662,10 +666,10 @@ class DrawProfiles(ParentMapTool):
                      fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
 
 
-    def draw_last_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx):  #@UnusedVariable
+    def draw_last_node(self, start_point, top_elev, ymax, z1, z2, cat_geom1, geom1, indx, z22, cat2):  #@UnusedVariable
 
         x = [start_point, start_point - (geom1), start_point - (geom1)]
-        y = [top_elev, top_elev, top_elev - ymax + z2 + cat_geom1]
+        y = [top_elev, top_elev, top_elev  - ymax + z22 + cat2]
         x1 = [start_point - geom1, start_point - geom1, start_point + geom1, start_point + geom1, start_point]
         y1 = [top_elev - ymax + z2, top_elev - ymax, top_elev - ymax, top_elev, top_elev]
 
@@ -677,10 +681,12 @@ class DrawProfiles(ParentMapTool):
         self.y = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3] + self.memory[indx - 1][5]
         self.x1 = self.memory[indx - 1][6] + self.memory[indx - 1][0]
         self.y1 = self.y1 = self.memory[indx - 1][1] - self.memory[indx - 1][2] + self.memory[indx - 1][3]
+
+        ytop2 = ymax - z22 - cat2
         self.x2 = (start_point - (geom1))
-        self.y2 = top_elev - ymax + z2 + cat_geom1
+        self.y2 = top_elev - ytop2
         self.x3 = (start_point - (geom1))
-        self.y3 = top_elev - ymax + z2
+        self.y3 = top_elev - ymax + z22
 
         self.first_top_x = self.memory[indx - 1][0]
         self.first_top_y = self.memory[indx - 1][1]
