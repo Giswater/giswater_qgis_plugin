@@ -911,7 +911,7 @@ class DrawProfiles(ParentMapTool):
         sql = "SELECT rid"
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + start_point + "'"
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])
 
@@ -919,7 +919,7 @@ class DrawProfiles(ParentMapTool):
         sql = "SELECT rid"
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + end_point + "'"
-        row = self.controller.get_rows(sql)
+        row = self.controller.get_row(sql)
         if row:
             rend_point = int(row[0])
 
@@ -942,6 +942,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         sql += ")"
+        self.controller.log_info(sql)
         rows = self.controller.get_rows(sql)
         for i in range(0, len(rows)):
             if self.version == '2':
