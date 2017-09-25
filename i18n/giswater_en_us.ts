@@ -230,7 +230,7 @@
     </message>
     <message>
         <source>tab_address</source>
-        <translation>Adress</translation>
+        <translation>Address</translation>
     </message>
     <message>
         <source>lbl_street</source>

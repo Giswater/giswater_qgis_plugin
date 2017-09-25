@@ -8,7 +8,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit,QPushButton
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit
 from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
@@ -22,8 +22,8 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
-from ..ui.add_doc import Add_doc                    # @UnresolvedImport
-from ..ui.add_element import Add_element            # @UnresolvedImport             
+from ..ui.add_doc import AddDoc                    # @UnresolvedImport
+from ..ui.add_element import AddElement            # @UnresolvedImport             
 from ..ui.config_edit import ConfigEdit             # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools       # @UnresolvedImport
 
@@ -34,7 +34,7 @@ from parent import ParentAction
 class Edit(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
-        """ Class to control Management toolbar actions """
+        """ Class to control toolbar 'edit' """
         self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         # Get tables or views specified in 'db' config section
@@ -114,14 +114,7 @@ class Edit(ParentAction):
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()
         if self.project_type == 'ws':
-            self.dlg.check_node_sink.setEnabled(False)
-            self.dlg.check_node_flow_regulator.setEnabled(False)
-            self.dlg.check_node_exit_upper_node_entry.setEnabled(False)
-            self.dlg.check_arc_intersection_without_node.setEnabled(False)
-            self.dlg.check_inverted_arcs.setEnabled(False)
-        if self.project_type == 'ud':
-            self.dlg.check_topology_coherence.setEnabled(False)
-
+            self.dlg.tab_review.removeTab(1)
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.edit_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
@@ -190,52 +183,59 @@ class Edit(ParentAction):
 
     def edit_change_elem_type(self):
         """ Button 28: User select one node. A form is opened showing current node_type.type
-        Combo to select new node_type.type
-        Combo to select new node_type.id
-        Combo to select new cat_node.id
+            Combo to select new node_type.type
+            Combo to select new node_type.id
+            Combo to select new cat_node.id
         """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 28)
-
-        # Check if at least one node is checked
+        
+        # Check if any active layer
         layer = self.iface.activeLayer()
+        if layer is None:
+            message = "You have to select a layer"
+            self.controller.show_info(message, context_name='ui_message')
+            return
+
+        # Check if at least one node is checked          
         count = layer.selectedFeatureCount()
         if count == 0:
             message = "You have to select at least one feature!"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
             return
         elif count > 1:
             message = "More than one feature selected. Only the first one will be processed!"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
 
         # Get selected features (nodes)
-        features = layer.selectedFeatures()
-        feature = features[0]
-        # Get node_id form current node
+        feature = layer.selectedFeatures()[0]
+        
+        # Get node_id and nodetype_id from current node
         self.node_id = feature.attribute('node_id')
-
-        # Get node_type from current node
-        node_type = feature.attribute('node_type')
+        node_type = feature.attribute('nodetype_id')
 
         # Create the dialog, fill node_type and define its signals
         dlg = ChangeNodeType()
+        utils_giswater.setDialog(dlg)
+
         dlg.node_node_type.setText(node_type)
         dlg.node_type_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
         dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value_2)
-        dlg.node_nodecat_id.currentIndexChanged.connect(self.edit_change_elem_type_get_value_3)
         dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
-        dlg.btn_cancel.pressed.connect(self.close_dialog)
+        dlg.btn_cancel.pressed.connect(dlg.close)        
 
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(type) FROM "+self.schema_name+".node_type ORDER BY type"
+        self.controller.log_info(sql)
         rows = self.dao.get_rows(sql)
-        utils_giswater.setDialog(dlg)
+
         utils_giswater.fillComboBox("node_type_type_new", rows)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(dlg, 'change_node_type')
+
         dlg.exec_()
 
 
@@ -244,11 +244,12 @@ class Edit(ParentAction):
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
 
         # Create the dialog and signals
-        self.dlg = Add_element()
+        self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
+        self.set_icon(self.dlg.add_geom, "129")
+
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
@@ -287,6 +288,7 @@ class Edit(ParentAction):
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
+
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
@@ -297,18 +299,16 @@ class Edit(ParentAction):
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
-        self.controller.check_action(True, 32)
 
         # Create the dialog and signals
-        self.dlg = Add_doc()
+        self.dlg = AddDoc()
         utils_giswater.setDialog(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.edit_add_file_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Get widgets
-        self.path = self.dlg.findChild(QLineEdit, "path")
-        self.dlg.findChild(QPushButton, "path_url").clicked.connect(partial(self.open_web_browser, self.path))
-        self.dlg.findChild(QPushButton, "path_doc").clicked.connect(partial(self.open_file_dialog, self.path))
+        self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
+        self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')
@@ -319,13 +319,10 @@ class Edit(ParentAction):
 
         # Fill combo boxes
         self.populate_combo("doc_type", "doc_type")
-        # TODO la tabla cat_tag no exixte
-        # self.populate_combo("tagcat_id", "cat_tag")
 
         # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit, "doc_id")
         self.completer = QCompleter()
-        self.edit.setCompleter(self.completer)
+        self.dlg.doc_id.setCompleter(self.completer)
 
         model = QStringListModel()
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc "
@@ -348,13 +345,16 @@ class Edit(ParentAction):
         """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
 
         # Get selected value from 1st combobox
-        self.value_combo1 = utils_giswater.getWidgetText("node_type_type_new")
+        node_type_type_new = utils_giswater.getWidgetText("node_type_type_new")
+        self.controller.log_info(node_type_type_new)        
 
         # When value is selected, enabled 2nd combo box
-        if self.value_combo1 != 'null':
-            self.dlg.node_node_type_new.setEnabled(True)
+        if node_type_type_new != 'null':
+            utils_giswater.setWidgetEnabled("node_node_type_new")
             # Fill 2nd combo_box-custom node type
-            sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type WHERE type='"+self.value_combo1+"'"
+            sql = "SELECT DISTINCT(id) FROM "+self.schema_name+".node_type"
+            sql += " WHERE type = '" + node_type_type_new + "'"
+            self.controller.log_info(sql)        
             rows = self.dao.get_rows(sql)
             utils_giswater.fillComboBox("node_node_type_new", rows)
 
@@ -366,38 +366,40 @@ class Edit(ParentAction):
             return
 
         # Get selected value from 2nd combobox
-        self.value_combo2 = utils_giswater.getWidgetText("node_node_type_new")
+        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
 
         # When value is selected, enabled 3rd combo box
-        if self.value_combo2 != 'null':
+        if node_node_type_new != 'null':
             # Get selected value from 2nd combobox
-            self.dlg.node_nodecat_id.setEnabled(True)
+            utils_giswater.setWidgetEnabled("node_nodecat_id")
             # Fill 3rd combo_box-catalog_id
             sql = "SELECT DISTINCT(id)"
-            sql += " FROM "+self.schema_name+".cat_node"
-            sql += " WHERE nodetype_id='"+self.value_combo2+"'"
+            sql += " FROM " + self.schema_name + ".cat_node"
+            sql += " WHERE nodetype_id = '" + node_node_type_new + "'"
             rows = self.dao.get_rows(sql)
             utils_giswater.fillComboBox("node_nodecat_id", rows)
-
-
-    def edit_change_elem_type_get_value_3(self, index):   #@UnusedVariable
-        self.value_combo3 = utils_giswater.getWidgetText("node_nodecat_id")
 
 
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
 
-        # Update node_type in the database
-        sql = "UPDATE "+self.schema_name+".v_edit_node"
-        sql += " SET node_type ='"+self.value_combo2+"'"
-        if self.value_combo3 != 'null':
-            sql += ", nodecat_id='"+self.value_combo3+"'"
-        sql += " WHERE node_id ='"+self.node_id+"'"
-        self.controller.execute_sql(sql)
+        self.controller.log_info("edit_change_elem_type_accept")
+        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
+        node_nodecat_id = utils_giswater.getWidgetText("node_nodecat_id")        
+        if node_node_type_new != "null":
 
-        # Show message to the user
-        message = "Node type has been update!"
-        self.controller.show_info(message, context_name='ui_message')
+            # Update node_type in the database
+            sql = "UPDATE "+self.schema_name+".v_edit_node"
+            sql += " SET nodetype_id = '" + node_node_type_new + "'"
+            if node_nodecat_id != 'null':
+                sql += ", nodecat_id = '" + node_nodecat_id + "'"
+            sql += " WHERE node_id = '" + self.node_id + "'"
+            self.controller.log_info(sql)
+            self.controller.execute_sql(sql)
+
+            # Show message to the user
+            message = "Node type has been update!"
+            self.controller.show_info(message)
 
         # Close form
         self.close_dialog()
@@ -441,12 +443,13 @@ class Edit(ParentAction):
         # Check if this document already exists
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".doc WHERE id = '" + doc_id + "'"
         row = self.dao.get_row(sql)
+        
         # If document already exist perform an UPDATE
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
                 sql = "UPDATE " + self.schema_name + ".doc "
-                sql += " SET doc_type = '" + doc_type + "', tagcat_id= '" + tagcat_id + "', observ = '" + observ + "', path = '" + path + "'"
+                sql += " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
                 sql += " WHERE id = '" + doc_id + "'"
                 status = self.controller.execute_sql(sql)
                 if status:
@@ -456,8 +459,8 @@ class Edit(ParentAction):
 
         # If document doesn't exist perform an INSERT
         else:
-            sql = "INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ, tagcat_id) "
-            sql += " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "', '" + tagcat_id + "')"
+            sql = "INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ) "
+            sql += " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ +  "')"
             status = self.controller.execute_sql(sql)
             if status:
                 self.ed_add_to_feature("doc", doc_id)
@@ -530,25 +533,29 @@ class Edit(ParentAction):
             self.controller.show_warning(message, context_name='ui_message')
             return
 
+        # Get SRID
+        srid = self.controller.plugin_settings_value('srid')   
+        self.controller.log_info(str(srid)) 
+        
         # Check if we already have data with selected element_id
-        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + element_id + "'"
+        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + str(element_id) + "'"
         row = self.dao.get_row(sql)
+        
         # If element already exist perform an UPDATE
         if row:
             answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
-                # TODO: Parametrize SRID
                 sql = "UPDATE " + self.schema_name + ".element"
                 sql += " SET elementcat_id = '" + elementcat_id + "', state = '" + state + "', location_type = '" + location_type + "'"
                 sql += ", workcat_id_end = '" + workcat_id_end + "', workcat_id = '" + workcat_id + "', buildercat_id = '" + buildercat_id + "', ownercat_id = '" + ownercat_id + "'"
                 sql += ", rotation = '" + rotation + "',comment = '" + comment + "', annotation = '" + annotation + "', observ = '" + observ + "', link = '" + link + "', verified = '" + verified + "'"
-                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + '), 25831)'
-                sql += " WHERE element_id = '" + element_id + "'"
+                sql += ", the_geom = ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"
+                sql += " WHERE element_id = '" + element_id + "'"              
                 status = self.controller.execute_sql(sql)
                 if status:
                     self.ed_add_to_feature("element", element_id)
                     message = "Values has been updated"
-                    self.controller.show_info(message, context_name='ui_message')
+                    self.controller.show_info(message)
 
         # If element doesn't exist perform an INSERT
         else:
@@ -557,15 +564,15 @@ class Edit(ParentAction):
             sql += " VALUES ('" + element_id + "', '" + elementcat_id + "', '" + state + "', '" + location_type + "', '"
             sql += workcat_id + "', '" + buildercat_id + "', '" + ownercat_id + "', '" + rotation + "', '" + comment + "', '"
             sql += annotation + "','" + observ + "','" + link + "','" + verified + "','" + workcat_id_end + "',"
-            sql += "ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + '), 25831))'
+            sql += "ST_SetSRID(ST_MakePoint(" + str(self.x) + "," + str(self.y) + "), " + str(srid) +")"         
             status = self.controller.execute_sql(sql)
             if status:
                 self.ed_add_to_feature("element", element_id)
                 message = "Values has been updated"
-                self.controller.show_info(message, context_name='ui_message')
+                self.controller.show_info(message)
             if not status:
                 message = "Error inserting element in table, you need to review data"
-                self.controller.show_warning(message, context_name='ui_message')
+                self.controller.show_warning(message)
                 return
 
         self.close_dialog(self.dlg)
@@ -751,10 +758,10 @@ class Edit(ParentAction):
         """ Button 98: Open a dialog showing data from table 'config_param_user' """
 
         # Create the dialog and signals
-        self.dlg_config_edit = ConfigEdit()
-        utils_giswater.setDialog(self.dlg_config_edit)
-        self.dlg_config_edit.btn_accept.pressed.connect(self.edit_config_edit_accept)
-        self.dlg_config_edit.btn_cancel.pressed.connect(self.dlg_config_edit.close)
+        self.dlg = ConfigEdit()
+        utils_giswater.setDialog(self.dlg)
+        self.dlg.btn_accept.pressed.connect(self.edit_config_edit_accept)
+        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
         # Set values from widgets of type QComboBox and dates
         # QComboBox Utils
@@ -811,59 +818,60 @@ class Edit(ParentAction):
             utils_giswater.setWidgetText("state_vdefault", str(rows[0][0]))
 
         if self.project_type == 'ws':
-            self.dlg_config_edit.tab_config.removeTab(2)
+            self.dlg.tab_config.removeTab(1)
+            self.dlg.tab_config.removeTab(1)
         elif self.project_type == 'ud':
-            self.dlg_config_edit.tab_config.removeTab(1)
+            self.dlg.tab_config.removeTab(1)
 
-        self.dlg_config_edit.exec_()
+        self.dlg.exec_()
 
 
     def edit_config_edit_accept(self):
 
         if utils_giswater.isChecked("chk_state_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.state_vdefault, "state_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.state_vdefault, "state_vdefault", "config_param_user")
         else:
             self.delete_row("state_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_workcat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.workcat_vdefault, "workcat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.workcat_vdefault, "workcat_vdefault", "config_param_user")
         else:
             self.delete_row("workcat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_verified_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.verified_vdefault, "verified_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.verified_vdefault, "verified_vdefault", "config_param_user")
         else:
             self.delete_row("verified_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_builtdate_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.builtdate_vdefault, "builtdate_vdefault", "config_param_user")
         else:
             self.delete_row("builtdate_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arccat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.arccat_vdefault, "arccat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.arccat_vdefault, "arccat_vdefault", "config_param_user")
         else:
             self.delete_row("arccat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_nodecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.nodecat_vdefault, "nodecat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.nodecat_vdefault, "nodecat_vdefault", "config_param_user")
         else:
             self.delete_row("nodecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_connecat_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.connecat_vdefault, "connecat_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.connecat_vdefault, "connecat_vdefault", "config_param_user")
         else:
             self.delete_row("connecat_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_nodetype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.nodetype_vdefault, "nodetype_vdefault", "config_param_user")
         else:
             self.delete_row("nodetype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_arctype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.arctype_vdefault, "arctype_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.arctype_vdefault, "arctype_vdefault", "config_param_user")
         else:
             self.delete_row("arctype_vdefault", "config_param_user")
         if utils_giswater.isChecked("chk_connectype_vdefault"):
-            self.insert_or_update_config_param_curuser(self.dlg_config_edit.connectype_vdefault, "connectype_vdefault", "config_param_user")
+            self.insert_or_update_config_param_curuser(self.dlg.connectype_vdefault, "connectype_vdefault", "config_param_user")
         else:
             self.delete_row("connectype_vdefault", "config_param_user")
 
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
-        self.dlg_config_edit.close()
+        self.close_dialog()
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
@@ -908,14 +916,15 @@ class Edit(ParentAction):
 
     def delete_row(self,  parameter, tablename):
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
 
 
     def populate_combo(self, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
-        sql = "SELECT " + field_name + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
+        sql = "SELECT " + field_name
+        sql += " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
@@ -925,10 +934,15 @@ class Edit(ParentAction):
     def edit_dimensions(self):
         """ Button 39: Dimensioning """
 
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
-        self.iface.setActiveLayer(layer)
-        layer.startEditing()
-        # Implement the Add Feature button
-        self.iface.actionAddFeature().trigger()
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")
+        if layer:
+            layer = layer[0]
+            self.iface.setActiveLayer(layer)
+            layer.startEditing()
+            # Implement the Add Feature button
+            self.iface.actionAddFeature().trigger()
+        else:
+            message = "Layer name not found"
+            self.controller.show_warning(message, parameter="v_edit_dimensions")
         
         

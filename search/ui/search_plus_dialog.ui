@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Search plus</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <widget class="QTabWidget" name="tab_main">
    <property name="geometry">
     <rect>
@@ -41,11 +44,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Code</string>
-      </property>
-     </item>
     </widget>
     <widget class="QComboBox" name="network_geom_type">
      <property name="geometry">

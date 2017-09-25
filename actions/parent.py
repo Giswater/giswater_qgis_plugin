@@ -6,8 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-
-from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QIcon
+from PyQt4.QtGui import QAbstractItemView, QTableView, QFileDialog, QComboBox, QIcon
 from PyQt4.QtSql import QSqlTableModel, QSqlQueryModel
 
 import os
@@ -204,38 +203,46 @@ class ParentAction():
         url = utils_giswater.getWidgetText(widget) 
         if url == 'null':
             url = 'www.giswater.org'
-        webbrowser.open(url)        
-                
-                
-    def open_file_dialog(self, widget):
-        """ Open File Dialog """
+        webbrowser.open(url)    
         
-        # Get default value from widget
+
+    def get_file_dialog(self, widget):
+        """ Get file dialog """
+        
+        # Check if selected file exists. Set default value if necessary
         file_path = utils_giswater.getWidgetText(widget)
-
-        # Set default value if necessary
-        if file_path == 'null': 
-            file_path = self.plugin_dir
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)): 
+            folder_path = self.plugin_dir   
+        else:     
+            folder_path = os.path.dirname(file_path) 
                 
-        # Check if file exists
-        if not os.path.exists(file_path):
-            message = "File path doesn't exist"
-            self.controller.show_warning(message, 10, context_name='ui_message')
-            file_path = self.plugin_dir
-                
-        # Get directory of that file
-        folder_path = os.path.dirname(file_path)
-        self.controller.show_warning("folder_path: "+folder_path)
+        # Open dialog to select file
         os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.AnyFile)        
         msg = "Select file"
-        file_path = QFileDialog.getOpenFileName(None, self.controller.tr(msg), "")
-
-        # Separate path to components
-        abs_path = os.path.split(file_path)
-
-        # Set text to QLineEdit
-        widget.setText(abs_path[0]+'/')
-
+        folder_path = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(msg))
+        if folder_path:
+            utils_giswater.setWidgetText(widget, str(folder_path))            
+                
+                
+    def get_folder_dialog(self, widget):
+        """ Get folder dialog """
+        
+        # Check if selected folder exists. Set default value if necessary
+        folder_path = utils_giswater.getWidgetText(widget)
+        if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path): 
+            folder_path = self.plugin_dir
+                
+        # Open dialog to select folder
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.Directory)      
+        msg = "Select folder"
+        folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
+        if folder_path:
+            utils_giswater.setWidgetText(widget, str(folder_path))
+        
         
     def close_dialog(self, dlg=None): 
         """ Close dialog """
@@ -244,10 +251,16 @@ class ParentAction():
             dlg = self.dlg
         try:
             dlg.close()
+            map_tool = self.iface.mapCanvas().mapTool()
+            # If selected map tool is from the plugin, set 'Pan' as current one 
+            if map_tool.toolName() == '':
+                self.iface.actionPan().trigger() 
         except AttributeError:
             pass
         
+        
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right):
+        
         # fill QTableView all_rows
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -279,9 +292,11 @@ class ParentAction():
         # QLineEdit
         dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog.txt_name, tbl_all_rows, tableleft, tableright, field_id_right))
 
+
     def hide_colums(self, widget, comuns_to_hide):
         for i in range(0, len(comuns_to_hide)):
             widget.hideColumn(comuns_to_hide[i])
+
 
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
         """ """
@@ -352,21 +367,73 @@ class ParentAction():
         self.iface.mapCanvas().refresh()
 
 
+    def fill_table_psector(self, widget, table_name, column_id):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+        
+        # Set model
+        self.model = QSqlTableModel()
+        self.model.setTable(self.schema_name+"."+table_name)
+        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setSort(0, 0)
+        self.model.select()
+
+        # Check for errors
+        if self.model.lastError().isValid():
+            self.controller.show_warning(self.model.lastError().text())
+        # Attach model to table view
+        widget.setModel(self.model)
+        # put combobox in qtableview
+        sql = "SELECT * FROM " + self.schema_name+"."+table_name + " ORDER BY " + column_id
+        rows = self.controller.get_rows(sql)
+        for x in range(len(rows)):
+            combo = QComboBox()
+            sql = "SELECT DISTINCT(priority) FROM " + self.schema_name+"."+table_name
+            row = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox(combo, row, False)
+            row = rows[x]
+            priority = row[4]
+            utils_giswater.setSelectedItem(combo, str(priority))
+            i = widget.model().index(x, 4)
+            widget.setIndexWidget(i, combo)
+            #combo.setStyleSheet("background:#F2F2F2")
+            combo.setStyleSheet("background:#E6E6E6")
+            combo.currentIndexChanged.connect(partial(self.update_combobox_values, widget, combo, x))
+
+
+    def update_combobox_values(self, widget, combo, x):
+        """ Insert combobox.currentText into widget (QTableView) """
+
+        index = widget.model().index(x, 4)
+        widget.model().setData(index, combo.currentText())
+
+
+    def save_table(self, widget, table_name, column_id):
+        """ Save widget (QTableView) into model"""
+
+        if self.model.submitAll():
+            self.model.database().commit()
+        else:
+            self.model.database().rollback()
+        self.fill_table_psector(widget, table_name, column_id)
+
+
     def fill_table(self, widget, table_name):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
         # Set model
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.select()
+        self.model = QSqlTableModel()
+        self.model.setTable(table_name)
+        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        self.model.setSort(0, 0)
+        self.model.select()
 
         # Check for errors
-        if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+        if self.model.lastError().isValid():
+            self.controller.show_warning(self.model.lastError().text())
         # Attach model to table view
-        widget.setModel(model)
+        widget.setModel(self.model)
 
 
     def fill_table_by_query(self, qtable, query):

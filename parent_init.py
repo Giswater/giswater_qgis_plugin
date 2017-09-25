@@ -10,11 +10,11 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
-import os.path
+import os
 import sys  
 import urlparse
 import webbrowser
@@ -24,6 +24,8 @@ from dao.controller import DaoController
 from init.add_sum import Add_sum
 from ui.ws_catalog import WScatalog
 from ui.ud_catalog import UDcatalog
+
+from models.sys_feature_cat import SysFeatureCat
         
 
 class ParentDialog(object):   
@@ -32,8 +34,7 @@ class ParentDialog(object):
         ''' Constructor class '''     
         self.dialog = dialog
         self.layer = layer
-        self.feature = feature
-        self.context_name = "ws_parent"    
+        self.feature = feature  
         self.iface = iface    
         self.init_config()     
         self.set_signals()    
@@ -82,6 +83,7 @@ class ParentDialog(object):
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
+        self.project_type = self.controller.get_project_type()
        
         
     def set_signals(self):
@@ -321,6 +323,11 @@ class ParentDialog(object):
             sql = "SELECT value FROM "+self.schema_name+".config_param_system"
             sql += " WHERE parameter = 'om_visit_absolute_path'"
             row = self.dao.get_row(sql)
+            if not row:
+                message = "Parameter not set in table 'config_param_system'"
+                self.controller.show_warning(message, parameter='om_visit_absolute_path')
+                return
+            
             # Full path= path + value from row
             self.full_path = row[0]+self.path
             
@@ -335,7 +342,7 @@ class ParentDialog(object):
                 # If its not URL ,check if file exist
                 if not os.path.exists(self.full_path):
                     message = "File not found!"
-                    self.controller.show_warning(message, context_name='ui_message')
+                    self.controller.show_warning(message)
                 else:
                     # Open the document
                     os.startfile(self.full_path)          
@@ -349,7 +356,7 @@ class ParentDialog(object):
         selected_list = self.tbl_document.selectionModel().selectedRows()    
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message, context_name='ui_message' ) 
+            self.controller.show_warning(message) 
             return
         
         inf_text = ""
@@ -364,28 +371,28 @@ class ParentDialog(object):
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
         if row is None:
-            message = "Check doc_absolute_path in table config_param_system, value does not exist or is not defined!"
-            self.controller.show_warning(message, context_name='ui_message')
+            message = "Parameter not set in table 'config_param_system'"
+            self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-        else:
-            # Full path= path + value from row
-            self.full_path =row[0]+self.path
-           
-            # Parse a URL into components
-            url=urlparse.urlsplit(self.full_path)
-    
-            # Check if path is URL
-            if url.scheme=="http":
-                # If path is URL open URL in browser
-                webbrowser.open(self.full_path) 
-            else: 
-                # If its not URL ,check if file exist
-                if not os.path.exists(self.full_path):
-                    message = "File not found:"+self.full_path 
-                    self.controller.show_warning(message, context_name='ui_message')
-                else:
-                    # Open the document
-                    os.startfile(self.full_path)    
+
+        # Full path= path + value from row
+        self.full_path =row[0]+self.path
+       
+        # Parse a URL into components
+        url=urlparse.urlsplit(self.full_path)
+
+        # Check if path is URL
+        if url.scheme=="http":
+            # If path is URL open URL in browser
+            webbrowser.open(self.full_path) 
+        else: 
+            # If its not URL ,check if file exist
+            if not os.path.exists(self.full_path):
+                message = "File not found:"+self.full_path 
+                self.controller.show_warning(message, context_name='ui_message')
+            else:
+                # Open the document
+                os.startfile(self.full_path)    
                 
 
     def set_filter_table(self, widget):
@@ -396,7 +403,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)                   
             return
         
         # Set filter
@@ -427,7 +434,7 @@ class ParentDialog(object):
         date_to = self.date_document_to.date().toString('yyyyMMdd') 
         if (date_from > date_to):
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message, context_name='ui_message')                   
+            self.controller.show_warning(message)                   
             return
         
         # Set filter
@@ -539,8 +546,8 @@ class ParentDialog(object):
         date = QDate.currentDate()
         self.date_document_to.setDate(date)
 
-        self.btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
-        self.btn_open_path.clicked.connect(self.open_selected_document_from_table) 
+        btn_open_path = self.dialog.findChild(QPushButton,"btn_open_path")
+        btn_open_path.clicked.connect(self.open_selected_document_from_table) 
         
         # Set signals
         doc_type.activated.connect(partial(self.set_filter_table_man, widget))
@@ -556,7 +563,7 @@ class ParentDialog(object):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox("doc_tag", rows)
 
-        # Fill ComboBox doccat_id
+        # Fill ComboBox doc_type
         sql = "SELECT DISTINCT(doc_type)"
         sql+= " FROM "+table_name
         sql+= " ORDER BY doc_type"
@@ -757,7 +764,7 @@ class ParentDialog(object):
                 self.tab_main.removeTab(i) 
 
         # For virtual arc remove tab Costs
-        if self.layer.name() == "Varc" :
+        if self.layer.name() == "Varc":
             self.tab_main.removeTab(4)          
                 
                 
@@ -818,7 +825,7 @@ class ParentDialog(object):
             layer.rollBack()
        
             
-    def catalog(self, wsoftware, geom_type):
+    def catalog(self, wsoftware, geom_type, node_type=None):
 
         # Set dialog depending water software
         if wsoftware == 'ws':
@@ -833,8 +840,8 @@ class ParentDialog(object):
         self.dlg_cat.open()        
             
         # Set signals
-        self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.clicked.connect(self.dlg_cat.close_dialog)
+        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -844,21 +851,22 @@ class ParentDialog(object):
 
         self.node_type_text = None
         if wsoftware == 'ws' and geom_type == 'node':
-            self.node_type_text = utils_giswater.getWidgetText(self.node_type)           
+            self.controller.log_info(str(node_type))
+            self.node_type_text = node_type
                   
         sql = "SELECT DISTINCT(matcat_id) as matcat_id " 
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
-        sql+= " ORDER BY matcat_id"
+            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql += " ORDER BY matcat_id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.matcat_id, rows)
 
         sql = "SELECT DISTINCT("+self.field2+")"
-        sql+= " FROM "+self.schema_name+".cat_"+geom_type
+        sql += " FROM "+self.schema_name+".cat_"+geom_type
         if wsoftware == 'ws' and geom_type == 'node':
-            sql+= " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"        
-        sql+= " ORDER BY "+self.field2        
+            sql += " WHERE "+geom_type+"type_id = '"+self.node_type_text+"'"
+        sql += " ORDER BY "+self.field2
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_cat.filter2, rows)
 
@@ -996,12 +1004,58 @@ class ParentDialog(object):
     def fill_geomcat_id(self, geom_type):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.dlg_cat.close_dialog()
+        self.dlg_cat.close()
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
         elif geom_type == 'arc':
             utils_giswater.setWidgetText(self.arccat_id, catalog_id)                    
         else:
-            utils_giswater.setWidgetText(self.connecat_id, catalog_id)                    
-                
-        
+            utils_giswater.setWidgetText(self.connecat_id, catalog_id)
+
+
+    def manage_feature_cat(self):
+
+        # Dictionary to keep every record of table 'sys_feature_cat'
+        # Key: field tablename
+        # Value: Object of the class SysFeatureCat
+        sql = "SELECT * FROM " + self.schema_name + ".sys_feature_cat"
+        rows = self.dao.get_rows(sql)
+        if not rows:
+            return
+
+        for row in rows:
+            tablename = row['tablename']
+            elem = SysFeatureCat(row['id'], row['type'], row['orderby'], row['tablename'], row['shortcut_key'])
+            self.feature_cat[tablename] = elem
+
+
+    def project_read(self):
+
+        # Check if we have any layer loaded
+        layers = self.iface.legendInterface().layers()
+        if len(layers) == 0:
+            return
+
+        self.manage_feature_cat()
+
+        # Iterate over all layers to get the ones specified in 'db' config section
+        for cur_layer in layers:
+            uri_table = self.controller.get_layer_source_table_name(cur_layer)  # @UnusedVariable
+            if uri_table is not None:
+
+                if uri_table in self.feature_cat.keys():
+                    elem = self.feature_cat[uri_table]
+                    elem.layername = cur_layer.name()
+
+
+    def set_icon(self, widget, icon):
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
+        if os.path.exists(icon_path):
+            widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
+

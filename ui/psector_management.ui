@@ -61,7 +61,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_delete_2">
+   <widget class="QPushButton" name="btn_current_psector">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -99,6 +99,19 @@
    </property>
    <property name="text">
     <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_save">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>500</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
    </property>
   </widget>
  </widget>

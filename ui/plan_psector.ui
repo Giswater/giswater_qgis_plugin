@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="General">
     <attribute name="title">
@@ -670,183 +670,6 @@
       <property name="echoMode">
        <enum>QLineEdit::Normal</enum>
       </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="Elements">
-    <attribute name="title">
-     <string>Elements</string>
-    </attribute>
-    <widget class="QTabWidget" name="tabWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>461</width>
-       <height>451</height>
-      </rect>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="Arc">
-      <attribute name="title">
-       <string>Arc</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_arc_plan">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>431</width>
-         <height>346</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_del_arc_plan">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_add_arc_plan">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="Node">
-      <attribute name="title">
-       <string>Node</string>
-      </attribute>
-      <widget class="QTableView" name="tbl_node_plan">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>431</width>
-         <height>346</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_del_node_plan">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_add_node_plan">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="Other">
-      <attribute name="title">
-       <string>Other</string>
-      </attribute>
-      <widget class="QPushButton" name="btn_add_other_plan">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-      <widget class="QTableView" name="tbl_other_plan">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>431</width>
-         <height>346</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_del_other_plan">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
      </widget>
     </widget>
    </widget>
@@ -1503,6 +1326,183 @@
      <property name="text">
       <string>Total arcs:</string>
      </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="Elements">
+    <attribute name="title">
+     <string>Elements</string>
+    </attribute>
+    <widget class="QTabWidget" name="tabWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>461</width>
+       <height>451</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="Arc">
+      <attribute name="title">
+       <string>Arc</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_arc_plan">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>431</width>
+         <height>346</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_del_arc_plan">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>20</y>
+         <width>91</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_add_arc_plan">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>20</y>
+         <width>91</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="Node">
+      <attribute name="title">
+       <string>Node</string>
+      </attribute>
+      <widget class="QTableView" name="tbl_node_plan">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>431</width>
+         <height>346</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_del_node_plan">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>20</y>
+         <width>91</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_add_node_plan">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>20</y>
+         <width>91</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="Other">
+      <attribute name="title">
+       <string>Other</string>
+      </attribute>
+      <widget class="QPushButton" name="btn_add_other_plan">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>20</y>
+         <width>91</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+      <widget class="QTableView" name="tbl_other_plan">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>431</width>
+         <height>346</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_del_other_plan">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>20</y>
+         <width>91</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
    </widget>
   </widget>
