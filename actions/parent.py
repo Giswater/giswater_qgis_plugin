@@ -370,6 +370,7 @@ class ParentAction():
     def fill_table_psector(self, widget, table_name, column_id):
         """ Set a model with selected filter.
         Attach that model to selected table """
+        
         # Set model
         self.model = QSqlTableModel()
         self.model.setTable(self.schema_name+"."+table_name)
@@ -454,8 +455,8 @@ class ParentAction():
         sql += " RIGHT JOIN " + self.controller.schema_name + "." + tableright + " ON " + tableleft + "." + field_id + " = " + tableright + "." + field_id
         sql += " WHERE cur_user = current_user) AND name LIKE '%" + query + "%'"
         self.fill_table_by_query(qtable, sql)
-
-
+        
+        
     def set_icon(self, widget, icon):
         """ Set @icon to selected @widget """
 
@@ -466,4 +467,4 @@ class ParentAction():
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
-
+                    

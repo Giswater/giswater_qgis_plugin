@@ -104,7 +104,7 @@ class Giswater(QObject):
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
 
         # Define signals
         self.set_signals()
