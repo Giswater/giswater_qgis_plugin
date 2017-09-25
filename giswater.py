@@ -6,9 +6,8 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsProject, QgsExpressionContextUtils
-from PyQt4 import uic
-from PyQt4.QtCore import QObject, QSettings, Qt
+from qgis.core import QgsMapLayerRegistry, QgsExpressionContextUtils
+from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
 import os.path
@@ -564,7 +563,8 @@ class Giswater(QObject):
         self.controller.set_schema_name(self.schema_name)   
         
         # Get PostgreSQL version
-        self.controller.get_postgresql_version()        
+        postgresql_version = self.controller.get_postgresql_version() 
+        self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)

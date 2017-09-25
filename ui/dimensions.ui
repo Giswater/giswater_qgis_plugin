@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>290</width>
-    <height>361</height>
+    <height>369</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -25,8 +25,8 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>70</y>
+     <x>15</x>
+     <y>80</y>
      <width>261</width>
      <height>141</height>
     </rect>
@@ -42,19 +42,6 @@
       <width>151</width>
       <height>20</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_snapping">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>10</y>
-      <width>31</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>...</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="feature_id">
@@ -77,7 +64,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_9">
+   <widget class="QLabel" name="label_feature_id">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -90,7 +77,7 @@
      <string>Feature id:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_10">
+   <widget class="QLabel" name="feature_type_2">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -103,7 +90,7 @@
      <string>Feature type:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_11">
+   <widget class="QLabel" name="label_depth">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -113,15 +100,32 @@
      </rect>
     </property>
     <property name="text">
-     <string>Direct value:</string>
+     <string>Custom depth:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_snapping">
+    <property name="geometry">
+     <rect>
+      <x>225</x>
+      <y>10</y>
+      <width>25</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../../Desktop/new_forms/icons/widgets/129.png</normaloff>../../../Desktop/new_forms/icons/widgets/129.png</iconset>
     </property>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>15</x>
+     <y>25</y>
      <width>261</width>
      <height>51</height>
     </rect>
@@ -139,37 +143,37 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="label_distance">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>81</width>
+      <width>86</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Custom value:</string>
+     <string>Custom distance:</string>
     </property>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>230</y>
+     <x>15</x>
+     <y>225</y>
      <width>261</width>
-     <height>121</height>
+     <height>106</height>
     </rect>
    </property>
    <property name="title">
-    <string>Symbology</string>
+    <string>Circle symbology</string>
    </property>
    <widget class="QLineEdit" name="y_symbol">
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>90</y>
+      <y>70</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -178,37 +182,24 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="label_y_symbol">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>141</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Figueres style (circle):</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>90</y>
-      <width>21</width>
+      <x>10</x>
+      <y>70</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>y:</string>
+     <string>Coordinate y:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="x_symbol">
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>60</y>
+      <y>40</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -217,32 +208,88 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="label_x_symbol">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>60</y>
-      <width>21</width>
+      <x>10</x>
+      <y>40</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>x:</string>
+     <string>Coordinate x:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_orientation">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>30</y>
-      <width>31</width>
-      <height>23</height>
+      <x>225</x>
+      <y>10</y>
+      <width>25</width>
+      <height>25</height>
      </rect>
     </property>
     <property name="text">
-     <string>...</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../../Desktop/new_forms/icons/widgets/131.png</normaloff>../../../Desktop/new_forms/icons/widgets/131.png</iconset>
     </property>
    </widget>
+  </widget>
+  <widget class="QLineEdit" name="id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>5</y>
+     <width>66</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_id">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>5</y>
+     <width>26</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>id:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_cancel">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>335</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_accept">
+   <property name="geometry">
+    <rect>
+     <x>115</x>
+     <y>335</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ok</string>
+   </property>
   </widget>
  </widget>
  <resources/>

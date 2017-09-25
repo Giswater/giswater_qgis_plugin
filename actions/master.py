@@ -275,9 +275,9 @@ class Master(ParentAction):
         self.select_config_param_system("config_param_system") 
 
         self.dlg.om_path_url.clicked.connect(partial(self.open_web_browser, "om_visit_absolute_path"))
-        self.dlg.om_path_doc.clicked.connect(partial(self.open_file_dialog, "om_visit_absolute_path"))
+        self.dlg.om_path_doc.clicked.connect(partial(self.get_folder_dialog, "om_visit_absolute_path"))
         self.dlg.doc_path_url.clicked.connect(partial(self.open_web_browser, "doc_absolute_path"))
-        self.dlg.doc_path_doc.clicked.connect(partial(self.open_file_dialog, "doc_absolute_path"))
+        self.dlg.doc_path_doc.clicked.connect(partial(self.get_folder_dialog, "doc_absolute_path"))
 
         if self.project_type == 'ws':
             self.dlg.tab_topology.removeTab(1)

@@ -289,7 +289,7 @@ class Edit(ParentAction):
         # Set signal to reach selected value from QCompleter
         self.completer.activated.connect(self.ed_add_el_autocomplete)
         self.dlg.add_geom.pressed.connect(self.add_point)
-        self.set_icon(self.dlg.add_geom, "129.png")
+
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
@@ -309,7 +309,7 @@ class Edit(ParentAction):
 
         # Get widgets
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
-        self.dlg.path_doc.clicked.connect(partial(self.open_file_dialog, "path"))
+        self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')
@@ -450,7 +450,7 @@ class Edit(ParentAction):
             answer = self.controller.ask_question("Are you sure you want change the data?")
             if answer:
                 sql = "UPDATE " + self.schema_name + ".doc "
-                sql += " SET doc_type = '" + doc_type + "', tagcat_id= '" + tagcat_id + "', observ = '" + observ + "', path = '" + path + "'"
+                sql += " SET doc_type = '" + doc_type + "', observ = '" + observ + "', path = '" + path + "'"
                 sql += " WHERE id = '" + doc_id + "'"
                 status = self.controller.execute_sql(sql)
                 if status:
@@ -460,8 +460,8 @@ class Edit(ParentAction):
 
         # If document doesn't exist perform an INSERT
         else:
-            sql = "INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ, tagcat_id) "
-            sql += " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ + "', '" + tagcat_id + "')"
+            sql = "INSERT INTO " + self.schema_name + ".doc (id, doc_type, path, observ) "
+            sql += " VALUES ('" + doc_id + "', '" + doc_type + "', '" + path + "', '" + observ +  "')"
             status = self.controller.execute_sql(sql)
             if status:
                 self.ed_add_to_feature("doc", doc_id)
