@@ -225,6 +225,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QCheckBox" name="checkBox_composer">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>190</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Composer</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QPushButton" name="btn_load_profile">
    <property name="geometry">
