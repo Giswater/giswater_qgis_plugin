@@ -102,8 +102,7 @@ class Giswater(QObject):
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincutManagement = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)        
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
 
         # Define signals
         self.set_signals()
@@ -134,11 +133,9 @@ class Giswater(QObject):
                     callback_function = getattr(self.basic, function_name)  
                     action.triggered.connect(callback_function)
                 # Mincut toolbar actions
-                elif int(index_action) == 26:
-                    callback_function = getattr(self.mincut, 'mg_mincut')
-                    action.triggered.connect(callback_function)
-                elif int(index_action) == 27:
-                    callback_function = getattr(self.mincutManagement, 'mg_mincut_management')                    
+                elif int(index_action) in (26, 27):
+                    callback_function = getattr(self.mincut, function_name)
+                    action.triggered.connect(callback_function)                 
                 # Edit toolbar actions
                 elif int(index_action) in (01, 02, 19, 28, 33, 34, 39, 98):
                     callback_function = getattr(self.edit, function_name)
@@ -239,9 +236,7 @@ class Giswater(QObject):
         if function_name:
             
             map_tool = None
-            # TODO: Bug checking actions randomly
-            #if int(index_action) in (19, 23, 24, 25, 36, 41, 48, 98, 99):
-            if int(index_action) in (98, 99):
+            if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 36, 41, 45, 46, 47, 48, 49, 98, 99):
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)
