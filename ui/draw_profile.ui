@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>351</height>
+    <width>331</width>
+    <height>338</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,20 +19,20 @@
   <widget class="QPushButton" name="btn_draw">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>280</y>
+     <x>240</x>
+     <y>270</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>DRAW </string>
+    <string>Draw</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>200</x>
      <y>20</y>
      <width>151</width>
      <height>241</height>
@@ -44,17 +44,20 @@
    <widget class="QListWidget" name="tbl_list_arc">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>-10</x>
       <y>20</y>
-      <width>131</width>
+      <width>121</width>
       <height>171</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_add_arc">
+   <widget class="QPushButton" name="btn_delete_arc">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>80</x>
       <y>200</y>
       <width>31</width>
       <height>23</height>
@@ -74,10 +77,13 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_delete_arc">
+   <widget class="QPushButton" name="btn_add_arc">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>40</x>
       <y>200</y>
       <width>31</width>
       <height>23</height>
@@ -108,14 +114,14 @@
     </rect>
    </property>
    <property name="title">
-    <string>Create Profil</string>
+    <string>Create Profile</string>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>71</width>
+      <x>0</x>
+      <y>80</y>
+      <width>111</width>
       <height>16</height>
      </rect>
     </property>
@@ -126,10 +132,10 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>120</y>
-      <width>46</width>
-      <height>13</height>
+      <x>0</x>
+      <y>130</y>
+      <width>91</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
@@ -142,18 +148,18 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>140</y>
+      <x>0</x>
+      <y>150</y>
       <width>113</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="add_start_point">
+   <widget class="QPushButton" name="btn_add_start_point">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>90</y>
+      <x>120</x>
+      <y>100</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -172,11 +178,11 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="add_end_point">
+   <widget class="QPushButton" name="btn_add_end_point">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>140</y>
+      <x>120</x>
+      <y>150</y>
       <width>31</width>
       <height>23</height>
      </rect>
@@ -195,8 +201,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>90</y>
+      <x>0</x>
+      <y>100</y>
       <width>113</width>
       <height>20</height>
      </rect>
@@ -205,9 +211,9 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>71</width>
+      <x>0</x>
+      <y>30</y>
+      <width>121</width>
       <height>16</height>
      </rect>
     </property>
@@ -218,20 +224,20 @@
    <widget class="QLineEdit" name="profile_id">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>40</y>
+      <x>0</x>
+      <y>50</y>
       <width>113</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_composer">
+   <widget class="QCheckBox" name="chk_composer">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>190</y>
-      <width>70</width>
-      <height>17</height>
+      <width>151</width>
+      <height>22</height>
      </rect>
     </property>
     <property name="text">
@@ -243,8 +249,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
-     <width>75</width>
+     <y>270</y>
+     <width>91</width>
      <height>23</height>
     </rect>
    </property>
@@ -255,9 +261,9 @@
   <widget class="QPushButton" name="btn_save_profile">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>280</y>
-     <width>75</width>
+     <x>10</x>
+     <y>300</y>
+     <width>91</width>
      <height>23</height>
     </rect>
    </property>
@@ -268,8 +274,8 @@
   <widget class="QPushButton" name="btn_clear_profile">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>310</y>
+     <x>240</x>
+     <y>300</y>
      <width>75</width>
      <height>23</height>
     </rect>
