@@ -930,7 +930,7 @@ class DrawProfiles(ParentMapTool):
             return
                     
         # Clear list of arcs and nodes - preparing for new profile
-        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id, source, target, cost" 
+        sql = "SELECT * FROM public.pgr_dijkstra('SELECT id::integer, source, target, cost" 
         sql += " FROM "+self.schema_name+".v_anl_pgrouting_arc', " + str(rstart_point) + ", " +str(rend_point) + ", false"
         if self.version == '2':
             sql += ", false"
