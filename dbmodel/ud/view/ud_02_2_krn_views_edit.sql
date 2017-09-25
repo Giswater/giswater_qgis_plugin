@@ -1606,7 +1606,7 @@ arc.expl_id,
 arc.num_value as conduit_num_value
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
-	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
+	JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	LEFT JOIN arc_type ON arc_type.id=arc.arc_type
@@ -1686,7 +1686,7 @@ arc.num_value as siphon_num_value,
 man_siphon.name AS siphon_name
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
-	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
+	JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	LEFT JOIN arc_type ON arc_type.id=arc.arc_type
@@ -1772,7 +1772,7 @@ man_waccel.name AS waccel_name,
 man_waccel.accessibility AS waccel_accessibility
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
-	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
+	JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	LEFT JOIN arc_type ON arc_type.id=arc.arc_type
@@ -1850,7 +1850,7 @@ arc.expl_id,
 arc.num_value as varc_num_value
 FROM selector_expl, arc
 	LEFT JOIN cat_arc ON arc.arccat_id = cat_arc.id
-	LEFT JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
+	JOIN v_arc_x_node ON v_arc_x_node.arc_id = arc.arc_id
 	LEFT JOIN dma ON arc.dma_id = dma.dma_id
 	LEFT JOIN sector ON arc.sector_id = sector.sector_id
 	LEFT JOIN arc_type ON arc_type.id=arc.arc_type
