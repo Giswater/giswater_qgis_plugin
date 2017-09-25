@@ -373,7 +373,8 @@ class ParentDialog(object):
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-
+        if row[0].lower() == "c:\\".lower():
+            self.controller.log_info(str(row[0]))
         # Full path= path + value from row
         self.full_path =row[0]+self.path
        
