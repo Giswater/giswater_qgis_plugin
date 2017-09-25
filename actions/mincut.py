@@ -50,7 +50,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.connec_group = []
         self.arc_group = []
 
-        ''' TODO: Search in table 'syhs_feature_cat'
+        ''' TODO: Search in table 'sys_feature_cat'
         sql = "SELECT DISTINCT(i18n) FROM " + self.schema_name + ".node_type_cat_type "
         nodes = self.controller.get_rows(sql)
         for node in nodes:
@@ -90,6 +90,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.state = self.dlg.findChild(QLineEdit, "state")
         self.result_id = self.dlg.findChild(QLineEdit, "result_id")
+        self.result_id.setVisible(False)
         self.customer_state = self.dlg.findChild(QLineEdit, "customer_state")
         self.work_order = self.dlg.findChild(QLineEdit, "work_order")
         self.street = self.dlg.findChild(QLineEdit, "street")
@@ -411,17 +412,17 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         btn_delete_connec = self.dlg_connec.findChild(QPushButton, "btn_delete")
         btn_delete_connec.pressed.connect(partial(self.delete_records, self.tbl_connec, table, "connec_id"))
-        self.set_icon(btn_delete_connec, "112.png")
+        self.set_icon(btn_delete_connec, "112")
 
         btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
         # TODO: Check slot function
         #btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table, "connec_id", self.dlg_connec))
         btn_insert_connec.pressed.connect(partial(self.manual_init, self.tbl_connec, table, "connec_id", self.dlg_connec, self.group_pointers_connec))
-        self.set_icon(btn_insert_connec, "111.png")
+        self.set_icon(btn_insert_connec, "111")
 
         btn_insert_connec_snap = self.dlg_connec.findChild(QPushButton, "btn_snapping")
         btn_insert_connec_snap.pressed.connect(self.snapping_init)
-        self.set_icon(btn_insert_connec_snap, "129.png")
+        self.set_icon(btn_insert_connec_snap, "129")
 
         btn_accept = self.dlg_connec.findChild(QPushButton, "btn_accept")
         btn_accept.pressed.connect(partial(self.exec_sql, "connec_id", "connec"))
@@ -487,7 +488,6 @@ class MincutParent(ParentAction, MultipleSnapping):
     def check_id(self):
         ''' Check if user entered ID '''
 
-        self.controller.log_info(str(self.customer_state.text()))
         customer_state = self.customer_state.text()
         if customer_state == "":
             message = "You need to enter customer code"
@@ -529,10 +529,10 @@ class MincutParent(ParentAction, MultipleSnapping):
         # TODO: Check slot function
         #self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
         self.btn_insert_hydro.pressed.connect(partial(self.manual_init, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
-        self.set_icon(self.btn_insert_hydro, "111.png")
+        self.set_icon(self.btn_insert_hydro, "111")
 
         self.btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
-        self.set_icon(self.btn_snapping_hydro, "129.png")
+        self.set_icon(self.btn_snapping_hydro, "129")
 
         self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
         self.btn_accept.pressed.connect(partial(self.exec_sql,"hydrometer_id", "hydrometer"))
