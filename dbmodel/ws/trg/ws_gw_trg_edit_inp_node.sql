@@ -31,8 +31,18 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+	
+		-- State
+		IF (NEW.state != OLD.state) THEN
+			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+		END IF;
+			
+		-- The geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+		END IF;
 
-
+		
         IF (NEW.nodecat_id <> OLD.nodecat_id) THEN  
             old_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
             new_nodetype:= (SELECT node_type.type FROM node_type JOIN cat_node ON (((node_type.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;

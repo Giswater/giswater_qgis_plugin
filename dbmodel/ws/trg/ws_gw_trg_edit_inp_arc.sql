@@ -22,7 +22,17 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-
+		-- State
+		IF (NEW.state != OLD.state) THEN
+			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+		END IF;
+			
+		-- The geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
+		END IF;
+	
+	
         UPDATE arc 
         SET arc_id=NEW.arc_id, arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
             "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, custom_length=NEW.custom_length, rotation=NEW.rotation, link=NEW.link, 

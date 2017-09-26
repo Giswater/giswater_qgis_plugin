@@ -849,14 +849,30 @@ BEGIN
 		END IF;
 */
 
+	-- State
+    IF (NEW.state != OLD.state) THEN
+        UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+    END IF;
+        
+	-- The geom
+	IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+           UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+    END IF;
+
+	--Label rotation
+	IF (NEW.tank_rotation != OLD.tank_rotation) THEN
+           UPDATE node SET rotation=NEW.tank_rotation WHERE node_id = OLD.node_id;
+    END IF;
+		
+
 -- MANAGEMENT UPDATE
     IF man_table ='man_junction' THEN
 		UPDATE node 
 		SET node_id=NEW.node_id, code=NEW.junction_code, elevation=NEW.junction_elevation, "depth"=NEW."junction_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.junction_annotation, "observ"=NEW."junction_observ", "comment"=NEW."junction_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.junction_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.junction_annotation, "observ"=NEW."junction_observ", "comment"=NEW."junction_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.junction_soilcat_id, 
 		function_type=NEW.junction_function_type, category_type=NEW.junction_category_type, fluid_type=NEW.junction_fluid_type, location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, workcat_id_end=NEW.junction_workcat_id_end,  
 		buildercat_id=NEW.junction_buildercat_id,	builtdate=NEW.junction_builtdate, enddate=NEW.junction_enddate, ownercat_id=NEW.junction_ownercat_id, address_01=NEW.junction_address_01, address_02=NEW.junction_address_02, 
-		address_03=NEW.junction_address_03, descript=NEW.junction_descript, rotation=NEW.junction_rotation,verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.junction_label_x, 
+		address_03=NEW.junction_address_03, descript=NEW.junction_descript, rotation=NEW.junction_rotation,verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.junction_label_x, 
 		label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.junction_hemisphere, num_value=NEW.junction_num_value
 		WHERE node_id = OLD.node_id;
 		
@@ -866,11 +882,11 @@ BEGIN
 
 	ELSIF man_table ='man_tank' THEN
 		UPDATE node 
-		SET node_id=NEW.node_id,  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", state_type=NEW.state_type,
+		SET node_id=NEW.node_id,  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.tank_annotation, "observ"=NEW."tank_observ", "comment"=NEW."tank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tank_soilcat_id, function_type=NEW.tank_function_type, 
 		category_type=NEW.tank_category_type, fluid_type=NEW.tank_fluid_type, location_type=NEW.tank_location_type, workcat_id=NEW.tank_workcat_id, workcat_id_end=NEW.tank_workcat_id_end, buildercat_id=NEW.tank_buildercat_id, 
 		builtdate=NEW.tank_builtdate, enddate=NEW.tank_enddate, ownercat_id=NEW.tank_ownercat_id, address_01=NEW.tank_address_01, address_02=NEW.tank_address_02, address_03=NEW.tank_address_03, descript=NEW.tank_descript, 
-		rotation=NEW.tank_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.tank_label_x, label_y=NEW.tank_label_y, label_rotation=NEW.tank_label_rotation,
+		rotation=NEW.tank_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.tank_label_x, label_y=NEW.tank_label_y, label_rotation=NEW.tank_label_rotation,
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.tank_hemisphere, num_value=NEW.tank_num_value
 		WHERE node_id = OLD.node_id;
 
@@ -880,11 +896,11 @@ BEGIN
 	
 	ELSIF man_table ='man_tank_pol' THEN
 		UPDATE node 
-		SET node_id=NEW.node_id,  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", state_type=NEW.state_type,
+		SET node_id=NEW.node_id,  code=NEW.tank_code, elevation=NEW.tank_elevation, "depth"=NEW."tank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.tank_annotation, "observ"=NEW."tank_observ", "comment"=NEW."tank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.tank_soilcat_id, function_type=NEW.tank_function_type, 
 		category_type=NEW.tank_category_type, fluid_type=NEW.tank_fluid_type, location_type=NEW.tank_location_type, workcat_id=NEW.tank_workcat_id, workcat_id_end=NEW.tank_workcat_id_end, buildercat_id=NEW.tank_buildercat_id, 
 		builtdate=NEW.tank_builtdate, enddate=NEW.tank_enddate, ownercat_id=NEW.tank_ownercat_id, address_01=NEW.tank_address_01, address_02=NEW.tank_address_02, address_03=NEW.tank_address_03, descript=NEW.tank_descript, 
-		rotation=NEW.tank_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.tank_label_x, label_y=NEW.tank_label_y, label_rotation=NEW.tank_label_rotation,
+		rotation=NEW.tank_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.tank_label_x, label_y=NEW.tank_label_y, label_rotation=NEW.tank_label_rotation,
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.tank_hemisphere, num_value=NEW.tank_num_value
 		WHERE node_id = OLD.node_id;
 
@@ -908,11 +924,11 @@ BEGIN
 
 	ELSIF man_table ='man_pump' THEN
 		UPDATE node
-		SET node_id=NEW.node_id, code=NEW.pump_code, elevation=NEW.pump_elevation, "depth"=NEW."pump_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", state_type=NEW.state_type,
+		SET node_id=NEW.node_id, code=NEW.pump_code, elevation=NEW.pump_elevation, "depth"=NEW."pump_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.pump_annotation, "observ"=NEW."pump_observ", "comment"=NEW."pump_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.pump_soilcat_id, function_type=NEW.pump_function_type, 
 		category_type=NEW.pump_category_type, fluid_type=NEW.pump_fluid_type, location_type=NEW.pump_location_type, workcat_id=NEW.pump_workcat_id, workcat_id_end=NEW.pump_workcat_id_end, buildercat_id=NEW.pump_buildercat_id, 
 		builtdate=NEW.pump_builtdate,  enddate=NEW.pump_enddate, ownercat_id=NEW.pump_ownercat_id, address_01=NEW.pump_address_01, address_02=NEW.pump_address_02, address_03=NEW.pump_address_03, 
-		descript=NEW.pump_descript,rotation=NEW.pump_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.pump_label_x, label_y=NEW.pump_label_y,
+		descript=NEW.pump_descript,rotation=NEW.pump_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.pump_label_x, label_y=NEW.pump_label_y,
 		label_rotation=NEW.pump_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.pump_hemisphere, num_value=NEW.pump_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -923,10 +939,10 @@ BEGIN
 	ELSIF man_table ='man_manhole' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.manhole_code, elevation=NEW.manhole_elevation, "depth"=NEW."manhole_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.manhole_annotation, "observ"=NEW."manhole_observ", "comment"=NEW."manhole_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.manhole_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.manhole_annotation, "observ"=NEW."manhole_observ", "comment"=NEW."manhole_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.manhole_soilcat_id, 
 		function_type=NEW.manhole_function_type, category_type=NEW.manhole_category_type, fluid_type=NEW.manhole_fluid_type, location_type=NEW.manhole_location_type, workcat_id=NEW.manhole_workcat_id, workcat_id_end=NEW.manhole_workcat_id_end, 
 		buildercat_id=NEW.manhole_buildercat_id, builtdate=NEW.manhole_builtdate, enddate=NEW.manhole_enddate,  ownercat_id=NEW.manhole_ownercat_id, address_01=NEW.manhole_address_01, address_02=NEW.manhole_address_02, 
-		address_03=NEW.manhole_address_03, descript=NEW.manhole_descript, rotation=NEW.manhole_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.manhole_label_x, 
+		address_03=NEW.manhole_address_03, descript=NEW.manhole_descript, rotation=NEW.manhole_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.manhole_label_x, 
 		label_y=NEW.manhole_label_y, label_rotation=NEW.manhole_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.manhole_hemisphere, num_value=NEW.manhole_num_value
 		WHERE node_id = OLD.node_id;
 		
@@ -937,10 +953,10 @@ BEGIN
 	ELSIF man_table ='man_hydrant' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.hydrant_code, elevation=NEW.hydrant_elevation, "depth"=NEW."hydrant_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", annotation=NEW.hydrant_annotation, "observ"=NEW."hydrant_observ", "comment"=NEW."hydrant_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.hydrant_soilcat_id, 
+		annotation=NEW.hydrant_annotation, "observ"=NEW."hydrant_observ", "comment"=NEW."hydrant_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.hydrant_soilcat_id, 
 		function_type=NEW.hydrant_function_type, category_type=NEW.hydrant_category_type, fluid_type=NEW.hydrant_fluid_type, location_type=NEW.hydrant_location_type, workcat_id=NEW.hydrant_workcat_id,workcat_id_end=NEW.hydrant_workcat_id_end, 
 		buildercat_id=NEW.hydrant_buildercat_id, builtdate=NEW.hydrant_builtdate, enddate=NEW.hydrant_enddate, ownercat_id=NEW.hydrant_ownercat_id, address_01=NEW.hydrant_address_01, address_02=NEW.hydrant_address_02, 
-		address_03=NEW.hydrant_address_03, descript=NEW.hydrant_descript, rotation=NEW.hydrant_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.hydrant_label_x, 
+		address_03=NEW.hydrant_address_03, descript=NEW.hydrant_descript, rotation=NEW.hydrant_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.hydrant_label_x, 
 		label_y=NEW.hydrant_label_y, label_rotation=NEW.hydrant_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.hydrant_hemisphere, num_value=NEW.hydrant_num_value
 		WHERE node_id = OLD.node_id;
 		
@@ -951,10 +967,10 @@ BEGIN
 	ELSIF man_table ='man_source' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.source_code, elevation=NEW.source_elevation, "depth"=NEW."source_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.source_annotation, "observ"=NEW."source_observ", "comment"=NEW."source_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.source_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.source_annotation, "observ"=NEW."source_observ", "comment"=NEW."source_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.source_soilcat_id, 
 		function_type=NEW.source_function_type, category_type=NEW.source_category_type, fluid_type=NEW.source_fluid_type, location_type=NEW.source_location_type, workcat_id=NEW.source_workcat_id, workcat_id_end=NEW.source_workcat_id_end, 
 		buildercat_id=NEW.source_buildercat_id, builtdate=NEW.source_builtdate, enddate=NEW.source_enddate, ownercat_id=NEW.source_ownercat_id, address_01=NEW.source_address_01, address_02=NEW.source_address_02, 
-		address_03=NEW.source_address_03, descript=NEW.source_descript, rotation=NEW.source_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.source_label_x, 
+		address_03=NEW.source_address_03, descript=NEW.source_descript, rotation=NEW.source_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.source_label_x, 
 		label_y=NEW.source_label_y, label_rotation=NEW.source_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.source_hemisphere, num_value=NEW.source_num_value
 		WHERE node_id = OLD.node_id;
 		
@@ -964,11 +980,11 @@ BEGIN
 
 	ELSIF man_table ='man_meter' THEN
 		UPDATE node
-		SET node_id=NEW.node_id, elevation=NEW.meter_elevation, "depth"=NEW."meter_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW."state", state_type=NEW.state_type,
+		SET node_id=NEW.node_id, elevation=NEW.meter_elevation, "depth"=NEW."meter_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 		annotation=NEW.meter_annotation, "observ"=NEW."meter_observ", "comment"=NEW."meter_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.meter_soilcat_id, function_type=NEW.meter_function_type, 
 		category_type=NEW.meter_category_type, fluid_type=NEW.meter_fluid_type, location_type=NEW.meter_location_type, workcat_id=NEW.meter_workcat_id, workcat_id_end=NEW.meter_workcat_id_end, buildercat_id=NEW.meter_buildercat_id, 
 		builtdate=NEW.meter_builtdate, enddate=NEW.meter_enddate,  ownercat_id=NEW.meter_ownercat_id, address_01=NEW.meter_address_01, address_02=NEW.meter_address_02, address_03=NEW.meter_address_03, descript=NEW.meter_descript,
-		rotation=NEW.meter_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.meter_label_x, label_y=NEW.meter_label_y, label_rotation=NEW.meter_label_rotation,
+		rotation=NEW.meter_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.meter_label_x, label_y=NEW.meter_label_y, label_rotation=NEW.meter_label_rotation,
 		code=NEW.meter_code, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.meter_hemisphere, num_value=NEW.meter_num_value
 		WHERE node_id = OLD.node_id;
 		
@@ -979,11 +995,11 @@ BEGIN
 	ELSIF man_table ='man_waterwell' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.waterwell_code, elevation=NEW.waterwell_elevation, "depth"=NEW."waterwell_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.waterwell_annotation, "observ"=NEW."waterwell_observ", "comment"=NEW."waterwell_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, 
+		state_type=NEW.state_type, annotation=NEW.waterwell_annotation, "observ"=NEW."waterwell_observ", "comment"=NEW."waterwell_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, 
 		soilcat_id=NEW.waterwell_soilcat_id, function_type=NEW.waterwell_function_type, category_type=NEW.waterwell_category_type, fluid_type=NEW.waterwell_fluid_type, location_type=NEW.waterwell_location_type, workcat_id=NEW.waterwell_workcat_id, 
 		workcat_id_end=NEW.waterwell_workcat_id_end, buildercat_id=NEW.waterwell_buildercat_id, builtdate=NEW.waterwell_builtdate, enddate=NEW.waterwell_enddate, ownercat_id=NEW.waterwell_ownercat_id, 
 		address_01=NEW.waterwell_address_01, address_02=NEW.waterwell_address_02, address_03=NEW.waterwell_address_03, descript=NEW.waterwell_descript,rotation=NEW.waterwell_rotation, 
-		verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.waterwell_label_x, label_y=NEW.waterwell_label_y, label_rotation=NEW.waterwell_label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
+		verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.waterwell_label_x, label_y=NEW.waterwell_label_y, label_rotation=NEW.waterwell_label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 		expl_id=NEW.expl_id, hemisphere=NEW.waterwell_hemisphere, num_value=NEW.waterwell_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -994,10 +1010,10 @@ BEGIN
 	ELSIF man_table ='man_reduction' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.reduction_code, elevation=NEW.reduction_elevation, "depth"=NEW."reduction_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.reduction_annotation, "observ"=NEW."reduction_observ", "comment"=NEW."reduction_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.reduction_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.reduction_annotation, "observ"=NEW."reduction_observ", "comment"=NEW."reduction_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.reduction_soilcat_id, 
 		function_type=NEW.reduction_function_type, category_type=NEW.reduction_category_type, fluid_type=NEW.reduction_fluid_type, location_type=NEW.reduction_location_type, workcat_id=NEW.reduction_workcat_id, 
 		workcat_id_end=NEW.reduction_workcat_id_end, buildercat_id=NEW.reduction_buildercat_id, builtdate=NEW.reduction_builtdate, enddate=NEW.reduction_enddate, ownercat_id=NEW.reduction_ownercat_id, address_01=NEW.reduction_address_01, 
-		address_02=NEW.reduction_address_02, address_03=NEW.reduction_address_03, descript=NEW.reduction_descript,rotation=NEW.reduction_rotation, verified=NEW.verified, the_geom=NEW.the_geom, 
+		address_02=NEW.reduction_address_02, address_03=NEW.reduction_address_03, descript=NEW.reduction_descript,rotation=NEW.reduction_rotation, verified=NEW.verified, 
 		undelete=NEW.undelete, label_x=NEW.reduction_label_x, label_y=NEW.reduction_label_y, label_rotation=NEW.reduction_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.reduction_hemisphere,
 		num_value=NEW.reduction_num_value
 		WHERE node_id = OLD.node_id;
@@ -1009,10 +1025,10 @@ BEGIN
 	ELSIF man_table ='man_valve' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.valve_code, elevation=NEW.valve_elevation, "depth"=NEW."valve_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.valve_annotation, "observ"=NEW."valve_observ", "comment"=NEW."valve_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.valve_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.valve_annotation, "observ"=NEW."valve_observ", "comment"=NEW."valve_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.valve_soilcat_id, 
 		function_type=NEW.valve_function_type, category_type=NEW.valve_category_type, fluid_type=NEW.valve_fluid_type, location_type=NEW.valve_location_type, workcat_id=NEW.valve_workcat_id, workcat_id_end=NEW.valve_workcat_id_end, buildercat_id=NEW.valve_buildercat_id, 
 		builtdate=NEW.valve_builtdate, enddate=NEW.valve_enddate,  ownercat_id=NEW.valve_ownercat_id, address_01=NEW.valve_address_01, address_02=NEW.valve_address_02, address_03=NEW.valve_address_03, descript=NEW.valve_descript,
-		rotation=NEW.valve_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.valve_label_x, label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, publish=NEW.publish, 
+		rotation=NEW.valve_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.valve_label_x, label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, publish=NEW.publish, 
 		inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.valve_hemisphere, num_value=NEW.valve_num_value
 		WHERE node_id = OLD.node_id;
 		
@@ -1025,10 +1041,10 @@ BEGIN
 	ELSIF man_table ='man_register' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.register_code, elevation=NEW.register_elevation, "depth"=NEW."register_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.register_annotation, "observ"=NEW."register_observ", "comment"=NEW."register_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.register_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.register_annotation, "observ"=NEW."register_observ", "comment"=NEW."register_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.register_soilcat_id, 
 		function_type=NEW.register_function_type, category_type=NEW.register_category_type, fluid_type=NEW.register_fluid_type, location_type=NEW.register_location_type, workcat_id=NEW.register_workcat_id, workcat_id_end=NEW.register_workcat_id_end, 
 		buildercat_id=NEW.register_buildercat_id, builtdate=NEW.register_builtdate, enddate=NEW.register_enddate, ownercat_id=NEW.register_ownercat_id, address_01=NEW.register_address_01, address_02=NEW.register_address_02, 
-		address_03=NEW.register_address_03, descript=NEW.register_descript,rotation=NEW.register_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.register_label_x, 
+		address_03=NEW.register_address_03, descript=NEW.register_descript,rotation=NEW.register_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.register_label_x, 
 		label_y=NEW.register_label_y, label_rotation=NEW.register_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.register_hemisphere, num_value=NEW.register_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -1040,10 +1056,10 @@ BEGIN
 	ELSIF man_table ='man_register_pol' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.register_code, elevation=NEW.register_elevation, "depth"=NEW."register_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.register_annotation, "observ"=NEW."register_observ", "comment"=NEW."register_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.register_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.register_annotation, "observ"=NEW."register_observ", "comment"=NEW."register_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.register_soilcat_id, 
 		function_type=NEW.register_function_type, category_type=NEW.register_category_type, fluid_type=NEW.register_fluid_type, location_type=NEW.register_location_type, workcat_id=NEW.register_workcat_id, workcat_id_end=NEW.register_workcat_id_end, 
 		buildercat_id=NEW.register_buildercat_id, builtdate=NEW.register_builtdate, enddate=NEW.register_enddate, ownercat_id=NEW.register_ownercat_id, address_01=NEW.register_address_01, address_02=NEW.register_address_02, 
-		address_03=NEW.register_address_03, descript=NEW.register_descript,rotation=NEW.register_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.register_label_x, 
+		address_03=NEW.register_address_03, descript=NEW.register_descript,rotation=NEW.register_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.register_label_x, 
 		label_y=NEW.register_label_y, label_rotation=NEW.register_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.register_hemisphere, num_value=NEW.register_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -1068,10 +1084,10 @@ BEGIN
 	ELSIF man_table ='man_netwjoin' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.netwjoin_code, elevation=NEW.netwjoin_elevation, "depth"=NEW."netwjoin_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.netwjoin_annotation, "observ"=NEW."netwjoin_observ", "comment"=NEW."netwjoin_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netwjoin_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.netwjoin_annotation, "observ"=NEW."netwjoin_observ", "comment"=NEW."netwjoin_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netwjoin_soilcat_id, 
 		function_type=NEW.netwjoin_function_type, category_type=NEW.netwjoin_category_type, fluid_type=NEW.netwjoin_fluid_type, location_type=NEW.netwjoin_location_type, workcat_id=NEW.netwjoin_workcat_id, 
 		workcat_id_end=NEW.netwjoin_workcat_id_end, buildercat_id=NEW.netwjoin_buildercat_id, builtdate=NEW.netwjoin_builtdate, enddate=NEW.netwjoin_enddate, ownercat_id=NEW.netwjoin_ownercat_id, address_01=NEW.netwjoin_address_01, 
-		address_02=NEW.netwjoin_address_02, address_03=NEW.netwjoin_address_03, descript=NEW.netwjoin_descript,rotation=NEW.netwjoin_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, 
+		address_02=NEW.netwjoin_address_02, address_03=NEW.netwjoin_address_03, descript=NEW.netwjoin_descript,rotation=NEW.netwjoin_rotation, verified=NEW.verified, undelete=NEW.undelete, 
 		label_x=NEW.netwjoin_label_x, label_y=NEW.netwjoin_label_y, label_rotation=NEW.netwjoin_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.netwjoin_hemisphere, num_value=NEW.netwjoin_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -1082,10 +1098,10 @@ BEGIN
 	ELSIF man_table ='man_expansiontank' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.exptank_code, elevation=NEW.exptank_elevation, "depth"=NEW."exptank_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.exptank_annotation, "observ"=NEW."exptank_observ", "comment"=NEW."exptank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.exptank_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.exptank_annotation, "observ"=NEW."exptank_observ", "comment"=NEW."exptank_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.exptank_soilcat_id, 
 		function_type=NEW.exptank_function_type, category_type=NEW.exptank_category_type, fluid_type=NEW.exptank_fluid_type, location_type=NEW.exptank_location_type, workcat_id=NEW.exptank_workcat_id, workcat_id_end=NEW.exptank_workcat_id_end, 
 		buildercat_id=NEW.exptank_buildercat_id, builtdate=NEW.exptank_builtdate, enddate=NEW.exptank_enddate,  ownercat_id=NEW.exptank_ownercat_id, address_01=NEW.exptank_address_01, address_02=NEW.exptank_address_02, 
-		address_03=NEW.exptank_address_03, descript=NEW.exptank_descript,rotation=NEW.exptank_rotation, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.exptank_label_x, 
+		address_03=NEW.exptank_address_03, descript=NEW.exptank_descript,rotation=NEW.exptank_rotation, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.exptank_label_x, 
 		label_y=NEW.exptank_label_y, label_rotation=NEW.exptank_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.exptank_hemisphere, num_value=NEW.exptank_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -1096,10 +1112,10 @@ BEGIN
 	ELSIF man_table ='man_flexunion' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.flexunion_code, elevation=NEW.flexunion_elevation, "depth"=NEW."flexunion_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.flexunion_annotation, "observ"=NEW."flexunion_observ", "comment"=NEW."flexunion_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.flexunion_soilcat_id, 
+		state_type=NEW.state_type, annotation=NEW.flexunion_annotation, "observ"=NEW."flexunion_observ", "comment"=NEW."flexunion_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.flexunion_soilcat_id, 
 		function_type=NEW.flexunion_function_type, category_type=NEW.flexunion_category_type, fluid_type=NEW.flexunion_fluid_type, location_type=NEW.flexunion_location_type, workcat_id=NEW.flexunion_workcat_id, 
 		workcat_id_end=NEW.flexunion_workcat_id_end, buildercat_id=NEW.flexunion_buildercat_id, builtdate=NEW.flexunion_builtdate, enddate=NEW.flexunion_enddate,  ownercat_id=NEW.flexunion_ownercat_id, address_01=NEW.flexunion_address_01, 
-		address_02=NEW.flexunion_address_02, address_03=NEW.flexunion_address_03, descript=NEW.flexunion_descript,rotation=NEW.flexunion_rotation, verified=NEW.verified, the_geom=NEW.the_geom, 
+		address_02=NEW.flexunion_address_02, address_03=NEW.flexunion_address_03, descript=NEW.flexunion_descript,rotation=NEW.flexunion_rotation, verified=NEW.verified, 
 		undelete=NEW.undelete, label_x=NEW.flexunion_label_x, label_y=NEW.flexunion_label_y, label_rotation=NEW.flexunion_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.flexunion_hemisphere,
 		num_value=NEW.flexunion_num_value
 		WHERE node_id = OLD.node_id;
@@ -1111,10 +1127,10 @@ BEGIN
 	ELSIF man_table ='man_netelement' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.netelement_code, elevation=NEW.netelement_elevation, "depth"=NEW."netelement_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", annotation=NEW.netelement_annotation, "observ"=NEW."netelement_observ", "comment"=NEW."netelement_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netelement_soilcat_id, 
+		annotation=NEW.netelement_annotation, "observ"=NEW."netelement_observ", "comment"=NEW."netelement_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.netelement_soilcat_id, 
 		function_type=NEW.netelement_function_type, category_type=NEW.netelement_category_type, fluid_type=NEW.netelement_fluid_type, location_type=NEW.netelement_location_type, workcat_id=NEW.netelement_workcat_id, 
 		workcat_id_end=NEW.netelement_workcat_id_end, buildercat_id=NEW.netelement_buildercat_id, builtdate=NEW.netelement_builtdate, enddate=NEW.netelement_enddate,  ownercat_id=NEW.netelement_ownercat_id, address_01=NEW.netelement_address_01, 
-		address_02=NEW.netelement_address_02, address_03=NEW.netelement_address_03, descript=NEW.netelement_descript,rotation=NEW.netelement_rotation, verified=NEW.verified, the_geom=NEW.the_geom, 
+		address_02=NEW.netelement_address_02, address_03=NEW.netelement_address_03, descript=NEW.netelement_descript,rotation=NEW.netelement_rotation, verified=NEW.verified, 
 		undelete=NEW.undelete, label_x=NEW.netelement_label_x, label_y=NEW.netelement_label_y, label_rotation=NEW.netelement_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.netelement_hemisphere,
 		num_value=NEW.netelement_num_value
 		WHERE node_id = OLD.node_id;
@@ -1126,11 +1142,11 @@ BEGIN
 	ELSIF man_table ='man_netsamplepoint' THEN
 		UPDATE node
 		SET node_id=NEW.node_id, code=NEW.netsample_code, elevation=NEW.netsample_elevation, "depth"=NEW."netsample_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-		"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.netsample_annotation, "observ"=NEW."netsample_observ", "comment"=NEW."netsample_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, 
+		state_type=NEW.state_type, annotation=NEW.netsample_annotation, "observ"=NEW."netsample_observ", "comment"=NEW."netsample_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, 
 		soilcat_id=NEW.netsample_soilcat_id, function_type=NEW.netsample_function_type, category_type=NEW.netsample_category_type, fluid_type=NEW.netsample_fluid_type, location_type=NEW.netsample_location_type, workcat_id=NEW.netsample_workcat_id, 
 		workcat_id_end=NEW.netsample_workcat_id_end, buildercat_id=NEW.netsample_buildercat_id, builtdate=NEW.netsample_builtdate, enddate=NEW.netsample_enddate,  ownercat_id=NEW.netsample_ownercat_id, 
 		address_01=NEW.netsample_address_01, address_02=NEW.netsample_address_02, address_03=NEW.netsample_address_03, descript=NEW.netsample_descript,rotation=NEW.netsample_rotation, 
-		verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete, label_x=NEW.netsample_label_x, label_y=NEW.netsample_label_y, label_rotation=NEW.netsample_label_rotation, publish=NEW.publish, inventory=NEW.inventory,
+		verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netsample_label_x, label_y=NEW.netsample_label_y, label_rotation=NEW.netsample_label_rotation, publish=NEW.publish, inventory=NEW.inventory,
 		expl_id=NEW.expl_id, hemisphere=NEW.netsample_hemisphere, num_value=NEW.netsample_num_value
 		WHERE node_id = OLD.node_id;
 	
@@ -1141,10 +1157,10 @@ BEGIN
 	ELSIF man_table ='man_wtp' THEN		
 		UPDATE node
 			SET node_id=NEW.node_id, code=NEW.wtp_code, elevation=NEW.wtp_elevation, "depth"=NEW."wtp_depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.wtp_annotation, "observ"=NEW."wtp_observ", "comment"=NEW."wtp_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.wtp_soilcat_id, 
+			state_type=NEW.state_type, annotation=NEW.wtp_annotation, "observ"=NEW."wtp_observ", "comment"=NEW."wtp_comment", dma_id=NEW.dma_id, presszonecat_id=NEW.presszonecat_id, soilcat_id=NEW.wtp_soilcat_id, 
 			function_type=NEW.wtp_function_type, category_type=NEW.wtp_category_type, fluid_type=NEW.wtp_fluid_type, location_type=NEW.wtp_location_type, workcat_id=NEW.wtp_workcat_id, 
 			workcat_id_end=NEW.wtp_workcat_id_end, buildercat_id=NEW.wtp_buildercat_id, builtdate=NEW.wtp_builtdate, enddate=NEW.wtp_enddate,  ownercat_id=NEW.wtp_ownercat_id, address_01=NEW.wtp_address_01, 
-			address_02=NEW.wtp_address_02, address_03=NEW.wtp_address_03, descript=NEW.wtp_descript,rotation=NEW.wtp_rotation,verified=NEW.verified, the_geom=NEW.the_geom, 
+			address_02=NEW.wtp_address_02, address_03=NEW.wtp_address_03, descript=NEW.wtp_descript,rotation=NEW.wtp_rotation,verified=NEW.verified, 
 			undelete=NEW.undelete, label_x=NEW.wtp_label_x, label_y=NEW.wtp_label_y, label_rotation=NEW.wtp_label_rotation, publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, hemisphere=NEW.wtp_hemisphere,
 			num_value=NEW.wtp_num_value
 			WHERE node_id = OLD.node_id;
