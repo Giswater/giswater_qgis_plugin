@@ -6,8 +6,6 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-import os
-
 from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
@@ -19,7 +17,6 @@ import utils_giswater
 from parent_init import ParentDialog
 from ui.gallery import Gallery              #@UnresolvedImport
 from ui.gallery_zoom import GalleryZoom     #@UnresolvedImport
-import ExtendedQLabel
 
 
 def formOpen(dialog, layer, feature):
