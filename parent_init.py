@@ -1079,9 +1079,19 @@ class ParentDialog(object):
                 self.tab_main.removeTab(tab_to_remove)
             return
     
+        self.widgets = {}
         for row in rows:
             self.manage_widget(row)
-        
+            
+        # Add 'Save' button
+        btn_save = QPushButton()
+        btn_save.setText("Save")
+        btn_save.setObjectName("btn_save")
+        btn_save.clicked.connect(self.save_custom_fields)
+              
+        # Add row with custom label and widget
+        self.form_layout.addRow(None, btn_save)            
+               
     
     def manage_widget(self, row):
         
@@ -1106,13 +1116,15 @@ class ParentDialog(object):
         if value_param is None:
             value_param = str(row['default_value'])
         utils_giswater.setWidgetText(widget, value_param)
+        self.widgets[row['id']] = widget
               
         # Add row with custom label and widget
         self.form_layout.addRow(label, widget)
 
 
     def get_param_value(self, parameter_id, feature_id):
-        
+        """ Get value_param from selected @parameter_id and @feature_id from table 'man_addfields_value' """
+                
         value_param = None
         sql = "SELECT value_param FROM " + self.schema_name + ".man_addfields_value"
         sql += " WHERE parameter_id = " + str(parameter_id) + " AND feature_id = '" + str(feature_id) + "'"
@@ -1123,3 +1135,26 @@ class ParentDialog(object):
         return value_param
     
     
+    def save_custom_fields(self):
+        """ Save data into table 'man_addfields_value' """
+        
+        # Delete previous data
+        sql = "DELETE FROM " + self.schema_name + ".man_addfields_value"
+        sql += " WHERE feature_id = '" + str(self.id) + "'" 
+        self.controller.log_info(sql)             
+        status = self.controller.execute_sql(sql)
+        if not status:
+            return False    
+                    
+        # Iterate over all widgets and execute one inserts per widget
+        for parameter_id, widget in self.widgets.iteritems():
+            self.controller.log_info(str(parameter_id))        
+            value_param = utils_giswater.getWidgetText(widget)  
+            if value_param != 'null':
+                sql = "INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
+                sql += " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');"
+                self.controller.log_info(sql)             
+                status = self.controller.execute_sql(sql)
+                if not status:
+                    return False                
+            
