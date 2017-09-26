@@ -173,6 +173,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'node'))
              
         # Set snapping
         self.canvas = self.iface.mapCanvas()
@@ -426,8 +427,7 @@ class ManNodeDialog(ParentDialog):
         if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
-        
-             
+
     def action_copy_paste(self):
                           
         self.emit_point.canvasClicked.connect(self.manage_snapping)      
