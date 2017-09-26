@@ -33,9 +33,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>5</y>
+       <y>10</y>
        <width>461</width>
-       <height>361</height>
+       <height>371</height>
       </rect>
      </property>
      <property name="title">
@@ -44,8 +44,8 @@
      <widget class="QLabel" name="psector_id_label">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>10</y>
+        <x>215</x>
+        <y>20</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -69,7 +69,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>105</y>
+        <y>120</y>
         <width>321</width>
         <height>41</height>
        </rect>
@@ -96,9 +96,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>10</y>
-        <width>101</width>
+        <x>295</x>
+        <y>20</y>
+        <width>111</width>
         <height>20</height>
        </rect>
       </property>
@@ -122,7 +122,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>285</y>
+        <y>300</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -143,7 +143,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>155</y>
+        <y>170</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -167,7 +167,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>220</y>
+        <y>235</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -195,7 +195,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>285</y>
+        <y>300</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -223,7 +223,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>155</y>
+        <y>170</y>
         <width>321</width>
         <height>56</height>
        </rect>
@@ -248,7 +248,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>220</y>
+        <y>235</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -269,7 +269,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>75</y>
+        <y>90</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -290,7 +290,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>105</y>
+        <y>120</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -311,7 +311,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>70</y>
+        <y>85</y>
         <width>321</width>
         <height>22</height>
        </rect>
@@ -475,7 +475,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>40</y>
+        <y>55</y>
         <width>321</width>
         <height>20</height>
        </rect>
@@ -503,7 +503,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>55</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -520,14 +520,31 @@
        <string>Name:</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="add_geom">
+      <property name="geometry">
+       <rect>
+        <x>415</x>
+        <y>20</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/widgets/131.png</normaloff>icons/widgets/131.png</iconset>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>370</y>
+       <y>380</y>
        <width>461</width>
-       <height>91</height>
+       <height>81</height>
       </rect>
      </property>
      <property name="title">
@@ -680,7 +697,7 @@
     <widget class="QLabel" name="vat_label">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>290</y>
        <width>51</width>
        <height>21</height>
@@ -701,7 +718,7 @@
     <widget class="QLabel" name="gexpenses_label">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>220</y>
        <width>131</width>
        <height>21</height>
@@ -725,7 +742,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>185</x>
        <y>150</y>
        <width>51</width>
        <height>21</height>
@@ -747,7 +764,7 @@
     <widget class="QLabel" name="other_label">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>145</x>
        <y>150</y>
        <width>31</width>
        <height>21</height>
@@ -768,7 +785,7 @@
     <widget class="QLabel" name="gexpenses_label_3">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>80</y>
        <width>191</width>
        <height>21</height>
@@ -792,7 +809,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>80</y>
        <width>101</width>
        <height>20</height>
@@ -814,7 +831,7 @@
     <widget class="QLabel" name="other_label_2">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>150</y>
        <width>121</width>
        <height>21</height>
@@ -838,7 +855,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>150</y>
        <width>101</width>
        <height>21</height>
@@ -863,7 +880,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>190</y>
        <width>101</width>
        <height>20</height>
@@ -885,7 +902,7 @@
     <widget class="QLabel" name="gexpenses_label_5">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>275</x>
        <y>190</y>
        <width>51</width>
        <height>21</height>
@@ -906,7 +923,7 @@
     <widget class="Line" name="line">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>170</y>
        <width>441</width>
        <height>21</height>
@@ -919,7 +936,7 @@
     <widget class="QLabel" name="other_label_3">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>145</x>
        <y>220</y>
        <width>31</width>
        <height>21</height>
@@ -943,7 +960,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>185</x>
        <y>220</y>
        <width>51</width>
        <height>21</height>
@@ -965,7 +982,7 @@
     <widget class="Line" name="line_2">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>240</y>
        <width>441</width>
        <height>21</height>
@@ -981,7 +998,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>220</y>
        <width>101</width>
        <height>21</height>
@@ -1006,7 +1023,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>185</x>
        <y>290</y>
        <width>51</width>
        <height>21</height>
@@ -1031,7 +1048,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>290</y>
        <width>101</width>
        <height>21</height>
@@ -1053,7 +1070,7 @@
     <widget class="QLabel" name="other_label_4">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>145</x>
        <y>290</y>
        <width>31</width>
        <height>21</height>
@@ -1077,7 +1094,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>260</y>
        <width>101</width>
        <height>20</height>
@@ -1099,7 +1116,7 @@
     <widget class="QLabel" name="gexpenses_label_6">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>275</x>
        <y>260</y>
        <width>51</width>
        <height>21</height>
@@ -1120,7 +1137,7 @@
     <widget class="Line" name="line_3">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>310</y>
        <width>441</width>
        <height>21</height>
@@ -1133,7 +1150,7 @@
     <widget class="QLabel" name="gexpenses_label_7">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>275</x>
        <y>330</y>
        <width>51</width>
        <height>21</height>
@@ -1157,7 +1174,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>330</y>
        <width>101</width>
        <height>20</height>
@@ -1182,7 +1199,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>120</y>
        <width>101</width>
        <height>20</height>
@@ -1204,7 +1221,7 @@
     <widget class="Line" name="line_4">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>100</y>
        <width>441</width>
        <height>21</height>
@@ -1217,7 +1234,7 @@
     <widget class="QLabel" name="gexpenses_label_8">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>275</x>
        <y>120</y>
        <width>51</width>
        <height>21</height>
@@ -1241,7 +1258,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>20</y>
        <width>101</width>
        <height>20</height>
@@ -1263,7 +1280,7 @@
     <widget class="QLabel" name="gexpenses_label_4">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>20</y>
        <width>191</width>
        <height>21</height>
@@ -1287,7 +1304,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>355</x>
        <y>50</y>
        <width>101</width>
        <height>20</height>
@@ -1309,7 +1326,7 @@
     <widget class="QLabel" name="gexpenses_label_10">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>15</x>
        <y>50</y>
        <width>191</width>
        <height>21</height>
@@ -1330,15 +1347,15 @@
    </widget>
    <widget class="QWidget" name="Elements">
     <attribute name="title">
-     <string>Elements</string>
+     <string>Relations</string>
     </attribute>
     <widget class="QTabWidget" name="tabWidget_2">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>461</width>
-       <height>451</height>
+       <x>0</x>
+       <y>40</y>
+       <width>481</width>
+       <height>431</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -1351,49 +1368,11 @@
       <widget class="QTableView" name="tbl_arc_plan">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>431</width>
-         <height>346</height>
+         <x>5</x>
+         <y>10</y>
+         <width>466</width>
+         <height>381</height>
         </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_del_arc_plan">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_add_arc_plan">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Add</string>
        </property>
       </widget>
      </widget>
@@ -1404,49 +1383,11 @@
       <widget class="QTableView" name="tbl_node_plan">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>431</width>
-         <height>346</height>
+         <x>5</x>
+         <y>10</y>
+         <width>466</width>
+         <height>381</height>
         </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_del_node_plan">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_add_node_plan">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Add</string>
        </property>
       </widget>
      </widget>
@@ -1454,55 +1395,78 @@
       <attribute name="title">
        <string>Other</string>
       </attribute>
-      <widget class="QPushButton" name="btn_add_other_plan">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
       <widget class="QTableView" name="tbl_other_plan">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>431</width>
-         <height>346</height>
+         <x>5</x>
+         <y>10</y>
+         <width>466</width>
+         <height>381</height>
         </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_del_other_plan">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>20</y>
-         <width>91</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Delete</string>
        </property>
       </widget>
      </widget>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>235</x>
+       <y>20</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_snapping">
+     <property name="geometry">
+      <rect>
+       <x>445</x>
+       <y>15</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/129.png</normaloff>icons/widgets/129.png</iconset>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_delete">
+     <property name="geometry">
+      <rect>
+       <x>415</x>
+       <y>15</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/112.png</normaloff>icons/widgets/112.png</iconset>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_insert">
+     <property name="geometry">
+      <rect>
+       <x>385</x>
+       <y>15</y>
+       <width>25</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icons/widgets/111.png</normaloff>icons/widgets/111.png</iconset>
+     </property>
     </widget>
    </widget>
   </widget>
