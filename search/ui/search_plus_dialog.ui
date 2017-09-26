@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>348</width>
-    <height>115</height>
+    <height>147</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,13 +17,13 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>30</y>
      <width>331</width>
      <height>101</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_network">
     <attribute name="title">
@@ -32,9 +32,9 @@
     <widget class="QComboBox" name="network_code">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>291</width>
+       <x>70</x>
+       <y>40</y>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -50,9 +50,9 @@
     <widget class="QComboBox" name="network_geom_type">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>40</y>
-       <width>291</width>
+       <x>70</x>
+       <y>10</y>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -65,6 +65,32 @@
       </property>
      </item>
     </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>46</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Type</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>46</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_hydrometer">
     <attribute name="title">
@@ -73,9 +99,9 @@
     <widget class="QComboBox" name="hydrometer_id">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>70</x>
        <y>40</y>
-       <width>291</width>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -91,9 +117,9 @@
     <widget class="QComboBox" name="hydrometer_connec">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>70</x>
        <y>10</y>
-       <width>291</width>
+       <width>241</width>
        <height>25</height>
       </rect>
      </property>
@@ -105,6 +131,32 @@
        <string>Connec</string>
       </property>
      </item>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>46</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connec</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hydrometer</string>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_address">

@@ -43,7 +43,7 @@ class SearchPlus(QObject):
 
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
-        self.dlg.network_code.editTextChanged.connect(self.filter_by_list)
+        self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
         self.enabled = True
 
 
@@ -182,7 +182,7 @@ class SearchPlus(QObject):
         self.list_all = self.list_arc + self.list_connec + self.list_element + self.list_gully + self.list_node
         self.list_all = sorted(set(self.list_all))
 
-        self.set_model_by_list(self.list_all)
+        self.set_model_by_list(self.list_all, self.dlg.network_code)
         return True
     
     
@@ -238,12 +238,12 @@ class SearchPlus(QObject):
         else:
             list_codes = self.list_all
 
-        self.set_model_by_list(list_codes)
+        self.set_model_by_list(list_codes, self.dlg.network_code)
         
         return True
 
 
-    def set_model_by_list(self, list):
+    def set_model_by_list(self, list, widget):
         
         model = QStringListModel()
         model.setStringList(list)
@@ -253,20 +253,20 @@ class SearchPlus(QObject):
         proxy_model_aux = QSortFilterProxyModel()
         proxy_model_aux.setSourceModel(model)
         proxy_model_aux.setFilterKeyColumn(0)
-        self.dlg.network_code.setModel(proxy_model_aux)
-        self.dlg.network_code.setModelColumn(0)
+        widget.setModel(proxy_model_aux)
+        widget.setModelColumn(0)
         completer = QCompleter()
         completer.setModel(self.proxy_model)
         completer.setCompletionColumn(0)
         completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-        self.dlg.network_code.setCompleter(completer)
+        widget.setCompleter(completer)
         
         # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
         self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
 
 
-    def filter_by_list(self):
-        self.proxy_model.setFilterFixedString(self.dlg.network_code.currentText())
+    def filter_by_list(self, widget):
+        self.proxy_model.setFilterFixedString(widget.currentText())
 
 
     def network_zoom(self, fieldname, network_code, network_geom_type):
