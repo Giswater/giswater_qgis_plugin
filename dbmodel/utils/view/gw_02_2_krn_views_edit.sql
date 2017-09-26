@@ -17,7 +17,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	lab_code,
 	feature_id,
 	featurecat_id,
-	dma_id,
+	samplepoint.dma_id,
 	dma.macrodma_id,
 	state,
 	workcat_id,
@@ -29,7 +29,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	cabinet,
 	observations,
 	verified,
-	the_geom,
+	samplepoint.the_geom,
 	samplepoint.expl_id
 FROM selector_expl,samplepoint
 LEFT JOIN dma ON dma.dma_id=samplepoint.dma_id
@@ -44,7 +44,7 @@ CREATE VIEW v_edit_element AS SELECT
 	code,
 	elementcat_id,
 	serial_number,
-	dma_id,
+	element.dma_id,
 	dma.macrodma_id,
 	state,
 	state_type
@@ -64,13 +64,13 @@ CREATE VIEW v_edit_element AS SELECT
 	rotation,
 	link,
 	verified,
-	the_geom,
+	element.the_geom,
 	label_x,
 	label_y,
 	label_rotation,
 	publish,
 	inventory,
-	undelete,
+	element.undelete,
 	element.expl_id
 FROM selector_expl,element
 LEFT JOIN dma ON dma.dma_id=element.dma_id
