@@ -176,7 +176,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-        self.dialog.findChild(QAction, "actionHelp").triggered.connect(self.action_help)
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'node'))
              
         # Set snapping
         self.canvas = self.iface.mapCanvas()
@@ -431,17 +431,6 @@ class ManNodeDialog(ParentDialog):
         if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
-        
-    def action_help(self):
-        self.controller.log_info(str(self.plugin_dir))
-        # Get pdf folder
-        pdf_folder = os.path.join(self.plugin_dir, 'png')
-        pdf_path = os.path.join(pdf_folder,  "ud_arc_en.pdf")
-        # Open pdf if exist
-        if os.path.exists(pdf_path):
-            os.system(pdf_path)
-        else:
-            self.controller.log_info("File not found", parameter=pdf_path)
 
     def action_copy_paste(self):
                           

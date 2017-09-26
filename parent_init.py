@@ -373,8 +373,6 @@ class ParentDialog(object):
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-        if row[0].lower() == "c:\\".lower():
-            self.controller.log_info(str(row[0]))
         # Full path= path + value from row
         self.full_path =row[0]+self.path
        
@@ -1059,3 +1057,18 @@ class ParentDialog(object):
         else:
             self.controller.log_info("File not found", parameter=icon_path)
 
+
+    def action_help(self, wsoftware, geom_type):
+        # Get pdf folder
+        pdf_folder = os.path.join(self.plugin_dir, 'png')
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale').lower()
+        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+        self.controller.log_info(str(pdf_path))
+        # Open pdf if exist
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_en" + ".pdf")
+            os.system(pdf_path)
+            self.controller.log_info("File not found", parameter=pdf_path)
