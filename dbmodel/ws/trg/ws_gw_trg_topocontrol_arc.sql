@@ -70,14 +70,16 @@ BEGIN
 				RETURN NEW;
 			END IF;
 
-	-- Check auto insert end nodes
-		ELSIF (nodeRecord1.node_id IS NOT NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
+-- Check auto insert end nodes
+		ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND (SELECT nodeinsert_arcendpoint FROM config) THEN
+			IF TG_OP = 'INSERT' THEN
 
 			INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
 				VALUES (
                 (SELECT nextval('urn_id_seq')),
                 (SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1), 
-                (SELECT nodecat_vdefault FROM config_param_user WHERE user=cur_user()), 
+				'JUNCTION'::text,
+				(SELECT "value" FROM config_param_user WHERE "parameter"='nodecat_vdefault' AND "cur_user"="current_user"()),
                 (SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
                 ST_endpoint(NEW.the_geom)
 				);
@@ -90,6 +92,7 @@ BEGIN
 			NEW.node_1:= nodeRecord1.node_id; 
 			NEW.node_2:= (SELECT currval('urn_id_seq'));  
 			RETURN NEW;
+			END IF;
 		
 	--	Error, no existing nodes
 		ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (rec.arc_searchnodes_control IS TRUE) THEN
