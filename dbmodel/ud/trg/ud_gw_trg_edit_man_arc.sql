@@ -253,6 +253,16 @@
 			RETURN NEW;
 			   
 		ELSIF TG_OP = 'UPDATE' THEN
+		
+			-- State
+			IF (NEW.state != OLD.state) THEN
+				UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+			END IF;
+				
+			-- The geom
+			IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+				UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
+			END IF;
 
 			IF (NEW.epa_type != OLD.epa_type) THEN    
 			 
@@ -304,12 +314,12 @@
 		   
 			IF man_table='man_conduit' THEN
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.conduit_y1, y2=NEW.conduit_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type,
+				SET arc_id=NEW.arc_id, y1=NEW.conduit_y1, y2=NEW.conduit_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 				annotation= NEW.conduit_annotation, "observ"=NEW.conduit_observ,"comment"=NEW.conduit_comment, inverted_slope=NEW.conduit_inverted_slope, custom_length=NEW.conduit_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.conduit_soilcat_id, category_type=NEW.conduit_category_type, fluid_type=NEW.conduit_fluid_type,location_type=NEW.conduit_location_type, workcat_id=NEW.conduit_workcat_id, 
 				buildercat_id=NEW.conduit_buildercat_id, builtdate=NEW.conduit_builtdate,ownercat_id=NEW.conduit_ownercat_id, address_01=NEW.conduit_address_01, address_02=NEW.conduit_address_02, 
 				address_03=NEW.conduit_address_03, descript=NEW.conduit_descript, link=NEW.conduit_link, custom_y1=NEW.conduit_custom_y1, custom_y2=NEW.conduit_custom_y2, verified=NEW.verified, 
-				the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.conduit_label_x,label_y=NEW.conduit_label_y, label_rotation=NEW.conduit_label_rotation,workcat_id_end=NEW.conduit_workcat_id_end,
+				 undelete=NEW.undelete,label_x=NEW.conduit_label_x,label_y=NEW.conduit_label_y, label_rotation=NEW.conduit_label_rotation,workcat_id_end=NEW.conduit_workcat_id_end,
 				code=NEW.conduit_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.conduit_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
 			
@@ -319,11 +329,11 @@
 			
 			ELSIF man_table='man_siphon' THEN			
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.siphon_y1, y2=NEW.siphon_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type,
+				SET arc_id=NEW.arc_id, y1=NEW.siphon_y1, y2=NEW.siphon_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 				annotation= NEW.siphon_annotation, "observ"=NEW.siphon_observ,"comment"=NEW.siphon_comment, inverted_slope=NEW.siphon_inverted_slope, custom_length=NEW.siphon_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.siphon_soilcat_id, category_type=NEW.siphon_category_type, fluid_type=NEW.siphon_fluid_type,location_type=NEW.siphon_location_type, workcat_id=NEW.siphon_workcat_id, 
 				buildercat_id=NEW.siphon_buildercat_id, builtdate=NEW.siphon_builtdate,ownercat_id=NEW.siphon_ownercat_id, address_01=NEW.siphon_address_01, address_02=NEW.siphon_address_02, address_03=NEW.siphon_address_03, 
-				descript=NEW.siphon_descript, link=NEW.siphon_link, custom_y1=NEW.siphon_custom_y1, custom_y2=NEW.siphon_custom_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
+				descript=NEW.siphon_descript, link=NEW.siphon_link, custom_y1=NEW.siphon_custom_y1, custom_y2=NEW.siphon_custom_y2, verified=NEW.verified,  undelete=NEW.undelete,
 				label_x=NEW.siphon_label_x,label_y=NEW.siphon_label_y, label_rotation=NEW.siphon_label_rotation,workcat_id_end=NEW.siphon_workcat_id_end,
 				code=NEW.siphon_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.siphon_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		
@@ -333,11 +343,11 @@
 			
 			ELSIF man_table='man_waccel' THEN
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.waccel_y1, y2=NEW.waccel_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type,
+				SET arc_id=NEW.arc_id, y1=NEW.waccel_y1, y2=NEW.waccel_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 				annotation= NEW.waccel_annotation, "observ"=NEW.waccel_observ,"comment"=NEW.waccel_comment, inverted_slope=NEW.waccel_inverted_slope, custom_length=NEW.waccel_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.waccel_soilcat_id, category_type=NEW.waccel_category_type, fluid_type=NEW.waccel_fluid_type,location_type=NEW.waccel_location_type, workcat_id=NEW.waccel_workcat_id, 
 				buildercat_id=NEW.waccel_buildercat_id, builtdate=NEW.waccel_builtdate,ownercat_id=NEW.waccel_ownercat_id, address_01=NEW.waccel_address_01, address_02=NEW.waccel_address_02, address_03=NEW.waccel_address_03, 
-				descript=NEW.waccel_descript, link=NEW.waccel_link, custom_y1=NEW.waccel_custom_y1, custom_y2=NEW.waccel_custom_y2, verified=NEW.verified, the_geom=NEW.the_geom, 
+				descript=NEW.waccel_descript, link=NEW.waccel_link, custom_y1=NEW.waccel_custom_y1, custom_y2=NEW.waccel_custom_y2, verified=NEW.verified,  
 				undelete=NEW.undelete,label_x=NEW.waccel_label_x,label_y=NEW.waccel_label_y, label_rotation=NEW.waccel_label_rotation,workcat_id_end=NEW.waccel_workcat_id_end,
 				code=NEW.waccel_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.waccel_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;	
@@ -347,11 +357,11 @@
 			
 			ELSIF man_table='man_varc' THEN
 				UPDATE arc 
-				SET arc_id=NEW.arc_id, y1=NEW.varc_y1, y2=NEW.varc_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type,
+				SET arc_id=NEW.arc_id, y1=NEW.varc_y1, y2=NEW.varc_y2, arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
 				annotation= NEW.varc_annotation, "observ"=NEW.varc_observ,"comment"=NEW.varc_comment, inverted_slope=NEW.varc_inverted_slope, custom_length=NEW.varc_custom_length, dma_id=NEW.dma_id, 
 				soilcat_id=NEW.varc_soilcat_id, category_type=NEW.varc_category_type, fluid_type=NEW.varc_fluid_type,location_type=NEW.varc_location_type, workcat_id=NEW.varc_workcat_id, 
 				buildercat_id=NEW.varc_buildercat_id, builtdate=NEW.varc_builtdate,ownercat_id=NEW.varc_ownercat_id, address_01=NEW.varc_address_01, address_02=NEW.varc_address_02, address_03=NEW.varc_address_03, 
-				descript=NEW.varc_descript, link=NEW.varc_link, custom_y1=NEW.varc_custom_y1, custom_y2=NEW.varc_custom_y2, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,
+				descript=NEW.varc_descript, link=NEW.varc_link, custom_y1=NEW.varc_custom_y1, custom_y2=NEW.varc_custom_y2, verified=NEW.verified,  undelete=NEW.undelete,
 				label_x=NEW.varc_label_x,label_y=NEW.varc_label_y, label_rotation=NEW.varc_label_rotation,workcat_id_end=NEW.varc_workcat_id_end,
 				code=NEW.varc_code, publish=NEW.publish, inventory=NEW.inventory, enddate=NEW.varc_enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id
 				WHERE arc_id=OLD.arc_id;		

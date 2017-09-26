@@ -28,11 +28,21 @@ BEGIN
 
 
     ELSIF TG_OP = 'UPDATE' THEN
-
+	
+		-- State
+		IF (NEW.state != OLD.state) THEN
+			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+		END IF;
+			
+		-- The geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+		END IF;
+	
 
         UPDATE node 
-        SET node_id=NEW.node_id, custom_top_elev=NEW.custom_top_elev, custom_ymax=NEW.custom_ymax, custom_elev=NEW.custom_elev, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-            annotation=NEW.annotation, the_geom=NEW.the_geom 
+        SET node_id=NEW.node_id, custom_top_elev=NEW.custom_top_elev, custom_ymax=NEW.custom_ymax, custom_elev=NEW.custom_elev, nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id,  
+            annotation=NEW.annotation
         WHERE node_id=OLD.node_id;
 
         IF node_table = 'inp_junction' THEN

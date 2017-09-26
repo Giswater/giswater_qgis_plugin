@@ -703,6 +703,21 @@ BEGIN
 
 
     ELSIF TG_OP = 'UPDATE' THEN
+	
+		-- State
+		IF (NEW.state != OLD.state) THEN
+			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+		END IF;
+			
+		-- The geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
+		END IF;
+	
+		--Label rotation
+		IF (NEW.tank_rotation != OLD.tank_rotation) THEN
+			UPDATE node SET rotation=NEW.tank_rotation WHERE node_id = OLD.node_id;
+		END IF;
 
 /*
 	IF (NEW.elev <> OLD.elev) THEN
@@ -760,11 +775,11 @@ BEGIN
 			
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.junction_code, top_elev=NEW.junction_top_elev, custom_top_elev=NEW.junction_custom_top_elev, ymax=NEW.junction_ymax, custom_ymax=NEW.junction_custom_ymax, elev=NEW.junction_elev, 
-			custom_elev=NEW.junction_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.junction_annotation, "observ"=NEW.junction_observ, 
+			custom_elev=NEW.junction_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.junction_annotation, "observ"=NEW.junction_observ, 
 			"comment"=NEW.junction_comment, dma_id=NEW.dma_id, soilcat_id=NEW.junction_soilcat_id, function_type=NEW.junction_function_type,	category_type=NEW.junction_category_type,fluid_type=NEW.junction_fluid_type, 
 			location_type=NEW.junction_location_type, workcat_id=NEW.junction_workcat_id, workcat_id_end=NEW.junction_workcat_id_end, buildercat_id=NEW.junction_buildercat_id, builtdate=NEW.junction_builtdate, enddate=NEW.junction_enddate,
 			ownercat_id=NEW.junction_ownercat_id, address_01=NEW.junction_address_01,address_02=NEW.junction_address_02, address_03=NEW.junction_address_03, descript=NEW.junction_descript, rotation=NEW.junction_rotation, 
-			link=NEW.junction_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.junction_label_x, label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation,the_geom=NEW.the_geom, 
+			link=NEW.junction_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.junction_label_x, label_y=NEW.junction_label_y, label_rotation=NEW.junction_label_rotation,
 			 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.junction_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.junction_num_value
 			WHERE node_id = OLD.node_id;
 			
@@ -775,12 +790,12 @@ BEGIN
 		
 			UPDATE node 
 			SET node_id=NEW.node_id,code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
-			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
+			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
 			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type,	category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
 			ownercat_id=NEW.netgully_ownercat_id, address_01=NEW.netgully_address_01,address_02=NEW.netgully_address_02, address_03=NEW.netgully_address_03, descript=NEW.netgully_descript,
 			rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
-			label_rotation=NEW.netgully_label_rotation, the_geom=NEW.the_geom,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netgully_num_value
+			label_rotation=NEW.netgully_label_rotation,  publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.netgully_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netgully_num_value
 			WHERE node_id = OLD.node_id;
 		
 			UPDATE man_netgully SET node_id=NEW.node_id, pol_id=NEW.netgully_pol_id, sander_depth=NEW.netgully_sander_depth, gratecat_id=NEW.netgully_gratecat_id, units=NEW.netgully_units, groove=NEW.netgully_groove, siphon=NEW.netgully_siphon, 
@@ -792,8 +807,8 @@ BEGIN
 			
 			UPDATE node 
 			SET node_id=NEW.node_id,code=NEW.netgully_code, top_elev=NEW.netgully_top_elev, custom_top_elev=NEW.netgully_custom_top_elev, ymax=NEW.netgully_ymax, custom_ymax=NEW.netgully_custom_ymax, elev=NEW.netgully_elev, 
-			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
-			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type,	category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
+			custom_elev=NEW.netgully_custom_elev,  node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netgully_annotation, "observ"=NEW.netgully_observ, 
+			"comment"=NEW.netgully_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netgully_soilcat_id, function_type=NEW.netgully_function_type, category_type=NEW.netgully_category_type,fluid_type=NEW.netgully_fluid_type, 
 			location_type=NEW.netgully_location_type, workcat_id=NEW.netgully_workcat_id, workcat_id_end=NEW.netgully_workcat_id_end, buildercat_id=NEW.netgully_buildercat_id, builtdate=NEW.netgully_builtdate, enddate=NEW.netgully_enddate,
 			ownercat_id=NEW.netgully_ownercat_id, address_01=NEW.netgully_address_01,address_02=NEW.netgully_address_02, address_03=NEW.netgully_address_03, descript=NEW.netgully_descript,
 			rotation=NEW.netgully_rotation, link=NEW.netgully_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netgully_label_x, label_y=NEW.netgully_label_y, 
@@ -818,12 +833,12 @@ BEGIN
 			
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.outfall_code, top_elev=NEW.outfall_top_elev, custom_top_elev=NEW.outfall_custom_top_elev, ymax=NEW.outfall_ymax, custom_ymax=NEW.outfall_custom_ymax, elev=NEW.outfall_elev, 
-			custom_elev=NEW.outfall_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.outfall_annotation, "observ"=NEW.outfall_observ, 
+			custom_elev=NEW.outfall_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.outfall_annotation, "observ"=NEW.outfall_observ, 
 			"comment"=NEW.outfall_comment, dma_id=NEW.dma_id, soilcat_id=NEW.outfall_soilcat_id, function_type=NEW.outfall_function_type, category_type=NEW.outfall_category_type,fluid_type=NEW.outfall_fluid_type, location_type=NEW.outfall_location_type, 
 			workcat_id=NEW.outfall_workcat_id, workcat_id_end=NEW.outfall_workcat_id_end,buildercat_id=NEW.outfall_buildercat_id, builtdate=NEW.outfall_builtdate, enddate=NEW.outfall_enddate,  ownercat_id=NEW.outfall_ownercat_id, 
 			address_01=NEW.outfall_address_01,address_02=NEW.outfall_address_02, address_03=NEW.outfall_address_03, descript=NEW.outfall_descript, rotation=NEW.outfall_rotation, 
-			link=NEW.outfall_link, verified=NEW.verified,  undelete=NEW.undelete, label_x=NEW.outfall_label_x, label_y=NEW.outfall_label_y, label_rotation=NEW.outfall_label_rotation, the_geom=NEW.the_geom,
-			 publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.outfall_num_value
+			link=NEW.outfall_link, verified=NEW.verified,  undelete=NEW.undelete, label_x=NEW.outfall_label_x, label_y=NEW.outfall_label_y, label_rotation=NEW.outfall_label_rotation, 
+			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.outfall_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.outfall_num_value
 			WHERE node_id = OLD.node_id;
 			
 			UPDATE man_outfall SET node_id=NEW.node_id, name=NEW.outfall_name
@@ -834,11 +849,11 @@ BEGIN
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.storage_code, top_elev=NEW.storage_top_elev, custom_top_elev=NEW.storage_custom_top_elev, ymax=NEW.storage_ymax, custom_ymax=NEW.storage_custom_ymax, 
 			elev=NEW.storage_elev, custom_elev=NEW.storage_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
+			state_type=NEW.state_type, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
 			category_type=NEW.storage_category_type,fluid_type=NEW.storage_fluid_type, location_type=NEW.storage_location_type, workcat_id=NEW.storage_workcat_id, workcat_id_end=NEW.storage_workcat_id_end, buildercat_id=NEW.storage_buildercat_id, 
 			builtdate=NEW.storage_builtdate, enddate=NEW.storage_enddate, ownercat_id=NEW.storage_ownercat_id, address_01=NEW.storage_address_01,address_02=NEW.storage_address_02, address_03=NEW.storage_address_03, descript=NEW.storage_descript,
 			rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, 
-			label_rotation=NEW.storage_label_rotation, the_geom=NEW.the_geom, publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
+			label_rotation=NEW.storage_label_rotation, publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.storage_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id,
 			num_value=NEW.storage_num_value
 			WHERE node_id = OLD.node_id;
 		
@@ -852,7 +867,7 @@ BEGIN
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.storage_code, top_elev=NEW.storage_top_elev, custom_top_elev=NEW.storage_custom_top_elev, ymax=NEW.storage_ymax, custom_ymax=NEW.storage_custom_ymax, 
 			elev=NEW.storage_elev, custom_elev=NEW.storage_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 
-			"state"=NEW."state", state_type=NEW.state_type, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
+			state_type=NEW.state_type, annotation=NEW.storage_annotation, "observ"=NEW.storage_observ, "comment"=NEW.storage_comment, dma_id=NEW.dma_id, soilcat_id=NEW.storage_soilcat_id, function_type=NEW.storage_function_type,
 			category_type=NEW.storage_category_type,fluid_type=NEW.storage_fluid_type, location_type=NEW.storage_location_type, workcat_id=NEW.storage_workcat_id, workcat_id_end=NEW.storage_workcat_id_end, buildercat_id=NEW.storage_buildercat_id, 
 			builtdate=NEW.storage_builtdate, enddate=NEW.storage_enddate, ownercat_id=NEW.storage_ownercat_id, address_01=NEW.storage_address_01,address_02=NEW.storage_address_02, address_03=NEW.storage_address_03, descript=NEW.storage_descript,
 			rotation=NEW.storage_rotation, link=NEW.storage_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.storage_label_x, label_y=NEW.storage_label_y, label_rotation=NEW.storage_label_rotation, 
@@ -877,11 +892,11 @@ BEGIN
 			
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.valve_code, top_elev=NEW.valve_top_elev, custom_top_elev=NEW.valve_custom_top_elev, ymax=NEW.valve_ymax, custom_ymax=NEW.valve_custom_ymax, elev=NEW.valve_elev, 
-			custom_elev=NEW.valve_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.valve_annotation, "observ"=NEW.valve_observ, 
+			custom_elev=NEW.valve_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.valve_annotation, "observ"=NEW.valve_observ, 
 			"comment"=NEW.valve_comment, dma_id=NEW.dma_id, soilcat_id=NEW.valve_soilcat_id, function_type=NEW.valve_function_type, category_type=NEW.valve_category_type,fluid_type=NEW.valve_fluid_type, location_type=NEW.valve_location_type, 
 			workcat_id=NEW.valve_workcat_id, workcat_id_end=NEW.valve_workcat_id_end, buildercat_id=NEW.valve_buildercat_id, builtdate=NEW.valve_builtdate, enddate=NEW.valve_enddate,  ownercat_id=NEW.valve_ownercat_id, 
 			address_01=NEW.valve_address_01,address_02=NEW.valve_address_02, address_03=NEW.valve_address_03, descript=NEW.valve_descript, rotation=NEW.valve_rotation, link=NEW.valve_link, verified=NEW.verified, 
-			undelete=NEW.undelete, label_x=NEW.valve_label_x, label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, the_geom=NEW.the_geom, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.valve_xyz_date, 
+			undelete=NEW.undelete, label_x=NEW.valve_label_x, label_y=NEW.valve_label_y, label_rotation=NEW.valve_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.valve_xyz_date, 
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.valve_num_value
 			WHERE node_id = OLD.node_id;
 		
@@ -893,11 +908,11 @@ BEGIN
 			
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.chamber_code, top_elev=NEW.chamber_top_elev, custom_top_elev=NEW.chamber_custom_top_elev, ymax=NEW.chamber_ymax, custom_ymax=NEW.chamber_custom_ymax, elev=NEW.chamber_elev, 
-			custom_elev=NEW.chamber_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.chamber_annotation, 
+			custom_elev=NEW.chamber_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.chamber_annotation, 
 			"observ"=NEW.chamber_observ, "comment"=NEW.chamber_comment, dma_id=NEW.dma_id, soilcat_id=NEW.chamber_soilcat_id, function_type=NEW.chamber_function_type, category_type=NEW.chamber_category_type,fluid_type=NEW.chamber_fluid_type, 
 			location_type=NEW.chamber_location_type, workcat_id=NEW.chamber_workcat_id, workcat_id_end=NEW.chamber_workcat_id_end, buildercat_id=NEW.chamber_buildercat_id, builtdate=NEW.chamber_builtdate, enddate=NEW.chamber_enddate,  
 			ownercat_id=NEW.chamber_ownercat_id, address_01=NEW.chamber_address_01,address_02=NEW.chamber_address_02, address_03=NEW.chamber_address_03, descript=NEW.chamber_descript,
-			rotation=NEW.chamber_rotation, link=NEW.chamber_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.chamber_label_x, label_y=NEW.chamber_label_y, label_rotation=NEW.chamber_label_rotation, the_geom=NEW.the_geom,
+			rotation=NEW.chamber_rotation, link=NEW.chamber_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.chamber_label_x, label_y=NEW.chamber_label_y, label_rotation=NEW.chamber_label_rotation,
 			publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.chamber_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.chamber_num_value
 			WHERE node_id = OLD.node_id;
 			
@@ -910,7 +925,7 @@ BEGIN
 		
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.chamber_code, top_elev=NEW.chamber_top_elev, custom_top_elev=NEW.chamber_custom_top_elev, ymax=NEW.chamber_ymax, custom_ymax=NEW.chamber_custom_ymax, elev=NEW.chamber_elev, 
-			custom_elev=NEW.chamber_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.chamber_annotation, 
+			custom_elev=NEW.chamber_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.chamber_annotation, 
 			"observ"=NEW.chamber_observ, "comment"=NEW.chamber_comment, dma_id=NEW.dma_id, soilcat_id=NEW.chamber_soilcat_id, function_type=NEW.chamber_function_type, category_type=NEW.chamber_category_type,fluid_type=NEW.chamber_fluid_type, 
 			location_type=NEW.chamber_location_type, workcat_id=NEW.chamber_workcat_id, workcat_id_end=NEW.chamber_workcat_id_end, buildercat_id=NEW.chamber_buildercat_id, builtdate=NEW.chamber_builtdate, enddate=NEW.chamber_enddate,  
 			ownercat_id=NEW.chamber_ownercat_id, address_01=NEW.chamber_address_01,address_02=NEW.chamber_address_02, address_03=NEW.chamber_address_03, descript=NEW.chamber_descript,
@@ -936,11 +951,11 @@ BEGIN
 		
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.manhole_code,top_elev=NEW.manhole_top_elev, custom_top_elev=NEW.manhole_custom_top_elev, ymax=NEW.manhole_ymax, custom_ymax=NEW.manhole_custom_ymax, elev=NEW.manhole_elev, 
-			custom_elev=NEW.manhole_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type,  sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.manhole_annotation, "observ"=NEW.manhole_observ, 
+			custom_elev=NEW.manhole_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type,  sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.manhole_annotation, "observ"=NEW.manhole_observ, 
 			"comment"=NEW.manhole_comment, dma_id=NEW.dma_id, soilcat_id=NEW.manhole_soilcat_id, function_type=NEW.manhole_function_type, category_type=NEW.manhole_category_type,fluid_type=NEW.manhole_fluid_type, 
 			location_type=NEW.manhole_location_type, workcat_id=NEW.manhole_workcat_id, workcat_id_end=NEW.manhole_workcat_id_end, buildercat_id=NEW.manhole_buildercat_id, builtdate=NEW.manhole_builtdate, enddate=NEW.manhole_enddate, 
 			ownercat_id=NEW.manhole_ownercat_id, address_01=NEW.manhole_address_01,address_02=NEW.manhole_address_02, address_03=NEW.manhole_address_03, descript=NEW.manhole_descript,
-			rotation=NEW.manhole_rotation, link=NEW.manhole_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.manhole_label_x, label_y=NEW.manhole_label_y, label_rotation=NEW.manhole_label_rotation, the_geom=NEW.the_geom, 
+			rotation=NEW.manhole_rotation, link=NEW.manhole_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.manhole_label_x, label_y=NEW.manhole_label_y, label_rotation=NEW.manhole_label_rotation, 
 			publish=NEW.publish, inventory=NEW.inventory,  uncertain=NEW.uncertain, xyz_date=NEW.manhole_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.manhole_num_value
 			WHERE node_id = OLD.node_id;
 			
@@ -953,11 +968,11 @@ BEGIN
 			
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.netinit_code, top_elev=NEW.netinit_top_elev, custom_top_elev=NEW.netinit_custom_top_elev, ymax=NEW.netinit_ymax, custom_ymax=NEW.netinit_custom_ymax, elev=NEW.netinit_elev, 
-			custom_elev=NEW.netinit_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.netinit_annotation, "observ"=NEW.netinit_observ, 
+			custom_elev=NEW.netinit_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netinit_annotation, "observ"=NEW.netinit_observ, 
 			"comment"=NEW.netinit_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netinit_soilcat_id, function_type=NEW.netinit_function_type, category_type=NEW.netinit_category_type,fluid_type=NEW.netinit_fluid_type, location_type=NEW.netinit_location_type, 
 			workcat_id=NEW.netinit_workcat_id, workcat_id_end=NEW.netinit_workcat_id_end,  buildercat_id=NEW.netinit_buildercat_id, builtdate=NEW.netinit_builtdate, enddate=NEW.netinit_enddate,  ownercat_id=NEW.netinit_ownercat_id, 
 			address_01=NEW.netinit_address_01,address_02=NEW.netinit_address_02, address_03=NEW.netinit_address_03, descript=NEW.netinit_descript, rotation=NEW.netinit_rotation, link=NEW.netinit_link, verified=NEW.verified, 
-			undelete=NEW.undelete, label_x=NEW.netinit_label_x, label_y=NEW.netinit_label_y, label_rotation=NEW.netinit_label_rotation, the_geom=NEW.the_geom,publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, 
+			undelete=NEW.undelete, label_x=NEW.netinit_label_x, label_y=NEW.netinit_label_y, label_rotation=NEW.netinit_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, 
 			xyz_date=NEW.netinit_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netinit_num_value, sander_depth=NEW.netinit_sander_depth
 			WHERE node_id = OLD.node_id;
 		
@@ -969,11 +984,11 @@ BEGIN
 		
 			UPDATE node 
 			SET node_id=NEW.node_id,code=NEW.wjump_code,top_elev=NEW.wjump_top_elev, custom_top_elev=NEW.wjump_custom_top_elev, ymax=NEW.wjump_ymax, custom_ymax=NEW.wjump_custom_ymax, elev=NEW.wjump_elev, 
-			custom_elev=NEW.wjump_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.wjump_annotation, "observ"=NEW.wjump_observ, 
+			custom_elev=NEW.wjump_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.wjump_annotation, "observ"=NEW.wjump_observ, 
 			"comment"=NEW.wjump_comment, dma_id=NEW.dma_id, soilcat_id=NEW.wjump_soilcat_id, category_type=NEW.wjump_category_type, function_type=NEW.wjump_function_type, fluid_type=NEW.wjump_fluid_type, location_type=NEW.wjump_location_type, 
 			workcat_id=NEW.wjump_workcat_id, workcat_id_end=NEW.wjump_workcat_id_end, buildercat_id=NEW.wjump_buildercat_id, builtdate=NEW.wjump_builtdate, enddate=NEW.wjump_enddate,  ownercat_id=NEW.wjump_ownercat_id, 
 			address_01=NEW.wjump_address_01,address_02=NEW.wjump_address_02, address_03=NEW.wjump_address_03, descript=NEW.wjump_descript,	rotation=NEW.wjump_rotation, link=NEW.wjump_link, verified=NEW.verified, undelete=NEW.undelete, 
-			label_x=NEW.wjump_label_x, label_y=NEW.wjump_label_y, label_rotation=NEW.wjump_label_rotation, the_geom=NEW.the_geom, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.wjump_xyz_date, 
+			label_x=NEW.wjump_label_x, label_y=NEW.wjump_label_y, label_rotation=NEW.wjump_label_rotation, publish=NEW.publish, inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.wjump_xyz_date, 
 			unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wjump_num_value
 			WHERE node_id = OLD.node_id;
 		
@@ -985,11 +1000,11 @@ BEGIN
 		
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev,
-			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	"state"=NEW.state, state_type=NEW.state_type, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, 
+			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	state_type=NEW.state_type, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, 
 			"comment"=NEW.wwtp_comment, dma_id=NEW.dma_id, soilcat_id=NEW.wwtp_soilcat_id, function_type=NEW.wwtp_function_type, category_type=NEW.wwtp_category_type, fluid_type=NEW.wwtp_fluid_type, 
 			location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, workcat_id_end=NEW.wwtp_workcat_id_end, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate, enddate=NEW.wwtp_enddate,  
 			ownercat_id=NEW.wwtp_ownercat_id,address_01=NEW.wwtp_address_01,address_02=NEW.wwtp_address_02, address_03=NEW.wwtp_address_03, descript=NEW.wwtp_descript,rotation=NEW.wwtp_rotation, link=NEW.wwtp_link, 
-			verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,	label_rotation=NEW.wwtp_label_rotation, the_geom=NEW.the_geom, publish=NEW.publish, inventory=NEW.inventory, 
+			verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,	label_rotation=NEW.wwtp_label_rotation, publish=NEW.publish, inventory=NEW.inventory, 
 			uncertain=NEW.uncertain, xyz_date=NEW.wwtp_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.wwtp_num_value
 			WHERE node_id = OLD.node_id;
 		
@@ -1001,7 +1016,7 @@ BEGIN
 		
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.wwtp_code,top_elev=NEW.wwtp_top_elev, custom_top_elev=NEW.wwtp_custom_top_elev, ymax=NEW.wwtp_ymax, custom_ymax=NEW.wwtp_custom_ymax, elev=NEW.wwtp_elev, custom_elev=NEW.wwtp_custom_elev, 
-			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	"state"=NEW.state, state_type=NEW.state_type, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, 
+			node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, 	state_type=NEW.state_type, annotation=NEW.wwtp_annotation, "observ"=NEW.wwtp_observ, "comment"=NEW.wwtp_comment, 
 			dma_id=NEW.dma_id, soilcat_id=NEW.wwtp_soilcat_id, function_type=NEW.wwtp_function_type, category_type=NEW.wwtp_category_type, fluid_type=NEW.wwtp_fluid_type, location_type=NEW.wwtp_location_type, workcat_id=NEW.wwtp_workcat_id, 
 			workcat_id_end=NEW.wwtp_workcat_id_end, buildercat_id=NEW.wwtp_buildercat_id, builtdate=NEW.wwtp_builtdate, enddate=NEW.wwtp_enddate,  ownercat_id=NEW.wwtp_ownercat_id,address_01=NEW.wwtp_address_01,address_02=NEW.wwtp_address_02, 
 			address_03=NEW.wwtp_address_03, descript=NEW.wwtp_descript,rotation=NEW.wwtp_rotation, link=NEW.wwtp_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.wwtp_label_x, label_y=NEW.wwtp_label_y,
@@ -1024,11 +1039,11 @@ BEGIN
 		ELSIF man_table ='man_netelement' THEN
 			UPDATE node 
 			SET node_id=NEW.node_id, code=NEW.netelement_code,top_elev=NEW.netelement_top_elev, custom_top_elev=NEW.netelement_custom_top_elev, ymax=NEW.netelement_ymax, custom_ymax=NEW.netelement_custom_ymax, elev=NEW.netelement_elev, 
-			custom_elev=NEW.netelement_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, "state"=NEW.state, state_type=NEW.state_type, annotation=NEW.netelement_annotation, 
+			custom_elev=NEW.netelement_custom_elev, node_type=NEW.node_type, nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type, annotation=NEW.netelement_annotation, 
 			"observ"=NEW.netelement_observ, "comment"=NEW.netelement_comment, dma_id=NEW.dma_id, soilcat_id=NEW.netelement_soilcat_id, function_type=NEW.netelement_function_type, category_type=NEW.netelement_category_type, fluid_type=NEW.netelement_fluid_type, 
 			location_type=NEW.netelement_location_type, workcat_id=NEW.netelement_workcat_id, workcat_id_end=NEW.netelement_workcat_id_end, buildercat_id=NEW.netelement_buildercat_id, builtdate=NEW.netelement_builtdate, enddate=NEW.netelement_enddate,  
 			ownercat_id=NEW.netelement_ownercat_id,address_01=NEW.netelement_address_01,address_02=NEW.netelement_address_02, address_03=NEW.netelement_address_03, descript=NEW.netelement_descript,rotation=NEW.netelement_rotation, 
-			link=NEW.netelement_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netelement_label_x, label_y=NEW.netelement_label_y,label_rotation=NEW.netelement_label_rotation, the_geom=NEW.the_geom, publish=NEW.publish, 
+			link=NEW.netelement_link, verified=NEW.verified, undelete=NEW.undelete, label_x=NEW.netelement_label_x, label_y=NEW.netelement_label_y,label_rotation=NEW.netelement_label_rotation, publish=NEW.publish, 
 			inventory=NEW.inventory, uncertain=NEW.uncertain, xyz_date=NEW.netelement_xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.netelement_num_value
 			WHERE node_id = OLD.node_id;
 		

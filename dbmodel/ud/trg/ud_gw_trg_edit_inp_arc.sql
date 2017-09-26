@@ -26,12 +26,22 @@ BEGIN
  
 
     ELSIF TG_OP = 'UPDATE' THEN
-
-
+	
+		-- State
+		IF (NEW.state != OLD.state) THEN
+			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+		END IF;
+			
+		-- The geom
+		IF (NEW.the_geom IS DISTINCT FROM OLD.the_geom)  THEN
+			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
+		END IF;
+	
+	
         UPDATE arc 
         SET arc_id=NEW.arc_id, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, 
-			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
-            "observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope, the_geom=NEW.the_geom 
+			arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
+            "observ"=NEW."observ", custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
         WHERE arc_id = OLD.arc_id;
 
         IF (epa_type = 'CONDUIT') THEN 
