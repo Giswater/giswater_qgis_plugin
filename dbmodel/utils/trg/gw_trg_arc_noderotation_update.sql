@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_arc_noderotation_update()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_noderotation_update()
   RETURNS trigger AS
 $BODY$
 DECLARE 
@@ -26,10 +26,10 @@ BEGIN
     
     IF TG_OP='INSERT' THEN
 
-	FOR rec_node IN SELECT node_id, the_geom FROM node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
+	FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 	LOOP
-		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node JOIN node_type on id=node_type;
-		SELECT hemisphere INTO hemisphere_rotation_aux FROM node;
+		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN node_type ON rec_node.nodetype_id=id;
+		SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
 	
 		-- init variables
 		ang_aux=0;
@@ -59,16 +59,19 @@ BEGIN
 		ang_aux=ang_aux/count;	
 		
 		IF hemisphere_rotation_bool IS true THEN
-			IF (hemisphere_rotation_aux-ang_aux) >0 or (hemisphere_rotation_aux-ang_aux) < 3.14159 THEN
-				ang_aux=ang_aux+3.1459/2;
-			ELSE
-				ang_aux=ang_aux+3.14159+3.14159/2;
+
+			IF (hemisphere_rotation_aux >180)  THEN
+				UPDATE node set rotation=(ang_aux*(180/3.14159)+90) where node_id=rec_node.node_id;
+			ELSE	
+				UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;
 			END IF;
-					
-		END IF;
+
+		ELSE
+			UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
+		END IF;	
 	
-		UPDATE node set rotation=ang_aux*(180/3.14159) where node_id=rec_node.node_id;
-	
+		
+			
 	END LOOP;
 
 	RETURN NEW;
@@ -76,10 +79,11 @@ BEGIN
 
     ELSIF TG_OP='UPDATE' THEN
 
-	FOR rec_node IN SELECT node_id, the_geom FROM node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
+	FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 	LOOP
-		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node JOIN node_type on id=node_type;
-		SELECT hemisphere INTO hemisphere_rotation_aux FROM node;
+		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN node_type ON rec_node.nodetype_id=id;
+		SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+
 	
 		-- init variables
 		ang_aux=0;
@@ -107,17 +111,18 @@ BEGIN
 		END LOOP;
 	
 		ang_aux=ang_aux/count;	
-		
+
 		IF hemisphere_rotation_bool IS true THEN
-			IF (hemisphere_rotation_aux-ang_aux) >0 or (hemisphere_rotation_aux-ang_aux) < 3.14159 THEN
-				ang_aux=ang_aux+3.1459/2;
-			ELSE
-				ang_aux=ang_aux+3.14159+3.14159/2;
+
+			IF (hemisphere_rotation_aux >180)  THEN
+				UPDATE node set rotation=(ang_aux*(180/3.14159)+90) where node_id=rec_node.node_id;
+			ELSE	
+				UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;
 			END IF;
-					
+
+		ELSE
+			UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
 		END IF;
-	
-		UPDATE node set rotation=ang_aux*(180/3.14159) where node_id=rec_node.node_id;
 	
 	END LOOP;
 
@@ -127,9 +132,9 @@ BEGIN
    	
 	FOR rec_node IN SELECT node_id, the_geom FROM node WHERE OLD.node_1 = node_id OR OLD.node_2 = node_id
 	LOOP
-		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM node JOIN node_type on id=node_type;
-		SELECT hemisphere INTO hemisphere_rotation_aux FROM node;
-	
+		SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN node_type ON rec_node.nodetype_id=id;
+		SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+
 		-- init variables
 		ang_aux=0;
 		count=0;
@@ -162,15 +167,16 @@ BEGIN
 		END IF;
 		
 		IF hemisphere_rotation_bool IS true THEN
-			IF (hemisphere_rotation_aux-ang_aux) >0 or (hemisphere_rotation_aux-ang_aux) < 3.14159 THEN
-				ang_aux=ang_aux+3.1459/2;
-			ELSE
-				ang_aux=ang_aux+3.14159+3.14159/2;
+
+			IF (hemisphere_rotation_aux >180)  THEN
+				UPDATE node set rotation=(ang_aux*(180/3.14159)+90) where node_id=rec_node.node_id;
+			ELSE	
+				UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;
 			END IF;
-					
+
+		ELSE
+			UPDATE node set rotation=(ang_aux*(180/3.14159)-90) where node_id=rec_node.node_id;		
 		END IF;
-	
-		UPDATE node set rotation=ang_aux*(180/3.14159) where node_id=rec_node.node_id;
 	
 	END LOOP;
 
@@ -184,7 +190,6 @@ $BODY$
   COST 100;
   
 
-/*  
+
 DROP TRIGGER IF EXISTS gw_trg_arc_noderotation_update ON "SCHEMA_NAME".arc;
 CREATE TRIGGER gw_trg_arc_noderotation_update  AFTER INSERT OR UPDATE OF the_geom OR DELETE  ON "SCHEMA_NAME".arc  FOR EACH ROW  EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_arc_noderotation_update();
-*/
