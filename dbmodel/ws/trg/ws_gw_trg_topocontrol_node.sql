@@ -109,6 +109,6 @@ END;
 $$;
 
 DROP TRIGGER IF EXISTS gw_trg_topocontrol_node ON "SCHEMA_NAME"."node";
-CREATE TRIGGER gw_trg_topocontrol_node BEFORE INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME"."node" 
+CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE OF the_geom, "state" ON "SCHEMA_NAME"."node" 
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME"."gw_trg_topocontrol_node"();
 
