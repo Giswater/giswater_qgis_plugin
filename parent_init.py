@@ -6,16 +6,15 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QIcon
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QWidget
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
-import os.path
+import os
 import sys  
 import urlparse
 import webbrowser
@@ -84,6 +83,7 @@ class ParentDialog(object):
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
+        self.project_type = self.controller.get_project_type()
        
         
     def set_signals(self):
@@ -374,7 +374,6 @@ class ParentDialog(object):
             message = "Parameter not set in table 'config_param_system'"
             self.controller.show_warning(message, parameter='doc_absolute_path')
             return
-
         # Full path= path + value from row
         self.full_path =row[0]+self.path
        
@@ -840,7 +839,7 @@ class ParentDialog(object):
         self.dlg_cat.open()        
             
         # Set signals
-        self.dlg_cat.btn_ok.clicked.connect(partial(self.fill_geomcat_id, geom_type))
+        self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
         self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
@@ -1004,7 +1003,7 @@ class ParentDialog(object):
     def fill_geomcat_id(self, geom_type):
         
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
-        self.dlg_cat.close_dialog()
+        self.dlg_cat.close()
         if geom_type == 'node':
             utils_giswater.setWidgetText(self.nodecat_id, catalog_id)                    
         elif geom_type == 'arc':
@@ -1049,13 +1048,45 @@ class ParentDialog(object):
 
 
     def set_icon(self, widget, icon):
-        giswater_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_folder = giswater_dir + '\\icons\\widgets'
-        icon_path = icon_folder + "\\" + str(icon) + ".png"
+        """ Set @icon to selected @widget """
+
+        # Get icons folder
+        icons_folder = os.path.join(self.plugin_dir, 'icons')           
+        icon_path = os.path.join(icons_folder, str(icon) + ".png")           
         if os.path.exists(icon_path):
             widget.setIcon(QIcon(icon_path))
+        else:
+            self.controller.log_info("File not found", parameter=icon_path)
+     
 
-
+    def action_help(self, wsoftware, geom_type):
+        """ Open PDF file with selected @wsoftware and @geom_type """
+        
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale').lower()
+        if locale == 'es_es':
+            locale = 'es'
+        elif locale == 'es_ca':
+            locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'    
+                
+        # Get PDF file
+        pdf_folder = os.path.join(self.plugin_dir, 'png')
+        pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+        
+        # Open PDF if exists. If not open Spanish version
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            locale = "es"
+            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+            if os.path.exists(pdf_path):            
+                os.system(pdf_path)
+            else:
+                self.controller.show_warning("File not found", parameter=pdf_path)
+                
+                
     def manage_custom_fields(self, featurecat_id=None, tab_to_remove=None):
         
         self.form_layout_widget = self.dialog.findChild(QWidget, 'widget_form_layout')    
@@ -1156,5 +1187,5 @@ class ParentDialog(object):
                 self.controller.log_info(sql)             
                 status = self.controller.execute_sql(sql)
                 if not status:
-                    return False                
-            
+                    return False                   
+                

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>390</width>
-    <height>212</height>
+    <width>382</width>
+    <height>166</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_accept">
    <property name="geometry">
     <rect>
-     <x>215</x>
-     <y>180</y>
+     <x>205</x>
+     <y>125</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="btn_cancel">
    <property name="geometry">
     <rect>
-     <x>295</x>
-     <y>180</y>
+     <x>285</x>
+     <y>125</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -39,28 +39,15 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="node_type_type_new">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>60</y>
-     <width>181</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="frame">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QComboBox" name="node_nodecat_id">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>140</y>
-     <width>181</width>
+     <x>165</x>
+     <y>90</y>
+     <width>166</width>
      <height>20</height>
     </rect>
    </property>
@@ -71,8 +58,8 @@
   <widget class="QLabel" name="label_catalog_id">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>140</y>
+     <x>20</x>
+     <y>90</y>
      <width>141</width>
      <height>22</height>
     </rect>
@@ -89,34 +76,7 @@
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>catalog id:</string>
-   </property>
-   <property name="margin">
-    <number>3</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_new_node_type">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>60</y>
-     <width>141</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <property name="text">
-    <string>new system node type:</string>
+    <string>Catalog id:</string>
    </property>
    <property name="margin">
     <number>3</number>
@@ -125,7 +85,7 @@
   <widget class="QLabel" name="label_node_type">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>20</y>
      <width>141</width>
      <height>22</height>
@@ -143,7 +103,7 @@
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>current system node type:</string>
+    <string>Current node type:</string>
    </property>
    <property name="margin">
     <number>3</number>
@@ -155,9 +115,9 @@
   <widget class="QLineEdit" name="node_node_type">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>165</x>
      <y>20</y>
-     <width>181</width>
+     <width>196</width>
      <height>20</height>
     </rect>
    </property>
@@ -171,9 +131,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>100</y>
-     <width>181</width>
+     <x>165</x>
+     <y>55</y>
+     <width>196</width>
      <height>20</height>
     </rect>
    </property>
@@ -184,8 +144,8 @@
   <widget class="QLabel" name="label_custom_node_type">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>100</y>
+     <x>20</x>
+     <y>55</y>
      <width>141</width>
      <height>22</height>
     </rect>
@@ -202,16 +162,28 @@
     <enum>QFrame::Raised</enum>
    </property>
    <property name="text">
-    <string>custom node type:</string>
+    <string>New node type:</string>
    </property>
    <property name="margin">
     <number>3</number>
    </property>
   </widget>
+  <widget class="QPushButton" name="btn_catalog">
+   <property name="geometry">
+    <rect>
+     <x>335</x>
+     <y>90</y>
+     <width>26</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>...</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>node_node_type</tabstop>
-  <tabstop>node_type_type_new</tabstop>
   <tabstop>node_node_type_new</tabstop>
   <tabstop>node_nodecat_id</tabstop>
   <tabstop>btn_accept</tabstop>

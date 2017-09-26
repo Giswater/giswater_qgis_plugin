@@ -28,7 +28,7 @@ class DaoController():
         self.plugin_dir = None           
         
     def set_schema_name(self, schema_name):
-        self.schema_name = schema_name  
+        self.schema_name = schema_name
                 
     def tr(self, message, context_name=None):
         if context_name is None:
@@ -146,7 +146,9 @@ class DaoController():
         sql = "SELECT current_setting('server_version_num');"
         row = self.dao.get_row(sql)  
         if row:
-            self.postgresql_version = row[0]            
+            self.postgresql_version = row[0] 
+        
+        return self.postgresql_version           
         
     
     def show_message(self, text, message_level=1, duration=5, context_name=None, parameter=None):
@@ -279,14 +281,68 @@ class DaoController():
 
         return True
            
+           
+    def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values):
+        """ Execute INSERT or UPDATE sentence. Used for PostgreSQL database versions <9.5 """
+         
+        # Check if we have to perfrom an INSERT or an UPDATE
+        if unique_value != 'current_user':
+            unique_value = "'" + unique_value + "'"
+        sql = "SELECT * FROM " + self.schema_name + "." + tablename
+        sql += " WHERE " + str(unique_field) + " = " + unique_value 
+        row = self.get_row(sql)
+        
+        # Get fields
+        sql_fields = "" 
+        for fieldname in fields:
+            sql_fields += fieldname + ", "
+            
+        # Get values            
+        sql_values = ""
+        for value in values:
+            if value != 'current_user':
+                sql_values += "'" + value + "', "
+            else:
+                sql_values += value + ", "                
+                
+        # Perform an INSERT
+        if not row:
+            # Set SQL for INSERT               
+            sql = " INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
+            sql += sql_fields[:-2] + ") VALUES ("   
+              
+            # Manage value 'current_user'   
+            if unique_value != 'current_user':
+                unique_value = "'" + unique_value + "'" 
+            sql += unique_value + ", " + sql_values[:-2] + ");"         
+        
+        # Perform an UPDATE
+        else: 
+            # Set SQL for UPDATE
+            sql = " UPDATE " + self.schema_name + "." + tablename
+            sql += " SET ("
+            sql += sql_fields[:-2] + ") = (" 
+            sql += sql_values[:-2] + ")" 
+            sql += " WHERE " + unique_field + " = " + unique_value          
+            
+        # Execute sql
+        self.log_info(sql)
+        result = self.dao.execute_sql(sql)
+        self.last_error = self.dao.last_error         
+        if not result:
+            self.show_warning_detail(self.log_codes[-1], str(self.dao.last_error))    
+            return False
+
+        return True
+               
             
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values):
-        ''' Execute UPSERT sentence '''
+        """ Execute UPSERT sentence """
          
         # Check PostgreSQL version
         if int(self.postgresql_version) < 90500:   
-            self.show_warning("UPSERT sentence not valid in PostgreSQL versions <9.5")
-            return
+            self.execute_insert_or_update(tablename, unique_field, unique_value, fields, values)
+            return True
          
         # Set SQL for INSERT               
         sql = " INSERT INTO " + self.schema_name + "." + tablename + "(" + unique_field + ", "  
@@ -533,5 +589,18 @@ class DaoController():
         # If dialog is set, then translate form
         if dialog:
             self.translate_form(dialog, locale_name)                              
+      
+      
+    def get_project_type(self):
+        """ Get water software from table 'version' """
         
+        project_type = None
+        sql = "SELECT lower(wsoftware)"
+        sql += " FROM " + self.schema_name + ".version ORDER BY id DESC LIMIT 1" 
+        row = self.get_row(sql)
+        if row:
+            project_type = row[0]
+            
+        return project_type
+         
             

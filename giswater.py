@@ -104,7 +104,7 @@ class Giswater(QObject):
         self.basic = Basic(self.iface, self.settings, self.controller, self.plugin_dir)
         self.edit = Edit(self.iface, self.settings, self.controller, self.plugin_dir)
         self.master = Master(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)    
+        self.mincut = MincutParent(self.iface, self.settings, self.controller, self.plugin_dir)     
 
         # Define signals
         self.set_signals()
@@ -505,7 +505,7 @@ class Giswater(QObject):
                                   
         
     def search_project_type(self):
-        ''' Search in table 'version' project type of current QGIS project '''
+        ''' Search in layer 'version' project type (field 'wsoftware') of current QGIS project '''
         
         try:
             self.show_toolbars(True)
@@ -526,7 +526,8 @@ class Giswater(QObject):
                 elif wsoftware.lower() == 'ud':
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(True)                   
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(False)          
-            
+                self.wsoftware = wsoftware.lower()
+                
         except Exception as e:
             self.controller.log_info("search_project_type - Exception: "+str(e))
             pass                  
@@ -563,7 +564,8 @@ class Giswater(QObject):
         self.controller.set_schema_name(self.schema_name)   
         
         # Get PostgreSQL version
-        self.controller.get_postgresql_version()        
+        postgresql_version = self.controller.get_postgresql_version() 
+        self.controller.log_info("PostgreSQL version", parameter=str(postgresql_version))       
         
         # Get SRID from table node
         self.srid = self.dao.get_srid(self.schema_name, self.table_node)
@@ -802,21 +804,30 @@ class Giswater(QObject):
         name_init = 'dimensions.py'
         name_function = 'formOpen'
         file_ui = os.path.join(self.plugin_dir, 'ui', name_ui)
-        file_init = os.path.join(self.plugin_dir,'init', name_init)                     
+        file_init = os.path.join(self.plugin_dir, 'init', name_init)                     
         layer.editFormConfig().setUiForm(file_ui) 
         layer.editFormConfig().setInitCodeSource(1)
         layer.editFormConfig().setInitFilePath(file_init)           
         layer.editFormConfig().setInitFunction(name_function)
         
+        if self.wsoftware == 'ws':
+            fieldname_node = "depth"
+            fieldname_connec = "depth"
+        elif self.wsoftware == 'ud':
+            fieldname_node = "ymax"
+            fieldname_connec = "connec_depth"
+            
         layer_node = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_node")
         if layer_node:
             layer_node = layer_node[0]
-            layer_node.setDisplayField('depth : [% "depth" %]')
+            display_field = 'depth : [% "' + fieldname_node + '" %]'
+            layer_node.setDisplayField(display_field)
         
         layer_connec = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_connec")
         if layer_connec:
             layer_connec = layer_connec[0]
-            layer_connec.setDisplayField('depth : [% "depth" %]')
+            display_field = 'depth : [% "' + fieldname_connec + '" %]'
+            layer_connec.setDisplayField(display_field)
 
     
     def manage_map_tools(self):

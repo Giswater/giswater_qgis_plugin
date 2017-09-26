@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QIcon
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
@@ -150,10 +150,10 @@ class ManNodeDialog(ParentDialog):
         self.fill_table(self.tbl_costs, self.schema_name+"."+table_costs, self.filter)
         
         # Configuration of table Costs
-        self.set_configuration(self.tbl_costs, table_element) 
-  
-        # Set signals          
-        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))            
+        self.set_configuration(self.tbl_costs, table_element)
+
+        # Set signals
+        self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
@@ -171,6 +171,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'node'))
              
         # Set snapping
         self.canvas = self.iface.mapCanvas()
@@ -287,19 +288,21 @@ class ManNodeDialog(ParentDialog):
         self.btn_next.clicked.connect(self.next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton,"btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
+        self.set_icon(self.btn_previous, "109")
+        self.set_icon(self.btn_next, "108")
+        self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
+        self.btn_close.clicked.connect(self.dlg_gallery.close)
 
         self.dlg_gallery.exec_()
 
 
     def next_gallery(self):
 
-        self.start_indx = self.start_indx+1
-        
+        self.start_indx = self.start_indx + 1
         # Clear previous
         for i in self.list_widget:
             i.clear()
-            #i.clicked.disconnect(self.zoom_img) #this disconnect all!
-  
+
         # Add new 9 images
         for i in range(0, 9):
             pixmap = QPixmap(self.img_path_list[self.start_indx][i])
@@ -316,28 +319,53 @@ class ManNodeDialog(ParentDialog):
         control = len(self.img_path_list1D) / 9
         if self.start_indx == (control-1):
             self.btn_next.setEnabled(False)
-            
-        
+
+
+    def previous_gallery(self):
+
+        self.start_indx = self.start_indx - 1
+
+        # First clear previous
+        for i in self.list_widget:
+            i.clear()
+
+        # Add new 9 images
+        for i in range(0, 9):
+            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
+            pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            self.list_widget[i].setPixmap(pixmap)
+
+        # Control sliding buttons
+        if self.start_indx == 0:
+            self.btn_previous.setEnabled(False)
+
+        control = len(self.img_path_list1D) / 9
+        if self.start_indx < (control - 1):
+            self.btn_next.setEnabled(True)
+
+
     def zoom_img(self, i):
 
-        handelerIndex = i    
-        
+        handelerIndex = i
+
         self.dlg_gallery_zoom = GalleryZoom()
         pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-  
-        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom") 
+
+        self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
         self.lbl_img.setPixmap(pixmap)
         #lbl_img.show()
-            
-        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id") 
-        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id") 
-        
+
+        zoom_visit_id = self.dlg_gallery_zoom.findChild(QLineEdit, "visit_id")
+        zoom_event_id = self.dlg_gallery_zoom.findChild(QLineEdit, "event_id")
+
         zoom_visit_id.setText(str(self.visit_id))
         zoom_event_id.setText(str(self.event_id))
-    
-        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious") 
-        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext") 
-        
+
+        self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
+        self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
+        self.set_icon(self.btn_slidePrevious, "109")
+        self.set_icon(self.btn_slideNext, "108")
+
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
@@ -369,36 +397,13 @@ class ManNodeDialog(ParentDialog):
         pixmap = QPixmap(self.img_path_list1D[indx])
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i + 1
-    
+
         # Control sliding buttons
         if indx > 0 :
-            self.btn_slidePrevious.setEnabled(True) 
-            
+            self.btn_slidePrevious.setEnabled(True)
+
         if indx == (self.num_events - 1):
-            self.btn_slideNext.setEnabled(False) 
-
-        
-    def previous_gallery(self):
-    
-        self.start_indx = self.start_indx-1
-        
-        # First clear previous
-        for i in self.list_widget:
-            i.clear()
-
-        # Add new 9 images
-        for i in range(0, 9):
-            pixmap = QPixmap(self.img_path_list[self.start_indx][i])
-            pixmap = pixmap.scaled(171,151,Qt.IgnoreAspectRatio,Qt.SmoothTransformation)
-            self.list_widget[i].setPixmap(pixmap)
-
-        # Control sliding buttons
-        if self.start_indx == 0 :
-            self.btn_previous.setEnabled(False)
-            
-        control = len(self.img_path_list1D) / 9
-        if self.start_indx < (control-1):
-            self.btn_next.setEnabled(True)
+            self.btn_slideNext.setEnabled(False)
             
      
     def action_rotation(self):
@@ -427,8 +432,7 @@ class ManNodeDialog(ParentDialog):
         if status: 
             message = "Hemisphere is updated for node "+str(self.id)
             self.controller.show_info(message, context_name='ui_message')
-        
-             
+
     def action_copy_paste(self):
                           
         self.emit_point.canvasClicked.connect(self.manage_snapping)      

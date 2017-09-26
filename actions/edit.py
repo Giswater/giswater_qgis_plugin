@@ -9,7 +9,6 @@ or (at your option) any later version.
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit
-from PyQt4.QtGui import QIcon
 from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
 
@@ -309,7 +308,7 @@ class Edit(ParentAction):
 
         # Get widgets
         self.dlg.path_url.clicked.connect(partial(self.open_web_browser, "path"))
-        self.dlg.path_doc.clicked.connect(partial(self.open_file_dialog, "path"))
+        self.dlg.path_doc.clicked.connect(partial(self.get_file_dialog, "path"))
 
         # Manage i18n of the form
         self.controller.translate_form(self.dlg, 'file')
@@ -917,14 +916,15 @@ class Edit(ParentAction):
 
     def delete_row(self,  parameter, tablename):
         sql = 'DELETE FROM ' + self.schema_name + '.' + tablename
-        sql += ' WHERE "cur_user" = current_user and parameter = ' + "'" + parameter + "'"
+        sql += ' WHERE "cur_user" = current_user AND parameter = ' + "'" + parameter + "'"
         self.controller.execute_sql(sql)
 
 
     def populate_combo(self, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
-        sql = "SELECT " + field_name + " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
+        sql = "SELECT " + field_name
+        sql += " FROM " + self.schema_name + "." + table_name + " ORDER BY " + field_name
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
@@ -934,10 +934,15 @@ class Edit(ParentAction):
     def edit_dimensions(self):
         """ Button 39: Dimensioning """
 
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")[0]
-        self.iface.setActiveLayer(layer)
-        layer.startEditing()
-        # Implement the Add Feature button
-        self.iface.actionAddFeature().trigger()
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_edit_dimensions")
+        if layer:
+            layer = layer[0]
+            self.iface.setActiveLayer(layer)
+            layer.startEditing()
+            # Implement the Add Feature button
+            self.iface.actionAddFeature().trigger()
+        else:
+            message = "Layer name not found"
+            self.controller.show_warning(message, parameter="v_edit_dimensions")
         
         

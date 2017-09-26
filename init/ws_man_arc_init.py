@@ -118,7 +118,8 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionCentered").triggered.connect(partial(self.action_centered, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionEnabled").triggered.connect(partial(self.action_enabled, action, layer))
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
-           
+        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'arc'))
+
         self.feature_cat = {}
         self.project_read()
         
