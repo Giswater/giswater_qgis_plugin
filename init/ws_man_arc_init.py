@@ -36,7 +36,7 @@ class ManArcDialog(ParentDialog):
         ''' Constructor class '''
         super(ManArcDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ws_man_arc', dialog)                   
+        #self.controller.manage_translation('ws_man_arc', dialog)                   
         if dialog.parent():        
             dialog.parent().setFixedSize(625, 685)
 
@@ -97,9 +97,6 @@ class ManArcDialog(ParentDialog):
         # Fill tab costs
         self.fill_costs()
 
-        # Manage tab visibility
-        self.set_tabs_visibility(2)
-
         # Set signals
         self.dialog.findChild(QPushButton, "btn_doc_delete").clicked.connect(partial(self.delete_records, self.tbl_document, table_document))
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_element, table_element))
@@ -124,8 +121,14 @@ class ManArcDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'arc'))
 
         self.feature_cat = {}
-
         self.project_read()
+        
+        # Manage custom fields                      
+        self.manage_custom_fields()  
+        #self.manage_custom_fields(featurecat_id='aa', tab_to_remove=6)        
+        
+        # Manage tab visibility
+        self.set_tabs_visibility(2)              
 
 
     def fill_costs(self):

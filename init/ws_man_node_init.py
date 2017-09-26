@@ -46,7 +46,7 @@ class ManNodeDialog(ParentDialog):
         ''' Constructor class '''
         super(ManNodeDialog, self).__init__(dialog, layer, feature)      
         self.init_config_form()
-        self.controller.manage_translation('ws_man_node', dialog)       
+        #self.controller.manage_translation('ws_man_node', dialog)       
         if dialog.parent():
             dialog.parent().setFixedSize(625, 720)
 
@@ -110,9 +110,6 @@ class ManNodeDialog(ParentDialog):
         self.tbl_scada = self.dialog.findChild(QTableView, "tbl_scada") 
         self.tbl_scada_value = self.dialog.findChild(QTableView, "tbl_scada_value")
         self.tbl_costs = self.dialog.findChild(QTableView, "tbl_masterplan")
-
-        # Manage tab visibility
-        self.set_tabs_visibility(16)
               
         # Load data from related tables
         self.load_data()
@@ -160,6 +157,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
+        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -185,6 +183,12 @@ class ManNodeDialog(ParentDialog):
         self.btn_open_event = self.dialog.findChild(QPushButton, "btn_open_event")
         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
+        # Manage custom fields                                     
+        self.manage_custom_fields(self.feature_cat_id, 18)
+        
+        # Manage tab visibility
+        self.set_tabs_visibility(16)        
+        
         
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
@@ -206,6 +210,7 @@ class ManNodeDialog(ParentDialog):
         sql +=" WHERE visit_id = '"+str(self.visit_id)+"'"
         rows = self.controller.get_rows(sql)
 
+        # Get absolute path
         sql = "SELECT value FROM "+self.schema_name+".config_param_system"
         sql += " WHERE parameter = 'doc_absolute_path'"
         row = self.dao.get_row(sql)
@@ -491,4 +496,3 @@ class ManNodeDialog(ParentDialog):
                 layer.updateFeature(id_list[0])
                 layer.commitChanges()
                 self.dialog.refreshFeature()
-

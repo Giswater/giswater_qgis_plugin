@@ -77,7 +77,7 @@
      <rect>
       <x>15</x>
       <y>50</y>
-      <width>579</width>
+      <width>571</width>
       <height>431</height>
      </rect>
     </property>
@@ -2703,22 +2703,6 @@
         </property>
        </widget>
       </widget>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>Custom fields</string>
-     </attribute>
-     <widget class="QWidget" name="formLayoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>10</y>
-        <width>561</width>
-        <height>391</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="form_layout"/>
      </widget>
     </widget>
     <widget class="QWidget" name="element">
@@ -5871,6 +5855,16 @@
        <zorder>label_cost_width</zorder>
       </widget>
      </widget>
+    </widget>
+    <widget class="QWidget" name="widget_form_layout">
+     <attribute name="title">
+      <string>Custom fields</string>
+     </attribute>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+     </layout>
     </widget>
    </widget>
    <widget class="QLabel" name="label_arc_type">

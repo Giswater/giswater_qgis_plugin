@@ -233,7 +233,7 @@ class DaoController():
         ret = msg_box.exec_()   #@UnusedVariable
                           
             
-    def get_row(self, sql):
+    def get_row(self, sql, log_info=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         row = self.dao.get_row(sql)   
@@ -245,13 +245,13 @@ class DaoController():
                 if '-1' in self.log_codes:   
                     text = self.log_codes[-1]   
                 self.show_warning_detail(text, str(self.last_error))
-            else:
+            elif self.last_error is None and log_info:
                 self.log_info("Any record found: "+sql)
           
         return row  
     
     
-    def get_rows(self, sql):
+    def get_rows(self, sql, log_info=True):
         ''' Execute SQL. Check its result in log tables, and show it to the user '''
         
         rows = self.dao.get_rows(sql)   
@@ -260,7 +260,7 @@ class DaoController():
             # Check if any error has been raised
             if self.last_error is not None:                  
                 self.show_warning_detail(self.log_codes[-1], str(self.last_error))  
-            else:
+            elif self.last_error is None and log_info:
                 self.log_info("Any record found: "+sql)                        		
 
         return rows  
