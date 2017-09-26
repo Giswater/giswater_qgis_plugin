@@ -1070,7 +1070,7 @@ class ParentDialog(object):
                     
         sql = "SELECT * FROM " + self.schema_name + ".man_addfields_parameter" 
         if featurecat_id is not None:
-            sql += " WHERE featurecat_id = '" + featurecat_id + "'"
+            sql += " WHERE featurecat_id = '" + featurecat_id + "' OR featurecat_id IS NULL"
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
         if not rows:

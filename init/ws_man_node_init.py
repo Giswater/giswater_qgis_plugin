@@ -6,7 +6,7 @@ or (at your option) any later version.
 '''
 
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit, QWidget
+from PyQt4.QtGui import QLabel, QPixmap, QPushButton, QTableView, QTabWidget, QAction, QComboBox, QLineEdit
 from PyQt4.QtCore import Qt, QPoint, QObject, QEvent, pyqtSignal
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsPoint
 from qgis.gui import QgsMapCanvasSnapper, QgsMapToolEmitPoint
@@ -157,6 +157,7 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))
         nodetype_id = self.dialog.findChild(QLineEdit, "nodetype_id")
         self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'node', nodetype_id.text()))
+        self.feature_cat_id = nodetype_id.text()
 
         feature = self.feature
         canvas = self.iface.mapCanvas()
@@ -182,8 +183,7 @@ class ManNodeDialog(ParentDialog):
         self.btn_open_event.clicked.connect(self.open_selected_event_from_table)
 
         # Manage custom fields                                     
-        self.manage_custom_fields()
-        #self.manage_custom_fields(featurecat_id='aa', tab_to_remove=18)
+        self.manage_custom_fields(self.feature_cat_id, 18)
         
         # Manage tab visibility
         self.set_tabs_visibility(16)        
