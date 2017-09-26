@@ -18,6 +18,7 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	feature_id,
 	featurecat_id,
 	dma_id,
+	dma.macrodma_id,
 	state,
 	workcat_id,
 	workcat_id_end,
@@ -27,9 +28,11 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	place_name,
 	cabinet,
 	observations,
+	verified,
 	the_geom,
 	samplepoint.expl_id
 FROM selector_expl,samplepoint
+LEFT JOIN dma ON dma.dma_id=samplepoint.dma_id
 WHERE ((samplepoint.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
@@ -41,13 +44,17 @@ CREATE VIEW v_edit_element AS SELECT
 	code,
 	elementcat_id,
 	serial_number,
+	dma_id,
+	dma.macrodma_id,
 	state,
+	state_type
 	annotation,
 	observ,
 	comment,
 	function_type,
 	category_type,
 	location_type,
+	fluid_type,
 	workcat_id,
 	workcat_id_end,
 	buildercat_id,
@@ -66,6 +73,7 @@ CREATE VIEW v_edit_element AS SELECT
 	undelete,
 	element.expl_id
 FROM selector_expl,element
+LEFT JOIN dma ON dma.dma_id=element.dma_id
 WHERE ((element.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 

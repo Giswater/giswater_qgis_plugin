@@ -56,8 +56,8 @@ BEGIN
 
 -- FEATURE INSERT      
 
-				INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", annotation, observ, "comment", function_type, category_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, undelete, expl_id)
-				VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.annotation, NEW.observ, NEW."comment", NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
+				INSERT INTO element (element_id, code, elementcat_id, serial_number, "state", state_type, annotation, observ, "comment", function_type, category_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, undelete, expl_id)
+				VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.annotation, NEW.observ, NEW."comment", NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 				NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, NEW.inventory, NEW.undelete, expl_id_int);
 		
 	
@@ -70,7 +70,8 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE element
-		SET element_id=NEW.element_id, code=NEW.code,  elementcat_id=NEW.elementcat_id, serial_number=NEW.serial_number, "state"=NEW."state", annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW."comment", function_type=NEW.function_type, category_type=NEW.category_type,  location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
+		SET element_id=NEW.element_id, code=NEW.code,  elementcat_id=NEW.elementcat_id, serial_number=NEW.serial_number, "state"=NEW."state", state_type=NEW.state_type, annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW."comment", 
+		function_type=NEW.function_type, category_type=NEW.category_type,  location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
 		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, 
 		the_geom=NEW.the_geom, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, undelete=NEW.undelete,expl_id=NEW.expl_id
 		WHERE element_id=OLD.element_id;
