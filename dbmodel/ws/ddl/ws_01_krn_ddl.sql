@@ -257,7 +257,6 @@ CREATE TABLE "connec" (
 "connecat_id" varchar(30) NOT NULL,
 "sector_id" integer NOT NULL,
 "customer_code" varchar(30),
-"demand" numeric(12,3),
 "state" int2 NOT NULL,
 "state_type" int2,
 "connec_length" numeric(12,3),
@@ -464,9 +463,9 @@ CONSTRAINT man_register_pkey PRIMARY KEY (node_id)
 
 CREATE TABLE "man_netwjoin" (
 "node_id" varchar(16) NOT NULL,
+"customer_code" varchar(30),
 "streetaxis_id" character varying(16),
-"postnumber" character varying(16),
-"demand" numeric (12,6),
+"postnumber" character varying(16), 
 "top_floor" integer,
 "cat_valve" character varying(30),
 CONSTRAINT man_netwjoin_pkey PRIMARY KEY (node_id)

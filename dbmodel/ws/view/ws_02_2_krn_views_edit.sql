@@ -1251,7 +1251,7 @@ dma.macrodma_id,
 node.expl_id,
 node.hemisphere as netwjoin_hemisphere,
 node.num_value as netwjoin_num_value,
-man_netwjoin.demand as netwjoin_demand,
+man_netwjoin.customer_code as netwjoin_customer_code,
 man_netwjoin.streetaxis_id as netwjoin_streetaxis_id,
 ext_streetaxis.name as netwjoin_streetname,
 man_netwjoin.postnumber AS netwjoin_postnumber,
@@ -1574,9 +1574,13 @@ CREATE VIEW v_edit_pond AS
 SELECT
 pond_id,
 connec_id,
+pond.dma_id,
+dma.macrodma_id,
+pond."state",
 pond.the_geom,
 pond.expl_id
 FROM selector_expl,pond
+LEFT JOIN dma ON pond.dma_id = dma.dma_id
 WHERE ((pond.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
@@ -1586,9 +1590,13 @@ CREATE VIEW v_edit_pool AS
 SELECT
 pool_id,
 connec_id,
+pool.dma_id,
+dma.macrodma_id,
+pool."state",
 pool.the_geom,
 pool.expl_id
 FROM selector_expl,pool
+LEFT JOIN dma ON pool.dma_id = dma.dma_id
 WHERE ((pool.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 

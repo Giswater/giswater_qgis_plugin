@@ -400,7 +400,6 @@ CREATE TABLE "gully" (
 "units" int2,
 "groove" boolean  ,
 "siphon" boolean  ,
-"connec_arccat_id" varchar(18)  ,
 "connec_length" numeric(12,3),
 "connec_depth" numeric(12,3),
 "arc_id" varchar(16)  ,

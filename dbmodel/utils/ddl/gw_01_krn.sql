@@ -367,6 +367,7 @@ CREATE TABLE "element" (
 "serial_number" varchar(30),
 "dma_id" integer,
 "state" int2 NOT NULL,
+"state_type" int2,
 "annotation" character varying(254),
 "observ" character varying(254),
 "comment" character varying(254),
