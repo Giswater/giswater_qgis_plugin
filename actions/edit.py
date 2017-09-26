@@ -8,9 +8,10 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit
-from qgis.core import QgsMapLayerRegistry           # @UnresolvedImport
+from PyQt4.QtGui import QCompleter, QStringListModel, QDateEdit, QLineEdit, QTabWidget, QTableView
+from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression           # @UnresolvedImport
 from qgis.gui import QgsMapToolEmitPoint            # @UnresolvedImport
+from PyQt4.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -85,6 +86,9 @@ class Edit(ParentAction):
         self.table_storage = self.settings.value('db/table_storage', 'v_edit_man_storage')
         self.table_storage_pol = self.settings.value('db/table_storage_pol', 'v_edit_man_storage_pol')
         self.table_outfall = self.settings.value('db/table_outfall', 'v_edit_man_outfall')
+
+        self.iface = iface
+        self.canvas = self.iface.mapCanvas()
 
 
     def set_project_type(self, project_type):
@@ -245,11 +249,16 @@ class Edit(ParentAction):
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
 
+        # Remove all previous selections
+        self.remove_selection()
+
         # Create the dialog and signals
         self.dlg = AddElement()
         utils_giswater.setDialog(self.dlg)
         self.set_icon(self.dlg.add_geom, "129")
-
+        self.set_icon(self.dlg.btn_insert, "111")
+        self.set_icon(self.dlg.btn_delete, "112")
+        self.set_icon(self.dlg.btn_snapping, "129")
 
         self.dlg.btn_accept.pressed.connect(self.ed_add_element_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
@@ -258,8 +267,8 @@ class Edit(ParentAction):
         self.controller.translate_form(self.dlg, 'element')
 
         # Check if we have at least one feature selected
-        if not self.edit_check():
-            return
+        #if not self.edit_check():
+        #    return
 
         # Fill combo boxes
         self.populate_combo("elementcat_id", "cat_element")
@@ -271,12 +280,107 @@ class Edit(ParentAction):
         self.populate_combo("verified", "value_verified")
         self.populate_combo("workcat_id_end", "cat_work")
 
+        # TODO : parametrizide list of layers
+        self.group_layers_arc = ["Pipe"]
+        self.group_pointers_arc = []
+        for layer in self.group_layers_arc:
+            self.group_pointers_arc.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
+
+        self.group_layers_node = ["Junction","Manhole","Tank","Valve"]
+        self.group_pointers_node = []
+        for layer in self.group_layers_node:
+            self.group_pointers_node.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
+
+        self.group_layers_connec = ["Wjoin"]
+        self.group_pointers_connec = []
+        for layer in self.group_layers_connec:
+            self.group_pointers_connec.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
+
+
+        # SET DEFAULT - TAB0
+        # Set default tab 0
+        self.tab_feature = self.dlg.findChild(QTabWidget, "tab_feature")
+        self.tab_feature.setCurrentIndex(0)
+        # Set default values
+        feature = "arc"
+        table = "element_x_arc"
+        view = "v_edit_arc"
+
+        # Adding auto-completion to a QLineEdit for default feature
+        self.init_add_element(feature, table, view)
+
+        # Set signal to reach selected value from QCompleter
+        # self.completer.activated.connect(self.ed_add_el_autocomplete)
+        #self.dlg.add_geom.pressed.connect(self.add_point)
+        self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
+        self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, "arc_id", self.dlg, self.group_pointers_arc))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, "arc_id", self.group_pointers_arc))
+
+        # Open the dialog
+        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg.open()
+
+        # Check which tab is selected
+        self.tab_feature.currentChanged.connect(self.set_feature)
+
+
+    def set_feature(self):
+        tab_position = self.tab_feature.currentIndex()
+
+        if tab_position == 0:
+            feature = "arc"
+            table = "element_x_arc"
+            view = "v_edit_arc"
+            group_pointers = self.group_pointers_arc
+        if tab_position == 1:
+            feature = "node"
+            table = "element_x_node"
+            view = "v_edit_node"
+            group_pointers = self.group_pointers_node
+        if tab_position == 2:
+            feature = "connec"
+            table = "element_x_connec"
+            view = "v_edit_connec"
+            group_pointers = self.group_pointers_connec
+        if tab_position == 3:
+            # TODO : check project if WS-delete gully tab if UD-set parameters
+            feature = "gully"
+            table = "element_x_gully"
+            view = "v_edit_gully"
+            #group_pointers = self.group_pointers_gully
+
+        self.controller.log_info(str(feature))
+        self.controller.log_info(str(table))
+        self.controller.log_info(str(view))
+
+        self.controller.log_info("change tab reload table")
+        self.reload_table(view, feature+"_id")
+
+
         # Adding auto-completion to a QLineEdit
-        self.edit = self.dlg.findChild(QLineEdit, "element_id")
+        self.init_add_element(feature, table, view)
+
+        self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_"+feature)
+
+        self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature+"_id", self.dlg, group_pointers))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature+"_id", group_pointers))
+
+
+    def init_add_element(self, feature, table, view):
+
+        self.controller.log_info(str(feature))
+        self.controller.log_info(str(table))
+        self.controller.log_info(str(view))
+
+        # Adding auto-completion to a QLineEdit
+        self.edit = self.dlg.findChild(QLineEdit, "feature_id")
         self.completer = QCompleter()
         self.edit.setCompleter(self.completer)
         model = QStringListModel()
-        sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element "
+
+        #sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element "
+        sql = "SELECT " + feature + "_id FROM " + self.schema_name + "."+view
+        self.controller.log_info(str(sql))
         row = self.dao.get_rows(sql)
         for i in range(0, len(row)):
             aux = row[i]
@@ -285,13 +389,189 @@ class Edit(ParentAction):
         model.setStringList(row)
         self.completer.setModel(model)
 
-        # Set signal to reach selected value from QCompleter
-        self.completer.activated.connect(self.ed_add_el_autocomplete)
-        self.dlg.add_geom.pressed.connect(self.add_point)
 
-        # Open the dialog
-        self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg.open()
+    def manual_init(self, widget, table, attribute, dialog, group_pointers) :
+        '''  Select feature with entered id
+        Set a model with selected filter.
+        Attach that model to selected table '''
+        self.controller.log_info("test")
+        widget_feature_id = self.dlg.findChild(QLineEdit, "feature_id")
+        #element_id = widget_id.text()
+        #feature_id = widget_feature_id.text()
+        element_id = widget_feature_id.text()
+        # Clear list of ids
+        self.ids = []
+
+        # Attribute = "connec_id"
+        '''
+        sql = "SELECT " + attribute + " FROM " + self.schema_name + "." + table
+        #sql += " WHERE customer_code = '" + customer_code + "'"
+        rows = self.controller.get_rows(sql)
+        self.controller.log_info(str(rows))
+        if not rows:
+            return
+        element_id = str(rows[0][0])
+        '''
+
+        # Get all selected features
+        self.controller.log_info(str(group_pointers))
+        for layer in group_pointers:
+            self.controller.log_info(str(layer.name()))
+            if layer.selectedFeatureCount() > 0:
+                # Get all selected features at layer
+                features = layer.selectedFeatures()
+                # Get id from all selected features
+                for feature in features:
+                    feature_id = feature.attribute(attribute)
+                    # List of all selected features
+                    self.ids.append(str(feature_id))
+
+        # Check if user entered hydrometer_id
+        if element_id == "":
+            message = "You need to enter id"
+            self.controller.show_info_box(message)
+            return
+        if element_id in self.ids:
+            message = str(attribute)+ ":"+element_id+" id already in the list!"
+            self.controller.show_info_box(message)
+            return
+        else:
+            # If feature id doesn't exist in list -> add
+            self.ids.append(element_id)
+
+            for layer in group_pointers:
+                # SELECT features which are in the list
+
+                if attribute == "arc_id":
+                    aux = "\"arc_id\" IN ("
+                if attribute == "node_id":
+                    aux = "\"node_id\" IN ("
+                if attribute == "connec_id":
+                    aux = "\"connec_id\" IN ("
+                #aux = "\"+attribute+\" IN ("
+                for i in range(len(self.ids)):
+                    aux += "'" + str(self.ids[i]) + "', "
+                aux = aux[:-2] + ")"
+                self.controller.log_info("aux")
+                self.controller.log_info(str(aux))
+                self.controller.log_info(str(layer))
+                expr = QgsExpression(aux)
+                if expr.hasParserError():
+                    message = "Expression Error: " + str(expr.parserErrorString())
+                    self.controller.show_warning(message)
+                    return
+
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+
+                # Build a list of feature id's from the previous result
+                id_list = [i.id() for i in it]
+                self.controller.log_info("id_list")
+                self.controller.log_info(str(id_list))
+
+                # Select features with these id's
+                layer.setSelectedFeatures(id_list)
+
+        # Reload table
+        self.reload_table(table, attribute)
+
+
+    def reload_table(self, table, attribute):
+        self.controller.log_info("reload table")
+        self.controller.log_info(str(self.ids))
+        # Reload table
+        #table = "v_edit_arc"
+        self.controller.log_info("--------------------")
+        self.controller.log_info(str(table))
+        table_name = self.schema_name + "." + table
+        widget = self.widget
+        expr = attribute+"= '" + self.ids[0] + "'"
+        if len(self.ids) > 1:
+            for el in range(1, len(self.ids)):
+                expr += " OR "+attribute+" = '" + self.ids[el] + "'"
+        self.controller.log_info(str(expr))
+        self.controller.log_info(str(table_name))
+
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+
+    def remove_selection(self):
+        ''' Remove all previous selections'''
+
+        for layer in self.canvas.layers():
+            layer.removeSelection()
+        self.canvas.refresh()
+
+
+    def delete_records(self, widget, table_name, id_, group_pointers):
+        ''' Delete selected elements of the table '''
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        del_id = []
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_feature = widget.model().record(row).value(id_)
+            inf_text += str(id_feature) + ", "
+            list_id = list_id + "'" + str(id_feature) + "', "
+            del_id.append(id_feature)
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        answer = self.controller.ask_question("Are you sure you want to delete these records?", "Delete records", inf_text)
+        if answer:
+            for el in del_id:
+                self.ids.remove(el)
+
+        # Reload selection
+        #layer = self.iface.activeLayer()
+        for layer in group_pointers:
+            # SELECT features which are in the list
+            aux = "\"arc_id\" IN ("
+            for i in range(len(self.ids)):
+                aux += "'" + str(self.ids[i]) + "', "
+            aux = aux[:-2] + ")"
+
+            expr = QgsExpression(aux)
+            if expr.hasParserError():
+                message = "Expression Error: " + str(expr.parserErrorString())
+                self.controller.show_warning(message)
+                return
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+
+            # Build a list of feature id's from the previous result
+            id_list = [i.id() for i in it]
+
+            # Select features with these id's
+            layer.setSelectedFeatures(id_list)
+
+
+        # Reload table
+        expr = str(id_)+" = '" + self.ids[0] + "'"
+        if len(self.ids) > 1:
+            for el in range(1, len(self.ids)):
+                expr += " OR "+str(id_)+ "= '" + self.ids[el] + "'"
+
+        widget.model().setFilter(expr)
+        widget.model().select()
 
 
     def edit_add_file(self):

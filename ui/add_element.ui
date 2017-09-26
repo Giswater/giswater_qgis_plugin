@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -756,7 +756,7 @@
     <attribute name="title">
      <string>Relations</string>
     </attribute>
-    <widget class="QTabWidget" name="tabWidget_2">
+    <widget class="QTabWidget" name="tab_feature">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -829,7 +829,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QLineEdit" name="lineEdit">
+    <widget class="QLineEdit" name="feature_id">
      <property name="geometry">
       <rect>
        <x>25</x>
