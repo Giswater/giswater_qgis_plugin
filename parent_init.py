@@ -1059,16 +1059,29 @@ class ParentDialog(object):
 
 
     def action_help(self, wsoftware, geom_type):
-        # Get pdf folder
-        pdf_folder = os.path.join(self.plugin_dir, 'png')
+        """ Open PDF file with selected @wsoftware and @geom_type """
+        
         # Get locale of QGIS application
         locale = QSettings().value('locale/userLocale').lower()
+        if locale == 'es_es':
+            locale = 'es'
+        elif locale == 'es_ca':
+            locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'    
+                
+        # Get PDF file
+        pdf_folder = os.path.join(self.plugin_dir, 'png')
         pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
-        self.controller.log_info(str(pdf_path))
-        # Open pdf if exist
+        
+        # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
-            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_en" + ".pdf")
-            os.system(pdf_path)
-            self.controller.log_info("File not found", parameter=pdf_path)
+            locale = "es"
+            pdf_path = os.path.join(pdf_folder, wsoftware + "_" + geom_type + "_" + locale + ".pdf")
+            if os.path.exists(pdf_path):            
+                os.system(pdf_path)
+            else:
+                self.controller.show_warning("File not found", parameter=pdf_path)
+                
