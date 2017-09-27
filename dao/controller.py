@@ -209,8 +209,8 @@ class DaoController():
             msg_box.setWindowTitle(title);        
         if inf_text is not None:
             msg_box.setInformativeText(inf_text);        
-        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        msg_box.setDefaultButton(QMessageBox.No)  
+        msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+        msg_box.setDefaultButton(QMessageBox.Ok)  
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         ret = msg_box.exec_()
         if ret == QMessageBox.Ok:
