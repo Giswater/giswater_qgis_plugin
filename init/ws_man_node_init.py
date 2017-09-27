@@ -171,7 +171,9 @@ class ManNodeDialog(ParentDialog):
         self.dialog.findChild(QAction, "actionZoomOut").triggered.connect(partial(self.action_zoom_out, feature, canvas, layer))
         self.dialog.findChild(QAction, "actionRotation").triggered.connect(self.action_rotation)
         self.dialog.findChild(QAction, "actionCopyPaste").triggered.connect(self.action_copy_paste)
-        self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'node'))
+        action_help=self.dialog.findChild(QAction, "actionHelp")
+        action_help.setVisible(False)
+        #self.dialog.findChild(QAction, "actionHelp").triggered.connect(partial(self.action_help, 'ws', 'node'))
              
         # Set snapping
         self.canvas = self.iface.mapCanvas()

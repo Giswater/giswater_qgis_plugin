@@ -119,7 +119,9 @@ class ManConnecDialog(ParentDialog):
         self.dialog.findChild(QPushButton, "delete_row_info_2").clicked.connect(partial(self.delete_records, self.tbl_info, table_element))       
         self.dialog.findChild(QPushButton, "btn_delete_hydrometer").clicked.connect(partial(self.delete_records_hydro, self.tbl_hydrometer))               
         self.dialog.findChild(QPushButton, "btn_add_hydrometer").clicked.connect(self.insert_records)
-        self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
+        action_help=self.dialog.findChild(QAction, "actionHelp")
+        action_help.setVisible(False)
+        #self.dialog.findChild(QPushButton, "btn_catalog").clicked.connect(partial(self.catalog, 'ws', 'connec'))
         
         feature = self.feature
         canvas = self.iface.mapCanvas()
