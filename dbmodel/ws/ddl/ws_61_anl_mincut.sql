@@ -150,10 +150,7 @@ id varchar(30) NOT NULL PRIMARY KEY,
 descript text
 );
 
-CREATE TABLE "cat_mincut_users"(
-id varchar(50) NOT NULL PRIMARY KEY,
-"name" varchar(150)
-);
+
 
 -- ----------------------------
 -- SELECTOR

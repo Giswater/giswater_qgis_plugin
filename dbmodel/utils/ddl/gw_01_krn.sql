@@ -72,6 +72,11 @@ CREATE SEQUENCE "element_x_connec_seq"
 -- ----------------------------
 -- Table: system structure 
 -- ----------------------------
+CREATE TABLE "cat_users"(
+id varchar(50) NOT NULL PRIMARY KEY,
+"name" varchar(150),
+"context" varchar(50)
+);
 
 CREATE TABLE "cat_feature"(
 id character varying(30) NOT NULL,

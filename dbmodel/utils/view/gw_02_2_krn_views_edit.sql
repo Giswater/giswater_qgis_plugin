@@ -47,7 +47,7 @@ CREATE VIEW v_edit_element AS SELECT
 	element.dma_id,
 	dma.macrodma_id,
 	state,
-	state_type
+	state_type,
 	annotation,
 	observ,
 	comment,
