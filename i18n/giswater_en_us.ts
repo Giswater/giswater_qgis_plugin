@@ -3461,9 +3461,11 @@
     <message>
         <source>Selected schema not found</source>
         <translation>Selected schema not found</translation>
-    </message>    
-
-
+    </message>
+    <message>
+        <source>The node has not been updated because no catalog has been selected</source>
+        <translation>The node has not been updated because no catalog has been selected</translation>
+    </message>
 
 
 </context>
