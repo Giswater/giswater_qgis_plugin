@@ -41,7 +41,7 @@
   </widget>
   <widget class="QComboBox" name="node_nodecat_id">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -127,7 +127,7 @@
   </widget>
   <widget class="QComboBox" name="node_node_type_new">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
