@@ -286,7 +286,7 @@ class Edit(ParentAction):
         for layer in self.group_layers_arc:
             self.group_pointers_arc.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
 
-        self.group_layers_node = ["Junction","Manhole","Tank","Valve"]
+        self.group_layers_node = ["Junction","Manhole","Tank","Valve","Source","Pump","Hydrant","Waterwell","Meter","Reduction","Filter"]
         self.group_pointers_node = []
         for layer in self.group_layers_node:
             self.group_pointers_node.append(QgsMapLayerRegistry.instance().mapLayersByName(layer)[0])
@@ -332,29 +332,40 @@ class Edit(ParentAction):
             table = "element_x_arc"
             view = "v_edit_arc"
             group_pointers = self.group_pointers_arc
+            widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         if tab_position == 1:
             feature = "node"
             table = "element_x_node"
             view = "v_edit_node"
             group_pointers = self.group_pointers_node
+            widget = self.dlg.findChild(QTableView, "tbl_doc_x_node")
         if tab_position == 2:
             feature = "connec"
             table = "element_x_connec"
             view = "v_edit_connec"
             group_pointers = self.group_pointers_connec
+            widget = self.dlg.findChild(QTableView, "tbl_doc_x_connec")
         if tab_position == 3:
             # TODO : check project if WS-delete gully tab if UD-set parameters
             feature = "gully"
             table = "element_x_gully"
             view = "v_edit_gully"
             #group_pointers = self.group_pointers_gully
+            #widget = self.dlg.findChild(QTableView, "tbl_doc_x_gully")
 
         self.controller.log_info(str(feature))
         self.controller.log_info(str(table))
         self.controller.log_info(str(view))
 
+        # Adding auto-completion to a QLineEdit
+        self.init_add_element(feature, table, view)
+
+        self.dlg.btn_insert.pressed.connect(partial(self.manual_init, widget, view, feature + "_id", self.dlg, group_pointers))
+
+        '''
+
         self.controller.log_info("change tab reload table")
-        self.reload_table(view, feature+"_id")
+        #self.reload_table(view, feature+"_id")
 
 
         # Adding auto-completion to a QLineEdit
@@ -364,13 +375,9 @@ class Edit(ParentAction):
 
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature+"_id", self.dlg, group_pointers))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature+"_id", group_pointers))
-
+        '''
 
     def init_add_element(self, feature, table, view):
-
-        self.controller.log_info(str(feature))
-        self.controller.log_info(str(table))
-        self.controller.log_info(str(view))
 
         # Adding auto-completion to a QLineEdit
         self.edit = self.dlg.findChild(QLineEdit, "feature_id")
@@ -394,7 +401,6 @@ class Edit(ParentAction):
         '''  Select feature with entered id
         Set a model with selected filter.
         Attach that model to selected table '''
-        self.controller.log_info("test")
         widget_feature_id = self.dlg.findChild(QLineEdit, "feature_id")
         #element_id = widget_id.text()
         #feature_id = widget_feature_id.text()
@@ -1208,7 +1214,7 @@ class Edit(ParentAction):
         rows = self.dao.get_rows(sql)
         utils_giswater.fillComboBox(widget, rows)
         if len(rows) > 0:
-            utils_giswater.setCurrentIndex(widget, 1)
+            utils_giswater.setCurrentIndex(widget, 0)
 
 
     def edit_dimensions(self):
