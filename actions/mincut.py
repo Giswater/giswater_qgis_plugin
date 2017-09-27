@@ -266,6 +266,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.btn_set_real_location = self.dlg_fin.findChild(QPushButton, "btn_set_real_location")
 
+
         self.btn_accept.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.dlg_fin.close)
 
@@ -273,13 +274,11 @@ class MincutParent(ParentAction, MultipleSnapping):
         utils_giswater.setText("mincut", str(self.result_id.text()))
         utils_giswater.setText("street", str(self.street.text()))
         utils_giswater.setText("number", str(self.number.text()))
-
         # Get status 'finished' (id = 2)
         sql = "SELECT name FROM " + self.schema_name + ".anl_mincut_cat_state WHERE id = 2"
         row = self.controller.get_row(sql)
         if row:
             self.state.setText(str(row[0]))
-
         self.dlg_fin.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Open the dialog
@@ -288,13 +287,23 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def accept_save_data(self, action):
 
-        mincut_result_state = self.state.text()
+        mincut_result_state_text = self.state.text()
+        self.controller.log_info(str(mincut_result_state_text))
+        if mincut_result_state_text == 'Planified':
+            mincut_result_state = int(0)
+        if mincut_result_state_text == 'In Progress':
+            mincut_result_state = int(1)
+        if mincut_result_state_text == 'Finished':
+            mincut_result_state = int(2)
+
+
         id_ = self.result_id.text()
         # exploitation =
         street = str(self.street.text())
         number = str(self.number.text())
         mincut_result_type = self.type.currentText()
         anl_cause = self.cause.currentText()
+        work_order = self.work_order.text()
 
         # anl_descript = str(utils_giswater.getWidgetText("pred_description"))
         anl_descript = self.pred_description.toPlainText()
@@ -324,21 +333,21 @@ class MincutParent(ParentAction, MultipleSnapping):
         dateEnd_real = self.cbx_date_end.date()
         timeEnd_real = self.cbx_hours_end.time()
         forecast_end_real = dateEnd_real.toString('yyyy-MM-dd') + " " + timeEnd_real.toString('HH:mm:ss')
-
         if action == "mg_mincut" :
             # Insert data to DB
-            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, id, address_1, address_2," 
+            sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_cat (mincut_state, work_order, streetname, number,"
             sql += " mincut_type, anl_cause, forecast_start, forecast_end, anl_descript"
             if self.btn_end.isEnabled():
                 sql += ", exec_start, exec_end, exec_from_plot, exec_depth, exec_descript)"
             else:
                 sql += ")"
-            sql += " VALUES ('" + mincut_result_state + "', '" + id_ + "', '" + street + "', '" + number + "', '" + mincut_result_type + "', '" + anl_cause + "', '"
-            sql += forecast_start_predict + "', '" + forecast_end_predict + "', '" + anl_descript + "'"
+            sql += " VALUES ('" + str(mincut_result_state) + "', '" + str(work_order) + "', '" + str(street) + "', '" + str(number) + "', '" + str(mincut_result_type) + "', '" + str(anl_cause) + "', '"
+            sql += str(forecast_start_predict) + "', '" + str(forecast_end_predict) + "', '" + str(anl_descript) + "'"
             if self.btn_end.isEnabled():
-                sql += ",'" + forecast_start_real + "', '" + forecast_end_real + "', '" + exec_limit_distance + "', '" + exec_depth + "', '" + exec_descript + "')"
+                sql += ",'" + str(forecast_start_real) + "', '" + str(forecast_end_real) + "', '" + exec_limit_distance + "', '" + exec_depth + "', '" + str(exec_descript) + "')"
             else :
                 sql += ")"
+
             status = self.controller.execute_sql(sql)
             if status:
                 message = "Values has been updated"
@@ -353,8 +362,8 @@ class MincutParent(ParentAction, MultipleSnapping):
             sql += " SET id = '" + id_ + "', mincut_state = '" + mincut_result_state + "', anl_descript = '" + anl_descript + \
                    "', exec_descript = '" + exec_descript + "', exec_depth = '" + exec_depth + "', exec_from_plot = '" + exec_limit_distance + \
                    "', forecast_start = '" + forecast_start_predict + "', forecast_end = '" + forecast_end_predict + \
-                   "', exec_start = '" + forecast_start_real + "', exec_end = '" + forecast_end_real + "' , address_1 = '" + street + \
-                   "', address_2 = '" + number + "', mincut_type = '" + mincut_result_type + "', anl_cause = '" + anl_cause + "' "
+                   "', exec_start = '" + forecast_start_real + "', exec_end = '" + forecast_end_real + "' , streetname = '" + street + \
+                   "', number = '" + number + "', mincut_type = '" + mincut_result_type + "', anl_cause = '" + anl_cause + "' "
             sql += " WHERE id = '" + id_ + "'"
             status = self.controller.execute_sql(sql)
             if status:
@@ -415,8 +424,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(btn_delete_connec, "112")
 
         btn_insert_connec = self.dlg_connec.findChild(QPushButton, "btn_insert")
-        # TODO: Check slot function
-        #btn_insert_connec.pressed.connect(partial(self.fill_table, self.tbl_connec, self.schema_name + "." + table, "connec_id", self.dlg_connec))
         btn_insert_connec.pressed.connect(partial(self.manual_init, self.tbl_connec, table, "connec_id", self.dlg_connec, self.group_pointers_connec))
         self.set_icon(btn_insert_connec, "111")
 
@@ -488,7 +495,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def check_id(self):
         ''' Check if user entered ID '''
 
-        customer_state = self.customer_state.text()
+        customer_state = self.work_order.text()
         if customer_state == "":
             message = "You need to enter customer code"
             self.controller.show_info_box(message)
@@ -526,8 +533,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table,"hydrometer_id"))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-        # TODO: Check slot function
-        #self.btn_insert_hydro.pressed.connect(partial(self.fill_table, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
         self.btn_insert_hydro.pressed.connect(partial(self.manual_init, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
         self.set_icon(self.btn_insert_hydro, "111")
 
@@ -865,7 +870,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def snapping_node_arc(self, point, btn):  #@UnusedVariable
-
+        self.controller.log_info("test")
         map_point = self.canvas.getCoordinateTransform().transform(point)
         x = map_point.x()
         y = map_point.y()
@@ -874,14 +879,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Snapping
         (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
+        self.controller.log_info(str(result))
         # If any feature snapped return
-        if result == []:
-            self.controller.log_info("Any feature snapped")
-            return
+        #if result == []:
+        #    self.controller.log_info("Any feature snapped")
+        #    return
 
         # Check feature
         for snap_point in result:
-
+            self.controller.log_info(str(snap_point))
             element_type = snap_point.layer.name()
             if element_type in self.node_group:
                 feat_type = 'node'
@@ -1114,7 +1120,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             # utils_giswater.fillComboBox("type", rows['mincut_result_type'])
             # utils_giswater.fillComboBox("cause", rows['anl_cause'])
             mincut_result_type = row['mincut_type']
-            cause = rows['anl_cause']
+            cause = row['anl_cause']
             # Clear comboBoxes
             self.type.clear()
             self.cause.clear()

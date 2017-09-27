@@ -147,7 +147,7 @@
       <number>3</number>
      </property>
     </widget>
-    <widget class="QLineEdit" name="streetname">
+    <widget class="QLineEdit" name="street">
      <property name="geometry">
       <rect>
        <x>110</x>
@@ -252,16 +252,6 @@
       </rect>
      </property>
     </widget>
-    <zorder>number</zorder>
-    <zorder>label_label_x_2</zorder>
-    <zorder>label_label_x_3</zorder>
-    <zorder>streetname</zorder>
-    <zorder>label_label_x</zorder>
-    <zorder>exploitation</zorder>
-    <zorder>label_label_x_6</zorder>
-    <zorder>exploitation_2</zorder>
-    <zorder>customer_state</zorder>
-    <zorder>customer_state</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -476,17 +466,6 @@
       </rect>
      </property>
     </widget>
-    <zorder>label_builtdate_4</zorder>
-    <zorder>cbx_date_end_predict</zorder>
-    <zorder>label_builtdate_3</zorder>
-    <zorder>cbx_hours_end_predict</zorder>
-    <zorder>cbx_date_start_predict</zorder>
-    <zorder>cbx_hours_start_predict</zorder>
-    <zorder>pred_description</zorder>
-    <zorder>label_builtdate_5</zorder>
-    <zorder>label_assigned_to</zorder>
-    <zorder>assigned_to</zorder>
-    <zorder>groupBox</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
@@ -1041,7 +1020,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="customer_state">
+   <widget class="QLineEdit" name="work_order">
     <property name="enabled">
      <bool>true</bool>
     </property>
