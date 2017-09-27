@@ -80,6 +80,8 @@ class DrawProfiles(ParentMapTool):
 
     def canvasReleaseEvent(self, event):
         
+        self.controller.log_info("canvasReleaseEvent")
+        
         # With left click the digitizing is finished
         if event.button() == Qt.LeftButton:
 
@@ -91,6 +93,8 @@ class DrawProfiles(ParentMapTool):
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
        
+            self.controller.log_info(str(result))       
+            
             if result <> []:
                 self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
  
@@ -429,6 +433,7 @@ class DrawProfiles(ParentMapTool):
             # Set node_id in memory
             parameters[12] = node_id
 
+            self.controller.log_info(str(parameters))
             # Check if we have all data for drawing
             if None in parameters:
                 message = "Some parameters are missing for node:"
@@ -908,6 +913,7 @@ class DrawProfiles(ParentMapTool):
         sql = "SELECT rid"
         sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + start_point + "'"
+        self.controller.log_info(sql)           
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])
@@ -939,6 +945,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         sql += ")"
+        self.controller.log_info(sql)        
         rows = self.controller.get_rows(sql)
         for i in range(0, len(rows)):
             if self.version == '2':

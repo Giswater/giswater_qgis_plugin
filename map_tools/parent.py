@@ -84,7 +84,8 @@ class ParentMapTool(QgsMapTool):
     def set_controller(self, controller):
         self.controller = controller
         self.schema_name = controller.schema_name
-        self.plugin_dir = self.controller.plugin_dir        
+        self.plugin_dir = self.controller.plugin_dir 
+        self.snapper_manager.controller = controller
         
         
     def deactivate(self):

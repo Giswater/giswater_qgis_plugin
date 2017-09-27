@@ -30,7 +30,9 @@ class SnappingConfigManager():
         self.canvas = self.iface.mapCanvas()
         self.layer_arc = None        
         self.layer_connec = None        
-        self.layer_node = None    
+        self.layer_node = None 
+        self.previous_snapping = None
+        self.controller = None
             
         # Snapper
         self.snapper = QgsMapCanvasSnapper(self.canvas)
@@ -118,17 +120,20 @@ class SnappingConfigManager():
         QgsProject.instance().setSnapSettingsForLayer(layer.id(), True, 2, 2, 1.0, False)
 
 
-    def apply_snapping_options(self, snappingsOptions):
+    def apply_snapping_options(self, snappings_options):
         ''' Function that restores the previous snapping '''
 
         # We loop through all the layers in the project
         # We don't want to refresh the snapping UI        
         QgsProject.instance().blockSignals(True)  
 
-        for snpOpts in snappingsOptions:
-            QgsProject.instance().setSnapSettingsForLayer(snpOpts['layerid'], int(snpOpts['enabled']),
-                                                          int(snpOpts['snapType']), int(snpOpts['unitType']),
-                                                          float(snpOpts['tolerance']), int(snpOpts['avoidInt']))
+        if snappings_options is not None:
+            for snp_opt in snappings_options:
+                QgsProject.instance().setSnapSettingsForLayer(snp_opt['layerid'], int(snp_opt['enabled']),
+                                                              int(snp_opt['snapType']), int(snp_opt['unitType']),
+                                                              float(snp_opt['tolerance']), int(snp_opt['avoidInt']))
+        else:
+            self.controller.log_info("apply_snapping_options")
 
         QgsProject.instance().blockSignals(False)
         # Update the gui        
