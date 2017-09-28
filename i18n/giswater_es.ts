@@ -3466,6 +3466,10 @@
         <source>The node has not been updated because no catalog has been selected</source>
         <translation>El nodo no ha sido actualizado porque no se ha seleccionado ningun catalogo</translation>
     </message>
+    <message>
+        <source>Field catalog_id required!</source>
+        <translation>El campo  catalog_id es obligatorio!</translation>
+    </message>
 
 </context>
 

@@ -212,28 +212,26 @@ class Edit(ParentAction):
 
         # Get selected features (nodes)
         feature = layer.selectedFeatures()[0]
-        
-        # Get node_id and nodetype_id from current node
-        self.node_id = feature.attribute('node_id')
-        node_type = feature.attribute('nodetype_id')
 
         # Create the dialog, fill node_type and define its signals
         self.dlg = ChangeNodeType()
         utils_giswater.setDialog(self.dlg)
-
-        self.dlg.node_node_type.setText(node_type)
-
         self.new_node_type = self.dlg.findChild(QComboBox, "node_node_type_new")
         self.new_nodecat_id = self.dlg.findChild(QComboBox, "node_nodecat_id")
 
+        # Get node_id and nodetype_id from current node
+        self.node_id = feature.attribute('node_id')
+        if self.project_type == 'ws':
+            node_type = feature.attribute('nodetype_id')
+        if self.project_type == 'ud':
+            node_type = feature.attribute('node_type')
+            sql = "SELECT DISTINCT(id) FROM ud30.cat_node ORDER BY id"
+            rows = self.controller.get_rows(sql)
+            utils_giswater.fillComboBox(self.new_nodecat_id, rows)
+
+        self.dlg.node_node_type.setText(node_type)
         self.new_node_type.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
-
-
-
-
-
-
-        self.dlg.btn_catalog.pressed.connect(partial(self.catalog, 'ws', 'node'))
+        self.dlg.btn_catalog.pressed.connect(partial(self.catalog, self.project_type, 'node'))
         self.dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
 
@@ -540,7 +538,7 @@ class Edit(ParentAction):
 
         # Get selected value from 2nd combobox
         node_node_type_new = utils_giswater.getWidgetText(self.new_node_type)
-        self.new_nodecat_id.clear()
+
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
             # Get selected value from 2nd combobox
@@ -562,30 +560,34 @@ class Edit(ParentAction):
         node_nodecat_id = utils_giswater.getWidgetText("node_nodecat_id")
 
         if node_node_type_new != "null":
-            sql = "SELECT man_table FROM  " + self.schema_name + ".node_type WHERE id = '" + old_node_type + "'"
-            row = self.controller.get_row(sql)
-            if not row:
-                return
+            if (node_nodecat_id != "null" and self.project_type == 'ws') or (self.project_type == 'ud'):
+                sql = "SELECT man_table FROM  " + self.schema_name + ".node_type WHERE id = '" + old_node_type + "'"
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
 
-            # Delete from current table
-            sql = "DELETE FROM "+self.schema_name + "." + row[0] + " WHERE node_id ='" + self.node_id + "'"
-            self.controller.execute_sql(sql)
+                # Delete from current table
+                sql = "DELETE FROM "+self.schema_name + "." + row[0] + " WHERE node_id ='" + self.node_id + "'"
+                self.controller.execute_sql(sql)
 
-            sql = "SELECT man_table FROM "+self.schema_name + ".node_type WHERE id ='" + node_node_type_new + "'"
-            row = self.controller.get_row(sql)
-            if not row:
-                return
+                sql = "SELECT man_table FROM "+self.schema_name + ".node_type WHERE id ='" + node_node_type_new + "'"
+                row = self.controller.get_row(sql)
+                if not row:
+                    return
 
-            # Insert into new table
-            sql = "INSERT INTO " + self.schema_name + "." + row[0] + "(node_id)"
-            sql += " VALUES (" + self.node_id + ")"
-            self.controller.execute_sql(sql)
+                # Insert into new table
+                sql = "INSERT INTO " + self.schema_name + "." + row[0] + "(node_id)"
+                sql += " VALUES (" + self.node_id + ")"
+                self.controller.execute_sql(sql)
 
-            # Update field 'nodecat_id'
-            sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
-            sql += " WHERE node_id = '" + self.node_id + "'"
-            self.controller.execute_sql(sql)
-
+                # Update field 'nodecat_id'
+                if self.project_type == 'ws':
+                    sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
+                    sql += " WHERE node_id = '" + self.node_id + "'"
+                    self.controller.execute_sql(sql)
+            else:
+                message = "Field catalog_id required!"
+                self.controller.show_warning(message)
         else:
             message = "The node has not been updated because no catalog has been selected!"
             self.controller.show_warning(message)
