@@ -608,6 +608,7 @@ class Giswater(QObject):
         self.layer_connec = None
         self.layer_connec_man_ud = []
         self.layer_connec_man_ws = []
+        self.layer_gully_man_ud = []     
 
         self.layer_gully = None
         self.layer_pgully = None
@@ -698,6 +699,9 @@ class Giswater(QObject):
                     self.layer_arc_man_ud.append(cur_layer)
                 if 'v_edit_man_waccel' == uri_table:
                     self.layer_arc_man_ud.append(cur_layer)
+                    
+                if 'v_edit_man_gully' == uri_table:
+                    self.layer_arc_man_ud.append(cur_layer)                    
                     
                 if 'v_edit_man_pipe' == uri_table:
                     self.layer_arc_man_ws.append(cur_layer)
@@ -851,7 +855,7 @@ class Giswater(QObject):
                 map_tool.set_layers(self.layer_arc_man_ws, self.layer_connec_man_ws, self.layer_node_man_ws)
                 map_tool.set_controller(self.controller)
             else:
-                map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud)
+                map_tool.set_layers(self.layer_arc_man_ud, self.layer_connec_man_ud, self.layer_node_man_ud, self.layer_gully_man_ud)
                 map_tool.set_controller(self.controller)
 
        
