@@ -495,8 +495,9 @@ class Master(ParentAction):
             return
         row = selected_list[0].row()
         psector_id = self.tbl_psm.model().record(row).value("psector_id")
-        self.master_new_psector(psector_id, True)
         self.close_dialog()
+        self.master_new_psector(psector_id, True)
+
 
 
     def snapping(self, layer_view, tablename, table_view, elem_type):
