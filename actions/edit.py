@@ -22,12 +22,12 @@ sys.path.append(plugin_path)
 import utils_giswater
 
 from ..ui.change_node_type import ChangeNodeType    # @UnresolvedImport  
-from ..ui.add_doc import AddDoc                    # @UnresolvedImport
-from ..ui.add_element import AddElement            # @UnresolvedImport             
+from ..ui.add_doc import AddDoc                     # @UnresolvedImport
+from ..ui.add_element import AddElement             # @UnresolvedImport             
 from ..ui.config_edit import ConfigEdit             # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools       # @UnresolvedImport
-from ..ui.ud_catalog import UDcatalog
-from ..ui.ws_catalog import WScatalog
+from ..ui.ud_catalog import UDcatalog               # @UnresolvedImport
+from ..ui.ws_catalog import WScatalog               # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -36,6 +36,7 @@ class Edit(ParentAction):
 
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control toolbar 'edit' """
+        
         self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         # Get tables or views specified in 'db' config section
@@ -107,15 +108,17 @@ class Edit(ParentAction):
 
 
     def edit_arc_topo_repair(self):
-        """ Button 19. Topology repair """
+        """ Button 19: Topology repair """
 
         # Uncheck all actions (buttons) except this one
         self.controller.check_actions(False)
         self.controller.check_action(True, 19)
+        
         # Create dialog to check wich topology functions we want to execute
         self.dlg = TopologyTools()
         if self.project_type == 'ws':
             self.dlg.tab_review.removeTab(1)
+            
         # Set signals
         self.dlg.btn_accept.clicked.connect(self.edit_arc_topo_repair_accept)
         self.dlg.btn_cancel.clicked.connect(self.close_dialog)
@@ -126,7 +129,7 @@ class Edit(ParentAction):
 
 
     def edit_arc_topo_repair_accept(self):
-        """ Button 19. Executes functions that are selected """
+        """ Button 19: Executes functions that are selected """
 
         # Review/Utils
         if self.dlg.check_node_orphan.isChecked():
@@ -727,7 +730,6 @@ class Edit(ParentAction):
         # Get SRID
         srid = self.controller.plugin_settings_value('srid')   
 
-        
         # Check if we already have data with selected element_id
         sql = "SELECT DISTINCT(element_id) FROM " + self.schema_name + ".element WHERE element_id = '" + str(element_id) + "'"
         row = self.dao.get_row(sql)

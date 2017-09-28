@@ -508,6 +508,11 @@ class Giswater(QObject):
         ''' Search in layer 'version' project type (field 'wsoftware') of current QGIS project '''
         
         try:
+            self.go2epa.set_controller(self.controller)            
+            self.basic.set_controller(self.controller)            
+            self.edit.set_controller(self.controller)            
+            self.master.set_controller(self.controller)            
+            self.mincut.set_controller(self.controller)            
             self.show_toolbars(True)
             self.go2epa.set_project_type(None)
             self.basic.set_project_type(None)
@@ -527,7 +532,8 @@ class Giswater(QObject):
                     self.plugin_toolbars['om_ud'].toolbar.setVisible(True)                   
                     self.plugin_toolbars['om_ws'].toolbar.setVisible(False)          
                 self.wsoftware = wsoftware.lower()
-                
+                break 
+            
         except Exception as e:
             self.controller.log_info("search_project_type - Exception: "+str(e))
             pass                  

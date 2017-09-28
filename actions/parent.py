@@ -43,6 +43,13 @@ class ParentAction():
             self.gsw_file = self.controller.plugin_settings_value('gsw_file')   
     
     
+    def set_controller(self, controller):
+        """ Set controller class """
+        
+        self.controller = controller
+        self.schema_name = self.controller.schema_name       
+        
+    
     def get_plugin_version(self):
         ''' Get plugin version from metadata.txt file '''
                
