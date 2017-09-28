@@ -38,12 +38,15 @@ class SearchPlus(QObject):
         self.dlg.adress_street.activated.connect(partial(self.address_zoom_street))
         self.dlg.adress_number.activated.connect(partial(self.address_zoom_portal))
 
-        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
-        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
-
         self.dlg.network_geom_type.activated.connect(partial(self.network_geom_type_changed))
         self.dlg.network_code.activated.connect(partial(self.network_zoom, 'code', self.dlg.network_code, self.dlg.network_geom_type))
         self.dlg.network_code.editTextChanged.connect(partial(self.filter_by_list, self.dlg.network_code))
+
+        self.dlg.hydrometer_connec.activated.connect(partial(self.hydrometer_get_hydrometers))
+        self.dlg.hydrometer_id.activated.connect(partial(self.hydrometer_zoom, self.params['hydrometer_urban_propierties_field_code'], self.dlg.hydrometer_id))
+         # TODO "filtros" descomentar para que el filtrado funcione
+        #self.dlg.hydrometer_id.editTextChanged.connect(partial(self.filter_by_list, self.dlg.hydrometer_id))
+
         self.enabled = True
 
 
@@ -237,7 +240,6 @@ class SearchPlus(QObject):
             list_codes = self.list_node
         else:
             list_codes = self.list_all
-
         self.set_model_by_list(list_codes, self.dlg.network_code)
         
         return True
@@ -262,7 +264,7 @@ class SearchPlus(QObject):
         widget.setCompleter(completer)
         
         # TODO buscar como filtrar cuando no existe, que no muestre todos, sino que no muestre ninguno
-        self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
+        #self.controller.log_info(str(self.proxy_model.filterCaseSensitivity()))
 
 
     def filter_by_list(self, widget):
@@ -355,11 +357,17 @@ class SearchPlus(QObject):
                 records.append(elem)
                   
         # Fill hydrometers
-        records_sorted = sorted(records, key = operator.itemgetter(1))           
+        records_sorted = sorted(records, key=operator.itemgetter(1))
         self.dlg.hydrometer_id.blockSignals(True)
         self.dlg.hydrometer_id.clear()
+        hydrometer_list = []
         for record in records_sorted:
             self.dlg.hydrometer_id.addItem(str(record[1]), record)
+            # TODO "filtros" descomentar para que el filtrado funcione
+            if record[1] != '':
+                hydrometer_list.append(str(record[1]))
+        # TODO "filtros" descomentar para que el filtrado funcione
+        # self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
         self.dlg.hydrometer_id.blockSignals(False)  
                 
         
@@ -378,7 +386,7 @@ class SearchPlus(QObject):
             return False      
         it = layer.getFeatures(QgsFeatureRequest(expr))
         ids = [i.id() for i in it]
-        layer.selectByIds(ids)    
+        layer.selectByIds(ids)
 
         # Zoom to selected feature of the layer
         self.zoom_to_selected_feature(self.layers['hydrometer_urban_propierties_layer'])
@@ -441,7 +449,7 @@ class SearchPlus(QObject):
         layer = self.layers['portal_layer'] 
         idx_field_code = layer.fieldNameIndex(self.params['portal_field_code'])            
         idx_field_number = layer.fieldNameIndex(self.params['portal_field_number'])   
-        aux = self.params['portal_field_code'] +"  = '" + str(code) + "'" 
+        aux = self.params['portal_field_code'] + "  = '" + str(code) + "'"
         
         # Check filter and existence of fields
         expr = QgsExpression(aux)     
@@ -613,11 +621,17 @@ class SearchPlus(QObject):
         # Fill combo box
         combo.blockSignals(True)
         combo.clear()
-        records_sorted = sorted(records, key = operator.itemgetter(1)) 
-        combo.addItem('', '')                 
+        records_sorted = sorted(records, key=operator.itemgetter(1))
+        combo.addItem('', '')
+        hydrometer_list = []
         for i in range(len(records_sorted)):
             record = records_sorted[i]
             combo.addItem(str(record[1]), record)
+            # TODO "filtros" descomentar para que el filtro funcione
+            if record[1] != '':
+                hydrometer_list.append(record[1])
+        # TODO "filtros" descomentar para que el filtro funcione
+        # self.set_model_by_list(hydrometer_list, self.dlg.hydrometer_id)
         combo.blockSignals(False)     
         
         return True
