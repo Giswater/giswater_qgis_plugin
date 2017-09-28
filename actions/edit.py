@@ -222,10 +222,16 @@ class Edit(ParentAction):
         utils_giswater.setDialog(self.dlg)
 
         self.dlg.node_node_type.setText(node_type)
-        self.dlg.node_node_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
 
-        self.new_selected_type = self.dlg.findChild(QComboBox, "node_node_type_new")
-        self.new_node_nodecat_id = self.dlg.findChild(QComboBox, "node_nodecat_id")
+        self.new_node_type = self.dlg.findChild(QComboBox, "node_node_type_new")
+        self.new_nodecat_id = self.dlg.findChild(QComboBox, "node_nodecat_id")
+
+        self.new_node_type.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
+
+
+
+
+
 
         self.dlg.btn_catalog.pressed.connect(partial(self.catalog, 'ws', 'node'))
         self.dlg.btn_accept.pressed.connect(self.edit_change_elem_type_accept)
@@ -234,7 +240,7 @@ class Edit(ParentAction):
         # Fill 1st combo boxes-new system node type
         sql = "SELECT DISTINCT(id) FROM " + self.schema_name + ".node_type ORDER BY id"
         rows = self.dao.get_rows(sql)
-        utils_giswater.fillComboBox("node_node_type_new", rows)
+        utils_giswater.fillComboBox(self.new_node_type, rows)
 
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'change_node_type')
@@ -245,7 +251,7 @@ class Edit(ParentAction):
     def catalog(self, wsoftware, geom_type, node_type=None):
         """ Set dialog depending water software """
 
-        node_type = self.new_selected_type.currentText()
+        node_type = self.new_node_type.currentText()
         if wsoftware == 'ws':
             self.dlg_cat = WScatalog()
             self.field2 = 'pnom'
@@ -421,8 +427,8 @@ class Edit(ParentAction):
     def fill_geomcat_id(self, geom_type):
         catalog_id = utils_giswater.getWidgetText(self.dlg_cat.id)
         self.close_dialog(self.dlg_cat)
-        self.new_node_nodecat_id.setEnabled(True)
-        utils_giswater.setWidgetText(self.new_node_nodecat_id, catalog_id)
+        self.new_nodecat_id.setEnabled(True)
+        utils_giswater.setWidgetText(self.new_nodecat_id, catalog_id)
 
 
     def edit_add_element(self):
@@ -529,23 +535,23 @@ class Edit(ParentAction):
 
     def edit_change_elem_type_get_value(self, index):
         """ Just select item to 'real' combo 'nodecat_id' (that is hidden) """
-
         if index == -1:
             return
 
         # Get selected value from 2nd combobox
-        node_node_type_new = utils_giswater.getWidgetText("node_node_type_new")
-
+        node_node_type_new = utils_giswater.getWidgetText(self.new_node_type)
+        self.new_nodecat_id.clear()
         # When value is selected, enabled 3rd combo box
         if node_node_type_new != 'null':
             # Get selected value from 2nd combobox
-            utils_giswater.setWidgetEnabled("node_nodecat_id")
+            utils_giswater.setWidgetEnabled(self.new_nodecat_id)
+
             # Fill 3rd combo_box-catalog_id
             sql = "SELECT DISTINCT(id)"
             sql += " FROM " + self.schema_name + ".cat_node"
             sql += " WHERE nodetype_id = '" + node_node_type_new + "'"
             rows = self.dao.get_rows(sql)
-            utils_giswater.fillComboBox("node_nodecat_id", rows)
+            utils_giswater.fillComboBox(self.new_nodecat_id, rows)
 
 
     def edit_change_elem_type_accept(self):
