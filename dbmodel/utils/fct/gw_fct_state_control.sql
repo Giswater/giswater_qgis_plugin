@@ -35,7 +35,7 @@ BEGIN
 		SELECT state INTO old_state_aux FROM arc WHERE arc_id=feature_id_aux;
 		IF state_aux!=old_state_aux THEN
 			SELECT count(connec_id) INTO num_connecs FROM v_edit_connec, v_edit_arc WHERE v_edit_connec.arc_id=feature_id_aux AND v_edit_connec.state!=0;
-			IF num_arcs > 0 THEN 
+			IF num_connecs > 0 THEN 
 				RAISE EXCEPTION 'Before downgrade the arc to state 0, please disconnect the associated connecs, arc_id= %',feature_id_aux;
 			END IF;
 		END IF;
