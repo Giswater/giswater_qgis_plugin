@@ -46,11 +46,6 @@ concat((select value from config_param_system where parameter='hydrometer_link_a
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::integer = rtc_hydrometer.hydrometer_id::integer
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text;
 
-FROM rtc_hydrometer
-LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::integer = rtc_hydrometer.hydrometer_id::integer
-LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id = ext_rtc_hydrometer.cat_hydrometer_id
-JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::integer = rtc_hydrometer.hydrometer_id::integer
-JOIN  connec ON rtc_hydrometer_x_connec.connec_id=connec.connec_id;
 
 
 
