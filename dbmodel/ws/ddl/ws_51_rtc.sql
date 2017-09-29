@@ -13,7 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- --------------------------
 
 CREATE TABLE "rtc_hydrometer" (
-hydrometer_id character varying(16) NOT NULL PRIMARY KEY
+hydrometer_id character varying(16) NOT NULL PRIMARY KEY,
+link text
 );
 
 

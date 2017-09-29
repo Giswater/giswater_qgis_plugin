@@ -24,21 +24,27 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer AS
 SELECT
 rtc_hydrometer.hydrometer_id,
 rtc_hydrometer_x_connec.connec_id,
-connec.code as urban_propierties_code,
-    ext_rtc_hydrometer.code,
-    ext_rtc_hydrometer.hydrometer_category,
-    ext_rtc_hydrometer.house_number,
-    ext_rtc_hydrometer.id_number,
-    ext_rtc_hydrometer.cat_hydrometer_id,
-    ext_rtc_hydrometer.hydrometer_number,
-    ext_rtc_hydrometer.identif,
-    ext_cat_hydrometer.id,
-    ext_cat_hydrometer.madeby,
-    ext_cat_hydrometer.class,
-    ext_cat_hydrometer.ulmc,
-    ext_cat_hydrometer.voltman_flow,
-    ext_cat_hydrometer.multi_jet_flow,
-    ext_cat_hydrometer.dnom
+connec.code AS urban_propierties_code,
+ext_rtc_hydrometer.code,
+ext_rtc_hydrometer.hydrometer_category,
+ext_rtc_hydrometer.house_number,
+ext_rtc_hydrometer.id_number,
+ext_rtc_hydrometer.cat_hydrometer_id,
+ext_rtc_hydrometer.hydrometer_number,
+ext_rtc_hydrometer.identif,
+ext_cat_hydrometer.id,
+ext_cat_hydrometer.madeby,
+ext_cat_hydrometer.class,
+ext_cat_hydrometer.ulmc,
+ext_cat_hydrometer.voltman_flow,
+ext_cat_hydrometer.multi_jet_flow,
+ext_cat_hydrometer.dnom,
+concat((select value from config_param_system where parameter='hydrometer_link_absolute_path'),rtc_hydrometer.link) as hydrometer_link
+   FROM rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::integer = rtc_hydrometer.hydrometer_id::integer
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.cat_hydrometer_id
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::integer = rtc_hydrometer.hydrometer_id::integer
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text;
 
 FROM rtc_hydrometer
 LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::integer = rtc_hydrometer.hydrometer_id::integer
