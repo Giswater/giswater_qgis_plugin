@@ -1036,7 +1036,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="result_id_2">
+   <widget class="QLineEdit" name="result_mincut_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
