@@ -98,7 +98,6 @@ BEGIN
                 arcrec.y2 := z_aux;
                 arcrec.node_1 := nodeRecord2.node_id;
                 arcrec.node_2 := nodeRecord1.node_id;                             
-                RETURN;
 
                 UPDATE arc SET the_geom=arcrec.the_geom, y1=arcrec.y1, y2=arcrec.y2, 
                 node_1=arcrec.node_1, node_2=arcrec.node_2 where arc_id=arcrec.arc_id;    
