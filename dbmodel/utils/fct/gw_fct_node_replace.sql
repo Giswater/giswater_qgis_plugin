@@ -1,13 +1,21 @@
-﻿
+﻿/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+
+DROP FUNCTION SCHEMA_NAME.gw_fct_node_replace(character varying);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_replace(
-    old_node_id_aux character varying,
-    table_aux character varying)
+    old_node_id_aux character varying)
   RETURNS integer AS
 $BODY$
 DECLARE
 
 	the_geom_aux public.geometry;
 	query_string_select text;
+	query_string_insert text;
 	query_string_update text;
 	arc_id_aux varchar;
 	new_node_id_aux varchar;
@@ -15,26 +23,55 @@ DECLARE
 	value_aux text;
 	state_aux integer;
 	rec_arc record;	
+	project_type_aux varchar;
+	nodetype_aux varchar;
+	nodecat_aux varchar;
+	man_table_aux varchar;
+	epa_table_aux varchar;
 
+	
+	
 BEGIN
 
 	-- Search path
 	SET search_path = 'SCHEMA_NAME', public;
 
 	-- values
+	SELECT wsoftware INTO project_type_aux FROM version LIMIT 1;
+	IF project_type_aux='WS' then
+		SELECT nodetype_id INTO  nodetype_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	ELSE 
+		SELECT node_type INTO nodetype_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	END IF;
+	SELECT nodecat_id INTO nodecat_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
 	SELECT the_geom INTO the_geom_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
 	SELECT state INTO state_aux FROM v_edit_node WHERE node_id=old_node_id_aux;
+	
 
 	-- Control of state(1)
 	IF (state_aux=0 OR state_aux=2 OR state_aux IS NULL) THEN
 		RAISE EXCEPTION 'The feature not have state(1) value to be replaced, state = %', state_aux;
 	ELSE
 
-		-- inserting new feature
-		INSERT INTO v_edit_node (state, the_geom) VALUES (0, the_geom_aux) returning node_id into new_node_id_aux;
-		raise notice 'new_node_id_aux %',new_node_id_aux;
+		-- inserting new feature on table node
+		IF project_type_aux='WS' then
+			INSERT INTO node (node_id, nodecat_id, state, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodecat_aux, 0, the_geom_aux) returning node_id into new_node_id_aux;
+		ELSE 
+			INSERT INTO node (node_id, node_type, nodecat_id, state, the_geom) VALUES ((SELECT nextval('urn_id_seq')), nodetype_aux, nodecat_aux, 0, the_geom_aux) returning node_id into new_node_id_aux;
+		END IF;
+		
+		-- inserting new feature on table man_table
+		SELECT man_table INTO man_table_aux FROM node_type WHERE id=nodetype_aux;
+		query_string_insert='INSERT INTO '||man_table_aux||' VALUES ('||new_node_id_aux||');';
+		execute query_string_insert;
+		
+		-- inserting new feature on table epa_table
+		SELECT epa_table INTO epa_table_aux FROM node_type WHERE id=nodetype_aux;		
+		query_string_insert='INSERT INTO '||epa_table_aux||' VALUES ('||new_node_id_aux||');';
+		execute query_string_insert;
+		
 
-		-- taking vaules from old feature (from table node)
+		-- updating values on table node from vaules of old feature
 		FOR column_aux IN select column_name    FROM information_schema.columns 
 							where (table_schema='SCHEMA_NAME' and udt_name <> 'inet' and 
 							table_name='node') and column_name!='node_id' and column_name!='the_geom' and column_name!='state'
@@ -53,23 +90,34 @@ BEGIN
 		END LOOP;
 
 
-
-
-		
-		-- taking values from old feature (from v_edit_man table)
+		-- updating values on table man_table from vaules of old feature
 		FOR column_aux IN select column_name    FROM information_schema.columns 
 							where (table_schema='SCHEMA_NAME' and udt_name <> 'inet' and 
-							table_name=table_aux) and column_name!='node_id' and column_name!='the_geom' and column_name!='state'
+							table_name=man_table_aux) and column_name!='node_id'
 		LOOP
-			query_string_select= 'SELECT '||column_aux||' FROM '||table_aux||' where node_id='||quote_literal(old_node_id_aux)||';';
+			query_string_select= 'SELECT '||column_aux||' FROM '||man_table_aux||' where node_id='||quote_literal(old_node_id_aux)||';';
 			IF query_string_select IS NOT NULL THEN
 				EXECUTE query_string_select INTO value_aux;	
-				raise notice 'value_aux %',value_aux;
 			END IF;
 			
-			query_string_update= 'UPDATE '||table_aux||' set '||column_aux||'='||quote_literal(value_aux)||' where node_id='||quote_literal(new_node_id_aux)||';';
+			query_string_update= 'UPDATE '||man_table_aux||' set '||column_aux||'='||quote_literal(value_aux)||' where node_id='||quote_literal(new_node_id_aux)||';';
 			IF query_string_update IS NOT NULL THEN
-				raise notice 'query_string_update %',query_string_update;
+				EXECUTE query_string_update; 
+			END IF;
+		END LOOP;
+
+		-- updating values on table epa_table from vaules of old feature
+		FOR column_aux IN select column_name    FROM information_schema.columns 
+							where (table_schema='SCHEMA_NAME' and udt_name <> 'inet' and 
+							table_name=epa_table_aux) and column_name!='node_id'
+		LOOP
+			query_string_select= 'SELECT '||column_aux||' FROM '||epa_table_aux||' where node_id='||quote_literal(old_node_id_aux)||';';
+			IF query_string_select IS NOT NULL THEN
+				EXECUTE query_string_select INTO value_aux;	
+			END IF;
+			
+			query_string_update= 'UPDATE '||epa_table_aux||' set '||column_aux||'='||quote_literal(value_aux)||' where node_id='||quote_literal(new_node_id_aux)||';';
+			IF query_string_update IS NOT NULL THEN
 				EXECUTE query_string_update; 
 			END IF;
 		END LOOP;
@@ -82,9 +130,7 @@ BEGIN
 		-- reconnecting arcs
 		-- Dissable config parameter arc_searchnodes
 		UPDATE config SET arc_searchnodes_control=FALSE;
-		RAISE NOTICE 'PERICO';
-
-		
+			
 		FOR rec_arc IN SELECT arc_id FROM arc WHERE node_1=old_node_id_aux
 		LOOP
 			UPDATE arc SET node_1=new_node_id_aux where arc_id=rec_arc.arc_id;
@@ -110,5 +156,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION SCHEMA_NAME.gw_fct_node_replace(character varying, character varying)
-  OWNER TO postgres;
+
