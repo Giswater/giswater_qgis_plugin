@@ -265,7 +265,10 @@ CREATE TABLE "plan_result_arc" (
 "protec_cost" numeric(12,2),
 "fill_cost" numeric(12,2),
 "arc_cost" numeric(12,2),
-"cost " numeric(12,2)
+"cost " numeric(12,2),
+"budget" numeric(12,2),
+"total_other" numeric(12,2),
+"total_cost" numeric(12,2)
 );
 
 

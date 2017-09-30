@@ -108,6 +108,9 @@ CREATE TABLE "cat_connec" (
 "brand" varchar(30)  ,
 "model" varchar(30)  ,
 "svg" varchar(50),
+"cost_ut" character varying(16),
+"cost_ml" character varying(16),
+"cost_m3" character varying(16),
 "active" boolean,
 CONSTRAINT cat_connec_pkey PRIMARY KEY (id)
 );

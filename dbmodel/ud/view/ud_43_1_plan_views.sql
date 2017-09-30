@@ -180,5 +180,62 @@ UNION
    JOIN v_price_compost ON cat_pavement.m2_cost = v_price_compost.id
 
    order by arc_id,catalog_id
+   
+   
+   
+DROP VIEW IF EXISTS "v_price_x_catconnec1" CASCADE;
+CREATE OR REPLACE VIEW v_price_x_catconnec1 AS 
+SELECT 
+cat_connec.id,
+v_price_compost.price AS cost_ut
+FROM cat_connec
+    JOIN v_price_compost ON cat_connec.cost_ut = v_price_compost.id;
 
+	
+	
+	
+DROP VIEW IF EXISTS "v_price_x_catconnec2" CASCADE;	
+CREATE OR REPLACE VIEW v_price_x_catconnec2 AS 
+SELECT
+cat_connec.id,
+v_price_compost.price AS cost_m3trench
+FROM cat_connec
+    JOIN v_price_compost ON cat_connec.cost_m3 = v_price_compost.id;
+
+
+	
+DROP VIEW IF EXISTS "v_price_x_catconnec3" CASCADE;	
+CREATE OR REPLACE VIEW v_price_x_catconnec3 AS 
+SELECT 
+cat_connec.id,
+v_price_compost.price AS cost_mlconnec
+FROM cat_connec
+	JOIN v_price_compost ON cat_connec.cost_ml = v_price_compost.id;
+
+	
+	
+DROP VIEW IF EXISTS "v_price_x_catconnec" CASCADE;
+CREATE OR REPLACE VIEW v_price_x_catconnec AS 
+SELECT 
+v_price_x_catconnec1.id,
+v_price_x_catconnec1.cost_ut,
+v_price_x_catconnec2.cost_m3trench,
+v_price_x_catconnec3.cost_mlconnec
+FROM v_price_x_catconnec1
+	JOIN v_price_x_catconnec2 ON v_price_x_catconnec2.id::text = v_price_x_catconnec1.id::text
+	JOIN v_price_x_catconnec3 ON v_price_x_catconnec3.id::text = v_price_x_catconnec1.id::text;
+
+	
+
+DROP VIEW IF EXISTS "v_price_x_catgrate" CASCADE;
+CREATE OR REPLACE VIEW v_price_x_catgrate AS 
+SELECT 
+id,
+price_compost.price
+FROM cat_grage
+	JOIN v_price_compost ON cat_grate.cost_ut = v_price_compost.id;
+
+
+
+	
 
