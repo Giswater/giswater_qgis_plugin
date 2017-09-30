@@ -279,7 +279,7 @@ CREATE TABLE "inp_options" (
 "unbalanced_n" numeric(12,6),
 "node_id" varchar(16),
 "valve_mode" varchar (18),
-"valve_mode_mincut_result" varchar(30),
+"valve_mode_mincut_result" integer,
 "rtc_enabled" boolean,
 "rtc_period_id" varchar(16),
 "rtc_coefficient" varchar(16)
