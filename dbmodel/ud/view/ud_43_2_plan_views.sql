@@ -154,15 +154,19 @@ v_price_x_catsoil.trenchlining,
 sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
-arc.the_geom
-
+arc.the_geom,
+expl_id
 FROM v_edit_arc arc
 	JOIN v_arc_x_node ON ((((arc.arc_id) = (v_arc_x_node.arc_id))))
 	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id) = (v_price_x_catarc.id))))
 	LEFT JOIN v_price_x_catsoil ON ((((arc.soilcat_id) = (v_price_x_catsoil.id))))
 	LEFT JOIN plan_arc_x_pavement ON ((((plan_arc_x_pavement.arc_id) = (arc.arc_id))))
 	LEFT JOIN v_price_x_catpavement ON ((((v_price_x_catpavement.pavcat_id) = (plan_arc_x_pavement.pavcat_id))))
-	GROUP BY arc.arc_id, v_arc_x_node.y1, v_arc_x_node.y2, mean_y,arc.arccat_id, v_price_x_catarc.geom1,v_price_x_catarc.z1,v_price_x_catarc.z2,v_price_x_catarc.area,v_price_x_catarc.width,v_price_x_catarc.bulk, cost_unit, arc_cost, m2bottom_cost, m3protec_cost, v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom;
+	GROUP BY arc.arc_id, v_arc_x_node.y1, v_arc_x_node.y2, mean_y,arc.arccat_id, 
+	v_price_x_catarc.geom1,v_price_x_catarc.z1,v_price_x_catarc.z2,v_price_x_catarc.area,
+	v_price_x_catarc.width,v_price_x_catarc.bulk, cost_unit, arc_cost, m2bottom_cost, 
+	m3protec_cost, v_price_x_catsoil.id, y_param, b, trenchlining, m3exc_cost, m3fill_cost, 
+	m3excess_cost, m2trenchl_cost,arc.state, arc.the_geom, expl_id;
 	
 
 -- ----------------------------
@@ -216,11 +220,47 @@ v_plan_ml_arc.b*2+(v_plan_ml_arc.width))/2)
 FROM v_plan_ml_arc;
 
 
+
+
+
+
 -- ----------------------------
--- View structure for v_plan_cost_arc
+-- View structure for v_plan_connec_x_arc
 -- ----------------------------
-DROP VIEW IF EXISTS "v_plan_cost_arc" CASCADE;
-CREATE VIEW "v_plan_cost_arc" AS 
+DROP VIEW IF EXISTS "v_plan_connec_x_arc" CASCADE;
+CREATE VIEW v_plan_connec_x_arc as
+select distinct (arc_id)
+arc_id,
+(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.333)+cost_ut)::numeric(12,2) AS connec_total_cost
+from connec
+join v_price_x_catconnec on id=connecat_id
+join link on feature_id=connec_id 
+join vnode on vnode.vnode_id=link.vnode_id 
+group by arc_id;
+	
+
+
+
+-- ----------------------------
+-- View structure for v_plan_gully_x_arc
+-- ----------------------------
+DROP VIEW IF EXISTS "v_plan_gully_x_arc" CASCADE;
+CREATE VIEW v_plan_gully_x_arc as
+select distinct (arc_id)
+arc_id,
+(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.333)+cost_ut*(1+ymax))::numeric(12,2) AS gully_total_cost
+from gully
+join v_price_x_catconnec on v_price_x_catconnec.id=connecat_id
+join v_price_x_catgrate on v_price_x_catgrate.id=gratecat_id
+group by arc_id;
+
+
+
+-- ----------------------------
+-- View structure for v_plan_arc
+-- ----------------------------
+DROP VIEW IF EXISTS "v_plan_arc" CASCADE;
+CREATE VIEW "v_plan_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
 v_plan_ml_arc.arccat_id,
@@ -283,65 +323,6 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
 + v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
-+ v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost
-
-FROM v_plan_ml_arc
-	JOIN v_plan_mlcost_arc ON v_plan_ml_arc.arc_id = v_plan_mlcost_arc.arc_id;
-	
-
-
-	
-
--- ----------------------------
--- View structure for v_plan_connec_x_arc
--- ----------------------------
-DROP VIEW IF EXISTS "v_plan_connec_x_arc" CASCADE;
-CREATE VIEW v_plan_connec_x_arc as
-select distinct (arc_id)
-arc_id,
-(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.333)+cost_ut)::numeric(12,2) AS connec_total_cost
-from connec
-join v_price_x_catconnec on id=connecat_id
-join link on feature_id=connec_id 
-join vnode on vnode.vnode_id=link.vnode_id 
-group by arc_id;
-	
-
-
-
--- ----------------------------
--- View structure for v_plan_gully_x_arc
--- ----------------------------
-DROP VIEW IF EXISTS "v_plan_gully_x_arc" CASCADE;
-CREATE VIEW v_plan_gully_x_arc as
-select distinct (arc_id)
-arc_id,
-(connec_length*(cost_mlconnec+cost_m3trench*connec_depth*0.333)+cost_ut*(1+ymax))::numeric(12,2) AS gully_total_cost
-from gully
-join v_price_x_catconnec on v_price_x_catconnec.id=connecat_id
-join v_price_x_catgrate on v_price_x_catgrate.id=gratecat_id
-group by arc_id;
-
-
-
--- ----------------------------
--- View structure for v_plan_arc
--- ----------------------------
-DROP VIEW IF EXISTS "v_plan_arc" CASCADE;
-CREATE VIEW "v_plan_arc" AS 
-SELECT
-v_plan_ml_arc.arc_id,
-v_plan_ml_arc.arccat_id,
-v_plan_ml_arc.cost_unit,
-
-(CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN v_plan_ml_arc.arc_cost ELSE
-(v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
-+ v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
-+ v_plan_mlcost_arc.m2mltrenchl*v_plan_mlcost_arc.m2trenchl_cost
-+ v_plan_mlcost_arc.m3mlprotec*v_plan_mlcost_arc.m3protec_cost
-+ v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
-+ v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
-+ v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost,
 
 (CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE (st_length2d(v_plan_ml_arc.the_geom)) END)::numeric(12,2)							AS length,
@@ -354,7 +335,7 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
 + v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
-+ v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS total_cost,
++ v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
 
 connec_total_cost+gully_total_cost as other_total_cost,
 
@@ -368,13 +349,18 @@ CASE
     END::numeric(14,2) AS budget, 
 
 v_plan_ml_arc."state",
-v_plan_ml_arc.the_geom
+v_plan_ml_arc.the_geom,
+v_plan_ml_arc.expl_id
 
-FROM v_plan_ml_arc
+FROM selector_expl, v_plan_ml_arc
 	JOIN v_plan_mlcost_arc ON v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id
     LEFT JOIN v_plan_connec_x_arc ON v_plan_connec_x_arc.arc_id = v_plan_mlcost_arc.arc_id
-	LEFT JOIN v_plan_gully_x_arc ON v_plan_gully_x_arc.arc_id = v_plan_mlcost_arc.arc_id;
+	LEFT JOIN v_plan_gully_x_arc ON v_plan_gully_x_arc.arc_id = v_plan_mlcost_arc.arc_id
+	WHERE ((arc.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"() ;
 
+
+	
 
 
 
@@ -393,10 +379,13 @@ v_price_x_catnode.cost_unit,
 v_price_x_catnode.cost,
 (CASE WHEN (v_price_x_catnode.cost_unit='u') THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.ymax*1=0::numeric) THEN v_price_x_catnode.estimated_y::numeric(12,2) ELSE ((node.ymax)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
 node."state",
-node.the_geom
+node.the_geom,
+node.expl_id
+FROM selector_expl, v_edit_node node
+	LEFT JOIN v_price_x_catnode ON node.nodecat_id = v_price_x_catnode.id
+	WHERE ((arc.expl_id)=(selector_expl.expl_id)
+	AND selector_expl.cur_user="current_user"() ;
 
-FROM (v_edit_node node
-LEFT JOIN v_price_x_catnode ON node.nodecat_id = v_price_x_catnode.id;
 
 
 
@@ -407,8 +396,8 @@ DROP VIEW IF EXISTS "v_plan_arc_x_psector" CASCADE;
 CREATE VIEW "v_plan_arc_x_psector" AS 
 SELECT
 
-v_edit_arc.arc_id,
-v_edit_arc.arccat_id,
+arc.arc_id,
+arc.arccat_id,
 v_plan_arc.cost_unit,
 (v_plan_arc.cost)::numeric (14,2) AS cost,
 v_plan_arc.length,
@@ -418,10 +407,10 @@ v_plan_arc.budget,
 v_plan_arc.other_total_cost,
 v_plan_arc.total_budget,
 plan_arc_x_psector.psector_id,
-v_edit_arc."state",
+arc."state",
 plan_arc_x_psector.atlas_id,
-v_edit_arc.the_geom
-FROM selector_expl, v_edit_arc
+arc.the_geom
+FROM selector_expl, v_edit_arc arc
 JOIN cat_arc ON arc.arccat_id = cat_arc.id
 JOIN plan_arc_x_psector ON plan_arc_x_psector.arc_id = arc.arc_id
 JOIN v_plan_arc ON arc.arc_id = v_plan_arc.arc_id
@@ -704,3 +693,42 @@ DROP VIEW IF EXISTS "v_plan_psector_filtered" CASCADE;
 				   
 				   
 				GROUP BY wtotal.psector_id, wtotal.atlas_id, wtotal.the_geom;
+				
+				
+
+--------------------------------
+-- plan result views
+--------------------------------
+DROP VIEW IF EXISTS "v_plan_result_node" CASCADE;			
+CREATE OR REPLACE VIEW 'v_plan_result_node' AS
+SELECT
+*
+FROM selector_expl, plan_result_node
+WHERE plan_result_node.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"()
+
+UNION
+SELECT
+* 
+FROM selector_expl, v_plan_node
+WHERE v_plan_node.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"()
+AND state=2;
+
+
+
+DROP VIEW IF EXISTS "v_plan_result_arc" CASCADE;			
+CREATE OR REPLACE VIEW 'v_plan_result_arc' AS
+SELECT
+*
+FROM selector_expl, plan_result_arc
+WHERE plan_result_arc.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"()
+
+UNION
+SELECT
+* 
+FROM selector_expl, v_plan_arc
+WHERE v_plan_arc.expl_id=selector_expl.expl_id
+AND selector_expl.cur_user="current_user"()
+AND state=2;
