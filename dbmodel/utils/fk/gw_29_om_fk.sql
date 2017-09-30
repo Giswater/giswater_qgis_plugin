@@ -31,17 +31,12 @@ ALTER TABLE "om_visit_parameter_type" DROP CONSTRAINT IF EXISTS "om_visit_parame
 ALTER TABLE "om_visit_parameter_type" DROP CONSTRAINT IF EXISTS "om_visit_parameter_type_context_fkey";
 
 ALTER TABLE om_visit_event_photo DROP CONSTRAINT IF EXISTS "om_visit_event_foto_event_id_fkey";
-ALTER TABLE om_visit_event_photo DROP CONSTRAINT IF EXISTS "om_visit_event_foto_visit_id_fkey";
 
+ALTER TABLE om_visit_event_photo DROP CONSTRAINT IF EXISTS "om_visit_event_foto_visit_id_fkey";
 
 ALTER TABLE "om_visit_parameter_type" DROP CONSTRAINT IF EXISTS "om_visit_parameter_type_criticity_fkey";
 
 ALTER TABLE "om_visit_parameter_type" DROP CONSTRAINT IF EXISTS "om_visit_parameter_type_context_fkey";
-
-
-*/
-
-
 
 ALTER TABLE "om_visit_event" ADD CONSTRAINT "om_visit_event_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "om_visit" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "om_visit_event" ADD CONSTRAINT "om_visit_event_parameter_id_fkey" FOREIGN KEY ("parameter_id") REFERENCES "om_visit_parameter" ("id") ON DELETE CASCADE ON UPDATE CASCADE;
