@@ -267,8 +267,8 @@ CREATE TABLE "plan_result_arc" (
 "arc_cost" numeric(12,2),
 "cost " numeric(12,2),
 "budget" numeric(12,2),
-"total_other" numeric(12,2),
-"total_cost" numeric(12,2)
+"total_other_cost" numeric(12,2),
+"total_budget" numeric(12,2)
 );
 
 

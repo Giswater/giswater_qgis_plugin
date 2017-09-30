@@ -156,7 +156,7 @@ sum (v_price_x_catpavement.thickness*plan_arc_x_pavement.percent)::numeric(12,2)
 sum (v_price_x_catpavement.m2pav_cost::numeric(12,2)*plan_arc_x_pavement.percent) AS m2pav_cost,
 arc.state,
 arc.the_geom
-FROM v_arc arc
+FROM v_edit_arc arc
 	JOIN v_arc_x_node ON ((((arc.arc_id) = (v_arc_x_node.arc_id))))
 	LEFT JOIN v_price_x_catarc ON ((((arc.arccat_id) = (v_price_x_catarc.id))))
 	LEFT JOIN v_price_x_catsoil ON ((((arc.soilcat_id) = (v_price_x_catsoil.id))))
@@ -290,21 +290,40 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost
 
 FROM v_plan_ml_arc
-	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
-	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)));
+	JOIN v_plan_mlcost_arc ON v_plan_ml_arc.arc_id = v_plan_mlcost_arc.arc_id;
+
 
 	
+	
+
+-- ----------------------------
+-- View structure for v_plan_connec_x_arc
+-- ----------------------------
+DROP VIEW IF EXISTS "v_plan_arc" CASCADE;
+CREATE VIEW v_plan_connec_x_arc as
+select distinct (arc_id)
+arc_id,
+(st_length2d(link.the_geom)*(cost_mlconnec+cost_m3trench*depth*0.333)+cost_ut)::numeric(12,2) AS connec_total_cost
+from connec
+join v_price_x_catconnec on id=connecat_id
+join link on feature_id=connec_id 
+join vnode on vnode.vnode_id=link.vnode_id 
+group by arc_id;
+	
+
+	
+
 
 -- ----------------------------
 -- View structure for v_plan_arc
 -- ----------------------------
-
 DROP VIEW IF EXISTS "v_plan_arc" CASCADE;
 CREATE VIEW "v_plan_arc" AS 
 SELECT
 v_plan_ml_arc.arc_id,
 v_plan_ml_arc.arccat_id,
 v_plan_ml_arc.cost_unit,
+
 (CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN v_plan_ml_arc.arc_cost ELSE
 (v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
 + v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
@@ -314,7 +333,9 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
 + v_plan_mlcost_arc.arc_cost) END)::numeric(12,2)							AS cost,
+
 (CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN NULL ELSE (st_length2d(v_plan_ml_arc.the_geom)) END)::numeric(12,2)							AS length,
+
 (CASE WHEN (v_plan_ml_arc.cost_unit='u') THEN v_plan_ml_arc.arc_cost ELSE((st_length2d(v_plan_ml_arc.the_geom))::numeric(12,2)*
 (v_plan_mlcost_arc.m3mlexc*v_plan_mlcost_arc.m3exc_cost
 + v_plan_mlcost_arc.m2mlbase*v_plan_mlcost_arc.m2bottom_cost
@@ -323,13 +344,26 @@ v_plan_ml_arc.cost_unit,
 + v_plan_mlcost_arc.m3mlfill*v_plan_mlcost_arc.m3fill_cost
 + v_plan_mlcost_arc.m3mlexcess*v_plan_mlcost_arc.m3excess_cost
 + v_plan_mlcost_arc.m2mlpavement*v_plan_mlcost_arc.m2pav_cost
-+ v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS budget,
++ v_plan_mlcost_arc.arc_cost)::numeric(14,2)) END)::numeric (14,2)						AS total_cost,
+
+connec_total_cost as other_total_cost,
+
+CASE
+    WHEN v_plan_ml_arc.cost_unit::text = 'u'::text 
+    THEN v_plan_ml_arc.arc_cost+connec_total_cost
+    ELSE st_length2d(v_plan_ml_arc.the_geom)::numeric(12,2) * (v_plan_mlcost_arc.m3mlexc * v_plan_mlcost_arc.m3exc_cost + v_plan_mlcost_arc.m2mlbase * 
+    v_plan_mlcost_arc.m2bottom_cost + v_plan_mlcost_arc.m2mltrenchl * v_plan_mlcost_arc.m2trenchl_cost + v_plan_mlcost_arc.m3mlprotec * 
+    v_plan_mlcost_arc.m3protec_cost + v_plan_mlcost_arc.m3mlfill * v_plan_mlcost_arc.m3fill_cost + v_plan_mlcost_arc.m3mlexcess * 
+    v_plan_mlcost_arc.m3excess_cost + v_plan_mlcost_arc.m2mlpavement * v_plan_mlcost_arc.m2pav_cost + v_plan_mlcost_arc.arc_cost)::numeric(14,2) + connec_total_cost
+    END::numeric(14,2) AS budget, 
+
 v_plan_ml_arc."state",
 v_plan_ml_arc.the_geom
+
 FROM v_plan_ml_arc
-	JOIN v_plan_mlcost_arc ON ((((v_plan_ml_arc.arc_id) = (v_plan_mlcost_arc.arc_id))))
-	JOIN selector_state ON (((v_plan_ml_arc."state") = (selector_state.state_id)))
-	JOIN arc ON arc.arc_id=v_plan_ml_arc.arc_id;
+	JOIN v_plan_mlcost_arc ON v_plan_ml_arc.arc_id = v_plan_mlcost_arc.arc_id
+    LEFT JOIN v_plan_connec_x_arc ON v_plan_connec_x_arc.arc_id = v_plan_mlcost_arc.arc_id;
+
 	
 
 -- ----------------------------
@@ -349,9 +383,8 @@ v_price_x_catnode.cost,
 (CASE WHEN (v_price_x_catnode.cost_unit='u') THEN v_price_x_catnode.cost ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)::numeric(12,2) END)*v_price_x_catnode.cost) END)::numeric(12,2) AS budget,
 node."state",
 node.the_geom
-FROM v_node node
-LEFT JOIN v_price_x_catnode ON ((((node.nodecat_id) = (v_price_x_catnode.id))))
-JOIN selector_state ON (((node."state") = (selector_state.state_id)));
+FROM v_edit_node node
+LEFT JOIN v_price_x_catnode ON node.nodecat_id = v_price_x_catnode.id;
 
 
 

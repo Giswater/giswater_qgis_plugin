@@ -232,7 +232,7 @@ CREATE OR REPLACE VIEW v_price_x_catgrate AS
 SELECT 
 id,
 price_compost.price
-FROM cat_grage
+FROM cat_grate
 	JOIN v_price_compost ON cat_grate.cost_ut = v_price_compost.id;
 
 
