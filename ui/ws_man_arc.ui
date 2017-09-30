@@ -822,8 +822,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1426,8 +1426,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3854,10 +3854,10 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cost">
+       <widget class="QLabel" name="label_budget">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>360</x>
           <y>290</y>
           <width>77</width>
           <height>22</height>
@@ -3878,7 +3878,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Total cost:</string>
+         <string>Budget:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -4805,12 +4805,12 @@
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QLabel" name="label_total_cost">
+       <widget class="QLabel" name="label_total_budget">
         <property name="geometry">
          <rect>
-          <x>345</x>
+          <x>330</x>
           <y>365</y>
-          <width>77</width>
+          <width>96</width>
           <height>22</height>
          </rect>
         </property>
@@ -4829,7 +4829,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Total cost:</string>
+         <string>Total budget:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -4857,7 +4857,7 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cost_total_other">
+       <widget class="QLabel" name="label_other_total_cost">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -4894,7 +4894,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="budget_other">
+       <widget class="QLineEdit" name="other_total_cost">
         <property name="geometry">
          <rect>
           <x>430</x>
@@ -4926,8 +4926,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>359</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">

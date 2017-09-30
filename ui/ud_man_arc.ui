@@ -447,8 +447,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>363</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1667,8 +1667,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2256,8 +2256,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2716,8 +2716,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>363</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3987,8 +3987,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -4576,8 +4576,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5036,8 +5036,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>332</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6275,8 +6275,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6864,8 +6864,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6932,8 +6932,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -7398,8 +7398,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>332</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -8647,8 +8647,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9236,8 +9236,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -9518,8 +9518,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
@@ -10957,10 +10957,10 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cost_budget">
+       <widget class="QLabel" name="label_budget">
         <property name="geometry">
          <rect>
-          <x>337</x>
+          <x>355</x>
           <y>290</y>
           <width>77</width>
           <height>22</height>
@@ -10981,7 +10981,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Total cost:</string>
+         <string>Budget:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -12101,12 +12101,12 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cost_budget_2">
+       <widget class="QLabel" name="label_total_budget">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>326</x>
           <y>365</y>
-          <width>77</width>
+          <width>91</width>
           <height>22</height>
          </rect>
         </property>
@@ -12125,7 +12125,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Total cost:</string>
+         <string>Total budget:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -12140,7 +12140,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cost_total_other">
+       <widget class="QLabel" name="label_other_total_cost">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -12177,7 +12177,7 @@
          <number>3</number>
         </property>
        </widget>
-       <widget class="QLineEdit" name="budget_other">
+       <widget class="QLineEdit" name="other_total_cost">
         <property name="geometry">
          <rect>
           <x>425</x>
@@ -12196,8 +12196,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>100</width>
-         <height>30</height>
+         <width>98</width>
+         <height>28</height>
         </rect>
        </property>
        <attribute name="label">
