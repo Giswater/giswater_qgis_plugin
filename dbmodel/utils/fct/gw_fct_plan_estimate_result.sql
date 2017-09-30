@@ -11,23 +11,24 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_plan_estimate_result(result_id_v
 $BODY$
 
 DECLARE 
-urn_id_seq integer;
-project_type_aux varchar;
+
 
 BEGIN 
 
     SET search_path = "SCHEMA_NAME", public;
 	/*
-	INSERT INTO plan_result_table
-	SELECT
-	null,
-	result_id_var,
 		
-	FROM 
-	(case when only_planified
+	UPDATE plan_result_node, plan_result_arc is_last false
+	
+	INSERT INTO plan_result_node, plan_result_arc
+	SELECT *
+	FROM v_plan_node, v_plan_arc WHERE state=1
+	
+	UPDATE prices*coefficient_var where is_last is null
+	
+	UPDATE plan_result_node, plan_result_arc result_id=result_id_var  where is_last is null, is_last=true
 	
 	
-	-- TO DO
 */
 	RETURN 1;
 
