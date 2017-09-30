@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>604</width>
-    <height>670</height>
+    <height>725</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>541</y>
+      <y>586</y>
       <width>186</width>
       <height>20</height>
      </rect>
@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>145</x>
-      <y>480</y>
+      <y>520</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -76,9 +76,9 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>50</y>
+      <y>45</y>
       <width>571</width>
-      <height>431</height>
+      <height>506</height>
      </rect>
     </property>
     <property name="font">
@@ -87,7 +87,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -111,7 +111,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>327</height>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -822,8 +822,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1426,8 +1426,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>100</width>
+         <height>30</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2125,8 +2125,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>319</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3238,10 +3238,10 @@
      <widget class="QToolBox" name="toolBox_7">
       <property name="geometry">
        <rect>
-        <x>6</x>
+        <x>0</x>
         <y>5</y>
         <width>560</width>
-        <height>396</height>
+        <height>451</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -3252,8 +3252,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>389</height>
         </rect>
        </property>
        <attribute name="label">
@@ -3407,8 +3407,8 @@
        <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
-          <x>428</x>
-          <y>289</y>
+          <x>205</x>
+          <y>290</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -3668,7 +3668,7 @@
         <property name="geometry">
          <rect>
           <x>428</x>
-          <y>313</y>
+          <y>290</y>
           <width>129</width>
           <height>20</height>
          </rect>
@@ -3854,11 +3854,11 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
-       <widget class="QLabel" name="label_cost_budget">
+       <widget class="QLabel" name="label_cost">
         <property name="geometry">
          <rect>
           <x>340</x>
-          <y>313</y>
+          <y>290</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -4139,8 +4139,8 @@
        <widget class="QLabel" name="label_cost_length">
         <property name="geometry">
          <rect>
-          <x>342</x>
-          <y>289</y>
+          <x>140</x>
+          <y>290</y>
           <width>77</width>
           <height>22</height>
          </rect>
@@ -4792,14 +4792,142 @@
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
+       <widget class="Line" name="line_3">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>310</y>
+          <width>553</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_total_cost">
+        <property name="geometry">
+         <rect>
+          <x>345</x>
+          <y>365</y>
+          <width>77</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Total cost:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="total_budget">
+        <property name="geometry">
+         <rect>
+          <x>430</x>
+          <y>365</y>
+          <width>129</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_cost_total_other">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>325</y>
+          <width>411</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+          <italic>false</italic>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="text">
+         <string>Total cost of other elements related to arc (connec):</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="budget_other">
+        <property name="geometry">
+         <rect>
+          <x>430</x>
+          <y>325</y>
+          <width>129</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="Line" name="line_4">
+        <property name="geometry">
+         <rect>
+          <x>5</x>
+          <y>345</y>
+          <width>553</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>359</height>
         </rect>
        </property>
        <attribute name="label">
@@ -5609,7 +5737,7 @@
           <x>135</x>
           <y>4</y>
           <width>351</width>
-          <height>331</height>
+          <height>336</height>
          </rect>
         </property>
         <property name="text">
@@ -5912,7 +6040,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>541</y>
+      <y>586</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -5925,7 +6053,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>480</y>
+      <y>525</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -5963,7 +6091,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>480</y>
+      <y>525</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6011,8 +6139,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>570</y>
-      <width>71</width>
+      <y>610</y>
+      <width>81</width>
       <height>17</height>
      </rect>
     </property>
@@ -6062,7 +6190,7 @@
     <property name="geometry">
      <rect>
       <x>435</x>
-      <y>595</y>
+      <y>640</y>
       <width>156</width>
       <height>23</height>
      </rect>
@@ -6074,9 +6202,9 @@
    <widget class="QCheckBox" name="undelete_2">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>570</y>
-      <width>56</width>
+      <x>515</x>
+      <y>610</y>
+      <width>71</width>
       <height>17</height>
      </rect>
     </property>
@@ -6088,7 +6216,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>521</y>
+      <y>566</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6164,7 +6292,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>480</y>
+      <y>525</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6215,7 +6343,7 @@
     <property name="geometry">
      <rect>
       <x>15</x>
-      <y>500</y>
+      <y>545</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -6272,7 +6400,7 @@
     <property name="geometry">
      <rect>
       <x>275</x>
-      <y>500</y>
+      <y>545</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -6291,7 +6419,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>521</y>
+      <y>566</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6327,7 +6455,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>570</y>
+      <y>610</y>
       <width>73</width>
       <height>17</height>
      </rect>
@@ -6343,7 +6471,7 @@
     <property name="geometry">
      <rect>
       <x>145</x>
-      <y>500</y>
+      <y>545</y>
       <width>119</width>
       <height>20</height>
      </rect>
@@ -6359,7 +6487,7 @@
     <property name="geometry">
      <rect>
       <x>405</x>
-      <y>500</y>
+      <y>545</y>
       <width>186</width>
       <height>20</height>
      </rect>
@@ -6395,7 +6523,7 @@
     <property name="geometry">
      <rect>
       <x>146</x>
-      <y>540</y>
+      <y>585</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -6405,7 +6533,7 @@
     <property name="geometry">
      <rect>
       <x>146</x>
-      <y>520</y>
+      <y>565</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -6441,7 +6569,7 @@
     <property name="geometry">
      <rect>
       <x>275</x>
-      <y>540</y>
+      <y>585</y>
       <width>121</width>
       <height>20</height>
      </rect>
@@ -6451,7 +6579,7 @@
     <property name="geometry">
      <rect>
       <x>275</x>
-      <y>520</y>
+      <y>565</y>
       <width>90</width>
       <height>22</height>
      </rect>
