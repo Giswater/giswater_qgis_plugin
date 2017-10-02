@@ -27,6 +27,7 @@ from ..ui.add_doc import AddDoc                    # @UnresolvedImport
 from ..ui.add_element import AddElement            # @UnresolvedImport             
 from ..ui.config_edit import ConfigEdit             # @UnresolvedImport
 from ..ui.topology_tools import TopologyTools       # @UnresolvedImport
+from multiple_snapping import MultipleSnapping                  # @UnresolvedImport
 
 from parent import ParentAction
 
@@ -39,6 +40,13 @@ class Edit(ParentAction):
         self.minor_version = "3.0"
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
         # Get tables or views specified in 'db' config section
+
+        self.iface = iface
+        self.settings = settings
+        self.controller = controller
+        self.plugin_dir = plugin_dir
+        self.canvas = self.iface.mapCanvas()
+
         self.table_arc = self.settings.value('db/table_arc', 'v_edit_arc')
         self.table_node = self.settings.value('db/table_node', 'v_edit_node')
         self.table_connec = self.settings.value('db/table_connec', 'v_edit_connec')
@@ -315,7 +323,7 @@ class Edit(ParentAction):
         self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, "arc_id", self.dlg, self.group_pointers_arc))
         self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, "arc_id", self.group_pointers_arc))
-
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, self.group_pointers_arc,self.group_layers_arc, "arc_id",view))
         # Open the dialog
         self.dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg.open()
@@ -332,19 +340,24 @@ class Edit(ParentAction):
             table = "element_x_arc"
             view = "v_edit_arc"
             group_pointers = self.group_pointers_arc
-            widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
+            group_layers = self.group_layers_arc
+
+            self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_arc")
         if tab_position == 1:
             feature = "node"
             table = "element_x_node"
             view = "v_edit_node"
             group_pointers = self.group_pointers_node
-            widget = self.dlg.findChild(QTableView, "tbl_doc_x_node")
+            group_layers = self.group_layers_node
+            self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_node")
         if tab_position == 2:
             feature = "connec"
             table = "element_x_connec"
             view = "v_edit_connec"
             group_pointers = self.group_pointers_connec
-            widget = self.dlg.findChild(QTableView, "tbl_doc_x_connec")
+            group_layers = self.group_layers_connec
+            self.widget = self.dlg.findChild(QTableView, "tbl_doc_x_connec")
+
         if tab_position == 3:
             # TODO : check project if WS-delete gully tab if UD-set parameters
             feature = "gully"
@@ -360,7 +373,9 @@ class Edit(ParentAction):
         # Adding auto-completion to a QLineEdit
         self.init_add_element(feature, table, view)
 
-        self.dlg.btn_insert.pressed.connect(partial(self.manual_init, widget, view, feature + "_id", self.dlg, group_pointers))
+        self.dlg.btn_insert.pressed.connect(partial(self.manual_init, self.widget, view, feature + "_id", self.dlg, group_pointers))
+        self.dlg.btn_delete.pressed.connect(partial(self.delete_records, self.widget, view, feature + "_id",  group_pointers))
+        self.dlg.btn_snapping.pressed.connect(partial(self.snapping_init, group_pointers,group_layers, feature + "_id",view))
 
         '''
 
@@ -479,6 +494,39 @@ class Edit(ParentAction):
 
         # Reload table
         self.reload_table(table, attribute)
+
+
+    def snapping_init(self, group_pointers,group_layers, attribute,view):
+        self.controller.log_info(str(attribute))
+        #btn_snapping
+        self.controller.log_info("snapping")
+        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir, group_layers)
+        self.canvas.setMapTool(self.tool)
+        self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection, group_pointers, attribute,view))
+
+
+    def snapping_selection(self, group_pointers, attribute, view):
+
+        self.ids = []
+        for layer in group_pointers:
+            if layer.selectedFeatureCount() > 0:
+
+                # Get all selected features at layer
+                features = layer.selectedFeatures()
+                # Get id from all selected features
+                for feature in features:
+                    element_id = feature.attribute(attribute)
+                    self.controller.log_info(str(element_id))
+                    # Add element
+                    if element_id in self.ids:
+                        message = " Feature :" + element_id + " id already in the list!"
+                        self.controller.show_info_box(message)
+                        return
+                    else:
+                        self.ids.append(element_id)
+
+        self.reload_table(view, attribute)
+
 
 
     def reload_table(self, table, attribute):
