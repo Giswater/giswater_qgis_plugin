@@ -343,6 +343,8 @@ CREATE TABLE "samplepoint"(
 "featurecat_id" varchar (30),
 "dma_id" integer,
 "state" int2,
+"builtdate" date,
+"enddate" date,
 "workcat_id" character varying(255),
 "workcat_id_end" character varying(255),
 "rotation" numeric(12,3),

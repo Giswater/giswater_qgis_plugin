@@ -20,6 +20,8 @@ CREATE VIEW v_edit_samplepoint AS SELECT
 	samplepoint.dma_id,
 	dma.macrodma_id,
 	state,
+	builtdate,
+	enddate,
 	workcat_id,
 	workcat_id_end,
 	rotation,
