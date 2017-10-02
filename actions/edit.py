@@ -961,10 +961,11 @@ class Edit(ParentAction):
         # Create the dialog and signals
         self.dlg = ConfigEdit()
         utils_giswater.setDialog(self.dlg)
-        self.load_plugin_settings_value(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.edit_config_edit_accept)
         self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
-        self.dlg.rejected.connect(partial(self.save_plugin_settings_value, self.dlg))
+        self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
+        
         # Set values from widgets of type QComboBox and dates
         # QComboBox Utils
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
