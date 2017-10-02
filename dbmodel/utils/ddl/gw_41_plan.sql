@@ -192,10 +192,10 @@ CREATE TABLE "plan_result_node" (
 "id" serial PRIMARY KEY NOT NULL,
 "result_id" varchar(30) NOT NULL,
 "node_id" varchar(16) NOT NULL,
-"elevation" numeric(12,3),
-"elev" numeric(12,3),
-"node_type" varchar(18)  ,
 "nodecat_id" varchar(30)  ,
+"node_type" varchar(18)  ,
+"top_elev" numeric(12,3),
+"elev" numeric(12,3),
 "epa_type" varchar(16)  ,
 "sector_id" integer NOT NULL,
 "state" int2  NOT NULL,
@@ -204,7 +204,8 @@ CREATE TABLE "plan_result_node" (
 "cost_unit" varchar(3),
 "calculated_depth" numeric(12,2),
 "cost" numeric(12,3),
-"budget" numeric(12,2)
+"budget" numeric(12,2),
+"expl_id" integer
 );
 
 
@@ -232,8 +233,6 @@ CREATE TABLE "plan_result_arc" (
 "thickness" numeric(12,2),
 "width" numeric(12,2),
 "b" numeric(12,2),
--- to do
--- gully's cost
 "bulk" numeric(12,2),
 "geom1" numeric(12,2),
 "area" numeric(12,2),
@@ -268,7 +267,8 @@ CREATE TABLE "plan_result_arc" (
 "cost " numeric(12,2),
 "budget" numeric(12,2),
 "total_other_cost" numeric(12,2),
-"total_budget" numeric(12,2)
+"total_budget" numeric(12,2),
+"expl_id" integer
 );
 
 

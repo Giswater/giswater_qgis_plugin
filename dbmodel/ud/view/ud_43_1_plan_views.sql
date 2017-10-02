@@ -179,7 +179,7 @@ UNION
    JOIN cat_pavement ON cat_pavement.id = plan_arc_x_pavement.pavcat_id
    JOIN v_price_compost ON cat_pavement.m2_cost = v_price_compost.id
 
-   order by arc_id,catalog_id
+   order by arc_id,catalog_id;
    
    
    
@@ -230,8 +230,8 @@ FROM v_price_x_catconnec1
 DROP VIEW IF EXISTS "v_price_x_catgrate" CASCADE;
 CREATE OR REPLACE VIEW v_price_x_catgrate AS 
 SELECT 
-id,
-price_compost.price
+cat_grate.id,
+price
 FROM cat_grate
 	JOIN v_price_compost ON cat_grate.cost_ut = v_price_compost.id;
 

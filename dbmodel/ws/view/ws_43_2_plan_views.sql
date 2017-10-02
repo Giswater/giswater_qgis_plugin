@@ -251,9 +251,9 @@ SELECT
 v_plan_ml_arc.arc_id,
 v_plan_ml_arc.arccat_id,
 v_plan_ml_arc.soilcat_id,
-v_plan_ml_arc.depth1,
-v_plan_ml_arc.depth2,
-v_plan_ml_arc.mean_depth,
+v_plan_ml_arc.depth1 as y1,
+v_plan_ml_arc.depth2 as y2,
+v_plan_ml_arc.mean_depth as mean_y,
 v_plan_ml_arc.z1,
 v_plan_ml_arc.z2,
 v_plan_ml_arc.thickness,
@@ -355,7 +355,11 @@ SELECT
 
 node.node_id,
 node.nodecat_id,
-node.depth,
+node.nodetype_id,
+node.elevation AS top_elev,
+node.elevation - node.depth as elev,
+node.epa_type,
+node.sector_id,
 v_price_x_catnode.cost_unit,
 (CASE WHEN (v_price_x_catnode.cost_unit='u') THEN NULL ELSE ((CASE WHEN (node.depth*1=0::numeric) OR (node.depth*1=0::numeric) IS NULL THEN v_price_x_catnode.estimated_depth::numeric(12,2) ELSE ((node.depth)/2)END)) END)::numeric(12,2) AS calculated_depth,
 v_price_x_catnode.cost,
@@ -660,41 +664,4 @@ DROP VIEW IF EXISTS v_plan_psector_filtered CASCADE;
 
 				
 				
-
---------------------------------
--- plan result views
---------------------------------
-DROP VIEW IF EXISTS "v_plan_result_node" CASCADE;			
-CREATE OR REPLACE VIEW 'v_plan_result_node' AS
-SELECT
-*
-FROM selector_expl, plan_result_node
-WHERE plan_result_node.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
-
-UNION
-SELECT
-* 
-FROM selector_expl, v_plan_node
-WHERE v_plan_node.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
-AND state=2;
-
-
-
-DROP VIEW IF EXISTS "v_plan_result_arc" CASCADE;			
-CREATE OR REPLACE VIEW 'v_plan_result_arc' AS
-SELECT
-*
-FROM selector_expl, plan_result_arc
-WHERE plan_result_arc.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
-
-UNION
-SELECT
-* 
-FROM selector_expl, v_plan_arc
-WHERE v_plan_arc.expl_id=selector_expl.expl_id
-AND selector_expl.cur_user="current_user"()
-AND state=2;
-				
+	
