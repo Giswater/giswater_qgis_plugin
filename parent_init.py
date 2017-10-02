@@ -79,7 +79,10 @@ class ParentDialog(object):
              
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
-                     
+         
+        # Load QGIS settings related with dialog position and size            
+        self.load_settings(self.dialog)        
+
         # Get schema_name and DAO object                
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name  
@@ -127,7 +130,38 @@ class ParentDialog(object):
         
     def close_dialog(self):
         ''' Close form without saving ''' 
-        self.dialog.parent().setVisible(False)         
+        self.dialog.parent().setVisible(False)  
+        self.save_settings(self.dialog)     
+        
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+         
+        if dialog is None:
+            dialog = self.dialog
+                    
+        key = self.layer.name()                    
+        width = self.controller.plugin_settings_value(key + "_width", dialog.parent().width())
+        height = self.controller.plugin_settings_value(key + "_height", dialog.parent().height())
+        x = self.controller.plugin_settings_value(key + "_x")
+        y = self.controller.plugin_settings_value(key + "_y")                                    
+        if x == "" or y == "":
+            dialog.resize(width, height)
+        else:
+            dialog.setGeometry(x, y, width, height)
+            
+            
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """
+                
+        if dialog is None:
+            dialog = self.dialog
+            
+        key = self.layer.name()         
+        self.controller.plugin_settings_set_value(key + "_width", dialog.parent().width())
+        self.controller.plugin_settings_set_value(key + "_height", dialog.parent().height())
+        self.controller.plugin_settings_set_value(key + "_x", dialog.parent().pos().x())
+        self.controller.plugin_settings_set_value(key + "_y", dialog.parent().pos().y())                     
         
         
     def set_model_to_table(self, widget, table_name, filter_): 
