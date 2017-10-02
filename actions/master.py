@@ -267,9 +267,10 @@ class Master(ParentAction):
         # Create the dialog and signals
         self.dlg = ConfigMaster()
         utils_giswater.setDialog(self.dlg)
+        self.load_settings(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.master_config_master_accept)
-        self.dlg.btn_cancel.pressed.connect(self.dlg.close)
-
+        self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.rejected.connect(partial(self.save_settings, self.dlg))
         # Get records from tables 'config' and 'config_param_system' and fill corresponding widgets
         self.select_config("config")
         self.select_config_param_system("config_param_system") 
@@ -360,7 +361,8 @@ class Master(ParentAction):
         
         message = "Values has been updated"
         self.controller.show_info(message)
-        self.close_dialog()
+
+        self.close_dialog(self.dlg)
 
 
     def update_config_param_system(self, tablename):

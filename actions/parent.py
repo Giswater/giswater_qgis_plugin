@@ -249,6 +249,34 @@ class ParentAction():
         folder_path = file_dialog.getExistingDirectory(parent=None, caption=self.controller.tr(msg))
         if folder_path:
             utils_giswater.setWidgetText(widget, str(folder_path))
+
+
+    def load_settings(self, dialog=None):
+        """ Load QGIS settings related with dialog position and size """
+         
+        if dialog is None:
+            dialog = self.dlg
+                    
+        width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.width())
+        height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.height())
+        x = self.controller.plugin_settings_value(dialog.objectName() + "_x")
+        y = self.controller.plugin_settings_value(dialog.objectName() + "_y")
+        if x == "" or y == "":
+            dialog.resize(width, height)
+        else:
+            dialog.setGeometry(x, y, width, height)
+
+
+    def save_settings(self, dialog=None):
+        """ Save QGIS settings related with dialog position and size """
+                
+        if dialog is None:
+            dialog = self.dlg
+            
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_width", dialog.width())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_height", dialog.height())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x())
+        self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y())
         
         
     def close_dialog(self, dlg=None): 
@@ -257,6 +285,7 @@ class ParentAction():
         if dlg is None or type(dlg) is bool:
             dlg = self.dlg
         try:
+            self.save_settings(dlg)
             dlg.close()
             map_tool = self.iface.mapCanvas().mapTool()
             # If selected map tool is from the plugin, set 'Pan' as current one 
