@@ -266,7 +266,7 @@ class Edit(ParentAction):
 
         # Set signals
         self.dlg_cat.btn_ok.pressed.connect(partial(self.fill_geomcat_id, geom_type))
-        self.dlg_cat.btn_cancel.pressed.connect(self.dlg_cat.close)
+        self.dlg_cat.btn_cancel.pressed.connect(partial(self.close_dialog(self.dlg_cat)))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_catalog_id, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter2, wsoftware, geom_type))
         self.dlg_cat.matcat_id.currentIndexChanged.connect(partial(self.fill_filter3, wsoftware, geom_type))
@@ -961,9 +961,10 @@ class Edit(ParentAction):
         # Create the dialog and signals
         self.dlg = ConfigEdit()
         utils_giswater.setDialog(self.dlg)
+        self.load_plugin_settings_value(self.dlg)
         self.dlg.btn_accept.pressed.connect(self.edit_config_edit_accept)
-        self.dlg.btn_cancel.pressed.connect(self.close_dialog)
-
+        self.dlg.btn_cancel.pressed.connect(partial(self.close_dialog, self.dlg))
+        self.dlg.rejected.connect(partial(self.save_plugin_settings_value, self.dlg))
         # Set values from widgets of type QComboBox and dates
         # QComboBox Utils
         sql = "SELECT DISTINCT(name) FROM " + self.schema_name + ".value_state ORDER BY name"
@@ -1072,7 +1073,7 @@ class Edit(ParentAction):
 
         message = "Values has been updated"
         self.controller.show_info(message, context_name='ui_message')
-        self.close_dialog()
+        self.close_dialog(self.dlg)
 
 
     def insert_or_update_config_param_curuser(self, widget, parameter, tablename):
