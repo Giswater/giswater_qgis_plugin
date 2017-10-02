@@ -230,7 +230,7 @@ class Edit(ParentAction):
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id) FROM ud30.cat_node ORDER BY id"
             rows = self.controller.get_rows(sql)
-            utils_giswater.fillComboBox(self.new_nodecat_id, rows)
+            utils_giswater.fillComboBox(self.new_nodecat_id, rows, allow_nulls=False)
 
         self.dlg.node_node_type.setText(node_type)
         self.new_node_type.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
@@ -586,6 +586,14 @@ class Edit(ParentAction):
                 # Update field 'nodecat_id'
                 if self.project_type == 'ws':
                     sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
+                    sql += " WHERE node_id = '" + self.node_id + "'"
+                    self.controller.execute_sql(sql)
+                # TODO  mirar si el  ""and node_nodecat_id != ''"" hace falta, ya que ahora el combobox no tendra registro vacio
+                if self.project_type == 'ud':
+                    sql = "UPDATE " + self.schema_name + ".node SET nodecat_id = '" + node_nodecat_id + "'"
+                    sql += " WHERE node_id = '" + self.node_id + "'"
+                    self.controller.execute_sql(sql)
+                    sql = "UPDATE " + self.schema_name + ".node SET node_type = '" + node_node_type_new + "'"
                     sql += " WHERE node_id = '" + self.node_id + "'"
                     self.controller.execute_sql(sql)
             else:
