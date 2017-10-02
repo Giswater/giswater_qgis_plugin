@@ -192,6 +192,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         action.triggered.connect(self.add_hydrometer)
         self.set_icon(action, "122")
 
+        # Show future id of mincut
+        sql = "SELECT MAX(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
+        row = self.controller.get_row(sql)
+
+        self.controller.log_info(str(row))
+        result_mincut_id = row[0] + 1
+        self.controller.log_info(str(result_mincut_id))
+        self.result_id.setText(str(result_mincut_id))
+
         self.dlg.show()
 
 
@@ -298,6 +307,13 @@ class MincutParent(ParentAction, MultipleSnapping):
 
     def accept_save_data(self, action):
 
+        # Check if user entered ID
+        check = self.check_id()
+        if check == 0:
+            return
+        else:
+            pass
+
         mincut_result_state_text = self.state.text()
         self.controller.log_info(str(mincut_result_state_text))
         if mincut_result_state_text == 'Planified':
@@ -318,8 +334,8 @@ class MincutParent(ParentAction, MultipleSnapping):
         # anl_descript = str(utils_giswater.getWidgetText("pred_description"))
         anl_descript = self.pred_description.toPlainText()
 
-        exec_limit_distance = self.distance.text()
-        exec_depth = self.depth.text()
+        exec_limit_distance = str(self.distance.text())
+        exec_depth = str(self.depth.text())
 
         # exec_descript =  str(utils_giswater.getWidgetText("real_description"))
         exec_descript = self.real_description.toPlainText()
@@ -354,10 +370,10 @@ class MincutParent(ParentAction, MultipleSnapping):
             sql += " VALUES ('" + str(result_mincut_id) + "','" + str(mincut_result_state) + "', '" + str(work_order) + "', '" + str(street) + "', '" + str(number) + "', '" + str(mincut_result_type) + "', '" + str(anl_cause) + "', '"
             sql += str(forecast_start_predict) + "', '" + str(forecast_end_predict) + "', '" + str(anl_descript) + "'"
             if self.btn_end.isEnabled():
-                sql += ",'" + str(forecast_start_real) + "', '" + str(forecast_end_real) + "', '" + exec_limit_distance + "', '" + exec_depth + "', '" + str(exec_descript) + "')"
+                sql += ",'" + str(forecast_start_real) + "', '" + str(forecast_end_real) + "', '" + str(exec_limit_distance) + "', '" + str(exec_depth) + "', '" + str(exec_descript) + "')"
             else :
                 sql += ")"
-
+            self.controller.log_info(str(sql))
             status = self.controller.execute_sql(sql)
             if status:
                 message = "Values has been updated"
@@ -476,10 +492,18 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir,self.group_layers_connec)
         self.canvas.setMapTool(self.tool)
-        self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection,self.group_pointers_connec,"connec_id"))
+        self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection,self.group_pointers_connec,"connec_id","connec"))
 
 
-    def snapping_selection(self, group_pointers,attribute):
+    def snapping_init_hydro(self):
+        ''' Snap connec '''
+
+        self.tool = MultipleSnapping(self.iface, self.settings, self.controller, self.plugin_dir,self.group_layers_connec)
+        self.canvas.setMapTool(self.tool)
+        self.iface.mapCanvas().selectionChanged.connect(partial(self.snapping_selection_hydro,self.group_pointers_connec,"connec_id","rtc_hydrometer_x_connec"))
+
+
+    def snapping_selection_hydro(self, group_pointers,attribute,table):
 
         self.ids = []
         for layer in group_pointers:
@@ -499,7 +523,30 @@ class MincutParent(ParentAction, MultipleSnapping):
                     else:
                         self.ids.append(element_id)
 
-        self.reload_table()
+        self.reload_table_hydro(table, attribute)
+
+
+    def snapping_selection(self, group_pointers,attribute,table):
+
+        self.ids = []
+        for layer in group_pointers:
+            if layer.selectedFeatureCount() > 0:
+
+                # Get all selected features at layer
+                features = layer.selectedFeatures()
+                # Get id from all selected features
+                for feature in features:
+                    element_id = feature.attribute(attribute)
+
+                    # Add element
+                    if element_id in self.ids:
+                        message = " Feature :" + element_id + " id already in the list!"
+                        self.controller.show_info_box(message)
+                        return
+                    else:
+                        self.ids.append(element_id)
+
+        self.reload_table(table, attribute)
 
 
     def check_id(self):
@@ -531,35 +578,40 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.set_icon(self.dlg_hydro.btn_insert, "111")
         self.set_icon(self.dlg_hydro.btn_delete, "112")
 
-        table = "rtc_hydrometer"
+        table = "rtc_hydrometer_x_connec"
         self.tbl = self.dlg_hydro.findChild(QTableView, "tbl")
 
         #- self.btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
         # -self.btn_cancel.pressed.connect(self.close_dialog_multi)
 
-        self.hydrometer = self.dlg_hydro.findChild(QLineEdit, "hydrometer_id")
+        self.tbl_hydro = self.dlg_hydro.findChild(QTableView, "tbl_hydro")
+
 
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table,"hydrometer_id"))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-        self.btn_insert_hydro.pressed.connect(partial(self.manual_init, self.tbl, self.schema_name + "." + table, "hydrometer_id",self.dlg_hydro))
+        #btn_insert_connec.pressed.connect(partial(self.manual_init, self.tbl_connec, table, "connec_id", self.dlg_connec, self.group_pointers_connec))
+        self.btn_insert_hydro.pressed.connect(partial(self.manual_init_hydro, self.tbl, table, "hydrometer_id",self.dlg_hydro,self.group_pointers_connec))
         self.set_icon(self.btn_insert_hydro, "111")
 
-        self.btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
-        self.set_icon(self.btn_snapping_hydro, "129")
+        btn_snapping_hydro = self.dlg_hydro.findChild(QPushButton, "btn_snapping")
+        btn_snapping_hydro.pressed.connect(self.snapping_init_hydro)
+        self.set_icon(btn_snapping_hydro, "129")
 
         self.btn_accept = self.dlg_hydro.findChild(QPushButton, "btn_accept")
         self.btn_accept.pressed.connect(partial(self.exec_sql,"hydrometer_id", "hydrometer"))
 
-        # Adding auto-completion to a QLineEdit
+        # Adding auto-completion to a QLineEdit - customer_code_connec
         self.completer = QCompleter()
-        self.hydrometer.setCompleter(self.completer)
+        self.customer_code_connec_hydro = self.dlg_hydro.findChild(QLineEdit, "customer_code_connec")
+        self.customer_code_connec_hydro.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer "
+        #sql = "SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer "
+        sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec "
         row = self.controller.get_rows(sql)
-
+        self.controller.log_info(str(row))
         values = []
         for value in row:
             values.append(str(value[0]))
@@ -567,12 +619,124 @@ class MincutParent(ParentAction, MultipleSnapping):
         model.setStringList(values)
         self.completer.setModel(model)
 
+        #self.customer_code_connec_hydro.textChanged.connect(self.auto_fill_hydro_id)
+        self.completer.activated.connect(self.auto_fill_hydro_id)
+
+
         # Set signal to reach selected value from QCompleter
         # self.completer.activated.connect(self.autocomplete)
 
         # self.fill_table(self.tbl, self.schema_name+"."+table)
         self.dlg_hydro.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_hydro.show()
+
+
+    def auto_fill_hydro_id(self):
+
+        # Adding auto-completion to a QLineEdit - hydrometer_id
+        self.completer_hydro = QCompleter()
+        self.hydrometer_id = self.dlg_hydro.findChild(QLineEdit, "hydrometer_id")
+        self.hydrometer_id.setCompleter(self.completer_hydro)
+        model = QStringListModel()
+
+
+        # If selected customer_code fill hydrometer_id
+        selected_customer_code = str(self.customer_code_connec_hydro.text())
+        self.controller.log_info(str(selected_customer_code))
+
+        # TODO
+        sql = "SELECT connec_id FROM " + self.schema_name + ".connec WHERE customer_code = '"+ str(selected_customer_code) + "'"
+        row = self.controller.get_row(sql)
+        connec_id = str(row[0])
+        self.controller.log_info(str(connec_id))
+
+        sql = "SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec WHERE connec_id = '"+ str(connec_id) + "'"
+        #sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec "
+        row = self.controller.get_rows(sql)
+        self.controller.log_info("hconnec_id")
+        self.controller.log_info(str(row))
+        values = []
+        for value in row:
+            values.append(str(value[0]))
+
+        model.setStringList(values)
+        self.completer_hydro.setModel(model)
+
+
+    def manual_init_hydro(self, widget, table, attribute, dialog, group_pointers) :
+        '''  Select feature with entered id
+        Set a model with selected filter.
+        Attach that model to selected table '''
+
+        widget_id = dialog.findChild(QLineEdit, attribute)
+        #element_id = widget_id.text()
+        hydrometer_id = widget_id.text()
+        # Clear list of ids
+        self.ids = []
+
+        # Attribute = "connec_id"
+        '''
+        sql = "SELECT " + attribute + " FROM " + self.schema_name + "." + table
+        sql += " WHERE customer_code = '" + customer_code + "'"
+        rows = self.controller.get_rows(sql)
+        if not rows:
+            return
+        element_id = str(rows[0][0])
+        '''
+        # Get connec_id from hydrometer_id
+        sql = "SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec WHERE hydrometer_id = '" + str(hydrometer_id) + "'"
+        row = self.controller.get_row(sql)
+        connec_id = str(row[0])
+        element_id = connec_id
+        self.controller.log_info(str(element_id))
+
+        # Get all selected features
+        for layer in group_pointers:
+            if layer.selectedFeatureCount() > 0:
+                # Get all selected features at layer
+                features = layer.selectedFeatures()
+                # Get id from all selected features
+                for feature in features:
+                    feature_id = feature.attribute(attribute)
+                    # List of all selected features
+                    self.ids.append(str(feature_id))
+
+        # Check if user entered hydrometer_id
+        if element_id == "":
+            message = "You need to enter id"
+            self.controller.show_info_box(message)
+            return
+        if element_id in self.ids:
+            message = str(attribute)+ ":"+element_id+" id already in the list!"
+            self.controller.show_info_box(message)
+            return
+        else:
+            # If feature id doesn't exist in list -> add
+            self.ids.append(element_id)
+
+            for layer in group_pointers:
+                # SELECT features which are in the list
+                aux = "\"connec_id\" IN ("
+                for i in range(len(self.ids)):
+                    aux += "'" + str(self.ids[i]) + "', "
+                aux = aux[:-2] + ")"
+                self.controller.log_info(str(aux))
+                expr = QgsExpression(aux)
+                if expr.hasParserError():
+                    message = "Expression Error: " + str(expr.parserErrorString())
+                    self.controller.show_warning(message)
+                    return
+
+                it = layer.getFeatures(QgsFeatureRequest(expr))
+
+                # Build a list of feature id's from the previous result
+                id_list = [i.id() for i in it]
+
+                # Select features with these id's
+                layer.setSelectedFeatures(id_list)
+
+        # Reload table
+        self.reload_table_hydro(table,attribute)
 
 
     def manual_init(self, widget, table, attribute, dialog, group_pointers) :
@@ -640,19 +804,56 @@ class MincutParent(ParentAction, MultipleSnapping):
                 layer.setSelectedFeatures(id_list)
 
         # Reload table
-        self.reload_table()
+        self.reload_table(table,attribute)
 
 
-    def reload_table(self):
-
+    def reload_table(self, table, attribute):
+        self.controller.log_info(str(table))
+        self.controller.log_info(str(attribute))
         # Reload table
-        table = "connec"
+        #table = "connec"
         table_name = self.schema_name + "." + table
         widget = self.tbl_connec
+        #expr = "connec_id = '" + self.ids[0] + "'"
+        expr = attribute +"= '" + self.ids[0] + "'"
+        if len(self.ids) > 1:
+            for el in range(1, len(self.ids)):
+                #expr += " OR connec_id = '" + self.ids[el] + "'"
+                expr += " OR " + attribute + " = '" + self.ids[el] + "'"
+
+        # Set model
+        model = QSqlTableModel();
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        widget.setModel(model)
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+
+    def reload_table_hydro(self, table, attribute):
+        self.controller.log_info(str(table))
+        self.controller.log_info(str(attribute))
+        # Reload table
+        table = "rtc_hydrometer_x_connec"
+        table_name = self.schema_name + "." + table
+        widget = self.tbl_hydro
+
+        # If filter hydrometer_id is empty
+
         expr = "connec_id = '" + self.ids[0] + "'"
+        #expr = attribute +"= '" + self.ids[0] + "'"
         if len(self.ids) > 1:
             for el in range(1, len(self.ids)):
                 expr += " OR connec_id = '" + self.ids[el] + "'"
+                #expr += " OR " + attribute + " = '" + self.ids[el] + "'"
+        self.controller.log_info(str(expr))
 
         # Set model
         model = QSqlTableModel();
@@ -922,71 +1123,13 @@ class MincutParent(ParentAction, MultipleSnapping):
 
             self.mincut(element_id, feat_type)
 
-        '''
-        self.controller.log_info("test")
-        map_point = self.canvas.getCoordinateTransform().transform(point)
-        x = map_point.x()
-        y = map_point.y()
-        event_point = QPoint(x, y)
 
-        # Snapping
-        (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-
-        self.controller.log_info(str(result))
-        # If any feature snapped return
-        #if result == []:
-        #    self.controller.log_info("Any feature snapped")
-        #    return
-
-        # Check feature
-        for snap_point in result:
-
-            self.controller.log_info(str(snap_point))
-            element_type = snap_point.layer.name()
-            if element_type in self.node_group:
-                feat_type = 'node'
-
-                # Get the point
-                point = (snap_point.snappedVertex)
-                snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                element_id = snapp_feat.attribute(feat_type + '_id')
-
-                # LEAVE SELECTION
-                snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                self.mincut(element_id, feat_type)
-
-        for snap_point in result:
-
-            element_type = snap_point.layer.name()
-            if element_type in self.arc_group :
-                feat_type = 'arc'
-
-                # Get the point
-                point = (snap_point.snappedVertex)
-                snapp_feat = next(snap_point.layer.getFeatures(QgsFeatureRequest().setFilterFid(snap_point.snappedAtGeometry)))
-                element_id = snapp_feat.attribute(feat_type + '_id')
-
-                # LEAVE SELECTION
-                snap_point.layer.select([snap_point.snappedAtGeometry])
-
-                self.mincut(element_id, feat_type)
-
-        '''
     def mincut(self,elem_id,elem_type):
 
         # Execute SQL function 'gw_fct_mincut'
-        result_id_text = utils_giswater.getWidgetText("result_id")
-
-        # Show future id of mincut
-        sql = "SELECT MAX(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
-        row = self.controller.get_row(sql)
-
-        self.controller.log_info(str(row))
-        result_mincut_id =row[0]+1
-        self.controller.log_info(str(result_mincut_id))
-        self.result_id.setText(str(result_mincut_id))
-        sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_mincut_id) + "')"
+        result_id_text = utils_giswater.getWidgetText("result_mincut_id")
+        status = self.controller.log_info("test")
+        sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_id_text) + "')"
         self.controller.log_info(str(sql))
         self.hold_elem_id = elem_id
         self.hold_elem_type = elem_type
@@ -1026,7 +1169,7 @@ class MincutParent(ParentAction, MultipleSnapping):
     def snapping_valve_analytics(self):
         
         # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("Valve analytics")[0]
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_anl_mincut_result_valves")[0]
         self.iface.setActiveLayer(layer)
 
         # TODO
@@ -1044,7 +1187,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Check feature
             for snapPoint in result:
 
-                if snapPoint.layer.name() == 'Valve analytics':
+                if snapPoint.layer.name() == 'v_anl_mincut_result_valve':
                     # Get the point
                     point = (result[0].snappedVertex)  # @UnusedVariable
                     snapp_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
@@ -1053,12 +1196,27 @@ class MincutParent(ParentAction, MultipleSnapping):
 
                     element_id = snapp_feat.attribute(feat_type + '_id')
                     self.custom_mincut(element_id)
+                    self.controller.log_info(str(element_id))
 
 
     def custom_mincut(self, elem_id):
         ''' Init function of custom mincut - Valve analytics
         Working just with layer Valve analytics '''
+        result_id_text = utils_giswater.getWidgetText("result_mincut_id")
+        # Use elem id of previous element - repeating automatic mincut
+        sql = "SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
+        sql += "('" + str(elem_id) + "', '" + str(result_id_text) + "');"
+        self.controller.log_info(sql)
+        status = self.controller.execute_sql(sql)
 
+        if status:
+            message = "Custom Mincut done successfully"
+            self.controller.show_info(message)
+
+        # Refresh map canvas
+        self.iface.mapCanvas().refreshAllLayers()
+
+        '''
         sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_valve_unaccess (mincut_result_cat_id, valve_id)"
         sql += " VALUES ('" + self.result_id_text + "', '" + elem_id + "')"
 
@@ -1088,7 +1246,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         # TRRIGER REPAINT
         for layerRefresh in self.iface.mapCanvas().layers():
             layerRefresh.triggerRepaint()
-
+        '''
 
     def mg_mincut_management(self):
         ''' Button 27: Mincut management '''

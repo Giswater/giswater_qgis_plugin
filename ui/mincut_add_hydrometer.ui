@@ -25,7 +25,7 @@
    <property name="title">
     <string>Hydrometer</string>
    </property>
-   <widget class="QTableView" name="tbl">
+   <widget class="QTableView" name="tbl_hydro">
     <property name="geometry">
      <rect>
       <x>10</x>
