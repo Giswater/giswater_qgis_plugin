@@ -240,7 +240,7 @@ class Giswater(QObject):
         if function_name:
             
             map_tool = None
-            if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 36, 41, 45, 46, 47, 48, 49, 98, 99):
+            if int(index_action) in (19, 23, 24, 25, 26, 27, 28, 36, 38, 41, 45, 46, 47, 48, 49, 98, 99):
                 action = self.create_action(index_action, text_action, toolbar, None, False, function_name, parent)
             else:
                 action = self.create_action(index_action, text_action, toolbar, None, True, function_name, parent)

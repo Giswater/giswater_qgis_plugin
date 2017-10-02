@@ -712,13 +712,8 @@ class Master(ParentAction):
         # Set signals
         self.dlg.btn_calculate.clicked.connect(self.master_estimate_result_new_calculate)
         self.dlg.btn_close.clicked.connect(self.close_dialog)
-        self.dlg.text_prices_coeficient.setValidator(QDoubleValidator())
+        self.dlg.prices_coefficient.setValidator(QDoubleValidator())
 
-        # Fill combo box
-        sql = "SELECT result_id FROM "+self.schema_name+".rpt_cat_result ORDER BY result_id"
-        rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("result_id", rows, False)
-        
         # Manage i18n of the form and open it
         self.controller.translate_form(self.dlg, 'estimate_result_new')
         self.dlg.exec_()
@@ -728,19 +723,24 @@ class Master(ParentAction):
         """ Execute function 'gw_fct_plan_estimate_result' """
 
         # Get values from form
-        result_id = utils_giswater.getWidgetText("result_id")
-        coefficient = utils_giswater.getWidgetText("text_prices_coeficient")
+        result_name = utils_giswater.getWidgetText("result_name")
+        coefficient = utils_giswater.getWidgetText("prices_coefficient")
+        observ = utils_giswater.getWidgetText("observ")
+        if result_name == 'null':
+            message = "Please, introduce a result name"
+            self.controller.show_warning(message)  
+            return          
         if coefficient == 'null':
             message = "Please, introduce a coefficient value"
-            self.controller.show_warning(message, context_name='ui_message')  
+            self.controller.show_warning(message)  
             return          
         
         # Execute function 'gw_fct_plan_estimate_result'
-        sql = "SELECT "+self.schema_name+".gw_fct_plan_estimate_result('" + result_id + "', " + coefficient + ")"
+        sql = "SELECT " + self.schema_name + ".gw_fct_plan_estimate_result('" + result_name + "', " + coefficient + ", '" + observ + "')"
         status = self.controller.execute_sql(sql)
         if status:
             message = "Values has been updated"
-            self.controller.show_info(message, context_name='ui_message')
+            self.controller.show_info(message)
         
         # Refresh canvas and close dialog
         self.iface.mapCanvas().refreshAllLayers()

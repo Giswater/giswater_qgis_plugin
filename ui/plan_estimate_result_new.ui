@@ -6,22 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>328</height>
+    <width>298</width>
+    <height>280</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLineEdit" name="text_prices_coeficient">
+  <widget class="QLineEdit" name="prices_coefficient">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>85</y>
-     <width>161</width>
+     <x>130</x>
+     <y>55</y>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
@@ -41,8 +41,8 @@
   <widget class="QLabel" name="label_prices_coefficient">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>85</y>
+     <x>20</x>
+     <y>55</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -62,9 +62,9 @@
   <widget class="QPushButton" name="btn_calculate">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>275</y>
-     <width>91</width>
+     <x>130</x>
+     <y>240</y>
+     <width>71</width>
      <height>26</height>
     </rect>
    </property>
@@ -75,9 +75,9 @@
   <widget class="QPushButton" name="btn_close">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>275</y>
-     <width>81</width>
+     <x>210</x>
+     <y>240</y>
+     <width>71</width>
      <height>26</height>
     </rect>
    </property>
@@ -88,8 +88,8 @@
   <widget class="QLabel" name="label_result_name">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>50</y>
+     <x>20</x>
+     <y>20</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -106,15 +106,15 @@
     <string>Result name:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="text_result_name">
+  <widget class="QLineEdit" name="result_name">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>50</y>
-     <width>161</width>
+     <x>130</x>
+     <y>20</y>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
@@ -131,15 +131,15 @@
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="text_observ">
+  <widget class="QLineEdit" name="observ">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>120</y>
-     <width>161</width>
+     <x>130</x>
+     <y>90</y>
+     <width>151</width>
      <height>141</height>
     </rect>
    </property>
@@ -159,8 +159,8 @@
   <widget class="QLabel" name="label_observ">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>120</y>
+     <x>20</x>
+     <y>90</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -175,52 +175,6 @@
    </property>
    <property name="text">
     <string>Observ:</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="text_result_id">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>20</y>
-     <width>161</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <italic>true</italic>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_result_id">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>15</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>MS Shell Dlg 2</family>
-     <pointsize>8</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Result id:</string>
    </property>
   </widget>
  </widget>
