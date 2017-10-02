@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2pg_element(table_aux varchar, tabletype_aux varchar)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2pg_element(table_aux text, tabletype_aux text)
 RETURNS void AS $BODY$
 
 
@@ -26,6 +26,7 @@ pg2pg_elementcat_id. Mandatory
 pg2pg_annotation 
 pg2pg_observ
 pg2pg_comment
+pg2pg_num_elements
 Data from this fields will be stored on the element table using the same fields
 
 2- We need the catalog of elements fullfilled
@@ -54,23 +55,23 @@ BEGIN
         LOOP
         -- Insert into element table and element_x_feature tables
         	IF tabletype_aux='arc' THEN
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_arc (element_id, arc_id) VALUES(id_last,rec_table.arc_id);
 				
 		ELSIF tabletype_aux='node' THEN 
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_node (element_id, node_id) VALUES(id_last,rec_table.node_id);
 				
 		ELSIF tabletype_aux='connec' THEN	
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_connec (element_id, connec_id) VALUES(id_last,rec_table.connec_id);
 				
 		ELSIF tabletype_aux='gully' THEN
-				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment) VALUES
-				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment) RETURNING element_id INTO id_last;
+				INSERT INTO element (element_id, elementcat_id, annotation, observ, comment, num_elements) VALUES
+				((SELECT nextval('urn_id_seq')), rec_table.pg2pg_elementcat_id, rec_table.pg2pg_annotation, rec_table.pg2pg_observ, rec_table.pg2pg_comment, rec_table.pg2pg_num_elements) RETURNING element_id INTO id_last;
 				INSERT INTO element_x_gully (element_id, gully_id) VALUES(id_last,rec_table.gully_id);
 		END IF;	
 

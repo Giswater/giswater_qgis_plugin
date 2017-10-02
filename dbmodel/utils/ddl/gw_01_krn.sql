@@ -217,9 +217,10 @@ CREATE TABLE "cat_work" (
 "id" varchar(30) NOT NULL,
 "descript" varchar(512),
 "link" varchar(512),
-"workid_key1" character varying(30),
-"workid_key2" character varying(30),
-"builtdate" date,
+workid_key1 character varying(30),
+workid_key2 character varying(30),
+builtdate date,
+"the_geom" public.geometry(POLYGON, SRID_VALUE),
 CONSTRAINT cat_work_pkey PRIMARY KEY (id)
 );
 
@@ -369,6 +370,7 @@ CREATE TABLE "element" (
 "code" varchar(30),
 "elementcat_id" varchar(30),
 "serial_number" varchar(30),
+"num_elements" integer,
 "dma_id" integer,
 "state" int2 NOT NULL,
 "state_type" int2,
