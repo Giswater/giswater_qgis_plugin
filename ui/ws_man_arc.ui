@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>145</x>
-      <y>520</y>
+      <y>525</y>
       <width>90</width>
       <height>22</height>
      </rect>
@@ -78,7 +78,7 @@
       <x>15</x>
       <y>45</y>
       <width>571</width>
-      <height>506</height>
+      <height>476</height>
      </rect>
     </property>
     <property name="font">
@@ -98,8 +98,8 @@
        <rect>
         <x>7</x>
         <y>10</y>
-        <width>560</width>
-        <height>381</height>
+        <width>551</width>
+        <height>436</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -110,8 +110,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>560</width>
-         <height>327</height>
+         <width>551</width>
+         <height>382</height>
         </rect>
        </property>
        <attribute name="label">
@@ -822,8 +822,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>382</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1414,20 +1414,20 @@
        <rect>
         <x>7</x>
         <y>10</y>
-        <width>560</width>
-        <height>381</height>
+        <width>551</width>
+        <height>436</height>
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>551</width>
+         <height>382</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2125,8 +2125,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>98</width>
-         <height>28</height>
+         <width>560</width>
+         <height>377</height>
         </rect>
        </property>
        <attribute name="label">
@@ -6480,7 +6480,7 @@
      <string notr="true"/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="expl_name">
+   <widget class="QLineEdit" name="expl_id">
     <property name="enabled">
      <bool>false</bool>
     </property>

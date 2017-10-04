@@ -2863,7 +2863,7 @@
      <string>Publish</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="expl_name">
+   <widget class="QLineEdit" name="expl_id">
     <property name="enabled">
      <bool>false</bool>
     </property>

@@ -10523,7 +10523,7 @@
          <x>0</x>
          <y>0</y>
          <width>560</width>
-         <height>389</height>
+         <height>397</height>
         </rect>
        </property>
        <attribute name="label">
@@ -13449,7 +13449,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="expl_name">
+   <widget class="QLineEdit" name="expl_id">
     <property name="enabled">
      <bool>false</bool>
     </property>
