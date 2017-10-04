@@ -559,7 +559,9 @@ class DaoController():
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
-            self.log_info("Add translator", parameter=locale_path)            
+            #self.log_info("Add translator", parameter=locale_path)
+        else:
+            self.log_info("Locale not found", parameter=locale_path)
             
                     
     def manage_translation(self, locale_name, dialog=None):  
@@ -577,7 +579,7 @@ class DaoController():
         # If user locale file not found, set English one by default
         if not os.path.exists(locale_path):
             self.log_info("Locale not found", parameter=locale_path)
-            locale_default = 'en_us'
+            locale_default = 'en'
             locale_path = os.path.join(self.plugin_dir, 'i18n', locale_name+'_{}.qm'.format(locale_default))
             # If English locale file not found, just log it
             if not os.path.exists(locale_path):            
