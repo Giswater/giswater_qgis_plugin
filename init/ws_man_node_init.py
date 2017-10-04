@@ -67,10 +67,21 @@ class ManNodeDialog(ParentDialog):
         filter_ = Filter(widget)
         widget.installEventFilter(filter_)
         return filter_.clicked
-
+     
+        
+    def event(self, event):
+        """ Capture event when dialog is opened """
+        
+#         self.controller.log_info(str(event.type()))
+#         if event.type() == 89:  # or event.type() == 104:
+#             close_dlg = self.controller.plugin_settings_value("close_dlg", "0") 
+#             #self.controller.log_info("event_close_dlg: "+close_dlg)
+#             if close_dlg == "1":
+#                 self.close_dialog()
+        
         
     def init_config_form(self):
-        ''' Custom form initial configuration '''
+        """ Custom form initial configuration """
       
         table_element = "v_ui_element_x_node" 
         table_document = "v_ui_doc_x_node"   
@@ -189,7 +200,34 @@ class ManNodeDialog(ParentDialog):
         # Manage tab visibility
         self.set_tabs_visibility(16)        
         
+        # Check topology
+        node2arc = self.controller.plugin_settings_value("node2arc", "0")
+        if node2arc == "0":
+            self.check_topology_arc()       
         
+
+    def check_topology_arc(self):
+        """ Check topology: Inserted node is over an existing arc? """
+       
+        # Get selected coordinates. Set SQL to check topology
+        point = self.feature.geometry().asPoint()
+        sql = "SELECT arc_id FROM " + self.schema_name + ".v_edit_arc" 
+        sql += " WHERE ST_Intersects(ST_SetSRID(ST_Point(" + str(point.x()) + ", " + str(point.y()) + "), 25831), "
+        sql += " ST_Buffer(the_geom, 1))"      
+        rows = self.controller.get_rows(sql)
+        if rows:
+            message = "We have detected you are trying to divide an arc. In function of the state of the new node the division not will be allowed.\n Would you like to continue?"
+            answer = self.controller.ask_question(message, "Divide intersected arc?")
+            if answer:      
+                self.controller.plugin_settings_set_value("node2arc", "1")
+                self.controller.plugin_settings_set_value("close_dlg", "0")
+            else:
+                self.controller.plugin_settings_set_value("close_dlg", "1")
+         
+#         close_dlg = self.controller.plugin_settings_value("close_dlg", "0")          
+#         self.controller.log_info("check_topology_arc: "+close_dlg)
+        
+                    
     def open_selected_event_from_table(self):
         ''' Button - Open EVENT | gallery from table event '''
 

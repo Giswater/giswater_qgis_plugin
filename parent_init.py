@@ -10,7 +10,7 @@ from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from PyQt4.Qt import QTableView, QDate
 from PyQt4.QtCore import QSettings, Qt
-from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget
+from PyQt4.QtGui import QLabel, QComboBox, QDateEdit, QPushButton, QLineEdit, QIcon, QWidget, QDialog
 from PyQt4.QtSql import QSqlTableModel
 
 from functools import partial
@@ -28,10 +28,10 @@ from ui.ud_catalog import UDcatalog
 from models.sys_feature_cat import SysFeatureCat
         
 
-class ParentDialog(object):   
+class ParentDialog(QDialog):   
     
     def __init__(self, dialog, layer, feature):
-        """ Constructor class """     
+        """ Constructor class """  
         self.dialog = dialog
         self.layer = layer
         self.feature = feature  
@@ -43,6 +43,8 @@ class ParentDialog(object):
         reload(sys)
         sys.setdefaultencoding('utf-8')   #@UndefinedVariable    
     
+        QDialog.__init__(self)        
+
         
     def init_config(self):    
      
@@ -122,16 +124,23 @@ class ParentDialog(object):
                 
     def save(self):
         """ Save feature """
+        
         self.dialog.save()
+        node2arc = self.controller.plugin_settings_value("node2arc", "0")      
+        if node2arc == "1":
+            # TODO: Execute normal process of insertion node and after execute gw_fct_node2arc ('node_id') function
+            pass
+        
         self.close_dialog()     
-        layer = self.iface.activeLayer()
-        layer.commitChanges()
+        self.iface.activeLayer().commitChanges()
         
         
     def close_dialog(self):
         """ Close form without saving """ 
         self.dialog.parent().setVisible(False)  
         self.save_settings(self.dialog)     
+        self.controller.plugin_settings_set_value("node2arc", "0")        
+        self.controller.plugin_settings_set_value("close_dialog", "0")           
         
 
     def load_settings(self, dialog=None):
@@ -1205,19 +1214,19 @@ class ParentDialog(object):
         # Delete previous data
         sql = "DELETE FROM " + self.schema_name + ".man_addfields_value"
         sql += " WHERE feature_id = '" + str(self.id) + "'" 
-        self.controller.log_info(sql)             
+        #self.controller.log_info(sql)             
         status = self.controller.execute_sql(sql)
         if not status:
             return False    
                     
         # Iterate over all widgets and execute one inserts per widget
         for parameter_id, widget in self.widgets.iteritems():
-            self.controller.log_info(str(parameter_id))        
+            #self.controller.log_info(str(parameter_id))        
             value_param = utils_giswater.getWidgetText(widget)  
             if value_param != 'null':
                 sql = "INSERT INTO " + self.schema_name + ".man_addfields_value (feature_id, parameter_id, value_param)"
                 sql += " VALUES ('" + str(self.id) + "', " + str(parameter_id) + ", '" + str(value_param) + "');"
-                self.controller.log_info(sql)             
+                #self.controller.log_info(sql)             
                 status = self.controller.execute_sql(sql)
                 if not status:
                     return False                   

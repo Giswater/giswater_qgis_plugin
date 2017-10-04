@@ -93,20 +93,20 @@ class Edit(ParentAction):
         self.project_type = project_type
 
 
-    def menu_activate(self, node_type):
-
-        # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)
+    def edit_add_feature(self, layername):
+        """ Button 01, 02: Add 'node' or 'arc' """
+                
+        # Set active layer and triggers action Add Feature
+        layer = QgsMapLayerRegistry.instance().mapLayersByName(layername)
         if layer:
             layer = layer[0]
             self.iface.setActiveLayer(layer)
             layer.startEditing()
-            # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
         else:
-            self.controller.show_warning("Selected layer name not found: " + str(node_type))
-
-
+            self.controller.show_warning("Selected layer name not found: " + str(layername))
+        
+        
     def edit_arc_topo_repair(self):
         """ Button 19: Topology repair """
 

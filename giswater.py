@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMapLayerRegistry, QgsExpressionContextUtils
+from qgis.core import QgsMapLayerRegistry, QgsExpressionContextUtils         
 from PyQt4.QtCore import QObject, QSettings
 from PyQt4.QtGui import QAction, QActionGroup, QIcon, QMenu
 
@@ -207,26 +207,12 @@ class Giswater(QObject):
             if (index_action == '01' and feature_cat.type == 'NODE') or (index_action == '02' and feature_cat.type == 'ARC'):
                 obj_action = QAction(str(feature_cat.layername), self)
                 obj_action.setShortcut(str(feature_cat.shortcut_key))
-                menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.menu_activate, str(feature_cat.layername)))
+                menu.addAction(obj_action)                 
+                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat.layername))
 
             action.setMenu(menu)
         
-        return action
-                         
-
-    def menu_activate(self, node_type):
-        
-        # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName(node_type)
-        if layer:
-            layer = layer[0]
-            self.iface.setActiveLayer(layer)
-            layer.startEditing()
-            # Implement the Add Feature button
-            self.iface.actionAddFeature().trigger()
-        else:
-            self.controller.show_warning("Selected layer name not found: "+str(node_type))
+        return action        
 
     
     def add_action(self, index_action, toolbar, parent):
@@ -593,6 +579,9 @@ class Giswater(QObject):
 
         # Set SearchPlus object
         self.set_search_plus()
+        
+        # Initialize parameter 'node2arc'
+        self.controller.plugin_settings_set_value("node2arc", "0")        
          
          
     def manage_layers(self):
