@@ -597,8 +597,8 @@ BEGIN
 		NEW.netwjoin_buildercat_id, NEW.netwjoin_builtdate, NEW.netwjoin_enddate, NEW.netwjoin_ownercat_id, NEW.netwjoin_address_01, NEW.netwjoin_address_02, NEW.netwjoin_address_03, NEW.netwjoin_descript, NEW.netwjoin_rotation, NEW.verified, 
 		NEW.the_geom, NEW.undelete,NEW.netwjoin_label_x,NEW.netwjoin_label_y,NEW.netwjoin_label_rotation, expl_id_int, NEW.publish, NEW.inventory, NEW.netwjoin_hemisphere, NEW.netwjoin_num_value);
 		
-		INSERT INTO man_netwjoin (node_id, demand, streetaxis_id, postnumber, top_floor,  cat_valve, customer_code) 
-		VALUES(NEW.node_id, NEW.netwjoin_demand, NEW.netwjoin_streetaxis_id, NEW.netwjoin_postnumber, NEW.netwjoin_top_floor, NEW.netwjoin_cat_valve, NEW.customer_code);
+		INSERT INTO man_netwjoin (node_id, streetaxis_id, postnumber, top_floor,  cat_valve, customer_code) 
+		VALUES(NEW.node_id, NEW.netwjoin_streetaxis_id, NEW.netwjoin_postnumber, NEW.netwjoin_top_floor, NEW.netwjoin_cat_valve, NEW.netwjoin_customer_code);
 		
 	ELSIF man_table='man_expansiontank' THEN
 
@@ -1173,7 +1173,7 @@ BEGIN
 		WHERE node_id = OLD.node_id;
 	
 		UPDATE man_netwjoin
-		SET node_id=NEW.node_id, demand=NEW.netwjoin_demand, streetaxis_id=NEW.netwjoin_streetaxis_id, postnumber=NEW.netwjoin_postnumber,top_floor= NEW.netwjoin_top_floor, cat_valve=NEW.netwjoin_cat_valve, customer_code=NEW.customer_code
+		SET node_id=NEW.node_id, streetaxis_id=NEW.netwjoin_streetaxis_id, postnumber=NEW.netwjoin_postnumber,top_floor= NEW.netwjoin_top_floor, cat_valve=NEW.netwjoin_cat_valve, customer_code=NEW.netwjoin_customer_code
 		WHERE node_id=OLD.node_id;		
 		
 	ELSIF man_table ='man_expansiontank' THEN

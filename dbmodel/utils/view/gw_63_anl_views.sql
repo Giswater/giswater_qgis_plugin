@@ -12,6 +12,7 @@ SET search_path = "SCHEMA_NAME" , public, pg_catalog;
 DROP VIEW IF EXISTS v_anl_node;
 CREATE OR REPLACE VIEW v_anl_node AS 
 SELECT
+anl_node.id,
 node_id,
 node_type,
 state,
@@ -30,6 +31,7 @@ FROM selector_expl, anl_node
 DROP VIEW IF EXISTS v_anl_connec;
 CREATE OR REPLACE VIEW v_anl_connec AS 
 SELECT
+anl_connec.id,
 connec_id,
 connec_type,
 state,
@@ -48,6 +50,7 @@ FROM selector_expl, anl_connec
 DROP VIEW IF EXISTS v_anl_arc;
 CREATE OR REPLACE VIEW v_anl_arc AS 
 SELECT
+anl_arc.id,
 arc_id,
 arc_type,
 state,
@@ -65,6 +68,7 @@ FROM selector_expl, anl_arc
 DROP VIEW IF EXISTS v_anl_arc_point;
 CREATE OR REPLACE VIEW v_anl_arc_point AS 
 SELECT
+anl_arc.id,
 arc_id,
 arc_type,
 state,
@@ -85,6 +89,7 @@ FROM selector_expl, anl_arc
 DROP VIEW IF EXISTS v_anl_arc_x_node;
 CREATE OR REPLACE VIEW v_anl_arc_x_node AS 
 SELECT
+anl_arc_x_node.id,
 arc_id,
 arc_type,
 state,
@@ -104,6 +109,7 @@ FROM selector_expl, anl_arc_x_node
 DROP VIEW IF EXISTS v_anl_arc_x_node_point;
 CREATE OR REPLACE VIEW v_anl_arc_x_node_point AS 
 SELECT
+anl_arc_x_node.id,
 arc_id,
 arc_type,
 node_id,

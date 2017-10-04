@@ -1601,3 +1601,19 @@ WHERE ((pool.expl_id)=(selector_expl.expl_id)
 AND selector_expl.cur_user="current_user"());
 
 
+
+CREATE OR REPLACE VIEW v_value_cat_connec AS 
+ SELECT cat_connec.id,
+    cat_connec.connectype_id AS connec_type,
+    connec_type.type
+   FROM cat_connec
+     JOIN connec_type ON connec_type.id::text = cat_connec.connectype_id::text;
+
+     
+     CREATE OR REPLACE VIEW v_value_cat_node AS 
+ SELECT cat_node.id,
+    cat_node.nodetype_id,
+    node_type.type
+   FROM cat_node
+     JOIN node_type ON node_type.id::text = cat_node.nodetype_id::text;
+
