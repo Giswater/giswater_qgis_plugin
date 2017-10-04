@@ -411,7 +411,6 @@ class ManArcDialog(ParentDialog):
             self.controller.show_warning(message)
             return
 
-        self.controller.log_info(str(self.feature_cat))
         # List of nodes from node_type_cat_type - nodes which we are using
         for key, feature_cat in self.feature_cat.iteritems():
             if feature_cat.type == 'NODE':

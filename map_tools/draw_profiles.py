@@ -92,10 +92,8 @@ class DrawProfiles(ParentMapTool):
 
             # Snap to node
             (retval, result) = self.snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
-       
-            self.controller.log_info(str(result))       
             
-            if result <> []:
+            if result:
                 self.snapped_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
  
                 # Leave last selection - SHOW ALL SELECTIONS
@@ -913,7 +911,6 @@ class DrawProfiles(ParentMapTool):
         sql = "SELECT rid"
         sql += " FROM " + self.schema_name + ".v_anl_pgrouting_node"
         sql += " WHERE node_id='" + start_point + "'"
-        self.controller.log_info(sql)           
         row = self.controller.get_row(sql)
         if row:
             rstart_point = int(row[0])

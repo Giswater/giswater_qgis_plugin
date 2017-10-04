@@ -96,7 +96,6 @@ class Go2Epa(ParentAction):
         self.dlg.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg.btn_accept.clicked.connect(self.go2epa_accept)
         self.dlg.btn_cancel.pressed.connect(self.close_dialog)
-        self.controller.log_info(str(self.project_type))
         if self.project_type == 'ws':
             self.dlg.btn_hs_ds.setText("Dscenario Selector")
             self.dlg.chk_export_subcatch.setVisible(False)
