@@ -538,6 +538,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="btn_start">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -726,6 +729,9 @@
      </property>
     </widget>
     <widget class="QCheckBox" name="appropiate">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -736,19 +742,6 @@
      </property>
      <property name="text">
       <string>Appropiate</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="result_id">
-     <property name="geometry">
-      <rect>
-       <x>290</x>
-       <y>90</y>
-       <width>51</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>result_id</string>
      </property>
     </widget>
    </widget>
@@ -903,6 +896,16 @@
      </property>
      <property name="calendarPopup">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTimeEdit" name="cbx_hours_start_predict_2">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>75</y>
+       <width>118</width>
+       <height>22</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -1113,6 +1116,9 @@
    <addaction name="actionConfig"/>
   </widget>
   <action name="actionConfig">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/99.png</normaloff>../icons/99.png</iconset>
@@ -1125,6 +1131,9 @@
    </property>
   </action>
   <action name="actionMincut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/126.png</normaloff>../icons/126.png</iconset>
@@ -1152,6 +1161,9 @@
    </property>
   </action>
   <action name="actionAddConnec">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/121.png</normaloff>../icons/121.png</iconset>
@@ -1161,6 +1173,9 @@
    </property>
   </action>
   <action name="actionAddHydrometer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../icons/122.png</normaloff>../icons/122.png</iconset>

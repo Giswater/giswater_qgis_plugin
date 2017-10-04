@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 from PyQt4.Qt import QDate, QTime
-from PyQt4.QtCore import QPoint, Qt, QObject, SIGNAL
+from PyQt4.QtCore import QPoint, Qt, QObject, SIGNAL, QDate, QTime
 from PyQt4.QtGui import QLineEdit, QTableView, QMenu, QPushButton, QComboBox, QTextEdit, QDateEdit, QTimeEdit, QAction, QStringListModel, QCompleter
 from PyQt4.QtSql import QSqlTableModel
 from qgis.core import QgsMapLayerRegistry, QgsFeatureRequest, QgsExpression, QgsPoint
@@ -28,7 +28,9 @@ from ..ui.mincut_fin import Mincut_fin                          # @UnresolvedImp
 from ..ui.multi_selector import Multi_selector                  # @UnresolvedImport  
 from ..ui.mincut_add_hydrometer import Mincut_add_hydrometer    # @UnresolvedImport  
 from ..ui.mincut_add_connec import Mincut_add_connec            # @UnresolvedImport  
-from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport  
+from ..ui.mincut_edit import Mincut_edit                        # @UnresolvedImport
+
+from datetime import datetime
 
 
 class MincutParent(ParentAction, MultipleSnapping):
@@ -133,7 +135,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         sql += " FROM " + self.schema_name + ".exploitation"
         sql += " ORDER BY descript"
         rows = self.controller.get_rows(sql)
-        utils_giswater.fillComboBox("exploitation", rows)
 
         # Fill ComboBox type
         sql = "SELECT id"
@@ -149,6 +150,13 @@ class MincutParent(ParentAction, MultipleSnapping):
         sql += " ORDER BY id"
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBoxDefault("cause", rows)
+
+        # Fill ComboBox assigned_to
+        sql = "SELECT name"
+        sql += " FROM " + self.schema_name + ".cat_users"
+        sql += " ORDER BY id"
+        rows = self.controller.get_rows(sql)
+        utils_giswater.fillComboBoxDefault("assigned_to", rows)
 
         # Set all QDateEdit to current date
         self.cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
@@ -178,27 +186,36 @@ class MincutParent(ParentAction, MultipleSnapping):
         action = self.dlg.findChild(QAction, "actionConfig")
         action.triggered.connect(self.config)
         self.set_icon(action, "99")
+        self.actionConfig = action
+
         action = self.dlg.findChild(QAction, "actionMincut")
         action.triggered.connect(self.mincut_init)
         self.set_icon(action, "126")
+        self.actionMincut = action
+
         action = self.dlg.findChild(QAction, "actionCustomMincut")
-        #action.triggered.connect(self.custom_mincut_init)
+        action.triggered.connect(self.custom_mincut_init)
         self.set_icon(action, "123")
         self.actionCustomMincut = action
+
         action = self.dlg.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self.add_connec)
         self.set_icon(action, "121")
+        self.actionAddConnec = action
+
+
         action = self.dlg.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self.add_hydrometer)
         self.set_icon(action, "122")
+        self.actionAddHydrometer = action
+
 
         # Show future id of mincut
         sql = "SELECT MAX(id) FROM " + self.schema_name + ".anl_mincut_result_cat "
         row = self.controller.get_row(sql)
 
-        self.controller.log_info(str(row))
         result_mincut_id = row[0] + 1
-        self.controller.log_info(str(result_mincut_id))
+
         self.result_id.setText(str(result_mincut_id))
 
         self.dlg.show()
@@ -213,6 +230,8 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
         #self.btn_cancel_main.clicked.connect(self.dlg.close)
+
+        self.dlg.work_order.textChanged.connect(self.activate_actions)
 
         # Get current date
         date_start = QDate.currentDate()
@@ -234,6 +253,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         self.btn_end.clicked.connect(self.real_end)
 
         self.dlg.show()
+
+
+    def activate_actions(self):
+        self.controller.log_info("test")
+        self.actionMincut.setDisabled(False)
+        self.actionAddConnec.setDisabled(False)
+        self.actionAddHydrometer.setDisabled(False)
+
+
 
 
     def real_start(self):
@@ -315,7 +343,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             pass
 
         mincut_result_state_text = self.state.text()
-        self.controller.log_info(str(mincut_result_state_text))
         if mincut_result_state_text == 'Planified':
             mincut_result_state = int(0)
         if mincut_result_state_text == 'In Progress':
@@ -373,7 +400,6 @@ class MincutParent(ParentAction, MultipleSnapping):
                 sql += ",'" + str(forecast_start_real) + "', '" + str(forecast_end_real) + "', '" + str(exec_limit_distance) + "', '" + str(exec_depth) + "', '" + str(exec_descript) + "')"
             else :
                 sql += ")"
-            self.controller.log_info(str(sql))
             status = self.controller.execute_sql(sql)
             if status:
                 message = "Values has been updated"
@@ -554,7 +580,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         customer_state = self.work_order.text()
         if customer_state == "":
-            message = "You need to enter customer code"
+            message = "You need to enter work order"
             self.controller.show_info_box(message)
             return 0
         else:
@@ -581,17 +607,15 @@ class MincutParent(ParentAction, MultipleSnapping):
         table = "rtc_hydrometer_x_connec"
         self.tbl = self.dlg_hydro.findChild(QTableView, "tbl")
 
-        #- self.btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
-        # -self.btn_cancel.pressed.connect(self.close_dialog_multi)
+        #self.btn_cancel = self.dlg_hydro.findChild(QPushButton, "btn_cancel")
+        #self.btn_cancel.pressed.connect(self.close_dialog_multi)
 
         self.tbl_hydro = self.dlg_hydro.findChild(QTableView, "tbl_hydro")
-
 
         self.btn_delete_hydro = self.dlg_hydro.findChild(QPushButton, "btn_delete")
         self.btn_delete_hydro.pressed.connect(partial(self.delete_records, self.tbl, table,"hydrometer_id"))
 
         self.btn_insert_hydro = self.dlg_hydro.findChild(QPushButton, "btn_insert")
-        #btn_insert_connec.pressed.connect(partial(self.manual_init, self.tbl_connec, table, "connec_id", self.dlg_connec, self.group_pointers_connec))
         self.btn_insert_hydro.pressed.connect(partial(self.manual_init_hydro, self.tbl, table, "hydrometer_id",self.dlg_hydro,self.group_pointers_connec))
         self.set_icon(self.btn_insert_hydro, "111")
 
@@ -611,7 +635,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         #sql = "SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer "
         sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec "
         row = self.controller.get_rows(sql)
-        self.controller.log_info(str(row))
         values = []
         for value in row:
             values.append(str(value[0]))
@@ -642,19 +665,15 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # If selected customer_code fill hydrometer_id
         selected_customer_code = str(self.customer_code_connec_hydro.text())
-        self.controller.log_info(str(selected_customer_code))
 
         # TODO
         sql = "SELECT connec_id FROM " + self.schema_name + ".connec WHERE customer_code = '"+ str(selected_customer_code) + "'"
         row = self.controller.get_row(sql)
         connec_id = str(row[0])
-        self.controller.log_info(str(connec_id))
 
         sql = "SELECT DISTINCT(hydrometer_id) FROM " + self.schema_name + ".rtc_hydrometer_x_connec WHERE connec_id = '"+ str(connec_id) + "'"
         #sql = "SELECT DISTINCT(customer_code) FROM " + self.schema_name + ".connec "
         row = self.controller.get_rows(sql)
-        self.controller.log_info("hconnec_id")
-        self.controller.log_info(str(row))
         values = []
         for value in row:
             values.append(str(value[0]))
@@ -674,6 +693,20 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Clear list of ids
         self.ids = []
 
+        self.controller.log_info("hydroemter id")
+        self.controller.log_info(str(hydrometer_id))
+
+        customer_code = dialog.findChild(QLineEdit, "customer_code_connec")
+        self.controller.log_info("customer code")
+        self.controller.log_info(str(customer_code))
+
+        sql = "SELECT connec_id FROM " + self.schema_name + ".connec"
+        sql += " WHERE customer_code = '" + customer_code + "'"
+        row = self.controller.get_row(sql)
+        if not row:
+            return
+        connec_id = str(row[0])
+
         # Attribute = "connec_id"
         '''
         sql = "SELECT " + attribute + " FROM " + self.schema_name + "." + table
@@ -683,12 +716,14 @@ class MincutParent(ParentAction, MultipleSnapping):
             return
         element_id = str(rows[0][0])
         '''
+        '''
         # Get connec_id from hydrometer_id
         sql = "SELECT connec_id FROM " + self.schema_name + ".rtc_hydrometer_x_connec WHERE hydrometer_id = '" + str(hydrometer_id) + "'"
         row = self.controller.get_row(sql)
         connec_id = str(row[0])
         element_id = connec_id
         self.controller.log_info(str(element_id))
+        '''
 
         # Get all selected features
         for layer in group_pointers:
@@ -700,8 +735,10 @@ class MincutParent(ParentAction, MultipleSnapping):
                     feature_id = feature.attribute(attribute)
                     # List of all selected features
                     self.ids.append(str(feature_id))
-
+        self.controller.log_info("test1")
+        self.controller.log_info(str(self.ids))
         # Check if user entered hydrometer_id
+
         if element_id == "":
             message = "You need to enter id"
             self.controller.show_info_box(message)
@@ -713,14 +750,22 @@ class MincutParent(ParentAction, MultipleSnapping):
         else:
             # If feature id doesn't exist in list -> add
             self.ids.append(element_id)
-
+            self.controller.log_info("test2")
+            self.controller.log_info(str(self.ids))
             for layer in group_pointers:
                 # SELECT features which are in the list
+
                 aux = "\"connec_id\" IN ("
                 for i in range(len(self.ids)):
                     aux += "'" + str(self.ids[i]) + "', "
                 aux = aux[:-2] + ")"
                 self.controller.log_info(str(aux))
+                '''
+                aux = "\"connec_id\"='"
+                for i in range(len(self.ids)):
+                    aux += str(self.ids[i])+"' AND \"hydrometer_id\"= '"+hydrometer_id+"'"
+                    self.controller.log_info(str(aux))
+                '''
                 expr = QgsExpression(aux)
                 if expr.hasParserError():
                     message = "Expression Error: " + str(expr.parserErrorString())
@@ -731,6 +776,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
                 # Build a list of feature id's from the previous result
                 id_list = [i.id() for i in it]
+                self.controller.log_info(str(id_list))
 
                 # Select features with these id's
                 layer.setSelectedFeatures(id_list)
@@ -808,8 +854,7 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def reload_table(self, table, attribute):
-        self.controller.log_info(str(table))
-        self.controller.log_info(str(attribute))
+
         # Reload table
         #table = "connec"
         table_name = self.schema_name + "." + table
@@ -838,13 +883,12 @@ class MincutParent(ParentAction, MultipleSnapping):
 
 
     def reload_table_hydro(self, table, attribute):
-        self.controller.log_info(str(table))
-        self.controller.log_info(str(attribute))
+
         # Reload table
         table = "rtc_hydrometer_x_connec"
         table_name = self.schema_name + "." + table
         widget = self.tbl_hydro
-
+        hydrometer_id = self.dlg_hydro.findChild(QLineEdit, "hydrometer_id")
         # If filter hydrometer_id is empty
 
         expr = "connec_id = '" + self.ids[0] + "'"
@@ -853,7 +897,8 @@ class MincutParent(ParentAction, MultipleSnapping):
             for el in range(1, len(self.ids)):
                 expr += " OR connec_id = '" + self.ids[el] + "'"
                 #expr += " OR " + attribute + " = '" + self.ids[el] + "'"
-        self.controller.log_info(str(expr))
+        if hydrometer_id != '':
+            expr += "AND hydrometer_id = '" + str(hydrometer_id) + "'" 
 
         # Set model
         model = QSqlTableModel();
@@ -1020,20 +1065,19 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Insert into anl_mincut_hydrometer all selected connecs
             sql = "INSERT INTO " + self.schema_name + ".anl_mincut_result_"+str(element)+" ("+str(id_el)+")"
             sql += " VALUES ('" + id_ + "')"
-            self.controller.log_info(sql)
             status = self.controller.execute_sql(sql)
+            '''
             if status:
                 # TODO: Execute SQL function
-                self.result_id_text = utils_giswater.getWidgetText("result_id")
+                self.result_id_text = utils_giswater.getWidgetText("work_order")
                 if self.result_id_text:                
                     function_name = "gw_fct_mincut_result_catalog"
                     sql = "SELECT " + self.schema_name + "." + function_name + "('" + self.result_id_text + "');"
-                    self.controller.log_info(sql)                
                     status = self.controller.execute_sql(sql)
                 else:
                     self.controller.log_info("id not found")
                     status = False
-
+            '''
         if status:
             message = "Function executed successfully"
             self.controller.show_info(message, parameter=function_name)
@@ -1092,8 +1136,6 @@ class MincutParent(ParentAction, MultipleSnapping):
         # Snapping
         (retval, result) = snapper.snapToBackgroundLayers(event_point)  # @UnusedVariable
 
-        self.controller.log_info(str(result))
-
         # That's the snapped point
         if result <> []:
 
@@ -1101,7 +1143,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             for snap_point in result:
 
                 element_type = snap_point.layer.name()
-                self.controller.log_info(str(element_type))
+
                 if element_type in self.group_layers_node:
                     feat_type = 'node'
                     break
@@ -1118,8 +1160,6 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Leave selection
             snap_point.layer.select([snap_point.snappedAtGeometry])
 
-            self.controller.log_info(str(element_id))
-            self.controller.log_info(str(feat_type))
 
             self.mincut(element_id, feat_type)
 
@@ -1128,13 +1168,13 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Execute SQL function 'gw_fct_mincut'
         result_id_text = utils_giswater.getWidgetText("result_mincut_id")
-        status = self.controller.log_info("test")
+
         sql = "SELECT " + self.schema_name + ".gw_fct_mincut('" + str(elem_id) + "', '" + str(elem_type) + "', '" + str(result_id_text) + "')"
-        self.controller.log_info(str(sql))
+
         self.hold_elem_id = elem_id
         self.hold_elem_type = elem_type
         self.hold_id_text = result_id_text
-        self.controller.log_info(sql)
+
         status = self.controller.execute_sql(sql)
 
         # Refresh map canvas
@@ -1145,7 +1185,10 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.controller.show_info(message)
 
             # If mincut is done enable CustomMincut
-            self.actionCustomMincut.setDisabled(False)
+            #self.actionCustomMincut.setDisabled(False)
+            #self.btn_start.setDisabled(False)
+            # If mincut is done enable CustomMincut
+
 
         # TRRIGER REPAINT
         for layer_refresh in self.iface.mapCanvas().layers():
@@ -1156,6 +1199,7 @@ class MincutParent(ParentAction, MultipleSnapping):
         ''' B2-123: Custom mincut analysis
         Working just with layer Valve analytics '''
 
+        self.controller.log_info("custom_mincut_init")
         # Check if user entered ID
         check = self.check_id()
         if check == 0:
@@ -1164,12 +1208,13 @@ class MincutParent(ParentAction, MultipleSnapping):
             pass
 
         self.emit_point.canvasClicked.connect(self.snapping_valve_analytics)
+        self.controller.log_info("fin  custom_mincut_init")
 
 
     def snapping_valve_analytics(self):
-        
+
         # Set active layer
-        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_anl_mincut_result_valves")[0]
+        layer = QgsMapLayerRegistry.instance().mapLayersByName("v_anl_mincut_result_valve")[0]
         self.iface.setActiveLayer(layer)
 
         # TODO
@@ -1187,26 +1232,30 @@ class MincutParent(ParentAction, MultipleSnapping):
             # Check feature
             for snapPoint in result:
 
-                if snapPoint.layer.name() == 'v_anl_mincut_result_valve':
+                if snapPoint.layer.name() == 'Mincut valve result':
                     # Get the point
                     point = (result[0].snappedVertex)  # @UnusedVariable
                     snapp_feat = next(result[0].layer.getFeatures(QgsFeatureRequest().setFilterFid(result[0].snappedAtGeometry)))
                     # LEAVE SELECTION
                     result[0].layer.select([result[0].snappedAtGeometry])
 
-                    element_id = snapp_feat.attribute(feat_type + '_id')
+                    element_id = snapp_feat.attribute('node_id')
                     self.custom_mincut(element_id)
-                    self.controller.log_info(str(element_id))
+
+
+
+
 
 
     def custom_mincut(self, elem_id):
+        self.controller.log_info("custom mincut execute")
         ''' Init function of custom mincut - Valve analytics
         Working just with layer Valve analytics '''
         result_id_text = utils_giswater.getWidgetText("result_mincut_id")
         # Use elem id of previous element - repeating automatic mincut
         sql = "SELECT " + self.schema_name + ".gw_fct_mincut_valve_unaccess"
         sql += "('" + str(elem_id) + "', '" + str(result_id_text) + "');"
-        self.controller.log_info(sql)
+
         status = self.controller.execute_sql(sql)
 
         if status:
@@ -1312,22 +1361,124 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.controller.show_warning(message)
             return
         row = selected_list[0].row()
+
         # Get mincut_id from selected row
         id_ = self.tbl_mincut_edit.model().record(row).value("id")
+
         self.dlg_min_edit.close()
 
         #self.mg_mincut()
         self.init_mincut_form()
 
-        self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
 
+        self.btn_accept_main.clicked.connect(partial(self.accept_save_data, self.action))
         # TODO: Force fill form
         sql = "SELECT * FROM " + self.schema_name + ".anl_mincut_result_cat"
-        sql += " WHERE id = '" + id_ + "'"
+        sql += " WHERE id = '" + str(id_) + "'"
+
         row = self.controller.get_row(sql)
-        if row:    
-            self.result_id.setText(row['id'])
-            self.state.setText(str(row['mincut_state']))
+
+        self.result_id.setText(str(id_))
+
+        if row:
+            #self.result_id.setText(row['id'])
+            self.work_order.setText(str(row['work_order']))
+
+            if str(row['mincut_state']) == '0':
+                self.state.setText("Planified")
+            elif str(row['mincut_state']) == '1':
+                self.state.setText("In Progress")
+            elif str(row['mincut_state']) == '2':
+                self.state.setText("Finished")
+
+            self.street.setText(str(row['streetname']))
+            self.number.setText(str(row['number']))
+            utils_giswater.setWidgetText("type", row['mincut_type'])
+            utils_giswater.setWidgetText("cause", row['anl_cause'])
+
+
+            self.controller.log_info(str(row))
+            # SET QDATETIME
+            datetime = (str(row['anl_tstamp']))
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            self.controller.log_info(str(time))
+
+            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
+            self.controller.log_info(str(qtDate))
+            recieved_date = self.dlg.findChild(QDateEdit, "cbx_date_start_predict_2")
+            recieved_date.setDate(qtDate)
+
+            # TODO set time
+            qtTime = QTime.fromString(time, 'h:mm:ss')
+            self.controller.log_info(str(qtTime))
+            recieved_time = self.dlg.findChild(QTimeEdit, "cbx_hours_start_predict_2")
+            recieved_time.setTime(qtTime)
+
+
+            datetime = (str(row['forecast_start']))
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            self.controller.log_info(str(time))
+
+            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
+            self.controller.log_info(str(qtDate))
+            date_start_predict = self.dlg.findChild(QDateEdit, "cbx_date_start_predict")
+            date_start_predict.setDate(qtDate)
+
+
+            datetime = (str(row['forecast_end']))
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            self.controller.log_info(str(time))
+
+            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
+            self.controller.log_info(str(qtDate))
+            date_end_predict = self.dlg.findChild(QDateEdit, "cbx_date_end_predict")
+            date_end_predict.setDate(qtDate)
+
+
+
+            datetime = (str(row['exec_start']))
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            self.controller.log_info(str(time))
+
+            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
+            self.controller.log_info(str(qtDate))
+            cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_start")
+            cbx_date_start.setDate(qtDate)
+
+
+
+            datetime = (str(row['exec_end']))
+            date = str(datetime.split()[0])
+            time = str(datetime.split()[1])
+            self.controller.log_info(str(time))
+
+            qtDate = QDate.fromString(date, 'yyyy-MM-dd')
+            self.controller.log_info(str(qtDate))
+            cbx_date_start = self.dlg.findChild(QDateEdit, "cbx_date_end")
+            cbx_date_start.setDate(qtDate)
+
+
+
+
+            utils_giswater.setWidgetText("pred_description", row['anl_descript'])
+            utils_giswater.setWidgetText("real_description", row['exec_descript'])
+
+            self.distance.setText(str(row['exec_from_plot']))
+            self.depth.setText(str(row['exec_depth']))
+
+            #row['assigned_to'] = assigned_to_id
+            # get name to fill combo
+            sql = "SELECT name FROM " + self.schema_name + ".cat_users"
+            sql += " WHERE id = '" + str(row['assigned_to']) + "'"
+            assigned_to_name = self.controller.get_row(sql)
+            self.controller.log_info(str(assigned_to_name[0]))
+            utils_giswater.setWidgetText("assigned_to", str(assigned_to_name[0]))
+        '''
+            #self.state.setText(str(row['mincut_state']))
             utils_giswater.setWidgetText("pred_description", row['anl_descript'])
             utils_giswater.setWidgetText("real_description", row['exec_descript'])
             self.distance.setText(str(row['exec_from_plot']))
@@ -1349,7 +1500,7 @@ class MincutParent(ParentAction, MultipleSnapping):
             self.cause.clear()
 
         # Fill comboBoxes
-        #self.type.addItem(rows[0]['mincut_result_type'])
+        #self.type.addItem(rows[0]['mincut_type'])
         #self.cause.addItem(rows[0]['anl_cause'])
 
         self.btn_end.setEnabled(True)
@@ -1363,13 +1514,14 @@ class MincutParent(ParentAction, MultipleSnapping):
 
         # Disable to edit ID
         self.result_id.setEnabled(False)
-
+        self.work_order.setEnabled(False)
+        '''
 
     def filter_by_id(self, table, widget_txt, tablename):
 
         id_ = utils_giswater.getWidgetText(widget_txt)
         if id_ != 'null':
-            expr = " id LIKE '" + id_ + "'"
+            expr = " id = '" + id_ + "'"
             # Refresh model with selected filter
             table.model().setFilter(expr)
             table.model().select()
